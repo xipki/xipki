@@ -96,11 +96,18 @@ public class P11PrivateKey implements PrivateKey {
     }
 
     /**
-     *
+     * Signs the content.
+     * @param mechanism
+     *          the mechanism
      * @param parameters
-     *          Parameters. Could be {@code null}.
+     *          the parameters. Could be {@code null}.
+     * @param content
+     *          the content to be signed.
+     * @return the signature.
      * @throws XiSecurityException
+     *           if security error happens
      * @throws P11TokenException
+     *           if token error happens.
      */
     public byte[] sign(final long mechanism, final P11Params parameters,
             final byte[] content) throws XiSecurityException, P11TokenException {

@@ -182,9 +182,10 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     private List<String> wantExtensionTypes;
 
     /**
-     *
+     * Gets the signer for the give signatureAlgoControl.
      * @param signatureAlgoControl
      *          The signature control. Must not be {@code null}.
+     * @return the signer
      */
     protected abstract ConcurrentContentSigner getSigner(
              SignatureAlgoControl signatureAlgoControl) throws Exception;

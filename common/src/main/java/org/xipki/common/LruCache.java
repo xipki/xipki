@@ -69,7 +69,7 @@ public class LruCache<K, V> {
      * created by {@code #create}. If a value was returned, it is moved to the
      * head of the queue. This returns null if a value is not cached and could not
      * be created.
-     * 
+     *
      * @param key: the key the value for {@code key} if it exists in the cache or can be
      * created by {@code #create}.
      * @return the
@@ -245,7 +245,7 @@ public class LruCache<K, V> {
      * at the same time (causing multiple values to be created), or when one
      * thread calls {@link #put} while another is creating a value for the same
      * key.
-     * 
+     *
      * @param key the key
      * @return the created computed value or null if no value can be computed
      */

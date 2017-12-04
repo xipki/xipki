@@ -28,6 +28,7 @@ public interface XiContentSigner extends ContentSigner {
 
     /**
      * returns the encoded algorithm identifier.
+     * @return the encoded algorithm identifier.
      */
     byte[] getEncodedAlgorithmIdentifier();
 

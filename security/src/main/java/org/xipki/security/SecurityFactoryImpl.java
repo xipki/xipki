@@ -19,7 +19,6 @@ package org.xipki.security;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -276,6 +275,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 numAliases++;
             }
 
+            if (tmpKeyname == null) {
+                throw new KeyStoreException("no key entry is contained in the keystore");
+            }
+
             Certificate[] certs;
             if (newCertChain == null || newCertChain.length < 1) {
                 if (numAliases == 1) {
@@ -353,7 +356,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
                 throw new ObjectCreationException(sb.toString());
             }
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
+        } catch (NoSuchAlgorithmException | InvalidKeyException
                 | SignatureException | NoSuchProviderException | NoIdleSignerException ex) {
             throw new ObjectCreationException(ex.getMessage(), ex);
         }

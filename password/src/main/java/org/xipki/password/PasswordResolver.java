@@ -25,11 +25,12 @@ package org.xipki.password;
 public interface PasswordResolver {
 
     /**
-     *
+     * Resolve the password.
      * @param passwordHint
      *          Hint of the password. Must not be {@code null}.
      * @return the resolved password
      * @throws PasswordResolverException
+     *         if cannot resolve the password
      */
     char[] resolvePassword(String passwordHint) throws PasswordResolverException;
 

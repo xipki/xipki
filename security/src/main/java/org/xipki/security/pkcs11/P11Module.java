@@ -38,10 +38,13 @@ public interface P11Module {
     List<P11SlotIdentifier> slotIdentifiers();
 
     /**
+     * Returns slot for the given {@code slotId}.
      *
      * @param slotId
-     *          Slot identifier. Must not be {@code null}.
+     *          slot identifier. Must not be {@code null}.
+     * @return the slot
      * @throws P11TokenException
+     *         if PKCS#11 token error occurs
      */
     P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException;
 

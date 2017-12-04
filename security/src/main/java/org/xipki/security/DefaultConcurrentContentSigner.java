@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -270,11 +271,16 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public byte[] sign(final byte[] data) throws NoIdleSignerException, IOException {
+    public byte[] sign(final byte[] data) throws NoIdleSignerException, SignatureException {
         ConcurrentBagEntrySigner contentSigner = borrowContentSigner();
         try {
             OutputStream signatureStream = contentSigner.value().getOutputStream();
-            signatureStream.write(data);
+            try {
+                signatureStream.write(data);
+            } catch (IOException ex) {
+                throw new SignatureException(
+                        "could not write data to SignatureStream: " + ex.getMessage(), ex);
+            }
             return contentSigner.value().getSignature();
         } finally {
             requiteContentSigner(contentSigner);

@@ -39,10 +39,21 @@ public class PasswordBasedEncryption {
     }
 
     /**
-     *
+     * Encrypts the message using password based encryption.
+     * @param algo
+     *        the encryption algorithm
+     * @param plaintext
+     *        the message to be encrypted
+     * @param password
+     *        the password
+     * @param iterationCount
+     *        the iteration count
+     * @param salt
+     *        the salt
      * @return iv and the cipher text in form of
      *         len(iv) of 1 byte | iv of len(iv) bytes | cipher text.
      * @throws GeneralSecurityException
+     *         if error occurs.
      */
     public static byte[] encrypt(final PBEAlgo algo, byte[] plaintext, final char[] password,
             final int iterationCount, final byte[] salt) throws GeneralSecurityException {

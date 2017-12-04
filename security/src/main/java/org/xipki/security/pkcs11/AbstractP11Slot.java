@@ -90,8 +90,11 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     /**
+     * Returns the hex representation of the bytes.
+     *
      * @param bytes
      *          Data to be encoded. Must not be {@code null}.
+     * @return the hex representation of the bytes.
      */
     protected static String hex(final byte[] bytes) {
         return Hex.toHexString(bytes).toUpperCase();
@@ -112,62 +115,86 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     /**
+     * Updates the certificate associated with the given {@code objectId} with the given certificate
+     * {@code newCert}.
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
-     * @param cert
+     * @param newCert
      *          Certificate to be added. Must not be {@code null}.
-     * @throws P11TokenException
      * @throws CertificateException
+     *         if process with certificate fails.
+     * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     protected abstract void updateCertificate0(final P11ObjectIdentifier objectId,
             final X509Certificate newCert) throws P11TokenException, CertificateException;
 
     /**
+     * Removes the key (private key, public key, secret key, and certificates) associated with
+     * the given identifier {@code objectId}.
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
      * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     protected abstract void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException;
 
     /**
+     * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
      * @param cert
      *          Certificate to be added. Must not be {@code null}.
-     * @throws P11TokenException
      * @throws CertificateException
+     *         if process with certificate fails.
+     * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     protected abstract void addCert0(final P11ObjectIdentifier objectId,
             final X509Certificate cert) throws P11TokenException, CertificateException;
 
     /**
+     * Generates a secret key in the PKCS#11 token.
      *
+     * @param keyType
+     *          key type
+     * @param keysize
+     *          key size
      * @param label
      *          Label of the generated key. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#11 token.
      * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     protected abstract P11Identity generateSecretKey0(long keyType, int keysize,
             String label, P11NewKeyControl control) throws P11TokenException;
 
     /**
+     * Creates secret key object in the PKCS#11 token. The key itself will not be generated
+     * within the PKCS#11 token.
      *
+     * @param keyType
+     *          key type.
      * @param keyValue
      *          Key value. Must not be {@code null}.
      * @param label
      *          Label of the created key. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#P11 token.
      * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     protected abstract P11Identity createSecretKey0(long keyType, byte[] keyValue,
             String label, P11NewKeyControl control) throws P11TokenException;
 
     /**
+     * Generates a DSA keypair.
      *
      * @param p
      *          p of DSA. Must not be {@code null}.
@@ -179,7 +206,9 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#P11 token.
      * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     // CHECKSTYLE:OFF
     protected abstract P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
@@ -188,6 +217,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     // CHECKSTYLE:ON
 
     /**
+     * Generates an EC keypair.
      *
      * @param curveId
      *         Object identifier of the EC curve. Must not be {@code null}.
@@ -195,7 +225,9 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#P11 token.
      * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     // CHECKSTYLE:SKIP
     protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
@@ -203,13 +235,19 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     /**
      *
+     * Generates an RSA keypair.
+     *
+     * @param keysize
+     *          key size
      * @param publicExponent
      *          RSA public exponent. Could be {@code null}.
      * @param label
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#P11 token.
      * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
      */
     // CHECKSTYLE:SKIP
     protected abstract P11Identity generateRSAKeypair0(int keysize,
@@ -223,9 +261,10 @@ public abstract class AbstractP11Slot implements P11Slot {
             throws P11TokenException;
 
     /**
-     *
+     * Gets certificate with the given identifier {@code id}.
      * @param id
      *          Identifier of the certificate. Must not be {@code null}.
+     * @return certificate with the given identifier.
      */
     protected X509Cert getCertForId(final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {

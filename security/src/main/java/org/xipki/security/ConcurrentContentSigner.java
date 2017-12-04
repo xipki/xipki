@@ -17,9 +17,9 @@
 
 package org.xipki.security;
 
-import java.io.IOException;
 import java.security.Key;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -55,7 +55,7 @@ public interface ConcurrentContentSigner {
     Key getSigningKey();
 
     /**
-     *
+     * Sets the public key.
      * @param publicKey
      *          Public key of this signer. Must not be {@code null}.
      */
@@ -79,35 +79,44 @@ public interface ConcurrentContentSigner {
     X509CertificateHolder[] getCertificateChainAsBcObjects();
 
     /**
-     *
+     * Initializes me.
      * @param conf
      *          Configuration. Could be {@code null}.
      * @param passwordResolver
      *          Password resolver. Could be {@code null}.
      * @throws XiSecurityException
+     *         if error during the initialization occurs.
      */
     void initialize(String conf, PasswordResolver passwordResolver)
             throws XiSecurityException;
 
     /**
-     *
+     * Sign the data.
      * @param data
      *          Data to be signed. Must not be {@code null}.
-     * @throws IOException
+     * @return the signature
      * @throws NoIdleSignerException
+     *         If no idle signer is available
+     * @throws SignatureException
+     *         if could not sign the data.
      */
-    byte[] sign(byte[] data) throws NoIdleSignerException, IOException;
+    byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
 
     /**
-     * borrow a ContentSigner with implementation-dependent default timeout.
+     * Borrows a signer with implementation-dependent default timeout.
+     * @return the signer
      * @throws NoIdleSignerException
+     *         If no idle signer is available
      */
     ConcurrentBagEntrySigner borrowContentSigner()
             throws NoIdleSignerException;
 
     /**
-     * @param timeout timeout in milliseconds, 0 for infinitely.
+     * Borrows a signer with the given {@code soTimeout}.
+     * @param soTimeout timeout in milliseconds, 0 for infinitely.
+     * @return the signer
      * @throws NoIdleSignerException
+     *         If no idle signer is available
      */
     ConcurrentBagEntrySigner borrowContentSigner(final int soTimeout)
             throws NoIdleSignerException;

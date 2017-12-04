@@ -28,7 +28,7 @@ package org.xipki.datasource.springframework.dao;
  * could notAcquireLockException and DeadlockLoserDataAccessException.
  *
  * @author Thomas Risberg
- * @see could notAcquireLockException
+ * @see CannotAcquireLockException
  * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")

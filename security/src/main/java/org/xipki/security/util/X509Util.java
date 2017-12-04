@@ -507,6 +507,7 @@ public class X509Util {
      * Build the certificate path. Cross certificate will not be considered.
      * @param cert certificate for which the certificate path will be built
      * @param certs collection of certificates.
+     * @return the certificate path
      */
     public static X509Certificate[] buildCertPath(final X509Certificate cert,
             final Set<? extends Certificate> certs) {
@@ -785,10 +786,12 @@ public class X509Util {
     }
 
     /**
-    *
+    * Creates {@link GeneralName} from the tagged value.
     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
     *     type=value.
+    * @return the created {@link GeneralName}
     * @throws BadInputException
+    *         if the {@code taggedValue} is invalid.
     */
     public static GeneralName createGeneralName(final String taggedValue) throws BadInputException {
         ParamUtil.requireNonBlank("taggedValue", taggedValue);

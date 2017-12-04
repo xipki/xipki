@@ -29,14 +29,16 @@ import org.xipki.common.ObjectCreationException;
 public interface SignerFactory {
 
     /**
+     * Indicates whether a signer of the given {@code type} can be created or not.
      *
      * @param type
      *          Type of the signer. Must no be {@code null}.
+     * @return true if signer of the given type can be created, false otherwise.
      */
     boolean canCreateSigner(String type);
 
     /**
-     *
+     * Creates a new signer.
      * @param type
      *          Type of the signer. Must not be {@code null}.
      * @param conf
@@ -45,7 +47,8 @@ public interface SignerFactory {
      *          Certificate chain of the signer. Could be {@code null}.
      *
      * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
+     * @throws ObjectCreationException
+     *         if signer could not be created.
      */
     ConcurrentContentSigner newSigner(String type, SignerConf conf,
             X509Certificate[] certificateChain) throws ObjectCreationException;

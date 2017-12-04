@@ -25,7 +25,7 @@ import org.xipki.security.XiSecurityConstants;
 
 /**
  *
- * Supported algorithms:<p></p>
+ * Supported algorithms:
  *
  * Keystore
  * <ul>

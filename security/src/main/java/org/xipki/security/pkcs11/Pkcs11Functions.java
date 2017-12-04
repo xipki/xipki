@@ -30,9 +30,10 @@ public class Pkcs11Functions {
     }
 
     /**
-     *
+     * get the code of the given mechanism name.
      * @param mechanismName
      *          Mechanism name. Must not be {@code null}.
+     * @return the code if could be found, -1 otherwise.
      */
     public static long mechanismStringToCode(final String mechanismName) {
         Long mech = Functions.mechanismStringToCode(mechanismName);

@@ -69,9 +69,10 @@ public class P11SlotRefreshResult {
     }
 
     /**
-     *
+     * Returns the certificate of the given identifier {@code id}.
      * @param id
      *          Identifier. Must not be {@code null}.
+     * @return the certificate of the given identifier.
      */
     public X509Cert getCertForId(final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {

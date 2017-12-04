@@ -41,7 +41,7 @@ public interface SecurityFactory {
     PasswordResolver getPasswordResolver();
 
     /**
-     *
+     * Create secret key and certificate pair.
      * @param type
      *          Type of the signer. Must not be {@code null}.
      * @param conf
@@ -50,11 +50,14 @@ public interface SecurityFactory {
      *          Certificate of the signer. If not {@code null}, it will be used; otherwise
      *          the certificates contained in the token will be used.
      * @return the new pair of key and certificate
+     * @throws ObjectCreationException
+     *         if could not create the object
      */
     KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf,
             X509Certificate cert) throws ObjectCreationException;
 
     /**
+     * Creates signer.
      *
      * @param type
      *          Type of the signer. Must not be {@code null}.
@@ -65,11 +68,13 @@ public interface SecurityFactory {
      *          the certificates contained in the token will be used.
      * @return the new signer
      * @throws ObjectCreationException
+     *         if could not create the signer
      */
     ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
             throws ObjectCreationException;
 
     /**
+     * Creates signer.
      *
      * @param type
      *          Type of the signer. Must not be {@code null}.
@@ -80,39 +85,49 @@ public interface SecurityFactory {
      *          the certificates contained in the token will be used.
      * @return the new signer
      * @throws ObjectCreationException
+     *         if could not create the signer
      */
     ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate[] certs)
             throws ObjectCreationException;
 
     /**
+     * Gets the ContentVerifierProvider from the public key.
      *
      * @param publicKey
      *          Signature verification key. Must not be {@code null}.
+     * @return the ContentVerifierProvider
      * @throws InvalidKeyException
+     *         If the publicKey is invalid or unsupported.
      */
     ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
             throws InvalidKeyException;
 
     /**
+     * Gets the ContentVerifierProvider from the certificate.
      *
      * @param cert
      *          Certificate that contains the signature verification key. Must not be {@code null}.
+     * @return the ContentVerifierProvider
      * @throws InvalidKeyException
+     *         If the publicKey contained in the certificate is invalid or unsupported.
      */
     ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
             throws InvalidKeyException;
 
     /**
+     * Gets the ContentVerifierProvider from the certificate.
      *
      * @param cert
      *          Certificate that contains the signature verification key. Must not be {@code null}.
+     * @return the ContentVerifierProvider
      * @throws InvalidKeyException
+     *         If the publicKey contained in the certificate is invalid or unsupported.
      */
     ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
             throws InvalidKeyException;
 
     /**
-     *
+     * Verifies the signature of CSR.
      * @param csr
      *          CSR to be verified. Must not be {@code null}.
      * @param algoValidator
@@ -123,6 +138,7 @@ public interface SecurityFactory {
     boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
 
     /**
+     * Verifies the signature of CSR.
      *
      * @param csr
      *          CSR to be verified. Must not be {@code null}.
@@ -134,15 +150,25 @@ public interface SecurityFactory {
     boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator);
 
     /**
-     *
+     * Create PublicKey from the {@code subjectPublicKeyInfo}
      * @param subjectPublicKeyInfo
      *          From which the public key will be created. Must not be {@code null}.
+     * @return the created public key.
      * @throws InvalidKeyException
+     *         if could not create public key.
      */
     PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
             throws InvalidKeyException;
 
     /**
+     * Extracts the keystore with minimal required information.
+     * <ol>
+     *   <li>If {@code keyname} is set, and its associated entry is a key entry, then only this
+     *   entry is remained.</li>
+     *   <li>if {@code keyname} is {@code null} and there exists at least one key entry, then only
+     *   the first entry is remained.</li>
+     *   <li>otherwise, {@link KeyStoreException} will be thrown.</li>
+     * </ol>
      *
      * @param keystoreType
      *          Type of the keystore. Must not be {@code null}.
@@ -155,7 +181,9 @@ public interface SecurityFactory {
      * @param newCertChain
      *          New certificates. If not {@code null}, the certificates in the keystore will be
      *          replaced.
+     * @return the minimal keystore
      * @throws KeyStoreException
+     *          If case 3 occurs.
      */
     byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
             char[] password, X509Certificate[] newCertChain)

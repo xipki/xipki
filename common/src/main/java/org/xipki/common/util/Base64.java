@@ -103,7 +103,7 @@ public class Base64 {
     /**
      *
      * The same as encodeToChar(byte[], false)
-     * 
+     *
      * @param sArr The bytes to convert. If <code>null</code> or length 0, an empty array will be
      *        returned.
      * @return A BASE64 encoded array without line separator.
@@ -533,7 +533,7 @@ public class Base64 {
     /**
      *
      * The same as encodeToString(byte[], false).
-     * 
+     *
      * @param sArr
      *          The bytes to convert. If <code>null</code> or length 0 an empty array will be
      *          returned.
