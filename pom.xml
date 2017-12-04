@@ -123,6 +123,7 @@
         </executions>
         <configuration>
           <failOnError>false</failOnError>
+          <excludePackageNames>*.jaxb*</excludePackageNames>
         </configuration>
       </plugin>
       <plugin>
