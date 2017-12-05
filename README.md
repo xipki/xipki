@@ -19,41 +19,39 @@ Just drop me an email.
 ## Tested Platforms
 
 - Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
-- HSM: [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/), [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick), Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
+- HSM: [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
+  [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
+  Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
 - JVM: OpenJDK 8, Oracle JDK 8, Oracle JRE 8
 - OS: Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
 
-## Get Binary Package
+## Get Started
 
 ### CA and OCSP Responder
 
-Download the binary package `xipki-pki-<version>.tar.gz` from https://github.com/xipki/xipki/releases.
+Download the binary package `xipki-pki-<version>.tar.gz` from
+[XiPKI releases](https://github.com/xipki/xipki/releases).
 
-Only if you want to use the development version, build it from source code as follows.
+Only if you want to use the development version, build it from source code as
+follows.
 
 - Get a copy of project code
   ```sh
   git clone https://github.com/xipki/xipki
   ```
-- Compile and install the artifacts
+- Build the project
 
   In folder `xipki`
   ```sh
-  mvn clean install
-  ```
-
-- Assembly
-
-  In folder `xipki/dist`
-  ```sh
-  mvn clean package
+  mvn clean package -Pdist
   ```
 
   Then you will find the `xipki-pki-*.tar.gz` in the directory `dist/target`.
 
 ### CA and OCSP Client
 
-Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com/xipki/xisdk/releases.
+Download the binary package `xipki-sdk-<version>.tar.gz` from
+[XiSDK releases](https://github.com/xipki/xisdk/releases).
 
 ## Configure the CA and OCSP Responder
 
@@ -62,40 +60,51 @@ Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com
     ```sh
     tar xvf xipki-pki-<version>.tar.gz
     ```
-    The following steps use `$XIPKI_HOME` to point to the unpacked root folder
+    The following steps use `$XIPKI_HOME` to point to the unpacked root folder.
+    
+    **Steps 2 - 5 can be skipped if you just want to try out.**
 
 2. Adapt the database configuration (optional)
 
   This step may be skipped if you just want to try out XiPKI.
 
-  In the folder `$XIPKI_HOME/xipki/ca-config`, copy the CA database configuration template file `example/ca-db.properties-<type>` to `ca-db.properties`, and the OCSP database configuration file `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt them.
+  In the folder `$XIPKI_HOME/xipki/ca-config`, copy the CA database
+  configuration template file `example/ca-db.properties-<type>` to
+  `ca-db.properties`, and the OCSP database configuration file
+  `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt
+  them.
 
   The database users must have both the read and right permissions.
 
 3. Configure PKCS#11 device (optional)
 
-   This step is only required if the real PKCS#11 device instead of the emulator is used.
+   This step is only required if the real PKCS#11 device instead of the emulator
+   is used.
 
-  * In file etc/org.xipki.security.pkcs11.cfg, change the pkcs11.confFile as follows:
+  * In file etc/org.xipki.security.pkcs11.cfg, change the pkcs11.confFile as
+    follows:
 
     ```sh
     pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
 
     #pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
     ```
-  * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
+  * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11
+    configuration.
 
 4. Configure how to handle SSL client certificate (optional)
 
   This step is only required if the CA is behind a reverse proxy apache httpd.
 
-  * In file etc/org.xipki.ca.server.cfg, change the sslCertInHttpHeader as follows:
+  * In file etc/org.xipki.ca.server.cfg, change the sslCertInHttpHeader as
+    follows:
 
     ```sh
     sslCertInHttpHeader = true
     ```
 
-  * configure the proxy to forward the headers via mod_proxy with the following configuration
+  * configure the proxy to forward the headers via mod_proxy with the following
+    configuration
 
     ```sh
     RequestHeader set SSL_CLIENT_VERIFY "%{SSL_CLIENT_VERIFY}s"
@@ -123,7 +132,8 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 
   * Copy the jar file to the folder `lib/jdbc`.
 
-  * Append the bundle URL to the feature `xipki-jdbc` in the file `lib/jdbc/features.xml`, And comment the unneeded jdbc drivers.
+  * Append the bundle URL to the feature `xipki-jdbc` in the file
+    `lib/jdbc/features.xml`, And comment the unneeded jdbc drivers.
 
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">
@@ -131,7 +141,9 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
       <bundle start-level="75">file:lib/jdbc/....jar</bundle>
     </feature>
     ```
-    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:". In general, a bundle contains the header Export-Package in the manifest file META-INF/MANIFEST.MF.
+    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by
+    the prefix "wrap:". In general, a bundle contains the header Export-Package
+    in the manifest file META-INF/MANIFEST.MF.
 
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">
@@ -148,7 +160,8 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
   RSA keys which will be generated during the installation process, and the keys
   are saved in PKCS#12 keystore.
 
-  - If you use the existing CA certificate, OCSP Responder certificate, and SCEP certificate
+  - If you use the existing CA certificate, OCSP Responder certificate, and SCEP
+    certificate
 
      - Copy the certificates to the directory to `xipki/setup/keycerts`.
 
@@ -158,23 +171,35 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 
      - Adapt the CA configuration file `xipki/setup/cacert-present-ca-conf.xml`
 
- - If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA configuration file `xipki/setup/cacert-none-ca-conf.xml` and the scripts in `xipki/setup/cacert-none-setup.script`
+ - If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA
+   configuration file `xipki/setup/cacert-none-ca-conf.xml` and the scripts in
+   `xipki/setup/cacert-none-setup.script`
 
 2. Start XiPKI
 
-    In folder `xipki-pki-version`
+2.1 Alternative 1: Start XiPKI as a normal application
+
+    In folder `xipki-pki-<version>`
     ```sh
     bin/karaf
     ```
 
-    HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the PKCS#11 sessions. In this case, XiPKI should be started as follows
+    HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
+    PKCS#11 sessions. In this case, XiPKI should be started as follows
     ```sh
     preload bin/karaf
     ```
+2.2 Alternative 2: Start XiPKI as a daemon
 
-    If you have changed the content within folder `etc` or `system`, please delete the folder `data` before starting XiPKI.
+    The same as Alternative 1 except the command `bin/start` instead of
+    `bin/karaf` is used.
+    
+For both alternatives, if the content within folder `etc` or `system` has been
+changed, please delete the folder `data` before starting XiPKI.
 
 3. Setup the CA and OCSP responder
+
+3.1. In case XiPKI is started as a normal application 
 
  * In case of using new keys and certificates, in OSGi console:  
    `source file:./xipki/setup/cacert-none-setup.script`
@@ -185,6 +210,14 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
  * Verify the installation, execute the OSGi command  
    `ca-info MYCA1`
 
+3.1. In case XiPKI is started as a daemon 
+
+ * In case of using new keys and certificates, in shell console:
+   `bin/client "sourcefile:./xipki/setup/cacert-none-setup.script"`
+
+ * In case of using existing keys and certificates, in shell console:  
+   `bin/client "sourcefile:./xipki/setup/cacert-none-setup.script"`
+
 ### Test the Installation
 
 1. Unpack the binary `xipki-sdk-<version>.tar.gz` file
@@ -194,7 +227,8 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
     ```
 2. Verify the installation
 
-  To verify that the CA and OCSP responder, execute the following commands in the OSGi console:
+  To verify that the CA and OCSP responder, execute the following commands in
+  the OSGi console:  
     - `source file:./xipki/client-script/cmp-client.script`
     - `source file:./xipki/client-script/rest-client.script`
     - `source file:./xipki/client-script/scep-client.script`
@@ -204,28 +238,36 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 * Embedded karaf commands  
   The karaf feature xipki-caclient-shell contains commands to to enroll/revoke
   certificates via CMP, and xipki-scepclient-shell contains commands to enroll
-  certificates via SCEP. Please refer to [commands.md](commands.md) for more details.
+  certificates via SCEP. Please refer to [commands.md](commands.md) for more
+  details.
 
 * SCEP  
-  Any SCEP client. XiPKI provides also a SCEP client in [xipki/xiscep](https://github.com/xipki/xiscep).
+  Any SCEP client. XiPKI provides also a SCEP client in
+  [xipki/xiscep](https://github.com/xipki/xiscep).
 
 * XiPKI SDK  
   The SDK ([xipki/xisdk](https://github.com/xipki/xisdk))
-  provides both the full-featured CA client and the lite version to enroll and revoke certificates
-  via CMP.
+  provides both the full-featured CA client and the lite version to enroll and
+  revoke certificates via CMP.
 
 * RESTFUL API  
-  The shell script `xipki/client-script/rest.sh` of the `xipki-sdk` demonstrates the use of RESTFUL API.
+  The shell script `xipki/client-script/rest.sh` of the `xipki-pki` demonstrates
+  the use of RESTFUL API.
 
 Karaf Features
 -----
 
-The karaf feature can be installed via the command `feature:install -r <feature name>` (the flag -r disables the refreshing of already installed bundles) and uninstalled in the OSGi console via the command `feature:uninstall <feature name>`. The possible feature can be auto-completed by typing the `TAB` key.
+The karaf feature can be installed via the command
+`feature:install -r <feature name>` (the flag -r disables the refreshing of
+already installed bundles) and uninstalled in the OSGi console via the command
+`feature:uninstall <feature name>`. The possible feature can be auto-completed
+by typing the `TAB` key.
 
 A list of all available XiPKI features can be retrieved via the command
 `feature:list  | grep xipki` in OSGi console.
 
-For details of karaf features please refer to [Karaf Manuel Provisioning](https://karaf.apache.org/manual/latest/provisioning)
+For details of karaf features please refer to
+[Karaf Manuel Provisioning](https://karaf.apache.org/manual/latest/provisioning)
 
 Karaf Commands
 -----
@@ -240,14 +282,7 @@ Components
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
-  - Supported databases
-    - Oracle
-    - DB2
-    - PostgreSQL
-    - MySQL
-    - MariaDB
-    - H2
-    - HSQLDB
+  - Supported databases: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
   - Customized extension to embed certificates in CRL
@@ -266,7 +301,8 @@ Components
     - SHA*withECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withDSA: where * is 1, 224, 256, 384 and 512
- - Native support of X.509 extensions (other extensions can be supported by configuring it as blob)
+ - Native support of X.509 extensions (other extensions can be supported by
+   configuring it as blob)
     - AdditionalInformation (German national standard CommonPKI)
     - Admission (German national standard CommonPKI)
     - AuthorityInformationAccess (RFC 5280)
@@ -299,8 +335,10 @@ Components
  - Multiple software instances (all can be in active mode) for the same CA
  - Native support of management of CA via embedded OSGi commands
  - API to specify CA management, e.g. GUI
- - Database tool (export and import CA database) simplifies the switch of databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
- - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
+ - Database tool (export and import CA database) simplifies the switch of
+   databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
+ - Client to enroll, revoke, unrevoke and remove certificates, to generate and
+   download CRLs
  - All configuration of CA except those of databases is saved in database
 
 - OCSP Responder
@@ -311,16 +349,11 @@ Components
   - Support of certificate status source CRL and DeltaCRL
   - API to support proprietary certificate sources
   - Support of both unsigned and signed OCSP requests
-  - Multiple software instances (all can be in active mode) for the same OCSP signer and certificate status sources.
-  - Supported databases
-    - Oracle
-    - DB2
-    - PostgreSQL
-    - MySQL
-    - MariaDB
-    - H2
-    - HSQLDB
-  - Database tool (export and import OCSP database) simplifies the switch of databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
+  - Multiple software instances (all can be in active mode) for the same OCSP
+    signer and certificate status sources.
+  - Supported databases: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle
+  - Database tool (export and import OCSP database) simplifies the switch of
+    databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
   - Client to send OCSP request
 
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
