@@ -177,22 +177,22 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 
 2. Start XiPKI
 
-2.1 Alternative 1: Start XiPKI as a normal application
+2.1 Alternative: Start XiPKI as a normal application
 
-    In folder `xipki-pki-<version>`
-    ```sh
-    bin/karaf
-    ```
+In folder `xipki-pki-<version>`
+```sh
+bin/karaf
+```
 
-    HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
-    PKCS#11 sessions. In this case, XiPKI should be started as follows
-    ```sh
-    preload bin/karaf
-    ```
-2.2 Alternative 2: Start XiPKI as a daemon
+HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
+PKCS#11 sessions. In this case, XiPKI should be started as follows
+```sh
+preload bin/karaf
+```
+2.2 Alternative: Start XiPKI as a daemon
 
-    The same as Alternative 1 except the command `bin/start` instead of
-    `bin/karaf` is used.
+The same as Alternative 1 except the command `bin/start` instead of
+`bin/karaf` is used.
     
 For both alternatives, if the content within folder `etc` or `system` has been
 changed, please delete the folder `data` before starting XiPKI.
@@ -227,11 +227,11 @@ changed, please delete the folder `data` before starting XiPKI.
     ```
 2. Verify the installation
 
-  To verify that the CA and OCSP responder, execute the following commands in
-  the OSGi console:  
-    - `source file:./xipki/client-script/cmp-client.script`
-    - `source file:./xipki/client-script/rest-client.script`
-    - `source file:./xipki/client-script/scep-client.script`
+To verify that the CA and OCSP responder, execute the following commands in
+the OSGi console:  
+- `source file:./xipki/client-script/cmp-client.script`
+- `source file:./xipki/client-script/rest-client.script`
+- `source file:./xipki/client-script/scep-client.script`
 
 ## Enroll/Revoke Certificate
 
