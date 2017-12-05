@@ -41,13 +41,18 @@ import org.xipki.common.util.StringUtil;
 /**
  *
  * Example configuration
+ * 
+ * <pre>
+ * 
  * caCert.included?true%signerCert.included?false
  *
  * # Whether CA certificate is included in the response. Default is true
- * caCert.included=<'true'|'false'>
+ * caCert.included=&lt;'true'|'false'&gt;
  *
  * # Whether CMS signer certificate is embedded in the CMS message. Default is true
- * signerCert.included=<'true'|'false'>
+ * signerCert.included=&lt;'true'|'false'&gt;
+ *
+ *</pre>
  *
  * @author Lijun Liao
  * @since 2.0.0

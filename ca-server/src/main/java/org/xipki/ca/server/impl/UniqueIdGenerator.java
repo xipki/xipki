@@ -40,9 +40,7 @@ import java.util.function.IntBinaryOperator;
 import org.xipki.common.util.ParamUtil;
 
 /**
- * Idea: http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
- * <br/>
- * id consists of
+ * An id consists of
  * <ol>
  *  <li>highest bit is set to 0 to assure positive long.
  *  <li>epoch in ms: 46 bits for 1312 years after the epoch</li>
@@ -50,6 +48,7 @@ import org.xipki.common.util.ParamUtil;
  *  <li>shard_id: 7 bits
  * </ol>
  *
+ * Idea is borrowed from http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
  * @author Lijun Liao
  * @since 2.0.0
  *

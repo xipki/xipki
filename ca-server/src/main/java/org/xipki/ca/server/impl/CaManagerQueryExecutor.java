@@ -34,11 +34,9 @@
 
 package org.xipki.ca.server.impl;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -2358,12 +2356,7 @@ class CaManagerQueryExecutor {
         }
         userEntry.ident().setId(existingId);
 
-        String hashedPassword;
-        try {
-            hashedPassword = PasswordHash.createHash(userEntry.password());
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            throw new CaMgmtException(ex);
-        }
+        String hashedPassword = PasswordHash.createHash(userEntry.password());
 
         long id;
         try {
@@ -2461,12 +2454,7 @@ class CaManagerQueryExecutor {
             }
 
             if (idxPassword != null) {
-                String hashedPassword;
-                try {
-                    hashedPassword = PasswordHash.createHash(password);
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-                    throw new CaMgmtException(ex);
-                }
+                String hashedPassword = PasswordHash.createHash(password);
                 ps.setString(idxPassword, hashedPassword);
                 sb.append("password: ****; ");
             }

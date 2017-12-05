@@ -42,15 +42,15 @@ package org.xipki.ca.server.impl.cmp;
 public interface CmpResponderManager {
 
     /**
-     *
+     * Returns the CA name for the alias {@code caAlias}.
      * @param caAlias
      *          CA alias. Must not be {@code null}.
-     * @param CA name for the given alias.
+     * @return CA name for the given alias.
      */
     String getCaNameForAlias(String caAlias);
 
     /**
-     *
+     * Returns the CMP responder for the CA {@code caName}.
      * @param caName
      *          CA name. Must not be {@code null}.
      * @return the CMP responder for the given CA name.

@@ -132,7 +132,7 @@ abstract class CmpResponder {
     } // method getRequestor
 
     /**
-     *
+     * Processes the request and returns the response.
      * @param request
      *          Original request. Will only be used for the storage. Could be{@code null}.
      * @param requestor
@@ -145,7 +145,7 @@ abstract class CmpResponder {
      *          Message id. Must not be {@code null}.
      * @param event
      *          Audit event. Must not be {@code null}.
-     * @return
+     * @return the response
      */
     protected abstract PKIMessage processPkiMessage0(PKIMessage request,
             RequestorInfo requestor, ASN1OctetString transactionId,

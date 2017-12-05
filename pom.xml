@@ -67,16 +67,6 @@
     <developerConnection>scm:git:git@github.com:xipki/xipki.git</developerConnection>
     <url>git@github.com:xipki/xipki.git</url>
   </scm>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
   <build>
     <plugins>
       <plugin>
@@ -287,6 +277,16 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
       <build>
         <plugins>
           <plugin>
@@ -306,6 +306,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
@@ -332,7 +333,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>2.9.1</version>
             <configuration>
-              <failOnError>false</failOnError>
+              <failOnError>true</failOnError>
               <excludePackageNames>*.jaxb*</excludePackageNames>
             </configuration>
             <executions>

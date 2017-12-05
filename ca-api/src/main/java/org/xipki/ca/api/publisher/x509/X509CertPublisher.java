@@ -54,13 +54,16 @@ import org.xipki.security.X509Cert;
 public abstract class X509CertPublisher {
 
     /**
-     *
+     * Initializes me.
+     * 
      * @param conf
      *          Configuration. Could be {@code null}.
      * @param passwordResolver
      *          Password resolver. Could be {@code null}.
      * @param datasources
      *          Datasources. Must not be {@code null}.
+     * @throws CertPublisherException
+     *         If error during the initialization occurs.
      */
     public abstract void initialize(String conf, PasswordResolver passwordResolver,
             Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
@@ -73,6 +76,7 @@ public abstract class X509CertPublisher {
     public abstract boolean isAsyn();
 
     /**
+     * Sets the {{@link EnvParameterResolver}.
      *
      * @param parameterResolver
      *          Parameter resolver. Could be {@code null}.
@@ -80,7 +84,7 @@ public abstract class X509CertPublisher {
     public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
     /**
-     *
+     * Publishes the certificate of the CA.
      * @param caCert
      *          CA certificate to be published. Must not be {@code null}.
      * @return whether the CA is published.
@@ -88,6 +92,7 @@ public abstract class X509CertPublisher {
     public abstract boolean caAdded(X509Cert caCert);
 
     /**
+     * Publishes a certificate.
      *
      * @param certInfo
      *          Certificate to be published.
@@ -96,6 +101,7 @@ public abstract class X509CertPublisher {
     public abstract boolean certificateAdded(X509CertificateInfo certInfo);
 
     /**
+     * Publishes the revocation of a certificate.
      *
      * @param caCert
      *          CA certificate. Must not be {@code null}.
@@ -111,7 +117,8 @@ public abstract class X509CertPublisher {
             X509CertWithDbId cert, String certprofile, CertRevocationInfo revInfo);
 
     /**
-     *
+     * Publishes the unrevocation of a certificate.
+     * 
      * @param caCert
      *          CA certificate. Must not be {@code null}.
      * @param cert
@@ -121,6 +128,7 @@ public abstract class X509CertPublisher {
     public abstract boolean certificateUnrevoked(X509Cert caCert, X509CertWithDbId cert);
 
     /**
+     * Publishes the remove of a certificate.
      *
      * @param caCert
      *          CA certificate. Must not be {@code null}.
@@ -131,6 +139,7 @@ public abstract class X509CertPublisher {
     public abstract boolean certificateRemoved(X509Cert caCert, X509CertWithDbId cert);
 
     /**
+     * Publishes a CRL.
      *
      * @param caCert
      *          CA certificate. Must not be {@code null}.
@@ -141,7 +150,8 @@ public abstract class X509CertPublisher {
     public abstract boolean crlAdded(X509Cert caCert, X509CRL crl);
 
     /**
-     *
+     * Publishes the revocation of a CA.
+     * 
      * @param caCert
      *          CA certificate. Must not be {@code null}.
      * @param revInfo
@@ -151,7 +161,8 @@ public abstract class X509CertPublisher {
     public abstract boolean caRevoked(X509Cert caCert, CertRevocationInfo revInfo);
 
     /**
-     *
+     * Publishes the unrevocation of a CA.
+     * 
      * @param caCert
      *          CA certificate. Must not be {@code null}.
      * @return whether the CA unrevocation is published.
@@ -161,7 +172,8 @@ public abstract class X509CertPublisher {
     public abstract boolean isHealthy();
 
     /**
-     *
+     * Sets the AuditServiceRegister.
+     * 
      * @param auditServiceRegister
      *          AuditServiceRegister to be set. Must not be {@code null}.
      */

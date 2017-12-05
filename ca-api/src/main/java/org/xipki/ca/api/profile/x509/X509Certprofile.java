@@ -82,8 +82,11 @@ public abstract class X509Certprofile {
     }
 
     /**
-     * Whether include subject and serial number of the issuer certificate in the
+     * Returns whether include subject and serial number of the issuer certificate in the
      * AuthorityKeyIdentifier extension.
+     * 
+     * @return whether include subject and serial number of the issuer certificate in the
+     *         AuthorityKeyIdentifier extension.
      */
     public boolean includeIssuerAndSerialInAki() {
         return false;
@@ -94,18 +97,22 @@ public abstract class X509Certprofile {
     }
 
     /**
-     *
+     * Increments the SerialNumber attribute in the subject
      * @param currentSerialNumber
      *          Current serial number. Could be {@code null}.
      * @return the incremented serial number
      * @throws BadFormatException
+     *         If the currentSerialNumber is not a non-negative decimal long.
      */
     public String incSerialNumber(final String currentSerialNumber)
             throws BadFormatException {
         try {
-            int currentSn = (currentSerialNumber == null) ? 0
-                    : Integer.parseInt(currentSerialNumber.trim());
-            return Integer.toString(currentSn + 1);
+            long currentSn = (currentSerialNumber == null) ? 0
+                    : Long.parseLong(currentSerialNumber.trim());
+            if (currentSn < 0) {
+                throw new BadFormatException("invalid currentSerialNumber " + currentSerialNumber);
+            }
+            return Long.toString(currentSn + 1);
         } catch (NumberFormatException ex) {
             throw new BadFormatException(String.format(
                     "invalid serialNumber attribute %s", currentSerialNumber));
@@ -130,7 +137,7 @@ public abstract class X509Certprofile {
     }
 
     /**
-     *
+     * Returns the parameter value for the given name.
      * @param paramName
      *          Parameter name. Must not be {@code null}.
      * @return parameter value.
@@ -152,7 +159,10 @@ public abstract class X509Certprofile {
     }
 
     /**
+     * Returns the SubjectInfoAccess modes. 
      * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
+     * 
+     * @return the SubjectInfoAccess modes.
      */
     public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
         return null;
@@ -161,9 +171,12 @@ public abstract class X509Certprofile {
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls();
 
     /**
-     *
+     * Initializes this object.
+     * 
      * @param data
      *          Configuration. Could be {@code null}.
+     * @throws CertprofileException
+     *         if error during the initialization occurs.
      */
     public abstract void initialize(String data) throws CertprofileException;
 
@@ -174,6 +187,7 @@ public abstract class X509Certprofile {
     public abstract Integer pathLenBasicConstraint();
 
     /**
+     * Sets the {{@link EnvParameterResolver}.
      *
      * @param parameterResolver
      *          Parameter resolver. Could be {@code null}.
@@ -181,7 +195,8 @@ public abstract class X509Certprofile {
     public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
     /**
-     *
+     * Checks and gets the granted NotBefore.
+     * 
      * @param notBefore
      *          Requested NotBefore. Could be {@code null}.
      * @return the granted NotBefore.
@@ -191,25 +206,34 @@ public abstract class X509Certprofile {
     public abstract CertValidity validity();
 
     /**
-     *
+     * Checks the public key. If the check passes, returns the canonicalized public key.
+     * 
      * @param publicKey
      *          Requested public key. Must not be {@code null}.
      * @return the granted public key.
+     * @throws BadCertTemplateException
+     *         If the publicKey does not have correct format or is not permitted.
      */
     public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
             throws BadCertTemplateException;
 
     /**
-     *
+     * Checks the requested subject. If the check passes, returns the canonicalized subject.
+     * 
      * @param requestedSubject
      *          Requested subject. Must not be {@code null}.
      * @return the granted subject
+     * @throws BadCertTemplateException
+     *         if the subject is not permitted.
+     * @throws CertprofileException
+     *         if error occurs.
      */
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
             throws CertprofileException, BadCertTemplateException;
 
     /**
-     *
+     * Checks the requested extensions and returns the canonicalized ones.
+     * 
      * @param extensionControls
      *          Extension controls. Must not be {@code null}.
      * @param requestedSubject
@@ -223,6 +247,10 @@ public abstract class X509Certprofile {
      * @param notAfter
      *          NotAfter. Must not be {@code null}.
      * @return extensions of the certificate to be issued.
+     * @throws BadCertTemplateException
+     *         if at least one of extension is not permitted.
+     * @throws CertprofileException
+     *         if error occurs.
      */
     public abstract ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
@@ -233,7 +261,10 @@ public abstract class X509Certprofile {
     public abstract boolean incSerialNumberIfSubjectExists();
 
     /**
-     * @return maximal size of the certificate, 0 or negative value indicates accepting all sizes.
+     * Returns maximal size in bytes of the certificate.
+     *
+     * @return maximal size in bytes of the certificate, 0 or negative value
+     *         indicates accepting all sizes.
      */
     public int maxCertSize() {
         return 0;

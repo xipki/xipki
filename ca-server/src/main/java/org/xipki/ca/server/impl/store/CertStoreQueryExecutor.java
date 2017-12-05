@@ -36,12 +36,10 @@ package org.xipki.ca.server.impl.store;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -1528,13 +1526,7 @@ class CertStoreQueryExecutor {
             return null;
         }
 
-        boolean valid;
-        try {
-            valid = PasswordHash.validatePassword(password, expPasswordText);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-        }
-
+        boolean valid = PasswordHash.validatePassword(password, expPasswordText);
         return valid ? new NameId(id, user) : null;
     } // method authenticateUser
 

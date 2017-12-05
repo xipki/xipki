@@ -72,16 +72,18 @@ public class OCSPRespBuilder {
 
     /**
      * basic constructor.
+     * 
+     * @param responderId
+     *          Responder ID
      */
-    public OCSPRespBuilder(
-        ResponderID responderId) {
+    public OCSPRespBuilder(ResponderID responderId) {
         this.responderId = responderId;
     }
 
     /**
      * Add a response for a particular Certificate ID.
      *
-     * @param certID certificate ID details
+     * @param certId certificate ID details
      * @param thisUpdate date this response was valid on
      * @param nextUpdate date when next update should be requested
      * @param certStatus status of the certificate - null if okay

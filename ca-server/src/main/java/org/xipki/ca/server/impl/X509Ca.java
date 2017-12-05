@@ -519,9 +519,12 @@ public class X509Ca {
     }
 
     /**
-     *
+     * Returns the certificates satisfying the given search criteria.
      * @param subjectName Subject of the certificate.
      * @param transactionId <code>null</code> for all transactionIds.
+     * @return the certificates satisfying the given search criteria
+     * @throws OperationException
+     *         if error occurs.
      */
     public List<X509Certificate> getCertificate(final X500Name subjectName,
             final byte[] transactionId) throws OperationException {

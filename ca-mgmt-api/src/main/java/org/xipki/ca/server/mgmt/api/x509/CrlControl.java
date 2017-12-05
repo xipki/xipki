@@ -49,69 +49,69 @@ import org.xipki.common.util.StringUtil;
 /**
  *<pre>
  * Example configuration
- * updateMode=<'interval'|'onDemand'>
+ * updateMode=&lt;'interval'|'onDemand'&gt;
  *
  * # For all updateMode
  *
  * # Whether expired certificates are considered. Default is false
- * expiredCerts.included=&lt;'true'|'false'>
+ * expiredCerts.included=&lt;'true'|'false'&gt;
  *
  * # Whether XiPKI-customized extension xipki-CrlCertSet is included. Default is false
- * xipki.certset=&lt;'true'|'false'>
+ * xipki.certset=&lt;'true'|'false'&gt;
  *
  * # Whether the extension xipki-CrlCertSet contains the raw certificates. Default is true
- * xipki.certset.certs=&lt;'true'|'false'>
+ * xipki.certset.certs=&lt;'true'|'false'&gt;
  *
  * # Whether the extension xipki-CrlCertSet contains the profile name of the certificate.
  * # Default is true
- * xipki.certset.profilename=&lt;'true'|'false'>
+ * xipki.certset.profilename=&lt;'true'|'false'&gt;
  *
  * # List of OIDs of extensions to be embedded in CRL,
  * # Unspecified or empty extensions indicates that the CA decides.
- * extensions=&lt;comma delimited OIDs of extensions>
+ * extensions=&lt;comma delimited OIDs of extensions&gt;
  *
  * # The following settings are only for updateMode 'interval'
  *
  * # Number of intervals to generate a full CRL. Default is 1
  * # Should be greater than 0
- * fullCRL.intervals=&lt;integer>
+ * fullCRL.intervals=&lt;integer&gt;
  *
  * # should be 0 or not greater than baseCRL.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
- * deltaCRL.intervals=&lt;integer>
+ * deltaCRL.intervals=&lt;integer&gt;
  *
- * overlap.minutes=&lt;minutes of overlap>
+ * overlap.minutes=&lt;minutes of overlap&gt;
  *
  * # should be less than fullCRL.intervals.
  * # If activated, a deltaCRL will be generated only between two full CRLs
- * deltaCRL.intervals=&lt;integer>
+ * deltaCRL.intervals=&lt;integer&gt;
  *
  * # Exactly one of interval.minutes and interval.days should be specified
  * # Number of minutes of one interval. At least 60 minutes
- * interval.minutes=&lt;minutes of one interval>
+ * interval.minutes=&lt;minutes of one interval&gt;
  *
  * # UTC time of generation of CRL, one interval covers 1 day.
- * interval.time=&lt;updatet time (hh:mm of UTC time)>
+ * interval.time=&lt;updatet time (hh:mm of UTC time)&gt;
  *
  * # Whether the nextUpdate of a fullCRL is the update time of the fullCRL
  * # Default is false
- * fullCRL.extendedNextUpdate=&lt;'true'|'false'>
+ * fullCRL.extendedNextUpdate=&lt;'true'|'false'&gt;
  *
  * # Whether only user certificates are considered in CRL
  * # Default is false
- * onlyContainsUserCerts=&lt;'true'|'false'>
+ * onlyContainsUserCerts=&lt;'true'|'false'&gt;
  *
  * # Whether only CA certificates are considered in CRL
  * # Default if false
- * onlyContainsCACerts=&lt;'true'|'false'>
+ * onlyContainsCACerts=&lt;'true'|'false'&gt;
  *
  * # Whether Revocation reason is contained in CRL
  * # Default is false
- * excludeReason=&lt;'true'|'false'>
+ * excludeReason=&lt;'true'|'false'&gt;
  *
  * # How the CRL entry extension invalidityDate is considered in CRL
  * # Default is false
- * invalidityDate=&lt;'required'|'optional'|'forbidden'>
+ * invalidityDate=&lt;'required'|'optional'|'forbidden'&gt;
  *
  * </pre>
  * @author Lijun Liao

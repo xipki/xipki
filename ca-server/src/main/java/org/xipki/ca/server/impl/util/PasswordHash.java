@@ -36,9 +36,7 @@ package org.xipki.ca.server.impl.util;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -77,9 +75,9 @@ public class PasswordHash {
      *
      * @param password - the password to hash
      * @return a salted PBKDF2 hash of the password
+     * 
      */
-    public static String createHash(final String password)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static String createHash(final String password) {
         ParamUtil.requireNonBlank("password", password);
         return createHash(password.getBytes());
     }
@@ -90,8 +88,7 @@ public class PasswordHash {
      * @param password - the password to hash
      * @return a salted PBKDF2 hash of the password
      */
-    public static String createHash(final byte[] password)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static String createHash(final byte[] password) {
         return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
     }
 
@@ -99,10 +96,13 @@ public class PasswordHash {
      * Returns a salted PBKDF2 hash of the password.
      *
      * @param password - the password to hash
+     * @param saltSize - the size of salt in bytes
+     * @param iterations - the iteration count (slowness factor)
+     * @param dkSize - the length of the derived key
      * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(final byte[] password, final int saltSize, final int iterations,
-            final int dkSize) throws NoSuchAlgorithmException, InvalidKeySpecException {
+            final int dkSize) {
         ParamUtil.requireNonNull("password", password);
         // Generate a random salt
         SecureRandom random = new SecureRandom();
@@ -122,8 +122,7 @@ public class PasswordHash {
      * @param correctHash - the hash of the valid password
      * @return true if the password is correct, false if not
      */
-    public static boolean validatePassword(final String password, final String correctHash)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static boolean validatePassword(final String password, final String correctHash) {
         ParamUtil.requireNonBlank("password", password);
         return validatePassword(password.getBytes(), correctHash);
     }
@@ -135,8 +134,7 @@ public class PasswordHash {
      * @param correctHash - the hash of the valid password
      * @return true if the password is correct, false if not
      */
-    public static boolean validatePassword(final byte[] password, final String correctHash)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static boolean validatePassword(final byte[] password, final String correctHash) {
         ParamUtil.requireNonNull("password", password);
         // Decode the hash into its parameters
         String[] params = correctHash.split(":");
@@ -178,12 +176,12 @@ public class PasswordHash {
      * @return the PBDKF2 hash of the password
      */
     public static byte[] pbkdf2(final byte[] password, final byte[] salt, final int iterations,
-            final int bytes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+            final int bytes) {
         byte[] pwdBytes;
         try {
             pwdBytes = new String(password).getBytes("UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new NoSuchAlgorithmException("no charset UTF-8");
+            throw new IllegalStateException("no charset UTF-8");
         }
         synchronized (GEN) {
             GEN.init(pwdBytes, salt, iterations);

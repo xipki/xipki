@@ -363,6 +363,23 @@ public class CertificateStore {
     /**
      * Returns the first serial number ascend sorted {@code numEntries} revoked certificates
      * which are not expired at {@code notExpiredAt} and the IDs are not less than {@code startId}.
+     * 
+     * @param ca
+     *          CA identifier
+     * @param notExpiredAt
+     *          Date at which the certificate is not expired.
+     * @param startId
+     *          The smallest id in the database ID column 
+     * @param numEntries
+     *          Maximal entries in the returned list.
+     * @param onlyCaCerts
+     *          Indicates whether only certificates which can be used to issuer other certificates
+     *          will be considered.
+     * @param onlyUserCerts
+     *          Indicates whether only end entity certificates will be considered.
+     * @return list of revoked certificate meta info.
+     * @throws OperationException
+     *         if error occurs
      */
     public List<CertRevInfoWithSerial> getRevokedCerts(final NameId ca,
             final Date notExpiredAt, final long startId, final int numEntries,

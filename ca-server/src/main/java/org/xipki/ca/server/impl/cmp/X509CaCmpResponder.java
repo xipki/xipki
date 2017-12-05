@@ -1605,9 +1605,6 @@ public class X509CaCmpResponder extends CmpResponder {
         }
     } // method cmpGeneralMsg
 
-    /**
-     * @since 2.1.0
-     */
     public CertificateList getCrl(final CmpRequestorInfo requestor, final BigInteger crlNumber)
             throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
@@ -1620,9 +1617,6 @@ public class X509CaCmpResponder extends CmpResponder {
         return (crlNumber == null) ? ca.getBcCurrentCrl() : ca.getBcCrl(crlNumber);
     }
 
-    /**
-     * @since 2.1.0
-     */
     public X509CRL generateCrlOnDemand(final CmpRequestorInfo requestor,
             final RequestType reqType, final String msgId) throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
@@ -1636,9 +1630,6 @@ public class X509CaCmpResponder extends CmpResponder {
         return ca.generateCrlOnDemand(msgId);
     }
 
-    /**
-     * @since 2.1.0
-     */
     public void revokeCert(final CmpRequestorInfo requestor, final BigInteger serialNumber,
             final CrlReason reason, final Date invalidityDate, final RequestType reqType,
             final String msgId) throws OperationException {
@@ -1670,9 +1661,6 @@ public class X509CaCmpResponder extends CmpResponder {
         }
     }
 
-    /**
-     * @since 2.1.0
-     */
     public void removeCert(final CmpRequestorInfo requestor, final BigInteger serialNumber,
             final RequestType reqType, final String msgId)
             throws OperationException {

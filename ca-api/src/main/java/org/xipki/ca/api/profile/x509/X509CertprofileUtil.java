@@ -57,13 +57,15 @@ import org.xipki.common.util.ParamUtil;
 public class X509CertprofileUtil {
 
     /**
-     *
+     * Creates GeneralName.
+     * 
      * @param requestedName
      *          Requested name. Must not be {@code null}.
      * @param modes
      *          Modes to be considered. Must not be {@code null}.
-     * @return
+     * @return the created GeneralName
      * @throws BadCertTemplateException
+     *         If requestedName is invalid or contains entries which are not allowed in the modes.
      */
     public static GeneralName createGeneralName(final GeneralName requestedName,
             final Set<GeneralNameMode> modes) throws BadCertTemplateException {
