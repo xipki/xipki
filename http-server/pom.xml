@@ -17,13 +17,6 @@
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <excludePackageNames>org/xipki/httpserver/v1</excludePackageNames>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
   <dependencies>

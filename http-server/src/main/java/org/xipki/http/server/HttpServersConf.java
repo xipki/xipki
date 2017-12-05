@@ -17,7 +17,7 @@
 
 package org.xipki.http.server;
 
-import org.xipki.httpserver.v1.Httpservers;
+import org.xipki.httpserver.v1.jaxb.Httpservers;
 
 /**
  * @author Lijun Liao

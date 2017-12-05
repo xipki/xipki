@@ -25,8 +25,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.xipki.httpserver.v1.Httpservers;
-import org.xipki.httpserver.v1.ObjectFactory;
+import org.xipki.httpserver.v1.jaxb.Httpservers;
+import org.xipki.httpserver.v1.jaxb.ObjectFactory;
 
 /**
  * @author Lijun Liao

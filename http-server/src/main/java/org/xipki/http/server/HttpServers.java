@@ -42,11 +42,11 @@ import javax.net.ssl.SSLParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.http.servlet.SslReverseProxyMode;
-import org.xipki.httpserver.v1.FileOrValueType;
-import org.xipki.httpserver.v1.HttpserverType;
-import org.xipki.httpserver.v1.KeystoreType;
-import org.xipki.httpserver.v1.TlsType;
-import org.xipki.httpserver.v1.TruststoreType;
+import org.xipki.httpserver.v1.jaxb.FileOrValueType;
+import org.xipki.httpserver.v1.jaxb.HttpserverType;
+import org.xipki.httpserver.v1.jaxb.KeystoreType;
+import org.xipki.httpserver.v1.jaxb.TlsType;
+import org.xipki.httpserver.v1.jaxb.TruststoreType;
 import org.xipki.password.PasswordResolver;
 
 import io.netty.handler.ssl.ClientAuth;
