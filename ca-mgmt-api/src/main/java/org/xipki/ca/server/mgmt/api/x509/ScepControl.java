@@ -41,9 +41,9 @@ import org.xipki.common.util.StringUtil;
 /**
  *
  * Example configuration
- * 
+ *
  * <pre>
- * 
+ *
  * caCert.included?true%signerCert.included?false
  *
  * # Whether CA certificate is included in the response. Default is true

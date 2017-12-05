@@ -71,7 +71,7 @@ public interface CaManager {
 
     /**
      * Republishes certificates of the CA {@code caName} to the publishers {@code publisherNames}.
-     * 
+     *
      * @param caName
      *          CA name. Could be {@code null}.
      * @param publisherNames
@@ -81,14 +81,14 @@ public interface CaManager {
      * @return whether the publish is successful
      * @throws CaMgmtException
      *          if error occurs.
-     * 
+     *
      */
     boolean republishCertificates(String caName, List<String> publisherNames,
             int numThreads) throws CaMgmtException;
 
     /**
      * Clear the publish queue for the CA {@code caName} and publishers {@code publisherNames}.
-     * 
+     *
      * @param caName
      *          CA name. Could be {@code null}.
      * @param publisherNames
@@ -102,7 +102,7 @@ public interface CaManager {
 
     /**
      * Removes the CA {@code caName} from the system.
-     * 
+     *
      * @param caName
      *          CA name. Must not be {@code null}.
      * @return whether the remove is successful
@@ -128,7 +128,7 @@ public interface CaManager {
 
     /**
      * Remove the alias {@code aliasName}.
-     * 
+     *
      * @param aliasName
      *          Alias name. Must not be {@code null}.
      * @return whether the remove is successful
@@ -139,7 +139,7 @@ public interface CaManager {
 
     /**
      * Gets the aliases of the given CA {@code caName}.
-     * 
+     *
      * @param caName
      *          CA name. Must not be {@code null}.
      * @return the aliases of the given CA.
@@ -208,7 +208,7 @@ public interface CaManager {
 
     /**
      * Removes the support of the certProfile {@code profileName} from the CA {@code caName}.
-     * 
+     *
      * @param profileName
      *          Profile name. Must not be {@code null}.
      * @param caName
@@ -904,7 +904,7 @@ public interface CaManager {
             throws CaMgmtException, IOException;
 
     /**
-     * Returns a sorted list of certificate meta information. 
+     * Returns a sorted list of certificate meta information.
      * @param caName
      *          CA name. Must not be {@code null}.
      * @param subjectPattern

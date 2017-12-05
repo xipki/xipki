@@ -75,7 +75,7 @@ public class PasswordHash {
      *
      * @param password - the password to hash
      * @return a salted PBKDF2 hash of the password
-     * 
+     *
      */
     public static String createHash(final String password) {
         ParamUtil.requireNonBlank("password", password);

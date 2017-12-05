@@ -55,7 +55,7 @@ public abstract class X509CertPublisher {
 
     /**
      * Initializes me.
-     * 
+     *
      * @param conf
      *          Configuration. Could be {@code null}.
      * @param passwordResolver
@@ -118,7 +118,7 @@ public abstract class X509CertPublisher {
 
     /**
      * Publishes the unrevocation of a certificate.
-     * 
+     *
      * @param caCert
      *          CA certificate. Must not be {@code null}.
      * @param cert
@@ -151,7 +151,7 @@ public abstract class X509CertPublisher {
 
     /**
      * Publishes the revocation of a CA.
-     * 
+     *
      * @param caCert
      *          CA certificate. Must not be {@code null}.
      * @param revInfo
@@ -162,7 +162,7 @@ public abstract class X509CertPublisher {
 
     /**
      * Publishes the unrevocation of a CA.
-     * 
+     *
      * @param caCert
      *          CA certificate. Must not be {@code null}.
      * @return whether the CA unrevocation is published.
@@ -173,7 +173,7 @@ public abstract class X509CertPublisher {
 
     /**
      * Sets the AuditServiceRegister.
-     * 
+     *
      * @param auditServiceRegister
      *          AuditServiceRegister to be set. Must not be {@code null}.
      */

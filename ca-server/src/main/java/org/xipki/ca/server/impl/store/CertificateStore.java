@@ -363,13 +363,13 @@ public class CertificateStore {
     /**
      * Returns the first serial number ascend sorted {@code numEntries} revoked certificates
      * which are not expired at {@code notExpiredAt} and the IDs are not less than {@code startId}.
-     * 
+     *
      * @param ca
      *          CA identifier
      * @param notExpiredAt
      *          Date at which the certificate is not expired.
      * @param startId
-     *          The smallest id in the database ID column 
+     *          The smallest id in the database ID column
      * @param numEntries
      *          Maximal entries in the returned list.
      * @param onlyCaCerts

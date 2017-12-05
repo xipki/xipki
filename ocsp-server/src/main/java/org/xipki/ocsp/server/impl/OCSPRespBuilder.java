@@ -72,7 +72,7 @@ public class OCSPRespBuilder {
 
     /**
      * basic constructor.
-     * 
+     *
      * @param responderId
      *          Responder ID
      */

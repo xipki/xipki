@@ -58,7 +58,7 @@ public class X509CertprofileUtil {
 
     /**
      * Creates GeneralName.
-     * 
+     *
      * @param requestedName
      *          Requested name. Must not be {@code null}.
      * @param modes

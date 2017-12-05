@@ -84,7 +84,7 @@ public abstract class X509Certprofile {
     /**
      * Returns whether include subject and serial number of the issuer certificate in the
      * AuthorityKeyIdentifier extension.
-     * 
+     *
      * @return whether include subject and serial number of the issuer certificate in the
      *         AuthorityKeyIdentifier extension.
      */
@@ -159,9 +159,9 @@ public abstract class X509Certprofile {
     }
 
     /**
-     * Returns the SubjectInfoAccess modes. 
+     * Returns the SubjectInfoAccess modes.
      * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
-     * 
+     *
      * @return the SubjectInfoAccess modes.
      */
     public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
@@ -172,7 +172,7 @@ public abstract class X509Certprofile {
 
     /**
      * Initializes this object.
-     * 
+     *
      * @param data
      *          Configuration. Could be {@code null}.
      * @throws CertprofileException
@@ -196,7 +196,7 @@ public abstract class X509Certprofile {
 
     /**
      * Checks and gets the granted NotBefore.
-     * 
+     *
      * @param notBefore
      *          Requested NotBefore. Could be {@code null}.
      * @return the granted NotBefore.
@@ -207,7 +207,7 @@ public abstract class X509Certprofile {
 
     /**
      * Checks the public key. If the check passes, returns the canonicalized public key.
-     * 
+     *
      * @param publicKey
      *          Requested public key. Must not be {@code null}.
      * @return the granted public key.
@@ -219,7 +219,7 @@ public abstract class X509Certprofile {
 
     /**
      * Checks the requested subject. If the check passes, returns the canonicalized subject.
-     * 
+     *
      * @param requestedSubject
      *          Requested subject. Must not be {@code null}.
      * @return the granted subject
@@ -233,7 +233,7 @@ public abstract class X509Certprofile {
 
     /**
      * Checks the requested extensions and returns the canonicalized ones.
-     * 
+     *
      * @param extensionControls
      *          Extension controls. Must not be {@code null}.
      * @param requestedSubject
