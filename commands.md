@@ -50,7 +50,7 @@ Feature xipki-shell-base (started by default)
 
      transfer a URL
 
-Feature xipki-security-shell (not started by default)
+Feature xipki-security (started by default)
 -----
 
    * `xi:cert-info`
@@ -85,15 +85,15 @@ Feature xipki-security-shell (not started by default)
 
      encrypt password with master password
 
-   * `xi:add-cert`
+   * `xi:add-cert-p11`
 
      add certificate to PKCS#11 device
 
-   * `xi:rm-cert`
+   * `xi:rm-cert-p11`
 
      remove certificate from PKCS#11 device
 
-   * `xi:export-cert`
+   * `xi:export-cert-p11`
 
      export certificate from PKCS#11 device
 
@@ -101,7 +101,7 @@ Feature xipki-security-shell (not started by default)
 
      export certificate from PKCS#12 keystore
 
-   * `xi:req`
+   * `xi:req-p11`
 
      generate CSR with PKCS#11 device
 
@@ -109,7 +109,7 @@ Feature xipki-security-shell (not started by default)
 
      generate CSR with PKCS#12 keystore
 
-   * `xi:update-cert`
+   * `xi:update-cert-p11`
 
      update certificate in PKCS#11 device
 
@@ -117,7 +117,7 @@ Feature xipki-security-shell (not started by default)
 
      update certificate in PKCS#12 keystore
 
-   * `xi:dsa`
+   * `xi:dsa-p11`
 
      generate DSA keypair in PKCS#11 device
 
@@ -125,7 +125,7 @@ Feature xipki-security-shell (not started by default)
 
      generate RSA keypair in PKCS#12 keystore
 
-   * `xi:ec`
+   * `xi:ec-p11`
 
      generate EC keypair in PKCS#11 device
 
@@ -133,31 +133,31 @@ Feature xipki-security-shell (not started by default)
 
      generate EC keypair in PKCS#12 keystore
 
-   * `xi:delete-key`
+   * `xi:delete-key-p11`
 
      delete key and cert in PKCS#11 device
 
-   * `xi:token-info`
+   * `xi:token-info-p11`
 
      list objects in PKCS#11 device
 
-   * `xi:delete-objects`
+   * `xi:delete-objects-p11`
 
      delete objects in PKCS#11 device
 
-   * `xi:provider-test`
+   * `xi:p11provider-test`
 
-     test the Xipki JCA/JCE provider
+     test the Xipki PKCS#11 JCA/JCE provider
 
-   * `xi:refresh`
+   * `xi:refresh-p11`
 
      refresh PKCS#11 module
      
-   * `xi:create-secretkey`
+   * `xi:create-secretkey-p11`
      
      create secret key with given value in PKCS#11 device
 
-   * `xi:secretkey`
+   * `xi:secretkey-p11`
      
      generate secret key in PKCS#11 device
      
@@ -165,7 +165,7 @@ Feature xipki-security-shell (not started by default)
      
      generate secret key in JCEKS (not PKCS#12) keystore
      
-   * `xi:rsa`
+   * `xi:rsa-p11`
 
      generate RSA keypair in PKCS#11 device
 
@@ -176,7 +176,7 @@ Feature xipki-security-shell (not started by default)
    * `keystore-convert`
      convert the keystore format
 
-   * `xi:speed-dsa-gen`
+   * `xi:speed-dsa-gen-p11`
 
      performance test of PKCS#11 DSA key generation
 
@@ -184,7 +184,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 DSA key generation
 
-   * `xi:speed-dsa-sign`
+   * `xi:speed-dsa-sign-p11`
 
      performance test of PKCS#11 DSA signature creation
 
@@ -192,7 +192,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 DSA signature creation
 
-   * `xi:speed-ec-gen`
+   * `xi:speed-ec-gen-p11`
 
      performance test of PKCS#11 EC key generation
 
@@ -200,7 +200,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 EC key generation
 
-   * `xi:speed-ec-sign`
+   * `xi:speed-ec-sign-p11`
 
      performance test of PKCS#11 EC signature creation
 
@@ -208,7 +208,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 EC signature creation
 
-   * `xi:speed-rsa-gen`
+   * `xi:speed-rsa-gen-p11`
 
      performance test of PKCS#11 RSA key generation
 
@@ -216,7 +216,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 RSA key generation
 
-   * `xi:speed-rsa-sign`
+   * `xi:speed-rsa-sign-p11`
 
      performance test of PKCS#11 RSA signature creation
 
@@ -224,7 +224,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 RSA signature creation
 
-   * `xi:bspeed-dsa-gen`
+   * `xi:bspeed-dsa-gen-p11`
 
      performance test of PKCS#11 DSA key generation (batch)
 
@@ -232,7 +232,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 DSA key generation (batch)
 
-   * `xi:bspeed-dsa-sign`
+   * `xi:bspeed-dsa-sign-p11`
 
      performance test of PKCS#11 DSA signature creation (batch)
 
@@ -240,7 +240,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 DSA signature creation (batch)
 
-   * `xi:bspeed-ec-gen`
+   * `xi:bspeed-ec-gen-p11`
 
      performance test of PKCS#11 EC key generation (batch)
 
@@ -248,7 +248,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 EC key generation (batch)
 
-   * `xi:bspeed-ec-sign`
+   * `xi:bspeed-ec-sign-p11`
 
      performance test of PKCS#11 EC signature creation (batch)
 
@@ -256,7 +256,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 EC signature creation (batch)
 
-   * `xi:bspeed-rsa-gen`
+   * `xi:bspeed-rsa-gen-p11`
 
      performance test of PKCS#11 RSA key generation (batch)
 
@@ -264,7 +264,7 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 RSA key generation (batch)
 
-   * `xi:bspeed-rsa-sign`
+   * `xi:bspeed-rsa-sign-p11`
 
      performance test of PKCS#11 RSA signature creation (batch)
 
