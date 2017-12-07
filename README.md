@@ -33,3 +33,8 @@ Only if you want to use the development version, build it from source code as fo
     ```
 
     Then you will find the `xipki-sdk-*.tar.gz` in the directory `dist/target`.
+
+Karaf Commands
+-----
+Please refer to [commands.md](commands.md) for more details.
+
