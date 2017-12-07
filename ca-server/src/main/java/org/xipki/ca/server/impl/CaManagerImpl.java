@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
+import java.security.KeyStoreException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
@@ -1321,6 +1322,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("CA named " + name + " exists");
         }
 
+        String origSignerConf = caEntry.signerConf();
+        String newSignerConf = canonicalizeSignerConf(caEntry.signerType(),
+                origSignerConf, null, securityFactory);
+        if (!origSignerConf.equals(newSignerConf)) {
+            caEntry.setSignerConf(newSignerConf);
+        }
+
         if (caEntry instanceof X509CaEntry) {
             try {
                 X509CaEntry tmpCaEntry = (X509CaEntry) caEntry;
@@ -1374,6 +1382,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if (ident == null) {
             throw new CaMgmtException("No CA named " + name + " does not exist");
         }
+
         entry.ident().setId(ident.id());
 
         boolean changed = queryExecutor.changeCa(entry, securityFactory);
@@ -1802,6 +1811,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return false;
         }
 
+        String conf = dbEntry.conf();
+        if (conf != null) {
+            String newConf = canonicalizeSignerConf(dbEntry.type(), conf, null, securityFactory);
+            if (!conf.equals(newConf)) {
+                dbEntry.setConf(newConf);
+            }
+        }
+
         CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
         queryExecutor.addResponder(dbEntry);
         responders.put(name, responder);
@@ -1842,7 +1859,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         CmpResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
-                base64Cert, this);
+                base64Cert, this, securityFactory);
         if (newResponder == null) {
             return false;
         }
@@ -1872,6 +1889,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         String name = dbEntry.name();
         if (crlSigners.containsKey(name)) {
             return false;
+        }
+
+        String conf = dbEntry.conf();
+        if (conf != null) {
+            String newConf = canonicalizeSignerConf(dbEntry.type(), conf, null, securityFactory);
+            if (!conf.equals(newConf)) {
+                dbEntry.setConf(newConf);
+            }
         }
 
         X509CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
@@ -1916,7 +1941,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         String crlControl = dbEntry.crlControl();
 
         X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(name, signerType,
-                signerConf, signerCert, crlControl, this);
+                signerConf, signerCert, crlControl, this, securityFactory);
         if (crlSigner == null) {
             return false;
         }
@@ -2896,6 +2921,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if (caIdent == null) {
             LOG.warn("CA {} does not exist", dbEntry.caIdent().name());
         }
+
+        String conf = dbEntry.responderConf();
+        if (conf != null) {
+            String newConf = canonicalizeSignerConf(
+                    dbEntry.responderType(), conf, null, securityFactory);
+            if (!conf.equals(newConf)) {
+                dbEntry.setResponderConf(newConf);
+            }
+        }
+
         dbEntry.caIdent().setId(caIdent.id());
 
         Scep scep = new Scep(dbEntry, this);
@@ -2945,8 +2980,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         }
 
-        Scep scep = queryExecutor.changeScep(name, caId, active,
-                type, conf, base64Cert, scepEntry.certProfiles(), control, this);
+        Scep scep = queryExecutor.changeScep(name, caId, active, type, conf, base64Cert,
+                scepEntry.certProfiles(), control, this, securityFactory);
         if (scep == null) {
             return false;
         }
@@ -2981,9 +3016,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
     }
 
-    private static String canonicalizeSignerConf(final String keystoreType, final String signerConf,
+    static String canonicalizeSignerConf(final String keystoreType, final String signerConf,
             final X509Certificate[] certChain, final SecurityFactory securityFactory)
-            throws Exception {
+            throws CaMgmtException {
         if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
             return signerConf;
         }
@@ -2996,15 +3031,25 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         byte[] ksBytes;
         if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
             String keystoreFile = keystoreConf.substring("file:".length());
-            ksBytes = IoUtil.read(keystoreFile);
+            try {
+                ksBytes = IoUtil.read(keystoreFile);
+            } catch (IOException ex) {
+                throw new CaMgmtException("IOException: " + ex.getMessage(), ex);
+            }
         } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
             ksBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         } else {
             return signerConf;
         }
 
-        ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
-                securityFactory.getPasswordResolver().resolvePassword(passwordHint), certChain);
+        try {
+            ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
+                    securityFactory.getPasswordResolver().resolvePassword(passwordHint), certChain);
+        } catch (KeyStoreException ex) {
+            throw new CaMgmtException("KeyStoreException: " + ex.getMessage(), ex);
+        } catch (PasswordResolverException ex) {
+            throw new CaMgmtException("PasswordResolverException: " + ex.getMessage(), ex);
+        }
         pairs.putPair("keystore", "base64:" + Base64.encodeToString(ksBytes));
         return pairs.getEncoded();
     } // method canonicalizeSignerConf

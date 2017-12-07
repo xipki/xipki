@@ -39,6 +39,7 @@ import java.util.Set;
 
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.security.AlgorithmValidator;
@@ -185,16 +186,22 @@ public class CmpControl {
         } catch (NoSuchAlgorithmException ex) {
             throw new InvalidConfException("invalid sigAlgos", ex);
         }
-        pairs.putPair(KEY_PROTECTION_SIGALGO,
-            StringUtil.collectionAsString(this.sigAlgoValidator.algoNames(), ALGO_DELIMITER));
+
+        if (CollectionUtil.isNonEmpty(sigAlgos)) {
+            pairs.putPair(KEY_PROTECTION_SIGALGO,
+                StringUtil.collectionAsString(this.sigAlgoValidator.algoNames(), ALGO_DELIMITER));
+        }
 
         try {
             this.popoAlgoValidator = new CollectionAlgorithmValidator(popoAlgos);
         } catch (NoSuchAlgorithmException ex) {
             throw new InvalidConfException("invalid popoAlgos", ex);
         }
-        pairs.putPair(KEY_POPO_SIGALGO,
-            StringUtil.collectionAsString(this.popoAlgoValidator.algoNames(), ALGO_DELIMITER));
+
+        if (CollectionUtil.isNonEmpty(popoAlgos)) {
+            pairs.putPair(KEY_POPO_SIGALGO,
+                StringUtil.collectionAsString(this.popoAlgoValidator.algoNames(), ALGO_DELIMITER));
+        }
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     } // constructor
@@ -258,7 +265,7 @@ public class CmpControl {
         sb.append("groupEnroll: ").append(getYesNo(groupEnroll)).append("\n");
         sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
-        sb.append("signature algos: ")
+        sb.append("protection algos: ")
             .append(StringUtil.collectionAsString(sigAlgoValidator.algoNames(), ALGO_DELIMITER))
             .append('\n');
         sb.append("popo algos: ")

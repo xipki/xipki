@@ -1190,6 +1190,11 @@ class CaManagerQueryExecutor {
 
                 if (signerConf != null) {
                     tmpSignerConf = getRealString(signerConf);
+
+                    if (tmpSignerConf != null) {
+                        tmpSignerConf = CaManagerImpl.canonicalizeSignerConf(tmpSignerType,
+                                tmpSignerConf, null, securityFactory);
+                    }
                 }
 
                 X509Certificate tmpCert;
@@ -1602,7 +1607,8 @@ class CaManagerQueryExecutor {
     } // method changeCmpRequestor
 
     CmpResponderEntryWrapper changeResponder(final String name, final String type,
-            final String conf, final String base64Cert, final CaManagerImpl caManager)
+            final String conf, final String base64Cert, final CaManagerImpl caManager,
+            final SecurityFactory securityFactory)
             throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("caManager", caManager);
@@ -1610,14 +1616,10 @@ class CaManagerQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
-        String tmpType = type;
-        String tmpConf = conf;
-        String tmpBase64Cert = base64Cert;
-
         AtomicInteger index = new AtomicInteger(1);
-        Integer idxType = addToSqlIfNotNull(sqlBuilder, index, tmpType, "TYPE");
-        Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, tmpBase64Cert, "CERT");
-        Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, tmpConf, "CONF");
+        Integer idxType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
+        Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "CERT");
+        Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
@@ -1627,16 +1629,19 @@ class CaManagerQueryExecutor {
 
         CmpResponderEntry dbEntry = createResponder(name);
 
-        if (tmpType == null) {
-            tmpType = dbEntry.type();
-        }
-
-        if (tmpConf == null) {
+        String tmpType = (type != null) ? type : dbEntry.type();
+        String tmpConf;
+        if (conf == null) {
             tmpConf = dbEntry.conf();
+        } else {
+            tmpConf = CaManagerImpl.canonicalizeSignerConf(tmpType, conf, null, securityFactory);
         }
 
-        if (tmpBase64Cert == null) {
+        String tmpBase64Cert;
+        if (base64Cert == null) {
             tmpBase64Cert = dbEntry.base64Cert();
+        } else {
+            tmpBase64Cert = base64Cert;
         }
 
         CmpResponderEntry newDbEntry = new CmpResponderEntry(name, tmpType,
@@ -1697,24 +1702,19 @@ class CaManagerQueryExecutor {
 
     X509CrlSignerEntryWrapper changeCrlSigner(final String name, final String signerType,
             final String signerConf, final String base64Cert, final String crlControl,
-            final CaManagerImpl caManager) throws CaMgmtException {
+            final CaManagerImpl caManager, SecurityFactory securityFactory) throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("caManager", caManager);
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CRLSIGNER SET ");
 
-        String tmpSignerType = signerType;
-        String tmpSignerConf = signerConf;
-        String tmpBase64Cert = base64Cert;
-        String tmpCrlControl = crlControl;
-
         AtomicInteger index = new AtomicInteger(1);
 
-        Integer idxSignerType = addToSqlIfNotNull(sqlBuilder, index, tmpSignerType, "SIGNER_TYPE");
-        Integer idxSignerCert = addToSqlIfNotNull(sqlBuilder, index, tmpBase64Cert, "SIGNER_CERT");
-        Integer idxCrlControl = addToSqlIfNotNull(sqlBuilder, index, tmpCrlControl, "CRL_CONTROL");
-        Integer idxSignerConf = addToSqlIfNotNull(sqlBuilder, index, tmpSignerConf, "SIGNER_CONF");
+        Integer idxSignerType = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
+        Integer idxSignerCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
+        Integer idxCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
+        Integer idxSignerConf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
 
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
@@ -1724,20 +1724,28 @@ class CaManagerQueryExecutor {
         }
 
         X509CrlSignerEntry dbEntry = createCrlSigner(name);
-        if (tmpSignerType == null) {
-            tmpSignerType = dbEntry.type();
-        }
+
+        String tmpSignerType = (signerType == null) ? dbEntry.type() : signerType;
+        String tmpCrlControl = crlControl;
+
+        String tmpSignerConf;
+        String tmpBase64Cert;
 
         if ("CA".equalsIgnoreCase(tmpSignerType)) {
             tmpSignerConf = null;
             tmpBase64Cert = null;
         } else {
-            if (tmpSignerConf == null) {
+            if (signerConf == null) {
                 tmpSignerConf = dbEntry.conf();
+            } else {
+                tmpSignerConf = CaManagerImpl.canonicalizeSignerConf(tmpSignerType,
+                        signerConf, null, securityFactory);
             }
 
-            if (tmpBase64Cert == null) {
+            if (base64Cert == null) {
                 tmpBase64Cert = dbEntry.base64Cert();
+            } else {
+                tmpBase64Cert = base64Cert;
             }
         }
 
@@ -1818,7 +1826,7 @@ class CaManagerQueryExecutor {
     Scep changeScep(final String name, final NameId caIdent, final Boolean active,
             final String responderType, final String responderConf,
             final String responderBase64Cert, final Set<String> certProfiles, final String control,
-            final CaManagerImpl caManager)
+            final CaManagerImpl caManager, final SecurityFactory securityFactory)
             throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("caManager", caManager);
@@ -1849,8 +1857,14 @@ class CaManagerQueryExecutor {
         String tmpResponderType = (responderType ==  null)
                 ? dbEntry.responderType() : responderType;
 
-        String tmpResponderConf = (responderConf == null)
-                ? dbEntry.responderConf() : responderConf;
+        String tmpResponderConf;
+
+        if (responderConf == null) {
+            tmpResponderConf = dbEntry.responderConf();
+        } else {
+            tmpResponderConf = CaManagerImpl.canonicalizeSignerConf(tmpResponderType,
+                    responderConf, null, securityFactory);
+        }
 
         String tmpResponderBase64Cert = (responderBase64Cert == null)
                 ? dbEntry.base64Cert() : responderBase64Cert;

@@ -34,6 +34,7 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.ca.api.NameId;
@@ -81,7 +82,11 @@ public class CaHasRequestorEntry {
     }
 
     public void setProfiles(final Set<String> profiles) {
-        this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
+        if (CollectionUtil.isEmpty(profiles)) {
+            this.profiles = Collections.emptySet();
+        } else {
+            this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
+        }
     }
 
     public Set<String> profiles() {

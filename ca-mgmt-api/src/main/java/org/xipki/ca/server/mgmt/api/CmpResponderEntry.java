@@ -55,7 +55,7 @@ public class CmpResponderEntry {
 
     private final String type;
 
-    private final String conf;
+    private String conf;
 
     private boolean certFaulty;
 
@@ -89,6 +89,10 @@ public class CmpResponderEntry {
 
     public String type() {
         return type;
+    }
+
+    public void setConf(String conf) {
+        this.conf = conf;
     }
 
     public String conf() {

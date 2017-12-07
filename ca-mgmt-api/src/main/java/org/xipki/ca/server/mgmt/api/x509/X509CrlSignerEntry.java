@@ -60,9 +60,9 @@ public class X509CrlSignerEntry {
 
     private final String signerType;
 
-    private final String signerConf;
-
     private final String base64Cert;
+
+    private String signerConf;
 
     private X509Certificate cert;
 
@@ -97,6 +97,10 @@ public class X509CrlSignerEntry {
 
     public void setConfFaulty(final boolean faulty) {
         this.confFaulty = faulty;
+    }
+
+    public void setConf(String conf) {
+        this.signerConf = conf;
     }
 
     public boolean isFaulty() {

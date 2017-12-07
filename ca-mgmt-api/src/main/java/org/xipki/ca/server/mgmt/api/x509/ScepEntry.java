@@ -71,9 +71,9 @@ public class ScepEntry {
 
     private final String responderType;
 
-    private final String responderConf;
-
     private final String base64Cert;
+
+    private String responderConf;
 
     private X509Certificate certificate;
 
@@ -132,6 +132,10 @@ public class ScepEntry {
 
     public String responderType() {
         return responderType;
+    }
+
+    public void setResponderConf(String conf) {
+        this.responderConf = conf;
     }
 
     public String responderConf() {

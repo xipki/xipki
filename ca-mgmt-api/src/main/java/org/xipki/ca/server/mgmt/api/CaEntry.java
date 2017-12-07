@@ -98,9 +98,13 @@ public class CaEntry {
     public static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
         ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.value("algo");
-        List<String> list = StringUtil.split(str, ":");
-        if (list == null) {
+        if (str == null) {
             throw new XiSecurityException("no algo is defined in CA signerConf");
+        }
+
+        List<String> list = StringUtil.split(str, ":");
+        if (CollectionUtil.isEmpty(list)) {
+            throw new XiSecurityException("empty algo is defined in CA signerConf");
         }
 
         List<String[]> signerConfs = new ArrayList<>(list.size());
@@ -136,6 +140,10 @@ public class CaEntry {
 
     public void setKeepExpiredCertInDays(final int days) {
         this.keepExpiredCertInDays = days;
+    }
+
+    public void setSignerConf(String signerConf) {
+        this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
     }
 
     public String signerConf() {
