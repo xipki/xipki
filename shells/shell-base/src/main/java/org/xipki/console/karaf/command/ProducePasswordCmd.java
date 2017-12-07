@@ -32,7 +32,7 @@ import org.xipki.password.PasswordProducer;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "produce-password",
+@Command(scope = "xi", name = "produce-password",
         description = "produce password")
 @Service
 public class ProducePasswordCmd extends XipkiCommandSupport {

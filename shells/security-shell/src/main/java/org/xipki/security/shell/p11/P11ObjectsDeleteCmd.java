@@ -31,7 +31,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "delete-objects",
+@Command(scope = "xi", name = "delete-objects",
         description = "delete objects in PKCS#11 device")
 @Service
 public class P11ObjectsDeleteCmd extends SecurityCommandSupport {

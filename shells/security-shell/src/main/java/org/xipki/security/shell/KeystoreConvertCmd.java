@@ -37,7 +37,7 @@ import org.xipki.security.util.KeyUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "keystore-convert",
+@Command(scope = "xi", name = "keystore-convert",
         description = "convert the keystore format")
 @Service
 public class KeystoreConvertCmd extends SecurityCommandSupport {

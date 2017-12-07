@@ -40,7 +40,7 @@ import org.xipki.security.shell.completer.KeystoreTypeCompleter;
  * @since 2.2.0
  */
 
-@Command(scope = "xipki-tk", name = "convert-keystore",
+@Command(scope = "xi", name = "convert-keystore",
         description = "Convert keystore")
 @Service
 public class ConvertKeystoreCmd extends SecurityCommandSupport {

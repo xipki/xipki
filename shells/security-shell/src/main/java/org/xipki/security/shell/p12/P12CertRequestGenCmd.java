@@ -45,7 +45,7 @@ import org.xipki.security.util.KeyUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "req-p12",
+@Command(scope = "xi", name = "req-p12",
         description = "generate CSR with PKCS#12 keystore")
 @Service
 public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {

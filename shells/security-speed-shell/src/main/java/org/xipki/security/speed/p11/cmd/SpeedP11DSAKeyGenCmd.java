@@ -28,7 +28,7 @@ import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "speed-dsa-gen",
+@Command(scope = "xi", name = "speed-dsa-gen",
         description = "performance test of PKCS#11 DSA key generation")
 @Service
 // CHECKSTYLE:SKIP

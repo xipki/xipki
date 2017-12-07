@@ -33,7 +33,7 @@ import org.xipki.console.karaf.intern.FileUtils;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "rm",
+@Command(scope = "xi", name = "rm",
         description = "remove file or directory")
 @Service
 public class FileRmCmd extends XipkiCommandSupport {

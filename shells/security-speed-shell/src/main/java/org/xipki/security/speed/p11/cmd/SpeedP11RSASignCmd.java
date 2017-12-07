@@ -30,7 +30,7 @@ import org.xipki.security.speed.p11.P11RSASignLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "speed-rsa-sign",
+@Command(scope = "xi", name = "speed-rsa-sign",
         description = "performance test of PKCS#11 RSA signature creation")
 @Service
 // CHECKSTYLE:SKIP

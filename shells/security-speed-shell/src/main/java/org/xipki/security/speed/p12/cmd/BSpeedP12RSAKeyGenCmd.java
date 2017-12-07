@@ -32,7 +32,7 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "bspeed-rsa-gen-p12",
+@Command(scope = "xi", name = "bspeed-rsa-gen-p12",
         description = "performance test of PKCS#12 RSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP

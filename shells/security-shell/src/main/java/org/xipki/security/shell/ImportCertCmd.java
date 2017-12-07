@@ -41,7 +41,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.2.0
  */
 
-@Command(scope = "xipki-tk", name = "import-cert",
+@Command(scope = "xi", name = "import-cert",
         description = "Import certificates to a keystore")
 @Service
 public class ImportCertCmd extends SecurityCommandSupport {

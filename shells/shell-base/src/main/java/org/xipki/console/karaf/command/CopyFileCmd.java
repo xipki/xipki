@@ -33,7 +33,7 @@ import org.xipki.console.karaf.intern.FileUtils;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "copy-file",
+@Command(scope = "xi", name = "copy-file",
         description = "copy file")
 @Service
 public class CopyFileCmd extends XipkiCommandSupport {

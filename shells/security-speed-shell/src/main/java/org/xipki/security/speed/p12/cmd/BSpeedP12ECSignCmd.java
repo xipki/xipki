@@ -31,7 +31,7 @@ import org.xipki.security.speed.p12.P12ECSignLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "bspeed-ec-sign-p12",
+@Command(scope = "xi", name = "bspeed-ec-sign-p12",
         description = "performance test of PKCS#12 EC signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP

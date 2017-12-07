@@ -28,7 +28,7 @@ import org.xipki.console.karaf.XipkiCommandSupport;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "confirm",
+@Command(scope = "xi", name = "confirm",
         description = "confirm an action")
 @Service
 public class ConfirmCmd extends XipkiCommandSupport {

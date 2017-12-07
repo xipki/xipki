@@ -31,7 +31,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "refresh",
+@Command(scope = "xi", name = "refresh",
         description = "refresh PKCS#11 module")
 @Service
 public class P11RefreshSlotCmd extends SecurityCommandSupport {

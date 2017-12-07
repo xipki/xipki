@@ -35,7 +35,7 @@ import org.xipki.security.HashAlgoType;
  * @since 2.1.0
  */
 
-@Command(scope = "xipki-tk", name = "cert-info",
+@Command(scope = "xi", name = "cert-info",
         description = "print certificate information")
 @Service
 public class CertInfoCmd extends SecurityCommandSupport {

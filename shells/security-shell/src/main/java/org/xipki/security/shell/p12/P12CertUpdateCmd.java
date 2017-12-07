@@ -41,7 +41,7 @@ import org.xipki.security.util.X509Util;
  * @author Lijun Liao
  * @since 2.0.0
  */
-@Command(scope = "xipki-tk", name = "update-cert-p12",
+@Command(scope = "xi", name = "update-cert-p12",
         description = "update certificate in PKCS#12 keystore")
 @Service
 public class P12CertUpdateCmd extends P12SecurityCommandSupport {

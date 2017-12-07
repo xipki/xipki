@@ -33,7 +33,7 @@ import org.xipki.password.OBFPasswordService;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "obfuscate",
+@Command(scope = "xi", name = "obfuscate",
         description = "obfuscate password")
 @Service
 public class ObfuscateCmd extends SecurityCommandSupport {

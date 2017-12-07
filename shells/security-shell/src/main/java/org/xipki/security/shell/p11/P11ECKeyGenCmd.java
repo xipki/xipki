@@ -30,7 +30,7 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "ec",
+@Command(scope = "xi", name = "ec",
         description = "generate EC keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP

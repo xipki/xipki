@@ -35,7 +35,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "ls",
+@Command(scope = "xi", name = "ls",
         description = "list directory contents")
 @Service
 public class FileListCmd extends XipkiCommandSupport {

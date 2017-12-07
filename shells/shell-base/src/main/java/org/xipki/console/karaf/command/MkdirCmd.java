@@ -31,7 +31,7 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "mkdir",
+@Command(scope = "xi", name = "mkdir",
         description = "make directories")
 @Service
 public class MkdirCmd extends XipkiCommandSupport {

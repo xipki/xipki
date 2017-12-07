@@ -36,7 +36,7 @@ import org.xipki.password.PBEPasswordService;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "pbe-dec",
+@Command(scope = "xi", name = "pbe-dec",
         description = "decrypt password with master password")
 @Service
 // CHECKSTYLE:SKIP

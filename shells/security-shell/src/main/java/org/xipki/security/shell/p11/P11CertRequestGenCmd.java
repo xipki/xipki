@@ -37,7 +37,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "req",
+@Command(scope = "xi", name = "req",
         description = "generate CSR request with PKCS#11 device")
 @Service
 public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {

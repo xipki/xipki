@@ -30,7 +30,7 @@ import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "speed-ec-gen",
+@Command(scope = "xi", name = "speed-ec-gen",
         description = "performance test of PKCS#11 EC key generation")
 @Service
 // CHECKSTYLE:SKIP

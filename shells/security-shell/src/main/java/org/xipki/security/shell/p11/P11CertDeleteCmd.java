@@ -32,7 +32,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "rm-cert",
+@Command(scope = "xi", name = "rm-cert",
         description = "remove certificate from PKCS#11 device")
 @Service
 public class P11CertDeleteCmd extends SecurityCommandSupport {

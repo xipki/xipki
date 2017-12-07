@@ -35,7 +35,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "add-cert",
+@Command(scope = "xi", name = "add-cert",
         description = "add certificate to PKCS#11 device")
 @Service
 public class P11CertAddCmd extends SecurityCommandSupport {

@@ -30,7 +30,7 @@ import org.xipki.security.speed.p12.P12HMACSignLoadTest;
  * @since 2.2.0
  */
 
-@Command(scope = "xipki-tk", name = "speed-hmac-sign-p12",
+@Command(scope = "xi", name = "speed-hmac-sign-p12",
         description = "performance test of PKCS#12 HMAC signature creation")
 @Service
 // CHECKSTYLE:SKIP

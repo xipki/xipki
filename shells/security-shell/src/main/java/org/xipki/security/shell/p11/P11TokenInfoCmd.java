@@ -34,7 +34,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "token-info",
+@Command(scope = "xi", name = "token-info",
         description = "list objects in PKCS#11 device")
 @Service
 public class P11TokenInfoCmd extends SecurityCommandSupport {

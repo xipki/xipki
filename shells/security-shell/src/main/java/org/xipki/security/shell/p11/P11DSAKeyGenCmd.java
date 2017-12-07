@@ -29,7 +29,7 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
+@Command(scope = "xi", name = "dsa",
         description = "generate DSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP

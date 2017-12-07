@@ -45,7 +45,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "extract-cert",
+@Command(scope = "xi", name = "extract-cert",
         description = "extract certificates from CRL")
 @Service
 public class ExtractCertFromCrlCmd extends SecurityCommandSupport {

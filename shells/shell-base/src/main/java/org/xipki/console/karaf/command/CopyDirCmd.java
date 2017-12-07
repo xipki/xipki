@@ -32,7 +32,7 @@ import org.xipki.console.karaf.intern.FileUtils;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "copy-dir",
+@Command(scope = "xi", name = "copy-dir",
         description = "copy content of the directory to destination")
 @Service
 public class CopyDirCmd extends XipkiCommandSupport {

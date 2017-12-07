@@ -29,7 +29,7 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "rsa-p12",
+@Command(scope = "xi", name = "rsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP

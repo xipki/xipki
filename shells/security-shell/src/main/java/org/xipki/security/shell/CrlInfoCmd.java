@@ -36,7 +36,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.1.0
  */
 
-@Command(scope = "xipki-tk", name = "crl-info",
+@Command(scope = "xi", name = "crl-info",
         description = "print CRL information")
 @Service
 public class CrlInfoCmd extends SecurityCommandSupport {
