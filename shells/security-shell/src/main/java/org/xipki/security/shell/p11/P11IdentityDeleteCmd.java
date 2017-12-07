@@ -27,7 +27,7 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "delete-key",
+@Command(scope = "xi", name = "delete-key-p11",
         description = "delete key and cert in PKCS#11 device")
 @Service
 public class P11IdentityDeleteCmd extends P11SecurityCommandSupport {

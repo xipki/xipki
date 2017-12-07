@@ -36,7 +36,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "bspeed-dsa-sign",
+@Command(scope = "xi", name = "bspeed-dsa-sign-p11",
         description = "performance test of PKCS#11 DSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP

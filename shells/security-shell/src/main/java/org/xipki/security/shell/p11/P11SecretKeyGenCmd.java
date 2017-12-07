@@ -33,7 +33,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @since 2.2.0
  */
 
-@Command(scope = "xi", name = "secretkey",
+@Command(scope = "xi", name = "secretkey-p11",
         description = "generate secret key in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP

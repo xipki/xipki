@@ -34,7 +34,7 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "export-cert",
+@Command(scope = "xi", name = "export-cert-p11",
         description = "export certificate from PKCS#11 device")
 @Service
 public class P11CertExportCmd extends P11SecurityCommandSupport {

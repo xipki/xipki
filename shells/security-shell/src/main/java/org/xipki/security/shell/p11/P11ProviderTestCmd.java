@@ -41,8 +41,8 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "provider-test",
-        description = "test the Xipki JCA/JCE provider")
+@Command(scope = "xi", name = "p11provider-test",
+        description = "test the Xipki PKCS#11 JCA/JCE provider")
 @Service
 public class P11ProviderTestCmd extends P11SecurityCommandSupport {
 

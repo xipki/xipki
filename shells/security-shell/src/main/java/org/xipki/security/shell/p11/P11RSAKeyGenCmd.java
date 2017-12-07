@@ -29,7 +29,7 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "rsa",
+@Command(scope = "xi", name = "rsa-p11",
         description = "generate RSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP

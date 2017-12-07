@@ -35,7 +35,7 @@ import org.xipki.security.speed.p11.P11RSASignLoadTest;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "bspeed-rsa-sign",
+@Command(scope = "xi", name = "bspeed-rsa-sign-p11",
         description = "performance test of PKCS#11 RSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
