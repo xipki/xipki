@@ -33,7 +33,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "remove-cert",
+@Command(scope = "xi", name = "cmp-remove-cert",
         description = "remove certificate")
 @Service
 public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {

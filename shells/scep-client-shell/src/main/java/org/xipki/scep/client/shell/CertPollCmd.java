@@ -38,7 +38,7 @@ import org.xipki.scep.client.ScepClient;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-scep", name = "certpoll",
+@Command(scope = "xi", name = "scep-certpoll",
         description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientCommandSupport {

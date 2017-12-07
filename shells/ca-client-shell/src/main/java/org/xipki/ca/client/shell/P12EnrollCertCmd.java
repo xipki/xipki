@@ -36,7 +36,7 @@ import org.xipki.security.SignerConf;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "enroll-p12",
+@Command(scope = "xi", name = "cmp-enroll-p12",
         description = "enroll certificate (PKCS#12 keystore)")
 @Service
 public class P12EnrollCertCmd extends EnrollCertCommandSupport {

@@ -41,7 +41,7 @@ import org.xipki.security.SecurityFactory;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "benchmark-revoke",
+@Command(scope = "xiqa", name = "cmp-benchmark-revoke",
         description = "CA client revoke load test")
 @Service
 public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {

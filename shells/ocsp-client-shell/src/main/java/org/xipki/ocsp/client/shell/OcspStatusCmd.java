@@ -67,7 +67,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ocsp", name = "status",
+@Command(scope = "xi", name = "ocsp-status",
         description = "request certificate status")
 @Service
 public class OcspStatusCmd extends BaseOcspStatusCommandSupport {

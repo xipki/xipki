@@ -13,60 +13,53 @@ CACERT = ${OUT_DIR}/cacert.der
 
 echo "# Get CA certificate"
 
-xipki-cmd:curl \
-  --out ${CACERT} \
-  $BASE_URL/cacert
+xi:curl --out ${CACERT} $BASE_URL/cacert
 
-CA_SHA1FP = $(xipki-tk:cert-info --fingerprint --hash SHA1 --in ${CACERT})
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
 
 echo "=====RESTFUL: Enroll====="
 
 CN = RESTFUL-TLS-${CUR_TIME}
 
-xipki-tk:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
-xipki-tk:req-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:req-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE" \
   --out ${OUT_DIR}/${CN}.csr
 
-xipki-cmd:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
+xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
   --header "Content-Type: application/pkcs10" \
   "$BASE_URL/enroll-cert?profile=TLS"
 
-SERIAL = $(xipki-tk:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
+SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 
 echo "Current OCSP Status"
-xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====RESTFUL: Suspend====="
 
-xipki-cmd:curl \
-  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "Current OCSP Status"
-xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====RESTFUL: Unsuspend====="
 
-xipki-cmd:curl \
-  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "Current OCSP Status"
-xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====RESTFUL: Revoke====="
 
-xipki-cmd:curl \
-  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "Current OCSP Status"
-xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====CMP: Generate CRL====="
 
-xipki-cmd:curl \
-  --out ${OUT_DIR}/RESTFUL-MYCA-GEN.crl $BASE_URL/new-crl
+xi:curl --out ${OUT_DIR}/RESTFUL-MYCA-GEN.crl $BASE_URL/new-crl
 
-xipki-cmd:curl \
-  --out ${OUT_DIR}/RESTFUL-MYCA-GET.crl $BASE_URL/crl
+xi:curl --out ${OUT_DIR}/RESTFUL-MYCA-GET.crl $BASE_URL/crl
 

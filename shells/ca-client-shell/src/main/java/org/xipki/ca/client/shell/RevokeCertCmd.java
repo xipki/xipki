@@ -39,7 +39,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "revoke",
+@Command(scope = "xi", name = "cmp-revoke",
         description = "revoke certificate")
 @Service
 public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {

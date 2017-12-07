@@ -40,7 +40,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-jscep", name = "certpoll",
+@Command(scope = "xi", name = "jscep-certpoll",
         description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientCommandSupport {

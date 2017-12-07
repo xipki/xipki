@@ -35,7 +35,7 @@ import org.xipki.console.karaf.completer.ECCurveNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "benchmark-enroll",
+@Command(scope = "xiqa", name = "cmp-benchmark-enroll",
         description = "CA client enroll load test")
 @Service
 public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {

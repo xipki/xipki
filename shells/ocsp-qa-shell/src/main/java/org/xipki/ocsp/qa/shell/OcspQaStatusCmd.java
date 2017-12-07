@@ -53,7 +53,7 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-qa", name = "ocsp-status",
+@Command(scope = "xiqa", name = "ocsp-status",
         description = "request certificate status (QA)")
 @Service
 public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {

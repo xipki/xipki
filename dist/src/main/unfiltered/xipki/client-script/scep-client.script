@@ -14,72 +14,72 @@ CACERT = ${OUT_DIR}/cacert.der
 
 echo "# Get CA certificate"
 
-xipki-scep:cacert --url ${URL} --out ${CACERT}
+xi:scep-cacert --url ${URL} --out ${CACERT}
 
 echo "=====SCEP: Enroll (self-signed identity cert) ====="
 
 CN = SCEP-TLS-${CUR_TIME}
 
 # Must use the same CN as in the CSR
-xipki-tk:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
 
-xipki-tk:req-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:req-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --challenge-password user1:password1 \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
 
 echo "# Enroll certificate via PKCSReq"
-xipki-scep:pkcs-req --url ${URL} --ca-cert ${CACERT} \
+xi:scep-enroll --method PKCS --url ${URL} --ca-cert ${CACERT} \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
 
 echo "# Poll Cert"
-xipki-scep:certpoll --url ${URL} --ca-cert ${CACERT} \
+xi:scep-certpoll --url ${URL} --ca-cert ${CACERT} \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --csr ${OUT_DIR}/${CN}.csr \
   --out ${OUT_DIR}/${CN}-certpoll.der
   
 echo "# Get Cert"
 
-SERIAL = $(xipki-tk:cert-info --serial --hex --in ${OUT_DIR}/${CN}-certpoll.der)
+SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}-certpoll.der)
 
-xipki-scep:getcert --url ${URL} --ca-cert ${CACERT} \
+xi:scep-getcert --url ${URL} --ca-cert ${CACERT} \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/${CN}-getcert.der \
   --serial ${SERIAL}
 
 echo "# Update the certificate in PKCS#12 file"
-xipki-tk:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
 
 echo "# Get CRL"
-xipki-scep:getcrl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
+xi:scep-getcrl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/MYCA1-scep.crl
  
 echo "# Renewal"
-xipki-tk:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=Dummy"
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=Dummy"
 
-xipki-tk:req-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+xi:req-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
   --subject "CN=${CN}-2.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}-2.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
-xipki-scep:renewal-req --url ${URL} --ca-cert ${CACERT} \
+xi:scep-enroll --method RENEWAL --url ${URL} --ca-cert ${CACERT} \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --csr ${OUT_DIR}/${CN}-2.csr --out ${OUT_DIR}/${CN}-2.der
 
 echo "# Update the certificate in PKCS#12 file"
-xipki-tk:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}-2.der --ca-cert ${CACERT}
 
 echo "# Renewal with different CommonName"
-xipki-tk:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=Dummy"
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=Dummy"
 
-xipki-tk:req-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+xi:req-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
   --subject "CN=${CN}-3.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}-3.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
-xipki-scep:renewal-req --url ${URL} --ca-cert ${CACERT} --p12 ${OUT_DIR}/${CN}.p12 \
+xi:scep-enroll --method RENEWAL --url ${URL} --ca-cert ${CACERT} --p12 ${OUT_DIR}/${CN}.p12 \
   --password 1234 --csr ${OUT_DIR}/${CN}-3.csr --out ${OUT_DIR}/${CN}-3.der
 
 echo "# Update the certificate in PKCS#12 file"
-xipki-tk:update-cert-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}-3.der --ca-cert ${CACERT}
 

@@ -17,33 +17,82 @@
 
 package org.xipki.scep.client.shell;
 
+import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
-import org.xipki.scep.client.exception.ScepClientException;
+import org.xipki.scep.client.shell.completer.EnrollMetodCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
-
-@Command(scope = "xipki-scep", name = "enroll",
-        description = "enroll certificate via automic selected messageType")
+@Command(scope = "xi", name = "scep-enroll", description = "enroll certificate")
 @Service
-public class EnrollCertCmd extends EnrollCertCommandSupport {
+public class EnrollCertCmd extends ClientCommandSupport {
+
+    @Option(name = "--csr",
+            required = true,
+            description = "CSR file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String csrFile;
+
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
+
+    @Option(name = "--method",
+            description = "method to enroll the certificate.")
+    @Completion(EnrollMetodCompleter.class)
+    private String method;
 
     @Override
-    protected EnrolmentResponse requestCertificate(final ScepClient client,
-            final CertificationRequest csr, final PrivateKey identityKey,
-            final X509Certificate identityCert) throws ScepClientException {
-        ParamUtil.requireNonNull("client", client);
-        return client.scepEnrol(csr, identityKey, identityCert);
+    protected Object execute0() throws Exception {
+        ScepClient client = getScepClient();
+
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+        EnrolmentResponse resp;
+        
+        PrivateKey key0 = getIdentityKey();
+        X509Certificate cert0 = getIdentityCert();
+        if (StringUtil.isBlank(method)) {
+            resp = client.scepEnrol(csr, key0, cert0);
+        } else if ("PKCS".equalsIgnoreCase(method)) {
+            resp = client.scepPkcsReq(csr, key0, cert0);
+        } else if ("RENEWAL".equalsIgnoreCase(method)) {
+            resp = client.scepRenewalReq(csr, key0, cert0);
+        } else if ("UPDATE".equalsIgnoreCase(method)) {
+            resp = client.scepUpdateReq(csr, key0, cert0);            
+        } else {
+            throw new CmdFailure("invalid enroll method");
+        }
+        
+        if (resp.isFailure()) {
+            throw new CmdFailure("server returned 'failure'");
+        }
+
+        if (resp.isPending()) {
+            throw new CmdFailure("server returned 'pending'");
+        }
+
+        X509Certificate cert = resp.certificates().get(0);
+        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+        return null;
     }
 
 }

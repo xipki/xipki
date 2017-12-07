@@ -36,7 +36,7 @@ import org.xipki.scep.client.ScepClient;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-scep", name = "cacert",
+@Command(scope = "xi", name = "scep-cacert",
         description = "get CA certificate")
 @Service
 public class GetCaCertCmd extends XipkiCommandSupport {

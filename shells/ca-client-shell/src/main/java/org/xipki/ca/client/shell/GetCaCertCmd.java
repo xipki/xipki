@@ -37,7 +37,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "cacert", description = "get CA certificate")
+@Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
 @Service
 public class GetCaCertCmd extends ClientCommandSupport {
 

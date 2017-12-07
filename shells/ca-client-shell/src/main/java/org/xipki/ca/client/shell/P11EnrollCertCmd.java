@@ -37,7 +37,7 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "enroll",
+@Command(scope = "xi", name = "cmp-enroll",
         description = "enroll certificate (PKCS#11 token)")
 @Service
 public class P11EnrollCertCmd extends EnrollCertCommandSupport {

@@ -46,7 +46,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-qa", name = "benchmark-ocsp-status",
+@Command(scope = "xiqa", name = "benchmark-ocsp-status",
         description = "OCSP benchmark")
 @Service
 public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {

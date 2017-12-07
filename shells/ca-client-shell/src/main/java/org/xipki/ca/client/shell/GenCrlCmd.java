@@ -30,7 +30,7 @@ import org.xipki.common.RequestResponseDebug;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "gencrl",
+@Command(scope = "xi", name = "cmp-gencrl",
         description = "generate CRL")
 @Service
 public class GenCrlCmd extends CrlCommandSupport {

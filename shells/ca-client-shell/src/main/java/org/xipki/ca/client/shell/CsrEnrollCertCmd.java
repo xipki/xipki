@@ -41,7 +41,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "csr-enroll",
+@Command(scope = "xi", name = "cmp-csr-enroll",
         description = "enroll certificate via CSR")
 @Service
 public class CsrEnrollCertCmd extends ClientCommandSupport {

@@ -35,7 +35,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-jscep", name = "getcrl",
+@Command(scope = "xi", name = "jscep-getcrl",
         description = "download CRL")
 @Service
 public class GetCrlCmd extends ClientCommandSupport {

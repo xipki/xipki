@@ -32,7 +32,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "benchmark-template-enroll",
+@Command(scope = "xiqa", name = "cmp-benchmark-template-enroll",
         description = "CA client template enroll load test")
 @Service
 public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
