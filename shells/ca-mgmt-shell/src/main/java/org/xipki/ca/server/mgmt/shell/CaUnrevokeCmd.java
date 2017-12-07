@@ -46,7 +46,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "ca-unrevoke",
+@Command(scope = "ca", name = "ca-unrevoke",
         description = "unrevoke CA")
 @Service
 public class CaUnrevokeCmd extends CaCommandSupport {

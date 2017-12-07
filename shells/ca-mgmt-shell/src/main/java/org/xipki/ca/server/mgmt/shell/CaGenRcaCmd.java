@@ -51,7 +51,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "gen-rca",
+@Command(scope = "ca", name = "gen-rca",
         description = "generate selfsigned CA")
 @Service
 public class CaGenRcaCmd extends CaAddOrGenCommandSupport {

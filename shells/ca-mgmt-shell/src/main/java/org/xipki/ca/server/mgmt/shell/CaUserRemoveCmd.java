@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
  * @since 2.2.0
  */
 
-@Command(scope = "xipki-ca", name = "causer-rm",
+@Command(scope = "ca", name = "causer-rm",
         description = "remove user from CA")
 @Service
 public class CaUserRemoveCmd extends CaCommandSupport {

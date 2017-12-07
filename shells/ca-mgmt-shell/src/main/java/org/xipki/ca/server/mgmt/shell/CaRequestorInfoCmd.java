@@ -49,7 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "careq-info",
+@Command(scope = "ca", name = "careq-info",
         description = "show information of requestor in CA")
 @Service
 public class CaRequestorInfoCmd extends CaCommandSupport {

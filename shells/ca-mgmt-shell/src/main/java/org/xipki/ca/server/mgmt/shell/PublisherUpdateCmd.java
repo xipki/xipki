@@ -48,7 +48,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "publisher-up",
+@Command(scope = "ca", name = "publisher-up",
         description = "update publisher")
 @Service
 public class PublisherUpdateCmd extends CaCommandSupport {

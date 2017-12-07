@@ -50,7 +50,7 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "revoke-cert",
+@Command(scope = "ca", name = "revoke-cert",
         description = "revoke certificate")
 @Service
 public class RevokeCertCmd extends UnRevRmCertCommandSupport {

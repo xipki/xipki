@@ -46,7 +46,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "profile-check",
+@Command(scope = "caqa", name = "profile-check",
         description = "check information of profiles (QA)")
 @Service
 public class ProfileCheckCmd extends ProfileUpdateCmd {

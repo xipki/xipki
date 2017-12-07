@@ -7,15 +7,15 @@ feature:install -r xipki-database-tool
 echo "Sleeping 1 second"
 sleep 1
 
-xipki-db:initdb-pki \
+ca:initdb-pki \
   --force
 
-xipki-db:initdb \
+ca:initdb \
   --force \
   --db-conf  xipki/ocsp-config/ocsp-cache-db.properties \
   --db-schema xipki/sql/ocsp-cache-init.xml
 
-xipki-db:initdb \
+ca:initdb \
   --force \
   --db-conf  xipki/ocsp-config/ocsp-crl-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
@@ -29,7 +29,7 @@ feature:install -r xipki-camgmt-shell
 echo "Sleeping 1 second"
 sleep 1
 
-xipki-ca:restart
+ca:restart
 
 echo "#################################################################"
 echo "#                       Prepare environment                    #"
@@ -37,107 +37,107 @@ echo "#################################################################"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
 # The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates
-xipki-ca:cmpcontrol-add \
+ca:cmpcontrol-add \
   --name cmpcontrol1 \
   --conf send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${HASH}withRSA:${HASH}withECDSA:${HASH}withDSA
 
 ## Certificate Profiles
-xipki-ca:profile-add \
+ca:profile-add \
   --name Cross \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_Cross.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name SubCA \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_SubCA.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name SubCA.Complex \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_SubCA_Complex.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name OCSP \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_OCSP.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name SCEP \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_SCEP.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name multipleOUs \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_multipleOUs.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name multiValuedRDN \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_multiValuedRDN.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name QC \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_QC.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name EE.Complex \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_EE_Complex.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name TLS \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_TLS.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name TLSA \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_TLS.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name TLS_C \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_TLS_C.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name TLSwithIncSN \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_TLSwithIncSN.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name gSMC_K \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_gSMC_K.xml
 
-xipki-ca:profile-add \
+ca:profile-add \
   --name MaxTime \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_MaxTime.xml
 
 ## Publishers
-xipki-ca:publisher-add \
+ca:publisher-add \
   --name OCSP.PUBLISHER \
   --type OCSP \
   --conf datasource=ocsp,publish.goodcerts=true
 
 # CMP Responder
 # with encrypted password 1234
-xipki-ca:responder-add \
+ca:responder-add \
   --name responder1 \
   --signer-type PKCS12 \
   --signer-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=REPLACEME-CMP_SIGALGO
 
 # CMP Requestors
-xipki-ca:requestor-add \
+ca:requestor-add \
   --name requestor1 \
   --cert xipki/security/tlskeys/tls-client.der
 
 ## CRL Signer
 # Generate CRL every day at 02:00 UTC with 90 minutes overlap time
-xipki-ca:crlsigner-add \
+ca:crlsigner-add \
   --name CASIGN.CRLSIGNER \
   --signer-type CA \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false
@@ -149,14 +149,14 @@ echo "#################################################################"
 echo "#                          Generate RCA                         #"
 echo "#################################################################"
 ## Add the profile RCA
-xipki-ca:profile-add \
+ca:profile-add \
   --name RCA \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:req \
+  xi:req \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label RCA1 \
@@ -164,7 +164,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --subject "CN=RCA1,O=xipki,C=DE" \
     --keyusage cRLSign
 } {
-  xipki-tk:req-p12 \
+  xi:req-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/RCA1.p12 \
     --password 1234 \
@@ -183,7 +183,7 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/RCA1.p12,password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg=="
 }
 
-xipki-ca:gen-rca \
+ca:gen-rca \
   --name RCA1 \
   --csr output/RCA1.csr \
   --profile RCA \
@@ -204,47 +204,50 @@ xipki-ca:gen-rca \
   --validity-mode CUTOFF \
   --save-req yes
 
+## Remove the profile RCA
+ca:profile-rm RCA
+
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:update-cert \
+  xi:update-cert \
     --slot $SLOT \
     --label RCA1 \
     --cert output/RCA1.der
 } {
-  xipki-tk:update-cert-p12 \
+  xi:update-cert-p12 \
     --p12 output/RCA1.p12 \
     --password 1234 \
     --cert output/RCA1.der
 }
 
-xipki-ca:caalias-add \
+ca:caalias-add \
   --ca RCA1 \
   --alias RCA
 
 ## Add Profiles
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca RCA1 \
   --profile Cross
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca RCA1 \
   --profile SubCA
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca RCA1 \
   --profile SubCA.Complex
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca RCA1 \
   --profile OCSP
 
 ## Add publisher
-xipki-ca:capub-add \
+ca:capub-add \
   --ca RCA1 \
   --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add \
+ca:careq-add \
   --requestor requestor1 \
   --permission ALL \
   --ra yes \
@@ -253,14 +256,14 @@ xipki-ca:careq-add \
 
 ## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:req \
+  xi:req \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCA1 \
     --out output/SubCA1.csr \
     --subject "CN=SubCA1,O=xipki,C=DE"
 } {
-  xipki-tk:req-p12 \
+  xi:req-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/SubCA1.p12 \
     --password 1234 \
@@ -268,19 +271,19 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --subject "CN=SubCA1,O=xipki,C=DE"
 }
 
-xipki-ca:enroll-cert \
+ca:enroll-cert \
   --ca RCA1 \
   --csr output/SubCA1.csr \
   --out output/SubCA1.der \
   --profile SubCA
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:update-cert \
+  xi:update-cert \
     --slot $SLOT \
     --label SubCA1 \
     --cert output/SubCA1.der \
 } {
-  xipki-tk:update-cert-p12 \
+  xi:update-cert-p12 \
     --p12 output/SubCA1.p12 \
     --password 1234 \
     --cert output/SubCA1.der \
@@ -289,7 +292,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
 ## Generate keys and CSR for SubCAwithCRL1
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:req \
+  xi:req \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
@@ -304,7 +307,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
     --keyusage cRLSign
 } {
-  xipki-tk:req-p12 \
+  xi:req-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/SubCAwithCRL1.p12 \
     --password 1234 \
@@ -321,19 +324,19 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 }
 
-xipki-ca:enroll-cert \
+ca:enroll-cert \
   --ca RCA1 \
   --csr output/SubCAwithCRL1.csr \
   --out output/SubCAwithCRL1.der \
   --profile SubCA.Complex
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:update-cert \
+  xi:update-cert \
     --slot $SLOT \
     --label SubCAwithCRL1 \
     --cert output/SubCAwithCRL1.der \
 } {
-  xipki-tk:update-cert-p12 \
+  xi:update-cert-p12 \
     --p12 output/SubCAwithCRL1.p12 \
     --password 1234 \
     --cert output/SubCAwithCRL1.der \
@@ -342,14 +345,14 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:req \
+  xi:req \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label OCSP99 \
     --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 } {
-  xipki-tk:req-p12 \
+  xi:req-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/OCSP99.p12 \
     --password 1234 \
@@ -357,26 +360,26 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 }
 
-xipki-ca:enroll-cert \
+ca:enroll-cert \
   --ca RCA1 \
   --csr output/OCSP99.csr \
   --out output/OCSP99.der \
   --profile OCSP
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xipki-tk:update-cert \
+  xi:update-cert \
     --slot $SLOT \
     --label OCSP99 \
     --cert output/OCSP99.der \
 } {
-  xipki-tk:update-cert-p12 \
+  xi:update-cert-p12 \
     --p12 output/OCSP99.p12 \
     --password 1234 \
     --cert output/OCSP99.der \
     --ca-cert output/RCA1.der
 }
 
-xipki-ca:caprofile-rm \
+ca:caprofile-rm \
   --ca RCA1 \
   --profile OCSP
 
@@ -393,7 +396,7 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/SubCA1.p12,algo=$SIGALGO"
 }
 
-xipki-ca:ca-add \
+ca:ca-add \
   --name SubCA1.complex-Name \
   --permission ALL \
   --sn-bitlen 63 \
@@ -410,42 +413,42 @@ xipki-ca:ca-add \
   --save-req yes \
   --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d
 
-xipki-ca:caalias-add \
+ca:caalias-add \
   --ca SubCA1.complex-Name \
   --alias SubCA
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCA1.complex-Name \
   --profile QC
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCA1.complex-Name \
   --profile EE.Complex
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCA1.complex-Name \
   --profile TLS
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCA1.complex-Name \
   --profile TLS_C
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCA1.complex-Name \
   --profile TLSwithIncSN
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCA1.complex-Name \
   --profile gSMC_K
 
 ## Add publisher
-xipki-ca:capub-add \
+ca:capub-add \
   --ca SubCA1.complex-Name \
   --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add \
+ca:careq-add \
   --requestor requestor1 \
   --permission ALL \
   --ra yes \
@@ -453,7 +456,7 @@ xipki-ca:careq-add \
   --ca SubCA1.complex-Name
 
 ## Restart the CA
-#xipki-ca:restart
+#ca:restart
 
 echo "#################################################################"
 echo "#                       Add SubCA with CRL                      #"
@@ -469,7 +472,7 @@ if { $TOKEN_TYPE equals "PKCS12" } {
 keystore=file:output/SubCAwithCRL1.p12,algo=$SIGALGO"
 }
 
-xipki-ca:ca-add \
+ca:ca-add \
   --name SubCAwithCRL1 \
   --permission ALL \
   --sn-bitlen 63 \
@@ -489,37 +492,37 @@ xipki-ca:ca-add \
   --validity-mode LAX \
   --save-req no
 
-xipki-ca:caalias-add \
+ca:caalias-add \
   --ca SubCAwithCRL1 \
   --alias SubCAwithCRL
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile OCSP
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile TLSA
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile SCEP
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile multipleOUs
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile multiValuedRDN
 
-xipki-ca:caprofile-add \
+ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile MaxTime
 
 ## Add CMP requestor to CA
-xipki-ca:careq-add \
+ca:careq-add \
   --requestor requestor1 \
   --permission ALL \
   --ra yes \

@@ -48,7 +48,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "profile-up",
+@Command(scope = "ca", name = "profile-up",
         description = "update certificate profile")
 @Service
 public class ProfileUpdateCmd extends CaCommandSupport {

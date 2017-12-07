@@ -50,7 +50,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "requestor-up",
+@Command(scope = "ca", name = "requestor-up",
         description = "update requestor")
 @Service
 public class RequestorUpdateCmd extends CaCommandSupport {

@@ -51,7 +51,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "publisher-export",
+@Command(scope = "ca", name = "publisher-export",
         description = "export publisher configuration")
 @Service
 public class PublisherExportCmd extends CaCommandSupport {

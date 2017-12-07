@@ -56,7 +56,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "list-cert",
+@Command(scope = "ca", name = "list-cert",
         description = "show a list of certificates")
 @Service
 public class ListCertCmd extends CaCommandSupport {

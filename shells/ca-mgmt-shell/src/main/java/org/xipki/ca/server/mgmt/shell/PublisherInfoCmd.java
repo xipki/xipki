@@ -52,7 +52,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "publisher-info",
+@Command(scope = "ca", name = "publisher-info",
         description = "show information of publisher")
 @Service
 public class PublisherInfoCmd extends CaCommandSupport {

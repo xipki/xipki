@@ -49,7 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "env-info",
+@Command(scope = "ca", name = "env-info",
         description = "show information of CA environment parameter")
 @Service
 public class EnvInfoCmd extends CaCommandSupport {

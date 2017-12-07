@@ -96,59 +96,59 @@ if { $printUsage equals "true" } {
   source file:./xipki/demo/demo.d/prepare-keys.script
 
   ## Prepare OCSP responder configuration
-  xipki-cmd:copy-file \
+  xi:copy-file \
     -f \
     xipki/ocsp-config/ocsp-responder.xml-template \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-TOKENTYPE" \
     --new "$TOKEN_TYPE" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-TOKENKEY" \
     --new "$OCSP_KEYCONF" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-SIGALGO" \
     --new "$SIGALGO" \
     xipki/ocsp-config/ocsp-responder.xml
 
   ## CA client configuration
-  xipki-cmd:copy-file \
+  xi:copy-file \
     -f \
     xipki/client-config/ca-client.xml-template \
     xipki/client-config/ca-client.xml
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-CMP_SIGALGO" \
     --new "$CMP_SIGALGO" \
     xipki/client-config/ca-client.xml
 
   ## Prepare scripts
-  xipki-cmd:copy-file \
+  xi:copy-file \
     -f \
     xipki/demo/rest.script-template \
     xipki/demo/rest.script
 
-  xipki-cmd:copy-file \
+  xi:copy-file \
     -f \
     xipki/demo/demo.d/ca-load.script-template \
     xipki/demo/demo.d/ca-load.script
 
-  xipki-cmd:copy-file \
+  xi:copy-file \
     -f \
     xipki/demo/demo.d/ca.script-template \
     xipki/demo/demo.d/ca.script
 
-  xipki-cmd:copy-file \
+  xi:copy-file \
     -f \
     xipki/demo/demo.d/ra.script-template \
     xipki/demo/demo.d/ra.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-CMP_SIGALGO" \
     --new "$CMP_SIGALGO" \
     xipki/demo/demo.d/ca.script
@@ -159,22 +159,22 @@ if { $printUsage equals "true" } {
     dsaPlain = "--dsa-plain"
   }
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-DSAPLAIN" \
     --new "${dsaPlain}" \
     xipki/demo/rest.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-DSAPLAIN" \
     --new "${dsaPlain}" \
     xipki/demo/demo.d/ca-load.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-DSAPLAIN" \
     --new "${dsaPlain}" \
     xipki/demo/demo.d/ca.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-DSAPLAIN" \
     --new "${dsaPlain}" \
     xipki/demo/demo.d/ra.script
@@ -184,22 +184,22 @@ if { $printUsage equals "true" } {
     rsaMgf1 = "--rsa-mgf1"
   }
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-RSAMGF1" \
     --new "${rsaMgf1}" \
     xipki/demo/demo.d/ca-load.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-RSAMGF1" \
     --new "${rsaMgf1}" \
     xipki/demo/rest.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-RSAMGF1" \
     --new "${rsaMgf1}" \
     xipki/demo/demo.d/ca.script
 
-  xipki-cmd:replace \
+  xi:replace \
     --old "REPLACEME-RSAMGF1" \
     --new "${rsaMgf1}" \
     xipki/demo/demo.d/ra.script
@@ -216,17 +216,17 @@ if { $printUsage equals "true" } {
 
   #### list certs ####
 
-  xipki-ca:list-cert \
+  ca:list-cert \
       --ca RCA1 \
       --subject "CN=*CA*,O=xipki" \
       --order subject \
       -n 100
 
   # get the serial number
-  SERIAL = $(xipki-tk:cert-info --serial --hex --in output/SubCA1.der)
+  SERIAL = $(xi:cert-info --serial --hex --in output/SubCA1.der)
 
   # save the certificate request
-  xipki-ca:get-request \
+  ca:get-request \
       --ca RCA1 \
       --serial $SERIAL \
       --out output/SubCA1.request
@@ -238,7 +238,7 @@ if { $printUsage equals "true" } {
   source file:./xipki/demo/rest.script
 
   # Force the OCSP responder to import the CRL to database
-  xipki-cmd:copy-file -f \
+  xi:copy-file -f \
     xipki/ocsp-config/example/foo.crl.UPDATEME \
     output/SubCAwithCRL1.crl.UPDATEME 
   

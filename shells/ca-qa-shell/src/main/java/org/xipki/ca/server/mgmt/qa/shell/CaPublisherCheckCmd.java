@@ -51,7 +51,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "capub-check",
+@Command(scope = "caqa", name = "capub-check",
         description = "check information of publishers in given CA (QA)")
 @Service
 public class CaPublisherCheckCmd extends CaCommandSupport {
@@ -79,8 +79,10 @@ public class CaPublisherCheckCmd extends CaCommandSupport {
         }
 
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
+
+        String upPublisherName = publisherName.toUpperCase();
         for (PublisherEntry m : entries) {
-            if (m.ident().name().equals(publisherName)) {
+            if (m.ident().name().equals(upPublisherName)) {
                 println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName
                         + "'");
                 return null;

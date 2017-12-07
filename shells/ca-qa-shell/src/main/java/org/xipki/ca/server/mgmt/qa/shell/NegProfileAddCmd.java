@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "neg-profile-add",
+@Command(scope = "caqa", name = "neg-profile-add",
         description = "add certificate profile (negative, QA)")
 @Service
 public class NegProfileAddCmd extends ProfileAddCmd {

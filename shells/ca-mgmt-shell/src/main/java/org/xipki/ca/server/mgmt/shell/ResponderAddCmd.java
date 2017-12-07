@@ -53,7 +53,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "responder-add",
+@Command(scope = "ca", name = "responder-add",
         description = "add responder")
 @Service
 public class ResponderAddCmd extends CaCommandSupport {

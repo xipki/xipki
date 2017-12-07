@@ -7,14 +7,14 @@ feature:install -r xipki-database-tool
 echo "Sleeping 1 second"
 sleep 1
 
-xipki-cmd:rm -r -f output/dbexport
+xi:rm -r -f output/dbexport
 
 ## Export CA
 echo "============================================================================"
 echo "||                             Export CA Database                         ||"
 echo "============================================================================"
 
-xipki-db:export-ca \
+ca:export-ca \
   --out-dir output/dbexport/ca
 
 ## Export OCSP
@@ -23,7 +23,7 @@ echo "==========================================================================
 echo "||                            Export OCSP Database                        ||"
 echo "============================================================================"
 
-xipki-db:export-ocsp \
+ca:export-ocsp \
   --out-dir output/dbexport/ocsp
 
 # Reset the CA and OCSP database
@@ -34,10 +34,10 @@ echo "==========================================================================
 echo "||                             Import CA Database                         ||"
 echo "============================================================================"
 
-xipki-db:initdb-ca \
+ca:initdb-ca \
   --force
 
-xipki-db:import-ca \
+ca:import-ca \
   --in-dir output/dbexport/ca
 
 ## Import OCSP
@@ -46,10 +46,10 @@ echo "==========================================================================
 echo "||                            Import OCSP Database                        ||"
 echo "============================================================================"
 
-xipki-db:initdb-ocsp \
+ca:initdb-ocsp \
   --force
 
-xipki-db:import-ocsp \
+ca:import-ocsp \
   --in-dir output/dbexport/ocsp
 
 ## Import OCSP FROM CA
@@ -58,10 +58,10 @@ echo "==========================================================================
 echo "||                        IMPORT OCSP DATABASE FROM CA                    ||"
 echo "============================================================================"
 
-xipki-db:initdb-ocsp \
+ca:initdb-ocsp \
   --force
 
-xipki-db:import-ocspfromca \
+ca:import-ocspfromca \
   --in-dir output/dbexport/ca
 
 ## Restart the CA
@@ -70,7 +70,7 @@ feature:install -r xipki-camgmt-shell
 echo "Sleeping 1 second"
 sleep 1
 
-xipki-ca:restart
+ca:restart
 
 #################################################################
 #              Uninstall unneeded features                      #

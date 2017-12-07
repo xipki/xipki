@@ -54,7 +54,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "diff-digest-db",
+@Command(scope = "ca", name = "diff-digest-db",
         description = "diff digest XiPKI/EJBCA database")
 @Service
 public class DiffDigestDbCmd extends DbPortCommandSupport {

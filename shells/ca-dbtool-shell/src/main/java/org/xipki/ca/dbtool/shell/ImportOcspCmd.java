@@ -48,7 +48,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "import-ocsp",
+@Command(scope = "ca", name = "import-ocsp",
         description = "import OCSP database")
 @Service
 public class ImportOcspCmd extends DbPortCommandSupport {

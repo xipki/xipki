@@ -57,7 +57,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "responder-up",
+@Command(scope = "ca", name = "responder-up",
         description = "update responder")
 @Service
 public class ResponderUpdateCmd extends CaCommandSupport {

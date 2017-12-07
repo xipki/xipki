@@ -56,7 +56,7 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "ca-revoke",
+@Command(scope = "ca", name = "ca-revoke",
         description = "revoke CA")
 @Service
 public class CaRevokeCmd extends CaCommandSupport {

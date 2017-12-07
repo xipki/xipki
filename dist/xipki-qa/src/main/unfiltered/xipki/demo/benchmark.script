@@ -57,14 +57,14 @@ if { $printUsage equals "true" } {
 
     # Loadtest Template
     echo "Template enroll benchmark"
-    xipki-cli:benchmark-template-enroll \
+    xiqa:cmp-benchmark-template-enroll \
       --template xipki/demo/demo.d/loadtest-template.xml \
       --duration $duration \
       --thread $threads
 
     # Loadtest RSA key
     echo "Enroll benchmark"
-    xipki-cli:benchmark-enroll \
+    xiqa:cmp-benchmark-enroll \
       --key-type RSA \
       --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
       --profile TLS \
@@ -83,7 +83,7 @@ if { $printUsage equals "true" } {
     sleep 1
 
     echo "Revoke benchmark"
-    xipki-cli:benchmark-revoke \
+    xiqa:cmp-benchmark-revoke \
       --issuer output/SubCA1.der \
       --ca-db xipki/ca-config/ca-db.properties \
       --duration $duration \
@@ -101,7 +101,7 @@ if { $printUsage equals "true" } {
     echo "Sleeping 1 second"
     sleep 1
     echo "OCSP status benchmark"
-    xipki-qa:benchmark-ocsp-status \
+    xiqa:benchmark-ocsp-status \
       --issuer output/SubCA1.der \
       --cert output/TLS_C2.der \
       --url $URL \
@@ -110,7 +110,7 @@ if { $printUsage equals "true" } {
       --queue-size $OCSP_QUEUE_SIZE
 
     echo "Loadtest OCSP status"
-    xipki-qa:benchmark-ocsp-status \
+    xiqa:benchmark-ocsp-status \
       --issuer output/SubCAwithCRL1.der \
       --cert output/OCSP2.der \
       --url $URL_CRL \

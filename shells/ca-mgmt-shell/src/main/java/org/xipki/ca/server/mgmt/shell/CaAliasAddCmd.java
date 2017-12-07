@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "caalias-add",
+@Command(scope = "ca", name = "caalias-add",
         description = "add CA alias")
 @Service
 public class CaAliasAddCmd extends CaCommandSupport {

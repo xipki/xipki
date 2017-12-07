@@ -49,7 +49,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "ca-add",
+@Command(scope = "ca", name = "ca-add",
         description = "add CA")
 @Service
 public class CaAddCmd extends CaAddOrGenCommandSupport {

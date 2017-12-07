@@ -48,7 +48,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "requestor-add",
+@Command(scope = "ca", name = "requestor-add",
         description = "add requestor")
 @Service
 public class RequestorAddCmd extends CaCommandSupport {

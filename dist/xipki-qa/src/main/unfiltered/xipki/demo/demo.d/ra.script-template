@@ -1,21 +1,21 @@
 ## Generate CRL
-xipki-ca:gencrl \
+ca:gencrl \
   --ca SubCAwithCRL1 \
   --out output/SubCAwithCRL1-CAMGMT-gen.crl
 
 ## Get CRL
-xipki-ca:getcrl \
+ca:getcrl \
   --ca SubCAwithCRL1 \
   --out output/SubCAwithCRL1-CAMGMT-get.crl
   
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/Cross1.p12 \
   --password 1234 \
   --subject "CN=Cross1,O=xipki,C=DE" \
   --out output/Cross1.csr
 
-xipki-ca:enroll-cert \
+ca:enroll-cert \
   --ca RCA1 \
   --profile Cross \
   --csr output/Cross1.csr \
@@ -31,20 +31,20 @@ sleep 1
 
 ## Check the healthy status
 
-xipki-cli:health \
+xi:cmp-health \
   --ca RCA1
 
-xipki-cli:health \
+xi:cmp-health \
   --ca SubCA1
 
-xipki-cli:health \
+xi:cmp-health \
   --ca SubCAwithCRL1
 
 ## Enroll certificates
 # Certificate OCSP1
 
 ## Create the CSR for the command caqa:check-cert in QA 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/OCSP1.p12 \
   --password 1234 \
@@ -52,7 +52,7 @@ xipki-tk:req-p12 \
   --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
-xipki-cli:enroll-p12 \
+xi:cmp-enroll-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/OCSP1.p12 \
   --password 1234 \
@@ -61,7 +61,7 @@ xipki-cli:enroll-p12 \
   --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/OCSP1.p12 \
   --password 1234 \
   --cert output/OCSP1.der \
@@ -71,7 +71,7 @@ xipki-tk:update-cert-p12 \
 # Certificate OCSP2
 
 ## Create the CSR for the command caqa:check-cert in QA 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/OCSP2.p12 \
   --password 1234 \
@@ -79,7 +79,7 @@ xipki-tk:req-p12 \
   --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
-xipki-cli:enroll-p12 \
+xi:cmp-enroll-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/OCSP2.p12 \
   --password 1234 \
@@ -88,7 +88,7 @@ xipki-cli:enroll-p12 \
   --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/OCSP2.p12 \
   --password 1234 \
   --cert output/OCSP2.der \
@@ -96,7 +96,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Revocate certificates
-xipki-cli:revoke \
+xi:cmp-revoke \
   --ca SubCAwithCRL1 \
   --cert output/OCSP2.der \
   --reason keyCompromise
@@ -104,14 +104,14 @@ xipki-cli:revoke \
 # Certificate multipleOUs
 
 ## Create the CSR for the command caqa:check-cert in QA 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/multipleOUs1.p12 \
   --password 1234 \
   --out output/multipleOUs1.csr \
   --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
-xipki-cli:enroll-p12 \
+xi:cmp-enroll-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/multipleOUs1.p12 \
   --password 1234 \
@@ -119,7 +119,7 @@ xipki-cli:enroll-p12 \
   --profile multipleOUs \
   --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/multipleOUs1.p12 \
   --password 1234 \
   --cert output/multipleOUs1.der \
@@ -127,14 +127,14 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Create the CSR for the command caqa:check-cert in QA 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/multipleOUs2.p12 \
   --password 1234 \
   --out output/multipleOUs2.csr \
   --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
-xipki-cli:enroll-p12 \
+xi:cmp-enroll-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/multipleOUs2.p12 \
   --password 1234 \
@@ -142,7 +142,7 @@ xipki-cli:enroll-p12 \
   --profile multipleOUs \
   --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/multipleOUs2.p12 \
   --password 1234 \
   --cert output/multipleOUs2.der \
@@ -152,14 +152,14 @@ xipki-tk:update-cert-p12 \
 # Certificate multiValuedRDN
 
 ## Create the CSR for the command caqa:check-cert in QA 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/multiValuedRDN1.p12 \
   --password 1234 \
   --out output/multiValuedRDN1.csr \
   --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
 
-xipki-cli:enroll-p12 \
+xi:cmp-enroll-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/multiValuedRDN1.p12 \
   --password 1234 \
@@ -167,7 +167,7 @@ xipki-cli:enroll-p12 \
   --profile multiValuedRDN \
   --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/multiValuedRDN1.p12 \
   --password 1234 \
   --cert output/multiValuedRDN1.der \
@@ -176,7 +176,7 @@ xipki-tk:update-cert-p12 \
 
 # Certificate QC
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/QC1.p12 \
   --password 1234 \
@@ -184,7 +184,7 @@ xipki-tk:req-p12 \
   --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
-xipki-cli:enroll-p12 \
+xi:cmp-enroll-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/QC1.p12 \
   --password 1234 \
@@ -193,7 +193,7 @@ xipki-cli:enroll-p12 \
   --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/QC1.p12 \
   --password 1234 \
   --cert output/QC1.der \
@@ -202,7 +202,7 @@ xipki-tk:update-cert-p12 \
 
 # Certificate EE.Complex1 with complex subject (parsable in openssl)
 
-xipki-tk:req-p12-complex \
+xi:req-p12-complex \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --subject "CN=EE.Complex1,O=xipki,C=DE" \
   --p12 output/EE.Complex1.p12 \
@@ -214,12 +214,12 @@ xipki-tk:req-p12-complex \
   --biometric-file xipki/README.md \
   --biometric-uri https://example.org/?id=123
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/EE.Complex1.csr \
   --out output/EE.Complex1.der \
   --profile EE.Complex
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/EE.Complex1.p12 \
   --password 1234 \
   --cert output/EE.Complex1.der \
@@ -228,7 +228,7 @@ xipki-tk:update-cert-p12 \
 
 # Certificate EE.Complex1 with complex subject (not parsable in openssl due to complex subject)
 
-xipki-tk:req-p12-complex \
+xi:req-p12-complex \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --subject "CN=EE.Complex2,O=xipki,C=DE" \
   --p12 output/EE.Complex2.p12 \
@@ -241,12 +241,12 @@ xipki-tk:req-p12-complex \
   --biometric-uri https://example.org/?id=123 \
   --complex-subject
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/EE.Complex2.csr \
   --out output/EE.Complex2.der \
   --profile EE.Complex
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/EE.Complex2.p12 \
   --password 1234 \
   --cert output/EE.Complex2.der \
@@ -255,19 +255,19 @@ xipki-tk:update-cert-p12 \
 
 # Certificate TLS1
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLS1.p12 \
   --password 1234 \
   --subject "CN=TLS1.xipki.org,O=xipki,C=DE" \
   --out output/TLS1.csr \
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLS1.csr \
   --out output/TLS1.der \
   --profile TLS
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/TLS1.p12 \
   --password 1234 \
   --cert output/TLS1.der \
@@ -277,61 +277,61 @@ xipki-tk:update-cert-p12 \
 # Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
 # 1.
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLSwithIncSN1.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
   --out output/TLSwithIncSN1.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLSwithIncSN1.csr \
   --out output/TLSwithIncSN1.der \
   --profile TLSwithIncSN
 
 # 2.
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLSwithIncSN1-1.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
   --out output/TLSwithIncSN1-1.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLSwithIncSN1-1.csr \
   --out output/TLSwithIncSN1-1.der \
   --profile TLSwithIncSN
 
 # 3.
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLSwithIncSN1-2.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
   --out output/TLSwithIncSN1-2.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLSwithIncSN1-2.csr \
   --out output/TLSwithIncSN1-2.der \
   --profile TLSwithIncSN
  
 # Certificate TLS2
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLS2.p12 \
   --password 1234 \
   --subject "CN=TLS2.xipki.org,O=xipki,C=DE" \
   --out output/TLS2.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLS2.csr \
   --out output/TLS2.der \
   --profile TLS
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/TLS2.p12 \
   --password 1234 \
   --cert output/TLS2.der \
@@ -339,17 +339,17 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Suspend certificates
-xipki-cli:revoke \
+xi:cmp-revoke \
   --ca SubCA1 \
   --cert output/TLS2.der \
   --reason certificateHold
 
-xipki-cli:unrevoke \
+xi:cmp-unrevoke \
   --ca SubCA1 \
   --cert output/TLS2.der
 
 ## Revocate certificates
-xipki-cli:revoke \
+xi:cmp-revoke \
   --ca SubCA1 \
   --cert output/TLS2.der \
   --reason affiliationChanged
@@ -358,19 +358,19 @@ xipki-cli:revoke \
 
 # Certificate TLS_C1
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLS_C1.p12 \
   --password 1234 \
   --subject "CN=TLS_C1,O=xipki,C=DE" \
   --out output/TLS_C1.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLS_C1.csr \
   --out output/TLS_C1.der \
   --profile TLS_C
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/TLS_C1.p12 \
   --password 1234 \
   --cert output/TLS_C1.der \
@@ -379,19 +379,19 @@ xipki-tk:update-cert-p12 \
 
 # Certificate TLS_C2
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/TLS_C2.p12 \
   --password 1234 \
   --subject "CN=TLS_C2,O=xipki,C=DE" \
   --out output/TLS_C2.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/TLS_C2.csr \
   --out output/TLS_C2.der \
   --profile TLS_C
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/TLS_C2.p12 \
   --password 1234 \
   --cert output/TLS_C2.der \
@@ -399,26 +399,26 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Revocate certificates
-xipki-cli:revoke \
+xi:cmp-revoke \
   --ca SubCA1 \
   --cert output/TLS_C2.der \
   --reason affiliationChanged
 
 ## Enroll certificates gSMC-K
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/gSMC_K1.p12 \
   --password 1234 \
   --subject "CN=80276123451234512345,O=xipki,C=DE" \
   --out output/gSMC_K1.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/gSMC_K1.csr \
   --out output/gSMC_K1.der \
   --profile gSMC_K
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/gSMC_K1.p12 \
   --password 1234 \
   --cert output/gSMC_K1.der \
@@ -431,19 +431,19 @@ sleep 2
 
 # with the same CN
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/gSMC_K2.p12 \
   --password 1234 \
   --subject "CN=80276123451234512345,O=xipki,C=DE" \
   --out output/gSMC_K2.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/gSMC_K2.csr \
   --out output/gSMC_K2.der \
   --profile gSMC_K
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/gSMC_K2.p12 \
   --password 1234 \
   --cert output/gSMC_K2.der \
@@ -452,19 +452,19 @@ xipki-tk:update-cert-p12 \
 
 # Certificate MaxTime1
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/MaxTime1.p12 \
   --password 1234 \
   --subject "CN=MaxTime1.xipki.org,O=xipki,C=DE" \
   --out output/MaxTime1.csr
 
-xipki-cli:csr-enroll \
+xi:cmp-csr-enroll \
   --csr output/MaxTime1.csr \
   --out output/MaxTime1.der \
   --profile MaxTime
 
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/MaxTime1.p12 \
   --password 1234 \
   --cert output/MaxTime1.der \
@@ -472,17 +472,17 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
   
 ## Get CRL
-xipki-cli:getcrl \
+xi:cmp-getcrl \
   --ca SubCAwithCRL1 \
   --out output/SubCAwithCRL1-1-get.crl
 
 ## Generate CRL
-xipki-cli:gencrl \
+xi:cmp-gencrl \
   --ca SubCAwithCRL1 \
   --out output/SubCAwithCRL1.crl
 
 ## Get CRL
-xipki-cli:getcrl \
+xi:cmp-getcrl \
   --ca SubCAwithCRL1 \
   --out output/SubCAwithCRL1-get.crl
 

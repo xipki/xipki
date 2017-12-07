@@ -51,7 +51,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
  * @since 2.2.0
  */
 
-@Command(scope = "xipki-ca", name = "causer-add",
+@Command(scope = "ca", name = "causer-add",
         description = "add user to CA")
 @Service
 public class CaUserAddCmd extends CaCommandSupport {

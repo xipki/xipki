@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "caalias-rm",
+@Command(scope = "ca", name = "caalias-rm",
         description = "remove CA alias")
 @Service
 public class CaAliasRemoveCmd extends CaCommandSupport {

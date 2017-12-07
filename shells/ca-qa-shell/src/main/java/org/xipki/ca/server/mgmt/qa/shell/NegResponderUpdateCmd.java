@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "neg-responder-up",
+@Command(scope = "caqa", name = "neg-responder-up",
         description = "update responder (negative, QA)")
 @Service
 public class NegResponderUpdateCmd extends ResponderUpdateCmd {

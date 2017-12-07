@@ -1,5 +1,6 @@
 printUsage = "false"
 argsValid = "false"
+errMsg = ""
 
 if { "$1" equals "" } {
   printUsage = "true"
@@ -21,21 +22,51 @@ if { "$1" equals "" } {
       KEYSPEC =$4
     }
 
-    list = [SHA1, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512]; each ($list) {
-      if { "$HASH" equals $it } {
-        argsValid = "true"
+   list = [PKCS11 PKCS12]; each ($list) {
+     if { "$TOKEN_TYPE" equals $it } {
+       argsValid = "true"
+     }
+   }
+
+    if { "$argsValid" equals "false" } {
+      errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+    } {
+      argsValid = "false"
+
+      list = [RSA RSAPSS EC PLAINEC DSA]; each ($list) {
+        if { "$SIG_TYPE" equals $it } {
+          argsValid = "true"
+        }
       }
     }
 
-    list = [PKCS11 PKCS12]; each ($list) {
-      if { "$TOKEN_TYPE" equals $it } {
-        argsValid = "true"
+    if { "$argsValid" equals "false" } {
+      errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    } {
+      argsValid = "false"
+
+      if { "$SIG_TYPE" equals "PLAINEC" } {
+        list = [SHA1 SHA256 SHA384 SHA512]; each ($list) {
+          if { "$HASH" equals $it } {
+            argsValid = "true"
+          }
+        }
+
+        if { "$argsValid" equals "false" } {
+          errMsg = "invalid combination $HASH and $SIG_TYPE"
+        }
+      } {
+        list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
+          if { "$HASH" equals $it } {
+            argsValid = "true"
+          }
+        }
       }
     }
 
-    list = [RSA RSAPSS EC PLAINEC DSA]; each ($list) {
-      if { "$SIG_TYPE" equals $it } {
-        argsValid = "true"
+    if { "$argsValid" equals "false" } {
+      if { "$errMsg" equals ""} {
+        errMsg = "invalid HASH $HASH"
       }
     }
 
@@ -43,17 +74,17 @@ if { "$1" equals "" } {
 }
 
 if { $argsValid equals "false" } {
-  echo "invalid arguments $args"
+  echo "$errMsg"
   echo ""
   printUsage = "true"
 }
-
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source file:.xipki/demo/demo.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "source file:./xipki/demo/camgmt-qa.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
+  echo "                     The SHA3 algorithms are not for PLAINEC."
   echo "    token type:      PKCS11, PKCS12"
   echo "    signature type:  RSA, RSAPSS, EC, PLAINEC, DSA"
   echo "    keyspec:         keysize for signature types RSA, RSAPSS and DSA,"
@@ -64,7 +95,57 @@ if { $printUsage equals "true" } {
   feature:install -r xipki-security-shell
   source file:./xipki/demo/demo.d/prepare-keys.script
 
-  source file:./xipki/demo/demo.d/ca.script
+  xi:copy-file \
+    -f \
+    xipki/demo/demo.d/ca-load.script-template \
+    xipki/demo/demo.d/ca-load.script
+
+  xi:copy-file \
+    -f \
+    xipki/demo/demo.d/ca.script-template \
+    xipki/demo/demo.d/ca.script
+
+  xi:replace \
+    --old "REPLACEME-CMP_SIGALGO" \
+    --new "$CMP_SIGALGO" \
+    xipki/demo/demo.d/ca.script
+
+  dsaPlain = ""
+
+  if { "$SIG_TYPE" equals "PLAINEC" } {
+    dsaPlain = "--dsa-plain"
+  }
+
+  xi:replace \
+    --old "REPLACEME-DSAPLAIN" \
+    --new "${dsaPlain}" \
+    xipki/demo/demo.d/ca-load.script
+
+  xi:replace \
+    --old "REPLACEME-DSAPLAIN" \
+    --new "${dsaPlain}" \
+    xipki/demo/demo.d/ca.script
+
+  rsaMgf1 = ""
+  if { "$SIG_TYPE" equals "RSAPSS" } {
+    rsaMgf1 = "--rsa-mgf1"
+  }
+
+  xi:replace \
+    --old "REPLACEME-RSAMGF1" \
+    --new "${rsaMgf1}" \
+    xipki/demo/demo.d/ca-load.script
+
+  xi:replace \
+    --old "REPLACEME-RSAMGF1" \
+    --new "${rsaMgf1}" \
+    xipki/demo/demo.d/ca.script
+
+  if { "$1" equals "-l" } {
+    source file:./xipki/demo/demo.d/ca-load.script
+  } {
+    source file:./xipki/demo/demo.d/ca.script
+  }
 
   feature:install -r xipki-caqa-shell
 
@@ -75,283 +156,282 @@ if { $printUsage equals "true" } {
   echo "#                          Environment                          #"
   echo "#################################################################"
 
-  xipki-ca:env-add \
+  ca:env-add \
     --name qa-env1 \
     --value value1
 
-  xipki-caqa:env-check \
+  caqa:env-check \
     --name qa-env1 \
     --value value1
 
-  xipki-ca:env-up \
+  ca:env-up \
     --name qa-env1 \
     --value value2
 
-  xipki-caqa:env-check \
+  caqa:env-check \
     --name qa-env1 \
     --value value2
 
   # Environment name exists
-  xipki-caqa:neg-env-add \
+  caqa:neg-env-add \
     --name qa-env1 \
     --value value3
 
-  xipki-caqa:env-check \
+  caqa:env-check \
     --name qa-env1 \
     --value value2
 
-  xipki-ca:env-rm \
+  ca:env-rm \
     qa-env1
 
   # Environment name does not exist
-  xipki-caqa:neg-env-rm \
+  caqa:neg-env-rm \
     qa-env-not-exits
 
   echo "#################################################################"
   echo "#                           CMP control                         #"
   echo "#################################################################"
-  xipki-caqa:cmpcontrol-check \
-    --name cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
+  
+  CMP_CONTROL = 'send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA'
 
-  xipki-ca:cmpcontrol-add \
+  ca:cmpcontrol-add \
     --name qa-cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
+    --conf "${CMP_CONTROL}"
 
-  xipki-caqa:cmpcontrol-check \
+  caqa:cmpcontrol-check \
     --name qa-cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
+    --conf "${CMP_CONTROL}"
 
-  xipki-ca:cmpcontrol-up \
+  ca:cmpcontrol-up \
     --name qa-cmpcontrol1 \
     --conf send.ca=true,messageTime.bias=300
 
-  xipki-caqa:neg-cmpcontrol-up \
+  caqa:neg-cmpcontrol-up \
     --name qa-cmpcontrol1 \
     --conf send.ca=true,messageTime.bias=300,protection.sigalgo=INVALIDALGO
 
-  xipki-caqa:cmpcontrol-check \
+  caqa:cmpcontrol-check \
     --name qa-cmpcontrol1 \
     --conf send.ca=true,messageTime.bias=300
 
   # name already exists
-  xipki-caqa:neg-cmpcontrol-add \
+  caqa:neg-cmpcontrol-add \
     --name qa-cmpcontrol1 \
     --conf send.ca=true,messageTime.bias=300
 
-  xipki-ca:cmpcontrol-rm \
+  ca:cmpcontrol-rm \
     qa-cmpcontrol1 \
 
-  xipki-caqa:neg-cmpcontrol-rm \
+  caqa:neg-cmpcontrol-rm \
     qa-cmpcontrol-not-exists \
 
   echo "#################################################################"
   echo "#                           Requestor                           #"
   echo "#################################################################"
-  xipki-caqa:requestor-check \
+  caqa:requestor-check \
     --name requestor1 \
     --cert xipki/security/tlskeys/tls-client.der
 
-  xipki-ca:requestor-add \
+  ca:requestor-add \
     --name qa-requestor1 \
     --cert xipki/security/tlskeys/tls-server.der
 
   # name already exists
-  xipki-caqa:neg-requestor-add \
+  caqa:neg-requestor-add \
     --name qa-requestor1 \
     --cert xipki/security/tlskeys/tls-server.der
 
   # invalid certificate
-  xipki-caqa:neg-requestor-add \
+  caqa:neg-requestor-add \
     --name qa-requestor1 \
     --cert xipki/demo/all-demo.script
 
-  xipki-caqa:requestor-check \
+  caqa:requestor-check \
     --name qa-requestor1 \
     --cert xipki/security/tlskeys/tls-server.der
 
-  xipki-ca:requestor-up \
+  ca:requestor-up \
     --name qa-requestor1 \
     --cert xipki/security/tlskeys/tls-client.der
 
-  xipki-caqa:requestor-check \
+  caqa:requestor-check \
     --name qa-requestor1 \
     --cert xipki/security/tlskeys/tls-client.der
 
-  xipki-ca:requestor-rm \
+  ca:requestor-rm \
     qa-requestor1
 
   # name does not exist
-  xipki-caqa:neg-requestor-rm \
+  caqa:neg-requestor-rm \
     qa-requestor1
 
   echo "#################################################################"
   echo "#                           Responder                           #"
   echo "#################################################################"
-  xipki-caqa:responder-check \
+  caqa:responder-check \
     --name responder1 \
     --signer-type PKCS12 \
     --signer-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
 
-  xipki-ca:responder-add \
+  ca:responder-add \
     --name qa-responder1 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA1withRSA
 
   # name already exists
-  xipki-caqa:neg-responder-add \
+  caqa:neg-responder-add \
     --name qa-responder1 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA1withRSA
 
   # password incorrect
-  xipki-caqa:neg-responder-add \
+  caqa:neg-responder-add \
     --name qa-responder2 \
     --signer-type PKCS12 \
     --signer-conf password=123456,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA1withRSA
 
   # invalid algo
-  xipki-caqa:neg-responder-add \
+  caqa:neg-responder-add \
     --name qa-responder2 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=INVALIDALGO
 
-  xipki-caqa:responder-check \
+  caqa:responder-check \
     --name qa-responder1 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA1withRSA
 
-  xipki-ca:responder-up \
+  ca:responder-up \
     --name qa-responder1 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
 
-  xipki-caqa:responder-check \
+  caqa:responder-check \
     --name qa-responder1 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
 
-  xipki-ca:responder-rm \
+  ca:responder-rm \
     qa-responder1
 
   # name does not exist
-  xipki-caqa:neg-responder-rm \
+  caqa:neg-responder-rm \
     qa-responder1
 
   echo "#################################################################"
   echo "#                    Add certificate profile                    #"
   echo "#################################################################"
-  xipki-caqa:profile-check \
+  caqa:profile-check \
     --name SubCA \
     --type XML \
     --conf-file xipki/demo/profile/Certprofile_SubCA.xml
 
-  xipki-ca:profile-add \
+  ca:profile-add \
     --name qa-SubCA \
     --type XML \
     --conf-file xipki/demo/profile/Certprofile_SubCA_Complex.xml
 
   # name already exists
-  xipki-caqa:neg-profile-add \
+  caqa:neg-profile-add \
     --name qa-SubCA \
     --type XML \
     --conf-file xipki/demo/profile/Certprofile_SubCA_Complex.xml
 
   # unknown type
-  xipki-caqa:neg-profile-add \
+  caqa:neg-profile-add \
     --name qa-SubCA2 \
     --type java:packagename.classname
 
   # invalid conf for the given type
-  xipki-caqa:neg-profile-add \
+  caqa:neg-profile-add \
     --name qa-SubCA \
     --type XML \
     --conf invalid-profile-conf
 
   # invalid type
-  xipki-caqa:neg-profile-up \
+  caqa:neg-profile-up \
     --name qa-SubCA \
     --type invalid-type
 
   # invalid conf
-  xipki-caqa:neg-profile-up \
+  caqa:neg-profile-up \
     --name qa-SubCA \
     --conf invalid-profile-conf
 
-  xipki-caqa:profile-check \
+  caqa:profile-check \
     --name qa-SubCA \
     --type XML \
     --conf-file xipki/demo/profile/Certprofile_SubCA_Complex.xml
 
-  xipki-ca:profile-rm \
+  ca:profile-rm \
     qa-SubCA \
 
   # name does not exist
-  xipki-caqa:neg-profile-rm \
+  caqa:neg-profile-rm \
     qa-SubCA \
 
   echo "#################################################################"
   echo "#                         Add CRL signer                        #"
   echo "#################################################################"
-  xipki-caqa:crlsigner-check \
+  caqa:crlsigner-check \
     --name CASIGN.CRLSIGNER \
     --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
   echo "direct CRL signer (signed by CA)"
 
-  xipki-ca:crlsigner-add \
+  ca:crlsigner-add \
     --name qa-direct-crlsigner1 \
     --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
   echo "neg-crlsigner-add: name already exists"
 
-  xipki-caqa:neg-crlsigner-add \
+  caqa:neg-crlsigner-add \
     --name qa-direct-crlsigner1 \
     --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
   echo "neg-crlsigner-add: invalid control"
 
-  xipki-caqa:neg-crlsigner-add \
+  caqa:neg-crlsigner-add \
     --name qa-direct-crlsigner2 \
     --signer-type CA \
     --control updateMode=unknown,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
-  xipki-caqa:crlsigner-check \
+  caqa:crlsigner-check \
     --name qa-direct-crlsigner1 \
     --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
-  xipki-ca:crlsigner-up \
+  ca:crlsigner-up \
     --name qa-direct-crlsigner1 \
     --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
-  xipki-caqa:crlsigner-check \
+  caqa:crlsigner-check \
     --name qa-direct-crlsigner1 \
     --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
   echo "neg-crlsigner-up: invalid fullCRL.intervals"
 
-  xipki-caqa:neg-crlsigner-up \
+  caqa:neg-crlsigner-up \
     --name qa-direct-crlsigner1 \
     --control updateMode=interval,fullCRL.intervals=abc,overlap.minutes=90,interval.time=03:00
 
-  xipki-caqa:crlsigner-check \
+  caqa:crlsigner-check \
     --name qa-direct-crlsigner1 \
     --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
-  xipki-ca:crlsigner-rm \
+  ca:crlsigner-rm \
   qa-direct-crlsigner1
 
   echo "neg-crlsigner-rm: name does not exist"
 
-  xipki-caqa:neg-crlsigner-rm \
+  caqa:neg-crlsigner-rm \
   qa-direct-crlsigner1
 
   # indrect CRL signer
 
-  xipki-ca:crlsigner-add \
+  ca:crlsigner-add \
     --name qa-indirect-crlsigner1 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/demo/keys/crlsigner.p12,algo=SHA256withRSA \
@@ -359,7 +439,7 @@ if { $printUsage equals "true" } {
 
   echo "neg-crlsigner-add: No keyusage CRLSign"
 
-  xipki-caqa:neg-crlsigner-add \
+  caqa:neg-crlsigner-add \
     --name qa-indirect-crlsigner2 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA1withRSA \
@@ -367,20 +447,20 @@ if { $printUsage equals "true" } {
 
   echo "neg-crlsigner-add: Unknown signature algorithm"
 
-  xipki-caqa:neg-crlsigner-add \
+  caqa:neg-crlsigner-add \
     --name qa-indirect-crlsigner2 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/demo/keys/crlsigner.p12,algo=INVALIDALGO \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
-  xipki-ca:crlsigner-rm \
+  ca:crlsigner-rm \
   qa-indirect-crlsigner1
 
   echo "#################################################################"
   echo "#                              CA                               #"
   echo "#################################################################"
 
-  xipki-caqa:ca-check \
+  caqa:ca-check \
     --name SUBCA1.COMPLEX-NAME \
     --permission ALL \
     --max-validity 5y \
@@ -393,7 +473,7 @@ if { $printUsage equals "true" } {
     --duplicate-subject yes \
     --duplicate-key yes
 
-  xipki-caqa:ca-check --name RCA1 \
+  caqa:ca-check --name RCA1 \
     --permission ALL \
     --max-validity 10y \
     --sn-bitlen 63  \
@@ -409,7 +489,7 @@ if { $printUsage equals "true" } {
 
   # change the CA configuration
 
-  xipki-ca:ca-up --name RCA1 \
+  ca:ca-up --name RCA1 \
     --permission ENROLL_CERT \
     --permission REVOKE_CERT \
     --max-validity 8y \
@@ -419,7 +499,7 @@ if { $printUsage equals "true" } {
     --duplicate-key no \
     --validity-mode STRICT
 
-  xipki-caqa:ca-check --name RCA1 \
+  caqa:ca-check --name RCA1 \
     --permission ENROLL_CERT \
     --permission REVOKE_CERT \
     --max-validity 8y \
@@ -435,7 +515,7 @@ if { $printUsage equals "true" } {
     --validity-mode STRICT
 
   # for commands neg-gen-rca
-  xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
+  ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
   # The CA named RCA2 exists. No new CA with the same name is allowed
 
@@ -449,7 +529,7 @@ if { $printUsage equals "true" } {
 
   echo "neg-gen-rca: CA named RCA1 already exists"
 
-  xipki-caqa:neg-gen-rca \
+  caqa:neg-gen-rca \
     --name RCA1 \
     --csr output/RCA1.csr \
     --profile RCA \
@@ -466,14 +546,13 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF \
-    --popo-algo SHA256withRSA
+    --validity-mode CUTOFF
 
-  xipki-ca:profile-rm RCA
+  ca:profile-rm RCA
 
   echo "neg-ca-add: certificate and key do not match"
 
-  xipki-caqa:neg-ca-add \
+  caqa:neg-ca-add \
     --name RCA2 \
     --permission ALL \
     --sn-bitlen 63  \
@@ -488,12 +567,11 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF \
-    --popo-algo SHA256withRSA
+    --validity-mode CUTOFF
 
   echo "neg-ca-add: CMP control name does not exist"
 
-  xipki-caqa:neg-ca-add \
+  caqa:neg-ca-add \
     --name RCA2 \
     --permission ALL \
     --sn-bitlen 63  \
@@ -508,12 +586,11 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF \
-    --popo-algo SHA256withRSA
+    --validity-mode CUTOFF
 
   echo "neg-ca-add: CRL signer name does not exist"
 
-  xipki-caqa:neg-ca-add \
+  caqa:neg-ca-add \
     --name RCA2 \
     --permission ALL \
     --sn-bitlen 63  \
@@ -529,12 +606,11 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF \
-    --popo-algo SHA256withRSA
+    --validity-mode CUTOFF
 
   echo "neg-ca-add: responder name does not exist"
 
-  xipki-caqa:neg-ca-add \
+  caqa:neg-ca-add \
     --name RCA2 \
     --permission ALL \
     --sn-bitlen 63  \
@@ -549,126 +625,125 @@ if { $printUsage equals "true" } {
     --responder responder2 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF \
-    --popo-algo SHA256withRSA
+    --validity-mode CUTOFF
 
   echo "#################################################################"
   echo "#                            CA alias                           #"
   echo "#################################################################"
-  xipki-caqa:caalias-check \
+  caqa:caalias-check \
     --ca RCA1 \
     --alias RCA
 
-  xipki-caqa:caalias-check \
+  caqa:caalias-check \
     --ca SUBCA1.COMPLEX-NAME \
     --alias SubCA
 
-  xipki-caqa:caalias-check \
+  caqa:caalias-check \
     --ca SUBCAWITHCRL1 \
     --alias SubCAwithCRL
 
-  xipki-ca:caalias-add \
+  ca:caalias-add \
     --ca RCA1 \
     --alias RCA-1
 
-  xipki-caqa:caalias-check \
+  caqa:caalias-check \
     --ca RCA1 \
     --alias RCA-1
 
-  xipki-ca:caalias-rm \
+  ca:caalias-rm \
   RCA-1
 
   echo "#################################################################"
   echo "#                          CA-has-profile                       #"
   echo "#################################################################"
 
-  xipki-caqa:caprofile-check \
+  caqa:caprofile-check \
     --ca RCA1 \
     --profile Cross
 
-  xipki-caqa:caprofile-check \
+  caqa:caprofile-check \
     --ca RCA1 \
     --profile SubCA
 
-  xipki-caqa:caprofile-check \
+  caqa:caprofile-check \
     --ca RCA1 \
     --profile SubCA.Complex
 
-  xipki-ca:caprofile-add \
+  ca:caprofile-add \
     --ca RCA1 \
     --profile TLS \
 
-  xipki-caqa:caprofile-check \
+  caqa:caprofile-check \
     --ca RCA1 \
     --profile TLS \
 
   # CA name does not exist
 
-  xipki-caqa:neg-caprofile-add \
+  caqa:neg-caprofile-add \
     --ca RCA10 \
     --profile PROFILE-DUMMY
 
   # profile name does not exist
 
-  xipki-caqa:neg-caprofile-add \
+  caqa:neg-caprofile-add \
     --ca RCA1 \
     --profile PROFILE-DUMMY
 
   # invalid permission
 
-  xipki-caqa:neg-caprofile-rm \
+  caqa:neg-caprofile-rm \
     --ca RCA1 \
     --profile PROFILE-DUMMY
 
   echo "#################################################################"
   echo "#                         CA-has-publisher                      #"
   echo "#################################################################"
-  xipki-caqa:capub-check \
+  caqa:capub-check \
     --ca RCA1 \
     --publisher OCSP.PUBLISHER
 
   # CA name does not exist
-  xipki-caqa:neg-capub-add \
+  caqa:neg-capub-add \
     --ca RCA10 \
     --publisher PUBLISHER-DUMMY
 
   # CA name does not exist
-  xipki-caqa:neg-capub-rm \
+  caqa:neg-capub-rm \
     --ca RCA10 \
     --publisher PUBLISHER-DUMMY
 
   # Publisher name does not exist
-  xipki-caqa:neg-capub-add \
+  caqa:neg-capub-add \
     --ca RCA1 \
     --publisher PUBLISHER-DUMMY
 
   # Publisher name does not exist
-  xipki-caqa:neg-capub-rm \
+  caqa:neg-capub-rm \
     --ca RCA1 \
     --publisher PUBLISHER-DUMMY
 
   echo "#################################################################"
   echo "#                         CA-has-requestor                      #"
   echo "#################################################################"
-  xipki-caqa:careq-check \
+  caqa:careq-check \
     --ca RCA1 \
     --requestor requestor1 \
     --ra yes \
     --permission ALL \
     --profile ALL
 
-  xipki-ca:careq-rm \
+  ca:careq-rm \
     --ca RCA1 \
     --requestor requestor1 \
 
-  xipki-ca:careq-add \
+  ca:careq-add \
     --ca RCA1 \
     --requestor requestor1 \
     --ra yes \
     --permission ENROLL_CERT \
     --permission REVOKE_CERT
 
-  xipki-caqa:careq-check \
+  caqa:careq-check \
     --ca RCA1 \
     --ra yes \
     --requestor requestor1 \
@@ -677,31 +752,31 @@ if { $printUsage equals "true" } {
     --profile NULL
 
   # CA name does not exist
-  xipki-caqa:neg-careq-add \
+  caqa:neg-careq-add \
     --ca RCA10 \
     --requestor REQUESTOR-DUMMY \
     --permission ALL \
     --profile ALL
 
   # CA name does not exist
-  xipki-caqa:neg-careq-rm \
+  caqa:neg-careq-rm \
     --ca RCA10 \
     --requestor REQUESTOR-DUMMY
 
   # Requestor name does not exist
-  xipki-caqa:neg-careq-add \
+  caqa:neg-careq-add \
     --ca RCA1 \
     --requestor REQUESTOR-DUMMY \
     --permission ALL \
     --profile ALL
 
   # Requestor name does not exist
-  xipki-caqa:neg-careq-rm \
+  caqa:neg-careq-rm \
     --ca RCA1 \
     --requestor REQUESTOR-DUMMY
 
   # Requestor name does not exist
-  xipki-caqa:neg-careq-add \
+  caqa:neg-careq-add \
     --ca RCA1 \
     --requestor REQUESTOR-DUMMY \
     --permission ALL \
@@ -711,56 +786,52 @@ if { $printUsage equals "true" } {
 
   ##### caalias #####
 
-  xipki-ca:caalias-info
+  ca:caalias-info
 
-  xipki-ca:caalias-info RCA
+  ca:caalias-info RCA
 
-  xipki-ca:caalias-rm RCA
+  ca:caalias-rm RCA
 
-  xipki-ca:caalias-add \
+  ca:caalias-add \
     --alias RCA \
     --ca RCA1
 
-  xipki-ca:ca-export \
-    --name RCA1 \
-    --out output/RCA1.export
-
   ##### caprofile #####
 
-  xipki-ca:caprofile-info \
+  ca:caprofile-info \
     --ca RCA1
 
-  xipki-ca:caprofile-rm \
+  ca:caprofile-rm \
     --profile SubCA \
     --ca RCA1
 
-  xipki-ca:caprofile-add \
+  ca:caprofile-add \
     --profile SubCA \
     --ca RCA1
 
   ##### capub #####
 
-  xipki-ca:capub-info \
+  ca:capub-info \
     --ca RCA1
 
-  xipki-ca:capub-rm \
+  ca:capub-rm \
     --publisher OCSP.PUBLISHER \
     --ca RCA1
 
-  xipki-ca:capub-add \
+  ca:capub-add \
     --ca RCA1 \
     --publisher OCSP.PUBLISHER
 
   ##### careq #####
 
-  xipki-ca:careq-info \
+  ca:careq-info \
     --ca RCA1
 
-  xipki-ca:careq-rm \
+  ca:careq-rm \
     --requestor requestor1 \
     --ca RCA1
 
-  xipki-ca:careq-add \
+  ca:careq-add \
     --requestor requestor1 \
     --ca RCA1 \
     --profile ALL \
@@ -769,50 +840,50 @@ if { $printUsage equals "true" } {
 
   ##### clear-publishqueue #####
 
-  xipki-ca:clear-publishqueue \
+  ca:clear-publishqueue \
     --ca RCA1 \
     --publisher OCSP.PUBLISHER
 
-  xipki-ca:clear-publishqueue \
+  ca:clear-publishqueue \
     --ca ALL \
     --publisher ALL
 
   ##### cmpcontrol #####
 
-  xipki-ca:cmpcontrol-add \
+  ca:cmpcontrol-add \
     --name cmpcontrol2 \
     --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
-  xipki-ca:cmpcontrol-info
+  ca:cmpcontrol-info
 
-  xipki-ca:cmpcontrol-info \
+  ca:cmpcontrol-info \
     cmpcontrol2
 
-  xipki-ca:cmpcontrol-up \
+  ca:cmpcontrol-up \
     --name cmpcontrol2 \
     --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA
 
-  xipki-ca:cmpcontrol-rm \
+  ca:cmpcontrol-rm \
     cmpcontrol2
 
   ##### crlsigner #####
 
-  xipki-ca:crlsigner-add \
+  ca:crlsigner-add \
     --name CASIGN.CRLSIGNER2 \
     --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
-  xipki-ca:crlsigner-info
+  ca:crlsigner-info
 
-  xipki-ca:crlsigner-info \
+  ca:crlsigner-info \
     CASIGN.CRLSIGNER2
 
-  xipki-ca:crlsigner-up \
+  ca:crlsigner-up \
     --name CASIGN.CRLSIGNER2 \
     --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:30
 
-  xipki-ca:crlsigner-rm \
+  ca:crlsigner-rm \
     CASIGN.CRLSIGNER2
 
   ##### env #####
@@ -821,172 +892,165 @@ if { $printUsage equals "true" } {
     --name ENV2 \
     --value VALUE2
 
-  xipki-ca:env-info
+  ca:env-info
 
-  xipki-ca:env-info \
+  ca:env-info \
     ENV2
 
-  xipki-ca:env-up \
+  ca:env-up \
     --name ENV2 \
     --value VALUE2-2
 
-  xipki-ca:env-rm \
+  ca:env-rm \
     ENV2
 
   ##### profile #####
 
-  xipki-ca:profile-info
+  ca:profile-info
 
-  xipki-ca:profile-info \
+  ca:profile-info \
     OCSP
 
-  xipki-ca:profile-export \
+  ca:profile-export \
     --name SubCA \
     --out output/Certprofile_SubCA.export
 
-  xipki-ca:profile-up \
+  ca:profile-up \
     --name SubCA \
     --conf-file output/Certprofile_SubCA.export
 
-  xipki-ca:profile-rm OCSP
-
   ##### publisher #####
 
-  xipki-ca:publisher-info
+  ca:publisher-info
 
-  xipki-ca:publisher-info \
+  ca:publisher-info \
     OCSP.PUBLISHER
 
-  xipki-ca:publisher-export \
+  ca:publisher-export \
     --name OCSP.PUBLISHER \
     --out output/publisher.export
 
-  xipki-ca:publisher-up \
+  ca:publisher-up \
     --name OCSP.PUBLISHER \
     --conf-file output/publisher.export
 
-  xipki-ca:publisher-add \
+  ca:publisher-add \
     --name OCSP.PUBLISHER2 \
     --type OCSP \
     --conf-file output/publisher.export
 
-  xipki-ca:publisher-rm \
+  ca:publisher-rm \
     OCSP.PUBLISHER2
 
   ##### requestor #####
 
-  xipki-ca:requestor-add \
+  ca:requestor-add \
     --cert xipki/security/tlskeys/tls-client.der \
     --name requestor2
 
-  xipki-ca:requestor-info
+  ca:requestor-info
 
-  xipki-ca:requestor-info \
+  ca:requestor-info \
     requestor2
 
-  xipki-ca:requestor-up \
+  ca:requestor-up \
     --cert xipki/security/tlskeys/tls-client.der \
     --name requestor2
 
-  xipki-ca:requestor-rm requestor2
+  ca:requestor-rm requestor2
 
   ##### responder #####
 
-  xipki-ca:responder-add \
+  ca:responder-add \
     --name responder2 \
     --signer-type PKCS12 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
 
-  xipki-ca:responder-info
+  ca:responder-info
 
-  xipki-ca:responder-info \
+  ca:responder-info \
     responder2
 
-  xipki-ca:responder-up \
+  ca:responder-up \
     --name responder2 \
     --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA1withRSA
 
-  xipki-ca:responder-rm \
+  ca:responder-rm \
     responder2
 
   ##### cert #####
 
-  xipki-ca:revoke-cert \
+  ca:revoke-cert \
     --ca RCA1 \
     --reason certificateHold \
     --cert output/SubCAwithCRL1.der
 
-  xipki-ca:unrevoke-cert \
+  ca:unrevoke-cert \
     --ca RCA1 \
     --cert output/SubCAwithCRL1.der
 
-  xipki-ca:revoke-cert \
+  ca:revoke-cert \
     --ca RCA1 \
     --reason certificateHold \
     --cert output/SubCAwithCRL1.der
 
-  xipki-ca:unrevoke-cert \
+  ca:unrevoke-cert \
     --ca RCA1 \
     --cert output/SubCAwithCRL1.der
 
-  xipki-ca:revoke-cert \
+  ca:revoke-cert \
     --ca RCA1 \
     --reason keyCompromise \
     --cert output/SubCAwithCRL1.der
 
-  xipki-ca:revoke-cert \
+  ca:revoke-cert \
     --ca RCA1 \
     --reason keyCompromise \
     --cert output/SubCA1.der
 
-  xipki-ca:remove-cert \
+  ca:remove-cert \
     --ca RCA1 \
     --cert output/SubCAwithCRL1.der
 
-  xipki-ca:remove-cert \
+  ca:remove-cert \
     --ca RCA1 \
     --cert output/SubCA1.der
 
   ##### CA #####
 
-  xipki-ca:ca-revoke \
+  ca:ca-revoke \
     --reason keyCompromise \
     RCA1
 
-  xipki-ca:ca-unrevoke \
+  ca:ca-unrevoke \
     RCA1
 
-  xipki-ca:notify-change
+  ca:notify-change
 
-  xipki-ca:system-status
+  ca:system-status
 
-  xipki-ca:unlock
+  ca:unlock
 
-  xipki-ca:ca-info
+  ca:ca-info
 
-  xipki-ca:ca-info \
+  ca:ca-info \
     RCA1
 
-  xipki-ca:ca-rm \
-    SUBCAWITHCRL1
-
-  xipki-ca:ca-up \
+  ca:ca-up \
     --name RCA1 \
     --permission ENROLL_CERT \
     --permission REVOKE_CERT \
     --max-validity 8y \
-    --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/RCA1-2.der \
     --duplicate-subject no \
     --duplicate-key no \
     --validity-mode STRICT
 
-  xipki-ca:ca-up \
+  ca:ca-up \
     --name RCA1 \
     --permission ALL \
     --max-validity 10y \
-    --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/RCA1.der \
     --duplicate-subject yes \

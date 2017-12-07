@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.api.AddUserEntry;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "user-add",
+@Command(scope = "ca", name = "user-add",
         description = "add user")
 @Service
 public class UserAddCmd extends CaCommandSupport {

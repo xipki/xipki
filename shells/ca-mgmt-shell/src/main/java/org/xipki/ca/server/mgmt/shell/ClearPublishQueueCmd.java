@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "clear-publishqueue",
+@Command(scope = "ca", name = "clear-publishqueue",
         description = "clear publish queue")
 @Service
 public class ClearPublishQueueCmd extends CaCommandSupport {

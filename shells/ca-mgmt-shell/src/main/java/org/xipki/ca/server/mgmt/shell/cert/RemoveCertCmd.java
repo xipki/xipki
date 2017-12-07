@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "remove-cert",
+@Command(scope = "ca", name = "remove-cert",
         description = "remove certificate")
 @Service
 public class RemoveCertCmd extends UnRevRmCertCommandSupport {

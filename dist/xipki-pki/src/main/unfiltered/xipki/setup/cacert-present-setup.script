@@ -8,25 +8,25 @@ echo "#################################################################"
 
 feature:install -r xipki-database-tool
 
-xipki-db:initdb-pki --force
+ca:initdb-pki --force
 
 feature:uninstall xipki-database-tool
 
-xipki-ca:restart
+ca:restart
 
 echo "#################################################################"
 echo "#                Load cacert-present-ca-conf.xml                #"
 echo "#################################################################"
 
-xipki-ca:load-conf --conf-file xipki/setup/cacert-present-ca-conf.xml
+ca:load-conf --conf-file xipki/setup/cacert-present-ca-conf.xml
 
 echo "# add user"
-xipki-ca:user-add --name user1 --password password1
+ca:user-add --name user1 --password password1
   
-xipki-ca:causer-add --user user1 --ca MYCA1 --profile ALL --permission ALL
+ca:causer-add --user user1 --ca MYCA1 --profile ALL --permission ALL
 
 echo "create initial CRL"
-xipki-ca:gencrl --ca MYCA1
+ca:gencrl --ca MYCA1
 
 echo "# Restart OCSP server"
 feature:uninstall xipki-ocspserver

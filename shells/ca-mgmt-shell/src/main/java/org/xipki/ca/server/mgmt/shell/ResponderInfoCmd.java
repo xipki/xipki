@@ -53,7 +53,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "responder-info",
+@Command(scope = "ca", name = "responder-info",
         description = "show information of responder")
 @Service
 public class ResponderInfoCmd extends CaCommandSupport {

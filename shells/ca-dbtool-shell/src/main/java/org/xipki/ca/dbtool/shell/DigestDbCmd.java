@@ -48,7 +48,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "digest-db",
+@Command(scope = "ca", name = "digest-db",
         description = "digest XiPKI/EJBCA database")
 @Service
 public class DigestDbCmd extends DbPortCommandSupport {

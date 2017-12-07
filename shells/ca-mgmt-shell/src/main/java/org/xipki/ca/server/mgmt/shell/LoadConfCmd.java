@@ -46,7 +46,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "load-conf",
+@Command(scope = "ca", name = "load-conf",
         description = "load configuration")
 @Service
 public class LoadConfCmd extends CaCommandSupport {

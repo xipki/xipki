@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "scep-rm",
+@Command(scope = "ca", name = "scep-rm",
         description = "remove SCEP")
 @Service
 public class ScepRemoveCmd extends CaCommandSupport {

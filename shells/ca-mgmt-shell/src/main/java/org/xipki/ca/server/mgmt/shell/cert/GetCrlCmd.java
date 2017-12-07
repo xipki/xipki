@@ -54,7 +54,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "getcrl",
+@Command(scope = "ca", name = "getcrl",
         description = "download CRL")
 @Service
 public class GetCrlCmd extends CrlCommandSupport {

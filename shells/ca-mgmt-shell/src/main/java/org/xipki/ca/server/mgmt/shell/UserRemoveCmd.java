@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "user-rm",
+@Command(scope = "ca", name = "user-rm",
         description = "remove user")
 @Service
 public class UserRemoveCmd extends CaCommandSupport {

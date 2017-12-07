@@ -47,7 +47,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "crlsigner-check",
+@Command(scope = "caqa", name = "crlsigner-check",
         description = "check information of CRL signers (QA)")
 @Service
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {

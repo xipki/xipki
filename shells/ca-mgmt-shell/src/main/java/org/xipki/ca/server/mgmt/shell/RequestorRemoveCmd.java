@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "requestor-rm",
+@Command(scope = "ca", name = "requestor-rm",
         description = "remove requestor")
 @Service
 public class RequestorRemoveCmd extends CaCommandSupport {

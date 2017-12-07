@@ -72,7 +72,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "ca-up",
+@Command(scope = "ca", name = "ca-up",
         description = "update CA")
 @Service
 public class CaUpdateCmd extends CaCommandSupport {

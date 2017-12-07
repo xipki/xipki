@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "profile-rm",
+@Command(scope = "ca", name = "profile-rm",
         description = "remove certificate profile")
 @Service
 public class ProfileRemoveCmd extends CaCommandSupport {

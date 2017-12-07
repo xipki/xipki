@@ -11,7 +11,7 @@ sleep 1
 
 # Prepare
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
@@ -20,7 +20,7 @@ xipki-tk:req-p12 \
   --out output/JSCEP-OCSP1.csr
 
 ## Enroll certificate via PKCSReq
-xipki-jscep:enroll \
+xi:jscep-enroll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -29,7 +29,7 @@ xipki-jscep:enroll \
   --out output/JSCEP-OCSP1.der
 
 ## Poll Cert
-xipki-jscep:certpoll \
+xi:jscep-certpoll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -39,9 +39,9 @@ xipki-jscep:certpoll \
   
 ## Get Cert
 
-SERIAL = $(xipki-tk:cert-info --serial --hex --in output/JSCEP-OCSP1.der)
+SERIAL = $(xi:cert-info --serial --hex --in output/JSCEP-OCSP1.der)
 
-xipki-jscep:getcert \
+xi:jscep-getcert \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -50,7 +50,7 @@ xipki-jscep:getcert \
   --serial $SERIAL
 
 ## Update the certificate in PKCS#12 file
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
   --cert output/JSCEP-OCSP1.der \
@@ -58,7 +58,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Get CRL
-xipki-jscep:getcrl \
+xi:jscep-getcrl \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --cert output/JSCEP-OCSP1.der \
@@ -68,7 +68,7 @@ xipki-jscep:getcrl \
  
 ## Renewal with same CommonName 
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH \
   --p12 output/JSCEP-OCSP1-2.p12 \
   --password 1234 \
@@ -76,7 +76,7 @@ xipki-tk:req-p12 \
   --out output/JSCEP-OCSP1-2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
-xipki-jscep:enroll \
+xi:jscep-enroll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -85,7 +85,7 @@ xipki-jscep:enroll \
   --out output/JSCEP-OCSP1-2.der \
 
 ## Update the certificate in PKCS#12 file
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/JSCEP-OCSP1-2.p12 \
   --password 1234 \
   --cert output/JSCEP-OCSP1-2.der \
@@ -94,7 +94,7 @@ xipki-tk:update-cert-p12 \
 
 ## Renewal with different CommonName 
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH \
   --p12 output/JSCEP-OCSP2.p12 \
   --password 1234 \
@@ -102,7 +102,7 @@ xipki-tk:req-p12 \
   --out output/JSCEP-OCSP2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
-xipki-jscep:enroll \
+xi:jscep-enroll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -111,7 +111,7 @@ xipki-jscep:enroll \
   --out output/JSCEP-OCSP2.der \
 
 ## Update the certificate in PKCS#12 file
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/JSCEP-OCSP2.p12 \
   --password 1234 \
   --cert output/JSCEP-OCSP2.der \

@@ -51,7 +51,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-add",
+@Command(scope = "ca", name = "crlsigner-add",
         description = "add CRL signer")
 @Service
 public class CrlSignerAddCmd extends CaCommandSupport {

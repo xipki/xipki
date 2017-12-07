@@ -43,7 +43,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "restart",
+@Command(scope = "ca", name = "restart",
         description = "restart CA system")
 @Service
 public class CaSystemRestartCmd extends CaCommandSupport {

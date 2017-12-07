@@ -46,7 +46,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "user-up",
+@Command(scope = "ca", name = "user-up",
         description = "update user")
 @Service
 public class UserUpdateCmd extends CaCommandSupport {

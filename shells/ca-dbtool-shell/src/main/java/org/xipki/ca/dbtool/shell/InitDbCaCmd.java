@@ -45,7 +45,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "initdb-ca",
+@Command(scope = "ca", name = "initdb-ca",
         description = "reset and initialize the CA database")
 @Service
 public class InitDbCaCmd extends LiquibaseCommandSupport {

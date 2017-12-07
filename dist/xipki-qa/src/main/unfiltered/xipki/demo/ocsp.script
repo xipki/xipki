@@ -11,7 +11,7 @@ sleep 1
 
 ## POST
 echo "QA: Good (POST, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/RCA1.der \
   --cert output/SubCA1.der \
   --exp-status good \
@@ -21,7 +21,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (POST, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/EE.Complex1.der \
   --exp-status unknown \
@@ -30,7 +30,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS_C1.der \
   --exp-status good \
@@ -40,7 +40,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS_C2.der \
   --exp-status affiliationChanged \
@@ -50,7 +50,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP1.der \
   --exp-status good \
@@ -60,7 +60,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP2.der \
   --exp-status keyCompromise \
@@ -70,7 +70,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --serial 99999 \
   --exp-status good \
@@ -81,7 +81,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC6960) (POST, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --serial 99999 \
   --exp-status unknown \
@@ -91,7 +91,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC2560) (POST, ISSUER UNKNOWN)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/OCSP1.der \
   --serial 2 \
   --exp-status issuerUnknown \
@@ -102,7 +102,7 @@ xipki-qa:ocsp-status \
 
 ## GET
 echo "QA: Good (GET, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/RCA1.der \
   --cert output/SubCA1.der \
   --http-get \
@@ -113,7 +113,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (GET, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/EE.Complex1.der \
   --http-get \
@@ -123,7 +123,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET,DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS_C1.der \
   --http-get \
@@ -134,7 +134,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS_C2.der \
   --http-get \
@@ -145,7 +145,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP1.der \
   --http-get \
@@ -156,7 +156,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP2.der \
   --http-get \
@@ -167,7 +167,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --serial 99999 \
   --http-get \
@@ -179,7 +179,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC6960) (GET, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --serial 99999 \
   --http-get \
@@ -190,7 +190,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC2560) (GET, ISSUER UNKNOWN)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/OCSP1.der \
   --serial 2 \
   --http-get \
@@ -202,7 +202,7 @@ xipki-qa:ocsp-status \
  
 ## POST, SIGNED
 echo "QA: Good (POST, SIGNED, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/RCA1.der \
   --cert output/SubCA1.der \
   --sign \
@@ -213,7 +213,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/EE.Complex1.der \
   --sign \
@@ -223,7 +223,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS_C1.der \
   --sign \
@@ -234,7 +234,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS_C2.der \
   --sign \
@@ -245,7 +245,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP1.der \
   --sign \
@@ -256,7 +256,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
  
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP2.der --sign \
   --exp-status keyCompromise \
@@ -266,7 +266,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
  
 echo "QA: Good (POST, SIGNED, CRL)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --serial 99999 \
   --sign \
@@ -278,7 +278,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/SubCA1.der \
   --serial 99999 \
   --sign \
@@ -289,7 +289,7 @@ xipki-qa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC2560) (POST, SIGNED, ISSUER UNKNOWN)"
-xipki-qa:ocsp-status \
+xiqa:ocsp-status \
   --issuer output/OCSP1.der \
   --serial 2 \
   --sign \

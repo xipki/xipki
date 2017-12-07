@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "neg-caalias-add",
+@Command(scope = "caqa", name = "neg-caalias-add",
         description = "add CA alias (negative, QA)")
 @Service
 public class NegCaAliasAddCmd extends CaAliasAddCmd {

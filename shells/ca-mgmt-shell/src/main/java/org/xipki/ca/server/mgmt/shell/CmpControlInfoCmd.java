@@ -52,7 +52,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-info",
+@Command(scope = "ca", name = "cmpcontrol-info",
         description = "show information of CMP control")
 @Service
 public class CmpControlInfoCmd extends CaCommandSupport {

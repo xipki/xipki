@@ -11,7 +11,7 @@ sleep 1
 
 # Prepare
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH \
   --p12 output/SCEP-OCSP1.p12 \
   --password 1234 \
@@ -20,7 +20,7 @@ xipki-tk:req-p12 \
   --out output/SCEP-OCSP1.csr
 
 ## Enroll certificate via PKCSReq
-xipki-scep:pkcs-req \
+xi:scep-enroll --method PKCS \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -29,7 +29,7 @@ xipki-scep:pkcs-req \
   --out output/SCEP-OCSP1.der
 
 ## Poll Cert
-xipki-scep:certpoll \
+xi:scep-certpoll \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -39,9 +39,9 @@ xipki-scep:certpoll \
   
 ## Get Cert
 
-SERIAL = $(xipki-tk:cert-info --serial --hex --in output/SCEP-OCSP1-certpoll.der)
+SERIAL = $(xi:cert-info --serial --hex --in output/SCEP-OCSP1-certpoll.der)
 
-xipki-scep:getcert \
+xi:scep-getcert \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -50,7 +50,7 @@ xipki-scep:getcert \
   --serial $SERIAL
 
 ## Update the certificate in PKCS#12 file
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/SCEP-OCSP1.p12 \
   --password 1234 \
   --cert output/SCEP-OCSP1.der \
@@ -58,7 +58,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Get CRL
-xipki-scep:getcrl \
+xi:scep-getcrl \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --cert output/SCEP-OCSP1.der \
@@ -68,7 +68,7 @@ xipki-scep:getcrl \
  
 ## Renewal
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH \
   --p12 output/SCEP-OCSP1-2.p12 \
   --password 1234 \
@@ -76,7 +76,7 @@ xipki-tk:req-p12 \
   --out output/SCEP-OCSP1-2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key SCEP-OCSP1.p12
-xipki-scep:renewal-req \
+xi:scep-enroll --method RENEWAL \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -85,7 +85,7 @@ xipki-scep:renewal-req \
   --out output/SCEP-OCSP1-2.der
 
 ## Update the certificate in PKCS#12 file
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/SCEP-OCSP1-2.p12 \
   --password 1234 \
   --cert output/SCEP-OCSP1-2.der \
@@ -94,7 +94,7 @@ xipki-tk:update-cert-p12 \
 
 ## Renewal with different CommonName 
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH \
   --p12 output/SCEP-OCSP2.p12 \
   --password 1234 \
@@ -102,7 +102,7 @@ xipki-tk:req-p12 \
   --out output/SCEP-OCSP2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key SCEP-OCSP1.p12
-xipki-scep:renewal-req \
+xi:scep-enroll --method RENEWAL \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -111,7 +111,7 @@ xipki-scep:renewal-req \
   --out output/SCEP-OCSP2.der
 
 ## Update the certificate in PKCS#12 file
-xipki-tk:update-cert-p12 \
+xi:update-cert-p12 \
   --p12 output/SCEP-OCSP2.p12 \
   --password 1234 \
   --cert output/SCEP-OCSP2.der \

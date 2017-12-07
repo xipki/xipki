@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "neg-env-add",
+@Command(scope = "caqa", name = "neg-env-add",
         description = "add environment parameter (negative, QA)")
 @Service
 public class NegEnvAddCmd extends EnvAddCmd {

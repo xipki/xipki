@@ -62,7 +62,7 @@ import org.xipki.password.PasswordResolverException;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "initdb",
+@Command(scope = "ca", name = "initdb",
         description = "reset and initialize single database")
 @Service
 public class InitDbCmd extends XipkiCommandSupport {

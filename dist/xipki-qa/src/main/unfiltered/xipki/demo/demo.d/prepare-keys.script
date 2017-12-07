@@ -1,6 +1,6 @@
-xipki-cmd:rm -r -f output
+xi:rm -r -f output
 
-xipki-cmd:mkdir output
+xi:mkdir output
 
 echo "========================================================"
 echo "HASH:       $HASH"
@@ -42,9 +42,9 @@ if { $SIG_TYPE equals "RSAPSS" } {
   CMP_SIGALGO = "${HASH}withRSA"
 }
 
-xipki-cmd:copy-dir xipki/demo/p12/shared output
+xi:copy-dir xipki/demo/p12/shared output
 
-xipki-cmd:copy-dir xipki/demo/p12/$KEY_TYPE output
+xi:copy-dir xipki/demo/p12/$KEY_TYPE output
 
 if { $KEY_TYPE equals "RSA" } {
   if { "$KEYSPEC" equals "" } {
@@ -69,39 +69,39 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=OCSP99"
 
-  xipki-tk:delete-key \
+  xi:delete-key \
     --slot $SLOT \
     --label RCA1
 
-  xipki-tk:delete-key \
+  xi:delete-key \
     --slot $SLOT \
     --label SubCA1
 
-  xipki-tk:delete-key \
+  xi:delete-key \
     --slot $SLOT \
     --label SubCAwithCRL1
 
-  xipki-tk:delete-key \
+  xi:delete-key \
     --slot $SLOT \
     --label OCSP99
 
   if { $KEY_TYPE equals "RSA" } {
-    xipki-tk:rsa \
+    xi:rsa \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
-    xipki-tk:rsa \
+    xi:rsa \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
-    xipki-tk:rsa \
+    xi:rsa \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
-    xipki-tk:rsa \
+    xi:rsa \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
@@ -109,44 +109,44 @@ if { $TOKEN_TYPE equals "PKCS11" } {
   }
 
   if { $KEY_TYPE equals "EC" } {
-    xipki-tk:ec \
+    xi:ec \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
-    xipki-tk:ec \
+    xi:ec \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
-    xipki-tk:ec \
+    xi:ec \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
-    xipki-tk:ec \
+    xi:ec \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
   }
 
   if { $KEY_TYPE equals "DSA" } {
-    xipki-tk:dsa \
+    xi:dsa \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
-    xipki-tk:dsa \
+    xi:dsa \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
-    xipki-tk:dsa \
+    xi:dsa \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
-    xipki-tk:dsa \
+    xi:dsa \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
@@ -160,22 +160,22 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   OCSP_KEYCONF = "password=1234,keystore=file:output/OCSP99.p12"
 
   if { $KEY_TYPE equals "RSA" } {
-    xipki-tk:rsa-p12 \
+    xi:rsa-p12 \
       --password 1234 \
       --key-size $KEYSPEC \
       --out output/RCA1.p12
 
-    xipki-tk:rsa-p12 \
+    xi:rsa-p12 \
       --password 1234 \
       --key-size $KEYSPEC \
       --out output/SubCA1.p12
 
-    xipki-tk:rsa-p12 \
+    xi:rsa-p12 \
       --password 1234 \
       --key-size $KEYSPEC \
       --out output/SubCAwithCRL1.p12
   
-    xipki-tk:rsa-p12 \
+    xi:rsa-p12 \
       --password 1234 \
       --key-size $KEYSPEC \
       --out output/OCSP99.p12 \
@@ -183,22 +183,22 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   }
   
   if { $KEY_TYPE equals "DSA" } {
-    xipki-tk:dsa-p12 \
+    xi:dsa-p12 \
       --password 1234 \
       --plen $KEYSPEC \
       --out output/RCA1.p12
 
-    xipki-tk:dsa-p12 \
+    xi:dsa-p12 \
       --password 1234 \
       --plen $KEYSPEC \
       --out output/SubCA1.p12
 
-    xipki-tk:dsa-p12 \
+    xi:dsa-p12 \
       --password 1234 \
       --plen $KEYSPEC \
       --out output/SubCAwithCRL1.p12
 
-    xipki-tk:dsa-p12 \
+    xi:dsa-p12 \
       --password 1234 \
       --plen $KEYSPEC \
       --out output/OCSP99.p12
@@ -206,22 +206,22 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   }
     
   if { $KEY_TYPE equals "EC" } {
-    xipki-tk:ec-p12 \
+    xi:ec-p12 \
       --curve $KEYSPEC \
       --password 1234 \
       --out output/RCA1.p12
 
-    xipki-tk:ec-p12 \
+    xi:ec-p12 \
       --curve $KEYSPEC \
       --password 1234 \
       --out output/SubCA1.p12
 
-    xipki-tk:ec-p12 \
+    xi:ec-p12 \
       --curve $KEYSPEC \
       --password 1234 \
       --out output/SubCAwithCRL1.p12
 
-    xipki-tk:ec-p12 \
+    xi:ec-p12 \
       --curve $KEYSPEC \
       --password 1234 \
       --out output/OCSP99.p12

@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "neg-clear-publishqueue",
+@Command(scope = "caqa", name = "neg-clear-publishqueue",
         description = "clear publish queue (negative, QA)")
 @Service
 public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {

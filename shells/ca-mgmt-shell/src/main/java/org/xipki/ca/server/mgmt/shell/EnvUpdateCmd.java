@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "env-up",
+@Command(scope = "ca", name = "env-up",
         description = "update CA environment parameter")
 @Service
 public class EnvUpdateCmd extends CaCommandSupport {

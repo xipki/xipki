@@ -46,7 +46,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "capub-rm",
+@Command(scope = "ca", name = "capub-rm",
         description = "remove publisher from CA")
 @Service
 public class CaPublisherRemoveCmd extends CaCommandSupport {

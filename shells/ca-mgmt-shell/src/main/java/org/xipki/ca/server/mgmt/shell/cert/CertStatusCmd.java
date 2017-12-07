@@ -49,7 +49,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "cert-status",
+@Command(scope = "ca", name = "cert-status",
         description = "show certificate status and save the certificate")
 @Service
 public class CertStatusCmd extends UnRevRmCertCommandSupport {

@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-up",
+@Command(scope = "ca", name = "cmpcontrol-up",
         description = "update CMP control")
 @Service
 public class CmpControlUpdateCmd extends CaCommandSupport {

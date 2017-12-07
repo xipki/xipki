@@ -57,7 +57,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "enroll-cert",
+@Command(scope = "ca", name = "enroll-cert",
         description = "enroll certificate")
 @Service
 public class EnrollCertCmd extends CaCommandSupport {

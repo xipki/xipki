@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "neg-unrevoke-cert",
+@Command(scope = "caqa", name = "neg-unrevoke-cert",
         description = "unrevoke certificate (negative, QA)")
 @Service
 public class NegUnrevokeCertCmd extends UnrevokeCertCmd {

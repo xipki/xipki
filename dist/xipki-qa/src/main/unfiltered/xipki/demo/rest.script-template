@@ -4,9 +4,9 @@ echo "#################################################################"
 echo "#             Manage certificate via REST interface             #"
 echo "#################################################################"
 
-CA_SHA1FP = $(xipki-tk:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)
 
-xipki-tk:req-p12 \
+xi:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/REST-TLS1.p12 \
   --password 1234 \
@@ -15,50 +15,50 @@ xipki-tk:req-p12 \
 
 echo "REST cacert"
 
-xipki-cmd:curl \
+xi:curl \
   --out output/rest/cacert-SubCAwithCRL.der \
   $BASE_URL/cacert
 
 echo "REST enroll"
 
-xipki-cmd:curl \
+xi:curl \
   --out output/rest/REST-TLS1.der \
   --data-file output/rest/REST-TLS1.csr \
   --header "Content-Type: application/pkcs10" \
   "$BASE_URL/enroll-cert?profile=TLSA"
 
-SERIAL = $(xipki-tk:cert-info --serial --hex --in output/rest/REST-TLS1.der)
+SERIAL = $(xi:cert-info --serial --hex --in output/rest/REST-TLS1.der)
 
 echo "REST revoke (suspend) "
 
-xipki-cmd:curl \
+xi:curl \
   "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "REST revoke (unsuspend)"
 
-xipki-cmd:curl \
+xi:curl \
   "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "REST revoke (revoke)"
 
-xipki-cmd:curl \
+xi:curl \
   "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "REST new-crl"
 
-xipki-cmd:curl \
+xi:curl \
   --out output/rest/new-crl.crl \
   $BASE_URL/new-crl
 
 echo "REST crl"
-  xipki-cmd:curl \
+  xi:curl \
   --out output/rest/crl.crl \
   $BASE_URL/crl
 
 echo "REST crl (crl-number)"
 
-CRLNUMBER = $(xipki-tk:crl-info --crlnumber --in output/rest/crl.crl)
+CRLNUMBER = $(xi:crl-info --crlnumber --in output/rest/crl.crl)
 
-xipki-cmd:curl \
+xi:curl \
   --out output/rest/crl-number-${CRLNUMBER}.crl \
   "$BASE_URL/crl?crl-nubmer=${CRLNUMBER}"

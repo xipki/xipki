@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "env-rm",
+@Command(scope = "ca", name = "env-rm",
         description = "remove CA environment parameter")
 @Service
 public class EnvRemoveCmd extends CaCommandSupport {

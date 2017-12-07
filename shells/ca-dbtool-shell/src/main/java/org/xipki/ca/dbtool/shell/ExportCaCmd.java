@@ -48,7 +48,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "export-ca",
+@Command(scope = "ca", name = "export-ca",
         description = "export CA database")
 @Service
 public class ExportCaCmd extends DbPortCommandSupport {

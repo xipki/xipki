@@ -53,7 +53,7 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "careq-add",
+@Command(scope = "ca", name = "careq-add",
         description = "add requestor to CA")
 @Service
 public class CaRequestorAddCmd extends CaCommandSupport {
@@ -85,9 +85,9 @@ public class CaRequestorAddCmd extends CaCommandSupport {
     private Set<String> permissions;
 
     @Option(name = "--profile",
-            required = true, multiValued = true,
+            multiValued = true,
             description = "profile name or 'ALL' for all profiles\n"
-                    + "(required, multi-valued)")
+                    + "(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

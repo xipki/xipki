@@ -49,7 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-info",
+@Command(scope = "ca", name = "caprofile-info",
         description = "show information of certificate profile in given CA")
 @Service
 public class CaProfileInfoCmd extends CaCommandSupport {

@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "gencrl",
+@Command(scope = "ca", name = "gencrl",
         description = "generate CRL")
 @Service
 public class GenCrlCmd extends CrlCommandSupport {

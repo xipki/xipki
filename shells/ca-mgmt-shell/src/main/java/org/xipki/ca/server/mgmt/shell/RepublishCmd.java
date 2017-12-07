@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "republish",
+@Command(scope = "ca", name = "republish",
         description = "republish certificates")
 @Service
 public class RepublishCmd extends CaCommandSupport {

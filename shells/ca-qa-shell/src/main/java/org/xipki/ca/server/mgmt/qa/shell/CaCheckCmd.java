@@ -54,7 +54,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "ca-check",
+@Command(scope = "caqa", name = "ca-check",
         description = "check information of CAs (QA)")
 @Service
 public class CaCheckCmd extends CaUpdateCmd {

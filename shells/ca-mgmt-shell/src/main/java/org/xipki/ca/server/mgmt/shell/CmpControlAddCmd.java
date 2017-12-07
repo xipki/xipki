@@ -44,7 +44,7 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-add",
+@Command(scope = "ca", name = "cmpcontrol-add",
         description = "add CMP control")
 @Service
 public class CmpControlAddCmd extends CaCommandSupport {

@@ -47,7 +47,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "get-request",
+@Command(scope = "ca", name = "get-request",
         description = "get certificate request")
 @Service
 public class GetRequestCmd extends UnRevRmCertCommandSupport {

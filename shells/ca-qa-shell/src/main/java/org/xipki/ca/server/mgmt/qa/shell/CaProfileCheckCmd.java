@@ -50,7 +50,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-caqa", name = "caprofile-check",
+@Command(scope = "caqa", name = "caprofile-check",
         description = "check information of certificate profiles in given CA (QA)")
 @Service
 public class CaProfileCheckCmd extends CaCommandSupport {
@@ -78,7 +78,7 @@ public class CaProfileCheckCmd extends CaCommandSupport {
         }
 
         Set<String> entries = caManager.getCertprofilesForCa(caName);
-        if (!entries.contains(profileName)) {
+        if (!entries.contains(profileName.toUpperCase())) {
             throw new CmdFailure("CA is not associated with profile '" + profileName + "'");
         }
 

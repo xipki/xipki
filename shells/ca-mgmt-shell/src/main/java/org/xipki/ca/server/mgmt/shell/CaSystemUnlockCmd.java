@@ -43,7 +43,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "unlock",
+@Command(scope = "ca", name = "unlock",
         description = "unlock CA system")
 @Service
 public class CaSystemUnlockCmd extends CaCommandSupport {
@@ -53,7 +53,7 @@ public class CaSystemUnlockCmd extends CaCommandSupport {
         boolean unlocked = caManager.unlockCa();
 
         if (unlocked) {
-            println("unlocked CA system, calling xipki-ca:restart to restart CA system");
+            println("unlocked CA system, calling ca:restart to restart CA system");
         } else {
             throw new CmdFailure("could not unlock CA system");
         }
