@@ -156,7 +156,7 @@ ca:profile-add \
 
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:req \
+  xi:req-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label RCA1 \
@@ -209,7 +209,7 @@ ca:profile-rm RCA
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert \
+  xi:update-cert-p11 \
     --slot $SLOT \
     --label RCA1 \
     --cert output/RCA1.der
@@ -256,7 +256,7 @@ ca:careq-add \
 
 ## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:req \
+  xi:req-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCA1 \
@@ -278,7 +278,7 @@ ca:enroll-cert \
   --profile SubCA
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert \
+  xi:update-cert-p11 \
     --slot $SLOT \
     --label SubCA1 \
     --cert output/SubCA1.der \
@@ -292,7 +292,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
 ## Generate keys and CSR for SubCAwithCRL1
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:req \
+  xi:req-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
@@ -331,7 +331,7 @@ ca:enroll-cert \
   --profile SubCA.Complex
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert \
+  xi:update-cert-p11 \
     --slot $SLOT \
     --label SubCAwithCRL1 \
     --cert output/SubCAwithCRL1.der \
@@ -345,7 +345,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:req \
+  xi:req-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label OCSP99 \
@@ -367,7 +367,7 @@ ca:enroll-cert \
   --profile OCSP
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert \
+  xi:update-cert-p11 \
     --slot $SLOT \
     --label OCSP99 \
     --cert output/OCSP99.der \

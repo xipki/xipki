@@ -39,13 +39,13 @@ xi:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/MYCA1.p12 --password 1234 \
 
 ## Choice : PKCS#11 CA Key
 # comment in for PKCS11.RSA
-#xi:rsa --slot 0 --label MYCA1 --key-size 2048
+#xi:rsa-p11 --slot 0 --label MYCA1 --key-size 2048
 
 # comment in for PKCS11.EC
-#xi:ec  --slot 0 --label MYCA1 --curve secp256r1
+#xi:ec-p11  --slot 0 --label MYCA1 --curve secp256r1
 
 # comment in for PKCS11
-#xi:req --hash $HASH --slot 0 --label MYCA1 \
+#xi:req-p11 --hash $HASH --slot 0 --label MYCA1 \
 #  --out ${KEYCERTS_DIR}/MYCA1.csr --subject "${CA_SUBJECT}"
 
 echo "#################################################################"
@@ -57,6 +57,9 @@ ca:load-conf --conf-file xipki/setup/cacert-none-ca-conf.xml
 echo "# Update the certificate in the device"
 xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/MYCA1.p12 --password 1234 \
   --cert ${KEYCERTS_DIR}/MYCA1.der
+
+# comment in for PKCS11
+#xi:update-cert-p11 --slot 0 --label MYCA1 --cert ${KEYCERTS_DIR}/MYCA1.der
 
 echo "# add user"
 ca:user-add --name user1 --password password1

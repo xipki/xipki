@@ -69,39 +69,39 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=OCSP99"
 
-  xi:delete-key \
+  xi:delete-key-p11 \
     --slot $SLOT \
     --label RCA1
 
-  xi:delete-key \
+  xi:delete-key-p11 \
     --slot $SLOT \
     --label SubCA1
 
-  xi:delete-key \
+  xi:delete-key-p11 \
     --slot $SLOT \
     --label SubCAwithCRL1
 
-  xi:delete-key \
+  xi:delete-key-p11 \
     --slot $SLOT \
     --label OCSP99
 
   if { $KEY_TYPE equals "RSA" } {
-    xi:rsa \
+    xi:rsa-p11 \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
-    xi:rsa \
+    xi:rsa-p11 \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
-    xi:rsa \
+    xi:rsa-p11 \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
-    xi:rsa \
+    xi:rsa-p11 \
       --key-size $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
@@ -109,44 +109,44 @@ if { $TOKEN_TYPE equals "PKCS11" } {
   }
 
   if { $KEY_TYPE equals "EC" } {
-    xi:ec \
+    xi:ec-p11 \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
-    xi:ec \
+    xi:ec-p11 \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
-    xi:ec \
+    xi:ec-p11 \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
-    xi:ec \
+    xi:ec-p11 \
       --curve $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
   }
 
   if { $KEY_TYPE equals "DSA" } {
-    xi:dsa \
+    xi:dsa-p11 \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
-    xi:dsa \
+    xi:dsa-p11 \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
-    xi:dsa \
+    xi:dsa-p11 \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
-    xi:dsa \
+    xi:dsa-p11 \
       --plen $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
