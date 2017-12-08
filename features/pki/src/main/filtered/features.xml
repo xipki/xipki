@@ -3,13 +3,14 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="netty" version="${netty.version}" description="netty">
-    <bundle start-level="65">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
+    <!--bundle start-level="65">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle-->
     <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
-    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
+    <!--bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle-->
     <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
