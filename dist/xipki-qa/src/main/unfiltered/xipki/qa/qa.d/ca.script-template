@@ -2,8 +2,6 @@ echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
 
-feature:install -r xipki-database-tool
-
 echo "Sleeping 1 second"
 sleep 1
 
@@ -19,8 +17,6 @@ ca:initdb \
   --force \
   --db-conf  xipki/ocsp-config/ocsp-crl-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
-
-feature:uninstall xipki-database-tool
 
 feature:install -r xipki-caserver
 
@@ -45,77 +41,77 @@ ca:cmpcontrol-add \
 ca:profile-add \
   --name Cross \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_Cross.xml
+  --conf-file xipki/qa/profile/Certprofile_Cross.xml
 
 ca:profile-add \
   --name SubCA \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_SubCA.xml
+  --conf-file xipki/qa/profile/Certprofile_SubCA.xml
 
 ca:profile-add \
   --name SubCA.Complex \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_SubCA_Complex.xml
+  --conf-file xipki/qa/profile/Certprofile_SubCA_Complex.xml
 
 ca:profile-add \
   --name OCSP \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_OCSP.xml
+  --conf-file xipki/qa/profile/Certprofile_OCSP.xml
 
 ca:profile-add \
   --name SCEP \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_SCEP.xml
+  --conf-file xipki/qa/profile/Certprofile_SCEP.xml
 
 ca:profile-add \
   --name multipleOUs \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_multipleOUs.xml
+  --conf-file xipki/qa/profile/Certprofile_multipleOUs.xml
 
 ca:profile-add \
   --name multiValuedRDN \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_multiValuedRDN.xml
+  --conf-file xipki/qa/profile/Certprofile_multiValuedRDN.xml
 
 ca:profile-add \
   --name QC \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_QC.xml
+  --conf-file xipki/qa/profile/Certprofile_QC.xml
 
 ca:profile-add \
   --name EE.Complex \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_EE_Complex.xml
+  --conf-file xipki/qa/profile/Certprofile_EE_Complex.xml
 
 ca:profile-add \
   --name TLS \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_TLS.xml
+  --conf-file xipki/qa/profile/Certprofile_TLS.xml
 
 ca:profile-add \
   --name TLSA \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_TLS.xml
+  --conf-file xipki/qa/profile/Certprofile_TLS.xml
 
 ca:profile-add \
   --name TLS_C \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_TLS_C.xml
+  --conf-file xipki/qa/profile/Certprofile_TLS_C.xml
 
 ca:profile-add \
   --name TLSwithIncSN \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_TLSwithIncSN.xml
+  --conf-file xipki/qa/profile/Certprofile_TLSwithIncSN.xml
 
 ca:profile-add \
   --name gSMC_K \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_gSMC_K.xml
+  --conf-file xipki/qa/profile/Certprofile_gSMC_K.xml
 
 ca:profile-add \
   --name MaxTime \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_MaxTime.xml
+  --conf-file xipki/qa/profile/Certprofile_MaxTime.xml
 
 ## Publishers
 ca:publisher-add \
@@ -152,7 +148,7 @@ echo "#################################################################"
 ca:profile-add \
   --name RCA \
   --type XML \
-  --conf-file xipki/demo/profile/Certprofile_RootCA.xml
+  --conf-file xipki/qa/profile/Certprofile_RootCA.xml
 
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "PKCS11" } {
@@ -528,5 +524,11 @@ ca:careq-add \
   --ra yes \
   --profile ALL \
   --ca SubCAwithCRL1
+  
+## add user to system
+ca:user-add --name user1 --password password1
 
-source file:./xipki/demo/demo.d/scep-server.script
+## Add user to CA SubCAwithCRL1  
+ca:causer-add --user user1 --ca SubCAwithCRL1 --profile ALL --permission ALL
+
+source file:./xipki/qa/qa.d/scep-server.script

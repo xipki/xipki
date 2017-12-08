@@ -1,0 +1,86 @@
+echo "#################################################################"
+echo "#                              QA                               #"
+echo "#################################################################"
+feature:install -r xipki-caqa-shell
+
+echo "Sleeping 1 second"
+sleep 1
+
+echo "#################################################################"
+echo "#                       Check certificate                       #"
+echo "#################################################################"
+
+## RCA
+
+caqa:check-cert --issuer RCA --profile RCA \
+  --csr output/RCA1.csr --cert output/RCA1.der
+
+caqa:check-cert --issuer RCA --profile Cross \
+  --csr output/Cross1.csr --cert output/Cross1.der
+
+caqa:check-cert --issuer RCA --profile SubCA \
+  --csr output/SubCA1.csr --cert output/SubCA1.der
+
+caqa:check-cert --issuer RCA --profile SubCA.Complex \
+  --csr output/SubCAwithCRL1.csr --cert output/SubCAwithCRL1.der
+
+## SubCAwithCRL
+
+caqa:check-cert --issuer SubCAwithCRL --profile OCSP \
+  --csr output/OCSP1.csr --cert output/OCSP1.der
+
+caqa:check-cert --issuer SubCAwithCRL --profile OCSP \
+  --csr output/OCSP2.csr --cert output/OCSP2.der
+
+caqa:check-cert --issuer SubCAwithCRL --profile multipleOUs \
+  --csr output/multipleOUs1.csr --cert output/multipleOUs1.der
+
+caqa:check-cert --issuer SubCAwithCRL --profile multipleOUs \
+  --csr output/multipleOUs2.csr --cert output/multipleOUs2.der
+
+caqa:check-cert --issuer SubCAwithCRL --profile multiValuedRDN \
+  --csr output/multiValuedRDN1.csr --cert output/multiValuedRDN1.der
+
+caqa:check-cert --issuer SubCAwithCRL --profile MaxTime \
+  --csr output/MaxTime1.csr --cert output/MaxTime1.der
+
+## SubCA
+
+caqa:check-cert --issuer SubCA --profile TLS \
+  --csr output/TLS1.csr --cert output/TLS1.der
+
+caqa:check-cert --issuer SubCA --profile TLSwithIncSN \
+  --csr output/TLSwithIncSN1.csr --cert output/TLSwithIncSN1.der
+
+caqa:check-cert --issuer SubCA --profile TLSwithIncSN \
+  --csr output/TLSwithIncSN1-1.csr --cert output/TLSwithIncSN1-1.der
+
+caqa:check-cert --issuer SubCA --profile TLSwithIncSN \
+  --csr output/TLSwithIncSN1-2.csr --cert output/TLSwithIncSN1-2.der
+
+caqa:check-cert --issuer SubCA --profile TLS \
+  --csr output/TLS2.csr --cert output/TLS2.der
+
+caqa:check-cert --issuer SubCA --profile TLS_C \
+  --csr output/TLS_C1.csr --cert output/TLS_C1.der
+
+caqa:check-cert --issuer SubCA --profile TLS_C \
+  --csr output/TLS_C2.csr --cert output/TLS_C2.der
+
+caqa:check-cert --issuer SubCA --profile gSMC_K \
+  --csr output/gSMC_K1.csr --cert output/gSMC_K1.der
+
+caqa:check-cert --issuer SubCA --profile gSMC_K \
+  --csr output/gSMC_K2.csr --cert output/gSMC_K2.der
+
+caqa:check-cert --issuer SubCA --profile QC \
+  --csr output/QC1.csr --cert output/QC1.der
+
+caqa:check-cert --issuer SubCA --profile EE.Complex \
+  --csr output/EE.Complex1.csr --cert output/EE.Complex1.der
+
+caqa:check-cert --issuer SubCA --profile EE.Complex \
+  --csr output/EE.Complex2.csr --cert output/EE.Complex2.der
+
+feature:uninstall xipki-caqa-shell
+

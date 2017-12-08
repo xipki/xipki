@@ -3,7 +3,6 @@ JSCEP_URL = http://localhost:8080/scep/scep1/ocsp/pkiclient.exe
 echo "#################################################################"
 echo "#              Enroll certificate with JSCEP                    #"
 echo "#################################################################"
-
 feature:install -r xipki-jscepclient-shell
 
 echo "Sleeping 1 second"
@@ -118,7 +117,5 @@ xi:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
-#################################################################
-#              Uninstall unneeded features                      #
-#################################################################
 feature:uninstall xipki-jscepclient-shell
+

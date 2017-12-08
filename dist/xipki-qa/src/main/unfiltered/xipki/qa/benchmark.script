@@ -30,7 +30,7 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/demo/benchmark.script <test type> [<durataion> [<threads>]]"
+  echo "source file:./xipki/qa/benchmark.script <test type> [<durataion> [<threads>]]"
   echo "test type:       enroll, ocsp, revoke"
   echo "duration:        duration in seconds, default is 15"
   echo "threads:         number of threads, default is 5"
@@ -57,21 +57,14 @@ if { $printUsage equals "true" } {
 
     # Loadtest Template
     echo "Template enroll benchmark"
-    xiqa:cmp-benchmark-template-enroll \
-      --template xipki/demo/demo.d/loadtest-template.xml \
-      --duration $duration \
-      --thread $threads
+    xiqa:cmp-benchmark-template-enroll --duration $duration --thread $threads \
+      --template xipki/qa/qa.d/loadtest-template.xml
 
     # Loadtest RSA key
     echo "Enroll benchmark"
-    xiqa:cmp-benchmark-enroll \
-      --key-type RSA \
-      --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
-      --profile TLS \
-      -n 3 \
-      --random-dn O \
-      --duration $duration \
-      --thread $threads
+    xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \
+      --key-type RSA --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
+      --profile TLS -n 3 --random-dn O
 
     feature:uninstall xipki-caclient-shell
   }
@@ -83,41 +76,27 @@ if { $printUsage equals "true" } {
     sleep 1
 
     echo "Revoke benchmark"
-    xiqa:cmp-benchmark-revoke \
+    xiqa:cmp-benchmark-revoke --duration $duration --thread $threads \
       --issuer output/SubCA1.der \
-      --ca-db xipki/ca-config/ca-db.properties \
-      --duration $duration \
-      --thread $threads
+      --ca-db xipki/ca-config/ca-db.properties
 
     feature:uninstall xipki-caclient-shell
   }
 
   if { "$action" equals "ocsp" } {
-    feature:install -r xipki-ocspqa-shell
-
     URL = http://localhost:8080/ocsp/responder1
     URL_CRL = http://localhost:8080/ocsp/responder2
 
     echo "Sleeping 1 second"
     sleep 1
     echo "OCSP status benchmark"
-    xiqa:benchmark-ocsp-status \
-      --issuer output/SubCA1.der \
-      --cert output/TLS_C2.der \
-      --url $URL \
-      --duration $duration \
-      --thread $threads \
+    xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
+      --issuer output/SubCA1.der --cert output/TLS_C2.der --url $URL \
       --queue-size $OCSP_QUEUE_SIZE
 
     echo "Loadtest OCSP status"
-    xiqa:benchmark-ocsp-status \
-      --issuer output/SubCAwithCRL1.der \
-      --cert output/OCSP2.der \
-      --url $URL_CRL \
-      --duration $duration \
-      --thread $threads \
+    xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
+      --issuer output/SubCAwithCRL1.der --cert output/OCSP2.der --url $URL_CRL \
       --queue-size $OCSP_QUEUE_SIZE
-
-    feature:uninstall xipki-ocspqa-shell
   }
 }

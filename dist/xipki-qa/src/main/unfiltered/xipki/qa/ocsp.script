@@ -1,10 +1,10 @@
 echo "#################################################################"
 echo "#                              OCSP                             #"
 echo "#################################################################"
-feature:install -r xipki-ocspqa-shell
-
 URL = http://localhost:8080/ocsp/responder1
 URL_CRL = http://localhost:8080/ocsp/responder2
+
+feature:install -r xipki-ocspqa-shell
 
 echo "Sleeping 1 second"
 sleep 1
@@ -300,3 +300,4 @@ xiqa:ocsp-status \
   --resp-issuer output/RCA1.der
 
 feature:uninstall xipki-ocspqa-shell
+

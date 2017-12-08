@@ -30,46 +30,46 @@
   </X509Issuers>
   <X509Certprofiles>
     <X509Certprofile name="RCA">
-      <file>xipki/demo/profile/Certprofile_RootCA.xml</file>
+      <file>xipki/qa/profile/Certprofile_RootCA.xml</file>
     </X509Certprofile>
     <X509Certprofile name="Cross">
-      <file>xipki/demo/profile/Certprofile_Cross.xml</file>
+      <file>xipki/qa/profile/Certprofile_Cross.xml</file>
     </X509Certprofile>
     <X509Certprofile name="SubCA">
-      <file>xipki/demo/profile/Certprofile_SubCA.xml</file>
+      <file>xipki/qa/profile/Certprofile_SubCA.xml</file>
     </X509Certprofile>
     <X509Certprofile name="SubCA.Complex">
-      <file>xipki/demo/profile/Certprofile_SubCA_Complex.xml</file>
+      <file>xipki/qa/profile/Certprofile_SubCA_Complex.xml</file>
     </X509Certprofile>
     <X509Certprofile name="OCSP">
-      <file>xipki/demo/profile/Certprofile_OCSP.xml</file>
+      <file>xipki/qa/profile/Certprofile_OCSP.xml</file>
     </X509Certprofile>
     <X509Certprofile name="multipleOUs">
-      <file>xipki/demo/profile/Certprofile_multipleOUs.xml</file>
+      <file>xipki/qa/profile/Certprofile_multipleOUs.xml</file>
     </X509Certprofile>
     <X509Certprofile name="multiValuedRDN">
-      <file>xipki/demo/profile/Certprofile_multiValuedRDN.xml</file>
+      <file>xipki/qa/profile/Certprofile_multiValuedRDN.xml</file>
     </X509Certprofile>
     <X509Certprofile name="TLS">
-      <file>xipki/demo/profile/Certprofile_TLS.xml</file>
+      <file>xipki/qa/profile/Certprofile_TLS.xml</file>
     </X509Certprofile>
     <X509Certprofile name="TLS_C">
-      <file>xipki/demo/profile/Certprofile_TLS_C.xml</file>
+      <file>xipki/qa/profile/Certprofile_TLS_C.xml</file>
     </X509Certprofile>
     <X509Certprofile name="TLSwithIncSN">
-      <file>xipki/demo/profile/Certprofile_TLSwithIncSN.xml</file>
+      <file>xipki/qa/profile/Certprofile_TLSwithIncSN.xml</file>
     </X509Certprofile>
     <X509Certprofile name="gSMC_K">
-      <file>xipki/demo/profile/Certprofile_gSMC_K.xml</file>
+      <file>xipki/qa/profile/Certprofile_gSMC_K.xml</file>
     </X509Certprofile>
     <X509Certprofile name="QC">
-      <file>xipki/demo/profile/Certprofile_QC.xml</file>
+      <file>xipki/qa/profile/Certprofile_QC.xml</file>
     </X509Certprofile>
     <X509Certprofile name="EE.Complex">
-      <file>xipki/demo/profile/Certprofile_EE_Complex.xml</file>
+      <file>xipki/qa/profile/Certprofile_EE_Complex.xml</file>
     </X509Certprofile>
     <X509Certprofile name="MaxTime">
-      <file>xipki/demo/profile/Certprofile_MaxTime.xml</file>
+      <file>xipki/qa/profile/Certprofile_MaxTime.xml</file>
     </X509Certprofile>
   </X509Certprofiles>
 </QAConf>

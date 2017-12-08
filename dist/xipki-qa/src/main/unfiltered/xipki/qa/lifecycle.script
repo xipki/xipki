@@ -81,7 +81,7 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/demo/demo.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "source file:./xipki/qa/lifecycle.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
   echo "                     The SHA3 algorithms are not for PLAINEC."
@@ -92,66 +92,43 @@ if { $printUsage equals "true" } {
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } {
-  feature:install -r xipki-security-shell
-  source file:./xipki/demo/demo.d/prepare-keys.script
+  source file:./xipki/qa/qa.d/prepare-keys.script
 
   ## Prepare OCSP responder configuration
-  xi:copy-file \
-    -f \
+  xi:copy-file -f \
     xipki/ocsp-config/ocsp-responder.xml-template \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xi:replace \
-    --old "REPLACEME-TOKENTYPE" \
-    --new "$TOKEN_TYPE" \
+  xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xi:replace \
-    --old "REPLACEME-TOKENKEY" \
-    --new "$OCSP_KEYCONF" \
+  xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xi:replace \
-    --old "REPLACEME-SIGALGO" \
-    --new "$SIGALGO" \
+  xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
     xipki/ocsp-config/ocsp-responder.xml
 
   ## CA client configuration
-  xi:copy-file \
-    -f \
-    xipki/client-config/ca-client.xml-template \
+  xi:copy-file -f xipki/client-config/ca-client.xml-template \
     xipki/client-config/ca-client.xml
 
-  xi:replace \
-    --old "REPLACEME-CMP_SIGALGO" \
-    --new "$CMP_SIGALGO" \
+  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
     xipki/client-config/ca-client.xml
 
   ## Prepare scripts
-  xi:copy-file \
-    -f \
-    xipki/demo/rest.script-template \
-    xipki/demo/rest.script
+  xi:copy-file -f xipki/qa/rest.script-template xipki/qa/rest.script
 
-  xi:copy-file \
-    -f \
-    xipki/demo/demo.d/ca-load.script-template \
-    xipki/demo/demo.d/ca-load.script
+  xi:copy-file -f xipki/qa/qa.d/ca-load.script-template \
+    xipki/qa/qa.d/ca-load.script
 
-  xi:copy-file \
-    -f \
-    xipki/demo/demo.d/ca.script-template \
-    xipki/demo/demo.d/ca.script
+  xi:copy-file -f xipki/qa/qa.d/ca.script-template \
+    xipki/qa/qa.d/ca.script
 
-  xi:copy-file \
-    -f \
-    xipki/demo/demo.d/ra.script-template \
-    xipki/demo/demo.d/ra.script
+  xi:copy-file -f xipki/qa/qa.d/ra.script-template \
+    xipki/qa/qa.d/ra.script
 
-  xi:replace \
-    --old "REPLACEME-CMP_SIGALGO" \
-    --new "$CMP_SIGALGO" \
-    xipki/demo/demo.d/ca.script
+  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+    xipki/qa/qa.d/ca.script
 
   dsaPlain = ""
 
@@ -159,55 +136,38 @@ if { $printUsage equals "true" } {
     dsaPlain = "--dsa-plain"
   }
 
-  xi:replace \
-    --old "REPLACEME-DSAPLAIN" \
-    --new "${dsaPlain}" \
-    xipki/demo/rest.script
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" xipki/qa/rest.script
 
-  xi:replace \
-    --old "REPLACEME-DSAPLAIN" \
-    --new "${dsaPlain}" \
-    xipki/demo/demo.d/ca-load.script
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    xipki/qa/qa.d/ca-load.script
 
-  xi:replace \
-    --old "REPLACEME-DSAPLAIN" \
-    --new "${dsaPlain}" \
-    xipki/demo/demo.d/ca.script
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    xipki/qa/qa.d/ca.script
 
-  xi:replace \
-    --old "REPLACEME-DSAPLAIN" \
-    --new "${dsaPlain}" \
-    xipki/demo/demo.d/ra.script
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    xipki/qa/qa.d/ra.script
 
   rsaMgf1 = ""
   if { "$SIG_TYPE" equals "RSAPSS" } {
     rsaMgf1 = "--rsa-mgf1"
   }
 
-  xi:replace \
-    --old "REPLACEME-RSAMGF1" \
-    --new "${rsaMgf1}" \
-    xipki/demo/demo.d/ca-load.script
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/qa.d/ca-load.script
 
-  xi:replace \
-    --old "REPLACEME-RSAMGF1" \
-    --new "${rsaMgf1}" \
-    xipki/demo/rest.script
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/rest.script
 
-  xi:replace \
-    --old "REPLACEME-RSAMGF1" \
-    --new "${rsaMgf1}" \
-    xipki/demo/demo.d/ca.script
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/qa.d/ca.script
 
-  xi:replace \
-    --old "REPLACEME-RSAMGF1" \
-    --new "${rsaMgf1}" \
-    xipki/demo/demo.d/ra.script
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/qa.d/ra.script
 
   if { "$1" equals "-l" } {
-    source file:./xipki/demo/demo.d/ca-load.script
+    source file:./xipki/qa/qa.d/ca-load.script
   } {
-    source file:./xipki/demo/demo.d/ca.script
+    source file:./xipki/qa/qa.d/ca.script
   }
 
   echo "#################################################################"
@@ -216,35 +176,27 @@ if { $printUsage equals "true" } {
 
   #### list certs ####
 
-  ca:list-cert \
-      --ca RCA1 \
-      --subject "CN=*CA*,O=xipki" \
-      --order subject \
-      -n 100
+  ca:list-cert --ca RCA1 --subject "CN=*CA*,O=xipki" --order subject -n 100
 
   # get the serial number
   SERIAL = $(xi:cert-info --serial --hex --in output/SubCA1.der)
 
   # save the certificate request
-  ca:get-request \
-      --ca RCA1 \
-      --serial $SERIAL \
-      --out output/SubCA1.request
+  ca:get-request --ca RCA1 --serial $SERIAL --out output/SubCA1.request
 
-  source file:./xipki/demo/demo.d/ra.script
+  source file:./xipki/qa/qa.d/ra.script
 
-  source file:./xipki/demo/ca-qa.script
+  source file:./xipki/qa/ca-qa.script
 
-  source file:./xipki/demo/rest.script
+  source file:./xipki/qa/rest.script
 
   # Force the OCSP responder to import the CRL to database
-  xi:copy-file -f \
-    xipki/ocsp-config/example/foo.crl.UPDATEME \
+  xi:copy-file -f xipki/ocsp-config/example/foo.crl.UPDATEME \
     output/SubCAwithCRL1.crl.UPDATEME 
   
   feature:install -r xipki-ocspserver
 
-  source file:./xipki/demo/ocsp.script
+  source file:./xipki/qa/ocsp.script
 
   feature:uninstall xipki-ocspserver
 

@@ -62,7 +62,6 @@
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>bin/**</exclude>
-        <exclude>**/demos/**</exclude>
         <exclude>deploy/README</exclude>
         <exclude>README</exclude>
         <exclude>LICENSE</exclude>

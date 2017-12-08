@@ -6,23 +6,18 @@ echo "#################################################################"
 
 CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)
 
-xi:req-p12 \
-  --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-  --p12 output/REST-TLS1.p12 \
-  --password 1234 \
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/REST-TLS1.p12 --password 1234 \
   --subject "CN=REST-TLS1.example.org,O=xipki,C=DE" \
   --out output/rest/REST-TLS1.csr
 
 echo "REST cacert"
 
-xi:curl \
-  --out output/rest/cacert-SubCAwithCRL.der \
-  $BASE_URL/cacert
+xi:curl --out output/rest/cacert-SubCAwithCRL.der $BASE_URL/cacert
 
 echo "REST enroll"
 
-xi:curl \
-  --out output/rest/REST-TLS1.der \
+xi:curl --out output/rest/REST-TLS1.der \
   --data-file output/rest/REST-TLS1.csr \
   --header "Content-Type: application/pkcs10" \
   "$BASE_URL/enroll-cert?profile=TLSA"
@@ -31,34 +26,26 @@ SERIAL = $(xi:cert-info --serial --hex --in output/rest/REST-TLS1.der)
 
 echo "REST revoke (suspend) "
 
-xi:curl \
-  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "REST revoke (unsuspend)"
 
-xi:curl \
-  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "REST revoke (revoke)"
 
-xi:curl \
-  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "REST new-crl"
 
-xi:curl \
-  --out output/rest/new-crl.crl \
-  $BASE_URL/new-crl
+xi:curl --out output/rest/new-crl.crl $BASE_URL/new-crl
 
 echo "REST crl"
-  xi:curl \
-  --out output/rest/crl.crl \
-  $BASE_URL/crl
+xi:curl --out output/rest/crl.crl $BASE_URL/crl
 
 echo "REST crl (crl-number)"
 
 CRLNUMBER = $(xi:crl-info --crlnumber --in output/rest/crl.crl)
 
-xi:curl \
-  --out output/rest/crl-number-${CRLNUMBER}.crl \
+xi:curl --out output/rest/crl-number-${CRLNUMBER}.crl \
   "$BASE_URL/crl?crl-nubmer=${CRLNUMBER}"

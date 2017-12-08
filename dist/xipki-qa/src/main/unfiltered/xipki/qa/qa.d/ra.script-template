@@ -1,0 +1,353 @@
+## Generate CRL
+ca:gencrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1-CAMGMT-gen.crl
+
+## Get CRL
+ca:getcrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1-CAMGMT-get.crl
+  
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/Cross1.p12 --password 1234 \
+  --subject "CN=Cross1,O=xipki,C=DE" \
+  --out output/Cross1.csr
+
+ca:enroll-cert --ca RCA1 --profile Cross \
+  --csr output/Cross1.csr --out output/Cross1.der
+
+echo "#################################################################"
+echo "#              Manage certificate with RA Client                #"
+echo "#################################################################"
+feature:install -r xipki-caclient-shell
+
+echo "Sleeping 1 second"
+sleep 1
+
+## Check the healthy status
+
+xi:cmp-health --ca RCA1
+
+xi:cmp-health --ca SubCA1
+
+xi:cmp-health --ca SubCAwithCRL1
+
+## Enroll certificates
+# Certificate OCSP1
+
+## Create the CSR for the command caqa:check-cert in QA 
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/OCSP1.p12 --password 1234 \
+  --out output/OCSP1.csr \
+  --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/OCSP1.p12 --password 1234 \
+  --out output/OCSP1.der --profile OCSP \
+  --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xi:update-cert-p12 --p12 output/OCSP1.p12 --password 1234 \
+  --cert output/OCSP1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate OCSP2
+
+## Create the CSR for the command caqa:check-cert in QA 
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/OCSP2.p12 --password 1234 \
+  --out output/OCSP2.csr \
+  --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/OCSP2.p12 --password 1234 \
+  --out output/OCSP2.der --profile OCSP \
+  --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xi:update-cert-p12 --p12 output/OCSP2.p12 --password 1234 \
+  --cert output/OCSP2.der --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+## Revocate certificates
+xi:cmp-revoke --ca SubCAwithCRL1 --cert output/OCSP2.der --reason keyCompromise
+
+# Certificate multipleOUs
+
+## Create the CSR for the command caqa:check-cert in QA 
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/multipleOUs1.p12 --password 1234 \
+  --out output/multipleOUs1.csr \
+  --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/multipleOUs1.p12 --password 1234 \
+  --out output/multipleOUs1.der --profile multipleOUs \
+  --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/multipleOUs1.p12 --password 1234 \
+  --cert output/multipleOUs1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+## Create the CSR for the command caqa:check-cert in QA 
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/multipleOUs2.p12 --password 1234 \
+  --out output/multipleOUs2.csr \
+  --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/multipleOUs2.p12 --password 1234 \
+  --out output/multipleOUs2.der --profile multipleOUs \
+  --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/multipleOUs2.p12 --password 1234 \
+  --cert output/multipleOUs2.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate multiValuedRDN
+
+## Create the CSR for the command caqa:check-cert in QA 
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/multiValuedRDN1.p12 --password 1234 \
+  --out output/multiValuedRDN1.csr \
+  --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/multiValuedRDN1.p12  --password 1234 \
+  --out output/multiValuedRDN1.der --profile multiValuedRDN \
+  --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/multiValuedRDN1.p12 --password 1234 \
+  --cert output/multiValuedRDN1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate QC
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/QC1.p12 --password 1234 \
+  --out output/QC1.csr \
+  --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/QC1.p12 --password 1234 \
+  --out output/QC1.der --profile QC \
+  --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xi:update-cert-p12 --p12 output/QC1.p12 --password 1234 \
+  --cert output/QC1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate EE.Complex1 with complex subject (parsable in openssl)
+
+xi:req-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --subject "CN=EE.Complex1,O=xipki,C=DE" \
+  --p12 output/EE.Complex1.p12 --password 1234 \
+  --out output/EE.Complex1.csr \
+  --qc-eu-limit EUR:150:15 \
+  --biometric-type 0 \
+  --biometric-hash SHA256 \
+  --biometric-file xipki/README.md \
+  --biometric-uri https://example.org/?id=123
+
+xi:cmp-csr-enroll --csr output/EE.Complex1.csr \
+  --out output/EE.Complex1.der \
+  --profile EE.Complex
+
+xi:update-cert-p12 --p12 output/EE.Complex1.p12 --password 1234 \
+  --cert output/EE.Complex1.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate EE.Complex1 with complex subject (not parsable in openssl due to complex subject)
+
+xi:req-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --subject "CN=EE.Complex2,O=xipki,C=DE" \
+  --p12 output/EE.Complex2.p12 --password 1234 \
+  --out output/EE.Complex2.csr \
+  --qc-eu-limit EUR:150:15 \
+  --biometric-type 0 \
+  --biometric-hash SHA256 \
+  --biometric-file xipki/README.md \
+  --biometric-uri https://example.org/?id=123 \
+  --complex-subject
+
+xi:cmp-csr-enroll --csr output/EE.Complex2.csr --out output/EE.Complex2.der \
+  --profile EE.Complex
+
+xi:update-cert-p12 --p12 output/EE.Complex2.p12 --password 1234 \
+  --cert output/EE.Complex2.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate TLS1
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLS1.p12 --password 1234 \
+  --subject "CN=TLS1.xipki.org,O=xipki,C=DE" \
+  --out output/TLS1.csr \
+
+xi:cmp-csr-enroll --csr output/TLS1.csr --out output/TLS1.der --profile TLS
+
+xi:update-cert-p12 --p12 output/TLS1.p12 --password 1234 \
+  --cert output/TLS1.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+ 
+# Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
+# 1.
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLSwithIncSN1.p12 --password 1234 \
+  --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
+  --out output/TLSwithIncSN1.csr
+
+xi:cmp-csr-enroll --csr output/TLSwithIncSN1.csr \
+  --out output/TLSwithIncSN1.der --profile TLSwithIncSN
+
+# 2.
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLSwithIncSN1-1.p12 --password 1234 \
+  --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
+  --out output/TLSwithIncSN1-1.csr
+
+xi:cmp-csr-enroll --csr output/TLSwithIncSN1-1.csr \
+  --out output/TLSwithIncSN1-1.der --profile TLSwithIncSN
+
+# 3.
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLSwithIncSN1-2.p12 --password 1234 \
+  --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
+  --out output/TLSwithIncSN1-2.csr
+
+xi:cmp-csr-enroll --csr output/TLSwithIncSN1-2.csr \
+  --out output/TLSwithIncSN1-2.der --profile TLSwithIncSN
+ 
+# Certificate TLS2
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLS2.p12 --password 1234 \
+  --subject "CN=TLS2.xipki.org,O=xipki,C=DE" \
+  --out output/TLS2.csr
+
+xi:cmp-csr-enroll --csr output/TLS2.csr --out output/TLS2.der --profile TLS
+
+xi:update-cert-p12 --p12 output/TLS2.p12 --password 1234 \
+  --cert output/TLS2.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+## Suspend certificates
+xi:cmp-revoke --ca SubCA1 --cert output/TLS2.der --reason certificateHold
+
+xi:cmp-unrevoke --ca SubCA1 --cert output/TLS2.der
+
+## Revocate certificates
+xi:cmp-revoke --ca SubCA1 --cert output/TLS2.der --reason affiliationChanged
+
+## Enroll certificates
+
+# Certificate TLS_C1
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLS_C1.p12 --password 1234 \
+  --subject "CN=TLS_C1,O=xipki,C=DE" \
+  --out output/TLS_C1.csr
+
+xi:cmp-csr-enroll --csr output/TLS_C1.csr --out output/TLS_C1.der --profile TLS_C
+
+xi:update-cert-p12 --p12 output/TLS_C1.p12 --password 1234 \
+  --cert output/TLS_C1.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate TLS_C2
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/TLS_C2.p12 --password 1234 \
+  --subject "CN=TLS_C2,O=xipki,C=DE" \
+  --out output/TLS_C2.csr
+
+xi:cmp-csr-enroll --csr output/TLS_C2.csr --out output/TLS_C2.der \
+  --profile TLS_C
+
+xi:update-cert-p12 --p12 output/TLS_C2.p12 --password 1234 \
+  --cert output/TLS_C2.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+## Revocate certificates
+xi:cmp-revoke --ca SubCA1 --cert output/TLS_C2.der --reason affiliationChanged
+
+## Enroll certificates gSMC-K
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/gSMC_K1.p12 --password 1234 \
+  --subject "CN=80276123451234512345,O=xipki,C=DE" \
+  --out output/gSMC_K1.csr
+
+xi:cmp-csr-enroll --csr output/gSMC_K1.csr --out output/gSMC_K1.der --profile gSMC_K
+
+xi:update-cert-p12 --p12 output/gSMC_K1.p12 --password 1234 \
+  --cert output/gSMC_K1.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+# Sleep 2 seconds to ensure different notBefore in certificate
+echo "Sleeping 2 seconds"
+sleep 2
+
+# with the same CN
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/gSMC_K2.p12 --password 1234 \
+  --subject "CN=80276123451234512345,O=xipki,C=DE" \
+  --out output/gSMC_K2.csr
+
+xi:cmp-csr-enroll --csr output/gSMC_K2.csr --out output/gSMC_K2.der --profile gSMC_K
+
+xi:update-cert-p12 --p12 output/gSMC_K2.p12 --password 1234 \
+  --cert output/gSMC_K2.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
+# Certificate MaxTime1
+
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+  --p12 output/MaxTime1.p12 --password 1234 \
+  --subject "CN=MaxTime1.xipki.org,O=xipki,C=DE" \
+  --out output/MaxTime1.csr
+
+xi:cmp-csr-enroll --csr output/MaxTime1.csr --out output/MaxTime1.der --profile MaxTime
+
+xi:update-cert-p12 --p12 output/MaxTime1.p12 --password 1234 \
+  --cert output/MaxTime1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+  
+## Get CRL
+xi:cmp-getcrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1-1-get.crl
+
+## Generate CRL
+xi:cmp-gencrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1.crl
+
+## Get CRL
+xi:cmp-getcrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1-get.crl
+
+echo "#################################################################"
+echo "#              Uninstall unneeded features                      #"
+echo "#################################################################"
+feature:uninstall xipki-caclient-shell
+
+source file:./xipki/qa/scep.script
+
+# JSCEP works only in case of RSA
+if { $KEY_TYPE equals "rsa" } {
+  source file:./xipki/qa/jscep.script
+}

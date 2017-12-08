@@ -2,25 +2,15 @@ echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
 
-feature:install -r xipki-database-tool
+ca:initdb-pki --force
 
-echo "Sleeping 1 second"
-sleep 1
-
-ca:initdb-pki \
-  --force
-
-ca:initdb \
-  --force \
+ca:initdb --force \
   --db-conf  xipki/ocsp-config/ocsp-cache-db.properties \
   --db-schema xipki/sql/ocsp-cache-init.xml
 
-ca:initdb \
-  --force \
+ca:initdb --force \
   --db-conf  xipki/ocsp-config/ocsp-crl-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
-
-feature:uninstall xipki-database-tool
 
 feature:install -r xipki-caserver
 
@@ -35,16 +25,12 @@ ca:restart
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:req-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --slot $SLOT \
-    --label RCA1 \
-    --out output/RCA1.csr \
-    --subject "CN=RCA1,O=xipki,C=DE" \
-    --keyusage cRLSign
+    --slot $SLOT --label RCA1 --out output/RCA1.csr \
+    --subject "CN=RCA1,O=xipki,C=DE" --keyusage cRLSign
 } {
   xi:req-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --p12 output/RCA1.p12 \
-    --password 1234 \
+    --p12 output/RCA1.p12 --password 1234 \
     --out output/RCA1.csr \
     --subject "CN=RCA1,O=xipki,C=DE" \
     --keyusage cRLSign
@@ -62,93 +48,60 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/RCA1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file \
-  -f \
-  xipki/demo/demo.d/RCA.xml-template \
-  xipki/demo/demo.d/RCA.xml
+xi:copy-file -f xipki/qa/qa.d/RCA.xml-template xipki/qa/qa.d/RCA.xml
 
-xi:replace \
-  --old "REPLACEME-CMP_SIGALGO" \
-  --new "$CMP_SIGALGO" \
-  xipki/demo/demo.d/RCA.xml
+xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+  xipki/qa/qa.d/RCA.xml
 
-xi:replace \
-  --old "REPLACEME-TOKEN_TYPE" \
-  --new "$TOKEN_TYPE" \
-  xipki/demo/demo.d/RCA.xml
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  xipki/qa/qa.d/RCA.xml
 
-xi:replace \
-  --old "REPLACEME-CA_SIGNERCONF" \
-  --new "$CA_SIGNER_CONF" \
-  xipki/demo/demo.d/RCA.xml
+xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/qa.d/RCA.xml
 
-xi:replace \
-  --old "REPLACEME-SIGALGO" \
-  --new "$SIGALGO" \
-  xipki/demo/demo.d/RCA.xml
+xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  xipki/qa/qa.d/RCA.xml
 
-xi:replace \
-  --old "REPLACEME-HASH" \
-  --new "$HASH" \
-  xipki/demo/demo.d/RCA.xml
+xi:replace --old "REPLACEME-HASH" --new "$HASH" \
+  xipki/qa/qa.d/RCA.xml
 
-ca:load-conf --conf-file xipki/demo/demo.d/RCA.xml
+ca:load-conf --conf-file xipki/qa/qa.d/RCA.xml
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label RCA1 \
-    --cert output/RCA1.der
+  xi:update-cert-p11 --slot $SLOT --label RCA1 --cert output/RCA1.der
 } {
-  xi:update-cert-p12 \
-    --p12 output/RCA1.p12 \
-    --password 1234 \
-    --cert output/RCA1.der
+  xi:update-cert-p12 --p12 output/RCA1.p12 --password 1234 --cert output/RCA1.der
 }
 
 ## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:req-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --slot $SLOT \
-    --label SubCA1 \
-    --out output/SubCA1.csr \
+  xi:req-p11 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --slot $SLOT --label SubCA1 --out output/SubCA1.csr \
     --subject "CN=SubCA1,O=xipki,C=DE"
 } {
-  xi:req-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --p12 output/SubCA1.p12 \
-    --password 1234 \
-    --out output/SubCA1.csr \
-    --subject "CN=SubCA1,O=xipki,C=DE"
+  xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --p12 output/SubCA1.p12 --password 1234 \
+    --out output/SubCA1.csr --subject "CN=SubCA1,O=xipki,C=DE"
 }
 
-ca:enroll-cert \
-  --ca RCA1 \
-  --csr output/SubCA1.csr \
-  --out output/SubCA1.der \
-  --profile SubCA
+ca:enroll-cert --ca RCA1 --csr output/SubCA1.csr \
+  --out output/SubCA1.der --profile SubCA
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label SubCA1 \
+  xi:update-cert-p11 --slot $SLOT --label SubCA1 \
     --cert output/SubCA1.der \
 } {
-  xi:update-cert-p12 \
-    --p12 output/SubCA1.p12 \
-    --password 1234 \
-    --cert output/SubCA1.der \
-    --ca-cert output/RCA1.der
+  xi:update-cert-p12 --p12 output/SubCA1.p12 --password 1234 \
+    --cert output/SubCA1.der --ca-cert output/RCA1.der
 }
 
 ## Generate keys and CSR for SubCAwithCRL1
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:req-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --slot $SLOT \
-    --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
+    --slot $SLOT --label SubCAwithCRL1 \
+    --out output/SubCAwithCRL1.csr \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
     --subject-alt-name "[2]xipki.org" \
@@ -162,8 +115,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 } {
   xi:req-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --p12 output/SubCAwithCRL1.p12 \
-    --password 1234 \
+    --p12 output/SubCAwithCRL1.p12 --password 1234 \
     --out output/SubCAwithCRL1.csr \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
@@ -177,64 +129,39 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 }
 
-ca:enroll-cert \
-  --ca RCA1 \
-  --csr output/SubCAwithCRL1.csr \
-  --out output/SubCAwithCRL1.der \
-  --profile SubCA.Complex
+ca:enroll-cert --ca RCA1 --csr output/SubCAwithCRL1.csr \
+  --out output/SubCAwithCRL1.der --profile SubCA.Complex
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label SubCAwithCRL1 \
+  xi:update-cert-p11 --slot $SLOT --label SubCAwithCRL1 \
     --cert output/SubCAwithCRL1.der \
 } {
-  xi:update-cert-p12 \
-    --p12 output/SubCAwithCRL1.p12 \
-    --password 1234 \
-    --cert output/SubCAwithCRL1.der \
-    --ca-cert output/RCA1.der
+  xi:update-cert-p12 --p12 output/SubCAwithCRL1.p12 --password 1234 \
+    --cert output/SubCAwithCRL1.der --ca-cert output/RCA1.der
 }
 
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:req-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --slot $SLOT \
-    --label OCSP99 \
-    --out output/OCSP99.csr \
+  xi:req-p11 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --slot $SLOT --label OCSP99 --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 } {
-  xi:req-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
-    --p12 output/OCSP99.p12 \
-    --password 1234 \
-    --out output/OCSP99.csr \
+  xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --p12 output/OCSP99.p12 --password 1234 --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 }
 
-ca:enroll-cert \
-  --ca RCA1 \
-  --csr output/OCSP99.csr \
-  --out output/OCSP99.der \
+ca:enroll-cert --ca RCA1 --csr output/OCSP99.csr --out output/OCSP99.der \
   --profile OCSP
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label OCSP99 \
-    --cert output/OCSP99.der \
+  xi:update-cert-p11 --slot $SLOT --label OCSP99 --cert output/OCSP99.der \
 } {
-  xi:update-cert-p12 \
-    --p12 output/OCSP99.p12 \
-    --password 1234 \
-    --cert output/OCSP99.der \
-    --ca-cert output/RCA1.der
+  xi:update-cert-p12 --p12 output/OCSP99.p12 --password 1234 \
+    --cert output/OCSP99.der --ca-cert output/RCA1.der
 }
 
-ca:caprofile-rm \
-  --ca RCA1 \
-  --profile OCSP
+ca:caprofile-rm --ca RCA1 --profile OCSP
 
 echo "#################################################################"
 echo "#                        Add SubCA with OCSP                    #"
@@ -249,22 +176,14 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/SubCA1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file \
-  -f \
-  xipki/demo/demo.d/SubCA.xml-template \
-  xipki/demo/demo.d/SubCA.xml
+xi:copy-file -f xipki/qa/qa.d/SubCA.xml-template xipki/qa/qa.d/SubCA.xml
 
-xi:replace \
-  --old "REPLACEME-TOKEN_TYPE" \
-  --new "$TOKEN_TYPE" \
-  xipki/demo/demo.d/SubCA.xml
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" xipki/qa/qa.d/SubCA.xml
 
-xi:replace \
-  --old "REPLACEME-CA_SIGNERCONF" \
-  --new "$CA_SIGNER_CONF" \
-  xipki/demo/demo.d/SubCA.xml
+xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/qa.d/SubCA.xml
 
-ca:load-conf --conf-file xipki/demo/demo.d/SubCA.xml
+ca:load-conf --conf-file xipki/qa/qa.d/SubCA.xml
 
 # Remove CertProfile RCA
 
@@ -286,21 +205,21 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/SubCAwithCRL1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file \
-  -f \
-  xipki/demo/demo.d/SubCAwithCRL.xml-template \
-  xipki/demo/demo.d/SubCAwithCRL.xml
+xi:copy-file -f xipki/qa/qa.d/SubCAwithCRL.xml-template \
+  xipki/qa/qa.d/SubCAwithCRL.xml
 
-xi:replace \
-  --old "REPLACEME-TOKEN_TYPE" \
-  --new "$TOKEN_TYPE" \
-  xipki/demo/demo.d/SubCAwithCRL.xml
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  xipki/qa/qa.d/SubCAwithCRL.xml
 
-xi:replace \
-  --old "REPLACEME-CA_SIGNERCONF" \
-  --new "$CA_SIGNER_CONF" \
-  xipki/demo/demo.d/SubCAwithCRL.xml
+xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/qa.d/SubCAwithCRL.xml
 
-ca:load-conf --conf-file xipki/demo/demo.d/SubCAwithCRL.xml
+ca:load-conf --conf-file xipki/qa/qa.d/SubCAwithCRL.xml
 
-source file:./xipki/demo/demo.d/scep-server.script
+## add user to system
+ca:user-add --name user1 --password password1
+
+## Add user to CA SubCAwithCRL1  
+ca:causer-add --user user1 --ca SubCAwithCRL1 --profile ALL --permission ALL
+
+source file:./xipki/qa/qa.d/scep-server.script

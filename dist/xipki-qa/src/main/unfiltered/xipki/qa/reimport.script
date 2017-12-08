@@ -2,8 +2,6 @@ echo "#################################################################"
 echo "#               Export-then-import CA and OCSP                  #"
 echo "#################################################################"
 
-feature:install -r xipki-database-tool
-
 echo "Sleeping 1 second"
 sleep 1
 
@@ -14,8 +12,7 @@ echo "==========================================================================
 echo "||                             Export CA Database                         ||"
 echo "============================================================================"
 
-ca:export-ca \
-  --out-dir output/dbexport/ca
+ca:export-ca --out-dir output/dbexport/ca
 
 ## Export OCSP
 
@@ -23,8 +20,7 @@ echo "==========================================================================
 echo "||                            Export OCSP Database                        ||"
 echo "============================================================================"
 
-ca:export-ocsp \
-  --out-dir output/dbexport/ocsp
+ca:export-ocsp --out-dir output/dbexport/ocsp
 
 # Reset the CA and OCSP database
 
@@ -34,11 +30,9 @@ echo "==========================================================================
 echo "||                             Import CA Database                         ||"
 echo "============================================================================"
 
-ca:initdb-ca \
-  --force
+ca:initdb-ca --force
 
-ca:import-ca \
-  --in-dir output/dbexport/ca
+ca:import-ca --in-dir output/dbexport/ca
 
 ## Import OCSP
 
@@ -46,11 +40,9 @@ echo "==========================================================================
 echo "||                            Import OCSP Database                        ||"
 echo "============================================================================"
 
-ca:initdb-ocsp \
-  --force
+ca:initdb-ocsp --force
 
-ca:import-ocsp \
-  --in-dir output/dbexport/ocsp
+ca:import-ocsp --in-dir output/dbexport/ocsp
 
 ## Import OCSP FROM CA
 
@@ -58,22 +50,15 @@ echo "==========================================================================
 echo "||                        IMPORT OCSP DATABASE FROM CA                    ||"
 echo "============================================================================"
 
-ca:initdb-ocsp \
-  --force
+ca:initdb-ocsp --force
 
-ca:import-ocspfromca \
-  --in-dir output/dbexport/ca
+ca:import-ocspfromca --in-dir output/dbexport/ca
 
 ## Restart the CA
+
 feature:install -r xipki-camgmt-shell
 
 echo "Sleeping 1 second"
 sleep 1
 
 ca:restart
-
-#################################################################
-#              Uninstall unneeded features                      #
-#################################################################
-feature:uninstall xipki-database-tool
-feature:uninstall xipki-camgmt-shell

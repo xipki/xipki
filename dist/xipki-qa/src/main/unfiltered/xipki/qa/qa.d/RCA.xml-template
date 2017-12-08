@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CAConf xmlns="http://xipki.org/ca/conf/v2" version="1">
   <properties>
-    <property name="profiles.dir">xipki/demo/profile</property>
+    <property name="profiles.dir">xipki/qa/profile</property>
     <property name="security.dir">xipki/security</property>
     <property name="output.dir">output</property>
     <property name="token.type">REPLACEME-TOKEN_TYPE</property>

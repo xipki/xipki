@@ -1,0 +1,51 @@
+echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS11 RSA 2048+++++'
+           source xipki/qa/lifecycle.script    SHA256 PKCS11 RSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/reimport.script+++++'
+           source xipki/qa/reimport.script
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS12 RSA 2048+++++'
+           source xipki/qa/lifecycle.script    SHA256 PKCS12 RSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS11 DSA 2048+++++'
+           source xipki/qa/lifecycle.script    SHA256 PKCS11 DSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS12 DSA 2048+++++'
+           source xipki/qa/lifecycle.script    SHA256 PKCS12 DSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS11 EC secp256r1+++++'
+           source xipki/qa/lifecycle.script    SHA256 PKCS11 EC secp256r1
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS12 EC secp256r1+++++'
+           source xipki/qa/lifecycle.script    SHA256 PKCS12 EC secp256r1
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script -l SHA256 PKCS11 RSA 2048+++++'
+           source xipki/qa/lifecycle.script -l SHA256 PKCS11 RSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script -l SHA256 PKCS12 RSA 2048+++++'
+           source xipki/qa/lifecycle.script -l SHA256 PKCS12 RSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script -l SHA256 PKCS11 DSA 2048+++++'
+           source xipki/qa/lifecycle.script -l SHA256 PKCS11 DSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script -l SHA256 PKCS12 DSA 2048+++++'
+           source xipki/qa/lifecycle.script -l SHA256 PKCS12 DSA 2048
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script -l SHA256 PKCS11 EC secp256r1+++++'
+           source xipki/qa/lifecycle.script -l SHA256 PKCS11 EC secp256r1
+
+sleep 2
+echo '+++++source xipki/qa/lifecycle.script -l SHA256 PKCS12 EC secp256r1+++++'
+           source xipki/qa/lifecycle.script -l SHA256 PKCS12 EC secp256r1
+
