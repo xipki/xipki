@@ -21,6 +21,17 @@ Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com
 
 Only if you want to use the development version, build it from source code as follows.
 
+  - Get a copy of `xipki/xitk` project code
+    ```sh
+    git clone https://github.com/xipki/xitk
+    ```
+  - Build the project
+
+    In folder `xitk`
+    ```sh
+    mvn clean install -DskipTests
+    ```
+
   - Get a copy of project code
     ```sh
     git clone https://github.com/xipki/xisdk.git
@@ -29,7 +40,7 @@ Only if you want to use the development version, build it from source code as fo
   - Build and install maven artifacts
     In folder `xisdk`
     ```sh
-    mvn clean install -Pdist
+    mvn clean install -Pdist -DskipTests
     ```
 
     Then you will find the `xipki-sdk-*.tar.gz` in the directory `dist/target`.
