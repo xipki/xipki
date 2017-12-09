@@ -22,7 +22,7 @@ Just drop me an email.
 - HSM: [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
   [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
   Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
-- JVM: OpenJDK 8, Oracle JDK 8, Oracle JRE 8
+- JVM: OpenJDK JDK/JRE 8, Oracle JDK/JRE 8, Zulu JDK 8
 - OS: Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
 
 ## Get Started
@@ -171,7 +171,7 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 6. Use the native features (optional)
 
   In Linux-X86_64 and OSX-X56_64 environment, openssl as SSL engine and the OS
-  native transport mechanism (Epoll in Linux and KQueue in OSX) ca Oe used in
+  native transport mechanism (Epoll in Linux and KQueue in OSX) can be used in
   XiPKI. Please refer to the configuration file
   `etc/org.apache.karaf.features.cfg` for more details.
 
