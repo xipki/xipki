@@ -14,7 +14,7 @@ Just drop me an email.
 
 ## Prerequisite
 * JRE / JDK 8
-  * [Oracle] (http://www.oracle.com/technetwork/java/javase/downloads/index.html) / [Zulu](https://www.azul.com/downloads/zulu/): [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+  * [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html) / [Zulu](https://www.azul.com/downloads/zulu/): [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
   * OpenJDK (via linux package manager): No policy files are required
 ## Tested Platforms
 
