@@ -14,8 +14,8 @@ Just drop me an email.
 
 ## Prerequisite
 * JRE / JDK 8
-  * OpenJDK/Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-
+  * [Oracle] (http://www.oracle.com/technetwork/java/javase/downloads/index.html) / [Zulu](https://www.azul.com/downloads/zulu/): [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+  * OpenJDK (via linux package manager): No policy files are required
 ## Tested Platforms
 
 - Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
@@ -26,6 +26,10 @@ Just drop me an email.
 - OS: Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
 
 ## Get Started
+
+### JAVA_HOME
+  Set the environment variable `JAVA_HOME` to point to root directory of the to
+  the JRE/JDK installation.
 
 ### CA and OCSP Responder
 
