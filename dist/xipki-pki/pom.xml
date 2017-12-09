@@ -219,6 +219,9 @@
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
+                <feature>netty-linux-x86_64</feature>
+                <feature>netty-osx-x86_64</feature>
+                <feature>netty</feature>
                 <feature>xipki-httpserver</feature>
                 <feature>xipki-caserver</feature>
                 <feature>xipki-camgmt-shell</feature>

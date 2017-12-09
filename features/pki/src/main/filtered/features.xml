@@ -2,21 +2,43 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <feature name="netty" version="${netty.version}" description="netty">
-    <!--bundle start-level="65">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle-->
+  <feature name="netty-linux-x86_64" version="${netty.version}" description="netty for platform linux-x86_64">
+    <!-- the start-level must be less than the other netty bundles -->
+    <bundle start-level="64">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
     <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
-    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
-    <!--bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle-->
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
+  </feature>
+  <feature name="netty-osx-x86_64" version="${netty.version}" description="netty for platform osx-x86_64">
+    <!-- the start-level must be less than the other netty bundles -->
+    <bundle start-level="64">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/osx-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-kqueue/${netty.version}/jar/osx-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
+  </feature>
+  <feature name="netty" version="${netty.version}" description="netty for all platforms">
+    <!-- the start-level must be less than the other netty bundles -->
+    <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
   </feature>
   <feature name="xipki-httpserver" version="${xitk.version}" description="HTTP server">
-    <feature>netty</feature>
     <bundle start-level="80">mvn:org.xipki.tk/common/${xitk.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.tk/password/${xitk.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.tk/servlet-api/${xitk.version}</bundle>

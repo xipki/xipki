@@ -35,6 +35,17 @@ Download the binary package `xipki-pki-<version>.tar.gz` from
 Only if you want to use the development version, build it from source code as
 follows.
 
+- Get a copy of `xipki/xitk` project code
+  ```sh
+  git clone https://github.com/xipki/xitk
+  ```
+- Build the project
+
+  In folder `xitk`
+  ```sh
+  mvn clean install -DskipTests
+  ```
+
 - Get a copy of project code
   ```sh
   git clone https://github.com/xipki/xipki
@@ -43,10 +54,11 @@ follows.
 
   In folder `xipki`
   ```sh
-  mvn clean package -Pdist
+  mvn clean install -Pdist -DskipTests
   ```
 
-  Then you will find the `xipki-pki-*.tar.gz` in the directory `dist/target`.
+  Then you will find `xipki-pki-*.tar.gz` in the directory
+  `dist/xipki-pki/target`.
 
 ### CA and OCSP Client
 
@@ -152,6 +164,14 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
     </feature>
     ```
 
+6. Use the native features (optional)
+
+  In Linux-X86_64 and OSX-X56_64 environment, openssl as SSL engine and the OS
+  native transport mechanism (Epoll in Linux and KQueue in OSX) ca Oe used in
+  XiPKI. Please refer to the configuration file
+  `etc/org.apache.karaf.features.cfg` for more details.
+
+
 ## Setup CA and OCSP Responder
 
 1. Prepare the configuration and scripts
@@ -195,7 +215,7 @@ The same as Alternative 1 except the command `bin/start` instead of
 `bin/karaf` is used.
     
 For both alternatives, if the content within folder `etc` or `system` has been
-changed, please delete the folder `data` before starting XiPKI.
+changed, please delete the folder `data/cache` before starting XiPKI.
 
 3. Setup the CA and OCSP responder
 
