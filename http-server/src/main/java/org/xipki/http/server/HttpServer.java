@@ -17,6 +17,9 @@
 
 package org.xipki.http.server;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
@@ -35,9 +38,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
@@ -161,7 +161,9 @@ public final class HttpServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
 
-    private static boolean useEpollLinux;
+    private static Boolean epollAvailable;
+
+    private static Boolean kqueueAvailable;
 
     private final int port;
 
@@ -174,12 +176,6 @@ public final class HttpServer {
     private EventLoopGroup bossGroup;
 
     private EventLoopGroup workerGroup;
-
-    static {
-        boolean linux = System.getProperty("os.name").toLowerCase().contains("linux");
-        useEpollLinux = linux ? Epoll.isAvailable() : false;
-        LOG.info("linux epoll available: {}", useEpollLinux);
-    }
 
     private SslReverseProxyMode sslReverseProxyMode = SslReverseProxyMode.NONE;
 
@@ -201,15 +197,95 @@ public final class HttpServer {
         this.servletListener = servletListener;
     }
 
+    static {
+        String os = System.getProperty("os.name").toLowerCase();
+        ClassLoader loader = HttpServer.class.getClassLoader();
+        if (os.contains("linux")) {
+            try {
+                Class<?> checkClazz = Class.forName(
+                        "io.netty.channel.epoll.Epoll", false, loader);
+                Method mt = checkClazz.getMethod("isAvailable");
+                Object obj = mt.invoke(null);
+
+                if (obj instanceof Boolean) {
+                    epollAvailable = (Boolean) obj;
+                }
+            } catch (Throwable th) {
+                if (th instanceof ClassNotFoundException) {
+                    LOG.info("epoll linux is not in classpath");
+                } else {
+                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
+                    LOG.debug("could not use Epoll transport", th);
+                }
+            }
+        } else if (os.contains("macos")) {
+            try {
+                Class<?> checkClazz = Class.forName(
+                        "io.netty.channel.epoll.kqueue.KQueue", false, loader);
+                Method mt = checkClazz.getMethod("isAvailable");
+                Object obj = mt.invoke(null);
+                if (obj instanceof Boolean) {
+                    kqueueAvailable = (Boolean) obj;
+                }
+            } catch (Exception ex) {
+                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
+                LOG.debug("could not use KQueue transport", ex);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public void start() {
         int numProcessors = Runtime.getRuntime().availableProcessors();
-        Class<? extends ServerSocketChannel> channelClass;
+        Class<? extends ServerSocketChannel> channelClass = null;
         int bossGroupThreads = numProcessors == 1 ? 1  : (numProcessors + 1)/ 2;
-        if (useEpollLinux) {
-            channelClass = EpollServerSocketChannel.class;
-            this.bossGroup = new EpollEventLoopGroup(bossGroupThreads);
-            this.workerGroup = new EpollEventLoopGroup(numThreads);
-        } else {
+
+        ClassLoader loader = getClass().getClassLoader();
+        if (epollAvailable != null && epollAvailable.booleanValue()) {
+            try {
+                channelClass = (Class<? extends ServerSocketChannel>)
+                        Class.forName("io.netty.channel.epoll.EpollServerSocketChannel",
+                                false, loader);
+
+                Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup",
+                                    true, loader);
+                Constructor<?> constructor = clazz.getConstructor(int.class);
+                this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
+                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+                LOG.info("use Epoll Transport");
+            } catch (Throwable th) {
+                if (th instanceof ClassNotFoundException) {
+                    LOG.info("epoll linux is not in classpath");
+                } else {
+                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
+                    LOG.debug("could not use Epoll transport", th);
+                }
+                channelClass = null;
+                this.bossGroup = null;
+                this.workerGroup = null;
+            }
+        } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
+            try {
+                channelClass = (Class<? extends ServerSocketChannel>)
+                        Class.forName("io.netty.channel.kqueue.KQueueServerSocketChannel",
+                                false, loader);
+
+                Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
+                                    true, loader);
+                Constructor<?> constructor = clazz.getConstructor(int.class);
+                this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
+                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+                LOG.info("Use KQueue Transport");
+            } catch (Exception ex) {
+                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
+                LOG.debug("could not use KQueue transport", ex);
+                channelClass = null;
+                this.bossGroup = null;
+                this.workerGroup = null;
+            }
+        }
+
+        if (this.bossGroup == null) {
             channelClass = NioServerSocketChannel.class;
             this.bossGroup = new NioEventLoopGroup(bossGroupThreads);
             this.workerGroup = new NioEventLoopGroup(numThreads);

@@ -11,6 +11,9 @@
   <artifactId>http-server</artifactId>
   <packaging>bundle</packaging>
   <name>XiTK :: ${project.artifactId}</name>
+  <properties>
+    <Import-Package>*,io.netty.channel.epoll;resolution:=optional;version="[4.1,5)",io.netty.channel.kqueue;resolution:=optional;version="[4.1,5)"</Import-Package>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -25,21 +28,6 @@
       <artifactId>netty-handler</artifactId>
       <version>${netty.version}</version>
     </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-transport-native-epoll</artifactId>
-      <version>${netty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-transport-native-unix-common</artifactId>
-      <version>${netty.version}</version>
-    </dependency>
-    <!--dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-tcnative</artifactId>
-      <version>${netty-tcnative.version}</version>
-    </dependency-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>servlet-api</artifactId>
