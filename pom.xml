@@ -59,6 +59,16 @@
     <developerConnection>scm:git:git@github.com:xipki/xitk.git</developerConnection>
     <url>git@github.com:xipki/xitk.git</url>
   </scm>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -296,16 +306,6 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-      </distributionManagement>
       <build>
         <plugins>
           <plugin>
