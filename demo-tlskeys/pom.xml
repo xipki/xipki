@@ -14,22 +14,21 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-artifacts</id>
+            <id>unix-bin</id>
             <phase>package</phase>
             <goals>
-              <goal>attach-artifact</goal>
+              <goal>single</goal>
             </goals>
             <configuration>
-              <artifacts>
-                <artifact>
-                  <file>resources/demo-tlskeys.zip</file>
-                  <type>zip</type>
-                </artifact>
-              </artifacts>
+              <descriptors>
+                <descriptor>src/main/descriptors/assembly-main.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>false</appendAssemblyId>
+              <tarLongFileMode>posix</tarLongFileMode>
             </configuration>
           </execution>
         </executions>
