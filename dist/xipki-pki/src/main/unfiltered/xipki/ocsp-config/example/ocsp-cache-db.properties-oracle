@@ -21,7 +21,7 @@ dataSource.driverType = thin
 dataSource.user = orauserocspcache
 # encrypted password 123456
 #dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
-datasource.password = 123456
+dataSource.password = 123456
 dataSource.implicitCachingEnabled = true
 dataSource.explicitCachingEnabled = true
 
