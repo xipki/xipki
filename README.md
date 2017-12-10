@@ -53,11 +53,6 @@ follows.
   Then you will find `xipki-pki-*.tar.gz` in the directory
   `dist/xipki-pki/target`.
 
-### CA and OCSP Client
-
-Download the binary package `xipki-sdk-<version>.tar.gz` from
-[XiSDK releases](https://github.com/xipki/xisdk/releases).
-
 ## Configure the CA and OCSP Responder
 
 1. Unpack the binary `xipki-pki-<version>.tar.gz` file
@@ -223,7 +218,7 @@ changed, please delete the folder `data/cache` before starting XiPKI.
  * Verify the installation, execute the OSGi command  
    `ca-info MYCA1`
 
-3.1. In case XiPKI is started as a daemon 
+3.2. In case XiPKI is started as a daemon 
 
  * In case of using new keys and certificates, in shell console:
    `bin/client "sourcefile:./xipki/setup/cacert-none-setup.script"`
@@ -231,28 +226,14 @@ changed, please delete the folder `data/cache` before starting XiPKI.
  * In case of using existing keys and certificates, in shell console:  
    `bin/client "sourcefile:./xipki/setup/cacert-none-setup.script"`
 
-### Test the Installation
+4. Enroll/Revoke Certificate and Get CRL via Shell (optional)
 
-1. Unpack the binary `xipki-sdk-<version>.tar.gz` file
-
-    ```sh
-    tar xvf xipki-sdk-<version>.tar.gz
-    ```
-2. Verify the installation
-
-To verify that the CA and OCSP responder, execute the following commands in
-the OSGi console:  
-- `source file:./xipki/client-script/cmp-client.script`
-- `source file:./xipki/client-script/rest-client.script`
-- `source file:./xipki/client-script/scep-client.script`
+- The following shell script demonstrates how to enroll and reveoke certificates, and how to get the current CRL:
+  `xipki/client-script/rest.sh`
+  
+  Note that this script tells CA to generate real certificates. DO NOT use it in the production environment.
 
 ## Enroll/Revoke Certificate
-
-* Embedded karaf commands  
-  The karaf feature xipki-caclient-shell contains commands to to enroll/revoke
-  certificates via CMP, and xipki-scepclient-shell contains commands to enroll
-  certificates via SCEP. Please refer to [commands.md](commands.md) for more
-  details.
 
 * SCEP  
   Any SCEP client. XiPKI provides also a SCEP client in
@@ -262,6 +243,12 @@ the OSGi console:
   The SDK ([xipki/xisdk](https://github.com/xipki/xisdk))
   provides both the full-featured CA client and the lite version to enroll and
   revoke certificates via CMP.
+
+  The binary `xipki-sdk-<version>`.tar.gz contains several example scripts in the folder xipki/client-script.
+  They can be executed in the karaf shell as follows:  
+  - `source file:./xipki/client-script/cmp-client.script` 
+  - `source file:./xipki/client-script/rest-client.script`
+  - `source file:./xipki/client-script/scep-client.script`
 
 * REST API  
   The shell script `xipki/client-script/rest.sh` of the `xipki-pki` demonstrates
