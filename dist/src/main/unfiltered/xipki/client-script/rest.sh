@@ -13,7 +13,7 @@ echo "working dir: ${DIR}"
 OPTS="--insecure --user user1:password1"
 
 # Use TLS client certificate to authorize
-#OPTS="--insecure --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem"
+#OPTS="--insecure --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-key.pem"
 
 CUR_TIME=`date +%Y%m%d-%H%M%S`
 

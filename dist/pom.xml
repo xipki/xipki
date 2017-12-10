@@ -116,7 +116,7 @@
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
                   <type>zip</type>
-                  <includes>tls-client*,tls-server.der</includes>
+                  <includes>tls-ca*,tls-client*,tls-server.der</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -170,6 +170,8 @@
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>
