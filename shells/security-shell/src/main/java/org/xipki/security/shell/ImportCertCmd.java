@@ -68,6 +68,7 @@ public class ImportCertCmd extends SecurityCommandSupport {
             required = true, multiValued = true,
             description = "Certificate files\n"
                     + "(required, multi-valued)")
+    @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 
     @Override
