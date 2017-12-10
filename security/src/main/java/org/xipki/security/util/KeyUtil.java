@@ -94,7 +94,11 @@ public class KeyUtil {
         if ("JKS".equalsIgnoreCase(storeType) || "JCEKS".equalsIgnoreCase(storeType)) {
             return KeyStore.getInstance(storeType);
         } else {
-            return KeyStore.getInstance(storeType, "BC");
+            try {
+                return KeyStore.getInstance(storeType, "SunJSSE");
+            } catch (KeyStoreException | NoSuchProviderException ex) {
+                return KeyStore.getInstance(storeType);
+            }
         }
     }
 
