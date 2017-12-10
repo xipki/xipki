@@ -2,7 +2,7 @@ HASH = SHA256
 BASE_URL = https://localhost:8443/rest/myca
 
 echo "#################################################################"
-echo "#             Manage certificate via RESTFUL API                #"
+echo "#               Manage certificate via REST API                 #"
 echo "#################################################################"
 
 CUR_TIME = $(date '+%Y%m%d-%H%M%S')
@@ -17,9 +17,9 @@ xi:curl --out ${CACERT} $BASE_URL/cacert
 
 CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
 
-echo "=====RESTFUL: Enroll====="
+echo "=====REST: Enroll====="
 
-CN = RESTFUL-TLS-${CUR_TIME}
+CN = REST-TLS-${CUR_TIME}
 
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
@@ -36,21 +36,21 @@ SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 echo "Current OCSP Status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
-echo "=====RESTFUL: Suspend====="
+echo "=====REST: Suspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "Current OCSP Status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
-echo "=====RESTFUL: Unsuspend====="
+echo "=====REST: Unsuspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "Current OCSP Status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
-echo "=====RESTFUL: Revoke====="
+echo "=====REST: Revoke====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
@@ -59,7 +59,7 @@ xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====CMP: Generate CRL====="
 
-xi:curl --out ${OUT_DIR}/RESTFUL-MYCA-GEN.crl $BASE_URL/new-crl
+xi:curl --out ${OUT_DIR}/REST-MYCA-GEN.crl $BASE_URL/new-crl
 
-xi:curl --out ${OUT_DIR}/RESTFUL-MYCA-GET.crl $BASE_URL/crl
+xi:curl --out ${OUT_DIR}/REST-MYCA-GET.crl $BASE_URL/crl
 

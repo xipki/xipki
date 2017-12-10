@@ -12,7 +12,7 @@ Just drop me an email.
 
 ## Layout
  - lite-caclient-example  
-   Example to communicate with the CA via CMP and RESTFUL API. Only dependencies BouncyCastle and
+   Example to communicate with the CA via CMP and REST API. Only dependencies BouncyCastle and
    slf4j-api are required.
 
 ## Get Binary Package
