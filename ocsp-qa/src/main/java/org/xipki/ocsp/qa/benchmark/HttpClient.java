@@ -35,9 +35,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -56,8 +53,6 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 final class HttpClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
-
-    private static boolean useEpollLinux;
 
     private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -110,19 +105,13 @@ final class HttpClient {
 
     private final CountLatch latch = new CountLatch(0, 0);
 
-    static {
-        boolean linux = System.getProperty("os.name").toLowerCase().contains("linux");
-        useEpollLinux = linux ? Epoll.isAvailable() : false;
-        LOG.info("linux epoll available: {}", useEpollLinux);
-    }
-
     public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize) {
         this.uri = ParamUtil.requireNonNull("uri", uri);
         if (queueSize > 0) {
             this.queueSize = queueSize;
         }
         this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
-        this.workerGroup = useEpollLinux ? new EpollEventLoopGroup() : new NioEventLoopGroup(1);
+        this.workerGroup = new NioEventLoopGroup(1);
     }
 
     public void start() throws Exception {
@@ -141,13 +130,7 @@ final class HttpClient {
             return;
         }
 
-        Class<? extends SocketChannel> channelClass;
-        // Configure the client.
-        if (workerGroup instanceof EpollEventLoopGroup) {
-            channelClass = EpollSocketChannel.class;
-        } else {
-            channelClass = NioSocketChannel.class;
-        }
+        Class<? extends SocketChannel> channelClass = NioSocketChannel.class;
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
