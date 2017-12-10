@@ -39,17 +39,6 @@ Download the binary package `xipki-pki-<version>.tar.gz` from
 Only if you want to use the development version, build it from source code as
 follows.
 
-- Get a copy of `xipki/xitk` project code
-  ```sh
-  git clone https://github.com/xipki/xitk
-  ```
-- Build the project
-
-  In folder `xitk`
-  ```sh
-  mvn clean install -DskipTests
-  ```
-
 - Get a copy of project code
   ```sh
   git clone https://github.com/xipki/xipki
