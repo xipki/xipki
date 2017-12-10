@@ -369,6 +369,11 @@ public final class HttpServers {
                 trustcerts.add((X509Certificate) cert);
             }
 
+            if (trustcerts.isEmpty()) {
+                throw new Exception("No certificates found int the truststore. Please verify it via"
+                        + " JDK's keytool.");
+            }
+
             builder.trustManager(trustcerts.toArray(new X509Certificate[0]));
         }
 
