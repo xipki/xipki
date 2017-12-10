@@ -158,7 +158,7 @@ certs.dir = output
           <keystore>
             <type>PKCS12</type>
             <keystore>
-              <file>xipki/security/tlskeys/tls-server-truststore.p12</file>
+              <file>xipki/security/tlskeys/tls-ca-cert.p12</file>
             </keystore>
             <password>1234</password>
           </keystore>

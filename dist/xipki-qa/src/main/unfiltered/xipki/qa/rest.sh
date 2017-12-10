@@ -16,7 +16,7 @@ CA_SHA1FP=`openssl sha1 ${DIR}/../../${CACERT} | cut -d '=' -f 2 | cut -d ' ' -f
 OPTS="--insecure --user user1:password1"
 
 # Use TLS client certificate to authorize
-#OPTS="--insecure --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem"
+#OPTS="--insecure --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-key.pem"
 
 filename=tls-`date +%s` 
 

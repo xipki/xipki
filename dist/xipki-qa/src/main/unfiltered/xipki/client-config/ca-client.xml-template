@@ -12,7 +12,7 @@
       <!-- Required if signRequest is true -->
       <!--
       <signerType>PKCS12</signerType>
-      <signerConf>password=1234,algo=REPLACEME-CMP_SIGALGO,keystore=file:xipki/security/tlskeys/tls-client-keystore.p12</signerConf>
+      <signerConf>password=1234,algo=REPLACEME-CMP_SIGALGO,keystore=file:xipki/security/tlskeys/tls-client.p12</signerConf>
       -->
     </requestor>
   </requestors>

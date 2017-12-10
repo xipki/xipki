@@ -23,16 +23,16 @@
       </ciphersuites>
       <keystore>
         <store>
-          <file>xipki/security/tlskeys/tls-server-keystore.jks</file>
+          <file>xipki/security/tlskeys/tls-server.p12</file>
         </store>
-        <type>JKS</type>
+        <type>PKCS12</type>
         <password>1234</password>
       </keystore>
       <truststore>
         <store>
-          <file>xipki/security/tlskeys/tls-server-truststore.jks</file>
+          <file>xipki/security/tlskeys/tls-ca-cert.p12</file>
         </store>
-        <type>JKS</type>
+        <type>PKCS12</type>
         <password>1234</password>
       </truststore>
     </tls>

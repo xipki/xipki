@@ -290,6 +290,8 @@
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>

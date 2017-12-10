@@ -139,6 +139,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.tk</groupId>
+                  <artifactId>http-server</artifactId>
+                  <version>${xitk.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.tk</groupId>
                   <artifactId>security</artifactId>
                   <version>${xitk.version}</version>
                   <type>jar</type>
@@ -190,7 +197,27 @@
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
                   <type>zip</type>
-                  <includes>tls-server*,tls-client.der</includes>
+                  <includes>tls-ca*,tls-server*,tls-client.der</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Extract the TLS keys -->
+            <id>unpack-client-tlskeys</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${output.directory}/xipki/client-script/tlskeys</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.tk</groupId>
+                  <artifactId>demo-tlskeys</artifactId>
+                  <version>${xitk.version}</version>
+                  <type>zip</type>
+                  <includes>tls-client*</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -250,6 +277,8 @@
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>

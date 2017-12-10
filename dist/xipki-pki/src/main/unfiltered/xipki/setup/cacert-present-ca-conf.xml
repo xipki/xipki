@@ -28,7 +28,7 @@
     <responder name="responder1">
       <type>PKCS12</type>
       <conf>
-        <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA</value>
+        <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server.p12,algo=SHA256withRSA</value>
       </conf>
     </responder>
   </responders>
