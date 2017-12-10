@@ -60,7 +60,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.RestfulAPIConstants;
+import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.ca.server.impl.CaAuditConstants;
 import org.xipki.ca.server.impl.CertTemplateData;
@@ -233,14 +233,14 @@ public class HttpRestServlet extends AbstractHttpServlet {
             String respCt = null;
             byte[] respBytes = null;
 
-            if (RestfulAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
-                respCt = RestfulAPIConstants.CT_pkix_cert;
+            if (RestAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
+                respCt = RestAPIConstants.CT_pkix_cert;
                 respBytes = ca.caInfo().certificate().encodedCert();
-            } else if (RestfulAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
-                String profile = servletUri.parameter(RestfulAPIConstants.PARAM_profile);
+            } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
+                String profile = servletUri.parameter(RestAPIConstants.PARAM_profile);
                 if (StringUtil.isBlank(profile)) {
                     throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-                            "required parameter " + RestfulAPIConstants.PARAM_profile
+                            "required parameter " + RestAPIConstants.PARAM_profile
                             + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
                 }
                 profile = profile.toUpperCase();
@@ -257,17 +257,17 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 }
 
                 String ct = request.headers().get("Content-Type");
-                if (!RestfulAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
+                if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
                     String message = "unsupported media type " + ct;
                     throw new HttpRespAuditException(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE,
                             message, AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
-                String strNotBefore = servletUri.parameter(RestfulAPIConstants.PARAM_not_before);
+                String strNotBefore = servletUri.parameter(RestAPIConstants.PARAM_not_before);
                 Date notBefore = (strNotBefore == null) ? null
                         : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
 
-                String strNotAfter = servletUri.parameter(RestfulAPIConstants.PARAM_not_after);
+                String strNotAfter = servletUri.parameter(RestAPIConstants.PARAM_not_after);
                 Date notAfter = (strNotAfter == null) ? null
                         : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
@@ -300,12 +300,12 @@ public class HttpRestServlet extends AbstractHttpServlet {
                     throw new HttpRespAuditException(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                             null, message, AuditLevel.INFO, AuditStatus.FAILED);
                 }
-                respCt = RestfulAPIConstants.CT_pkix_cert;
+                respCt = RestAPIConstants.CT_pkix_cert;
                 respBytes = cert.encodedCert();
-            } else if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
-                    || RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+            } else if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
+                    || RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
                 int permission;
-                if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+                if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
                     permission = PermissionConstants.REVOKE_CERT;
                 } else {
                     permission = PermissionConstants.REMOVE_CERT;
@@ -316,31 +316,31 @@ public class HttpRestServlet extends AbstractHttpServlet {
                     throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
                 }
 
-                String strCaSha1 = servletUri.parameter(RestfulAPIConstants.PARAM_ca_sha1);
+                String strCaSha1 = servletUri.parameter(RestAPIConstants.PARAM_ca_sha1);
                 if (StringUtil.isBlank(strCaSha1)) {
                     throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-                            "required parameter " + RestfulAPIConstants.PARAM_ca_sha1
+                            "required parameter " + RestAPIConstants.PARAM_ca_sha1
                             + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
                 String strSerialNumber =
-                        servletUri.parameter(RestfulAPIConstants.PARAM_serial_number);
+                        servletUri.parameter(RestAPIConstants.PARAM_serial_number);
                 if (StringUtil.isBlank(strSerialNumber)) {
                     throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-                             "required parameter " + RestfulAPIConstants.PARAM_serial_number
+                             "required parameter " + RestAPIConstants.PARAM_serial_number
                              + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
                 if (!strCaSha1.equalsIgnoreCase(ca.getHexSha1OfCert())) {
                     throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-                            "unknown " + RestfulAPIConstants.PARAM_ca_sha1,
+                            "unknown " + RestAPIConstants.PARAM_ca_sha1,
                             AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
                 BigInteger serialNumber = toBigInt(strSerialNumber);
 
-                if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
-                    String strReason = servletUri.parameter(RestfulAPIConstants.PARAM_reason);
+                if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+                    String strReason = servletUri.parameter(RestAPIConstants.PARAM_reason);
                     CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
                             : CrlReason.forNameOrText(strReason);
 
@@ -349,24 +349,24 @@ public class HttpRestServlet extends AbstractHttpServlet {
                     } else {
                         Date invalidityTime = null;
                         String strInvalidityTime = servletUri.parameter(
-                                RestfulAPIConstants.PARAM_invalidity_time);
+                                RestAPIConstants.PARAM_invalidity_time);
                         if (StringUtil.isNotBlank(strInvalidityTime)) {
                             invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
                         }
 
                         ca.revokeCertificate(serialNumber, reason, invalidityTime, msgId);
                     }
-                } else if (RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+                } else if (RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
                     ca.removeCertificate(serialNumber, msgId);
                 }
-            } else if (RestfulAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
+            } else if (RestAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
                 try {
                     requestor.assertPermitted(PermissionConstants.GET_CRL);
                 } catch (InsuffientPermissionException ex) {
                     throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
                 }
 
-                String strCrlNumber = servletUri.parameter(RestfulAPIConstants.PARAM_crl_number);
+                String strCrlNumber = servletUri.parameter(RestAPIConstants.PARAM_crl_number);
                 BigInteger crlNumber = null;
                 if (StringUtil.isNotBlank(strCrlNumber)) {
                     try {
@@ -387,9 +387,9 @@ public class HttpRestServlet extends AbstractHttpServlet {
                             null, message, AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
-                respCt = RestfulAPIConstants.CT_pkix_crl;
+                respCt = RestAPIConstants.CT_pkix_crl;
                 respBytes = crl.getEncoded();
-            } else if (RestfulAPIConstants.CMD_new_crl.equalsIgnoreCase(command)) {
+            } else if (RestAPIConstants.CMD_new_crl.equalsIgnoreCase(command)) {
                 try {
                     requestor.assertPermitted(PermissionConstants.GEN_CRL);
                 } catch (InsuffientPermissionException ex) {
@@ -404,7 +404,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                             null, message, AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
-                respCt = RestfulAPIConstants.CT_pkix_crl;
+                respCt = RestAPIConstants.CT_pkix_crl;
                 respBytes = crl.getEncoded();
             } else {
                 String message = "invalid command '" + command + "'";
@@ -414,8 +414,8 @@ public class HttpRestServlet extends AbstractHttpServlet {
             }
 
             FullHttpResponse resp = createOKResponse(version, respCt, respBytes);
-            resp.headers().add(RestfulAPIConstants.HEADER_PKISTATUS,
-                    RestfulAPIConstants.PKISTATUS_accepted);
+            resp.headers().add(RestAPIConstants.HEADER_PKISTATUS,
+                    RestAPIConstants.PKISTATUS_accepted);
             return resp;
         } catch (OperationException ex) {
             ErrorCode code = ex.errorCode();
@@ -427,55 +427,55 @@ public class HttpRestServlet extends AbstractHttpServlet {
             switch (code) {
             case ALREADY_ISSUED:
                 sc = HttpResponseStatus.BAD_REQUEST;
-                failureInfo = RestfulAPIConstants.FAILINFO_badRequest;
+                failureInfo = RestAPIConstants.FAILINFO_badRequest;
                 break;
             case BAD_CERT_TEMPLATE:
                 sc = HttpResponseStatus.BAD_REQUEST;
-                failureInfo = RestfulAPIConstants.FAILINFO_badCertTemplate;
+                failureInfo = RestAPIConstants.FAILINFO_badCertTemplate;
                 break;
             case BAD_REQUEST:
                 sc = HttpResponseStatus.BAD_REQUEST;
-                failureInfo = RestfulAPIConstants.FAILINFO_badRequest;
+                failureInfo = RestAPIConstants.FAILINFO_badRequest;
                 break;
             case CERT_REVOKED:
                 sc = HttpResponseStatus.CONFLICT;
-                failureInfo = RestfulAPIConstants.FAILINFO_certRevoked;
+                failureInfo = RestAPIConstants.FAILINFO_certRevoked;
                 break;
             case CRL_FAILURE:
                 sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                failureInfo = RestfulAPIConstants.FAILINFO_systemFailure;
+                failureInfo = RestAPIConstants.FAILINFO_systemFailure;
                 break;
             case DATABASE_FAILURE:
                 sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                failureInfo = RestfulAPIConstants.FAILINFO_systemFailure;
+                failureInfo = RestAPIConstants.FAILINFO_systemFailure;
                 break;
             case NOT_PERMITTED:
                 sc = HttpResponseStatus.UNAUTHORIZED;
-                failureInfo = RestfulAPIConstants.FAILINFO_notAuthorized;
+                failureInfo = RestAPIConstants.FAILINFO_notAuthorized;
                 break;
             case INVALID_EXTENSION:
                 sc = HttpResponseStatus.BAD_REQUEST;
-                failureInfo = RestfulAPIConstants.FAILINFO_badRequest;
+                failureInfo = RestAPIConstants.FAILINFO_badRequest;
                 break;
             case SYSTEM_FAILURE:
                 sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                failureInfo = RestfulAPIConstants.FAILINFO_systemFailure;
+                failureInfo = RestAPIConstants.FAILINFO_systemFailure;
                 break;
             case SYSTEM_UNAVAILABLE:
                 sc = HttpResponseStatus.SERVICE_UNAVAILABLE;
-                failureInfo = RestfulAPIConstants.FAILINFO_systemUnavail;
+                failureInfo = RestAPIConstants.FAILINFO_systemUnavail;
                 break;
             case UNKNOWN_CERT:
                 sc = HttpResponseStatus.BAD_REQUEST;
-                failureInfo = RestfulAPIConstants.FAILINFO_badCertId;
+                failureInfo = RestAPIConstants.FAILINFO_badCertId;
                 break;
             case UNKNOWN_CERT_PROFILE:
                 sc = HttpResponseStatus.BAD_REQUEST;
-                failureInfo = RestfulAPIConstants.FAILINFO_badCertTemplate;
+                failureInfo = RestAPIConstants.FAILINFO_badCertTemplate;
                 break;
             default:
                 sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
-                failureInfo = RestfulAPIConstants.FAILINFO_systemFailure;
+                failureInfo = RestAPIConstants.FAILINFO_systemFailure;
                 break;
             } // end switch (code)
 
@@ -493,10 +493,10 @@ public class HttpRestServlet extends AbstractHttpServlet {
             } // end switch code
 
             FullHttpResponse resp = createErrorResponse(version, sc);
-            resp.headers().add(RestfulAPIConstants.HEADER_PKISTATUS,
-                    RestfulAPIConstants.PKISTATUS_rejection);
+            resp.headers().add(RestAPIConstants.HEADER_PKISTATUS,
+                    RestAPIConstants.PKISTATUS_rejection);
             if (StringUtil.isNotBlank(failureInfo)) {
-                resp.headers().add(RestfulAPIConstants.HEADER_failInfo, failureInfo);
+                resp.headers().add(RestAPIConstants.HEADER_failInfo, failureInfo);
             }
             return resp;
         } catch (HttpRespAuditException ex) {

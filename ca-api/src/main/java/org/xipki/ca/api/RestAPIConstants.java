@@ -40,7 +40,7 @@ package org.xipki.ca.api;
  */
 
 // CHECKSTYLE:OFF
-public class RestfulAPIConstants {
+public class RestAPIConstants {
 
     public static final String CT_pkcs10 = "application/pkcs10";
 

@@ -263,9 +263,9 @@ the OSGi console:
   provides both the full-featured CA client and the lite version to enroll and
   revoke certificates via CMP.
 
-* RESTFUL API  
+* REST API  
   The shell script `xipki/client-script/rest.sh` of the `xipki-pki` demonstrates
-  the use of RESTFUL API.
+  the use of REST API.
 
 Karaf Features
 -----
