@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.p11proxy</groupId>
     <artifactId>xip11proxy-parent</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-p11proxy</artifactId>
   <packaging>pom</packaging>
@@ -92,6 +92,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.tk</groupId>
+                  <artifactId>http-server</artifactId>
+                  <version>${xitk.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.tk</groupId>
                   <artifactId>security</artifactId>
                   <version>${xitk.version}</version>
                   <type>jar</type>
@@ -115,7 +122,7 @@
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
                   <type>zip</type>
-                  <includes>tls-server-keystore.jks,tls-server-truststore.jks</includes>
+                  <includes>tls-server.p12,tls-ca-cert.p12</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -169,6 +176,8 @@
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>

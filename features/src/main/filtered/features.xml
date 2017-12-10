@@ -8,8 +8,9 @@
     <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
-    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
+    <!--bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle-->
     <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
