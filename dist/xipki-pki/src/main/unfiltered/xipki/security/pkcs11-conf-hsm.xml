@@ -25,8 +25,9 @@
               <index>0</index>
             </slot>
           </slots>
+          <password>123456</password>
           <!-- encrypted password 123456 -->
-          <password>PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==</password>
+          <!--password>PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==</password-->
         </passwords>
       </passwordSets>
       <mechanismSets>

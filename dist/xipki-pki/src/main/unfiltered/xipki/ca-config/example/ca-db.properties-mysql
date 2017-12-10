@@ -17,7 +17,8 @@ dataSource.port = 3306
 dataSource.databaseName = ca
 dataSource.user = root
 # encrypted password 123456
-dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
+#dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
+datasource.password = 123456
 dataSource.cachePrepStmts = true
 dataSource.prepStmtCacheSize = 250
 dataSource.prepStmtCacheSqlLimit = 2048
