@@ -67,7 +67,7 @@ Download the binary package `xipki-sdk-<version>.tar.gz` from
     ```
     The following steps use `$XIPKI_HOME` to point to the unpacked root folder.
     
-    **Steps 2 - 5 can be skipped if you just want to try out.**
+    **The next steps can be skipped if you just want to try out.**
 
 2. Adapt the database configuration (optional)
 
