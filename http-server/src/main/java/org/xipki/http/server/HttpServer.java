@@ -218,7 +218,7 @@ public final class HttpServer {
                     LOG.debug("could not use Epoll transport", th);
                 }
             }
-        } else if (os.contains("macos")) {
+        } else if (os.contains("mac os") || os.contains("os x")) {
             try {
                 Class<?> checkClazz = Class.forName(
                         "io.netty.channel.epoll.kqueue.KQueue", false, loader);
