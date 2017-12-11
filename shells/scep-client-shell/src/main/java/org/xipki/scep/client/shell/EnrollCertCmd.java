@@ -67,7 +67,7 @@ public class EnrollCertCmd extends ClientCommandSupport {
 
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
         EnrolmentResponse resp;
-        
+
         PrivateKey key0 = getIdentityKey();
         X509Certificate cert0 = getIdentityCert();
         if (StringUtil.isBlank(method)) {
@@ -77,11 +77,11 @@ public class EnrollCertCmd extends ClientCommandSupport {
         } else if ("RENEWAL".equalsIgnoreCase(method)) {
             resp = client.scepRenewalReq(csr, key0, cert0);
         } else if ("UPDATE".equalsIgnoreCase(method)) {
-            resp = client.scepUpdateReq(csr, key0, cert0);            
+            resp = client.scepUpdateReq(csr, key0, cert0);
         } else {
             throw new CmdFailure("invalid enroll method");
         }
-        
+
         if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }

@@ -11,6 +11,9 @@
   <artifactId>ocsp-qa</artifactId>
   <packaging>bundle</packaging>
   <name>XiSDK :: ${project.artifactId}</name>
+  <properties>
+    <Import-Package>*,io.netty.channel.epoll;resolution:=optional;version="[4.1,5)",io.netty.channel.kqueue;resolution:=optional;version="[4.1,5)"</Import-Package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

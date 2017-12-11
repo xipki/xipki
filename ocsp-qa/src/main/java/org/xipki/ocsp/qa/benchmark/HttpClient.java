@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.qa.benchmark;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
@@ -91,6 +93,12 @@ final class HttpClient {
         }
     }
 
+    private static Boolean epollAvailable;
+
+    private static Boolean kqueueAvailable;
+
+    private final CountLatch latch = new CountLatch(0, 0);
+
     private int queueSize = 1000;
 
     private String uri;
@@ -103,7 +111,42 @@ final class HttpClient {
 
     private int pendingRequests = 0;
 
-    private final CountLatch latch = new CountLatch(0, 0);
+    static {
+        String os = System.getProperty("os.name").toLowerCase();
+        ClassLoader loader = HttpClient.class.getClassLoader();
+        if (os.contains("linux")) {
+            try {
+                Class<?> checkClazz = Class.forName(
+                        "io.netty.channel.epoll.Epoll", false, loader);
+                Method mt = checkClazz.getMethod("isAvailable");
+                Object obj = mt.invoke(null);
+
+                if (obj instanceof Boolean) {
+                    epollAvailable = (Boolean) obj;
+                }
+            } catch (Throwable th) {
+                if (th instanceof ClassNotFoundException) {
+                    LOG.info("epoll linux is not in classpath");
+                } else {
+                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
+                    LOG.debug("could not use Epoll transport", th);
+                }
+            }
+        } else if (os.contains("mac os") || os.contains("os x")) {
+            try {
+                Class<?> checkClazz = Class.forName(
+                        "io.netty.channel.epoll.kqueue.KQueue", false, loader);
+                Method mt = checkClazz.getMethod("isAvailable");
+                Object obj = mt.invoke(null);
+                if (obj instanceof Boolean) {
+                    kqueueAvailable = (Boolean) obj;
+                }
+            } catch (Exception ex) {
+                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
+                LOG.debug("could not use KQueue transport", ex);
+            }
+        }
+    }
 
     public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize) {
         this.uri = ParamUtil.requireNonNull("uri", uri);
@@ -114,6 +157,7 @@ final class HttpClient {
         this.workerGroup = new NioEventLoopGroup(1);
     }
 
+    @SuppressWarnings("unchecked")
     public void start() throws Exception {
         URI uri = new URI(this.uri);
         String scheme = (uri.getScheme() == null) ? "http" : uri.getScheme();
@@ -131,6 +175,54 @@ final class HttpClient {
         }
 
         Class<? extends SocketChannel> channelClass = NioSocketChannel.class;
+
+        final int numThreads = 1;
+
+        ClassLoader loader = getClass().getClassLoader();
+        if (epollAvailable != null && epollAvailable.booleanValue()) {
+            try {
+                channelClass = (Class<? extends SocketChannel>)
+                        Class.forName("io.netty.channel.epoll.EpollSocketChannel",
+                                false, loader);
+
+                Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup",
+                                    true, loader);
+                Constructor<?> constructor = clazz.getConstructor(int.class);
+                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+                LOG.info("use Epoll Transport");
+            } catch (Throwable th) {
+                if (th instanceof ClassNotFoundException) {
+                    LOG.info("epoll linux is not in classpath");
+                } else {
+                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
+                    LOG.debug("could not use Epoll transport", th);
+                }
+                channelClass = null;
+                this.workerGroup = null;
+            }
+        } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
+            try {
+                channelClass = (Class<? extends SocketChannel>)
+                        Class.forName("io.netty.channel.kqueue.KQueueSocketChannel",
+                                false, loader);
+
+                Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
+                                    true, loader);
+                Constructor<?> constructor = clazz.getConstructor(int.class);
+                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+                LOG.info("Use KQueue Transport");
+            } catch (Exception ex) {
+                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
+                LOG.debug("could not use KQueue transport", ex);
+                channelClass = null;
+                this.workerGroup = null;
+            }
+        }
+
+        if (this.workerGroup == null) {
+            channelClass = NioSocketChannel.class;
+            this.workerGroup = new NioEventLoopGroup(numThreads);
+        }
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
