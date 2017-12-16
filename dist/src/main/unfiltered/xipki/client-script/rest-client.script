@@ -33,21 +33,21 @@ xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
 
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 
-echo "Current OCSP Status"
+echo "Current OCSP status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====REST: Suspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
-echo "Current OCSP Status"
+echo "Current OCSP status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====REST: Unsuspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
-echo "Current OCSP Status"
+echo "Current OCSP status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====REST: Revoke====="
