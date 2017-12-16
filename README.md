@@ -3,8 +3,7 @@ XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure) is
 a highly scalable and high-performance open source PKI (CA and OCSP responder).
 
 ## License
-* XiPKI Commercial License
-* GNU AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
+* The Apache Software License, Version 2.0
 
 ## Owner
 Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)

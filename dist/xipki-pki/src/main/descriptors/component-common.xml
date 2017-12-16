@@ -83,7 +83,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.basedir}/../../LICENSE.txt</source>
+      <source>${project.basedir}/../../LICENSE</source>
       <outputDirectory>license</outputDirectory>
       <destName>xipki-LICENSE</destName>
       <fileMode>0644</fileMode>
