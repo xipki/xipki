@@ -41,6 +41,16 @@
     <developerConnection>scm:git:git@github.com:xipki/xiscep.git</developerConnection>
     <url>git@github.com:xipki/xiscep.git</url>
   </scm>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
   <build>
     <plugins>
       <plugin>
@@ -139,16 +149,6 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-      </distributionManagement>
       <build>
         <plugins>
           <plugin>
