@@ -173,7 +173,7 @@
             <configuration>
               <serverId>ossrh</serverId>
               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <!-- Call mvn nexus-staging:release to trige a release of the staging repository, or nexus-staging:drop to drop the staging repositoy-->
+              <!-- Call "mvn nexus-staging:release -Prelease" to trige a release of the staging repository, or nexus-staging:drop to drop the staging repositoy-->
               <autoReleaseAfterClose>false</autoReleaseAfterClose>
             </configuration>
           </plugin>
