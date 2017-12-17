@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.scep</groupId>
     <artifactId>scep-parent</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
   <artifactId>scep-example</artifactId>
   <packaging>bundle</packaging>
