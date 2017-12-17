@@ -11,7 +11,7 @@
   <groupId>org.xipki.p11proxy</groupId>
   <artifactId>xip11proxy-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.4.0-SNAPSHOT</version>
+  <version>3.0.0</version>
   <name>XiP11Proxy :: ${project.artifactId}</name>
   <description>XiPKI PKCS#11 Proxy</description>
   <url>http://xipki.org</url>
@@ -30,9 +30,9 @@
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <xitk.version>2.4.0-SNAPSHOT</xitk.version>
+    <xitk.version>3.0.0</xitk.version>
     <karaf.version>4.1.3</karaf.version>
-    <netty.version>4.1.16.Final</netty.version>
+    <netty.version>4.1.18.Final</netty.version>
     <netty-tcnative.version>2.0.7.Final</netty-tcnative.version>
     <bc.version>1.58</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
@@ -204,11 +204,6 @@
   </build>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>${bc.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
