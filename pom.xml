@@ -11,7 +11,7 @@
   <groupId>org.xipki.p11proxy</groupId>
   <artifactId>xip11proxy-parent</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <name>XiP11Proxy :: ${project.artifactId}</name>
   <description>XiPKI PKCS#11 Proxy</description>
   <url>http://xipki.org</url>

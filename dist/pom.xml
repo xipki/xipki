@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.p11proxy</groupId>
     <artifactId>xip11proxy-parent</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-p11proxy</artifactId>
   <packaging>pom</packaging>
