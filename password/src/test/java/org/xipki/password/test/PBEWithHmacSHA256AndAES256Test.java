@@ -17,8 +17,6 @@
 
 package org.xipki.password.test;
 
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.password.PBEAlgo;
@@ -43,7 +41,6 @@ public class PBEWithHmacSHA256AndAES256Test {
         int iterationCount = 1000;
         byte[] encrypted = PasswordBasedEncryption.encrypt(algo, plainText, password,
                 iterationCount, salt);
-        System.out.println(Arrays.toString(encrypted));
         byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password,
                 iterationCount, salt);
         Assert.assertArrayEquals(plainText, decrypted);
