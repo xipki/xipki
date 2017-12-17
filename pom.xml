@@ -11,7 +11,7 @@
   <groupId>org.xipki.sdk</groupId>
   <artifactId>xisdk-parent</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <name>XiSDK :: ${project.artifactId}</name>
   <description>XiPKI SDK</description>
   <url>http://xipki.org</url>
