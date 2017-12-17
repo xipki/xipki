@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.pki.features</groupId>
     <artifactId>features-parent</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>qa</artifactId>
   <packaging>pom</packaging>

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.pki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>ocsp-server</artifactId>
   <packaging>bundle</packaging>
