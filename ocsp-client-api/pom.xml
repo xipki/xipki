@@ -18,7 +18,7 @@
       <version>${xitk.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
+      <groupId>org.xipki.bc</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
     </dependency>
   </dependencies>

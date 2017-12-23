@@ -13,7 +13,7 @@
   <name>XiSDK :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
+      <groupId>org.xipki.bc</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
     </dependency>
     <dependency>

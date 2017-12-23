@@ -132,6 +132,11 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
                     + "(only applied to DSA and ECDSA key)")
     private Boolean dsaPlain = Boolean.FALSE;
 
+    @Option(name = "--gm",
+            description = "whether to use the chinese GM algorithm for the POPO computation\n"
+                    + "(only applied to EC key with GM curves)")
+    private Boolean gm = Boolean.FALSE;
+
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
@@ -217,7 +222,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
         ConcurrentContentSigner signer = getSigner(
-                new SignatureAlgoControl(rsaMgf1, dsaPlain));
+                new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
         X509CertificateHolder ssCert = signer.getCertificateAsBcObject();
 
         X500Name x500Subject = new X500Name(subject);
