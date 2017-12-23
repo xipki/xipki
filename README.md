@@ -293,7 +293,8 @@ Components
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
   - Signature algorithms of certificates
-    - SHA3-*withRSA: where * is 224, 256, 384 and 512
+    - SM3withSM2
+    - SHA3-*withRSA: where * is 224, 256, 384 and 512
     - SHA3-*withRSAandMGF1: where * is 224, 256, 384 and 512
     - SHA3-*withECDSA: where * is 224, 256, 384 and 512
     - SHA3-*withDSA: where * is 224, 256, 384 and 512
