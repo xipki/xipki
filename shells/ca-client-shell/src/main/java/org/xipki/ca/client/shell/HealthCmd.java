@@ -35,7 +35,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Command(scope = "xi", name = "cmp-health",
         description = "check healty status of CA")
 @Service
-public class HealthCmd extends ClientCommandSupport {
+public class HealthCmd extends ClientAction {
 
     @Option(name = "--ca",
             description = "CA name\n"

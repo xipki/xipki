@@ -38,7 +38,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xi", name = "jscep-getcrl",
         description = "download CRL")
 @Service
-public class GetCrlCmd extends ClientCommandSupport {
+public class GetCrlCmd extends ClientAction {
 
     @Option(name = "--cert", aliases = "-c",
             required = true,

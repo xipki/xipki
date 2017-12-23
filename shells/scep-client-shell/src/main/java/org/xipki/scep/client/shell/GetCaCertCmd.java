@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
@@ -39,7 +39,7 @@ import org.xipki.scep.client.ScepClient;
 @Command(scope = "xi", name = "scep-cacert",
         description = "get CA certificate")
 @Service
-public class GetCaCertCmd extends XipkiCommandSupport {
+public class GetCaCertCmd extends XiAction {
 
     @Option(name = "--url",
             required = true,

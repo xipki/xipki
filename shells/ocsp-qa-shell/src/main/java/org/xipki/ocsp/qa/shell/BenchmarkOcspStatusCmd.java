@@ -37,7 +37,7 @@ import org.xipki.common.util.RangeBigIntegerIterator;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.ocsp.client.shell.OcspStatusCommandSupport;
+import org.xipki.ocsp.client.shell.OcspStatusAction;
 import org.xipki.ocsp.qa.benchmark.OcspBenchmark;
 import org.xipki.security.util.X509Util;
 
@@ -49,7 +49,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xiqa", name = "benchmark-ocsp-status",
         description = "OCSP benchmark")
 @Service
-public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
+public class BenchmarkOcspStatusCmd extends OcspStatusAction {
     @Option(name = "--hex",
             description = "serial number without prefix is hex number")
     private Boolean hex = Boolean.FALSE;

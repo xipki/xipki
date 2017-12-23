@@ -27,7 +27,7 @@ import java.util.Enumeration;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
@@ -41,7 +41,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class ClientCommandSupport extends XipkiCommandSupport {
+public abstract class ClientAction extends XiAction {
 
     @Option(name = "--url",
             required = true,

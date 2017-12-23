@@ -42,7 +42,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xi", name = "cmp-revoke",
         description = "revoke certificate")
 @Service
-public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
+public class RevokeCertCmd extends UnRevRemoveCertAction {
 
     @Option(name = "--reason", aliases = "-r",
             required = true,

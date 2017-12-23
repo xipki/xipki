@@ -33,7 +33,7 @@ import org.xipki.common.RequestResponseDebug;
 @Command(scope = "xi", name = "cmp-gencrl",
         description = "generate CRL")
 @Service
-public class GenCrlCmd extends CrlCommandSupport {
+public class GenCrlCmd extends CrlAction {
 
     @Override
     protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {

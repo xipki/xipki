@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.SigAlgCompleter;
@@ -34,7 +34,7 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-public abstract class OcspStatusCommandSupport extends XipkiCommandSupport {
+public abstract class OcspStatusAction extends XiAction {
 
     @Option(name = "--issuer", aliases = "-i",
             required = true,

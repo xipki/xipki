@@ -41,7 +41,7 @@ import org.xipki.scep.client.ScepClient;
 @Command(scope = "xi", name = "scep-certpoll",
         description = "poll certificate")
 @Service
-public class CertPollCmd extends ClientCommandSupport {
+public class CertPollCmd extends ClientAction {
 
     @Option(name = "--csr",
             required = true,

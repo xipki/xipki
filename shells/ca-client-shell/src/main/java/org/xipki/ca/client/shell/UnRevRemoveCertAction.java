@@ -39,7 +39,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport {
+public abstract class UnRevRemoveCertAction extends ClientAction {
 
     @Option(name = "--ca",
             description = "CA name\n"

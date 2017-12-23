@@ -86,7 +86,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
+public abstract class EnrollCertAction extends ClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;

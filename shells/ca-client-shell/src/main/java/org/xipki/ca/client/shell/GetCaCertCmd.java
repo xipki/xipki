@@ -39,7 +39,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 
 @Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
 @Service
-public class GetCaCertCmd extends ClientCommandSupport {
+public class GetCaCertCmd extends ClientAction {
 
     @Reference
     protected CaClient caClient;

@@ -37,7 +37,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
+public abstract class EnrollCertAction extends ClientAction {
 
     @Option(name = "--csr",
             required = true,

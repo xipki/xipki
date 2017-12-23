@@ -43,7 +43,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xi", name = "jscep-certpoll",
         description = "poll certificate")
 @Service
-public class CertPollCmd extends ClientCommandSupport {
+public class CertPollCmd extends ClientAction {
 
     @Option(name = "--csr",
             required = true,

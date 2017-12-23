@@ -35,7 +35,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xiqa", name = "cmp-benchmark-template-enroll",
         description = "CA client template enroll load test")
 @Service
-public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
+public class CaLoadTestTemplateEnrollCmd extends CaLoadTestAction {
 
     @Option(name = "--template", aliases = "-t",
             required = true,

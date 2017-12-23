@@ -26,7 +26,7 @@ import org.xipki.ca.client.api.CaClient;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-public abstract class ClientCommandSupport extends XipkiCommandSupport {
+public abstract class ClientAction extends XiAction {
 
     @Reference
     protected CaClient caClient;

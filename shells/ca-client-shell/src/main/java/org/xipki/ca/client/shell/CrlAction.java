@@ -35,7 +35,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-public abstract class CrlCommandSupport extends ClientCommandSupport {
+public abstract class CrlAction extends ClientAction {
 
     @Option(name = "--ca",
             description = "CA name\n"

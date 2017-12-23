@@ -36,7 +36,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xi", name = "cmp-unrevoke",
         description = "unrevoke certificate")
 @Service
-public class UnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
+public class UnrevokeCertCmd extends UnRevRemoveCertAction {
 
     @Override
     protected Object execute0() throws Exception {

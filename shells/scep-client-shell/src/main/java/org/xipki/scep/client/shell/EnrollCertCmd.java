@@ -40,7 +40,7 @@ import org.xipki.scep.client.shell.completer.EnrollMetodCompleter;
  */
 @Command(scope = "xi", name = "scep-enroll", description = "enroll certificate")
 @Service
-public class EnrollCertCmd extends ClientCommandSupport {
+public class EnrollCertCmd extends ClientAction {
 
     @Option(name = "--csr",
             required = true,

@@ -40,7 +40,7 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 @Command(scope = "xi", name = "cmp-enroll",
         description = "enroll certificate (PKCS#11 token)")
 @Service
-public class P11EnrollCertCmd extends EnrollCertCommandSupport {
+public class P11EnrollCertCmd extends EnrollCertAction {
 
     @Option(name = "--slot",
             required = true,

@@ -65,7 +65,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupport {
+public abstract class BaseOcspStatusAction extends OcspStatusAction {
 
     protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP
             = new HashMap<>();

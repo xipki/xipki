@@ -35,7 +35,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.SigAlgCompleter;
-import org.xipki.ocsp.client.shell.BaseOcspStatusCommandSupport;
+import org.xipki.ocsp.client.shell.BaseOcspStatusAction;
 import org.xipki.ocsp.qa.Occurrence;
 import org.xipki.ocsp.qa.OcspCertStatus;
 import org.xipki.ocsp.qa.OcspError;
@@ -56,7 +56,7 @@ import org.xipki.security.util.AlgorithmUtil;
 @Command(scope = "xiqa", name = "ocsp-status",
         description = "request certificate status (QA)")
 @Service
-public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
+public class OcspQaStatusCmd extends BaseOcspStatusAction {
 
     @Option(name = "--exp-error",
             description = "expected error")

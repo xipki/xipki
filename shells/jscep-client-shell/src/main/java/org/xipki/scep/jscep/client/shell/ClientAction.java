@@ -34,7 +34,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -44,7 +44,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class ClientCommandSupport extends XipkiCommandSupport {
+public abstract class ClientAction extends XiAction {
 
     @Option(name = "--url",
             required = true,

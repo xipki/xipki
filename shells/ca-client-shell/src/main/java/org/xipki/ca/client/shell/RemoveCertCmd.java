@@ -36,7 +36,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xi", name = "cmp-remove-cert",
         description = "remove certificate")
 @Service
-public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {
+public class RemoveCertCmd extends UnRevRemoveCertAction {
 
     @Override
     protected Object execute0() throws Exception {

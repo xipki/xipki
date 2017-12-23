@@ -70,7 +70,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xi", name = "ocsp-status",
         description = "request certificate status")
 @Service
-public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
+public class OcspStatusCmd extends BaseOcspStatusAction {
 
     @Reference
     private SecurityFactory securityFactory;

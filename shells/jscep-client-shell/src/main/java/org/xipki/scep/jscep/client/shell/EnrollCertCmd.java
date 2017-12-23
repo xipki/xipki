@@ -36,7 +36,7 @@ import org.jscep.transaction.TransactionException;
 @Command(scope = "xi", name = "jscep-enroll",
         description = "enroll certificate via automatic selected messageType")
 @Service
-public class EnrollCertCmd extends EnrollCertCommandSupport {
+public class EnrollCertCmd extends EnrollCertAction {
 
     @Override
     protected EnrollmentResponse requestCertificate(final Client client,

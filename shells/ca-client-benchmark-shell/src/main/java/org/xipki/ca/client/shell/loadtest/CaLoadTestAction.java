@@ -19,14 +19,14 @@ package org.xipki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.client.api.CaClient;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class CaLoadTestCommandSupport extends XipkiCommandSupport {
+public abstract class CaLoadTestAction extends XiAction {
 
     @Reference
     protected CaClient caClient;
