@@ -13,7 +13,7 @@
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
+      <groupId>org.xipki.bc</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
       <version>${bc.version}</version>
     </dependency>

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
@@ -505,10 +506,15 @@ public class ScepUtil {
         generator.addCertificates(certStore);
     }
 
-    private static CertificateFactory getCertFactory() throws CertificateException {
+    private static CertificateFactory getCertFactory()
+            throws CertificateException {
         synchronized (certFactLock) {
             if (certFact == null) {
-                certFact = CertificateFactory.getInstance("X.509");
+                try {
+                    certFact = CertificateFactory.getInstance("X.509", "BC");
+                } catch (NoSuchProviderException ex) {
+                    certFact = CertificateFactory.getInstance("X.509");
+                }
             }
             return certFact;
         }
