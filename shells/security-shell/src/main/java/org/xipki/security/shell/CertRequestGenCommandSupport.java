@@ -117,6 +117,11 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             description = "whether to use the Plain DSA for the POPO computation")
     private Boolean dsaPlain = Boolean.FALSE;
 
+    @Option(name = "--gm",
+            description = "whether to use the chinese GM algorithm for the POPO computation\n"
+                    + "(only applied to EC key with GM curves)")
+    private Boolean gm = Boolean.FALSE;
+
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "output file name\n"
@@ -329,7 +334,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     ee.toASN1Primitive().getEncoded()));
         }
 
-        ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain));
+        ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
         if (CollectionUtil.isNonEmpty(extensions)) {

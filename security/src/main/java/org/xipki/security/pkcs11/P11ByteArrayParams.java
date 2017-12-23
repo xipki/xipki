@@ -15,41 +15,23 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.pkcs11;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public class SignatureAlgoControl {
+// CHECKSTYLE:SKIP
+public class P11ByteArrayParams implements P11Params {
 
-    private final boolean rsaMgf1;
+    private final byte[] bytes;
 
-    private final boolean dsaPlain;
-
-    private final boolean gm;
-
-    public SignatureAlgoControl() {
-        this(false, false, false);
+    public P11ByteArrayParams(final byte[] bytes) {
+        this.bytes = bytes;
     }
 
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain, final boolean gm) {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-        this.gm = gm;
-    }
-
-    public boolean isRsaMgf1() {
-        return rsaMgf1;
-    }
-
-    public boolean isDsaPlain() {
-        return dsaPlain;
-    }
-
-    public boolean isGm() {
-        return gm;
+    public byte[] getBytes() {
+        return bytes;
     }
 
 }

@@ -36,6 +36,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.EllipticCurve;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
@@ -64,9 +66,11 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.bc.XiSM2Signer;
 import org.xipki.security.bc.XiWrappedContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
@@ -77,6 +81,12 @@ import org.xipki.security.util.X509Util;
  */
 
 public class SoftTokenContentSignerBuilder {
+
+    private static final AlgorithmIdentifier ALGID_SM2_SM3 =
+            new AlgorithmIdentifier(GMObjectIdentifiers.sm2sign_with_sm3);
+
+    private static final AlgorithmIdentifier ALGID_SM3 =
+            new AlgorithmIdentifier(GMObjectIdentifiers.sm3);
 
     // CHECKSTYLE:SKIP
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
@@ -159,6 +169,25 @@ public class SoftTokenContentSignerBuilder {
 
             return plain ? new DSAPlainDigestSigner(dsaSigner, dig)
                     : new DSADigestSigner(dsaSigner, dig);
+        }
+
+    } // class ECDSAContentSignerBuilder
+
+    private static class SM2ContentSignerBuilder extends BcContentSignerBuilder {
+
+        private SM2ContentSignerBuilder() throws NoSuchAlgorithmException {
+            super(ALGID_SM2_SM3, ALGID_SM3);
+        }
+
+        protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
+            if (!AlgorithmUtil.isSm2SigAlg(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid EC signature algorithm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
+
+            return new XiSM2Signer();
         }
 
     } // class ECDSAContentSignerBuilder
@@ -291,8 +320,13 @@ public class SoftTokenContentSignerBuilder {
                             AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
                 } else if (key instanceof ECPrivateKey) {
                     keyparam = ECUtil.generatePrivateKeyParameter(key);
-                    signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
-                            AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+                    EllipticCurve curve = ((ECPrivateKey) key).getParams().getCurve();
+                    if (GMUtil.isSm2primev2Curve(curve)) {
+                        signerBuilder = new SM2ContentSignerBuilder();
+                    } else {
+                        signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
+                                AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+                    }
                 } else {
                     throw new XiSecurityException("unsupported key "
                             + key.getClass().getName());

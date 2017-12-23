@@ -95,7 +95,7 @@ public class KeyUtil {
             return KeyStore.getInstance(storeType);
         } else {
             try {
-                return KeyStore.getInstance(storeType, "SunJSSE");
+                return KeyStore.getInstance(storeType, "BC");
             } catch (KeyStoreException | NoSuchProviderException ex) {
                 return KeyStore.getInstance(storeType);
             }

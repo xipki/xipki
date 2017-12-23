@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -30,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.common.util.ParamUtil;
@@ -41,6 +44,7 @@ import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.provider.P11PrivateKey;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -112,36 +116,51 @@ public class P11ContentSignerBuilder {
             final int parallelism) throws XiSecurityException, P11TokenException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
-        if (publicKey instanceof RSAPublicKey) {
-            if (!AlgorithmUtil.isRSASigAlgId(signatureAlgId)) {
-                throw new XiSecurityException(
-                        "the given algorithm is not a valid RSA signature algorithm '"
-                        + signatureAlgId.getAlgorithm().getId() + "'");
-            }
-        } else if (publicKey instanceof ECPublicKey) {
-            if (!AlgorithmUtil.isECSigAlg(signatureAlgId)) {
-                throw new XiSecurityException(
-                        "the given algorithm is not a valid EC signature algorithm '"
-                        + signatureAlgId.getAlgorithm().getId() + "'");
-            }
-        } else if (publicKey instanceof DSAPublicKey) {
-            if (!AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
-                throw new XiSecurityException(
-                        "the given algorithm is not a valid DSA signature algorithm '"
-                        + signatureAlgId.getAlgorithm().getId() + "'");
-            }
-        } else {
-            throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
-        }
-
         List<XiContentSigner> signers = new ArrayList<>(parallelism);
+
+        Boolean isSm2p256v1 = null;
         for (int i = 0; i < parallelism; i++) {
             XiContentSigner signer;
             if (publicKey instanceof RSAPublicKey) {
+                if (i == 0 && !AlgorithmUtil.isRSASigAlgId(signatureAlgId)) {
+                    throw new XiSecurityException(
+                            "the given algorithm is not a valid RSA signature algorithm '"
+                            + signatureAlgId.getAlgorithm().getId() + "'");
+                }
                 signer = createRSAContentSigner(signatureAlgId);
             } else if (publicKey instanceof ECPublicKey) {
-                signer = createECContentSigner(signatureAlgId);
+                ECPublicKey ecKey = (ECPublicKey) publicKey;
+
+                if (i == 0) {
+                    isSm2p256v1 = GMUtil.isSm2primev2Curve(ecKey.getParams().getCurve());
+                    if (isSm2p256v1) {
+                        if (!AlgorithmUtil.isSm2SigAlg(signatureAlgId)) {
+                            throw new XiSecurityException(
+                                "the given algorithm is not a valid SM2 signature algorithm '"
+                                + signatureAlgId.getAlgorithm().getId() + "'");
+                        }
+                    } else {
+                        if (!AlgorithmUtil.isECSigAlg(signatureAlgId)) {
+                            throw new XiSecurityException(
+                                "the given algorithm is not a valid EC signature algorithm '"
+                                + signatureAlgId.getAlgorithm().getId() + "'");
+                        }
+                    }
+                }
+
+                if (isSm2p256v1) {
+                    java.security.spec.ECPoint w = ecKey.getW();
+                    signer = createSM2ContentSigner(signatureAlgId, GMObjectIdentifiers.sm2p256v1,
+                            w.getAffineX(), w.getAffineY());
+                } else {
+                    signer = createECContentSigner(signatureAlgId);
+                }
             } else if (publicKey instanceof DSAPublicKey) {
+                if (i == 0 && !AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
+                    throw new XiSecurityException(
+                            "the given algorithm is not a valid DSA signature algorithm '"
+                            + signatureAlgId.getAlgorithm().getId() + "'");
+                }
                 signer = createDSAContentSigner(signatureAlgId);
             } else {
                 throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
@@ -183,6 +202,14 @@ public class P11ContentSignerBuilder {
             throws XiSecurityException, P11TokenException {
         return new P11ECDSAContentSigner(cryptService, identityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+    }
+
+    // CHECKSTYLE:SKIP
+    private XiContentSigner createSM2ContentSigner(AlgorithmIdentifier signatureAlgId,
+            ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
+            throws XiSecurityException, P11TokenException {
+        return new P11SM2ContentSigner(cryptService, identityId, signatureAlgId,
+                curveOid, pubPointX, pubPointy);
     }
 
     // CHECKSTYLE:SKIP

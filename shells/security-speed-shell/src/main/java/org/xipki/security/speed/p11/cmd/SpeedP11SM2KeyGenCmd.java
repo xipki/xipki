@@ -15,41 +15,27 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.speed.p11.cmd;
+
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.LoadExecutor;
+import org.xipki.security.speed.p11.P11SM2KeyGenLoadTest;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class SignatureAlgoControl {
+@Command(scope = "xi", name = "speed-sm2-gen-p11",
+        description = "performance test of PKCS#11 SM2 key generation")
+@Service
+// CHECKSTYLE:SKIP
+public class SpeedP11SM2KeyGenCmd extends SpeedP11CommandSupport {
 
-    private final boolean rsaMgf1;
-
-    private final boolean dsaPlain;
-
-    private final boolean gm;
-
-    public SignatureAlgoControl() {
-        this(false, false, false);
-    }
-
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain, final boolean gm) {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-        this.gm = gm;
-    }
-
-    public boolean isRsaMgf1() {
-        return rsaMgf1;
-    }
-
-    public boolean isDsaPlain() {
-        return dsaPlain;
-    }
-
-    public boolean isGm() {
-        return gm;
+    @Override
+    protected LoadExecutor getTester() throws Exception {
+        return new P11SM2KeyGenLoadTest(getSlot());
     }
 
 }

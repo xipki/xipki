@@ -38,7 +38,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.concurrent.ConcurrentBag;
@@ -52,10 +54,12 @@ import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
  * @author Lijun Liao
@@ -72,6 +76,8 @@ public class EmulatorP11Identity extends P11Identity {
 
     private final ConcurrentBag<ConcurrentBagEntry<Signature>> dsaSignatures =
             new ConcurrentBag<>();
+
+    private final ConcurrentBag<ConcurrentBagEntry<SM2Signer>> sm2Signers = new ConcurrentBag<>();
 
     private final SecureRandom random;
 
@@ -119,7 +125,9 @@ public class EmulatorP11Identity extends P11Identity {
         } else {
             String algorithm;
             if (this.publicKey instanceof ECPublicKey) {
-                algorithm = "NONEwithECDSA";
+                boolean sm2curve = GMUtil.isSm2primev2Curve(
+                        ((ECPublicKey) this.publicKey).getParams().getCurve());
+                algorithm = sm2curve ? null: "NONEwithECDSA";
             } else if (this.publicKey instanceof DSAPublicKey) {
                 algorithm = "NONEwithDSA";
             } else {
@@ -129,10 +137,18 @@ public class EmulatorP11Identity extends P11Identity {
                         + " (class: " + this.publicKey.getClass().getName() + ")");
             }
 
-            for (int i = 0; i < maxSessions; i++) {
-                Signature dsaSignature = Signature.getInstance(algorithm, "BC");
-                dsaSignature.initSign(privateKey, random);
-                dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
+            if (algorithm != null) {
+                for (int i = 0; i < maxSessions; i++) {
+                    Signature dsaSignature = Signature.getInstance(algorithm, "BC");
+                    dsaSignature.initSign(privateKey, random);
+                    dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
+                }
+            } else {
+                for (int i = 0; i < maxSessions; i++) {
+                    SM2Signer sm2signer = new SM2Signer(
+                            ECUtil.generatePrivateKeyParameter(privateKey));
+                    sm2Signers.add(new ConcurrentBagEntry<>(sm2signer));
+                }
             }
         }
     } // constructor
@@ -175,6 +191,10 @@ public class EmulatorP11Identity extends P11Identity {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA3_384);
         } else if (PKCS11Constants.CKM_ECDSA_SHA3_512 == mechanism) {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA3_512);
+        } else if (PKCS11VendorConstants.CKM_VENDOR_SM2 == mechanism) {
+            return sm2Sign(content, null);
+        } else if (PKCS11VendorConstants.CKM_VENDOR_SM2_SM3 == mechanism) {
+            return sm2Sign(content, HashAlgoType.SM3);
         } else if (PKCS11Constants.CKM_DSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
         } else if (PKCS11Constants.CKM_DSA_SHA1 == mechanism) {
@@ -372,6 +392,38 @@ public class EmulatorP11Identity extends P11Identity {
             throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
         } finally {
             dsaSignatures.requite(sig0);
+        }
+    }
+
+    private byte[] sm2Sign(final byte[] dataToSign, HashAlgoType hash) throws P11TokenException {
+        ConcurrentBagEntry<SM2Signer> sig0;
+        try {
+            sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            throw new P11TokenException(
+                    "InterruptedException occurs while retrieving idle signature");
+        }
+
+        if (sig0 == null) {
+            throw new P11TokenException("no idle SM2 Signer available");
+        }
+
+        try {
+            SM2Signer sig = sig0.value();
+
+            byte[] x962Signature;
+            if (hash == null) {
+                x962Signature = sig.generateSignatureForHash(dataToSign);
+            } else {
+                x962Signature = sig.generateSignatureForMessage(dataToSign);
+            }
+            return SignerUtil.convertX962DSASigToPlain(x962Signature, signatureKeyBitLength());
+        } catch (CryptoException ex) {
+            throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
+        } catch (XiSecurityException ex) {
+            throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
+        } finally {
+            sm2Signers.requite(sig0);
         }
     }
 

@@ -67,7 +67,6 @@ public abstract class XipkiCommandSupport implements Action {
             throws IOException {
         File saveTo = expandFilepath(file);
 
-        boolean randomSaveTo = false;
         if (saveTo.exists()) {
             try {
                 boolean bo = true;
@@ -89,7 +88,7 @@ public abstract class XipkiCommandSupport implements Action {
                     } else if ("no".equalsIgnoreCase(answer)) {
                         String newFn;
                         while (true) {
-                            newFn = readPrompt("Enter name of file to save to ... ");
+                            newFn = readPrompt("Enter new path to save to ... ");
                             if (!newFn.trim().isEmpty()) {
                                 break;
                             }
@@ -103,22 +102,35 @@ public abstract class XipkiCommandSupport implements Action {
                 } // end while
             } catch (IOException ex) {
                 saveTo = new File("tmp-" + randomHex(6));
-                randomSaveTo = true;
             }
         } // end if(saveTo.exists())
 
-        try {
-            save(saveTo, encoded);
-        } catch (IOException ex) {
-            System.out.println("ERROR: " + ex.getMessage());
-            if (!randomSaveTo) {
-                saveTo = new File("tmp-" + randomHex(6));
+        int retries = 2;
+        while(true) {
+            try {
                 save(saveTo, encoded);
+                break;
+            } catch (IOException ex) {
+                if (retries > 0) {
+                    String newFn;
+                    while (true) {
+                        newFn = readPrompt("Enter new path to save to ... ");
+                        if (!newFn.trim().isEmpty()) {
+                            break;
+                        }
+                    }
+                    saveTo = new File(newFn);
+                } else if (retries == 0) {
+                    // save it to tmp file
+                    saveTo = new File("tmp-" + randomHex(6));
+                } else {
+                    throw new IOException("could not save to file");
+                }
             }
         }
 
         String tmpPromptPrefix = promptPrefix;
-        if (tmpPromptPrefix == null || tmpPromptPrefix.isEmpty()) {
+        if (promptPrefix == null || promptPrefix.isEmpty()) {
             tmpPromptPrefix = "saved to file";
         }
 

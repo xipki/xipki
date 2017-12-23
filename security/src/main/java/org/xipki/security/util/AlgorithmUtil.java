@@ -36,6 +36,8 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
+import org.bouncycastle.asn1.gm.GMNamedCurves;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -170,7 +172,11 @@ public class AlgorithmUtil {
         map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.getId(),
                 AlgorithmCode.SHA3_512WITHRSA);
 
-        // SHA
+        // SM2
+        map.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(),
+                AlgorithmCode.SM2WITHSM3);
+
+        // Hash
         for (HashAlgoType hashAlgo : HashAlgoType.values()) {
             map.put(hashAlgo.oid().getId(), hashAlgo.algorithmCode());
         }
@@ -367,6 +373,8 @@ public class AlgorithmUtil {
                 throw new NoSuchAlgorithmException("unsupported digest algorithm "
                         + digestAlgOid.getId());
             }
+        } else if (GMObjectIdentifiers.sm2sign_with_sm3.equals(algOid)) {
+            return "SM3withSM2";
         } else {
             throw new NoSuchAlgorithmException("unsupported signature algorithm "
                     + algOid.getId());
@@ -652,6 +660,10 @@ public class AlgorithmUtil {
                     || "DSAwithSHA3-512".equalsIgnoreCase(algoS)
                     || NISTObjectIdentifiers.id_dsa_with_sha3_512.getId().equals(algoS)) {
                 algOid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
+            } else if ("SM3withSM2".equalsIgnoreCase(algoS)
+                    || "SM2withSM2".equalsIgnoreCase(algoS)
+                    || GMObjectIdentifiers.sm2sign_with_sm3.getId().equals(algoS)) {
+                algOid = GMObjectIdentifiers.sm2sign_with_sm3;
             } else {
                 throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
             }
@@ -671,13 +683,14 @@ public class AlgorithmUtil {
         } else {
             SignatureAlgoControl algoControl = signerConf.signatureAlgoControl();
             HashAlgoType hashAlgo = signerConf.hashAlgo();
-            boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
-            boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
             if (pubKey instanceof RSAPublicKey) {
+                boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
                 return getRSASigAlgId(hashAlgo, rsaMgf1);
             } else if (pubKey instanceof ECPublicKey) {
-                return getECDSASigAlgId(hashAlgo, dsaPlain);
+                boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
+                boolean gm =  (algoControl == null) ? false : algoControl.isGm();
+                return getECSigAlgId(hashAlgo, dsaPlain, gm);
             } else if (pubKey instanceof DSAPublicKey) {
                 return getDSASigAlgId(hashAlgo);
             } else {
@@ -691,13 +704,14 @@ public class AlgorithmUtil {
             final HashAlgoType hashAlgo, final SignatureAlgoControl algoControl)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-        boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
-        boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
         if (pubKey instanceof RSAPublicKey) {
+            boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
             return getRSASigAlgId(hashAlgo, rsaMgf1);
         } else if (pubKey instanceof ECPublicKey) {
-            return getECDSASigAlgId(hashAlgo, dsaPlain);
+            boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
+            boolean gm =  (algoControl == null) ? false : algoControl.isGm();
+            return getECSigAlgId(hashAlgo, dsaPlain, gm);
         } else if (pubKey instanceof DSAPublicKey) {
             return getDSASigAlgId(hashAlgo);
         } else {
@@ -768,6 +782,20 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
+    public static boolean isSm2SigAlg(final AlgorithmIdentifier algId) {
+        ParamUtil.requireNonNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if (GMObjectIdentifiers.sm2sign_with_sm3.equals(oid)) {
+            return true;
+        }
+
+        // other algorithms not supported yet.
+
+        return false;
+    }
+
+    // CHECKSTYLE:SKIP
     public static boolean isDSASigAlg(final AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
@@ -825,6 +853,8 @@ public class AlgorithmUtil {
         case SHA3_512:
             sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512;
             break;
+        case SM3:
+            throw new NoSuchAlgorithmException("unsupported hash SM3 for RSA key");
         default:
             throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
@@ -866,6 +896,8 @@ public class AlgorithmUtil {
         case SHA3_512:
             sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
             break;
+        case SM3:
+            throw new NoSuchAlgorithmException("unsupported hash SM3 for DSA key");
         default:
             throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
@@ -874,14 +906,26 @@ public class AlgorithmUtil {
     } // method getDSASigAlgId
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getECDSASigAlgId(final HashAlgoType hashAlgo,
-            final boolean plainSignature)
+    public static AlgorithmIdentifier getECSigAlgId(final HashAlgoType hashAlgo,
+            final boolean plainSignature, final boolean gm)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+        if (gm && plainSignature) {
+            throw new IllegalArgumentException("plainSignature and gm cannot be both true");
+        }
 
         ASN1ObjectIdentifier sigAlgOid;
 
-        if (plainSignature) {
+        if (gm) {
+            switch (hashAlgo) {
+            case SM3:
+                sigAlgOid = GMObjectIdentifiers.sm2sign_with_sm3;
+                break;
+            default:
+                throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo +
+                        " for SM2 EC key");
+            }
+        } else if (plainSignature) {
             switch (hashAlgo) {
             case SHA1:
                 sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA1;
@@ -898,6 +942,9 @@ public class AlgorithmUtil {
             case SHA512:
                 sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA512;
                 break;
+            case SM3:
+                throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo.getName() +
+                        "for plain signature");
             default:
                 throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
             }
@@ -930,6 +977,8 @@ public class AlgorithmUtil {
             case SHA3_512:
                 sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_512;
                 break;
+            case SM3:
+                throw new NoSuchAlgorithmException("unsupported hash SM3 for non-SM EC key");
             default:
                 throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
             }
@@ -1041,6 +1090,8 @@ public class AlgorithmUtil {
             } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.equals(algOid)) {
                 digestAlg = HashAlgoType.SHA3_384;
             } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA3_512;
+            } else if (GMObjectIdentifiers.sm2sign_with_sm3.equals(algOid)) {
                 digestAlg = HashAlgoType.SHA3_512;
             } else {
                 throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
@@ -1180,7 +1231,6 @@ public class AlgorithmUtil {
 
     public static String getCurveName(final ASN1ObjectIdentifier curveOid) {
         ParamUtil.requireNonNull("curveOid", curveOid);
-
         String curveName = X962NamedCurves.getName(curveOid);
         if (curveName == null) {
             curveName = SECNamedCurves.getName(curveOid);
@@ -1190,6 +1240,9 @@ public class AlgorithmUtil {
         }
         if (curveName == null) {
             curveName = NISTNamedCurves.getName(curveOid);
+        }
+        if (curveName == null) {
+            curveName = GMNamedCurves.getName(curveOid);
         }
 
         return curveName;

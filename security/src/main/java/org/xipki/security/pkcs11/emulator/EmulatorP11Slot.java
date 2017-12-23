@@ -54,6 +54,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -84,6 +85,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
  * @author Lijun Liao
@@ -205,7 +207,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
         PKCS11Constants.CKM_ECDSA_SHA3_224,
         PKCS11Constants.CKM_ECDSA_SHA3_256,
         PKCS11Constants.CKM_ECDSA_SHA3_384,
-        PKCS11Constants.CKM_ECDSA_SHA3_512};
+        PKCS11Constants.CKM_ECDSA_SHA3_512,
+
+        // SM2
+        PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
+        PKCS11VendorConstants.CKM_VENDOR_SM2_SM3,
+        PKCS11VendorConstants.CKM_VENDOR_SM2
+        };
 
     private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
@@ -878,6 +886,12 @@ class EmulatorP11Slot extends AbstractP11Slot {
             throw new P11TokenException(ex.getMessage(), ex);
         }
         return saveP11Entity(keypair, label);
+    }
+
+    @Override
+    protected P11Identity generateSM2Keypair0(
+            final String label, P11NewKeyControl control) throws P11TokenException {
+        return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
     }
 
     @Override

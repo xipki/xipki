@@ -49,6 +49,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.AbstractP11Slot;
+import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11MechanismFilter;
@@ -73,8 +74,8 @@ import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.ECPrivateKey;
+import iaik.pkcs.pkcs11.objects.ECPublicKey;
 import iaik.pkcs.pkcs11.objects.GenericSecretKey;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.KeyPair;
@@ -82,13 +83,18 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.RSAPublicKey;
+import iaik.pkcs.pkcs11.objects.SM2PrivateKey;
+import iaik.pkcs.pkcs11.objects.SM2PublicKey;
 import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
+import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
+import iaik.pkcs.pkcs11.parameters.Parameters;
 import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
+import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
  * @author Lijun Liao
@@ -387,7 +393,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 session.signUpdate(content, i, blockLen);
             }
 
-            int expectedSignatureLen = identity.expectedSignatureLen();
+            int expectedSignatureLen;
             if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC) {
                 expectedSignatureLen = 20;
             } else if (mechanism == PKCS11Constants.CKM_SHA224_HMAC
@@ -402,8 +408,12 @@ class IaikP11Slot extends AbstractP11Slot {
             } else if (mechanism == PKCS11Constants.CKM_SHA512_HMAC
                     || mechanism == PKCS11Constants.CKM_SHA3_512) {
                 expectedSignatureLen = 64;
+            } else if (mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2
+                    || mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2_SM3) {
+                expectedSignatureLen = 32;
+            } else {
+                expectedSignatureLen = identity.expectedSignatureLen();
             }
-
             return session.signFinal(expectedSignatureLen);
         } catch (TokenException e) {
             throw new P11TokenException(e);
@@ -451,15 +461,22 @@ class IaikP11Slot extends AbstractP11Slot {
             return ret;
         }
 
+        Parameters paramObj;
         if (parameters instanceof P11RSAPkcsPssParams) {
             P11RSAPkcsPssParams param = (P11RSAPkcsPssParams) parameters;
-            RSAPkcsPssParameters paramObj = new RSAPkcsPssParameters(
+            paramObj = new RSAPkcsPssParameters(
                     Mechanism.get(param.hashAlgorithm()), param.maskGenerationFunction(),
                     param.saltLength());
-            ret.setParameters(paramObj);
+        } else if (parameters instanceof P11ByteArrayParams) {
+            paramObj = new OpaqueParameters(((P11ByteArrayParams) parameters).getBytes());
         } else {
             throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
         }
+
+        if (paramObj != null) {
+            ret.setParameters(paramObj);
+        }
+
         return ret;
     }
 
@@ -765,8 +782,8 @@ class IaikP11Slot extends AbstractP11Slot {
             } catch (InvalidKeySpecException ex) {
                 throw new XiSecurityException(ex.getMessage(), ex);
             }
-        } else if (p11Key instanceof ECDSAPublicKey) {
-            ECDSAPublicKey ecP11Key = (ECDSAPublicKey) p11Key;
+        } else if (p11Key instanceof ECPublicKey) {
+            ECPublicKey ecP11Key = (ECPublicKey) p11Key;
             byte[] encodedAlgorithmIdParameters = ecP11Key.getEcdsaParams().getByteArrayValue();
             byte[] encodedPoint = DEROctetString.getInstance(
                     ecP11Key.getEcPoint().getByteArrayValue()).getOctets();
@@ -1067,8 +1084,8 @@ class IaikP11Slot extends AbstractP11Slot {
     @Override
     protected P11Identity generateECKeypair0(final ASN1ObjectIdentifier curveId,
             final String label, P11NewKeyControl control) throws P11TokenException {
-        ECDSAPrivateKey privateKey = new ECDSAPrivateKey();
-        ECDSAPublicKey publicKey = new ECDSAPublicKey();
+        ECPrivateKey privateKey = new ECPrivateKey();
+        ECPublicKey publicKey = new ECPublicKey();
         setKeyAttributes(label, PKCS11Constants.CKK_EC, control, publicKey, privateKey);
         byte[] encodedCurveId;
         try {
@@ -1093,6 +1110,17 @@ class IaikP11Slot extends AbstractP11Slot {
             }
             return generateKeyPair(PKCS11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
         }
+    }
+
+    @Override
+    protected P11Identity generateSM2Keypair0(
+            final String label, P11NewKeyControl control) throws P11TokenException {
+        SM2PrivateKey privateKey = new SM2PrivateKey();
+        SM2PublicKey publicKey = new SM2PublicKey();
+        setKeyAttributes(label, PKCS11VendorConstants.CKK_VENDOR_SM2,
+                control, publicKey, privateKey);
+        return generateKeyPair(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
+                privateKey, publicKey);
     }
 
     private P11Identity generateKeyPair(final long mech, final PrivateKey privateKey,

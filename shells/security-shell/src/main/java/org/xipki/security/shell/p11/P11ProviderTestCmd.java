@@ -65,6 +65,11 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
                     + "(only applied to ECDSA key)")
     private Boolean dsaPlain = Boolean.FALSE;
 
+    @Option(name = "--gm",
+            description = "whether to use the chinese GM algorithm for the POPO computation\n"
+                    + "(only applied to EC key with GM curves)")
+    private Boolean gm = Boolean.FALSE;
+
     @Override
     protected Object execute0() throws Exception {
         KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
@@ -123,7 +128,7 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
     }
 
     private String getSignatureAlgo(final PublicKey pubKey) throws NoSuchAlgorithmException {
-        SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain);
+        SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
         AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
                 HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);
         return AlgorithmUtil.getSignatureAlgoName(sigAlgId);

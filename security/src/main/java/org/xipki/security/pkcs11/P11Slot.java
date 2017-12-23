@@ -224,6 +224,21 @@ public interface P11Slot {
             throws P11TokenException;
 
     /**
+     * Generates an SM2 keypair.
+     *
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#P11 token.
+     * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
+     */
+    // CHECKSTYLE:SKIP
+    P11ObjectIdentifier generateSM2Keypair(String label, P11NewKeyControl control)
+            throws P11TokenException;
+
+    /**
      * Generates a secret key in the PKCS#11 token.
      *
      * @param keyType

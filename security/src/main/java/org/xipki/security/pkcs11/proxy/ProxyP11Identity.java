@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.xipki.security.exception.P11TokenException;
+import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
@@ -58,7 +59,11 @@ class ProxyP11Identity extends P11Identity {
         if (parameters instanceof P11RSAPkcsPssParams) {
             p11Param = new Asn1P11Params(
                     new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
+        } else if (parameters instanceof P11ByteArrayParams) {
+            byte[] bytes = ((P11ByteArrayParams) parameters).getBytes();
+            p11Param = new Asn1P11Params(new DEROctetString(bytes));
         }
+
         Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
                 content);
         byte[] result = ((ProxyP11Slot) slot).module().send(P11ProxyConstants.ACTION_SIGN,

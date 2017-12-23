@@ -18,7 +18,6 @@
 package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
@@ -28,29 +27,23 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "delete-key-p11",
-        description = "delete key and cert in PKCS#11 device")
+@Command(scope = "xi", name = "sm2-p11",
+        description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
 @Service
-public class P11IdentityDeleteCmd extends P11SecurityCommandSupport {
-
-    @Option(name = "--force", aliases = "-f",
-            description = "remove identifies without prompt")
-    private Boolean force = Boolean.FALSE;
+// CHECKSTYLE:SKIP
+public class P11Sm2KeyGenCmd extends P11KeyGenCommandSupport {
 
     @Override
     protected Object execute0() throws Exception {
         P11Slot slot = getSlot();
-        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
-        if (objIdentifier == null) {
-            println("identity to be deleted does not exist");
-            return null;
-        }
-
-        if (force || confirm("Do you want to remove the identity " + objIdentifier, 3)) {
-            slot.removeIdentity(objIdentifier);
-            println("deleted identity " + objIdentifier);
-        }
+        P11ObjectIdentifier objId = slot.generateSM2Keypair(label, getControl());
+        finalize("SM2", objId);
         return null;
+    }
+
+    @Override
+    protected boolean getDefaultExtractable() {
+        return false;
     }
 
 }

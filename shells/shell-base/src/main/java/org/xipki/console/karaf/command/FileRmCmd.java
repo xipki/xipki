@@ -50,7 +50,7 @@ public class FileRmCmd extends XipkiCommandSupport {
     private Boolean recursive = Boolean.FALSE;
 
     @Option(name = "--force", aliases = "-f",
-            description = "ignore nonexistent files, never prompt")
+            description = "remove files without prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
@@ -72,7 +72,7 @@ public class FileRmCmd extends XipkiCommandSupport {
                 println("removed directory " + targetPath);
             }
         } else {
-            if (force || confirm("Do you want o remove file " + targetPath, 3)) {
+            if (force || confirm("Do you want to remove file " + targetPath, 3)) {
                 target.delete();
                 println("removed file " + targetPath);
             }

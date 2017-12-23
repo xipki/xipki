@@ -48,6 +48,7 @@ import org.xipki.security.pkcs11.proxy.msg.Asn1EntityIdAndCert;
 import org.xipki.security.pkcs11.proxy.msg.Asn1GenDSAKeypairParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1GenECKeypairParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1GenRSAKeypairParams;
+import org.xipki.security.pkcs11.proxy.msg.Asn1GenSM2KeypairParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1GenSecretKeyParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1P11EntityIdentifier;
 import org.xipki.security.pkcs11.proxy.msg.Asn1P11ObjectIdentifier;
@@ -245,6 +246,14 @@ public class ProxyP11Slot extends AbstractP11Slot {
         Asn1GenECKeypairParams asn1 = new Asn1GenECKeypairParams(slotId, label, control,
                 curveId);
         byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC, asn1);
+        return parseGenerateKeypairResult(resp);
+    }
+
+    @Override
+    protected P11Identity generateSM2Keypair0(
+            final String label, final P11NewKeyControl control) throws P11TokenException {
+        Asn1GenSM2KeypairParams asn1 = new Asn1GenSM2KeypairParams(slotId, label, control);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2, asn1);
         return parseGenerateKeypairResult(resp);
     }
 

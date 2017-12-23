@@ -94,6 +94,8 @@ public class P11ProxyConstants {
 
     public static final short ACTION_REMOVE_OBJECTS    = 0x0144;
 
+    public static final short ACTION_GEN_KEYPAIR_SM2   = 0x0145;
+
     private static final Map<Short, String> rcMap;
 
     private static final Map<Short, String> actionMap;

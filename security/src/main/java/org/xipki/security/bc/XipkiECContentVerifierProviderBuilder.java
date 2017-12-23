@@ -17,10 +17,12 @@
 
 package org.xipki.security.bc;
 
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.ECDSASigner;
+import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
@@ -46,13 +48,23 @@ public class XipkiECContentVerifierProviderBuilder extends BcECContentVerifierPr
     protected Signer createSigner(AlgorithmIdentifier sigAlgId)
             throws OperatorCreationException {
         boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
-        if (!plainDsa) {
-            return super.createSigner(sigAlgId);
+
+        if (plainDsa) {
+            AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+            Digest dig = digestProvider.get(digAlg);
+            return new DSAPlainDigestSigner(new ECDSASigner(), dig);
         }
 
-        AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-        Digest dig = digestProvider.get(digAlg);
-        return new DSAPlainDigestSigner(new ECDSASigner(), dig);
+        boolean sm2 = AlgorithmUtil.isSm2SigAlg(sigAlgId);
+        if (sm2) {
+            AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+            if (GMObjectIdentifiers.sm3.equals(digAlg.getAlgorithm())) {
+                return new SM2Signer();
+            }
+        }
+
+        return super.createSigner(sigAlgId);
+
     }
 
 }

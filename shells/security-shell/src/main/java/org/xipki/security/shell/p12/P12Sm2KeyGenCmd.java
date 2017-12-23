@@ -15,41 +15,37 @@
  * limitations under the License.
  */
 
-package org.xipki.security.shell.p11;
+package org.xipki.security.shell.p12;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.xipki.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "delete-key-p11",
-        description = "delete key and cert in PKCS#11 device")
+@Command(scope = "xi", name = "sm2-p12",
+        description = "generate SM2 (curve sm2p256v1) keypair in PKCS#12 keystore")
 @Service
-public class P11IdentityDeleteCmd extends P11SecurityCommandSupport {
+// CHECKSTYLE:SKIP
+public class P12Sm2KeyGenCmd extends P12KeyGenCommandSupport {
 
-    @Option(name = "--force", aliases = "-f",
-            description = "remove identifies without prompt")
-    private Boolean force = Boolean.FALSE;
+    @Option(name = "--subject", aliases = "-s",
+            description = "subject of the self-signed certificate")
+    protected String subject;
 
     @Override
     protected Object execute0() throws Exception {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
-        if (objIdentifier == null) {
-            println("identity to be deleted does not exist");
-            return null;
-        }
+        P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(
+                GMObjectIdentifiers.sm2p256v1.getId(),
+                getKeyGenParameters(), subject);
+        saveKey(keypair);
 
-        if (force || confirm("Do you want to remove the identity " + objIdentifier, 3)) {
-            slot.removeIdentity(objIdentifier);
-            println("deleted identity " + objIdentifier);
-        }
         return null;
     }
 

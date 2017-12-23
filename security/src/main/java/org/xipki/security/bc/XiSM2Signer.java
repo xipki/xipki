@@ -15,41 +15,37 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.bc;
+
+import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.signers.SM2Signer;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public class SignatureAlgoControl {
+public class XiSM2Signer extends SM2Signer {
 
-    private final boolean rsaMgf1;
-
-    private final boolean dsaPlain;
-
-    private final boolean gm;
-
-    public SignatureAlgoControl() {
-        this(false, false, false);
+    public XiSM2Signer() {
+        super();
     }
 
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain, final boolean gm) {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-        this.gm = gm;
+    @Override
+    public boolean verifySignature(byte[] signature) {
+        try {
+            return super.verifySignature(signature);
+        } finally {
+            super.reset();
+        }
     }
 
-    public boolean isRsaMgf1() {
-        return rsaMgf1;
-    }
-
-    public boolean isDsaPlain() {
-        return dsaPlain;
-    }
-
-    public boolean isGm() {
-        return gm;
+    @Override
+    public byte[] generateSignature() throws CryptoException {
+        try {
+            return super.generateSignature();
+        } finally {
+            super.reset();
+        }
     }
 
 }

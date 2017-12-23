@@ -31,9 +31,11 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.digests.SM3Digest;
 import org.xipki.common.util.ParamUtil;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
  * @author Lijun Liao
@@ -50,7 +52,8 @@ public enum HashAlgoType {
     SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7", "SHA3-224", "S3-224"),
     SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8", "SHA3-256", "S3-256"),
     SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9", "SHA3-384", "S3-384"),
-    SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512", "S3-512");
+    SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512", "S3-512"),
+    SM3(32, AlgorithmCode.SM3, "1.2.156.10197.1.401", "SM3", "SM3");
 
     private static final Map<String, HashAlgoType> map = new HashMap<>();
 
@@ -83,6 +86,7 @@ public enum HashAlgoType {
         map.put("SHA3256", SHA3_256);
         map.put("SHA3384", SHA3_384);
         map.put("SHA3512", SHA3_512);
+        map.put("SM3", SM3);
     }
 
     private HashAlgoType(final int length, final AlgorithmCode algorithmCode, final String oid,
@@ -169,6 +173,10 @@ public enum HashAlgoType {
             return HashAlgoType.SHA3_384;
         } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
             return HashAlgoType.SHA3_512;
+        } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
+            return HashAlgoType.SHA3_512;
+        } else if (hashMech == PKCS11VendorConstants.CKM_VENDOR_SM3){
+            return HashAlgoType.SM3;
         } else {
             return null;
         }
@@ -194,6 +202,7 @@ public enum HashAlgoType {
         } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_512) {
             return HashAlgoType.SHA3_512;
         } else {
+            // SM3 does not apply to RSAPSS signature
             return null;
         }
     }
@@ -248,6 +257,8 @@ public enum HashAlgoType {
             return new SHA3Digest(384);
         case SHA3_512:
             return new SHA3Digest(512);
+        case SM3:
+            return new SM3Digest();
         default:
             throw new RuntimeException("should not reach here, unknown HashAlgoType " + name());
         }

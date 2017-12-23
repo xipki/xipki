@@ -52,6 +52,7 @@ import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
  * @author Lijun Liao
@@ -231,6 +232,21 @@ public abstract class AbstractP11Slot implements P11Slot {
      */
     // CHECKSTYLE:SKIP
     protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
+            String label, P11NewKeyControl control) throws P11TokenException;
+
+    /**
+     * Generates an SM2p256v1 keypair.
+     *
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     * @return the identifier of the key within the PKCS#P11 token.
+     * @throws P11TokenException
+     *         if PKCS#11 token exception occurs.
+     */
+    // CHECKSTYLE:SKIP
+    protected abstract P11Identity generateSM2Keypair0(
             String label, P11NewKeyControl control) throws P11TokenException;
 
     /**
@@ -653,6 +669,10 @@ public abstract class AbstractP11Slot implements P11Slot {
             throws P11TokenException {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateSecretKey");
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
 
         P11Identity identity = generateSecretKey0(keyType, keysize, label, control);
         addIdentity(identity);
@@ -668,6 +688,10 @@ public abstract class AbstractP11Slot implements P11Slot {
             throws P11TokenException {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("createSecretKey");
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
 
         P11Identity identity = createSecretKey0(keyType, keyValue, label, control);
         addIdentity(identity);
@@ -688,6 +712,10 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
         assertWritable("generateRSAKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
 
         BigInteger tmpPublicExponent = publicExponent;
         if (tmpPublicExponent == null) {
@@ -710,6 +738,10 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
         assertWritable("generateDSAKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
 
         DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength,
                 random);
@@ -733,6 +765,10 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonNull("g", g);
         assertWritable("generateDSAKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
 
         P11Identity identity = generateDSAKeypair0(p, q, g, label, control);
         addIdentity(identity);
@@ -749,6 +785,10 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateECKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
 
         ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (curveId == null) {
@@ -758,6 +798,24 @@ public abstract class AbstractP11Slot implements P11Slot {
         addIdentity(identity);
         P11ObjectIdentifier objId = identity.identityId().objectId();
         LOG.info("generated EC keypair {}", objId);
+        return objId;
+    }
+
+    @Override
+    public P11ObjectIdentifier generateSM2Keypair(final String label, P11NewKeyControl control)
+            throws P11TokenException {
+        ParamUtil.requireNonBlank("label", label);
+        assertWritable("generateSM2Keypair");
+
+        assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
+        if (getObjectIdForLabel(label) != null) {
+            throw new P11DuplicateEntityException("identity with label " + label +
+                    " already exists");
+        }
+        P11Identity identity = generateSM2Keypair0(label, control);
+        addIdentity(identity);
+        P11ObjectIdentifier objId = identity.identityId().objectId();
+        LOG.info("generated SM2 keypair {}", objId);
         return objId;
     }
 

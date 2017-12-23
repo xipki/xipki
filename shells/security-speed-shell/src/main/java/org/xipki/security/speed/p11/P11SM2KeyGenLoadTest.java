@@ -15,41 +15,25 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.speed.p11;
+
+import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11Slot;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
-
-public class SignatureAlgoControl {
-
-    private final boolean rsaMgf1;
-
-    private final boolean dsaPlain;
-
-    private final boolean gm;
-
-    public SignatureAlgoControl() {
-        this(false, false, false);
+// CHECKSTYLE:SKIP
+public class P11SM2KeyGenLoadTest extends P11KeyGenLoadTest {
+    public P11SM2KeyGenLoadTest(final P11Slot slot) throws Exception {
+        super(slot, "PKCS#11 SM2 key generation");
     }
 
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain, final boolean gm) {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-        this.gm = gm;
-    }
-
-    public boolean isRsaMgf1() {
-        return rsaMgf1;
-    }
-
-    public boolean isDsaPlain() {
-        return dsaPlain;
-    }
-
-    public boolean isGm() {
-        return gm;
+    @Override
+    protected void genKeypair() throws Exception {
+        P11ObjectIdentifier objId = slot.generateSM2Keypair(getDummyLabel(), getControl());
+        slot.removeIdentity(objId);
     }
 
 }

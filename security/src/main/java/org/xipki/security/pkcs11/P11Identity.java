@@ -31,6 +31,7 @@ import org.xipki.security.exception.P11UnsupportedMechanismException;
 import org.xipki.security.exception.XiSecurityException;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
  * @author Lijun Liao
@@ -112,7 +113,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
      * Signs the content.
      *
      * @param mechanism
-     *          mechanim to sign the content.
+     *          mechanism to sign the content.
      * @param parameters
      *          Parameters. Could be {@code null}.
      * @param content
@@ -195,7 +196,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
                     || PKCS11Constants.CKM_SHA3_256_HMAC == mechanism
                     || PKCS11Constants.CKM_SHA3_384_HMAC == mechanism
                     || PKCS11Constants.CKM_SHA3_512_HMAC == mechanism) {
-                return true;
+                return parameters == null;
             }
         }
 
@@ -216,7 +217,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
                     || PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
                 return parameters instanceof P11RSAPkcsPssParams;
             } else if (PKCS11Constants.CKM_RSA_X_509 == mechanism) {
-                return true;
+                return parameters == null;
             }
         } else if (publicKey instanceof DSAPublicKey) {
             if (parameters != null) {
@@ -231,16 +232,16 @@ public abstract class P11Identity implements Comparable<P11Identity> {
                 return true;
             }
         } else if (publicKey instanceof ECPublicKey) {
-            if (parameters != null) {
-                return false;
-            }
             if (PKCS11Constants.CKM_ECDSA == mechanism
                     || PKCS11Constants.CKM_ECDSA_SHA1 == mechanism
                     || PKCS11Constants.CKM_ECDSA_SHA224 == mechanism
                     || PKCS11Constants.CKM_ECDSA_SHA256 == mechanism
                     || PKCS11Constants.CKM_ECDSA_SHA384 == mechanism
-                    || PKCS11Constants.CKM_ECDSA_SHA512 == mechanism) {
-                return true;
+                    || PKCS11Constants.CKM_ECDSA_SHA512 == mechanism
+                    || PKCS11VendorConstants.CKM_VENDOR_SM2 == mechanism) {
+                return parameters == null;
+            } else if (PKCS11VendorConstants.CKM_VENDOR_SM2_SM3 == mechanism) {
+                return parameters instanceof P11ByteArrayParams;
             }
         }
 

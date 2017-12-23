@@ -15,41 +15,27 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.speed.p12.cmd;
+
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.LoadExecutor;
+import org.xipki.security.speed.p12.P12SM2SignLoadTest;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class SignatureAlgoControl {
+@Command(scope = "xi", name = "speed-sm3-sign-p12",
+        description = "performance test of PKCS#12 SM2 signature creation")
+@Service
+// CHECKSTYLE:SKIP
+public class SpeedP12SM2SignCmd extends SpeedP12SignCommandSupport {
 
-    private final boolean rsaMgf1;
-
-    private final boolean dsaPlain;
-
-    private final boolean gm;
-
-    public SignatureAlgoControl() {
-        this(false, false, false);
-    }
-
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain, final boolean gm) {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-        this.gm = gm;
-    }
-
-    public boolean isRsaMgf1() {
-        return rsaMgf1;
-    }
-
-    public boolean isDsaPlain() {
-        return dsaPlain;
-    }
-
-    public boolean isGm() {
-        return gm;
+    @Override
+    protected LoadExecutor getTester() throws Exception {
+        return new P12SM2SignLoadTest(securityFactory);
     }
 
 }
