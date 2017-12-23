@@ -209,10 +209,12 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 3.1. In case XiPKI is started as a normal application 
 
  * In case of using new keys and certificates, in OSGi console:  
-   `source file:./xipki/setup/cacert-none-setup.script`
+   `source file:./xipki/setup/cacert-none/setup-*.script`
+   where * is place holder.
 
  * In case of using existing keys and certificates, in OSGi console:  
-    `source file:./xipki/setup/cacert-present-setup.script`
+    `source file:./xipki/setup/cacert-present/setup-*.script`
+   where * is place holder.
 
  * Verify the installation, execute the OSGi command  
    `ca-info MYCA1`
@@ -220,14 +222,14 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 3.2. In case XiPKI is started as a daemon 
 
  * In case of using new keys and certificates, in shell console:
-   `bin/client "sourcefile:./xipki/setup/cacert-none-setup.script"`
+   `bin/client "sourcefile:./xipki/setup/cacert-none/setup-*.script"`
 
  * In case of using existing keys and certificates, in shell console:  
-   `bin/client "sourcefile:./xipki/setup/cacert-none-setup.script"`
+   `bin/client "sourcefile:./xipki/setup/cacert-present/setup*.script"`
 
 4. Enroll/Revoke Certificate and Get CRL via Shell (optional)
 
-- The following shell script demonstrates how to enroll and reveoke certificates, and how to get the current CRL:
+- The following shell script demonstrates how to enroll and revoke certificates, and how to get the current CRL:
   `xipki/client-script/rest.sh`
   
   Note that this script tells CA to generate real certificates. DO NOT use it in the production environment.

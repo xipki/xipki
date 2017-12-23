@@ -11,7 +11,7 @@
     <cmpcontrol name="cmpcontrol1">
       <!-- The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates -->
       <conf>
-        <value>send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA</value>
+        <value>send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</value>
        </conf>
     </cmpcontrol>
   </cmpcontrols>

@@ -1,0 +1,43 @@
+# Please adapt me
+OCSP_SUBJECT="CN=OCSP1,O=xipki,C=DE"
+
+# Please adapt me
+SCEP_SUBJECT="CN=SCEP1,O=xipki,C=DE"
+
+# Please adapt me
+HASH = SHA256
+
+KEYCERTS_DIR = xipki/setup/keycerts
+
+echo "# Generate key and certificate for SCEP"
+
+xi:rsa-p12 --key-size 2048 --password 1234 --out ${KEYCERTS_DIR}/SCEP1.p12 \
+  --subject "CN=Dummy"
+
+xi:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/SCEP1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/SCEP1.csr --subject "${SCEP_SUBJECT}"
+
+ca:enroll-cert --ca MYCA1 --csr ${KEYCERTS_DIR}/SCEP1.csr \
+  --out ${KEYCERTS_DIR}/SCEP1.der --profile SCEP
+
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/SCEP1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/SCEP1.der --ca-cert ${KEYCERTS_DIR}/MYCA1.der
+
+echo "# add SCEP"
+ca:scep-add --name SCEP1 --ca MYCA1 --profile ALL --resp-type PKCS12 \
+  --resp-conf password=1234,keystore=file:${KEYCERTS_DIR}/SCEP1.p12 \
+  --control caCert.included=false,signerCert.included=true,support.getcrl=true
+
+echo "# Generate key and certificate for OCSPResponder"
+
+xi:rsa-p12 --key-size 2048 --password 1234 --out ${KEYCERTS_DIR}/OCSP1.p12 \
+  --subject "CN=Dummy"
+
+xi:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/OCSP1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/OCSP1.csr --subject "${OCSP_SUBJECT}"
+
+ca:enroll-cert --ca MYCA1 --csr ${KEYCERTS_DIR}/OCSP1.csr \
+  --out ${KEYCERTS_DIR}/OCSP1.der --profile OCSP
+
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/OCSP1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/OCSP1.der --ca-cert ${KEYCERTS_DIR}/MYCA1.der

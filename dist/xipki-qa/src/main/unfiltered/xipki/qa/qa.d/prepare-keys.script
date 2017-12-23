@@ -4,6 +4,7 @@ xi:mkdir output
 
 echo "========================================================"
 echo "HASH:       $HASH"
+echo "STDHASH:    $STDHASH"
 echo "TOKEN_TYPE: $TOKEN_TYPE"
 echo "SIG_TYPE:   $SIG_TYPE"
 echo "KEYSPEC:    $KEYSPEC"
@@ -36,12 +37,18 @@ if { $SIG_TYPE equals "DSA" } {
   SIGALGO = "${HASH}withDSA"
 }
 
-if { $SIG_TYPE equals "RSAPSS" } {
-  CMP_SIGALGO = "${HASH}withRSAandMGF1"
-} {
-  CMP_SIGALGO = "${HASH}withRSA"
+if { $SIG_TYPE equals "SM2" } {
+  KEY_TYPE = "SM2"
+  SIGALGO = "${HASH}withSM2"
 }
 
+if { $SIG_TYPE equals "RSAPSS" } {
+  CMP_SIGALGO = "${STDHASH}withRSAandMGF1"
+} {
+  CMP_SIGALGO = "${STDHASH}withRSA"
+}
+
+echo ">>>>> ${CMP_SIGALGO} <<<<<"
 xi:copy-dir xipki/qa/p12/shared output
 
 xi:copy-dir xipki/qa/p12/$KEY_TYPE output
@@ -69,13 +76,13 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=OCSP99"
 
-  xi:delete-key-p11 --slot $SLOT --label RCA1
+  xi:delete-key-p11 --force --slot $SLOT --label RCA1
 
-  xi:delete-key-p11 --slot $SLOT --label SubCA1
+  xi:delete-key-p11 --force --slot $SLOT --label SubCA1
 
-  xi:delete-key-p11 --slot $SLOT --label SubCAwithCRL1
+  xi:delete-key-p11 --force --slot $SLOT --label SubCAwithCRL1
 
-  xi:delete-key-p11 --slot $SLOT --label OCSP99
+  xi:delete-key-p11 --force --slot $SLOT --label OCSP99
 
   if { $KEY_TYPE equals "RSA" } {
     xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label RCA1
@@ -107,6 +114,16 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
     xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label OCSP99
 
+  }
+
+  if { $KEY_TYPE equals "SM2" } {
+    xi:sm2-p11 --slot $SLOT --label RCA1
+
+    xi:sm2-p11 --slot $SLOT --label SubCA1
+
+    xi:sm2-p11 --slot $SLOT --label SubCAwithCRL1
+
+    xi:sm2-p11 --slot $SLOT --label OCSP99
   }
 
 }
@@ -144,6 +161,16 @@ if { $TOKEN_TYPE equals "PKCS12" } {
     xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/SubCAwithCRL1.p12
 
     xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/OCSP99.p12
+  }
+
+  if { $KEY_TYPE equals "SM2" } {
+    xi:sm2-p12 --password 1234 --out output/RCA1.p12
+
+    xi:sm2-p12 --password 1234 --out output/SubCA1.p12
+
+    xi:sm2-p12 --password 1234 --out output/SubCAwithCRL1.p12
+
+    xi:sm2-p12 --password 1234 --out output/OCSP99.p12
   }
 
 }

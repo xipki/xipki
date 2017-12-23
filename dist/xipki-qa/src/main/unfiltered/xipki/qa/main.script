@@ -1,3 +1,11 @@
+echo '+++++source xipki/qa/lifecycle.script    SM3 PKCS11 SM2+++++'
+           source xipki/qa/lifecycle.script    SM3 PKCS11 SM2
+
+echo '+++++source xipki/qa/lifecycle.script    SM3 PKCS12 SM2+++++'
+           source xipki/qa/lifecycle.script    SM3 PKCS12 SM2
+
+sleep 2
+
 echo '+++++source xipki/qa/lifecycle.script    SHA256 PKCS11 RSA 2048+++++'
            source xipki/qa/lifecycle.script    SHA256 PKCS11 RSA 2048
 

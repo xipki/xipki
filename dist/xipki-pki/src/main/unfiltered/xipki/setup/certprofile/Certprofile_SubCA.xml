@@ -40,6 +40,7 @@
     <algorithm>SHA384withRSAandMGF1</algorithm>
     <algorithm>SHA256withRSAandMGF1</algorithm>
     <algorithm>SHA1withRSAandMGF1</algorithm>
+    <algorithm>SM3withSM2</algorithm>
   </signatureAlgorithms>
   <certLevel>SubCA</certLevel>
   <validity>8y</validity>

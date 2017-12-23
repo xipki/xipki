@@ -32,10 +32,10 @@ echo "#                       Prepare environment                    #"
 echo "#################################################################"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
-# The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates
+# The popo.algo ${STDHASH}withRSA is for the enrollment of SCEP responder certificates
 ca:cmpcontrol-add \
   --name cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${HASH}withRSA:${HASH}withECDSA:${HASH}withDSA
+  --conf send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA
 
 ## Certificate Profiles
 ca:profile-add \
@@ -153,7 +153,7 @@ ca:profile-add \
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:req-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label RCA1 \
     --out output/RCA1.csr \
@@ -161,7 +161,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 } {
   xi:req-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/RCA1.p12 \
     --password 1234 \
     --out output/RCA1.csr \
@@ -253,14 +253,14 @@ ca:careq-add \
 ## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:req-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCA1 \
     --out output/SubCA1.csr \
     --subject "CN=SubCA1,O=xipki,C=DE"
 } {
   xi:req-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/SubCA1.p12 \
     --password 1234 \
     --out output/SubCA1.csr \
@@ -289,7 +289,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 ## Generate keys and CSR for SubCAwithCRL1
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:req-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
@@ -304,7 +304,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 } {
   xi:req-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/SubCAwithCRL1.p12 \
     --password 1234 \
     --out output/SubCAwithCRL1.csr \
@@ -342,14 +342,14 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:req-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label OCSP99 \
     --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 } {
   xi:req-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/OCSP99.p12 \
     --password 1234 \
     --out output/OCSP99.csr \

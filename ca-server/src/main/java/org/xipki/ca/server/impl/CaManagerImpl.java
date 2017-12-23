@@ -3026,8 +3026,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         try {
+            char[] password = securityFactory.getPasswordResolver().resolvePassword(passwordHint);
             ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
-                    securityFactory.getPasswordResolver().resolvePassword(passwordHint), certChain);
+                    password, certChain);
         } catch (KeyStoreException ex) {
             throw new CaMgmtException("KeyStoreException: " + ex.getMessage(), ex);
         } catch (PasswordResolverException ex) {

@@ -44,6 +44,7 @@
     <algorithm>SHA384withPlainECDSA</algorithm>
     <algorithm>SHA256withPlainECDSA</algorithm>
     <algorithm>SHA1withPlainECDSA</algorithm>
+    <algorithm>SM3withSM2</algorithm>
   </signatureAlgorithms>
   <certLevel>RootCA</certLevel>
   <validity>10y</validity>

@@ -187,6 +187,13 @@ Feature xipki-security-shell (not started by default)
 
      generate EC keypair in PKCS#12 keystore
 
+   * `xi:sm2-p11`
+
+     generate SM2 keypair in PKCS#11 device
+
+   * `xi:sm2-p12`
+
+     generate SM2 keypair in PKCS#12 keystore
    * `xi:delete-key-p11`
 
      delete key and cert in PKCS#11 device
@@ -261,6 +268,22 @@ Feature xipki-security-shell (not started by default)
    * `xi:speed-ec-sign-p12`
 
      performance test of PKCS#12 EC signature creation
+
+   * `xi:speed-sm2-gen-p11`
+
+     performance test of PKCS#11 SM2 key generation
+
+   * `xi:speed-sm2-gen-p12`
+
+     performance test of PKCS#12 SM2 key generation
+
+   * `xi:speed-sm2-sign-p11`
+
+     performance test of PKCS#11 SM2 signature creation
+
+   * `xi:speed-sm2-sign-p12`
+
+     performance test of PKCS#12 SM2 signature creation
 
    * `xi:speed-rsa-gen-p11`
 

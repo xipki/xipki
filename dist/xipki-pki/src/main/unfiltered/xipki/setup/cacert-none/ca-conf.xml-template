@@ -3,25 +3,13 @@
   <properties>
     <property name="profiles.dir">xipki/setup/certprofile</property>
     <property name="security.dir">xipki/security</property>
-     <!-- Valid algo within ca.signerConf
-       - For RSA key: SHA*withRSA and SHA*withRSAandMGF1,
-       - For EC key: SHA*withECDSA,
-       - For DSA key: SHA*withDSA
-       
-       Where * is 1, 224, 256, 384, 512 and 3-224, 3-256, 3-384 and 3-512 -->
-    <!-- PKCS#12 CA key -->
-    <property name="token.type">PKCS12</property>
-    <property name="ca.signerConf">algo=SHA256withRSA,password=1234,keystore=file:xipki/setup/keycerts/MYCA1.p12</property>
-    <!-- PKCS#11 CA key -->
-    <!--
-    <property name="token.type">PKCS11</property>
-    <property name="ca.signerConf">algo=SHA256withRSA,slot=0,key-label=RCA1</property>
-    -->
+    <property name="token.type">REPLACEME_TOKEN_TYPE</property>
+    <property name="ca.signerConf">REPLACEME_CA_SIGNERCONF</property>
   </properties>
   <cmpcontrols>
     <cmpcontrol name="cmpcontrol1">
       <conf>
-        <value>send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withRSA:SHA256withECDSA:SHA256withDSA</value>
+        <value>send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</value>
        </conf>
     </cmpcontrol>
   </cmpcontrols>

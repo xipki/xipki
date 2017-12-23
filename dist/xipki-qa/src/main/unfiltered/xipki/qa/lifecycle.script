@@ -22,18 +22,24 @@ if { "$1" equals "" } {
       KEYSPEC =$4
     }
 
-   list = [PKCS11 PKCS12]; each ($list) {
-     if { "$TOKEN_TYPE" equals $it } {
-       argsValid = "true"
-     }
-   }
+    if { "$HASH" equals "SM3" } {
+      STDHASH = SHA256
+    } {
+      STDHASH = "$HASH"
+    }
+
+    list = [PKCS11 PKCS12]; each ($list) {
+      if { "$TOKEN_TYPE" equals $it } {
+        argsValid = "true"
+      }
+    }
 
     if { "$argsValid" equals "false" } {
       errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
     } {
       argsValid = "false"
 
-      list = [RSA RSAPSS EC PLAINEC DSA]; each ($list) {
+      list = [RSA RSAPSS EC PLAINEC DSA SM2]; each ($list) {
         if { "$SIG_TYPE" equals $it } {
           argsValid = "true"
         }
@@ -56,9 +62,22 @@ if { "$1" equals "" } {
           errMsg = "invalid combination $HASH and $SIG_TYPE"
         }
       } {
-        list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
-          if { "$HASH" equals $it } {
-            argsValid = "true"
+        if { "$SIG_TYPE" equals "SM2" } {
+          list = [SM3]; each ($list) {
+            if { "$HASH" equals $it } {
+              argsValid = "true"
+            }
+          }
+
+          if { "$argsValid" equals "false" } {
+            errMsg = "invalid combination $HASH and $SIG_TYPE"
+          }
+
+        } {
+          list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
+            if { "$HASH" equals $it } {
+              argsValid = "true"
+            }
           }
         }
       }
@@ -78,15 +97,17 @@ if { $argsValid equals "false" } {
   echo ""
   printUsage = "true"
 }
+
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/qa/lifecycle.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
+  echo "                     SM3 (only for signature type SM2)"
   echo "                     The SHA3 algorithms are not for PLAINEC."
   echo "    token type:      PKCS11, PKCS12"
-  echo "    signature type:  RSA, RSAPSS, EC, PLAINEC, DSA"
+  echo "    signature type:  RSA, RSAPSS, EC, PLAINEC, DSA, SM2"
   echo "    keyspec:         keysize for signature types RSA, RSAPSS and DSA,"
   echo "                     curve name for signature types EC and PLAINEC"
   echo "options"
@@ -162,6 +183,23 @@ if { $printUsage equals "true" } {
     xipki/qa/qa.d/ca.script
 
   xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/qa.d/ra.script
+
+  gm = ""
+
+  if { "$SIG_TYPE" equals "SM2" } {
+    gm = "--gm"
+  }
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" xipki/qa/rest.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
+    xipki/qa/qa.d/ca-load.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
+    xipki/qa/qa.d/ca.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
     xipki/qa/qa.d/ra.script
 
   if { "$1" equals "-l" } {

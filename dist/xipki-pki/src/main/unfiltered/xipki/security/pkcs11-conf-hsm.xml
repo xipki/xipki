@@ -109,6 +109,10 @@
           <mechanism>CKM_ECDSA_SHA3_256</mechanism>
           <mechanism>CKM_ECDSA_SHA3_384</mechanism>
           <mechanism>CKM_ECDSA_SHA3_512</mechanism>
+          
+          <mechanism>CKM_VENDOR_SM2</mechanism>
+          <mechanism>CKM_VENDOR_SM2_SM3</mechanism>
+          <mechanism>CKM_VENDOR_SM2_KEY_PAIR_GEN</mechanism>          
         </mechanisms>
       </mechanismSets>
     </module>
@@ -181,6 +185,10 @@
           <mechanism>CKM_ECDSA_SHA3_256</mechanism>
           <mechanism>CKM_ECDSA_SHA3_384</mechanism>
           <mechanism>CKM_ECDSA_SHA3_512</mechanism>
+
+          <mechanism>CKM_VENDOR_SM2</mechanism>
+          <mechanism>CKM_VENDOR_SM2_SM3</mechanism>
+          <mechanism>CKM_VENDOR_SM2_KEY_PAIR_GEN</mechanism>          
         </mechanisms>
       </mechanismSets>
     </module-->

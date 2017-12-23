@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,6 +64,10 @@ import org.xipki.security.util.X509Util;
  */
 
 public class DbCertStatusStore extends OcspStore {
+
+    private static final Set<HashAlgoType> certHashAlgos = new HashSet<>(
+            Arrays.asList(HashAlgoType.SHA1, HashAlgoType.SHA224,
+                    HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512));
 
     private static class SimpleIssuerEntry {
 
@@ -269,6 +274,9 @@ public class DbCertStatusStore extends OcspStore {
             HashAlgoType certHashAlgo = null;
             if (includeCertHash) {
                 certHashAlgo = (certHashAlg == null) ? reqIssuer.hashAlgorithm() : certHashAlg;
+                if (!certHashAlgos.contains(certHashAlgo)) {
+                    certHashAlgo = HashAlgoType.SHA256;
+                }
                 sql = (includeRit ? sqlCsMap : sqlCsNoRitMap).get(certHashAlgo);
             } else {
                 sql = includeRit ? sqlCs : sqlCsNoRit;

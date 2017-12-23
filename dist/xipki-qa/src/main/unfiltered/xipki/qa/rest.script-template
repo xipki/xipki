@@ -6,7 +6,7 @@ echo "#################################################################"
 
 CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)
 
-xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
+xi:req-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/REST-TLS1.p12 --password 1234 \
   --subject "CN=REST-TLS1.example.org,O=xipki,C=DE" \
   --out output/rest/REST-TLS1.csr

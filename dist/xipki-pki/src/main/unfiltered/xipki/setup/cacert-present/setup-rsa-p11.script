@@ -1,0 +1,48 @@
+# Please adapt me
+HASH = SHA256
+
+# Signature type: RSA or RSAandMGF1
+SIGTYPE=RSA
+
+P11_LABEL = MYCA1-RSA
+
+echo "#################################################################"
+echo "#                      Initialize the database                  #"
+echo "#################################################################"
+
+feature:install -r xipki-database-tool
+
+ca:initdb-pki --force
+
+feature:uninstall xipki-database-tool
+
+ca:restart
+
+echo "#################################################################"
+echo "#                          Load ca-conf.xml                     #"
+echo "#################################################################"
+
+xi:copy-file -f xipki/setup/cacert-none/ca-conf.xml-template \
+  xipki/setup/cacert-present/ca-conf.xml
+
+xi:replace --old "REPLACEME_TOKEN_TYPE" --new "PKCS11" \
+  xipki/setup/cacert-present/ca-conf.xml
+
+xi:replace --old "REPLACEME_CA_SIGNERCONF" \
+  --new "algo=${HASH}with${SIGTYPE},slot=0,key-label=${P11_LABEL}" \
+  xipki/setup/cacert-present/ca-conf.xml
+
+ca:load-conf --conf-file xipki/setup/cacert-present/ca-conf.xml
+
+echo "# add user"
+ca:user-add --name user1 --password password1
+  
+ca:causer-add --user user1 --ca MYCA1 --profile ALL --permission ALL
+
+echo "create initial CRL"
+ca:gencrl --ca MYCA1
+
+echo "# Restart OCSP server"
+feature:uninstall xipki-ocspserver
+
+feature:install xipki-ocspserver

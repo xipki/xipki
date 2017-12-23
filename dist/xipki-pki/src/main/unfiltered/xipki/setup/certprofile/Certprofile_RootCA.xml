@@ -40,6 +40,7 @@
     <algorithm>SHA384withRSAandMGF1</algorithm>
     <algorithm>SHA256withRSAandMGF1</algorithm>
     <algorithm>SHA1withRSAandMGF1</algorithm>
+    <algorithm>SM3withSM2</algorithm>
   </signatureAlgorithms>
   <certLevel>RootCA</certLevel>
   <validity>10y</validity>
