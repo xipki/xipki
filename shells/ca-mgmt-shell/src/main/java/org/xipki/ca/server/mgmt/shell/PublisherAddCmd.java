@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "publisher-add",
         description = "add publisher")
 @Service
-public class PublisherAddCmd extends CaCommandSupport {
+public class PublisherAddCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

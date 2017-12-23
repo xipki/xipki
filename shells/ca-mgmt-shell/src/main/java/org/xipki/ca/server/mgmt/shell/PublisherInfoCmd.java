@@ -38,7 +38,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "publisher-info",
         description = "show information of publisher")
 @Service
-public class PublisherInfoCmd extends CaCommandSupport {
+public class PublisherInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "publisher name")
     @Completion(PublisherNameCompleter.class)

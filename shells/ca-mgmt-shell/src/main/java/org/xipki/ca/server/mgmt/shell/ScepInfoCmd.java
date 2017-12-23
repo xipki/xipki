@@ -34,7 +34,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "scep-info",
         description = "show information of SCEP")
 @Service
-public class ScepInfoCmd extends CaCommandSupport {
+public class ScepInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "SCEP name")
     @Completion(ScepNameCompleter.class)

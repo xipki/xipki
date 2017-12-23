@@ -28,7 +28,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "ca", name = "unrevoke-cert",
         description = "unrevoke certificate")
 @Service
-public class UnrevokeCertCmd extends UnRevRmCertCommandSupport {
+public class UnrevokeCertCmd extends UnRevRmCertAction {
 
     @Override
     protected Object execute0() throws Exception {

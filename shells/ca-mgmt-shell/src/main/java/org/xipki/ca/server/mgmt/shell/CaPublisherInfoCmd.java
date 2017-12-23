@@ -35,7 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "capub-info",
         description = "show information of publisher in given CA")
 @Service
-public class CaPublisherInfoCmd extends CaCommandSupport {
+public class CaPublisherInfoCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -39,7 +39,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
+public abstract class UnRevRmCertAction extends CaAction {
 
     @Option(name = "--ca",
             required = true,

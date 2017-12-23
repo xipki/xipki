@@ -30,7 +30,7 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 @Command(scope = "ca", name = "cmpcontrol-add",
         description = "add CMP control")
 @Service
-public class CmpControlAddCmd extends CaCommandSupport {
+public class CmpControlAddCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

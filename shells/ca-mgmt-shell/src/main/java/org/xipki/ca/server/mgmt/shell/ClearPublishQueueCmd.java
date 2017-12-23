@@ -34,7 +34,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 @Command(scope = "ca", name = "clear-publishqueue",
         description = "clear publish queue")
 @Service
-public class ClearPublishQueueCmd extends CaCommandSupport {
+public class ClearPublishQueueCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

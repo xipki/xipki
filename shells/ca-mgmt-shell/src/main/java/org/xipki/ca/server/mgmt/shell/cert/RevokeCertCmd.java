@@ -36,7 +36,7 @@ import org.xipki.security.CrlReason;
 @Command(scope = "ca", name = "revoke-cert",
         description = "revoke certificate")
 @Service
-public class RevokeCertCmd extends UnRevRmCertCommandSupport {
+public class RevokeCertCmd extends UnRevRmCertAction {
 
     @Option(name = "--reason", aliases = "-r",
             required = true,

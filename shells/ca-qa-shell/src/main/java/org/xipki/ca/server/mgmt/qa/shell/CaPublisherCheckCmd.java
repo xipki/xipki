@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
@@ -37,7 +37,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "caqa", name = "capub-check",
         description = "check information of publishers in given CA (QA)")
 @Service
-public class CaPublisherCheckCmd extends CaCommandSupport {
+public class CaPublisherCheckCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

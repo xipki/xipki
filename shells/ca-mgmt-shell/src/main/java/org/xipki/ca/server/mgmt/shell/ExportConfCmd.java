@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "export-conf",
         description = "export configuration to zip file")
 @Service
-public class ExportConfCmd extends CaCommandSupport {
+public class ExportConfCmd extends CaAction {
 
     @Option(name = "--conf-file",
             required = true,

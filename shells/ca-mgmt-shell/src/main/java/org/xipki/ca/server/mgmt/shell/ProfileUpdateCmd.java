@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "profile-up",
         description = "update certificate profile")
 @Service
-public class ProfileUpdateCmd extends CaCommandSupport {
+public class ProfileUpdateCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

@@ -35,7 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "env-info",
         description = "show information of CA environment parameter")
 @Service
-public class EnvInfoCmd extends CaCommandSupport {
+public class EnvInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "environment parameter name")
     private String name;

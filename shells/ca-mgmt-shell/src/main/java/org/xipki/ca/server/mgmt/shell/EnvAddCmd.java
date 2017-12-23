@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "ca", name = "env-add",
         description = "add CA environment parameter")
 @Service
-public class EnvAddCmd extends CaCommandSupport {
+public class EnvAddCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

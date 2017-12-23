@@ -34,7 +34,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 @Command(scope = "ca", name = "republish",
         description = "republish certificates")
 @Service
-public class RepublishCmd extends CaCommandSupport {
+public class RepublishCmd extends CaAction {
 
     @Option(name = "--thread",
             description = "number of threads")

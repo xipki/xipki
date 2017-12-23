@@ -35,7 +35,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "cert-status",
         description = "show certificate status and save the certificate")
 @Service
-public class CertStatusCmd extends UnRevRmCertCommandSupport {
+public class CertStatusCmd extends UnRevRmCertAction {
 
     @Option(name = "--out", aliases = "-o",
             description = "where to save the certificate")

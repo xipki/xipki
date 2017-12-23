@@ -29,7 +29,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "unlock",
         description = "unlock CA system")
 @Service
-public class CaSystemUnlockCmd extends CaCommandSupport {
+public class CaSystemUnlockCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {

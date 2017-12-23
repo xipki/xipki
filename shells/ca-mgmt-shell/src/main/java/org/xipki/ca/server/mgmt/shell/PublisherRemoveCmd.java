@@ -31,7 +31,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Command(scope = "ca", name = "publisher-rm",
         description = "remove publisher")
 @Service
-public class PublisherRemoveCmd extends CaCommandSupport {
+public class PublisherRemoveCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "publisher name", required = true)
     @Completion(PublisherNameCompleter.class)

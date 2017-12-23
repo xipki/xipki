@@ -31,7 +31,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "ca", name = "caprofile-rm",
         description = "remove certificate profile from CA")
 @Service
-public class CaProfileRemoveCmd extends CaCommandSupport {
+public class CaProfileRemoveCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

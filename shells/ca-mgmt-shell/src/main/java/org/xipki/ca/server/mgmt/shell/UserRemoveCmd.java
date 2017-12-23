@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "ca", name = "user-rm",
         description = "remove user")
 @Service
-public class UserRemoveCmd extends CaCommandSupport {
+public class UserRemoveCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

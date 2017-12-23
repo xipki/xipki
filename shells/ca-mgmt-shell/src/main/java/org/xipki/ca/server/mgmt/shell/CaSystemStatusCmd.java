@@ -30,7 +30,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "system-status",
         description = "show CA system status")
 @Service
-public class CaSystemStatusCmd extends CaCommandSupport {
+public class CaSystemStatusCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {

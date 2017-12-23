@@ -31,7 +31,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
 @Command(scope = "ca", name = "updatedb-ca",
         description = "update the CA database schema")
 @Service
-public class UpdateDbCaCmd extends LiquibaseCommandSupport {
+public class UpdateDbCaCmd extends LiquibaseAction {
 
     private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
 

@@ -33,7 +33,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.dbtool.shell.completer.LogLevelCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
@@ -48,7 +48,7 @@ import org.xipki.password.PasswordResolverException;
 @Command(scope = "ca", name = "initdb",
         description = "reset and initialize single database")
 @Service
-public class InitDbCmd extends XipkiCommandSupport {
+public class InitDbCmd extends XiAction {
 
     private static final List<String> YES_NO = Arrays.asList("yes", "no");
 

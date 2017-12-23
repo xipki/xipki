@@ -40,7 +40,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "diff-digest-db",
         description = "diff digest XiPKI/EJBCA database")
 @Service
-public class DiffDigestDbCmd extends DbPortCommandSupport {
+public class DiffDigestDbCmd extends DbPortAction {
 
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"

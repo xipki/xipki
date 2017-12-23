@@ -32,7 +32,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 @Command(scope = "ca", name = "caprofile-add",
         description = "add certificate profile to CA")
 @Service
-public class CaProfileAddCmd extends CaCommandSupport {
+public class CaProfileAddCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

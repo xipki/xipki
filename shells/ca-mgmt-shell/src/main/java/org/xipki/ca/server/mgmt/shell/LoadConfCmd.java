@@ -32,7 +32,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "load-conf",
         description = "load configuration")
 @Service
-public class LoadConfCmd extends CaCommandSupport {
+public class LoadConfCmd extends CaAction {
 
     @Option(name = "--conf-file",
             description = "CA system configuration file (XML or zip file")

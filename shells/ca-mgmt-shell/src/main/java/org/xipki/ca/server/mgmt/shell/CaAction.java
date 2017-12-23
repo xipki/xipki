@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
 
 /**
@@ -32,7 +32,7 @@ import org.xipki.security.SecurityFactory;
  * @since 2.0.0
  */
 
-public abstract class CaCommandSupport extends XipkiCommandSupport {
+public abstract class CaAction extends XiAction {
 
     @Reference
     protected CaManager caManager;

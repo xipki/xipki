@@ -35,7 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "careq-info",
         description = "show information of requestor in CA")
 @Service
-public class CaRequestorInfoCmd extends CaCommandSupport {
+public class CaRequestorInfoCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

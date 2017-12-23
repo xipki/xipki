@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.x509.CertWithStatusInfo;
-import org.xipki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
@@ -37,7 +37,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "get-cert",
         description = "get certificate")
 @Service
-public class GetCertCmd extends CaCommandSupport {
+public class GetCertCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

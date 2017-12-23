@@ -40,7 +40,7 @@ import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -51,7 +51,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "caqa", name = "check-cert",
         description = "check the certificate")
 @Service
-public class CheckCertCmd extends XipkiCommandSupport {
+public class CheckCertCmd extends XiAction {
 
     @Option(name = "--cert", aliases = "-c",
             required = true,

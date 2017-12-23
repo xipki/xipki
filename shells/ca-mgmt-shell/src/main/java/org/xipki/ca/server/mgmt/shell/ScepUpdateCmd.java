@@ -49,7 +49,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "ca", name = "scep-up",
         description = "Update SCEP")
 @Service
-public class ScepUpdateCmd extends CaCommandSupport {
+public class ScepUpdateCmd extends CaAction {
 
     @Option(name = "--name",
             required = true,

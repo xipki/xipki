@@ -31,7 +31,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 @Command(scope = "ca", name = "responder-rm",
         description = "remove responder")
 @Service
-public class ResponderRemoveCmd extends CaCommandSupport {
+public class ResponderRemoveCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "responder name", required = true)
     @Completion(ResponderNameCompleter.class)

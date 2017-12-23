@@ -43,7 +43,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "ca", name = "responder-up",
         description = "update responder")
 @Service
-public class ResponderUpdateCmd extends CaCommandSupport {
+public class ResponderUpdateCmd extends CaAction {
 
     @Reference
     protected PasswordResolver passwordResolver;

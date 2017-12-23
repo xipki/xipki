@@ -33,7 +33,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "get-request",
         description = "get certificate request")
 @Service
-public class GetRequestCmd extends UnRevRmCertCommandSupport {
+public class GetRequestCmd extends UnRevRmCertAction {
 
     @Option(name = "--out", aliases = "-o",
             required = true,

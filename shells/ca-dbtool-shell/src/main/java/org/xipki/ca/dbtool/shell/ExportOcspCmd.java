@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "export-ocsp",
         description = "export OCSP database")
 @Service
-public class ExportOcspCmd extends DbPortCommandSupport {
+public class ExportOcspCmd extends DbPortAction {
 
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 

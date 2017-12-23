@@ -34,7 +34,7 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Command(scope = "ca", name = "capub-add",
         description = "add publisher to CA")
 @Service
-public class CaPublisherAddCmd extends CaCommandSupport {
+public class CaPublisherAddCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

@@ -32,7 +32,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Command(scope = "ca", name = "user-up",
         description = "update user")
 @Service
-public class UserUpdateCmd extends CaCommandSupport {
+public class UserUpdateCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

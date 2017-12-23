@@ -39,7 +39,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "requestor-info",
         description = "show information of requestor")
 @Service
-public class RequestorInfoCmd extends CaCommandSupport {
+public class RequestorInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "requestor name")
     @Completion(RequestorNameCompleter.class)

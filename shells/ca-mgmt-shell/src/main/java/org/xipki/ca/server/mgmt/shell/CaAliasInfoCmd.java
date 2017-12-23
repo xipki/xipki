@@ -37,7 +37,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "caalias-info",
         description = "show information of CA alias")
 @Service
-public class CaAliasInfoCmd extends CaCommandSupport {
+public class CaAliasInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "alias", description = "CA alias")
     @Completion(CaAliasCompleter.class)

@@ -39,7 +39,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "crlsigner-info",
         description = "show information of CRL signer")
 @Service
-public class CrlSignerInfoCmd extends CaCommandSupport {
+public class CrlSignerInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "CRL signer name")
     @Completion(CrlSignerNameCompleter.class)

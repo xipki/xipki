@@ -37,7 +37,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "ca-info",
         description = "show information of CA")
 @Service
-public class CaInfoCmd extends CaCommandSupport {
+public class CaInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "CA name")
     @Completion(CaNameCompleter.class)

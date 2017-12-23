@@ -42,7 +42,7 @@ import org.xipki.security.CrlReason;
 @Command(scope = "ca", name = "ca-revoke",
         description = "revoke CA")
 @Service
-public class CaRevokeCmd extends CaCommandSupport {
+public class CaRevokeCmd extends CaAction {
 
     public static final List<CrlReason> PERMITTED_REASONS = Collections.unmodifiableList(
             Arrays.asList(new CrlReason[] {

@@ -34,7 +34,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "user-info",
         description = "show information of user")
 @Service
-public class UserInfoCmd extends CaCommandSupport {
+public class UserInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", required = true, description = "user name")
     private String name;

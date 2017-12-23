@@ -38,7 +38,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "cmpcontrol-info",
         description = "show information of CMP control")
 @Service
-public class CmpControlInfoCmd extends CaCommandSupport {
+public class CmpControlInfoCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "CMP control name")
     @Completion(CmpControlNameCompleter.class)

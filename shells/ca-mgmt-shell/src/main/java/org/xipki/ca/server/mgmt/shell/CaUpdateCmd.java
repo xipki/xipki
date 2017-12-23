@@ -58,7 +58,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "ca", name = "ca-up",
         description = "update CA")
 @Service
-public class CaUpdateCmd extends CaCommandSupport {
+public class CaUpdateCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

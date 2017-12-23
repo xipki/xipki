@@ -47,7 +47,7 @@ import org.xipki.password.PasswordResolver;
  * @since 2.0.0
  */
 
-public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
+public abstract class CaAddOrGenAction extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

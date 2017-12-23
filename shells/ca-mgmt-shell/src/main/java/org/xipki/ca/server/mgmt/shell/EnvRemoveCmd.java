@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "ca", name = "env-rm",
         description = "remove CA environment parameter")
 @Service
-public class EnvRemoveCmd extends CaCommandSupport {
+public class EnvRemoveCmd extends CaAction {
 
     @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
     private String name;

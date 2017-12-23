@@ -27,7 +27,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
-import org.xipki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CertListSortByCompleter;
 import org.xipki.common.util.DateUtil;
@@ -42,7 +42,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Command(scope = "ca", name = "list-cert",
         description = "show a list of certificates")
 @Service
-public class ListCertCmd extends CaCommandSupport {
+public class ListCertCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

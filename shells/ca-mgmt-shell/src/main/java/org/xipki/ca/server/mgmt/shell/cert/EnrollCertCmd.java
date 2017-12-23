@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.common.util.DateUtil;
@@ -43,7 +43,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "enroll-cert",
         description = "enroll certificate")
 @Service
-public class EnrollCertCmd extends CaCommandSupport {
+public class EnrollCertCmd extends CaAction {
 
     @Option(name = "--ca",
             required = true,

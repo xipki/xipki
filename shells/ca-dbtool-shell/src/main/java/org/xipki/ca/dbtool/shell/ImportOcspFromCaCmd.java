@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "import-ocspfromca",
         description = "import OCSP database from CA data")
 @Service
-public class ImportOcspFromCaCmd extends DbPortCommandSupport {
+public class ImportOcspFromCaCmd extends DbPortAction {
 
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 

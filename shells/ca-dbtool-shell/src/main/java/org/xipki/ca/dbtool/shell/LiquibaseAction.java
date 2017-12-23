@@ -33,7 +33,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.dbtool.shell.completer.LogLevelCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
@@ -45,7 +45,7 @@ import org.xipki.password.PasswordResolverException;
  * @since 2.0.0
  */
 
-public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
+public abstract class LiquibaseAction extends XiAction {
 
     private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 

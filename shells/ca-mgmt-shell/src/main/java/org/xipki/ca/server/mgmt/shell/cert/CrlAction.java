@@ -23,7 +23,7 @@ import java.security.cert.X509CRL;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -33,7 +33,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-public abstract class CrlCommandSupport extends CaCommandSupport {
+public abstract class CrlAction extends CaAction {
 
     @Option(name = "--ca",
             required = true,

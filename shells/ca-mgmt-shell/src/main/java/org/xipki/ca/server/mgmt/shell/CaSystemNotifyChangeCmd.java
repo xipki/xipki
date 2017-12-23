@@ -28,7 +28,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "ca", name = "notify-change",
         description = "notify the change of CA system")
 @Service
-public class CaSystemNotifyChangeCmd extends CaCommandSupport {
+public class CaSystemNotifyChangeCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {

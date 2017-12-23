@@ -30,7 +30,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "ca", name = "gencrl",
         description = "generate CRL")
 @Service
-public class GenCrlCmd extends CrlCommandSupport {
+public class GenCrlCmd extends CrlAction {
 
     @Override
     protected X509CRL retrieveCrl() throws Exception {

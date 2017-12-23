@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "export-ca",
         description = "export CA database")
 @Service
-public class ExportCaCmd extends DbPortCommandSupport {
+public class ExportCaCmd extends DbPortAction {
 
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 

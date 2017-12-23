@@ -37,7 +37,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "ca", name = "publisher-export",
         description = "export publisher configuration")
 @Service
-public class PublisherExportCmd extends CaCommandSupport {
+public class PublisherExportCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

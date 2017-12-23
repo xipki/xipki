@@ -36,7 +36,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "ca", name = "requestor-up",
         description = "update requestor")
 @Service
-public class RequestorUpdateCmd extends CaCommandSupport {
+public class RequestorUpdateCmd extends CaAction {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

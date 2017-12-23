@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.password.PasswordResolver;
 
@@ -33,14 +33,14 @@ import org.xipki.password.PasswordResolver;
  * @since 2.0.0
  */
 
-public abstract class DbPortCommandSupport extends XipkiCommandSupport {
+public abstract class DbPortAction extends XiAction {
 
     protected DataSourceFactory datasourceFactory;
 
     @Reference
     protected PasswordResolver passwordResolver;
 
-    public DbPortCommandSupport() {
+    public DbPortAction() {
         datasourceFactory = new DataSourceFactory();
     }
 

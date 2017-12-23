@@ -29,7 +29,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "ca", name = "restart",
         description = "restart CA system")
 @Service
-public class CaSystemRestartCmd extends CaCommandSupport {
+public class CaSystemRestartCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {
