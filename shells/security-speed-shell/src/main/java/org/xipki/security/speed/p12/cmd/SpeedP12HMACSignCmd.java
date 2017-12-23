@@ -34,7 +34,7 @@ import org.xipki.security.speed.p12.P12HMACSignLoadTest;
         description = "performance test of PKCS#12 HMAC signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP12HMACSignCmd extends SpeedP12SignCommandSupport {
+public class SpeedP12HMACSignCmd extends SpeedP12SignAction {
 
     @Option(name = "--sig-algo",
             required = true,

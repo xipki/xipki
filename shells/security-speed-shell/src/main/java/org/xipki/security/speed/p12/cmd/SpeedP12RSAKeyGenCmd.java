@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.SingleSpeedCommandSupport;
+import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
 /**
@@ -33,7 +33,7 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
         description = "performance test of PKCS#12 RSA key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP12RSAKeyGenCmd extends SingleSpeedCommandSupport {
+public class SpeedP12RSAKeyGenCmd extends SingleSpeedAction {
 
     @Option(name = "--key-size",
             description = "keysize in bit")

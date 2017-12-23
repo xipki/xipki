@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -37,7 +37,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xi", name = "token-info-p11",
         description = "list objects in PKCS#11 device")
 @Service
-public class P11TokenInfoCmd extends SecurityCommandSupport {
+public class P11TokenInfoCmd extends SecurityAction {
 
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")

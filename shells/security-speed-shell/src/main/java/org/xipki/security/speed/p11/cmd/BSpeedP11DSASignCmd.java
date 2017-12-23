@@ -40,7 +40,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
         description = "performance test of PKCS#11 DSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP11DSASignCmd extends BSpeedP11CommandSupport {
+public class BSpeedP11DSASignCmd extends BSpeedP11Action {
 
     @Option(name = "--sig-algo",
             required = true,

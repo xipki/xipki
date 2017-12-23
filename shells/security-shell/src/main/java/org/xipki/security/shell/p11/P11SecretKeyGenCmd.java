@@ -37,7 +37,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
         description = "generate secret key in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
-public class P11SecretKeyGenCmd extends P11KeyGenCommandSupport {
+public class P11SecretKeyGenCmd extends P11KeyGenAction {
 
     @Option(name = "--key-type",
             required = true,

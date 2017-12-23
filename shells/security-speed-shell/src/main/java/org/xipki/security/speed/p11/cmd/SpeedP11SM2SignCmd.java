@@ -31,7 +31,7 @@ import org.xipki.security.speed.p11.P11SM2SignLoadTest;
         description = "performance test of PKCS#11 SM2 signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11SM2SignCmd extends SpeedP11CommandSupport {
+public class SpeedP11SM2SignCmd extends SpeedP11Action {
 
     @Override
     protected LoadExecutor getTester() throws Exception {

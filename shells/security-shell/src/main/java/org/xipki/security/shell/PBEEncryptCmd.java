@@ -40,7 +40,7 @@ import org.xipki.password.PBEPasswordService;
         description = "encrypt password with master password")
 @Service
 // CHECKSTYLE:SKIP
-public class PBEEncryptCmd extends SecurityCommandSupport {
+public class PBEEncryptCmd extends SecurityAction {
 
     @Option(name = "--iteration-count", aliases = "-n",
             description = "iteration count, between 1 and 65535")

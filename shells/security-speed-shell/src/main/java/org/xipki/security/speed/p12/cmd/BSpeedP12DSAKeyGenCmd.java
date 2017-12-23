@@ -23,7 +23,7 @@ import java.util.Queue;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
 
@@ -36,7 +36,7 @@ import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
         description = "performance test of PKCS#12 DSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
+public class BSpeedP12DSAKeyGenCmd extends BatchSpeedAction {
 
     private final Queue<DSAControl> queue = new LinkedList<>();
 

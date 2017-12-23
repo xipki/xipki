@@ -35,7 +35,7 @@ import org.xipki.security.speed.p12.P12ECSignLoadTest;
         description = "performance test of PKCS#12 EC signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
+public class BSpeedP12ECSignCmd extends BSpeedP12SignAction {
 
     private final Queue<ECControl> queue = new LinkedList<>();
 

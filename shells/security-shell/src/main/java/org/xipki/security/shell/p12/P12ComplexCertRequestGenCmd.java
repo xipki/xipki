@@ -66,7 +66,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.BadInputException;
-import org.xipki.security.shell.CertRequestGenCommandSupport;
+import org.xipki.security.shell.CertRequestGenAction;
 import org.xipki.security.util.KeyUtil;
 
 /**
@@ -77,7 +77,7 @@ import org.xipki.security.util.KeyUtil;
 @Command(scope = "xi", name = "req-p12-complex",
         description = "generate complex CSR with PKCS#12 keystore (only for test)")
 @Service
-public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
+public class P12ComplexCertRequestGenCmd extends CertRequestGenAction {
 
     @Option(name = "--p12",
             required = true,

@@ -36,7 +36,7 @@ import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
         description = "performance test of PKCS#11 DSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
+public class BSpeedP11DSAKeyGenCmd extends BSpeedP11Action {
 
     private final Queue<DSAControl> queue = new LinkedList<>();
 

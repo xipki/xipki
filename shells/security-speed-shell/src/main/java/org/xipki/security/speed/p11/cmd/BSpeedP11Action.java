@@ -28,14 +28,14 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.security.speed.cmd.BatchSpeedAction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class BSpeedP11CommandSupport extends BatchSpeedCommandSupport {
+public abstract class BSpeedP11Action extends BatchSpeedAction {
 
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;

@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.security.speed.p12.cmd;
-
-import org.xipki.security.speed.cmd.SingleSpeedCommandSupport;
+package org.xipki.security.shell;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class SpeedP12SignCommandSupport extends SingleSpeedCommandSupport {
+public abstract class KeyGenAction extends SecurityAction {
 
 }

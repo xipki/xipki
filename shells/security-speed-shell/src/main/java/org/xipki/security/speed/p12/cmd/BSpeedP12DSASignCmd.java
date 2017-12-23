@@ -35,7 +35,7 @@ import org.xipki.security.speed.p12.P12DSASignLoadTest;
         description = "performance test of PKCS#12 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
+public class BSpeedP12DSASignCmd extends BSpeedP12SignAction {
 
     private final Queue<DSAControl> queue = new LinkedList<>();
 

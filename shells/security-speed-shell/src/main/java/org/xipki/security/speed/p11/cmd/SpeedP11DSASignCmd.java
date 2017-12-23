@@ -35,7 +35,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
         description = "performance test of PKCS#11 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11DSASignCmd extends SpeedP11CommandSupport {
+public class SpeedP11DSASignCmd extends SpeedP11Action {
 
     @Option(name = "--plen",
             description = "bit length of the prime")

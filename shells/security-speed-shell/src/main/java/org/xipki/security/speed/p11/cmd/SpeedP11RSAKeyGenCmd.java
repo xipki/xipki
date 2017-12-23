@@ -32,7 +32,7 @@ import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
         description = "performance test of PKCS#11 RSA key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11RSAKeyGenCmd extends SpeedP11CommandSupport {
+public class SpeedP11RSAKeyGenCmd extends SpeedP11Action {
 
     @Option(name = "--key-size",
             description = "keysize in bit")

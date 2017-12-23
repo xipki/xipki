@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.PasswordNameCompleter;
 import org.xipki.password.PasswordProducer;
 
@@ -35,7 +35,7 @@ import org.xipki.password.PasswordProducer;
 @Command(scope = "xi", name = "produce-password",
         description = "produce password")
 @Service
-public class ProducePasswordCmd extends XipkiCommandSupport {
+public class ProducePasswordCmd extends XiAction {
 
     @Option(name = "--name", required = true, description = "name of the password")
     @Completion(PasswordNameCompleter.class)

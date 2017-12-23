@@ -28,14 +28,14 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.speed.cmd.SingleSpeedCommandSupport;
+import org.xipki.security.speed.cmd.SingleSpeedAction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class SpeedP11CommandSupport extends SingleSpeedCommandSupport {
+public abstract class SpeedP11Action extends SingleSpeedAction {
 
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;

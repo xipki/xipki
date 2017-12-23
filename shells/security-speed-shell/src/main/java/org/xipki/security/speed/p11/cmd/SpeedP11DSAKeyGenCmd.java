@@ -32,7 +32,7 @@ import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
         description = "performance test of PKCS#11 DSA key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11DSAKeyGenCmd extends SpeedP11CommandSupport {
+public class SpeedP11DSAKeyGenCmd extends SpeedP11Action {
 
     @Option(name = "--plen",
             description = "bit length of the prime")

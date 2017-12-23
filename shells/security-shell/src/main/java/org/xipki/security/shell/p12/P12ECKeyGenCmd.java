@@ -34,7 +34,7 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
         description = "generate EC keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
-public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
+public class P12ECKeyGenCmd extends P12KeyGenAction {
 
     @Option(name = "--subject", aliases = "-s",
             description = "subject of the self-signed certificate")

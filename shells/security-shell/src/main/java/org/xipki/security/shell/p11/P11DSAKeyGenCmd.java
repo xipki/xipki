@@ -33,7 +33,7 @@ import org.xipki.security.pkcs11.P11Slot;
         description = "generate DSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class P11DSAKeyGenCmd extends P11KeyGenAction {
 
     @Option(name = "--plen",
             description = "bit length of the prime")

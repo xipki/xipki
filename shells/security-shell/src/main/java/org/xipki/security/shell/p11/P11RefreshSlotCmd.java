@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -34,7 +34,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xi", name = "refresh-p11",
         description = "refresh PKCS#11 module")
 @Service
-public class P11RefreshSlotCmd extends SecurityCommandSupport {
+public class P11RefreshSlotCmd extends SecurityAction {
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")

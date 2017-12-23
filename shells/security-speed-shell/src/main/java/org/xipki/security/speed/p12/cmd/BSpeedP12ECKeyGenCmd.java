@@ -23,7 +23,7 @@ import java.util.Queue;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.ECControl;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
@@ -36,7 +36,7 @@ import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
         description = "performance test of PKCS#12 EC key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
+public class BSpeedP12ECKeyGenCmd extends BatchSpeedAction {
 
     private final Queue<ECControl> queue = new LinkedList<>();
 

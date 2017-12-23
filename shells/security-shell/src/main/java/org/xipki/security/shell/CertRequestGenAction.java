@@ -83,7 +83,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class CertRequestGenCommandSupport extends SecurityCommandSupport {
+public abstract class CertRequestGenAction extends SecurityAction {
 
     @Option(name = "--hash",
             description = "hash algorithm name")

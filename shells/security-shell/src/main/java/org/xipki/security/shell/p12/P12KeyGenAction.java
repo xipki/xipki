@@ -27,14 +27,14 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
-import org.xipki.security.shell.KeyGenCommandSupport;
+import org.xipki.security.shell.KeyGenAction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
+public abstract class P12KeyGenAction extends KeyGenAction {
 
     @Option(name = "--out", aliases = "-o",
             required = true,

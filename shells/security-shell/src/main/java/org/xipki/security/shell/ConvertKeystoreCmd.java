@@ -43,7 +43,7 @@ import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 @Command(scope = "xi", name = "convert-keystore",
         description = "Convert keystore")
 @Service
-public class ConvertKeystoreCmd extends SecurityCommandSupport {
+public class ConvertKeystoreCmd extends SecurityAction {
 
     @Option(name = "--in",
             required = true,

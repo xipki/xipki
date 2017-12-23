@@ -39,7 +39,7 @@ import org.xipki.security.speed.p11.P11RSASignLoadTest;
         description = "performance test of PKCS#11 RSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP11RSASignCmd extends BSpeedP11CommandSupport {
+public class BSpeedP11RSASignCmd extends BSpeedP11Action {
 
     @Option(name = "--sig-algo",
             required = true,

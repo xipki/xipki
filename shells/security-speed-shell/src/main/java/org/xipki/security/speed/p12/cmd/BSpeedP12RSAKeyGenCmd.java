@@ -23,7 +23,7 @@ import java.util.Queue;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.RSAControl;
 import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
@@ -36,7 +36,7 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
         description = "performance test of PKCS#12 RSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
+public class BSpeedP12RSAKeyGenCmd extends BatchSpeedAction {
 
     private final Queue<RSAControl> queue = new LinkedList<>();
 

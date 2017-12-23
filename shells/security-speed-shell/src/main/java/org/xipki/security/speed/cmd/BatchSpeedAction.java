@@ -32,9 +32,9 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
+public abstract class BatchSpeedAction extends SecurityAction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedCommandSupport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedAction.class);
 
     protected static final String DEFAULT_P11MODULE_NAME =
             P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;

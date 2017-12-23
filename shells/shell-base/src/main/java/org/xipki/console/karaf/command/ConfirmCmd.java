@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 
 /**
  * @author Lijun Liao
@@ -31,7 +31,7 @@ import org.xipki.console.karaf.XipkiCommandSupport;
 @Command(scope = "xi", name = "confirm",
         description = "confirm an action")
 @Service
-public class ConfirmCmd extends XipkiCommandSupport {
+public class ConfirmCmd extends XiAction {
 
     @Argument(index = 0, name = "message",
             required = true,

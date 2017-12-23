@@ -37,7 +37,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
-import org.xipki.security.shell.CertRequestGenCommandSupport;
+import org.xipki.security.shell.CertRequestGenAction;
 import org.xipki.security.util.KeyUtil;
 
 /**
@@ -48,7 +48,7 @@ import org.xipki.security.util.KeyUtil;
 @Command(scope = "xi", name = "req-p12",
         description = "generate CSR with PKCS#12 keystore")
 @Service
-public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
+public class P12CertRequestGenCmd extends CertRequestGenAction {
 
     @Option(name = "--p12",
             required = true,

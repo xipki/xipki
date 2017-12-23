@@ -34,7 +34,7 @@ import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
         description = "performance test of PKCS#11 EC key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11ECKeyGenCmd extends SpeedP11CommandSupport {
+public class SpeedP11ECKeyGenCmd extends SpeedP11Action {
 
     @Option(name = "--curve",
             required = true,

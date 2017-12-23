@@ -28,7 +28,7 @@ import java.security.cert.CertificateException;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.util.KeyUtil;
 
 /**
@@ -36,7 +36,7 @@ import org.xipki.security.util.KeyUtil;
  * @since 2.0.0
  */
 
-public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
+public abstract class P12SecurityAction extends SecurityAction {
 
     @Option(name = "--p12",
             required = true,

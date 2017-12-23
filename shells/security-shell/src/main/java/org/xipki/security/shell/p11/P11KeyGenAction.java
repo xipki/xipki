@@ -26,7 +26,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.shell.KeyGenCommandSupport;
+import org.xipki.security.shell.KeyGenAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -34,7 +34,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
+public abstract class P11KeyGenAction extends KeyGenAction {
 
     @Option(name = "--label",
             required = true,

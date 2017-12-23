@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -35,7 +35,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xi", name = "rm-cert-p11",
         description = "remove certificate from PKCS#11 device")
 @Service
-public class P11CertDeleteCmd extends SecurityCommandSupport {
+public class P11CertDeleteCmd extends SecurityAction {
 
     @Option(name = "--slot",
             required = true,

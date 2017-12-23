@@ -35,7 +35,7 @@ import org.xipki.security.speed.p12.P12ECSignLoadTest;
         description = "performance test of PKCS#12 EC signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP12ECSignCmd extends SpeedP12SignCommandSupport {
+public class SpeedP12ECSignCmd extends SpeedP12SignAction {
 
     @Option(name = "--curve",
             required = true,

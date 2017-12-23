@@ -25,7 +25,7 @@ import org.xipki.common.LoadExecutor;
  * @since 2.0.0
  */
 
-public abstract class SingleSpeedCommandSupport extends SecurityCommandSupport {
+public abstract class SingleSpeedAction extends SecurityAction {
 
     @Option(name = "--duration",
             description = "duration")

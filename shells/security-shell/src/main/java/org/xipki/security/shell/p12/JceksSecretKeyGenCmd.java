@@ -33,7 +33,7 @@ import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
 @Command(scope = "xi", name = "secretkey-p12",
         description = "generate secret key in JCEKS (not PKCS#12) keystore")
 @Service
-public class JceksSecretKeyGenCmd extends P12KeyGenCommandSupport {
+public class JceksSecretKeyGenCmd extends P12KeyGenAction {
 
     @Option(name = "--key-type",
             required = true,

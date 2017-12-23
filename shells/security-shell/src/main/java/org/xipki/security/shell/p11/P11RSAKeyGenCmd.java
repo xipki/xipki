@@ -33,7 +33,7 @@ import org.xipki.security.pkcs11.P11Slot;
         description = "generate RSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
-public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class P11RSAKeyGenCmd extends P11KeyGenAction {
 
     @Option(name = "--key-size",
             description = "keysize in bit")

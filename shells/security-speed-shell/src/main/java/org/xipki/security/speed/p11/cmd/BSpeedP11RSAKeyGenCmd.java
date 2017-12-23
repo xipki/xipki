@@ -36,7 +36,7 @@ import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
         description = "performance test of PKCS#11 RSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
+public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Action {
 
     private final Queue<RSAControl> queue = new LinkedList<>();
 

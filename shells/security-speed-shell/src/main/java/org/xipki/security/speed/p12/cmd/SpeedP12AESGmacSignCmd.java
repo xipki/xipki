@@ -34,7 +34,7 @@ import org.xipki.security.speed.p12.P12AESGmacSignLoadTest;
         description = "performance test of PKCS#12 AES GMAC signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP12AESGmacSignCmd extends SpeedP12SignCommandSupport {
+public class SpeedP12AESGmacSignCmd extends SpeedP12SignAction {
 
     @Option(name = "--sig-algo",
             required = true,

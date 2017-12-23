@@ -44,7 +44,7 @@ import org.xipki.security.util.AlgorithmUtil;
 @Command(scope = "xi", name = "p11provider-test",
         description = "test the Xipki PKCS#11 JCA/JCE provider")
 @Service
-public class P11ProviderTestCmd extends P11SecurityCommandSupport {
+public class P11ProviderTestCmd extends P11SecurityAction {
 
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")

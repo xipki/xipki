@@ -31,7 +31,7 @@ import org.xipki.security.speed.p11.P11SM2KeyGenLoadTest;
         description = "performance test of PKCS#11 SM2 key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11SM2KeyGenCmd extends SpeedP11CommandSupport {
+public class SpeedP11SM2KeyGenCmd extends SpeedP11Action {
 
     @Override
     protected LoadExecutor getTester() throws Exception {

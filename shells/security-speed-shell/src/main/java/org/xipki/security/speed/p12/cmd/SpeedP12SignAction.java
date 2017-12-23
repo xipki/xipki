@@ -17,20 +17,13 @@
 
 package org.xipki.security.speed.p12.cmd;
 
-import org.apache.karaf.shell.api.action.Option;
-import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.security.speed.cmd.SingleSpeedAction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class BSpeedP12SignCommandSupport extends BatchSpeedCommandSupport {
-
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
+public abstract class SpeedP12SignAction extends SingleSpeedAction {
 
 }

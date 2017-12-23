@@ -25,7 +25,7 @@ import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -33,7 +33,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
+public abstract class P11SecurityAction extends SecurityAction {
 
     @Option(name = "--slot",
             required = true,

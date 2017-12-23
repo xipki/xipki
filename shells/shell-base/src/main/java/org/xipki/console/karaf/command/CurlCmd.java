@@ -36,7 +36,7 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -47,7 +47,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xi", name = "curl",
         description = "transfer a URL")
 @Service
-public class CurlCmd extends XipkiCommandSupport {
+public class CurlCmd extends XiAction {
 
     @Argument(index = 0, name = "url",
             required = true,

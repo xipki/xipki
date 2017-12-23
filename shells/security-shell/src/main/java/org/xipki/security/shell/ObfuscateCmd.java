@@ -36,7 +36,7 @@ import org.xipki.password.OBFPasswordService;
 @Command(scope = "xi", name = "obfuscate",
         description = "obfuscate password")
 @Service
-public class ObfuscateCmd extends SecurityCommandSupport {
+public class ObfuscateCmd extends SecurityAction {
 
     @Option(name = "--out", description = "where to save the encrypted password")
     @Completion(FilePathCompleter.class)

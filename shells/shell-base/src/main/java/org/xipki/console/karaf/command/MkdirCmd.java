@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.DirPathCompleter;
 
 /**
@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
 @Command(scope = "xi", name = "mkdir",
         description = "make directories")
 @Service
-public class MkdirCmd extends XipkiCommandSupport {
+public class MkdirCmd extends XiAction {
 
     @Argument(index = 0, name = "directory_name",
             required = true,

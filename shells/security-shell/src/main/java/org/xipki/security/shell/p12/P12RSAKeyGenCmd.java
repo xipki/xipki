@@ -33,7 +33,7 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
         description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
-public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
+public class P12RSAKeyGenCmd extends P12KeyGenAction {
 
     @Option(name = "--subject", aliases = "-s",
             description = "subject of the self-signed certificate")

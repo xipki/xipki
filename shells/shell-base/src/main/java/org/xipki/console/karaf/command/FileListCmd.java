@@ -27,7 +27,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -38,7 +38,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xi", name = "ls",
         description = "list directory contents")
 @Service
-public class FileListCmd extends XipkiCommandSupport {
+public class FileListCmd extends XiAction {
 
     @Argument(index = 0, name = "file",
             required = true,

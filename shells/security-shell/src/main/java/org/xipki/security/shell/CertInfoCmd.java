@@ -38,7 +38,7 @@ import org.xipki.security.HashAlgoType;
 @Command(scope = "xi", name = "cert-info",
         description = "print certificate information")
 @Service
-public class CertInfoCmd extends SecurityCommandSupport {
+public class CertInfoCmd extends SecurityAction {
 
     @Option(name = "--in", description = "certificate file\n"
                     + "(required)")

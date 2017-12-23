@@ -37,12 +37,12 @@ import org.xipki.password.SecurePasswordInputPanel;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 3.0.1
  */
 
-public abstract class XipkiCommandSupport implements Action {
+public abstract class XiAction implements Action {
 
-    private static final Logger LOG = LoggerFactory.getLogger(XipkiCommandSupport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XiAction.class);
 
     @Reference
     protected Session session;

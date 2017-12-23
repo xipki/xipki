@@ -18,7 +18,7 @@
 package org.xipki.security.speed.cmd;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
 
 /**
@@ -26,7 +26,7 @@ import org.xipki.security.SecurityFactory;
  * @since 2.0.0
  */
 
-public abstract class SecurityCommandSupport extends XipkiCommandSupport {
+public abstract class SecurityAction extends XiAction {
 
     @Reference
     protected SecurityFactory securityFactory;

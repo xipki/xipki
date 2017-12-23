@@ -34,7 +34,7 @@ import org.xipki.security.pkcs11.P11Slot;
         description = "generate EC keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
-public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
+public class P11ECKeyGenCmd extends P11KeyGenAction {
 
     @Option(name = "--curve",
             description = "EC curve name")

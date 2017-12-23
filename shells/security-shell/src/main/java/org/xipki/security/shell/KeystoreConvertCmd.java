@@ -40,7 +40,7 @@ import org.xipki.security.util.KeyUtil;
 @Command(scope = "xi", name = "keystore-convert",
         description = "convert the keystore format")
 @Service
-public class KeystoreConvertCmd extends SecurityCommandSupport {
+public class KeystoreConvertCmd extends SecurityAction {
 
     @Option(name = "--in-type",
             required = true,

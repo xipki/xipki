@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.security.speed.cmd.SingleSpeedCommandSupport;
+import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
@@ -35,7 +35,7 @@ import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
         description = "performance test of PKCS#12 EC key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP12ECKeyGenCmd extends SingleSpeedCommandSupport {
+public class SpeedP12ECKeyGenCmd extends SingleSpeedAction {
 
     @Option(name = "--curve",
             required = true,

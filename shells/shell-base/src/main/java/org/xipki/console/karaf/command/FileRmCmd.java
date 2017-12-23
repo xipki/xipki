@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.intern.FileUtils;
 
@@ -36,7 +36,7 @@ import org.xipki.console.karaf.intern.FileUtils;
 @Command(scope = "xi", name = "rm",
         description = "remove file or directory")
 @Service
-public class FileRmCmd extends XipkiCommandSupport {
+public class FileRmCmd extends XiAction {
 
     @Argument(index = 0, name = "file",
             required = true,

@@ -34,7 +34,7 @@ import org.xipki.security.speed.p11.P11RSASignLoadTest;
         description = "performance test of PKCS#11 RSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11RSASignCmd extends SpeedP11CommandSupport {
+public class SpeedP11RSASignCmd extends SpeedP11Action {
 
     @Option(name = "--key-size",
             description = "keysize in bit")

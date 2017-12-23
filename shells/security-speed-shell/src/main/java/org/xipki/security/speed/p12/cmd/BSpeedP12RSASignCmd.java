@@ -35,7 +35,7 @@ import org.xipki.security.speed.p12.P12RSASignLoadTest;
         description = "performance test of PKCS#12 RSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP12RSASignCmd extends BSpeedP12SignCommandSupport {
+public class BSpeedP12RSASignCmd extends BSpeedP12SignAction {
 
     private final Queue<RSAControl> queue = new LinkedList<>();
 

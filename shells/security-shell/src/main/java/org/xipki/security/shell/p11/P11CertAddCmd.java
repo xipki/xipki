@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 import org.xipki.security.util.X509Util;
 
@@ -38,7 +38,7 @@ import org.xipki.security.util.X509Util;
 @Command(scope = "xi", name = "add-cert-p11",
         description = "add certificate to PKCS#11 device")
 @Service
-public class P11CertAddCmd extends SecurityCommandSupport {
+public class P11CertAddCmd extends SecurityAction {
 
     @Option(name = "--slot",
             required = true,

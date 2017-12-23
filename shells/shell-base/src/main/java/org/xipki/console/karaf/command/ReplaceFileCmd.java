@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -40,7 +40,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xi", name = "replace",
         description = "replace text in file")
 @Service
-public class ReplaceFileCmd extends XipkiCommandSupport {
+public class ReplaceFileCmd extends XiAction {
 
     @Argument(index = 0, name = "file",
             required = true,

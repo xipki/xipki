@@ -40,7 +40,7 @@ import org.xipki.password.PBEPasswordService;
         description = "decrypt password with master password")
 @Service
 // CHECKSTYLE:SKIP
-public class PBEDecryptCmd extends SecurityCommandSupport {
+public class PBEDecryptCmd extends SecurityAction {
 
     @Option(name = "--password",
             description = "encrypted password, starts with PBE:\n"

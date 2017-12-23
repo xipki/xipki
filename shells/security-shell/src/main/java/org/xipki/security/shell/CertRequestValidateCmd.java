@@ -34,7 +34,7 @@ import org.xipki.security.util.AlgorithmUtil;
 @Command(scope = "xi", name = "validate-csr",
         description = "validate CSR")
 @Service
-public class CertRequestValidateCmd extends SecurityCommandSupport {
+public class CertRequestValidateCmd extends SecurityAction {
 
     @Option(name = "--csr",
             required = true,

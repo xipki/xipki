@@ -20,7 +20,7 @@ package org.xipki.security.speed.p12.cmd;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.SingleSpeedCommandSupport;
+import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
@@ -32,7 +32,7 @@ import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
         description = "performance test of PKCS#12 SM2 key generation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP12SM2KeyGenCmd extends SingleSpeedCommandSupport {
+public class SpeedP12SM2KeyGenCmd extends SingleSpeedAction {
 
     @Override
     protected LoadExecutor getTester() throws Exception {

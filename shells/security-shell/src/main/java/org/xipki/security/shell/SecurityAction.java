@@ -22,7 +22,7 @@ import java.util.Date;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.common.util.DateUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -37,7 +37,7 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public abstract class SecurityCommandSupport extends XipkiCommandSupport {
+public abstract class SecurityAction extends XiAction {
 
     protected static final String DEFAULT_P11MODULE_NAME =
             P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
