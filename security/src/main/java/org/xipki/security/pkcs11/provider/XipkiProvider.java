@@ -248,11 +248,11 @@ public class XipkiProvider extends Provider {
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA512", "SHA512withPlain-ECDSA");
             provider.put("Alg.Alias.Signature.SHA512withPlainECDSA", "SHA512withPlain-ECDSA");
             provider.put("Alg.Alias.Signature.PlainECDSAwithSHA512", "SHA512withPlain-ECDSA");
-            /*
+
             provider.put("Signature.SM3withSM2",
-                    P11SM2SignatureSpi.SM2.class.getName());
+                    P11SM3WithSM2SignatureSpi.class.getName());
             provider.put("Alg.Alias.Signature.SM2withSM3", "SM3withSM2");
-            */
+
             provider.put("Signature.SHA1withRSAandMGF1",
                     P11RSAPSSSignatureSpi.SHA1withRSA.class.getName());
             provider.put("Alg.Alias.Signature.RSAandMGF1withSHA1", "SHA1withRSAandMGF1");

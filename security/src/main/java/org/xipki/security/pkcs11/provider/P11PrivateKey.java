@@ -46,21 +46,23 @@ public class P11PrivateKey implements PrivateKey {
     private final String algorithm;
 
     private final int keysize;
+    
+    private final PublicKey publicKey;
 
     public P11PrivateKey(final P11CryptService p11CryptService,
             final P11EntityIdentifier identityId) throws P11TokenException {
         this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
         this.identityId = ParamUtil.requireNonNull("entityId", identityId);
 
-        PublicKey publicKey = p11CryptService.getIdentity(identityId).publicKey();
+        this.publicKey = p11CryptService.getIdentity(identityId).publicKey();
 
-        if (publicKey instanceof RSAPublicKey) {
+        if (this.publicKey instanceof RSAPublicKey) {
             algorithm = "RSA";
             keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
-        } else if (publicKey instanceof DSAPublicKey) {
+        } else if (this.publicKey instanceof DSAPublicKey) {
             algorithm = "DSA";
             keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
-        } else if (publicKey instanceof ECPublicKey) {
+        } else if (this.publicKey instanceof ECPublicKey) {
             algorithm = "EC";
             keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
         } else {
@@ -93,6 +95,10 @@ public class P11PrivateKey implements PrivateKey {
 
     public int keysize() {
         return keysize;
+    }
+    
+    public PublicKey publicKey() {
+        return publicKey;
     }
 
     /**
