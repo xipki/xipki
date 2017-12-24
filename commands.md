@@ -206,9 +206,13 @@ Feature xipki-security-shell (not started by default)
 
      delete objects in PKCS#11 device
 
-   * `xi:p11provider-test`
+   * `xi:p11prov-test`
 
      test the Xipki PKCS#11 JCA/JCE provider
+
+   * `xi:p11prov-sm2-test`
+
+     test the SM2 implementation of the Xipki PKCS#11 JCA/JCE provider
 
    * `xi:refresh-p11`
 
