@@ -60,8 +60,8 @@
   </bean>
 
   <!-- provider XIPKI -->
-  <bean id="XipkiProviderRegister"
-      class="org.xipki.security.pkcs11.provider.XipkiProviderRegister"
+  <bean id="XiProviderRegister"
+      class="org.xipki.security.pkcs11.provider.XiProviderRegister"
       init-method="regist">
     <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>

@@ -96,20 +96,20 @@ import org.xipki.security.XiSecurityConstants;
  * @since 2.0.0
  */
 
-public class XipkiProvider extends Provider {
+public class XiProvider extends Provider {
 
     @SuppressWarnings("rawtypes")
     private static class MyPrivilegedAction implements PrivilegedAction {
 
-        private final XipkiProvider provider;
+        private final XiProvider provider;
 
-        MyPrivilegedAction(final XipkiProvider provider) {
+        MyPrivilegedAction(final XiProvider provider) {
             this.provider = provider;
         }
 
         @Override
         public Object run() {
-            provider.put("KeyStore.PKCS11", XipkiKeyStoreSpi.class.getName());
+            provider.put("KeyStore.PKCS11", XiKeyStoreSpi.class.getName());
 
             provider.put("Signature.NONEwithRSA", P11RSADigestSignatureSpi.NoneRSA.class.getName());
             provider.put("Alg.Alias.Signature.RSAwithNONE", "NONEwithRSA");
@@ -315,7 +315,7 @@ public class XipkiProvider extends Provider {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
-    public XipkiProvider() {
+    public XiProvider() {
         super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_INFO);
         AccessController.doPrivileged(new MyPrivilegedAction(this));
     }

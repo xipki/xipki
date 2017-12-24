@@ -55,8 +55,8 @@ import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.bc.XipkiECContentVerifierProviderBuilder;
-import org.xipki.security.bc.XipkiRSAContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -127,11 +127,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
         if (builder == null) {
             if ("RSA".equals(keyAlg)) {
-                builder = new XipkiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+                builder = new XiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
             } else if ("DSA".equals(keyAlg)) {
                 builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
             } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-                builder = new XipkiECContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+                builder = new XiECContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
             } else {
                 throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
             }

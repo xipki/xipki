@@ -34,10 +34,10 @@ import org.xipki.security.util.SignerUtil;
  */
 
 // CHECKSTYLE:SKIP
-public class XipkiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
+public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-    public XipkiRSAContentVerifierProviderBuilder(
+    public XiRSAContentVerifierProviderBuilder(
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         super(digestAlgorithmFinder);
         this.digestAlgorithmFinder = digestAlgorithmFinder;

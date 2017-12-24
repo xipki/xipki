@@ -66,9 +66,9 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class XipkiKeyStoreSpi extends KeyStoreSpi {
+public class XiKeyStoreSpi extends KeyStoreSpi {
 
-    private static final Logger LOG = LoggerFactory.getLogger(XipkiKeyStoreSpi.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XiKeyStoreSpi.class);
 
     private static class MyEnumeration<E> implements Enumeration<E> {
 

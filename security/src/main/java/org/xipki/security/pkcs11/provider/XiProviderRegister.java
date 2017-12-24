@@ -26,16 +26,16 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
  * @since 2.0.0
  */
 
-public class XipkiProviderRegister {
+public class XiProviderRegister {
 
     public void regist() {
-        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new XipkiProvider());
+        if (Security.getProperty(XiProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new XiProvider());
         }
     }
 
     public void setP11CryptServiceFactory(final P11CryptServiceFactory p11CryptServiceFactory) {
-        XipkiKeyStoreSpi.setP11CryptServiceFactory(p11CryptServiceFactory);
+        XiKeyStoreSpi.setP11CryptServiceFactory(p11CryptServiceFactory);
     }
 
 }

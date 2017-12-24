@@ -35,11 +35,11 @@ import org.xipki.security.util.AlgorithmUtil;
  */
 
 // CHECKSTYLE:SKIP
-public class XipkiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
+public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
 
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-    public XipkiECContentVerifierProviderBuilder(
+    public XiECContentVerifierProviderBuilder(
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         super(digestAlgorithmFinder);
         this.digestAlgorithmFinder = digestAlgorithmFinder;
