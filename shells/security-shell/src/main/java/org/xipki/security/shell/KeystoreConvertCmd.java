@@ -29,8 +29,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.security.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -55,6 +55,10 @@ public class KeystoreConvertCmd extends SecurityAction {
     @Completion(FilePathCompleter.class)
     private String inFile;
 
+    @Option(name = "--in-provider",
+            description = "Security provider of source keystore")
+    private String inProvider;
+
     @Option(name = "--in-pass",
             description = "password of source keystore")
     private String inPass;
@@ -74,6 +78,10 @@ public class KeystoreConvertCmd extends SecurityAction {
             description = "type of target keystore\n"
                     + "(required)")
     private String outType;
+
+    @Option(name = "--out-provider",
+            description = "Security provider of target keystore")
+    private String outProvider;
 
     @Option(name = "--out",
             required = true,
@@ -98,7 +106,12 @@ public class KeystoreConvertCmd extends SecurityAction {
 
     @Override
     protected Object execute0() throws Exception {
-        KeyStore srcKs = KeyUtil.getKeyStore(inType);
+        KeyStore srcKs;
+        if (StringUtil.isBlank(inProvider)) {
+            srcKs = KeyStore.getInstance(inType);
+        } else {
+            srcKs = KeyStore.getInstance(inType, inProvider);
+        }
 
         char[] inPwd;
         if (inPass != null) {
@@ -151,7 +164,13 @@ public class KeystoreConvertCmd extends SecurityAction {
             }
         }
 
-        KeyStore destKs = KeyUtil.getKeyStore(outType);
+        KeyStore destKs;
+        if (StringUtil.isBlank(outProvider)) {
+            destKs = KeyStore.getInstance(outType);
+        } else {
+            destKs = KeyStore.getInstance(outType, inProvider);
+        }
+
         destKs.load(null, outPwd);
 
         aliases = srcKs.aliases();

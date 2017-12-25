@@ -49,13 +49,16 @@ public class CanonicalizeCode {
     }
 
     public static void main(final String[] args) {
-        try {
-            String baseDir = args[0];
-            CanonicalizeCode canonicalizer = new CanonicalizeCode(baseDir);
-            canonicalizer.canonicalize();
-            canonicalizer.checkWarnings();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        for (String arg : args) {
+            try {
+                String baseDir = arg;
+                System.out.println("Canonicalize dir " + baseDir);
+                CanonicalizeCode canonicalizer = new CanonicalizeCode(baseDir);
+                canonicalizer.canonicalize();
+                canonicalizer.checkWarnings();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

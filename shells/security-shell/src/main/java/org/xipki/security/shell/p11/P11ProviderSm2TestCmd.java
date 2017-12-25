@@ -81,11 +81,11 @@ public class P11ProviderSm2TestCmd extends P11SecurityAction {
         String sigAlgo = "SM3withSM2";
         println("signature algorithm: " + sigAlgo);
         Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
-        
+
         if (StringUtil.isNotBlank(ida)) {
             sig.setParameter(new XiSM2ParameterSpec(ida.getBytes()));
         }
-        
+
         sig.initSign(key);
 
         byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};

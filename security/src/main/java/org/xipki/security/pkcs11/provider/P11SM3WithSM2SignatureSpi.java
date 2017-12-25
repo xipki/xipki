@@ -54,13 +54,13 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
     private OutputStream outputStream;
 
     private P11PrivateKey signingKey;
-    
+
     private XiSM2ParameterSpec paramSpec;
-    
+
     private byte[] sm2Z;
 
     private P11Params p11Params;
-    
+
     public P11SM3WithSM2SignatureSpi() {
     }
 
@@ -75,31 +75,31 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
         }
-        
+
         this.signingKey = (P11PrivateKey) privateKey;
         if (!(signingKey.publicKey() instanceof ECPublicKey)) {
-           throw new InvalidKeyException("only EC key is allowed"); 
+           throw new InvalidKeyException("only EC key is allowed");
         }
-        
+
         ECPublicKey pubKey = (ECPublicKey) signingKey.publicKey();
         if (!GMUtil.isSm2primev2Curve(pubKey.getParams().getCurve())) {
             throw new InvalidKeyException("only EC key of curve sm2primev2 is allowed");
         }
-        
+
         String algo = privateKey.getAlgorithm();
         if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
             throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
         }
 
         byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getID();
-        
+
         if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
             mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
             outputStream = new DigestOutputStream(HashAlgoType.SM3.createDigest());
             p11Params = null;
-            
+
             ECPoint w = pubKey.getW();
-            
+
             sm2Z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
                     w.getAffineX(), w.getAffineY());
             try {
@@ -162,7 +162,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineSetParameter(final AlgorithmParameterSpec params) 
+    protected void engineSetParameter(final AlgorithmParameterSpec params)
             throws InvalidAlgorithmParameterException {
         if (params instanceof XiSM2ParameterSpec) {
             paramSpec = (XiSM2ParameterSpec)params;

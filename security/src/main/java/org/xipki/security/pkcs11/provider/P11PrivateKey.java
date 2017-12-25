@@ -46,7 +46,7 @@ public class P11PrivateKey implements PrivateKey {
     private final String algorithm;
 
     private final int keysize;
-    
+
     private final PublicKey publicKey;
 
     public P11PrivateKey(final P11CryptService p11CryptService,
@@ -96,7 +96,7 @@ public class P11PrivateKey implements PrivateKey {
     public int keysize() {
         return keysize;
     }
-    
+
     public PublicKey publicKey() {
         return publicKey;
     }
