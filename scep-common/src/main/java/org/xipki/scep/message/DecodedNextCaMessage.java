@@ -290,12 +290,8 @@ public class DecodedNextCaMessage {
             return ret;
         }
 
-        X509Certificate[] locaRaCerts;
-        if (raCerts.isEmpty()) {
-            locaRaCerts = null;
-        } else {
-            locaRaCerts = raCerts.toArray(new X509Certificate[0]);
-        }
+        X509Certificate[] locaRaCerts = raCerts.isEmpty()
+                ? null : raCerts.toArray(new X509Certificate[0]);
 
         AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(caCert, locaRaCerts);
         ret.setAuthorityCertStore(authorityCertStore);

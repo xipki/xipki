@@ -40,8 +40,7 @@ public class CaIdentifier {
         ScepUtil.requireNonBlank("serverUrl", serverUrl);
         URL tmpUrl = new URL(serverUrl);
         final String protocol = tmpUrl.getProtocol();
-        if (!"http".equalsIgnoreCase(protocol)
-                && !"https".equalsIgnoreCase(protocol)) {
+        if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
             throw new IllegalArgumentException(
                     "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
         }

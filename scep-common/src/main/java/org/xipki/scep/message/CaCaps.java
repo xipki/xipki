@@ -46,11 +46,8 @@ public class CaCaps {
     }
 
     public CaCaps(final Set<CaCapability> capabilities) {
-        if (capabilities == null || capabilities.isEmpty()) {
-            this.capabilities = new HashSet<CaCapability>();
-        } else {
-            this.capabilities = new HashSet<CaCapability>(capabilities);
-        }
+        this.capabilities = ((capabilities == null || capabilities.isEmpty()))
+             ? new HashSet<CaCapability>() : new HashSet<CaCapability>(capabilities);
         refresh();
     }
 
@@ -132,8 +129,7 @@ public class CaCaps {
             return false;
         }
 
-        CaCaps other = (CaCaps) obj;
-        return capabilities.equals(other.capabilities);
+        return capabilities.equals(((CaCaps) obj).capabilities);
     }
 
     public byte[] bytes() {

@@ -336,9 +336,7 @@ public class PkiMessage {
         }
         edGenerator.addRecipientInfoGenerator(recipientGenerator);
         try {
-
             OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(encAlgId).build();
-
             CMSEnvelopedData pkcsPkiEnvelope = edGenerator.generate(envelopable, encryptor);
             return pkcsPkiEnvelope;
         } catch (CMSException ex) {

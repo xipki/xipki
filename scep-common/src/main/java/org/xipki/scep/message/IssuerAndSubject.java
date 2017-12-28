@@ -68,9 +68,9 @@ public class IssuerAndSubject extends ASN1Object {
             return (IssuerAndSubject) obj;
         } else if (obj != null) {
             return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
+        } else {
+            return null;
         }
-
-        return null;
     }
 
 }

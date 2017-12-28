@@ -152,6 +152,7 @@ public class ScepResponder {
         if (rep.pkiStatus() == PkiStatus.FAILURE) {
             event.setLevel(AuditLevel.ERROR);
         }
+
         if (rep.failInfo() != null) {
             event.putEventData(ScepAuditConstants.NAME_failInfo, rep.failInfo());
         }
@@ -189,27 +190,20 @@ public class ScepResponder {
         TransactionId tid = req.transactionId();
         PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
         rep.setPkiStatus(PkiStatus.SUCCESS);
-
         rep.setRecipientNonce(req.senderNonce());
 
         if (req.failureMessage() != null) {
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badRequest);
-            return rep;
+            return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         }
 
         Boolean bo = req.isSignatureValid();
         if (bo != null && !bo.booleanValue()) {
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badMessageCheck);
-            return rep;
+            return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badMessageCheck);
         }
 
         bo = req.isDecryptionSuccessful();
         if (bo != null && !bo.booleanValue()) {
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badRequest);
-            return rep;
+            return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         }
 
         Date signingTime = req.signingTime();
@@ -227,9 +221,7 @@ public class ScepResponder {
             }
 
             if (isTimeBad) {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badTime);
-                return rep;
+                return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badTime);
             }
         }
 
@@ -238,9 +230,7 @@ public class ScepResponder {
         ScepHashAlgoType hashAlgoType = ScepHashAlgoType.forNameOrOid(oid);
         if (hashAlgoType == null) {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badAlg);
-            return rep;
+            return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
         } // end if
 
         boolean supported = false;
@@ -264,9 +254,7 @@ public class ScepResponder {
 
         if (!supported) {
             LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badAlg);
-            return rep;
+            return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
         } // end if
 
         // check the content encryption algorithm
@@ -274,29 +262,21 @@ public class ScepResponder {
         if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
             if (!caCaps.containsCapability(CaCapability.DES3)) {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badAlg);
-                return rep;
+                return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
             }
         } else if (AES_ENC_ALGS.contains(encOid)) {
             if (!caCaps.containsCapability(CaCapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badAlg);
-                return rep;
+                return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
             }
         } else if (CMSAlgorithm.DES_CBC.equals(encOid)) {
             if (!control.isUseInsecureAlg()) {
                 LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid, encOid);
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badAlg);
-                return rep;
+                return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
             }
         } else {
             LOG.warn("tid={}: encryption with algorithm {} is not permitted", tid, encOid);
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badAlg);
-            return rep;
+            return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
         }
 
         if (rep.pkiStatus() == PkiStatus.FAILURE) {
@@ -317,17 +297,14 @@ public class ScepResponder {
                         req.signatureCert().getSubjectX500Principal().getEncoded());
                 if (!name.equals(csr.getCertificationRequestInfo().getSubject())) {
                     LOG.warn("tid={}: self-signed cert.subject != CSR.subject", tid);
-                    rep.setPkiStatus(PkiStatus.FAILURE);
-                    rep.setFailInfo(FailInfo.badRequest);
-                    return rep;
+                    return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
                 }
             }
 
             String challengePwd = getChallengePassword(csr.getCertificationRequestInfo());
             if (challengePwd == null || !control.secret().equals(challengePwd)) {
                 LOG.warn("challengePassword is not trusted");
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badRequest);
+                return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
             }
 
             Certificate cert;
@@ -343,8 +320,7 @@ public class ScepResponder {
                 ContentInfo messageData = createSignedData(cert);
                 rep.setMessageData(messageData);
             } else {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badCertId);
+                buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
             }
 
             break;
@@ -354,8 +330,7 @@ public class ScepResponder {
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
             } else {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badCertId);
+                buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
             }
 
             break;
@@ -366,15 +341,13 @@ public class ScepResponder {
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
             } else {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badCertId);
+                buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
             }
 
             break;
         case RenewalReq:
             if (!caCaps.containsCapability(CaCapability.Renewal)) {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badRequest);
+                buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
             } else {
                 csr = CertificationRequest.getInstance(req.messageData());
                 try {
@@ -392,8 +365,7 @@ public class ScepResponder {
             break;
         case UpdateReq:
             if (!caCaps.containsCapability(CaCapability.Update)) {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badRequest);
+                buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
             } else {
                 csr = CertificationRequest.getInstance(req.messageData());
                 try {
@@ -404,8 +376,7 @@ public class ScepResponder {
                 if (cert != null) {
                     rep.setMessageData(createSignedData(cert));
                 } else {
-                    rep.setPkiStatus(PkiStatus.FAILURE);
-                    rep.setFailInfo(FailInfo.badCertId);
+                    buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
                 }
             }
             break;
@@ -420,13 +391,11 @@ public class ScepResponder {
             if (crl != null) {
                 rep.setMessageData(createSignedData(crl));
             } else {
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badCertId);
+                buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
             }
             break;
         default:
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badRequest);
+            buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         } // end switch
 
         return rep;
@@ -499,6 +468,13 @@ public class ScepResponder {
             }
         }
         return null;
+    }
+
+    private static PkiMessage buildPkiMessage(PkiMessage message,
+            PkiStatus status, FailInfo failInfo) {
+        message.setPkiStatus(PkiStatus.FAILURE);
+        message.setFailInfo(FailInfo.badRequest);
+        return message;
     }
 
 }

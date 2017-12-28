@@ -93,10 +93,7 @@ public class ScepServlet extends HttpServlet {
         try {
             CaCaps caCaps = responder.caCaps();
             if (post && !caCaps.containsCapability(CaCapability.POSTPKIOperation)) {
-                final String message = "HTTP POST is not supported";
-                LOG.error(message);
-
-                auditMessage = message;
+                auditMessage = "HTTP POST is not supported";
                 auditLevel = AuditLevel.ERROR;
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
@@ -109,20 +106,12 @@ public class ScepServlet extends HttpServlet {
                 CMSSignedData reqMessage;
                 // parse the request
                 try {
-                    byte[] content;
-                    if (post) {
-                        content = ScepUtil.read(req.getInputStream());
-                    } else {
-                        String b64 = req.getParameter("message");
-                        content = Base64.decode(b64);
-                    }
+                    byte[] content = post ? ScepUtil.read(req.getInputStream())
+                            : Base64.decode(req.getParameter("message"));
 
                     reqMessage = new CMSSignedData(content);
                 } catch (Exception ex) {
-                    final String message = "invalid request";
-                    LOG.error(message, LOG);
-
-                    auditMessage = message;
+                    auditMessage = "invalid request";
                     auditLevel = AuditLevel.ERROR;
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return;
@@ -132,18 +121,12 @@ public class ScepServlet extends HttpServlet {
                 try {
                     ci = responder.servicePkiOperation(reqMessage, event);
                 } catch (MessageDecodingException ex) {
-                    final String message = "could not decrypt and/or verify the request";
-                    LOG.error(message, ex);
-
-                    auditMessage = message;
+                    auditMessage = "could not decrypt and/or verify the request";
                     auditLevel = AuditLevel.ERROR;
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 } catch (CaException ex) {
-                    final String message = "system internal error";
-                    LOG.error(message, ex);
-
-                    auditMessage = message;
+                    auditMessage = "system internal error";
                     auditLevel = AuditLevel.ERROR;
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
@@ -174,10 +157,7 @@ public class ScepServlet extends HttpServlet {
                                 new CMSAbsentContent());
                         respBytes = degenerateSignedData.getEncoded();
                     } catch (CMSException ex) {
-                        final String message = "system internal error";
-                        LOG.error(message, ex);
-
-                        auditMessage = message;
+                        auditMessage = "system internal error";
                         auditLevel = AuditLevel.ERROR;
                         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         return;
@@ -207,10 +187,7 @@ public class ScepServlet extends HttpServlet {
                     byte[] respBytes = signedData.getEncoded();
                     sendToResponse(resp, ScepConstants.CT_X509_NEXT_CA_CERT, respBytes);
                 } catch (Exception ex) {
-                    final String message = "system internal error";
-                    LOG.error(message, LOG);
-
-                    auditMessage = message;
+                    auditMessage = "system internal error";
                     auditLevel = AuditLevel.ERROR;
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 }
@@ -247,8 +224,7 @@ public class ScepServlet extends HttpServlet {
     }
 
     protected PKIMessage generatePkiMessage(final InputStream is) throws IOException {
-        ScepUtil.requireNonNull("is", is);
-        ASN1InputStream asn1Stream = new ASN1InputStream(is);
+        ASN1InputStream asn1Stream = new ASN1InputStream(ScepUtil.requireNonNull("is", is));
 
         try {
             return PKIMessage.getInstance(asn1Stream.readObject());
