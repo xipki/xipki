@@ -33,17 +33,13 @@ import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 @Service
 public class CmpControlUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CMP control name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "CMP control name\n(required)")
     @Completion(CmpControlNameCompleter.class)
     protected String name;
 
-    @Option(name = "--conf",
-            required = true,
-            description = "CMP control configuration\n"
-                    + "(required)")
+    @Option(name = "--conf", required = true,
+            description = "CMP control configuration\n(required)")
     protected String conf;
 
     @Override

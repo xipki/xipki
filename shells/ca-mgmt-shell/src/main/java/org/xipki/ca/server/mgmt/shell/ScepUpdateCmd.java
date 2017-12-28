@@ -51,10 +51,8 @@ import org.xipki.security.util.X509Util;
 @Service
 public class ScepUpdateCmd extends CaAction {
 
-    @Option(name = "--name",
-            required = true,
-            description = "name\n"
-                    + "(required)")
+    @Option(name = "--name", required = true,
+            description = "name\n(required)")
     @Completion(ScepNameCompleter.class)
     private String name;
 
@@ -85,10 +83,8 @@ public class ScepUpdateCmd extends CaAction {
     @Completion(FilePathCompleter.class)
     private String certFile;
 
-    @Option(name = "--profile",
-            multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n"
-                    + "(multi-valued)")
+    @Option(name = "--profile", multiValued = true,
+            description = "profile name or 'ALL' for all profiles\n(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

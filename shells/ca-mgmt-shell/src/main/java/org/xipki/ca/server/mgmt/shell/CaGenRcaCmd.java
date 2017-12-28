@@ -39,17 +39,13 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CaGenRcaCmd extends CaAddOrGenAction {
 
-    @Option(name = "--csr",
-            required = true,
-            description = "CSR of the Root CA\n"
-                    + "(required)")
+    @Option(name = "--csr", required = true,
+            description = "CSR of the Root CA\n(required)")
     @Completion(FilePathCompleter.class)
     private String csrFile;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile of the Root CA\n"
-                    + "(required)")
+    @Option(name = "--profile", required = true,
+            description = "profile of the Root CA\n(required)")
     private String rcaProfile;
 
     @Option(name = "--serial",

@@ -41,21 +41,16 @@ import org.xipki.security.util.X509Util;
 @Service
 public class ResponderAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "responder name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "responder name\n(required)")
     private String name;
 
-    @Option(name = "--signer-type",
-            required = true,
-            description = "type of the responder signer\n"
-                    + "(required)")
+    @Option(name = "--signer-type", required = true,
+            description = "type of the responder signer\n(required)")
     @Completion(SignerTypeCompleter.class)
     private String signerType;
 
-    @Option(name = "--signer-conf",
-            required = true,
+    @Option(name = "--signer-conf", required = true,
             description = "conf of the responder signer")
     private String signerConf;
 

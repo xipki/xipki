@@ -36,15 +36,14 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class ExportConfCmd extends CaAction {
 
-    @Option(name = "--conf-file",
-            required = true,
+    @Option(name = "--conf-file", required = true,
             description = "zip file that saves the exported configuration")
     @Completion(FilePathCompleter.class)
     private String confFile;
 
     @Option(name = "--ca", multiValued = true,
             description = "CAs whose configuration should be exported."
-            + " Empty list means all CAs\n(multi-valued)")
+                    + " Empty list means all CAs\n(multi-valued)")
     @Completion(CaNameCompleter.class)
     private List<String> caNames;
 

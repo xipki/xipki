@@ -33,7 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 @Service
 public class CmpControlRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CMP control name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "CMP control name")
     @Completion(CmpControlNameCompleter.class)
     private String name;
 

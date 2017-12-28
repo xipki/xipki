@@ -46,10 +46,8 @@ import org.xipki.security.util.X509Util;
 @Service
 public class CrlSignerUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CRL signer name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "CRL signer name\n(required)")
     @Completion(CrlSignerNameCompleter.class)
     private String name;
 

@@ -41,7 +41,8 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class ResponderInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "responder name")
+    @Argument(index = 0, name = "name",
+            description = "responder name")
     @Completion(ResponderNameCompleter.class)
     private String name;
 

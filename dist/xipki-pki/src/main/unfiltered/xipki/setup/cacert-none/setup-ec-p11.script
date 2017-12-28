@@ -17,7 +17,7 @@ echo "#################################################################"
 
 xi:ec-p11  --slot 0 --label ${P11_LABEL} --curve ${CURVE}
 
-xi:req-p11 --hash ${HASH} --slot 0 --label ${P11_LABEL} \
+xi:csr-p11 --hash ${HASH} --slot 0 --label ${P11_LABEL} \
   --out ${KEYCERTS_DIR}/MYCA1.csr --subject "${CA_SUBJECT}"
 
 echo "#################################################################"

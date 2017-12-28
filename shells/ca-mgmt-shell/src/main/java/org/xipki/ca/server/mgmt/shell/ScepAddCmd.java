@@ -44,16 +44,12 @@ import org.xipki.password.PasswordResolver;
 @Service
 public class ScepAddCmd extends CaAction {
 
-    @Option(name = "--name",
-            required = true,
-            description = "name\n"
-                    + "(required)")
+    @Option(name = "--name", required = true,
+            description = "name\n(required)")
     private String name;
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(ScepNameCompleter.class)
     private String caName;
 
@@ -61,17 +57,13 @@ public class ScepAddCmd extends CaAction {
             description = "do not activate this SCEP")
     private Boolean inactive = Boolean.FALSE;
 
-    @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
+    @Option(name = "--resp-type", required = true,
+            description = "type of the responder\n(required)")
     @Completion(SignerTypeCompleter.class)
     private String responderType;
 
-    @Option(name = "--resp-conf",
-            required = true,
-            description = "conf of the responder\n"
-                    + "(required)")
+    @Option(name = "--resp-conf", required = true,
+            description = "conf of the responder\n(required)")
     private String responderConf;
 
     @Option(name = "--resp-cert",
@@ -80,14 +72,11 @@ public class ScepAddCmd extends CaAction {
     private String certFile;
 
     @Option(name = "--control",
-            required = false,
             description = "SCEP control")
     private String scepControl;
 
-    @Option(name = "--profile",
-            required = true, multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n"
-                    + "(required, multi-valued)")
+    @Option(name = "--profile", required = true, multiValued = true,
+            description = "profile name or 'ALL' for all profiles\n(required, multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

@@ -15,7 +15,7 @@ echo "#################################################################"
 
 xi:rsa-p12 --password 1234 --out ${KEYCERTS_DIR}/MYCA1.p12 --key-size 2048
 
-xi:req-p12 --hash ${HASH} --p12 ${KEYCERTS_DIR}/MYCA1.p12 --password 1234 \
+xi:csr-p12 --hash ${HASH} --p12 ${KEYCERTS_DIR}/MYCA1.p12 --password 1234 \
   --out ${KEYCERTS_DIR}/MYCA1.csr --subject "${CA_SUBJECT}"
 
 echo "#################################################################"

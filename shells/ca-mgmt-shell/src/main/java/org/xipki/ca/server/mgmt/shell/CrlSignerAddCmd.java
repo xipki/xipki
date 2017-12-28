@@ -39,16 +39,12 @@ import org.xipki.security.util.X509Util;
 @Service
 public class CrlSignerAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CRL signer name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "CRL signer name\n(required)")
     private String name;
 
-    @Option(name = "--signer-type",
-            required = true,
-            description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n"
-                    + "(required)")
+    @Option(name = "--signer-type", required = true,
+            description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n(required)")
     @Completion(CrlSignerNameCompleter.class)
     private String signerType;
 
@@ -61,10 +57,8 @@ public class CrlSignerAddCmd extends CaAction {
     @Completion(FilePathCompleter.class)
     private String signerCertFile;
 
-    @Option(name = "--control",
-            required = true,
-            description = "CRL control\n"
-                    + "(required)")
+    @Option(name = "--control", required = true,
+            description = "CRL control\n(required)")
     private String crlControl;
 
     @Reference

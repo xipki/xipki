@@ -53,30 +53,23 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CheckCertCmd extends XiAction {
 
-    @Option(name = "--cert", aliases = "-c",
-            required = true,
-            description = "certificate file\n"
-                    + "(required)")
+    @Option(name = "--cert", aliases = "-c", required = true,
+            description = "certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--issuer",
-            description = "issuer name\n"
-                    + "required if multiple issuers are configured")
+            description = "issuer name\n(required if multiple issuers are configured)")
     @Completion(X509IssuerNameCompleter.class)
     private String issuerName;
 
-    @Option(name = "--csr",
-            required = true,
-            description = "CSR file\n"
-                    + "(required)")
+    @Option(name = "--csr", required = true,
+            description = "CSR file\n(required)")
     @Completion(FilePathCompleter.class)
     private String csrFile;
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "certificate profile\n"
-                    + "(required)")
+    @Option(name = "--profile", aliases = "-p", required = true,
+            description = "certificate profile\n(required)")
     @Completion(X509CertprofileNameCompleter.class)
     private String profileName;
 

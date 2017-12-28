@@ -33,16 +33,13 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class CaProfileRemoveCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile",
-            required = true, description = "certificate profile name\n"
-                    + "(required)")
+    @Option(name = "--profile", required = true,
+            description = "certificate profile name\n(required)")
     private String profileName;
 
     @Override

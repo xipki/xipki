@@ -33,7 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Service
 public class PublisherRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "publisher name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "publisher name")
     @Completion(PublisherNameCompleter.class)
     private String name;
 

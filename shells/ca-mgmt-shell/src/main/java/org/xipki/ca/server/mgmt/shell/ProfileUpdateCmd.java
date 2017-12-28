@@ -36,10 +36,8 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class ProfileUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "profile name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "profile name\n(required)")
     @Completion(ProfileNameCompleter.class)
     protected String name;
 

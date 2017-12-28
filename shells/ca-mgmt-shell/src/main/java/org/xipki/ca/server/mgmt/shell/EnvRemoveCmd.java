@@ -31,7 +31,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class EnvRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "environment parameter name")
     private String name;
 
     @Override

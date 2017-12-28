@@ -39,20 +39,16 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class GetCertCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
+    @Option(name = "--serial", aliases = "-s", required = true,
             description = "serial number")
     private String serialNumberS;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
+    @Option(name = "--out", aliases = "-o", required = true,
             description = "where to save the certificate")
     @Completion(FilePathCompleter.class)
     private String outputFile;

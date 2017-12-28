@@ -38,16 +38,12 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class ProfileExportCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "profile name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "profile name\n(required)")
     private String name;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the profile configuration\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the profile configuration\n(required)")
     @Completion(FilePathCompleter.class)
     private String confFile;
 

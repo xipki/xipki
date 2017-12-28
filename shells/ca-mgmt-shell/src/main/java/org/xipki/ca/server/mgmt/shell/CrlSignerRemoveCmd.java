@@ -33,7 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 @Service
 public class CrlSignerRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "CRL signer name")
     @Completion(CrlSignerNameCompleter.class)
     private String name;
 

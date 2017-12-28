@@ -32,16 +32,12 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 @Service
 public class CmpControlAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CMP control name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "CMP control name\n(required)")
     private String name;
 
-    @Option(name = "--conf",
-            required = true,
-            description = "CMP control configuration\n"
-                    + "(required)")
+    @Option(name = "--conf", required = true,
+            description = "CMP control configuration\n(required)")
     private String conf;
 
     @Override

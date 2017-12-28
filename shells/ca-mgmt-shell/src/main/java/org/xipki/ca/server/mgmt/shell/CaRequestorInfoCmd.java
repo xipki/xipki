@@ -37,10 +37,8 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CaRequestorInfoCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 

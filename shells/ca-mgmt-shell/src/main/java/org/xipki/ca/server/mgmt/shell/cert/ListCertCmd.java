@@ -44,10 +44,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class ListCertCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     protected String caName;
 

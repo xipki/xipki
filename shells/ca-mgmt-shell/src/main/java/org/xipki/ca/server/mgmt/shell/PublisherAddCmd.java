@@ -36,16 +36,12 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class PublisherAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "publisher Name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "publisher Name\n(required)")
     private String name;
 
-    @Option(name = "--type",
-            required = true,
-            description = "publisher type\n"
-                    + "(required)")
+    @Option(name = "--type", required = true,
+            description = "publisher type\n(required)")
     private String type;
 
     @Option(name = "--conf",

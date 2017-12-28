@@ -54,16 +54,13 @@ public class DiffDigestDbCmd extends DbPortAction {
     @Completion(DirPathCompleter.class)
     private String refDir;
 
-    @Option(name = "--target",
-            required = true,
+    @Option(name = "--target", required = true,
             description = "configuration file of the target database to be evaluated")
     @Completion(FilePathCompleter.class)
     private String dbconfFile;
 
-    @Option(name = "--report-dir",
-            required = true,
-            description = "report directory\n"
-                    + "(required)")
+    @Option(name = "--report-dir", required = true,
+            description = "report directory\n(required)")
     @Completion(DirPathCompleter.class)
     private String reportDir;
 
@@ -78,10 +75,8 @@ public class DiffDigestDbCmd extends DbPortAction {
             description = "number of threads to query the target database")
     private Integer numTargetThreads = 40;
 
-    @Option(name = "--ca-cert",
-            multiValued = true,
-            description = "Certificate of CAs to be considered\n"
-                        + "(multi-valued)")
+    @Option(name = "--ca-cert", multiValued = true,
+            description = "Certificate of CAs to be considered\n(multi-valued)")
     @Completion(FilePathCompleter.class)
     private List<String> caCertFiles;
 

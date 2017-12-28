@@ -35,8 +35,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class GetRequestCmd extends UnRevRmCertAction {
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
+    @Option(name = "--out", aliases = "-o", required = true,
             description = "where to save the request")
     @Completion(FilePathCompleter.class)
     private String outputFile;

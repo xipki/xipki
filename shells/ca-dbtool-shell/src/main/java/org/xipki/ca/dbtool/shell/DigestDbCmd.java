@@ -36,16 +36,13 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class DigestDbCmd extends DbPortAction {
 
-    @Option(name = "--db-conf",
-            required = true,
+    @Option(name = "--db-conf", required = true,
             description = "database configuration file")
     @Completion(FilePathCompleter.class)
     private String dbconfFile;
 
-    @Option(name = "--out-dir",
-            required = true,
-            description = "output directory\n"
-                    + "(required)")
+    @Option(name = "--out-dir", required = true,
+            description = "output directory\n(required)")
     @Completion(DirPathCompleter.class)
     private String outdir;
 

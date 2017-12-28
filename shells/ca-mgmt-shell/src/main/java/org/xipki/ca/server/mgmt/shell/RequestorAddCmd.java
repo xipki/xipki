@@ -36,16 +36,12 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class RequestorAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "requestor name\n(required)")
     private String name;
 
-    @Option(name = "--cert",
-            required = true,
-            description = "requestor certificate file\n"
-                    + "(required)")
+    @Option(name = "--cert", required = true,
+            description = "requestor certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     private String certFile;
 

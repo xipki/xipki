@@ -45,31 +45,23 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class EnrollCertCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--csr",
-            required = true,
-            description = "CSR file\n"
-                    + "(required)")
+    @Option(name = "--csr", required = true,
+            description = "CSR file\n(required)")
     @Completion(FilePathCompleter.class)
     private String csrFile;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "profile name\n"
-                    + "(required)")
+    @Option(name = "--profile", aliases = "-p", required = true,
+            description = "profile name\n(required)")
     @Completion(ProfileNameCompleter.class)
     private String profileName;
 

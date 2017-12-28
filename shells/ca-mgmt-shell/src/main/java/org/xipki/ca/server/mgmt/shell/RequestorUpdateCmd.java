@@ -38,16 +38,12 @@ import org.xipki.security.util.X509Util;
 @Service
 public class RequestorUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "requestor name\n(required)")
     protected String name;
 
-    @Option(name = "--cert",
-            required = true,
-            description = "requestor certificate file\n"
-                    + "(required)")
+    @Option(name = "--cert", required = true,
+            description = "requestor certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     protected String certFile;
 

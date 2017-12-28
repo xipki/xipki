@@ -33,17 +33,13 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class CaAliasAddCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--alias",
-            required = true,
-            description = "CA alias\n"
-                    + "(required)")
+    @Option(name = "--alias", required = true,
+            description = "CA alias\n(required)")
     private String caAlias;
 
     @Override

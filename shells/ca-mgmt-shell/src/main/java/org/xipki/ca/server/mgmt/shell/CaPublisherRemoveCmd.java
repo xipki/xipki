@@ -34,10 +34,8 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Service
 public class CaPublisherRemoveCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 

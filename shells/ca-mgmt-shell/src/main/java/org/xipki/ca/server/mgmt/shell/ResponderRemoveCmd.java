@@ -33,7 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 @Service
 public class ResponderRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "responder name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "responder name")
     @Completion(ResponderNameCompleter.class)
     private String name;
 

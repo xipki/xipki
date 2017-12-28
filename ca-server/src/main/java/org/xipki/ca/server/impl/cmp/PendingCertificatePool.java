@@ -28,6 +28,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -51,7 +52,7 @@ class PendingCertificatePool {
             this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
             this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
             this.waitForConfirmTill = waitForConfirmTill;
-            this.certHash = certInfo.hashAlgo().hash(certInfo.cert().encodedCert());
+            this.certHash = HashAlgoType.SHA1.hash(certInfo.cert().encodedCert());
         }
 
         @Override

@@ -34,17 +34,13 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 @Service
 public class CaProfileAddCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
+    @Option(name = "--profile", required = true,
+            description = "profile name\n(required)")
     @Completion(ProfileNameCompleter.class)
     private String profileName;
 

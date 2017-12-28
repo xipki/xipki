@@ -47,8 +47,7 @@ public class GetCrlCmd extends CrlAction {
     private Boolean withBaseCrl = Boolean.FALSE;
 
     @Option(name = "--basecrl-out",
-            description = "where to save the baseCRL\n"
-                    + "(defaults to <out>-baseCRL)")
+            description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
     @Completion(FilePathCompleter.class)
     private String baseCrlOut;
 

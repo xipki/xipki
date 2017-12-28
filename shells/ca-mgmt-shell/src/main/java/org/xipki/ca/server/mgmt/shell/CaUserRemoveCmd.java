@@ -33,17 +33,13 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class CaUserRemoveCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--user",
-            required = true,
-            description = "user name\n"
-                    + "(required)")
+    @Option(name = "--user", required = true,
+            description = "user name\n(required)")
     private String userName;
 
     @Override

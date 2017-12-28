@@ -33,7 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 @Service
 public class ProfileRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "certificate profile name")
     @Completion(ProfileNameCompleter.class)
     private String name;
 

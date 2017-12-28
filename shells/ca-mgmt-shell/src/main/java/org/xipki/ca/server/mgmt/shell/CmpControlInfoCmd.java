@@ -40,7 +40,8 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CmpControlInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CMP control name")
+    @Argument(index = 0, name = "name",
+            description = "CMP control name")
     @Completion(CmpControlNameCompleter.class)
     private String name;
 

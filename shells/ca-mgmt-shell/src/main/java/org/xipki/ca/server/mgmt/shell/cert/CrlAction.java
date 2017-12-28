@@ -35,10 +35,8 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 
 public abstract class CrlAction extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     protected String caName;
 

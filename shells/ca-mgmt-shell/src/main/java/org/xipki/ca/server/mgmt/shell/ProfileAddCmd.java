@@ -36,16 +36,12 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class ProfileAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "profile name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "profile name\n(required)")
     private String name;
 
-    @Option(name = "--type",
-            required = true,
-            description = "profile type\n"
-                    + "(required)")
+    @Option(name = "--type", required = true,
+            description = "profile type\n(required)")
     private String type;
 
     @Option(name = "--conf",

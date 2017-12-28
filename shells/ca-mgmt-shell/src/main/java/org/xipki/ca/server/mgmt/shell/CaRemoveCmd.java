@@ -33,7 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class CaRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CA name", required = true)
+    @Argument(index = 0, name = "name", required = true,
+            description = "CA name")
     @Completion(CaNameCompleter.class)
     private String name;
 

@@ -39,30 +39,22 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
 @Service
 public class CaUserAddCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--user",
-            required = true,
-            description = "user name\n"
-                    + "(required)")
+    @Option(name = "--user", required = true,
+            description = "user name\n(required)")
     private String userName;
 
-    @Option(name = "--permission",
-            required = true, multiValued = true,
-            description = "permission\n"
-                    + "(required, multi-valued)")
+    @Option(name = "--permission", required = true, multiValued = true,
+            description = "permission\n(required, multi-valued)")
     @Completion(PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--profile",
-            required = true, multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n"
-                    + "(required, multi-valued)")
+    @Option(name = "--profile", required = true, multiValued = true,
+            description = "profile name or 'ALL' for all profiles\n(required, multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

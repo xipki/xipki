@@ -10,7 +10,7 @@ sleep 1
 
 # Prepare
 
-xi:req-p12 \
+xi:csr-p12 \
   --hash $STDHASH \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
@@ -67,7 +67,7 @@ xi:jscep-getcrl \
  
 ## Renewal with same CommonName 
 
-xi:req-p12 \
+xi:csr-p12 \
   --hash $STDHASH \
   --p12 output/JSCEP-OCSP1-2.p12 \
   --password 1234 \
@@ -93,7 +93,7 @@ xi:update-cert-p12 \
 
 ## Renewal with different CommonName 
 
-xi:req-p12 \
+xi:csr-p12 \
   --hash $STDHASH \
   --p12 output/JSCEP-OCSP2.p12 \
   --password 1234 \

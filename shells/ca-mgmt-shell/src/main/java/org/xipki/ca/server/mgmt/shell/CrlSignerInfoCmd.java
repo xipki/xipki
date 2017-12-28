@@ -41,7 +41,8 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CrlSignerInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CRL signer name")
+    @Argument(index = 0, name = "name",
+            description = "CRL signer name")
     @Completion(CrlSignerNameCompleter.class)
     private String name;
 

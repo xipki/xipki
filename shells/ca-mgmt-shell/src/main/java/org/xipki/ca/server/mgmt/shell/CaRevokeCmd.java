@@ -55,10 +55,8 @@ public class CaRevokeCmd extends CaAction {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--reason",
-            required = true,
-            description = "CRL reason\n"
-                    + "(required)")
+    @Option(name = "--reason", required = true,
+            description = "CRL reason\n(required)")
     @Completion(CaCrlReasonCompleter.class)
     private String reason;
 

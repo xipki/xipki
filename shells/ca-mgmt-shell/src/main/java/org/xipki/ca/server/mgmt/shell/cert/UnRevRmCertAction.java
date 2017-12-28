@@ -41,22 +41,18 @@ import org.xipki.security.util.X509Util;
 
 public abstract class UnRevRmCertAction extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "--cert", aliases = "-c",
-            description = "certificate file"
-                    + "(either cert or serial must be specified)")
+            description = "certificate file\n(either cert or serial must be specified)")
     @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "--serial", aliases = "-s",
-            description = "serial number\n"
-                    + "(either cert or serial must be specified)")
+            description = "serial number\n(either cert or serial must be specified)")
     private String serialNumberS;
 
     protected BigInteger getSerialNumber()

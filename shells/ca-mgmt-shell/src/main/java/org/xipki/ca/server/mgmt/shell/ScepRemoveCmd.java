@@ -33,10 +33,8 @@ import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 @Service
 public class ScepRemoveCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "SCEP CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "SCEP CA name\n(required)")
     @Completion(ScepNameCompleter.class)
     private String name;
 

@@ -155,11 +155,11 @@ Feature xipki-security-shell (not started by default)
 
      export certificate from PKCS#12 keystore
 
-   * `xi:req-p11`
+   * `xi:csr-p11`
 
      generate CSR with PKCS#11 device
 
-   * `xi:req-p12`
+   * `xi:csr-p12`
 
      generate CSR with PKCS#12 keystore
 

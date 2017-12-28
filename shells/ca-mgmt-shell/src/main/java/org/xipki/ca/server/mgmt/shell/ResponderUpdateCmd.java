@@ -48,10 +48,8 @@ public class ResponderUpdateCmd extends CaAction {
     @Reference
     protected PasswordResolver passwordResolver;
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "responder name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "responder name\n(required)")
     @Completion(ResponderNameCompleter.class)
     protected String name;
 

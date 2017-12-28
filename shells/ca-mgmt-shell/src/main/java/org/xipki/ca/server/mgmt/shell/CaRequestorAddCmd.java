@@ -41,17 +41,13 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
 @Service
 public class CaRequestorAddCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--requestor",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
+    @Option(name = "--requestor", required = true,
+            description = "requestor name\n(required)")
     @Completion(RequestorNameCompleter.class)
     private String requestorName;
 
@@ -60,17 +56,13 @@ public class CaRequestorAddCmd extends CaAction {
     @Completion(YesNoCompleter.class)
     private String raS = "no";
 
-    @Option(name = "--permission",
-            required = true, multiValued = true,
-            description = "permission\n"
-                    + "(required, multi-valued)")
+    @Option(name = "--permission", required = true, multiValued = true,
+            description = "permission\n(required, multi-valued)")
     @Completion(PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--profile",
-            multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n"
-                    + "(multi-valued)")
+    @Option(name = "--profile", multiValued = true,
+            description = "profile name or 'ALL' for all profiles\n(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

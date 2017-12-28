@@ -14,7 +14,7 @@ echo "# Generate key and certificate for SCEP"
 xi:rsa-p12 --key-size 2048 --password 1234 --out ${KEYCERTS_DIR}/SCEP1.p12 \
   --subject "CN=Dummy"
 
-xi:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/SCEP1.p12 --password 1234 \
+xi:csr-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/SCEP1.p12 --password 1234 \
   --out ${KEYCERTS_DIR}/SCEP1.csr --subject "${SCEP_SUBJECT}"
 
 ca:enroll-cert --ca MYCA1 --csr ${KEYCERTS_DIR}/SCEP1.csr \
@@ -33,7 +33,7 @@ echo "# Generate key and certificate for OCSPResponder"
 xi:rsa-p12 --key-size 2048 --password 1234 --out ${KEYCERTS_DIR}/OCSP1.p12 \
   --subject "CN=Dummy"
 
-xi:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/OCSP1.p12 --password 1234 \
+xi:csr-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/OCSP1.p12 --password 1234 \
   --out ${KEYCERTS_DIR}/OCSP1.csr --subject "${OCSP_SUBJECT}"
 
 ca:enroll-cert --ca MYCA1 --csr ${KEYCERTS_DIR}/OCSP1.csr \

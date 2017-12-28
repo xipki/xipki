@@ -34,17 +34,13 @@ import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 @Service
 public class CaRequestorRemoveCmd extends CaAction {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    @Option(name = "--ca", required = true,
+            description = "CA name\n(required)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--requestor",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
+    @Option(name = "--requestor", required = true,
+            description = "requestor name\n(required)")
     @Completion(RequestorNameCompleter.class)
     private String requestorName;
 

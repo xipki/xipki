@@ -31,16 +31,12 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class EnvUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-                description = "parameter name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "parameter name\n(required)")
     protected String name;
 
-    @Option(name = "--value",
-            required = true,
-            description = "environment parameter value\n"
-                    + "(required)")
+    @Option(name = "--value", required = true,
+            description = "environment parameter value\n(required)")
     protected String value;
 
     @Override

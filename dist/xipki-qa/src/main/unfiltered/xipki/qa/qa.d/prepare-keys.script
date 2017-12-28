@@ -48,7 +48,6 @@ if { $SIG_TYPE equals "RSAPSS" } {
   CMP_SIGALGO = "${STDHASH}withRSA"
 }
 
-echo ">>>>> ${CMP_SIGALGO} <<<<<"
 xi:copy-dir xipki/qa/p12/shared output
 
 xi:copy-dir xipki/qa/p12/$KEY_TYPE output

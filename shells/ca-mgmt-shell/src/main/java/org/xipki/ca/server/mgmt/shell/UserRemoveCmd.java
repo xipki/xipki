@@ -31,10 +31,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class UserRemoveCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "user Name\n"
-                    + "(required)")
+    @Option(name = "--name", aliases = "-n", required = true,
+            description = "user Name\n(required)")
     private String name;
 
     @Override

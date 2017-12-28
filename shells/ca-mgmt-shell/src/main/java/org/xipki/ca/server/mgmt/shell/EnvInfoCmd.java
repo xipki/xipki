@@ -37,7 +37,8 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class EnvInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "environment parameter name")
+    @Argument(index = 0, name = "name",
+            description = "environment parameter name")
     private String name;
 
     @Override
