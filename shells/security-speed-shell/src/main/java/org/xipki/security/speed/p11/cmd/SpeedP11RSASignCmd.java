@@ -44,10 +44,8 @@ public class SpeedP11RSASignCmd extends SpeedP11Action {
             description = "public exponent")
     private String publicExponent = "0x10001";
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
+    @Option(name = "--sig-algo", required = true,
+            description = "signature algorithm\n(required)")
     @Completion(RSASigAlgCompleter.class)
     private String sigAlgo;
 

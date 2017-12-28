@@ -38,11 +38,13 @@ import org.xipki.password.OBFPasswordService;
 @Service
 public class ObfuscateCmd extends SecurityAction {
 
-    @Option(name = "--out", description = "where to save the encrypted password")
+    @Option(name = "--out",
+            description = "where to save the encrypted password")
     @Completion(FilePathCompleter.class)
     private String outFile;
 
-    @Option(name = "-k", description = "quorum of the password parts")
+    @Option(name = "-k",
+            description = "quorum of the password parts")
     private Integer quorum = 1;
 
     @Override

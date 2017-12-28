@@ -34,12 +34,10 @@ import org.xipki.security.util.AlgorithmUtil;
 @Command(scope = "xi", name = "validate-csr",
         description = "validate CSR")
 @Service
-public class CertRequestValidateCmd extends SecurityAction {
+public class CsrValidateCmd extends SecurityAction {
 
-    @Option(name = "--csr",
-            required = true,
-            description = "CSR file\n"
-                    + "(required)")
+    @Option(name = "--csr", required = true,
+            description = "CSR file\n(required)")
     @Completion(FilePathCompleter.class)
     private String csrFile;
 

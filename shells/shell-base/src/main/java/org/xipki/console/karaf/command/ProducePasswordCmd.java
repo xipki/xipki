@@ -37,11 +37,13 @@ import org.xipki.password.PasswordProducer;
 @Service
 public class ProducePasswordCmd extends XiAction {
 
-    @Option(name = "--name", required = true, description = "name of the password")
+    @Option(name = "--name", required = true,
+            description = "name of the password")
     @Completion(PasswordNameCompleter.class)
     private String name;
 
-    @Option(name = "-k", description = "quorum of the password parts")
+    @Option(name = "-k",
+            description = "quorum of the password parts")
     private Integer quorum = 1;
 
     @Override

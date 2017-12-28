@@ -38,10 +38,8 @@ import org.xipki.console.karaf.intern.FileUtils;
 @Service
 public class FileRmCmd extends XiAction {
 
-    @Argument(index = 0, name = "file",
-            required = true,
-            description = "file or directory to be deleted\n"
-                    + "(required)")
+    @Argument(index = 0, name = "file", required = true,
+            description = "file or directory to be deleted\n(required)")
     @Completion(FilePathCompleter.class)
     private String targetPath;
 

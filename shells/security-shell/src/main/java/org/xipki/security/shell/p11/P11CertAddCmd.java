@@ -40,16 +40,12 @@ import org.xipki.security.util.X509Util;
 @Service
 public class P11CertAddCmd extends SecurityAction {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     private Integer slotIndex;
 
-    @Option(name = "--cert",
-            required = true,
-            description = "certificate file\n"
-                    + "(required)")
+    @Option(name = "--cert", required = true,
+            description = "certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     private String certFile;
 

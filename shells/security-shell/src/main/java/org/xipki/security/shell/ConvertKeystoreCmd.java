@@ -45,17 +45,13 @@ import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 @Service
 public class ConvertKeystoreCmd extends SecurityAction {
 
-    @Option(name = "--in",
-            required = true,
-            description = "Source keystore file\n"
-                    + "(required)")
+    @Option(name = "--in", required = true,
+            description = "Source keystore file\n(required)")
     @Completion(FilePathCompleter.class)
     private String inFile;
 
-    @Option(name = "--intype",
-            required = true,
-            description = "Type of the source keystore\n"
-                    + "(required)")
+    @Option(name = "--intype", required = true,
+            description = "Type of the source keystore\n(required)")
     @Completion(KeystoreTypeCompleter.class)
     private String inType;
 
@@ -63,17 +59,13 @@ public class ConvertKeystoreCmd extends SecurityAction {
             description = "password of the source keystore")
     private String inPwd;
 
-    @Option(name = "--out",
-            required = true,
-            description = "Destination keystore file\n"
-                    + "(required)")
+    @Option(name = "--out", required = true,
+            description = "Destination keystore file\n(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;
 
-    @Option(name = "--outtype",
-            required = true,
-            description = "Type of the destination keystore\n"
-                    + "(required)")
+    @Option(name = "--outtype", required = true,
+            description = "Type of the destination keystore\n(required)")
     @Completion(KeystoreTypeCompleter.class)
     private String outType;
 

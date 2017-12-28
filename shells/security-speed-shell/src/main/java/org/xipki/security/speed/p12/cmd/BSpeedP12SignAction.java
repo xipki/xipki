@@ -27,10 +27,8 @@ import org.xipki.security.speed.cmd.BatchSpeedAction;
 
 public abstract class BSpeedP12SignAction extends BatchSpeedAction {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
+    @Option(name = "--sig-algo", required = true,
+            description = "signature algorithm\n(required)")
     protected String sigAlgo;
 
 }

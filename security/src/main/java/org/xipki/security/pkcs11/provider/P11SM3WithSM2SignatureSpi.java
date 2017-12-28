@@ -155,7 +155,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
 
         try {
             byte[] plainSignature = signingKey.sign(mechanism, p11Params, dataToSign);
-            return SignerUtil.convertPlainDSASigToX962(plainSignature);
+            return SignerUtil.dsaSigPlainToX962(plainSignature);
         } catch (XiSecurityException | P11TokenException ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }

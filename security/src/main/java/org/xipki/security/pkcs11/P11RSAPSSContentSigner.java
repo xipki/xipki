@@ -143,7 +143,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
         if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_PSS)) {
             this.mechanism = PKCS11Constants.CKM_RSA_PKCS_PSS;
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
-            Digest digest = SignerUtil.getDigest(hashAlgo);
+            Digest digest = hashAlgo.createDigest();
             this.outputStream = new DigestOutputStream(digest);
         } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
             this.mechanism = PKCS11Constants.CKM_RSA_X_509;

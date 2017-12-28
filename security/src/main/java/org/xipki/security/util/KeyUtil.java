@@ -70,8 +70,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.jce.spec.ECPublicKeySpec;
-import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.util.BigIntegers;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -100,13 +99,6 @@ public class KeyUtil {
                 return KeyStore.getInstance(storeType);
             }
         }
-    }
-
-    // CHECKSTYLE:SKIP
-    public static KeyPair generateRSAKeypair(final int keysize, final SecureRandom random)
-            throws NoSuchAlgorithmException, NoSuchProviderException,
-                InvalidAlgorithmParameterException {
-        return generateRSAKeypair(keysize, (BigInteger) null, random);
     }
 
     // CHECKSTYLE:SKIP
@@ -278,32 +270,6 @@ public class KeyUtil {
         }
     }
 
-    // CHECKSTYLE:SKIP
-    public static ECPublicKey generateECPublicKeyForNameOrOid(final String curveNameOrOid,
-            final byte[] encodedQ)
-            throws InvalidKeySpecException {
-        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-        if (oid == null) {
-            throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
-        }
-        return generateECPublicKey(oid, encodedQ);
-    }
-
-    // CHECKSTYLE:SKIP
-    public static ECPublicKey generateECPublicKey(final ASN1ObjectIdentifier curveOid,
-            final byte[] encodedQ)
-            throws InvalidKeySpecException {
-        ParamUtil.requireNonNull("curveOid", curveOid);
-        ParamUtil.requireNonNull("encoded", encodedQ);
-        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid.getId());
-        ECPoint pointQ = spec.getCurve().decodePoint(encodedQ);
-        ECPublicKeySpec keySpec = new ECPublicKeySpec(pointQ, spec);
-        KeyFactory kf = getKeyFactory("EC");
-        synchronized (kf) {
-            return (ECPublicKey) kf.generatePublic(keySpec);
-        }
-    }
-
     public static AsymmetricKeyParameter generatePrivateKeyParameter(final PrivateKey key)
             throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
@@ -378,7 +344,7 @@ public class KeyUtil {
             ECParameterSpec paramSpec = ecPubKey.getParams();
             ASN1ObjectIdentifier curveOid = detectCurveOid(paramSpec);
             if (curveOid == null) {
-                throw new InvalidKeyException("Cannot find namedCurve of the given public key");
+                throw new InvalidKeyException("Cannot find namedCurve of the given private key");
             }
 
             java.security.spec.ECPoint pointW = ecPubKey.getW();
@@ -393,20 +359,12 @@ public class KeyUtil {
             }
 
             int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
-            byte[] wxBytes = wx.toByteArray();
-            byte[] wyBytes = wy.toByteArray();
+            byte[] wxBytes = BigIntegers.asUnsignedByteArray(keysize, wx);
+            byte[] wyBytes = BigIntegers.asUnsignedByteArray(keysize, wy);
             byte[] pubKey = new byte[1 + keysize * 2];
             pubKey[0] = 4; // uncompressed
-
-            int numBytesToCopy = Math.min(wxBytes.length, keysize);
-            int srcOffset = Math.max(0, wxBytes.length - numBytesToCopy);
-            int destOffset = 1 + Math.max(0, keysize - wxBytes.length);
-            System.arraycopy(wxBytes, srcOffset, pubKey, destOffset, numBytesToCopy);
-
-            numBytesToCopy = Math.min(wyBytes.length, keysize);
-            srcOffset = Math.max(0, wyBytes.length - numBytesToCopy);
-            destOffset = 1 + keysize + Math.max(0, keysize - wyBytes.length);
-            System.arraycopy(wyBytes, srcOffset, pubKey, destOffset, numBytesToCopy);
+            System.arraycopy(wxBytes, 0, pubKey, 1, keysize);
+            System.arraycopy(wyBytes, 0, pubKey, 1 + keysize, keysize);
 
             AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
                     curveOid);

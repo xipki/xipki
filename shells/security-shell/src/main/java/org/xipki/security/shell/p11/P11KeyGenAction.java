@@ -36,20 +36,16 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 public abstract class P11KeyGenAction extends KeyGenAction {
 
-    @Option(name = "--label",
-            required = true,
-            description = "label of the PKCS#11 objects\n"
-                    + "(required)")
+    @Option(name = "--label", required = true,
+            description = "label of the PKCS#11 objects\n(required)")
     protected String label;
 
     @Option(name = "--extractable", aliases = {"-x"},
             description = "whether the key is extractable")
     private Boolean extractable;
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     private Integer slotIndex;
 
     @Option(name = "--module",

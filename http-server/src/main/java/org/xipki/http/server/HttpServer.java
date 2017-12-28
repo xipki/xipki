@@ -24,6 +24,7 @@ import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.HttpServlet;
 import org.xipki.http.servlet.ServletURI;
 import org.xipki.http.servlet.SslReverseProxyMode;
@@ -257,8 +258,7 @@ public final class HttpServer {
                 if (th instanceof ClassNotFoundException) {
                     LOG.info("epoll linux is not in classpath");
                 } else {
-                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
-                    LOG.debug("could not use Epoll transport", th);
+                    LogUtil.warn(LOG, th, "could not use Epoll transport");
                 }
                 channelClass = null;
                 this.bossGroup = null;

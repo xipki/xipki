@@ -40,10 +40,8 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class FileListCmd extends XiAction {
 
-    @Argument(index = 0, name = "file",
-            required = true,
-            description = "file or directory\n"
-                    + "(required)")
+    @Argument(index = 0, name = "file", required = true,
+            description = "file or directory\n(required)")
     @Completion(FilePathCompleter.class)
     private String targetPath;
 

@@ -39,10 +39,8 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class P12CertExportCmd extends P12SecurityAction {
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;
 

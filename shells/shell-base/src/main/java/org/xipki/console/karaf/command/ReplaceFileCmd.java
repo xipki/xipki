@@ -42,20 +42,16 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class ReplaceFileCmd extends XiAction {
 
-    @Argument(index = 0, name = "file",
-            required = true,
-            description = "file\n"
-                    + "(required)")
+    @Argument(index = 0, name = "file", required = true,
+            description = "file\n(required)")
     @Completion(FilePathCompleter.class)
     private String source;
 
-    @Option(name = "--old",
-            required = true,
+    @Option(name = "--old", required = true,
             description = "text to be replaced")
     private String oldText;
 
-    @Option(name = "--new",
-            required = true,
+    @Option(name = "--new", required = true,
             description = "next text")
     private String newText;
 

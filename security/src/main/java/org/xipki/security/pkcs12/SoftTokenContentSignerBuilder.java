@@ -63,7 +63,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DefaultConcurrentContentSigner;
+import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.bc.XiSM2Signer;
@@ -355,7 +355,7 @@ public class SoftTokenContentSignerBuilder {
         final boolean mac = false;
         ConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
+            concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

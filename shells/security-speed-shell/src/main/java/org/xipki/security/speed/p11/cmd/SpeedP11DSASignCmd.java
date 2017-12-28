@@ -45,10 +45,8 @@ public class SpeedP11DSASignCmd extends SpeedP11Action {
             description = "bit length of the sub-prime")
     private Integer qlen;
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
+    @Option(name = "--sig-algo", required = true,
+            description = "signature algorithm\n(required)")
     @Completion(DSASigAlgCompleter.class)
     private String sigAlgo;
 

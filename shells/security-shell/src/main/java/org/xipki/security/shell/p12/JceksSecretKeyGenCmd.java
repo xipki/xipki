@@ -35,15 +35,12 @@ import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
 @Service
 public class JceksSecretKeyGenCmd extends P12KeyGenAction {
 
-    @Option(name = "--key-type",
-            required = true,
-            description = "keytype, current only AES, DES3 and GENERIC are supported\n"
-                    + "(required)")
+    @Option(name = "--key-type", required = true,
+            description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
     @Completion(SecretKeyTypeCompleter.class)
    private String keyType;
 
-    @Option(name = "--key-size",
-            required = true,
+    @Option(name = "--key-size", required = true,
             description = "keysize in bit.")
     private Integer keysize;
 

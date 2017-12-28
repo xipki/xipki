@@ -37,16 +37,12 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Service
 public class P11CertDeleteCmd extends SecurityAction {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     private Integer slotIndex;
 
-    @Option(name = "--id",
-            required = true,
-            description = "id of the certificate in the PKCS#11 device\n"
-                    + "(required)")
+    @Option(name = "--id", required = true,
+            description = "id of the certificate in the PKCS#11 device\n(required)")
     private String id;
 
     @Option(name = "--module",

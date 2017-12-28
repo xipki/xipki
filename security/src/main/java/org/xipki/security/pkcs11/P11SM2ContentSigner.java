@@ -100,7 +100,7 @@ class P11SM2ContentSigner implements XiContentSigner {
             this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
 
             this.mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
-            Digest digest = SignerUtil.getDigest(hashAlgo);
+            Digest digest = hashAlgo.createDigest();
             this.outputStream = new DigestOutputStream(digest);
         } else {
             this.z = null; // not required
@@ -151,7 +151,7 @@ class P11SM2ContentSigner implements XiContentSigner {
     public byte[] getSignature() {
         try {
             byte[] plainSignature = getPlainSignature();
-            return SignerUtil.convertPlainDSASigToX962(plainSignature);
+            return SignerUtil.dsaSigPlainToX962(plainSignature);
         } catch (XiSecurityException ex) {
             LogUtil.warn(LOG, ex);
             throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());

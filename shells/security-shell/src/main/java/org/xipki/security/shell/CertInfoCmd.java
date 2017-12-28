@@ -40,30 +40,37 @@ import org.xipki.security.HashAlgoType;
 @Service
 public class CertInfoCmd extends SecurityAction {
 
-    @Option(name = "--in", description = "certificate file\n"
-                    + "(required)")
+    @Option(name = "--in",
+            description = "certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     private String inFile;
 
-    @Option(name = "--hex", aliases = "-h", description = "print hex number")
+    @Option(name = "--hex", aliases = "-h",
+            description = "print hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--serial", description = "print serial number")
+    @Option(name = "--serial",
+            description = "print serial number")
     private Boolean serial;
 
-    @Option(name = "--subject", description = "print subject")
+    @Option(name = "--subject",
+            description = "print subject")
     private Boolean subject;
 
-    @Option(name = "--issuer", description = "print issuer")
+    @Option(name = "--issuer",
+            description = "print issuer")
     private Boolean issuer;
 
-    @Option(name = "--not-before", description = "print notBefore")
+    @Option(name = "--not-before",
+            description = "print notBefore")
     private Boolean notBefore;
 
-    @Option(name = "--not-after", description = "print notAfter")
+    @Option(name = "--not-after",
+            description = "print notAfter")
     private Boolean notAfter;
 
-    @Option(name = "--fingerprint", description = "print fingerprint in hex")
+    @Option(name = "--fingerprint",
+            description = "print fingerprint in hex")
     private Boolean fingerprint;
 
     @Option(name = "--hash",

@@ -36,17 +36,11 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
-import org.bouncycastle.asn1.gm.GMNamedCurves;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
-import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.common.util.ParamUtil;
@@ -63,125 +57,417 @@ import org.xipki.security.SignerConf;
 
 public class AlgorithmUtil {
 
-    private static final Map<String, AlgorithmCode> algNameCodeMap;
-
-    // CHECKSTYLE:SKIP
     private static final List<String> curveNames;
 
-    private static final Map<String, ASN1ObjectIdentifier> curveNameOidMap;
+    private static final Map<String, ASN1ObjectIdentifier> curveNameToOidMap;
+
+    private static final Map<ASN1ObjectIdentifier, String> curveOidToNameMap;
+
+    private static final Map<ASN1ObjectIdentifier, AlgorithmCode> algOidToCodeMap;
+
+    private static final Map<ASN1ObjectIdentifier, HashAlgoType> sigAlgOidToDigestMap;
+
+    private static final Map<ASN1ObjectIdentifier, HashAlgoType> macAlgOidToDigestMap;
+
+    private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToECSigAlgMap;
+
+    private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToECPlainSigAlgMap;
+
+    private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToDSASigAlgMap;
+
+    private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToRSASigAlgMap;
+
+    private static final Map<ASN1ObjectIdentifier, String> macAlgOidToNameMap;
+
+    private static final Map<String, ASN1ObjectIdentifier> macAlgNameToOidMap;
+
+    private static final Map<ASN1ObjectIdentifier, String> sigAlgOidToNameMap;
+
+    private static final Map<String, ASN1ObjectIdentifier> sigAlgNameToOidMap;
+
+    private static final Map<ASN1ObjectIdentifier, AlgorithmCode> digestToMgf1AlgCodeMap;
+
+    private static final Map<ASN1ObjectIdentifier, String> digestOidToMgf1SigNameMap;
+
+    private static final Map<String, HashAlgoType> mgf1SigNameToDigestOidMap;
 
     static {
-        List<String> nameList = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
+        //----- initialize the static fields curveNames, curveNameOidMap, curveOidNameMap
+        {
+            List<String> nameList = new LinkedList<>();
+            Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
+            Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
 
-        Enumeration<?> names = ECNamedCurveTable.getNames();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
-            if (oid == null) {
-                continue;
+            Enumeration<?> names = ECNamedCurveTable.getNames();
+            while (names.hasMoreElements()) {
+                String name = ((String) names.nextElement()).toLowerCase();
+                ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
+                if (oid == null) {
+                    continue;
+                }
+
+                nameList.add(name);
+                nameOidMap.put(name, oid);
+                oidNameMap.put(oid, name);
             }
 
-            nameList.add(name);
-            nameOidMap.put(name.toLowerCase(), oid);
+            Collections.sort(nameList);
+            curveNames = Collections.unmodifiableList(nameList);
+            curveNameToOidMap = Collections.unmodifiableMap(nameOidMap);
+            curveOidToNameMap = Collections.unmodifiableMap(oidNameMap);
         }
 
-        Collections.sort(nameList);
-        curveNames = Collections.unmodifiableList(nameList);
-        curveNameOidMap = Collections.unmodifiableMap(nameOidMap);
+        //----- Initialize the static fields algNameCodeMap
+        {
+            Map<ASN1ObjectIdentifier, AlgorithmCode> map = new HashMap<>();
+            // HMAC
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA1,   AlgorithmCode.HMAC_SHA1);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA224, AlgorithmCode.HMAC_SHA224);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA256, AlgorithmCode.HMAC_SHA256);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA384, AlgorithmCode.HMAC_SHA384);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA512, AlgorithmCode.HMAC_SHA512);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_224, AlgorithmCode.HMAC_SHA224);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256, AlgorithmCode.HMAC_SHA256);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384, AlgorithmCode.HMAC_SHA384);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512, AlgorithmCode.HMAC_SHA512);
 
-        // Algorithm Name and Code Map
-        Map<String, AlgorithmCode> map = new HashMap<>();
-        // HMAC
-        map.put(PKCSObjectIdentifiers.id_hmacWithSHA1.getId(), AlgorithmCode.HMAC_SHA1);
-        map.put(PKCSObjectIdentifiers.id_hmacWithSHA224.getId(), AlgorithmCode.HMAC_SHA224);
-        map.put(PKCSObjectIdentifiers.id_hmacWithSHA256.getId(), AlgorithmCode.HMAC_SHA256);
-        map.put(PKCSObjectIdentifiers.id_hmacWithSHA384.getId(), AlgorithmCode.HMAC_SHA384);
-        map.put(PKCSObjectIdentifiers.id_hmacWithSHA512.getId(), AlgorithmCode.HMAC_SHA512);
-        map.put(NISTObjectIdentifiers.id_hmacWithSHA3_224.getId(), AlgorithmCode.HMAC_SHA224);
-        map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256.getId(), AlgorithmCode.HMAC_SHA256);
-        map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384.getId(), AlgorithmCode.HMAC_SHA384);
-        map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512.getId(), AlgorithmCode.HMAC_SHA512);
+            // GMAC
+            map.put(NISTObjectIdentifiers.id_aes128_GCM, AlgorithmCode.AES128_GMAC);
+            map.put(NISTObjectIdentifiers.id_aes192_GCM, AlgorithmCode.AES192_GMAC);
+            map.put(NISTObjectIdentifiers.id_aes256_GCM, AlgorithmCode.AES256_GMAC);
 
-        // GMAC
-        map.put(NISTObjectIdentifiers.id_aes128_GCM.getId(), AlgorithmCode.AES128_GMAC);
-        map.put(NISTObjectIdentifiers.id_aes192_GCM.getId(), AlgorithmCode.AES192_GMAC);
-        map.put(NISTObjectIdentifiers.id_aes256_GCM.getId(), AlgorithmCode.AES256_GMAC);
+            // ECDSA
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA1,   AlgorithmCode.SHA1WITHECDSA);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA224, AlgorithmCode.SHA224WITHECDSA);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA256, AlgorithmCode.SHA256WITHECDSA);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA384, AlgorithmCode.SHA384WITHECDSA);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA512, AlgorithmCode.SHA512WITHECDSA);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224,
+                    AlgorithmCode.SHA3_224WITHECDSA);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256,
+                    AlgorithmCode.SHA3_256WITHECDSA);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384,
+                    AlgorithmCode.SHA3_384WITHECDSA);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512,
+                    AlgorithmCode.SHA3_512WITHECDSA);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1,
+                    AlgorithmCode.SHA1WITHPLAIN_ECDSA);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224,
+                    AlgorithmCode.SHA224WITHPLAIN_ECDSA);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256,
+                    AlgorithmCode.SHA256WITHPLAIN_ECDSA);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384,
+                    AlgorithmCode.SHA384WITHPLAIN_ECDSA);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512,
+                    AlgorithmCode.SHA512WITHPLAIN_ECDSA);
 
-        // ECDSA
-        map.put(X9ObjectIdentifiers.ecdsa_with_SHA1.getId(), AlgorithmCode.SHA1WITHECDSA);
-        map.put(X9ObjectIdentifiers.ecdsa_with_SHA224.getId(), AlgorithmCode.SHA224WITHECDSA);
-        map.put(X9ObjectIdentifiers.ecdsa_with_SHA256.getId(), AlgorithmCode.SHA256WITHECDSA);
-        map.put(X9ObjectIdentifiers.ecdsa_with_SHA384.getId(), AlgorithmCode.SHA384WITHECDSA);
-        map.put(X9ObjectIdentifiers.ecdsa_with_SHA512.getId(), AlgorithmCode.SHA512WITHECDSA);
-        map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId(),
-                AlgorithmCode.SHA3_224WITHECDSA);
-        map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(),
-                AlgorithmCode.SHA3_256WITHECDSA);
-        map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(),
-                AlgorithmCode.SHA3_384WITHECDSA);
-        map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(),
-                AlgorithmCode.SHA3_512WITHECDSA);
-        map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1.getId(),
-                AlgorithmCode.SHA1WITHPLAIN_ECDSA);
-        map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224.getId(),
-                AlgorithmCode.SHA224WITHPLAIN_ECDSA);
-        map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256.getId(),
-                AlgorithmCode.SHA256WITHPLAIN_ECDSA);
-        map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384.getId(),
-                AlgorithmCode.SHA384WITHPLAIN_ECDSA);
-        map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512.getId(),
-                AlgorithmCode.SHA512WITHPLAIN_ECDSA);
+            // DSA
+            map.put(X9ObjectIdentifiers.id_dsa_with_sha1,
+                    AlgorithmCode.SHA1WITHDSA);
+            map.put(NISTObjectIdentifiers.dsa_with_sha224,
+                    AlgorithmCode.SHA224WITHDSA);
+            map.put(NISTObjectIdentifiers.dsa_with_sha256,
+                    AlgorithmCode.SHA256WITHDSA);
+            map.put(NISTObjectIdentifiers.dsa_with_sha384,
+                    AlgorithmCode.SHA384WITHDSA);
+            map.put(NISTObjectIdentifiers.dsa_with_sha512,
+                    AlgorithmCode.SHA512WITHDSA);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224,
+                    AlgorithmCode.SHA3_224WITHDSA);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256,
+                    AlgorithmCode.SHA3_256WITHDSA);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384,
+                    AlgorithmCode.SHA3_384WITHDSA);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512,
+                    AlgorithmCode.SHA3_512WITHDSA);
+            // RSA
+            map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption,
+                    AlgorithmCode.SHA1WITHDSA);
+            map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption,
+                    AlgorithmCode.SHA224WITHRSA);
+            map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption,
+                    AlgorithmCode.SHA256WITHRSA);
+            map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption,
+                    AlgorithmCode.SHA384WITHRSA);
+            map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption,
+                    AlgorithmCode.SHA512WITHRSA);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
+                    AlgorithmCode.SHA3_224WITHRSA);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
+                    AlgorithmCode.SHA3_256WITHRSA);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
+                    AlgorithmCode.SHA3_384WITHRSA);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
+                    AlgorithmCode.SHA3_512WITHRSA);
 
-        // DSA
-        map.put(X9ObjectIdentifiers.id_dsa_with_sha1.getId(),
-                AlgorithmCode.SHA1WITHDSA);
-        map.put(NISTObjectIdentifiers.dsa_with_sha224.getId(),
-                AlgorithmCode.SHA224WITHDSA);
-        map.put(NISTObjectIdentifiers.dsa_with_sha256.getId(),
-                AlgorithmCode.SHA256WITHDSA);
-        map.put(NISTObjectIdentifiers.dsa_with_sha384.getId(),
-                AlgorithmCode.SHA384WITHDSA);
-        map.put(NISTObjectIdentifiers.dsa_with_sha512.getId(),
-                AlgorithmCode.SHA512WITHDSA);
-        map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224.getId(),
-                AlgorithmCode.SHA3_224WITHDSA);
-        map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256.getId(),
-                AlgorithmCode.SHA3_256WITHDSA);
-        map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384.getId(),
-                AlgorithmCode.SHA3_384WITHDSA);
-        map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512.getId(),
-                AlgorithmCode.SHA3_512WITHDSA);
-        // RSA
-        map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption.getId(),
-                AlgorithmCode.SHA1WITHDSA);
-        map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption.getId(),
-                AlgorithmCode.SHA224WITHRSA);
-        map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
-                AlgorithmCode.SHA256WITHRSA);
-        map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption.getId(),
-                AlgorithmCode.SHA384WITHRSA);
-        map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption.getId(),
-                AlgorithmCode.SHA512WITHRSA);
-        map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224.getId(),
-                AlgorithmCode.SHA3_224WITHRSA);
-        map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256.getId(),
-                AlgorithmCode.SHA3_256WITHRSA);
-        map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.getId(),
-                AlgorithmCode.SHA3_384WITHRSA);
-        map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.getId(),
-                AlgorithmCode.SHA3_512WITHRSA);
+            // SM2
+            map.put(GMObjectIdentifiers.sm2sign_with_sm3,
+                    AlgorithmCode.SM2WITHSM3);
 
-        // SM2
-        map.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(),
-                AlgorithmCode.SM2WITHSM3);
-
-        // Hash
-        for (HashAlgoType hashAlgo : HashAlgoType.values()) {
-            map.put(hashAlgo.oid().getId(), hashAlgo.algorithmCode());
+            // Hash
+            for (HashAlgoType hashAlgo : HashAlgoType.values()) {
+                map.put(hashAlgo.oid(), hashAlgo.algorithmCode());
+            }
+            algOidToCodeMap = Collections.unmodifiableMap(map);
         }
 
-        algNameCodeMap = Collections.unmodifiableMap(map);
+        //----- Initialize the static field digstMgf1AlgCodeMap
+        {
+            Map<ASN1ObjectIdentifier, AlgorithmCode> map = new HashMap<>();
+            map.put(HashAlgoType.SHA1.oid(),   AlgorithmCode.SHA1WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA224.oid(), AlgorithmCode.SHA224WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA256.oid(), AlgorithmCode.SHA256WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA384.oid(), AlgorithmCode.SHA384WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA512.oid(), AlgorithmCode.SHA512WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA3_224.oid(), AlgorithmCode.SHA3_224WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA3_256.oid(), AlgorithmCode.SHA3_256WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA3_384.oid(), AlgorithmCode.SHA3_384WITHRSAANDMGF1);
+            map.put(HashAlgoType.SHA3_512.oid(), AlgorithmCode.SHA3_512WITHRSAANDMGF1);
+            digestToMgf1AlgCodeMap = Collections.unmodifiableMap(map);
+        }
+
+        //----- Initialize the static fields digestECSigAlgMap, digestECPlainSigAlgMap,
+        // digestDSASigAlgMap, digestRSASigAlgMap
+        {
+            // ECDSA
+            Map<HashAlgoType, ASN1ObjectIdentifier> map = new HashMap<>();
+            map.put(HashAlgoType.SHA1,   X9ObjectIdentifiers.ecdsa_with_SHA1);
+            map.put(HashAlgoType.SHA224, X9ObjectIdentifiers.ecdsa_with_SHA224);
+            map.put(HashAlgoType.SHA256, X9ObjectIdentifiers.ecdsa_with_SHA256);
+            map.put(HashAlgoType.SHA384, X9ObjectIdentifiers.ecdsa_with_SHA384);
+            map.put(HashAlgoType.SHA512, X9ObjectIdentifiers.ecdsa_with_SHA512);
+            map.put(HashAlgoType.SHA3_224, NISTObjectIdentifiers.id_ecdsa_with_sha3_224);
+            map.put(HashAlgoType.SHA3_256, NISTObjectIdentifiers.id_ecdsa_with_sha3_256);
+            map.put(HashAlgoType.SHA3_384, NISTObjectIdentifiers.id_ecdsa_with_sha3_384);
+            map.put(HashAlgoType.SHA3_512, NISTObjectIdentifiers.id_ecdsa_with_sha3_512);
+            digestToECSigAlgMap = Collections.unmodifiableMap(map);
+
+            // PlainECDSA
+            map = new HashMap<>();
+            map.put(HashAlgoType.SHA1,   BSIObjectIdentifiers.ecdsa_plain_SHA1);
+            map.put(HashAlgoType.SHA224, BSIObjectIdentifiers.ecdsa_plain_SHA224);
+            map.put(HashAlgoType.SHA256, BSIObjectIdentifiers.ecdsa_plain_SHA256);
+            map.put(HashAlgoType.SHA384, BSIObjectIdentifiers.ecdsa_plain_SHA384);
+            map.put(HashAlgoType.SHA512, BSIObjectIdentifiers.ecdsa_plain_SHA512);
+            digestToECPlainSigAlgMap = Collections.unmodifiableMap(map);
+
+            // DSA
+            map = new HashMap<>();
+            map.put(HashAlgoType.SHA1,   X9ObjectIdentifiers.id_dsa_with_sha1);
+            map.put(HashAlgoType.SHA224, NISTObjectIdentifiers.dsa_with_sha224);
+            map.put(HashAlgoType.SHA256, NISTObjectIdentifiers.dsa_with_sha256);
+            map.put(HashAlgoType.SHA384, NISTObjectIdentifiers.dsa_with_sha384);
+            map.put(HashAlgoType.SHA512, NISTObjectIdentifiers.dsa_with_sha512);
+            map.put(HashAlgoType.SHA3_224, NISTObjectIdentifiers.id_dsa_with_sha3_224);
+            map.put(HashAlgoType.SHA3_256, NISTObjectIdentifiers.id_dsa_with_sha3_256);
+            map.put(HashAlgoType.SHA3_384, NISTObjectIdentifiers.id_dsa_with_sha3_384);
+            map.put(HashAlgoType.SHA3_512, NISTObjectIdentifiers.id_dsa_with_sha3_512);
+            digestToDSASigAlgMap = Collections.unmodifiableMap(map);
+
+            // RSA
+            map = new HashMap<>();
+            map.put(HashAlgoType.SHA1,   PKCSObjectIdentifiers.sha1WithRSAEncryption);
+            map.put(HashAlgoType.SHA224, PKCSObjectIdentifiers.sha224WithRSAEncryption);
+            map.put(HashAlgoType.SHA256, PKCSObjectIdentifiers.sha256WithRSAEncryption);
+            map.put(HashAlgoType.SHA384, PKCSObjectIdentifiers.sha384WithRSAEncryption);
+            map.put(HashAlgoType.SHA512, PKCSObjectIdentifiers.sha512WithRSAEncryption);
+            map.put(HashAlgoType.SHA3_224,
+                    NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224);
+            map.put(HashAlgoType.SHA3_256,
+                    NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256);
+            map.put(HashAlgoType.SHA3_384,
+                    NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384);
+            map.put(HashAlgoType.SHA3_512,
+                    NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512);
+            digestToRSASigAlgMap = Collections.unmodifiableMap(map);
+        }
+
+        //----- Initialize the static fields sigAlgOidDigestMap
+        {
+            Map<ASN1ObjectIdentifier, HashAlgoType> map = new HashMap<>();
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA1,   HashAlgoType.SHA1);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA224, HashAlgoType.SHA224);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA256, HashAlgoType.SHA256);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA384, HashAlgoType.SHA384);
+            map.put(X9ObjectIdentifiers.ecdsa_with_SHA512, HashAlgoType.SHA512);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224, HashAlgoType.SHA3_224);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256, HashAlgoType.SHA3_256);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384, HashAlgoType.SHA3_384);
+            map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512, HashAlgoType.SHA3_512);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1,   HashAlgoType.SHA1);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224, HashAlgoType.SHA224);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256, HashAlgoType.SHA256);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384, HashAlgoType.SHA384);
+            map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512, HashAlgoType.SHA512);
+            map.put(X9ObjectIdentifiers.id_dsa_with_sha1,  HashAlgoType.SHA1);
+            map.put(NISTObjectIdentifiers.dsa_with_sha224, HashAlgoType.SHA224);
+            map.put(NISTObjectIdentifiers.dsa_with_sha256, HashAlgoType.SHA256);
+            map.put(NISTObjectIdentifiers.dsa_with_sha384, HashAlgoType.SHA384);
+            map.put(NISTObjectIdentifiers.dsa_with_sha512, HashAlgoType.SHA512);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224, HashAlgoType.SHA3_224);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256, HashAlgoType.SHA3_256);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384, HashAlgoType.SHA3_384);
+            map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512, HashAlgoType.SHA3_512);
+            map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption,   HashAlgoType.SHA1);
+            map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, HashAlgoType.SHA224);
+            map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgoType.SHA256);
+            map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgoType.SHA384);
+            map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgoType.SHA512);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
+                    HashAlgoType.SHA3_224);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
+                    HashAlgoType.SHA3_256);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
+                    HashAlgoType.SHA3_384);
+            map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
+                    HashAlgoType.SHA3_512);
+            map.put(GMObjectIdentifiers.sm2sign_with_sm3, HashAlgoType.SM3);
+            sigAlgOidToDigestMap = Collections.unmodifiableMap(map);
+        }
+
+        //----- Initialize the static field macAlgOidDigestMap
+        {
+            Map<ASN1ObjectIdentifier, HashAlgoType> map = new HashMap<>();
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA1,   HashAlgoType.SHA1);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA224, HashAlgoType.SHA224);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA256, HashAlgoType.SHA256);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA384, HashAlgoType.SHA384);
+            map.put(PKCSObjectIdentifiers.id_hmacWithSHA512, HashAlgoType.SHA512);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_224, HashAlgoType.SHA224);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256, HashAlgoType.SHA256);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384, HashAlgoType.SHA384);
+            map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512, HashAlgoType.SHA512);
+            macAlgOidToDigestMap = Collections.unmodifiableMap(map);
+        }
+
+        //----- Initialize the static field macAlgIdNameMap
+        {
+            Map<ASN1ObjectIdentifier, String> m1 = new HashMap<>();
+            Map<String, ASN1ObjectIdentifier> m2 = new HashMap<>();
+
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_aes128_GCM, "AES128GMAC");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_aes192_GCM, "AES192GMAC");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_aes256_GCM, "AES256GMAC");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.id_hmacWithSHA1,   "HMACSHA1");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.id_hmacWithSHA224, "HMACSHA224");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.id_hmacWithSHA256, "HMACSHA256");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.id_hmacWithSHA384, "HMACSHA384");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.id_hmacWithSHA512, "HMACSHA512");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_224, "HMACSHA3-224");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_256, "HMACSHA3-256");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_384, "HMACSHA3-384");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_512, "HMACSHA3-512");
+            macAlgOidToNameMap = Collections.unmodifiableMap(m1);
+            macAlgNameToOidMap = Collections.unmodifiableMap(m2);
+        }
+
+        //----- Initialize the static fields sigAlgOidNameMap, digestMgf1SigAlgNameMap.
+        {
+            Map<ASN1ObjectIdentifier, String> m1 = new HashMap<>();
+            Map<String, ASN1ObjectIdentifier> m2 = new HashMap<>();
+
+            addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA1, "SHA1WITHECDSA",
+                    "ECDSAWITHSHA1");
+            addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA224, "SHA224WITHECDSA",
+                    "ECDSAWITHSHA224");
+            addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA256, "SHA256WITHECDSA",
+                    "ECDSAWITHSHA256");
+            addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA384, "SHA384WITHECDSA",
+                    "ECDSAWITHSHA384");
+            addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA512, "SHA512WITHECDSA",
+                    "ECDSAWITHSHA512");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_224,
+                    "SHA3-224WITHECDSA", "ECDSAWITHSHA3-224");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_256,
+                    "SHA3-256WITHECDSA", "ECDSAWITHSHA3-256");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_384,
+                    "SHA3-384WITHECDSA", "ECDSAWITHSHA3-384");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_512,
+                    "SHA3-512WITHECDSA", "ECDSAWITHSHA3-512");
+            addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA1,
+                    "SHA1WITHPLAINECDSA", "PLAINECDSAWITHSHA1");
+            addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA224,
+                    "SHA224WITHPLAIN-ECDSA", "PLAINECDSAWITHSHA224");
+            addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA256,
+                    "SHA256WITHPLAINECDSA", "PLAINECDSAWITHSHA256");
+            addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA384,
+                    "SHA384WITHPLAINECDSA", "PLAINECDSAWITHSHA384");
+            addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA512,
+                    "SHA512WITHPLAINECDSA", "PLAINECDSAWITHSHA512");
+            addOidNameMap(m1, m2, X9ObjectIdentifiers.id_dsa_with_sha1, "SHA1WITHDSA",
+                    "DSAWITHSHA1");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha224, "SHA224WITHDSA",
+                    "DSAWITHSHA224");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha256, "SHA256WITHDSA",
+                    "DSAWITHSHA256");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha384, "SHA384WITHDSA",
+                    "DSAWITHSHA384");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha512, "SHA512WITHDSA",
+                    "DSAWITHSHA512");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_224, "SHA3-224WITHDSA",
+                    "DSAWITHSHA3-224");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_256, "SHA3-256WITHDSA",
+                    "DSAWITHSHA3-256");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_384, "SHA3-384WITHDSA",
+                    "DSAWITHSHA3-384");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_512, "SHA3-512WITHDSA",
+                    "DSAWITHSHA3-512");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha1WithRSAEncryption, "SHA1WITHRSA",
+                    "RSAWITHSHA1");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha224WithRSAEncryption, "SHA224WITHRSA",
+                    "RSAWITHSHA224");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha256WithRSAEncryption, "SHA256WITHRSA",
+                    "RSAWITHSHA256");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha384WithRSAEncryption, "SHA384WITHRSA",
+                    "RSAWITHSHA384");
+            addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha512WithRSAEncryption, "SHA512WITHRSA",
+                    "RSAWITHSHA512");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
+                    "SHA3-224WITHRSA", "RSAWITHSHA3-224");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
+                    "SHA3-256WITHRSA", "RSAWITHSHA3-256");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
+                    "SHA3-384WITHRSA", "RSAWITHSHA3-384");
+            addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
+                    "SHA3-512WITHRSA", "RSAWITHSHA3-512");
+            addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
+            sigAlgOidToNameMap = Collections.unmodifiableMap(m1);
+            sigAlgNameToOidMap = Collections.unmodifiableMap(m2);
+
+            m1 = new HashMap<>();
+            Map<String, HashAlgoType> m3 = new HashMap<>();
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA1,   "SHA1WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA224, "SHA224WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA256, "SHA256WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA384, "SHA384WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA512, "SHA512WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_224, "SHA3-224WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_256, "SHA3-256WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_384, "SHA3-384WITHRSAANDMGF1");
+            addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_512, "SHA3-512WITHRSAANDMGF1");
+            digestOidToMgf1SigNameMap = Collections.unmodifiableMap(m1);
+            mgf1SigNameToDigestOidMap = Collections.unmodifiableMap(m3);
+        }
+
+    }
+
+    private static final void addOidNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
+            Map<String, ASN1ObjectIdentifier> nameOidMap, ASN1ObjectIdentifier oid,
+            String... names) {
+        oidNameMap.put(oid, names[0].toUpperCase());
+        nameOidMap.put(oid.getId(), oid);
+        for (String name : names) {
+            nameOidMap.put(name.toUpperCase(), oid);
+        }
+    }
+
+    private static final void addHashAlgoNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
+            Map<String, HashAlgoType> nameOidMap, HashAlgoType hashAlgo, String... names) {
+        oidNameMap.put(hashAlgo.oid(), names[0].toUpperCase());
+        nameOidMap.put(hashAlgo.oid().getId(), hashAlgo);
+        for (String name : names) {
+            nameOidMap.put(name.toUpperCase(), hashAlgo);
+        }
     }
 
     private AlgorithmUtil() {
@@ -190,7 +476,7 @@ public class AlgorithmUtil {
     public static ASN1ObjectIdentifier getHashAlg(final String hashAlgName)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgName", hashAlgName);
-        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(hashAlgName);
+        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(hashAlgName.toUpperCase());
         if (hashAlgo == null) {
             throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgName);
         }
@@ -210,7 +496,7 @@ public class AlgorithmUtil {
     public static AlgorithmCode getSigOrMacAlgoCode(final AlgorithmIdentifier algId)
             throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
-        AlgorithmCode code = algNameCodeMap.get(oid.getId());
+        AlgorithmCode code = algOidToCodeMap.get(oid);
         if (code != null) {
             return code;
         }
@@ -218,28 +504,11 @@ public class AlgorithmUtil {
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
             RSASSAPSSparams param = RSASSAPSSparams.getInstance(algId.getParameters());
             ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-            if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA1WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA224WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA256WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA384WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA512WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha3_224.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA3_224WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha3_256.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA3_256WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha3_384.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA3_384WITHRSAANDMGF1;
-            } else if (NISTObjectIdentifiers.id_sha3_512.equals(digestAlgOid)) {
-                return AlgorithmCode.SHA3_512WITHRSAANDMGF1;
-            } else {
-                throw new NoSuchAlgorithmException("unsupported digest algorithm "
-                        + digestAlgOid.getId());
+            code = digestToMgf1AlgCodeMap.get(digestAlgOid);
+            if (code == null) {
+                throw new NoSuchAlgorithmException("unsupported digest algorithm " + digestAlgOid);
             }
+            return code;
         } else {
             throw new NoSuchAlgorithmException("unsupported signature algorithm "
                     + oid.getId());
@@ -250,135 +519,31 @@ public class AlgorithmUtil {
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if (NISTObjectIdentifiers.id_aes128_GCM.equals(algOid)) {
-            return "AES128GMAC";
-        } else if (NISTObjectIdentifiers.id_aes192_GCM.equals(algOid)) {
-            return "AES192GMAC";
-        } else if (NISTObjectIdentifiers.id_aes256_GCM.equals(algOid)) {
-            return "AES256GMAC";
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA1.equals(algOid)) {
-            return "HMACSHA1";
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA224.equals(algOid)) {
-            return "HMACSHA224";
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA256.equals(algOid)) {
-            return "HMACSHA256";
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA384.equals(algOid)) {
-            return "HMACSHA384";
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA512.equals(algOid)) {
-            return "HMACSHA512";
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_224.equals(algOid)) {
-            return "HMACSHA3-224";
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_256.equals(algOid)) {
-            return "HMACSHA3-256";
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_384.equals(algOid)) {
-            return "HMACSHA3-384";
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_512.equals(algOid)) {
-            return "HMACSHA3-512";
-        } else {
-            return getSignatureAlgoName(sigAlgId);
-        }
+        String name = macAlgOidToNameMap.get(algOid);
+        return (name != null) ? name : getSignatureAlgoName(sigAlgId);
     }
 
     public static String getSignatureAlgoName(final AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
-        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
-        if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid)) {
-            return "SHA1withECDSA";
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid)) {
-            return "SHA224withECDSA";
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid)) {
-            return "SHA256withECDSA";
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid)) {
-            return "SHA384withECDSA";
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid)) {
-            return "SHA512withECDSA";
-        } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_224.equals(algOid)) {
-            return "SHA3-224withECDSA";
-        } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_256.equals(algOid)) {
-            return "SHA3-256withECDSA";
-        } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_384.equals(algOid)) {
-            return "SHA3-384withECDSA";
-        } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_512.equals(algOid)) {
-            return "SHA3-512withECDSA";
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid)) {
-            return "SHA1withPLAIN-ECDSA";
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid)) {
-            return "SHA224withPLAIN-ECDSA";
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(algOid)) {
-            return "SHA256withPLAIN-ECDSA";
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(algOid)) {
-            return "SHA384withPLAIN-ECDSA";
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid)) {
-            return "SHA512withPLAIN-ECDSA";
-        } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
-            return "SHA1withDSA";
-        } else if (NISTObjectIdentifiers.dsa_with_sha224.equals(algOid)) {
-            return "SHA224withDSA";
-        } else if (NISTObjectIdentifiers.dsa_with_sha256.equals(algOid)) {
-            return "SHA256withDSA";
-        } else if (NISTObjectIdentifiers.dsa_with_sha384.equals(algOid)) {
-            return "SHA384withDSA";
-        } else if (NISTObjectIdentifiers.dsa_with_sha512.equals(algOid)) {
-            return "SHA512withDSA";
-        } else if (NISTObjectIdentifiers.id_dsa_with_sha3_224.equals(algOid)) {
-            return "SHA3-224withDSA";
-        } else if (NISTObjectIdentifiers.id_dsa_with_sha3_256.equals(algOid)) {
-            return "SHA3-256withDSA";
-        } else if (NISTObjectIdentifiers.id_dsa_with_sha3_384.equals(algOid)) {
-            return "SHA3-384withDSA";
-        } else if (NISTObjectIdentifiers.id_dsa_with_sha3_512.equals(algOid)) {
-            return "SHA3-512withDSA";
-        } else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
-            return "SHA1withRSA";
-        } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
-            return "SHA224withRSA";
-        } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
-            return "SHA256withRSA";
-        } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
-            return "SHA384withRSA";
-        } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
-            return "SHA512withRSA";
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224.equals(algOid)) {
-            return "SHA3-224withRSA";
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256.equals(algOid)) {
-            return "SHA3-256withRSA";
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.equals(algOid)) {
-            return "SHA3-384withRSA";
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.equals(algOid)) {
-            return "SHA3-512withRSA";
-        } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+        String name = null;
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
             RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
             ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-            if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
-                return "SHA1withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOid)) {
-                return "SHA224withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOid)) {
-                return "SHA256withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOid)) {
-                return "SHA384withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOid)) {
-                return "SHA512withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha3_224.equals(digestAlgOid)) {
-                return "SHA3-224withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha3_256.equals(digestAlgOid)) {
-                return "SHA3-256withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha3_384.equals(digestAlgOid)) {
-                return "SHA3-384withRSAandMGF1";
-            } else if (NISTObjectIdentifiers.id_sha3_512.equals(digestAlgOid)) {
-                return "SHA3-512withRSAandMGF1";
-            } else {
-                throw new NoSuchAlgorithmException("unsupported digest algorithm "
-                        + digestAlgOid.getId());
+            name = digestOidToMgf1SigNameMap.get(digestAlgOid);
+            if (name == null) {
+                throw new NoSuchAlgorithmException("unsupported digest algorithm " + digestAlgOid);
             }
-        } else if (GMObjectIdentifiers.sm2sign_with_sm3.equals(algOid)) {
-            return "SM3withSM2";
         } else {
-            throw new NoSuchAlgorithmException("unsupported signature algorithm "
-                    + algOid.getId());
+            name = sigAlgOidToNameMap.get(algOid);
         }
+
+        if (name == null) {
+            throw new NoSuchAlgorithmException("unsupported signature algorithm " + algOid.getId());
+        }
+        return name;
     } // method getSignatureAlgoName
 
     // CHECKSTYLE:SKIP
@@ -395,279 +560,35 @@ public class AlgorithmUtil {
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("macAlgName", macAlgName);
         String algoS = macAlgName.toUpperCase();
-        if (algoS.indexOf('-') != -1 && algoS.indexOf("SHA3-") == -1) {
-            algoS = algoS.replaceAll("-", "");
-        }
+        algoS = canonicalizeAlgoText(algoS);
 
-        ASN1ObjectIdentifier oid;
-        if ("HMACSHA1".equals(algoS)) {
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA1;
-        } else if ("HMACSHA224".equals(algoS)) {
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA224;
-        } else if ("HMACSHA256".equals(algoS)) {
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA256;
-        } else if ("HMACSHA384".equals(algoS)) {
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA384;
-        } else if ("HMACSHA512".equals(algoS)) {
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA512;
-        } else if ("HMACSHA3-224".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_224;
-        } else if ("HMACSHA3-256".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_256;
-        } else if ("HMACSHA3-384".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_384;
-        } else if ("HMACSHA3-512".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_512;
-        } else if ("AES128GMAC".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_aes128_GCM;
-        } else if ("AES192GMAC".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_aes192_GCM;
-        } else if ("AES256GMAC".equals(algoS)) {
-            oid = NISTObjectIdentifiers.id_aes256_GCM;
-        } else {
+        ASN1ObjectIdentifier oid = macAlgNameToOidMap.get(algoS);
+        if (oid == null) {
             throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
         }
         return new AlgorithmIdentifier(oid, DERNull.INSTANCE);
     } // method getMacAlgId
 
-    public static AlgorithmIdentifier getHmacAlgId(
-            final HashAlgoType hashAlgo)
-            throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-        ASN1ObjectIdentifier oid;
-        switch (hashAlgo) {
-        case SHA1:
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA1;
-            break;
-        case SHA224:
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA224;
-            break;
-        case SHA256:
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA256;
-            break;
-        case SHA384:
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA384;
-            break;
-        case SHA512:
-            oid = PKCSObjectIdentifiers.id_hmacWithSHA512;
-            break;
-        case SHA3_224:
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_224;
-            break;
-        case SHA3_256:
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_256;
-            break;
-        case SHA3_384:
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_384;
-            break;
-        case SHA3_512:
-            oid = NISTObjectIdentifiers.id_hmacWithSHA3_512;
-            break;
-        default:
-            throw new NoSuchAlgorithmException("unsupported digest algorithm " + hashAlgo);
-        }
-        return new AlgorithmIdentifier(oid, DERNull.INSTANCE);
-    }
-
     public static AlgorithmIdentifier getSigAlgId(final String sigAlgName)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("sigAlgName", sigAlgName);
         String algoS = sigAlgName.toUpperCase();
-        if (algoS.indexOf('-') != -1 && algoS.indexOf("SHA3-") == -1) {
-            algoS = algoS.replaceAll("-", "");
-        }
+        algoS = canonicalizeAlgoText(algoS);
 
         AlgorithmIdentifier signatureAlgId;
-        if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA224withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA256withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA384withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA512withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA3-224withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA3-256withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA3-384withRSAandMGF1".equalsIgnoreCase(algoS)
-                || "SHA3-512withRSAandMGF1".equalsIgnoreCase(algoS)) {
-            HashAlgoType hashAlgo;
-            if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA1;
-            } else if ("SHA224withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA224;
-            } else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA256;
-            } else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA384;
-            } else if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA512;
-            } else if ("SHA3-224withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA3_224;
-            } else if ("SHA3-256withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA3_256;
-            } else if ("SHA3-384withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA3_384;
-            } else if ("SHA3-512withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = HashAlgoType.SHA3_512;
-            } else {
-                throw new NoSuchAlgorithmException("should not reach here, unknown algorithm "
-                        + algoS);
+        if (algoS.contains("MGF1")) {
+            HashAlgoType ha = mgf1SigNameToDigestOidMap.get(algoS);
+            if (ha == null) {
+                throw new NoSuchAlgorithmException("unknown algorithm " + algoS);
             }
 
-            signatureAlgId = buildRSAPSSAlgId(hashAlgo);
+            signatureAlgId = buildRSAPSSAlgId(ha);
         } else {
-            boolean withNullParam = false;
-            ASN1ObjectIdentifier algOid;
-            if ("SHA1withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA1".equalsIgnoreCase(algoS)
-                    || PKCSObjectIdentifiers.sha1WithRSAEncryption.getId().equals(algoS)) {
-                algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-                withNullParam = true;
-            } else if ("SHA224withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA224".equalsIgnoreCase(algoS)
-                    || PKCSObjectIdentifiers.sha224WithRSAEncryption.getId().equals(algoS)) {
-                algOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
-                withNullParam = true;
-            } else if ("SHA256withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA256".equalsIgnoreCase(algoS)
-                    || PKCSObjectIdentifiers.sha256WithRSAEncryption.getId().equals(algoS)) {
-                algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-                withNullParam = true;
-            } else if ("SHA384withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA384".equalsIgnoreCase(algoS)
-                    || PKCSObjectIdentifiers.sha384WithRSAEncryption.getId().equals(algoS)) {
-                algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-                withNullParam = true;
-            } else if ("SHA512withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA512".equalsIgnoreCase(algoS)
-                    || PKCSObjectIdentifiers.sha512WithRSAEncryption.getId().equals(algoS)) {
-                algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-                withNullParam = true;
-            } else if ("SHA512withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA512".equalsIgnoreCase(algoS)
-                    || PKCSObjectIdentifiers.sha512WithRSAEncryption.getId().equals(algoS)) {
-                algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-                withNullParam = true;
-            } else if ("SHA3-224withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA3-224".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224.getId()
-                        .equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224;
-                withNullParam = true;
-            } else if ("SHA3-256withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA3-256".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256.getId()
-                        .equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256;
-                withNullParam = true;
-            } else if ("SHA3-384withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA3-384".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.getId()
-                        .equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384;
-                withNullParam = true;
-            } else if ("SHA3-512withRSA".equalsIgnoreCase(algoS)
-                    || "RSAwithSHA3-512".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.getId()
-                        .equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512;
-                withNullParam = true;
-            } else if ("SHA1withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA1".equalsIgnoreCase(algoS)
-                    || X9ObjectIdentifiers.ecdsa_with_SHA1.getId().equals(algoS)) {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-            } else if ("SHA224withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA224".equalsIgnoreCase(algoS)
-                    || X9ObjectIdentifiers.ecdsa_with_SHA224.getId().equals(algoS)) {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            } else if ("SHA256withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA256".equalsIgnoreCase(algoS)
-                    || X9ObjectIdentifiers.ecdsa_with_SHA256.getId().equals(algoS)) {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            } else if ("SHA384withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA384".equalsIgnoreCase(algoS)
-                    || X9ObjectIdentifiers.ecdsa_with_SHA384.getId().equals(algoS)) {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            } else if ("SHA512withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA512".equalsIgnoreCase(algoS)
-                    || X9ObjectIdentifiers.ecdsa_with_SHA512.getId().equals(algoS)) {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            } else if ("SHA3-224withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA3-224".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_224;
-            } else if ("SHA3-256withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA3-256".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_256;
-            } else if ("SHA3-384withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA3-384".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_384;
-            } else if ("SHA3-512withECDSA".equalsIgnoreCase(algoS)
-                    || "ECDSAwithSHA3-512".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_512;
-            } else if ("SHA1withPlainECDSA".equalsIgnoreCase(algoS)
-                    || "PlainECDSAwithSHA1".equalsIgnoreCase(algoS)
-                    || BSIObjectIdentifiers.ecdsa_plain_SHA1.getId().equals(algoS)) {
-                algOid = BSIObjectIdentifiers.ecdsa_plain_SHA1;
-            } else if ("SHA224withPlainECDSA".equalsIgnoreCase(algoS)
-                    || "PlainECDSAwithSHA224".equalsIgnoreCase(algoS)
-                    || BSIObjectIdentifiers.ecdsa_plain_SHA224.getId().equals(algoS)) {
-                algOid = BSIObjectIdentifiers.ecdsa_plain_SHA224;
-            } else if ("SHA256withPlainECDSA".equalsIgnoreCase(algoS)
-                    || "PlainECDSAwithSHA256".equalsIgnoreCase(algoS)
-                    || BSIObjectIdentifiers.ecdsa_plain_SHA256.getId().equals(algoS)) {
-                algOid = BSIObjectIdentifiers.ecdsa_plain_SHA256;
-            } else if ("SHA384withPlainECDSA".equalsIgnoreCase(algoS)
-                    || "PlainECDSAwithSHA384".equalsIgnoreCase(algoS)
-                    || BSIObjectIdentifiers.ecdsa_plain_SHA384.getId().equals(algoS)) {
-                algOid = BSIObjectIdentifiers.ecdsa_plain_SHA384;
-            } else if ("SHA512withPlainECDSA".equalsIgnoreCase(algoS)
-                    || "PlainECDSAwithSHA512".equalsIgnoreCase(algoS)
-                    || BSIObjectIdentifiers.ecdsa_plain_SHA512.getId().equals(algoS)) {
-                algOid = BSIObjectIdentifiers.ecdsa_plain_SHA512;
-            } else if ("SHA1withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA1".equalsIgnoreCase(algoS)
-                    || X9ObjectIdentifiers.id_dsa_with_sha1.getId().equals(algoS)) {
-                algOid = X9ObjectIdentifiers.id_dsa_with_sha1;
-            } else if ("SHA224withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA224".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.dsa_with_sha224.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.dsa_with_sha224;
-            } else if ("SHA256withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA256".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.dsa_with_sha256.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.dsa_with_sha256;
-            } else if ("SHA384withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA384".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.dsa_with_sha384.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.dsa_with_sha384;
-            } else if ("SHA512withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA512".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.dsa_with_sha512.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.dsa_with_sha512;
-            } else if ("SHA3-224withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA3-224".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_dsa_with_sha3_224.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_dsa_with_sha3_224;
-            } else if ("SHA3-256withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA3-256".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_dsa_with_sha3_256.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_dsa_with_sha3_256;
-            } else if ("SHA3-384withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA3-384".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_dsa_with_sha3_384.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_dsa_with_sha3_384;
-            } else if ("SHA3-512withDSA".equalsIgnoreCase(algoS)
-                    || "DSAwithSHA3-512".equalsIgnoreCase(algoS)
-                    || NISTObjectIdentifiers.id_dsa_with_sha3_512.getId().equals(algoS)) {
-                algOid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
-            } else if ("SM3withSM2".equalsIgnoreCase(algoS)
-                    || "SM2withSM2".equalsIgnoreCase(algoS)
-                    || GMObjectIdentifiers.sm2sign_with_sm3.getId().equals(algoS)) {
-                algOid = GMObjectIdentifiers.sm2sign_with_sm3;
-            } else {
-                throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
+            ASN1ObjectIdentifier algOid = sigAlgNameToOidMap.get(algoS);
+            if (algOid == null) {
+                throw new NoSuchAlgorithmException("unknown algorithm " + algoS);
             }
-
+            boolean withNullParam = algoS.contains("RSA");
             signatureAlgId = withNullParam ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE)
                     : new AlgorithmIdentifier(algOid);
         }
@@ -746,7 +667,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isECDSASigAlg(final AlgorithmIdentifier algId) {
+    private static boolean isECDSASigAlg(final AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
@@ -816,7 +737,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getRSASigAlgId(final HashAlgoType hashAlgo,
+    private static AlgorithmIdentifier getRSASigAlgId(final HashAlgoType hashAlgo,
             final boolean mgf1)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -824,89 +745,29 @@ public class AlgorithmUtil {
             return buildRSAPSSAlgId(hashAlgo);
         }
 
-        ASN1ObjectIdentifier sigAlgOid;
-        switch (hashAlgo) {
-        case SHA1:
-            sigAlgOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-            break;
-        case SHA224:
-            sigAlgOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
-            break;
-        case SHA256:
-            sigAlgOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-            break;
-        case SHA384:
-            sigAlgOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-            break;
-        case SHA512:
-            sigAlgOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-            break;
-        case SHA3_224:
-            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224;
-            break;
-        case SHA3_256:
-            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256;
-            break;
-        case SHA3_384:
-            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384;
-            break;
-        case SHA3_512:
-            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512;
-            break;
-        case SM3:
-            throw new NoSuchAlgorithmException("unsupported hash SM3 for RSA key");
-        default:
-            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
+        ASN1ObjectIdentifier sigAlgOid = digestToRSASigAlgMap.get(hashAlgo);
+        if (sigAlgOid == null) {
+            throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for RSA key");
         }
 
         return new AlgorithmIdentifier(sigAlgOid, DERNull.INSTANCE);
     } // method getRSASigAlgId
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getDSASigAlgId(final HashAlgoType hashAlgo)
+    private static AlgorithmIdentifier getDSASigAlgId(final HashAlgoType hashAlgo)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
-        ASN1ObjectIdentifier sigAlgOid;
-        switch (hashAlgo) {
-        case SHA1:
-            sigAlgOid = X9ObjectIdentifiers.id_dsa_with_sha1;
-            break;
-        case SHA224:
-            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha224;
-            break;
-        case SHA256:
-            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha256;
-            break;
-        case SHA384:
-            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha384;
-            break;
-        case SHA512:
-            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha512;
-            break;
-        case SHA3_224:
-            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_224;
-            break;
-        case SHA3_256:
-            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_256;
-            break;
-        case SHA3_384:
-            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_384;
-            break;
-        case SHA3_512:
-            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
-            break;
-        case SM3:
-            throw new NoSuchAlgorithmException("unsupported hash SM3 for DSA key");
-        default:
-            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
+        ASN1ObjectIdentifier sigAlgOid  = digestToDSASigAlgMap.get(hashAlgo);
+        if (sigAlgOid == null) {
+            throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for DSA key");
         }
 
         return new AlgorithmIdentifier(sigAlgOid);
     } // method getDSASigAlgId
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getECSigAlgId(final HashAlgoType hashAlgo,
+    private static AlgorithmIdentifier getECSigAlgId(final HashAlgoType hashAlgo,
             final boolean plainSignature, final boolean gm)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -926,61 +787,15 @@ public class AlgorithmUtil {
                         " for SM2 EC key");
             }
         } else if (plainSignature) {
-            switch (hashAlgo) {
-            case SHA1:
-                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA1;
-                break;
-            case SHA224:
-                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA224;
-                break;
-            case SHA256:
-                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA256;
-                break;
-            case SHA384:
-                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA384;
-                break;
-            case SHA512:
-                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA512;
-                break;
-            case SM3:
-                throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo.getName() +
-                        "for plain signature");
-            default:
-                throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
+            sigAlgOid = digestToECPlainSigAlgMap.get(hashAlgo);
+            if (sigAlgOid == null) {
+                throw new NoSuchAlgorithmException(
+                        "unsupported hash " + hashAlgo + " for SM2 EC key");
             }
         } else {
-            switch (hashAlgo) {
-            case SHA1:
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-                break;
-            case SHA224:
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-                break;
-            case SHA256:
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-                break;
-            case SHA384:
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-                break;
-            case SHA512:
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-                break;
-            case SHA3_224:
-                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_224;
-                break;
-            case SHA3_256:
-                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_256;
-                break;
-            case SHA3_384:
-                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_384;
-                break;
-            case SHA3_512:
-                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_512;
-                break;
-            case SM3:
-                throw new NoSuchAlgorithmException("unsupported hash SM3 for non-SM EC key");
-            default:
-                throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
+            sigAlgOid = digestToECSigAlgMap.get(hashAlgo);
+            if (sigAlgOid == null) {
+                throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for EC key");
             }
         }
 
@@ -988,27 +803,9 @@ public class AlgorithmUtil {
     } // method getECDSASigAlgId
 
     public static HashAlgoType extractHashAlgoFromMacAlg(AlgorithmIdentifier macAlg) {
-        HashAlgoType hashAlgo;
         ASN1ObjectIdentifier oid = macAlg.getAlgorithm();
-        if (PKCSObjectIdentifiers.id_hmacWithSHA1.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA1;
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA224.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA224;
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA256.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA256;
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA384.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA384;
-        } else if (PKCSObjectIdentifiers.id_hmacWithSHA512.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA512;
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_224.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA3_224;
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_256.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA3_256;
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_384.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA3_384;
-        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_512.equals(oid)) {
-            hashAlgo = HashAlgoType.SHA3_512;
-        } else {
+        HashAlgoType hashAlgo = macAlgOidToDigestMap.get(oid);
+        if (hashAlgo == null) {
             throw new IllegalArgumentException("unknown algorithm identifier " + oid.getId());
         }
         return hashAlgo;
@@ -1025,78 +822,10 @@ public class AlgorithmUtil {
             RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
             digestAlgOid = param.getHashAlgorithm().getAlgorithm();
         } else {
-            HashAlgoType digestAlg;
-
-            if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA1;
-            } else if (X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA224;
-            } else if (X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA256;
-            } else if (X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA384;
-            } else if (X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA512;
-            } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_224.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_224;
-            } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_256.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_256;
-            } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_384.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_384;
-            } else if (NISTObjectIdentifiers.id_ecdsa_with_sha3_512.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_512;
-            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA1;
-            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA224;
-            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA256;
-            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA384;
-            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA512;
-            } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA1;
-            } else if (NISTObjectIdentifiers.dsa_with_sha224.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA224;
-            } else if (NISTObjectIdentifiers.dsa_with_sha256.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA256;
-            } else if (NISTObjectIdentifiers.dsa_with_sha384.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA384;
-            } else if (NISTObjectIdentifiers.dsa_with_sha512.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA512;
-            } else if (NISTObjectIdentifiers.id_dsa_with_sha3_224.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_224;
-            } else if (NISTObjectIdentifiers.id_dsa_with_sha3_256.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_256;
-            } else if (NISTObjectIdentifiers.id_dsa_with_sha3_384.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_384;
-            } else if (NISTObjectIdentifiers.id_dsa_with_sha3_512.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_512;
-            } else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA1;
-            } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA224;
-            } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA256;
-            } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA384;
-            } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA512;
-            } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_224;
-            } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_256;
-            } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_384;
-            } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_512;
-            } else if (GMObjectIdentifiers.sm2sign_with_sm3.equals(algOid)) {
-                digestAlg = HashAlgoType.SHA3_512;
-            } else {
-                throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
+            HashAlgoType digestAlg = sigAlgOidToDigestMap.get(algOid);
+            if (digestAlg == null) {
+                throw new NoSuchAlgorithmException("unknown signature algorithm " + algOid.getId());
             }
-
             digestAlgOid = digestAlg.oid();
         }
 
@@ -1160,55 +889,14 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier buildRSAPSSAlgId(final HashAlgoType digestAlg)
+    private static AlgorithmIdentifier buildRSAPSSAlgId(final HashAlgoType digestAlg)
             throws NoSuchAlgorithmException {
         RSASSAPSSparams params = createPSSRSAParams(digestAlg);
         return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier buildDSASigAlgId(final HashAlgoType digestAlg)
-            throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("digestAlg", digestAlg);
-
-        ASN1ObjectIdentifier sid;
-
-        switch (digestAlg) {
-        case SHA1:
-            sid = X9ObjectIdentifiers.id_dsa_with_sha1;
-            break;
-        case SHA224:
-            sid = NISTObjectIdentifiers.dsa_with_sha224;
-            break;
-        case SHA256:
-            sid = NISTObjectIdentifiers.dsa_with_sha256;
-            break;
-        case SHA384:
-            sid = NISTObjectIdentifiers.dsa_with_sha384;
-            break;
-        case SHA512:
-            sid = NISTObjectIdentifiers.dsa_with_sha512;
-            break;
-        case SHA3_224:
-            sid = NISTObjectIdentifiers.id_dsa_with_sha3_224;
-            break;
-        case SHA3_256:
-            sid = NISTObjectIdentifiers.id_dsa_with_sha3_256;
-            break;
-        case SHA3_384:
-            sid = NISTObjectIdentifiers.id_dsa_with_sha3_384;
-            break;
-        case SHA3_512:
-            sid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
-            break;
-        default:
-            throw new RuntimeException("unknown HashAlgoType: " + digestAlg);
-        }
-        return new AlgorithmIdentifier(sid);
-    } // method buildRSAPSSAlgorithmIdentifier
-
-    // CHECKSTYLE:SKIP
-    public static RSASSAPSSparams createPSSRSAParams(final HashAlgoType digestAlg)
+    private static RSASSAPSSparams createPSSRSAParams(final HashAlgoType digestAlg)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("digestAlg", digestAlg);
         int saltSize = digestAlg.length();
@@ -1219,9 +907,9 @@ public class AlgorithmUtil {
             new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     } // method createPSSRSAParams
 
-    public static ASN1ObjectIdentifier getCurveOidForName(final String curveName) {
+    private static ASN1ObjectIdentifier getCurveOidForName(final String curveName) {
         ParamUtil.requireNonBlank("curveName", curveName);
-        return curveNameOidMap.get(curveName.toLowerCase());
+        return curveNameToOidMap.get(curveName.toLowerCase());
     }
 
     // CHECKSTYLE:SKIP
@@ -1231,21 +919,7 @@ public class AlgorithmUtil {
 
     public static String getCurveName(final ASN1ObjectIdentifier curveOid) {
         ParamUtil.requireNonNull("curveOid", curveOid);
-        String curveName = X962NamedCurves.getName(curveOid);
-        if (curveName == null) {
-            curveName = SECNamedCurves.getName(curveOid);
-        }
-        if (curveName == null) {
-            curveName = TeleTrusTNamedCurves.getName(curveOid);
-        }
-        if (curveName == null) {
-            curveName = NISTNamedCurves.getName(curveOid);
-        }
-        if (curveName == null) {
-            curveName = GMNamedCurves.getName(curveOid);
-        }
-
-        return curveName;
+        return curveOidToNameMap.get(curveOid);
     }
 
     public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(final String curveNameOrOid) {
@@ -1257,6 +931,27 @@ public class AlgorithmUtil {
             oid = getCurveOidForName(curveNameOrOid);
         }
         return oid;
+    }
+
+    private static String canonicalizeAlgoText(String algoText) {
+        if (algoText.indexOf('-') == -1) {
+            return algoText;
+        }
+
+        StringBuilder sb = new StringBuilder(algoText.length());
+        for (int i = 0; i < algoText.length(); i++) {
+            char c = algoText.charAt(i);
+            if (c == '-') {
+                if (i > 3 && !(algoText.charAt(i - 4) == 'S' && algoText.charAt(i - 3) == 'H'
+                        && algoText.charAt(i - 2) == 'A' && algoText.charAt(i - 1) == '3')) {
+                    continue;
+                }
+            }
+
+            sb.append(c);
+        }
+
+        return sb.toString();
     }
 
 }

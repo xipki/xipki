@@ -115,7 +115,7 @@ public class DSAPlainDigestSigner implements Signer {
         BigInteger[] sig = dsaSigner.generateSignature(hash);
 
         try {
-            return SignerUtil.convertDSASigToPlain(sig[0], sig[1], keyBitLen);
+            return SignerUtil.dsaSigToPlain(sig[0], sig[1], keyBitLen);
         } catch (XiSecurityException ex) {
             throw new IllegalStateException("unable to encode signature");
         }

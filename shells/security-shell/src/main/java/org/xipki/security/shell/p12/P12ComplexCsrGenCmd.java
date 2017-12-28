@@ -66,7 +66,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.BadInputException;
-import org.xipki.security.shell.CertRequestGenAction;
+import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.util.KeyUtil;
 
 /**
@@ -74,15 +74,13 @@ import org.xipki.security.util.KeyUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "req-p12-complex",
+@Command(scope = "xi", name = "csr-p12-complex",
         description = "generate complex CSR with PKCS#12 keystore (only for test)")
 @Service
-public class P12ComplexCertRequestGenCmd extends CertRequestGenAction {
+public class P12ComplexCsrGenCmd extends CsrGenAction {
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 keystore file\n"
-                    + "(required)")
+    @Option(name = "--p12", required = true,
+            description = "PKCS#12 keystore file\n(required)")
     @Completion(FilePathCompleter.class)
     private String p12File;
 

@@ -42,16 +42,12 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class KeystoreConvertCmd extends SecurityAction {
 
-    @Option(name = "--in-type",
-            required = true,
-            description = "type of source keystore\n"
-                    + "(required)")
+    @Option(name = "--in-type", required = true,
+            description = "type of source keystore\n(required)")
     private String inType;
 
-    @Option(name = "--in",
-            required = true,
-            description = "file of source keystore\n"
-                    + "(required)")
+    @Option(name = "--in", required = true,
+            description = "file of source keystore\n(required)")
     @Completion(FilePathCompleter.class)
     private String inFile;
 
@@ -73,20 +69,16 @@ public class KeystoreConvertCmd extends SecurityAction {
                     + "Default to the keystore password")
     private String inKeyPass;
 
-    @Option(name = "--out-type",
-            required = true,
-            description = "type of target keystore\n"
-                    + "(required)")
+    @Option(name = "--out-type", required = true,
+            description = "type of target keystore\n(required)")
     private String outType;
 
     @Option(name = "--out-provider",
             description = "Security provider of target keystore")
     private String outProvider;
 
-    @Option(name = "--out",
-            required = true,
-            description = "file of target keystore\n"
-                    + "(required)")
+    @Option(name = "--out", required = true,
+            description = "file of target keystore\n(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;
 

@@ -35,10 +35,8 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 public abstract class P11SecurityAction extends SecurityAction {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     protected Integer slotIndex;
 
     @Option(name = "--id",

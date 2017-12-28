@@ -50,17 +50,13 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11SecretKeyCreateCmd extends P11KeyGenAction {
 
-    @Option(name = "--key-type",
-            required = true,
-            description = "keytype, current only AES, DES3 and GENERIC are supported\n"
-                    + "(required)")
+    @Option(name = "--key-type", required = true,
+            description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
     @Completion(SecretKeyTypeCompleter.class)
     private String keyType;
 
-    @Option(name = "--keystore",
-            required = true,
-            description = "JCEKS keystore from which the key is imported\n"
-                    + "(required)")
+    @Option(name = "--keystore", required = true,
+            description = "JCEKS keystore from which the key is imported\n(required)")
     @Completion(FilePathCompleter.class)
     private String keyOutFile;
 

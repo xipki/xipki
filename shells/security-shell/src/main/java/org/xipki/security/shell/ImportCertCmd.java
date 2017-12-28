@@ -46,17 +46,13 @@ import org.xipki.security.util.X509Util;
 @Service
 public class ImportCertCmd extends SecurityAction {
 
-    @Option(name = "--keystore",
-            required = true,
-            description = "Keystore file\n"
-                    + "(required)")
+    @Option(name = "--keystore", required = true,
+            description = "Keystore file\n(required)")
     @Completion(FilePathCompleter.class)
     private String ksFile;
 
-    @Option(name = "--type",
-            required = true,
-            description = "Type of the keystore\n"
-                    + "(required)")
+    @Option(name = "--type", required = true,
+            description = "Type of the keystore\n(required)")
     @Completion(KeystoreTypeCompleter.class)
     private String ksType;
 
@@ -64,10 +60,8 @@ public class ImportCertCmd extends SecurityAction {
             description = "password of the keystore")
     private String ksPwd;
 
-    @Option(name = "--cert", aliases = "-c",
-            required = true, multiValued = true,
-            description = "Certificate files\n"
-                    + "(required, multi-valued)")
+    @Option(name = "--cert", aliases = "-c", required = true, multiValued = true,
+            description = "Certificate files\n(required, multi-valued)")
     @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 

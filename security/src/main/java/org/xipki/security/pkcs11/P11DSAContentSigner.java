@@ -117,7 +117,7 @@ class P11DSAContentSigner implements XiContentSigner {
         P11Slot slot = cryptService.getSlot(slotId);
         if (slot.supportsMechanism(PKCS11Constants.CKM_DSA)) {
             this.mechanism = PKCS11Constants.CKM_DSA;
-            Digest digest = SignerUtil.getDigest(hashAlgo);
+            Digest digest = hashAlgo.createDigest();
             this.outputStream = new DigestOutputStream(digest);
         } else {
             this.mechanism = hashMechMap.get(hashAlgo).longValue();
@@ -153,7 +153,7 @@ class P11DSAContentSigner implements XiContentSigner {
     public byte[] getSignature() {
         try {
             byte[] plainSignature = getPlainSignature();
-            return plain ? plainSignature : SignerUtil.convertPlainDSASigToX962(plainSignature);
+            return plain ? plainSignature : SignerUtil.dsaSigPlainToX962(plainSignature);
         } catch (XiSecurityException ex) {
             LogUtil.warn(LOG, ex);
             throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());

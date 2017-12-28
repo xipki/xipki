@@ -37,7 +37,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DefaultConcurrentContentSigner;
+import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
@@ -170,9 +170,9 @@ public class P11ContentSignerBuilder {
 
         final boolean mac = false;
         PrivateKey privateKey = new P11PrivateKey(cryptService, identityId);
-        DefaultConcurrentContentSigner concurrentSigner;
+        DfltConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, privateKey);
+            concurrentSigner = new DfltConcurrentContentSigner(mac, signers, privateKey);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

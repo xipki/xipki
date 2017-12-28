@@ -48,9 +48,9 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
+public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DfltConcurrentContentSigner.class);
 
     private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
 
@@ -91,12 +91,12 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
     }
 
-    public DefaultConcurrentContentSigner(final boolean mac, final List<XiContentSigner> signers)
+    public DfltConcurrentContentSigner(final boolean mac, final List<XiContentSigner> signers)
             throws NoSuchAlgorithmException {
         this(mac, signers, null);
     }
 
-    public DefaultConcurrentContentSigner(final boolean mac,
+    public DfltConcurrentContentSigner(final boolean mac,
             final List<XiContentSigner> signers, final Key signingKey)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonEmpty("signers", signers);

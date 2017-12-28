@@ -88,10 +88,7 @@ public class LiquibaseMain {
         String defaultSchemaName = dbConf.schema();
         this.database = CommandLineUtils.createDatabaseObject(
             clOpener, // resourceAccessor
-            dbConf.url(), // url
-            dbConf.username(), // username
-            dbConf.password(), // password
-            dbConf.driver(), // driver
+            dbConf.url(), dbConf.username(), dbConf.password(), dbConf.driver(),
             (String) null, // defaultCatalogName
             defaultSchemaName, // defaultSchemaName
             false, // outputDefaultCatalog

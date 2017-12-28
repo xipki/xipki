@@ -36,10 +36,8 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Service
 public class P11ObjectsDeleteCmd extends SecurityAction {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     protected Integer slotIndex;
 
     @Option(name = "--id",

@@ -47,7 +47,8 @@ public class PBEDecryptCmd extends SecurityAction {
                     + "exactly one of password and password-file must be specified")
     private String passwordHint;
 
-    @Option(name = "--password-file", description = "file containing the encrypted password")
+    @Option(name = "--password-file",
+            description = "file containing the encrypted password")
     @Completion(FilePathCompleter.class)
     private String passwordFile;
 
@@ -56,10 +57,12 @@ public class PBEDecryptCmd extends SecurityAction {
     @Completion(FilePathCompleter.class)
     private String masterPasswordFile;
 
-    @Option(name = "--mk", description = "quorum of the master password parts")
+    @Option(name = "--mk",
+            description = "quorum of the master password parts")
     private Integer mquorum = 1;
 
-    @Option(name = "--out", description = "where to save the password")
+    @Option(name = "--out",
+            description = "where to save the password")
     @Completion(FilePathCompleter.class)
     private String outFile;
 

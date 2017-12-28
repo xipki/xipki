@@ -36,10 +36,8 @@ import org.xipki.security.speed.p12.P12HMACSignLoadTest;
 // CHECKSTYLE:SKIP
 public class SpeedP12HMACSignCmd extends SpeedP12SignAction {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
+    @Option(name = "--sig-algo", required = true,
+            description = "signature algorithm\n(required)")
     @Completion(HMACSigAlgCompleter.class)
     private String sigAlgo;
 

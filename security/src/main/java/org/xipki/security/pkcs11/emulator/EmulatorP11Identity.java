@@ -385,7 +385,7 @@ public class EmulatorP11Identity extends P11Identity {
             Signature sig = sig0.value();
             sig.update(hash);
             byte[] x962Signature = sig.sign();
-            return SignerUtil.convertX962DSASigToPlain(x962Signature, signatureKeyBitLength());
+            return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
         } catch (SignatureException ex) {
             throw new P11TokenException("SignatureException: " + ex.getMessage(), ex);
         } catch (XiSecurityException ex) {
@@ -417,7 +417,7 @@ public class EmulatorP11Identity extends P11Identity {
             } else {
                 x962Signature = sig.generateSignatureForMessage(dataToSign);
             }
-            return SignerUtil.convertX962DSASigToPlain(x962Signature, signatureKeyBitLength());
+            return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
         } catch (CryptoException ex) {
             throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
         } catch (XiSecurityException ex) {

@@ -33,10 +33,8 @@ import org.xipki.console.karaf.XiAction;
 @Service
 public class ConfirmCmd extends XiAction {
 
-    @Argument(index = 0, name = "message",
-            required = true,
-            description = "prompt message\n"
-                    + "(required)")
+    @Argument(index = 0, name = "message", required = true,
+            description = "prompt message\n(required)")
     private String prompt;
 
     @Override

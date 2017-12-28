@@ -37,7 +37,7 @@ import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DefaultConcurrentContentSigner;
+import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
@@ -123,9 +123,9 @@ public class SoftTokenMacContentSignerBuilder {
         }
 
         final boolean mac = true;
-        DefaultConcurrentContentSigner concurrentSigner;
+        DfltConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
+            concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

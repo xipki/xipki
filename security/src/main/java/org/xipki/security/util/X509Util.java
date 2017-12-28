@@ -713,7 +713,7 @@ public class X509Util {
         return cutText(text, maxLen);
     }
 
-    public static Extension createExtensionSubjectAltName(final List<String> taggedValues,
+    public static Extension createExtnSubjectAltName(final List<String> taggedValues,
             final boolean critical) throws BadInputException {
         GeneralNames names = createGeneralNames(taggedValues);
         if (names == null) {
@@ -727,7 +727,7 @@ public class X509Util {
         }
     }
 
-    public static Extension createExtensionSubjectInfoAccess(
+    public static Extension createExtnSubjectInfoAccess(
             final List<String> accessMethodAndLocations, final boolean critical)
             throws BadInputException {
         if (CollectionUtil.isEmpty(accessMethodAndLocations)) {

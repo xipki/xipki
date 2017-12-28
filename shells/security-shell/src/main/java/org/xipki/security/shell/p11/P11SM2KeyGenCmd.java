@@ -31,7 +31,7 @@ import org.xipki.security.pkcs11.P11Slot;
         description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
-public class P11Sm2KeyGenCmd extends P11KeyGenAction {
+public class P11SM2KeyGenCmd extends P11KeyGenAction {
 
     @Override
     protected Object execute0() throws Exception {

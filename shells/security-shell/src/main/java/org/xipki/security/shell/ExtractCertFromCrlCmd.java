@@ -50,17 +50,13 @@ import org.xipki.security.util.X509Util;
 @Service
 public class ExtractCertFromCrlCmd extends SecurityAction {
 
-    @Option(name = "--crl",
-            required = true,
-            description = "CRL file\n"
-                    + "(required)")
+    @Option(name = "--crl", required = true,
+            description = "CRL file\n(required)")
     @Completion(FilePathCompleter.class)
     private String crlFile;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "ZIP file to save the extracted certificates\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "ZIP file to save the extracted certificates\n(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;
 

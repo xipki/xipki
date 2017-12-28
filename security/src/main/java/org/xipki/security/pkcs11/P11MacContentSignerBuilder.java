@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DefaultConcurrentContentSigner;
+import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -66,9 +66,9 @@ public class P11MacContentSignerBuilder {
         } // end for
 
         final boolean mac = true;
-        DefaultConcurrentContentSigner concurrentSigner;
+        DfltConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, null);
+            concurrentSigner = new DfltConcurrentContentSigner(mac, signers, null);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

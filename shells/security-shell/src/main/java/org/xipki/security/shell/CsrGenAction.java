@@ -83,29 +83,23 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class CertRequestGenAction extends SecurityAction {
+public abstract class CsrGenAction extends SecurityAction {
 
     @Option(name = "--hash",
             description = "hash algorithm name")
     @Completion(HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--subject-alt-name",
-            multiValued = true,
-            description = "subjectAltName\n"
-                    + "(multi-valued)")
+    @Option(name = "--subject-alt-name", multiValued = true,
+            description = "subjectAltName\n(multi-valued)")
     protected List<String> subjectAltNames;
 
-    @Option(name = "--subject-info-access",
-            multiValued = true,
-            description = "subjectInfoAccess\n"
-                    + "(multi-valued)")
+    @Option(name = "--subject-info-access", multiValued = true,
+            description = "subjectInfoAccess\n(multi-valued)")
     protected List<String> subjectInfoAccesses;
 
-    @Option(name = "--subject", aliases = "-s",
-            required = true,
-            description = "subject in the CSR\n"
-                    + "(required)")
+    @Option(name = "--subject", aliases = "-s", required = true,
+            description = "subject in the CSR\n(required)")
     private String subject;
 
     @Option(name = "--rsa-mgf1",
@@ -122,35 +116,27 @@ public abstract class CertRequestGenAction extends SecurityAction {
                     + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "output file name\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "output file name\n(required)")
     @Completion(FilePathCompleter.class)
     private String outputFilename;
 
     @Option(name = "--challenge-password", aliases = "-c",
-            description = "Challenge password")
+            description = "challenge password")
     private String challengePassword;
 
-    @Option(name = "--keyusage",
-            multiValued = true,
-            description = "keyusage\n"
-                    + "(multi-valued)")
+    @Option(name = "--keyusage", multiValued = true,
+            description = "keyusage\n(multi-valued)")
     @Completion(KeyusageCompleter.class)
     private List<String> keyusages;
 
-    @Option(name = "--ext-keyusage",
-            multiValued = true,
-            description = "extended keyusage\n"
-                    + "(multi-valued)")
+    @Option(name = "--ext-keyusage", multiValued = true,
+            description = "extended keyusage\n(multi-valued)")
     @Completion(ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
-    @Option(name = "--qc-eu-limit",
-            multiValued = true,
-            description = "QC EuLimitValue of format <currency>:<amount>:<exponent>.\n"
-                    + "(multi-valued)")
+    @Option(name = "--qc-eu-limit", multiValued = true,
+            description = "QC EuLimitValue of format <currency>:<amount>:<exponent> (multi-valued)")
     private List<String> qcEuLimits;
 
     @Option(name = "--biometric-type",
@@ -171,18 +157,15 @@ public abstract class CertRequestGenAction extends SecurityAction {
     @Completion(FilePathCompleter.class)
     private String biometricUri;
 
-    @Option(name = "--need-extension",
-            multiValued = true,
+    @Option(name = "--need-extension", multiValued = true,
             description = "types of extension that must be contained in the certificate\n"
                     + "(multi-valued)")
     @Completion(ExtensionNameCompleter.class)
     private List<String> needExtensionTypes;
 
-    @Option(name = "--want-extension",
-            multiValued = true,
+    @Option(name = "--want-extension", multiValued = true,
             description = "types of extension that should be contained in the certificate if"
-                    + " possible\n"
-                    + "(multi-valued)")
+                    + " possible\n(multi-valued)")
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
@@ -383,13 +366,12 @@ public abstract class CertRequestGenAction extends SecurityAction {
 
     protected ASN1OctetString createExtnValueSubjectAltName() throws BadInputException {
         return isEmpty(subjectAltNames) ? null
-                : X509Util.createExtensionSubjectAltName(subjectAltNames, false).getExtnValue();
+                : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
     }
 
     protected ASN1OctetString createExtnValueSubjectInfoAccess() throws BadInputException {
         return isEmpty(subjectInfoAccesses) ? null
-                : X509Util.createExtensionSubjectInfoAccess(subjectInfoAccesses, false)
-                    .getExtnValue();
+                : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
     }
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(

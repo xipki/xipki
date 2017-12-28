@@ -41,24 +41,29 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CrlInfoCmd extends SecurityAction {
 
-    @Option(name = "--in", description = "CRL file\n"
-                    + "(required)")
+    @Option(name = "--in",
+            description = "CRL file\n(required)")
     @Completion(FilePathCompleter.class)
     private String inFile;
 
-    @Option(name = "--hex", aliases = "-h", description = "print hex number")
+    @Option(name = "--hex", aliases = "-h",
+            description = "print hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--crlnumber", description = "print CRL number")
+    @Option(name = "--crlnumber",
+            description = "print CRL number")
     private Boolean crlNumber;
 
-    @Option(name = "--issuer", description = "print issuer")
+    @Option(name = "--issuer",
+            description = "print issuer")
     private Boolean issuer;
 
-    @Option(name = "--this-update", description = "print thisUpdate")
+    @Option(name = "--this-update",
+            description = "print thisUpdate")
     private Boolean thisUpdate;
 
-    @Option(name = "--next-update", description = "print nextUpdate")
+    @Option(name = "--next-update",
+            description = "print nextUpdate")
     private Boolean nextUpdate;
 
     @Override

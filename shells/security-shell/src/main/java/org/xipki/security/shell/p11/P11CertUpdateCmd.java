@@ -37,10 +37,8 @@ import org.xipki.security.util.X509Util;
 @Service
 public class P11CertUpdateCmd extends P11SecurityAction {
 
-    @Option(name = "--cert",
-            required = true,
-            description = "certificate file\n"
-                    + "(required)")
+    @Option(name = "--cert", required = true,
+            description = "certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     private String certFile;
 

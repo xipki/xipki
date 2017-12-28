@@ -49,10 +49,8 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CurlCmd extends XiAction {
 
-    @Argument(index = 0, name = "url",
-            required = true,
-            description = "URL\n"
-                    + "(required)")
+    @Argument(index = 0, name = "url", required = true,
+            description = "URL\n(required)")
     private String url;
 
     @Option(name = "--verbose", aliases = "-v",
@@ -80,8 +78,7 @@ public class CurlCmd extends XiAction {
     @Completion(FilePathCompleter.class)
     private String outFile;
 
-    @Option(name = "--header", aliases = "-h",
-            multiValued = true,
+    @Option(name = "--header", aliases = "-h", multiValued = true,
             description = "header in request")
     @Completion(FilePathCompleter.class)
     private List<String> headers;

@@ -39,15 +39,12 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11SecretKeyGenCmd extends P11KeyGenAction {
 
-    @Option(name = "--key-type",
-            required = true,
-            description = "keytype, current only AES, DES3 and GENERIC are supported\n"
-                    + "(required)")
+    @Option(name = "--key-type", required = true,
+            description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
     @Completion(SecretKeyTypeCompleter.class)
     private String keyType;
 
-    @Option(name = "--key-size",
-            required = true,
+    @Option(name = "--key-size", required = true,
             description = "keysize in bit.")
     private Integer keysize;
 

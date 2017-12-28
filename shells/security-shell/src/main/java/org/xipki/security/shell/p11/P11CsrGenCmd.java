@@ -29,7 +29,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
-import org.xipki.security.shell.CertRequestGenAction;
+import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -37,15 +37,13 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "req-p11",
+@Command(scope = "xi", name = "csr-p11",
         description = "generate CSR request with PKCS#11 device")
 @Service
-public class P11CertRequestGenCmd extends CertRequestGenAction {
+public class P11CsrGenCmd extends CsrGenAction {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     private Integer slotIndex;
 
     @Option(name = "--id",

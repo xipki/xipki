@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,34 +58,22 @@ public class SignerUtil {
     private static final Map<HashAlgoType, byte[]> digestPkcsPrefix = new HashMap<>();
 
     static {
-        digestPkcsPrefix.put(HashAlgoType.SHA1,
-                Hex.decode("3021300906052b0e03021a05000414"));
-        digestPkcsPrefix.put(HashAlgoType.SHA224,
-                Hex.decode("302d300d06096086480165030402040500041c"));
-        digestPkcsPrefix.put(HashAlgoType.SHA256,
-                Hex.decode("3031300d060960864801650304020105000420"));
-        digestPkcsPrefix.put(HashAlgoType.SHA384,
-                Hex.decode("3041300d060960864801650304020205000430"));
-        digestPkcsPrefix.put(HashAlgoType.SHA512,
-                Hex.decode("3051300d060960864801650304020305000440"));
-        digestPkcsPrefix.put(HashAlgoType.SHA3_224,
-                Hex.decode("302d300d06096086480165030402070500041c"));
-        digestPkcsPrefix.put(HashAlgoType.SHA3_256,
-                Hex.decode("3031300d060960864801650304020805000420"));
-        digestPkcsPrefix.put(HashAlgoType.SHA3_384,
-                Hex.decode("3041300d060960864801650304020905000430"));
-        digestPkcsPrefix.put(HashAlgoType.SHA3_512,
-                Hex.decode("3051300d060960864801650304020a05000440"));
+        addDigestPkcsPrefix(HashAlgoType.SHA1, "3021300906052b0e03021a05000414");
+        addDigestPkcsPrefix(HashAlgoType.SHA224, "302d300d06096086480165030402040500041c");
+        addDigestPkcsPrefix(HashAlgoType.SHA256, "3031300d060960864801650304020105000420");
+        addDigestPkcsPrefix(HashAlgoType.SHA384, "3041300d060960864801650304020205000430");
+        addDigestPkcsPrefix(HashAlgoType.SHA512, "3051300d060960864801650304020305000440");
+        addDigestPkcsPrefix(HashAlgoType.SHA3_224, "302d300d06096086480165030402070500041c");
+        addDigestPkcsPrefix(HashAlgoType.SHA3_256, "3031300d060960864801650304020805000420");
+        addDigestPkcsPrefix(HashAlgoType.SHA3_384, "3041300d060960864801650304020905000430");
+        addDigestPkcsPrefix(HashAlgoType.SHA3_512, "3051300d060960864801650304020a05000440");
+    }
+
+    private static void addDigestPkcsPrefix(HashAlgoType algo, String prefix) {
+        digestPkcsPrefix.put(algo, Hex.decode(prefix));
     }
 
     private SignerUtil() {
-    }
-
-    // CHECKSTYLE:SKIP
-    public static RSAKeyParameters generateRSAPublicKeyParameter(final RSAPublicKey key) {
-        ParamUtil.requireNonNull("key", key);
-        return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
-
     }
 
     // CHECKSTYLE:SKIP
@@ -266,12 +253,11 @@ public class SignerUtil {
      */
     private static void ItoOSP( // CHECKSTYLE:SKIP
         final int i, // CHECKSTYLE:SKIP
-        final byte[] sp,
-        final int spOffset) {
-        sp[spOffset + 0] = (byte)(i >>> 24);
+        final byte[] sp, final int spOffset) {
+        sp[spOffset    ] = (byte)(i >>> 24);
         sp[spOffset + 1] = (byte)(i >>> 16);
         sp[spOffset + 2] = (byte)(i >>> 8);
-        sp[spOffset + 3] = (byte)(i >>> 0);
+        sp[spOffset + 3] = (byte)(i);
     }
 
     /**
@@ -305,7 +291,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] convertPlainDSASigToX962(final byte[] signature)
+    public static byte[] dsaSigPlainToX962(final byte[] signature)
             throws XiSecurityException {
         ParamUtil.requireNonNull("signature", signature);
         if (signature.length % 2 != 0) {
@@ -329,7 +315,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] convertX962DSASigToPlain(final byte[] x962Signature, final int keyBitLen)
+    public static byte[] dsaSigX962ToPlain(final byte[] x962Signature, final int keyBitLen)
             throws XiSecurityException {
         ParamUtil.requireNonNull("x962Signature", x962Signature);
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
@@ -338,11 +324,11 @@ public class SignerUtil {
         }
         BigInteger sigR = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
         BigInteger sigS = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
-        return convertDSASigToPlain(sigR, sigS, keyBitLen);
+        return dsaSigToPlain(sigR, sigS, keyBitLen);
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] convertDSASigToPlain(final BigInteger sigR, final BigInteger sigS,
+    public static byte[] dsaSigToPlain(final BigInteger sigR, final BigInteger sigS,
             final int keyBitLen)
             throws XiSecurityException {
         ParamUtil.requireNonNull("sigR", sigR);
@@ -374,11 +360,7 @@ public class SignerUtil {
         }
     }
 
-    public static Digest getDigest(final HashAlgoType hashAlgo) throws XiSecurityException {
-        return hashAlgo.createDigest();
-    }
-
-    public static Digest getDigest(final AlgorithmIdentifier hashAlgo) throws XiSecurityException {
+    private static Digest getDigest(final AlgorithmIdentifier hashAlgo) throws XiSecurityException {
         HashAlgoType hat = HashAlgoType.getHashAlgoType(hashAlgo.getAlgorithm());
         if (hat != null) {
             return hat.createDigest();

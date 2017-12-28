@@ -100,24 +100,20 @@ public class LiquibaseDatabaseConf {
             }
         } else if (datasourceClassName.contains("mysql.")) {
             driverClassName = "com.mysql.jdbc.Driver";
-            urlBuilder.append("jdbc:mysql://");
-            urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
-            urlBuilder.append(":");
-            urlBuilder.append(dbProps.getProperty("dataSource.port"));
-            urlBuilder.append("/");
-            urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
+            urlBuilder.append("jdbc:mysql://")
+                .append(dbProps.getProperty("dataSource.serverName")).append(":")
+                .append(dbProps.getProperty("dataSource.port")).append("/")
+                .append(dbProps.getProperty("dataSource.databaseName"));
         } else if (datasourceClassName.contains("mariadb.")) {
             driverClassName = "org.mariadb.jdbc.Driver";
             String str = dbProps.getProperty("dataSource.URL");
             if (isNotBlank(str)) {
                 urlBuilder.append(str);
             } else {
-                urlBuilder.append("jdbc:mariadb://");
-                urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
-                urlBuilder.append(":");
-                urlBuilder.append(dbProps.getProperty("dataSource.port"));
-                urlBuilder.append("/");
-                urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
+                urlBuilder.append("jdbc:mariadb://")
+                    .append(dbProps.getProperty("dataSource.serverName")).append(":")
+                    .append(dbProps.getProperty("dataSource.port")).append("/")
+                    .append(dbProps.getProperty("dataSource.databaseName"));
             }
         } else if (datasourceClassName.contains("oracle.")) {
             driverClassName = "oracle.jdbc.driver.OracleDriver";
@@ -125,23 +121,19 @@ public class LiquibaseDatabaseConf {
             if (isNotBlank(str)) {
                 urlBuilder.append(str);
             } else {
-                urlBuilder.append("jdbc:oracle:thin:@");
-                urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
-                urlBuilder.append(":");
-                urlBuilder.append(dbProps.getProperty("dataSource.portNumber"));
-                urlBuilder.append(":");
-                urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
+                urlBuilder.append("jdbc:oracle:thin:@")
+                    .append(dbProps.getProperty("dataSource.serverName")).append(":")
+                    .append(dbProps.getProperty("dataSource.portNumber")).append(":")
+                    .append(dbProps.getProperty("dataSource.databaseName"));
             }
         } else if (datasourceClassName.contains("com.ibm.db2.")) {
             driverClassName = "com.ibm.db2.jcc.DB2Driver";
             schema = dbProps.getProperty("dataSource.currentSchema");
 
-            urlBuilder.append("jdbc:db2://");
-            urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
-            urlBuilder.append(":");
-            urlBuilder.append(dbProps.getProperty("dataSource.portNumber"));
-            urlBuilder.append("/");
-            urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
+            urlBuilder.append("jdbc:db2://")
+                .append(dbProps.getProperty("dataSource.serverName")).append(":")
+                .append(dbProps.getProperty("dataSource.portNumber")).append("/")
+                .append(dbProps.getProperty("dataSource.databaseName"));
         } else if (datasourceClassName.contains("postgresql.")
                 || datasourceClassName.contains("impossibl.postgres.")) {
             String serverName;
@@ -157,9 +149,8 @@ public class LiquibaseDatabaseConf {
                 databaseName = dbProps.getProperty("dataSource.database");
             }
             driverClassName = "org.postgresql.Driver";
-            urlBuilder.append("jdbc:postgresql://");
-            urlBuilder.append(serverName).append(":").append(portNumber).append("/")
-                .append(databaseName);
+            urlBuilder.append("jdbc:postgresql://")
+                .append(serverName).append(":").append(portNumber).append("/").append(databaseName);
         } else if (datasourceClassName.contains("hsqldb.")) {
             driverClassName = "org.hsqldb.jdbc.JDBCDriver";
             urlBuilder.append(dbProps.getProperty("dataSource.url"));

@@ -41,10 +41,8 @@ import org.xipki.security.speed.p11.P11ECSignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11ECSignCmd extends BSpeedP11Action {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
+    @Option(name = "--sig-algo", required = true,
+            description = "signature algorithm\n(required)")
     @Completion(ECDSASigAlgCompleter.class)
     private String sigAlgo;
 

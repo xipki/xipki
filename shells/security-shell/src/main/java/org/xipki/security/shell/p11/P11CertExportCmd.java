@@ -39,10 +39,8 @@ import org.xipki.security.pkcs11.P11Slot;
 @Service
 public class P11CertExportCmd extends P11SecurityAction {
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;
 
