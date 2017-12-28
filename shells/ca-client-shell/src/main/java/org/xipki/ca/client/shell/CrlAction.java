@@ -38,15 +38,12 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 public abstract class CrlAction extends ClientAction {
 
     @Option(name = "--ca",
-            description = "CA name\n"
-                    + "(required if multiple CAs are configured)")
+            description = "CA name\n(required if multiple CAs are configured)")
     @Completion(CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the CRL\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the CRL\n(required)")
     @Completion(FilePathCompleter.class)
     protected String outFile;
 

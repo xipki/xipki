@@ -42,10 +42,8 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 @Service
 public class P11EnrollCertCmd extends EnrollCertAction {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
+    @Option(name = "--slot", required = true,
+            description = "slot index\n(required)")
     private Integer slotIndex;
 
     @Option(name = "--key-id",

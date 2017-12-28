@@ -30,28 +30,27 @@ import org.xipki.common.util.ParamUtil;
 
 public class EnrollCertResult {
 
-    private final Certificate caCertificate;
+    private final Certificate caCert;
 
-    private final Map<String, CertOrError> certificatesOrErrors;
+    private final Map<String, CertOrError> certsOrErrors;
 
-    public EnrollCertResult(final Certificate caCertificate,
-            final Map<String, CertOrError> certificatesOrErrors) {
-        this.certificatesOrErrors = ParamUtil.requireNonEmpty("certificatesOrErrors",
-                certificatesOrErrors);
-        this.caCertificate = caCertificate;
+    public EnrollCertResult(final Certificate caCert,
+            final Map<String, CertOrError> certsOrErrors) {
+        this.certsOrErrors = ParamUtil.requireNonEmpty("certsOrErrors", certsOrErrors);
+        this.caCert = caCert;
     }
 
-    public Certificate caCertificate() {
-        return caCertificate;
+    public Certificate caCert() {
+        return caCert;
     }
 
-    public CertOrError getCertificateOrError(final String id) {
+    public CertOrError getCertOrError(final String id) {
         ParamUtil.requireNonBlank("id", id);
-        return certificatesOrErrors.get(id);
+        return certsOrErrors.get(id);
     }
 
     public Set<String> allIds() {
-        return certificatesOrErrors.keySet();
+        return certsOrErrors.keySet();
     }
 
 }

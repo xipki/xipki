@@ -39,17 +39,13 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 
 public abstract class EnrollCertAction extends ClientAction {
 
-    @Option(name = "--csr",
-            required = true,
-            description = "CSR file\n"
-                    + "(required)")
+    @Option(name = "--csr", required = true,
+            description = "CSR file\n(required)")
     @Completion(FilePathCompleter.class)
     private String csrFile;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outputFile;
 

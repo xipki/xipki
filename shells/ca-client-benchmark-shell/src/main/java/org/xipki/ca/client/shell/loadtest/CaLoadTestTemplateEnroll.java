@@ -127,7 +127,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
             }
 
             for (String id : ids) {
-                CertOrError certOrError = result.getCertificateOrError(id);
+                CertOrError certOrError = result.getCertOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.certificate();
 
                 if (cert == null) {

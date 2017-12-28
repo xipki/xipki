@@ -232,6 +232,7 @@ public final class CaClientImpl implements CaClient {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
         }
+
         if (securityFactory == null) {
             throw new IllegalStateException("securityFactory is not set");
         }
@@ -274,9 +275,6 @@ public final class CaClientImpl implements CaClient {
             LOG.warn("no active CA is configured");
         }
 
-        Boolean bo = config.isDevMode();
-        boolean devMode = bo != null && bo.booleanValue();
-
         // responders
         Map<String, CmpResponder> responders = new HashMap<>();
         for (ResponderType m : config.getResponders().getResponder()) {
@@ -305,8 +303,7 @@ public final class CaClientImpl implements CaClient {
         // CA
         Set<CaConf> cas = new HashSet<>();
         for (CAType caType : config.getCAs().getCA()) {
-            bo = caType.isEnabled();
-            if (!bo.booleanValue()) {
+            if (!caType.isEnabled()) {
                 continue;
             }
 
@@ -371,9 +368,7 @@ public final class CaClientImpl implements CaClient {
                 }
             } catch (IOException | CertificateException ex) {
                 LogUtil.error(LOG, ex, "could not configure CA " + caName);
-                if (!devMode) {
-                    throw new CaClientException(ex.getMessage(), ex);
-                }
+                throw new CaClientException(ex.getMessage(), ex);
             }
         }
 
@@ -424,11 +419,11 @@ public final class CaClientImpl implements CaClient {
 
             X509CmpRequestor cmpRequestor;
             if (requestorSigners.containsKey(requestorName)) {
-                cmpRequestor = new DefaultHttpX509CmpRequestor(requestorSigners.get(requestorName),
+                cmpRequestor = new DfltHttpX509CmpRequestor(requestorSigners.get(requestorName),
                         ca.responder(), ca.url(), securityFactory);
                 cmpRequestor.setSignRequest(requestorSignRequests.get(requestorName));
             } else if (requestorCerts.containsKey(requestorName)) {
-                cmpRequestor = new DefaultHttpX509CmpRequestor(requestorCerts.get(requestorName),
+                cmpRequestor = new DfltHttpX509CmpRequestor(requestorCerts.get(requestorName),
                         ca.responder(), ca.url(), securityFactory);
             } else {
                 throw new CaClientException("could not find requestor named " + requestorName
@@ -471,12 +466,7 @@ public final class CaClientImpl implements CaClient {
             }
 
             if (CollectionUtil.isNonEmpty(failedCaNames)) {
-                final String msg = "could not configure following CAs " + failedCaNames;
-                if (devMode) {
-                    LOG.warn(msg);
-                } else {
-                    throw new CaClientException(msg);
-                }
+                throw new CaClientException("could not configure following CAs " + failedCaNames);
             }
 
             if (caInfoUpdateInterval > 0) {
@@ -948,8 +938,7 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
-        UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.subject(),
-                serial);
+        UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.subject(), serial);
         if (ca.cmpControl().isRrAkiRequired()) {
             entry.setAuthorityKeyIdentifier(ca.subjectKeyIdentifier());
         }
@@ -1015,8 +1004,7 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
-        UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.subject(),
-                serial);
+        UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.subject(), serial);
         if (ca.cmpControl().isRrAkiRequired()) {
             entry.setAuthorityKeyIdentifier(ca.subjectKeyIdentifier());
         }

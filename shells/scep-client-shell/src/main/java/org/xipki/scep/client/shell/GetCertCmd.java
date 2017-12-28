@@ -41,16 +41,12 @@ import org.xipki.scep.client.ScepClient;
 @Service
 public class GetCertCmd extends ClientAction {
 
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
+    @Option(name = "--serial", aliases = "-s", required = true,
+            description = "serial number\n(required)")
     private String serialNumber;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outputFile;
 

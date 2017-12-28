@@ -37,11 +37,9 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CaLoadTestTemplateEnrollCmd extends CaLoadTestAction {
 
-    @Option(name = "--template", aliases = "-t",
-            required = true,
+    @Option(name = "--template", aliases = "-t", required = true,
             description = "template file. Note the contained profiles must allow duplication of"
-                    + " public key \n"
-                    + "(required)")
+                    + " public key\n(required)")
     @Completion(FilePathCompleter.class)
     private String templateFile;
 
@@ -54,8 +52,7 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestAction {
     private Integer numThreads = 5;
 
     @Option(name = "--max-num",
-            description = "maximal number of requests\n"
-                    + "0 for unlimited")
+            description = "maximal number of requests\n0 for unlimited")
     private Integer maxRequests = 0;
 
     @Override

@@ -24,7 +24,7 @@ CN = SCEP-TLS-${CUR_TIME}
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
 
-xi:req-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --challenge-password user1:password1 \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
 
@@ -57,7 +57,7 @@ xi:scep-getcrl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
 echo "# Renewal"
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=Dummy"
 
-xi:req-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
   --subject "CN=${CN}-2.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}-2.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
@@ -72,7 +72,7 @@ xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
 echo "# Renewal with different CommonName"
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=Dummy"
 
-xi:req-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
   --subject "CN=${CN}-3.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}-3.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"

@@ -36,10 +36,8 @@ import org.xipki.security.util.AlgorithmUtil;
 
 public abstract class OcspStatusAction extends XiAction {
 
-    @Option(name = "--issuer", aliases = "-i",
-            required = true,
-            description = "issuer certificate file\n"
-                    + "(required)")
+    @Option(name = "--issuer", aliases = "-i", required = true,
+            description = "issuer certificate file\n(required)")
     @Completion(FilePathCompleter.class)
     protected String issuerCertFile;
 
@@ -56,10 +54,8 @@ public abstract class OcspStatusAction extends XiAction {
     @Completion(HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--sig-alg",
-            multiValued = true,
-            description = "comma-separated preferred signature algorithms\n"
-                    + "(multi-valued)")
+    @Option(name = "--sig-alg", multiValued = true,
+            description = "comma-separated preferred signature algorithms\n(multi-valued)")
     @Completion(SigAlgCompleter.class)
     protected List<String> prefSigAlgs;
 

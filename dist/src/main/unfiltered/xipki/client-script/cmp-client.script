@@ -36,7 +36,7 @@ CN = CMPCSR-TLS-${CUR_TIME}
 
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
-xi:req-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
 
 xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile TLS

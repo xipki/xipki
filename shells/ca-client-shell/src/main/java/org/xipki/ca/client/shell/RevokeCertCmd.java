@@ -44,10 +44,8 @@ import org.xipki.security.util.X509Util;
 @Service
 public class RevokeCertCmd extends UnRevRemoveCertAction {
 
-    @Option(name = "--reason", aliases = "-r",
-            required = true,
-            description = "CRL reason\n"
-                    + "(required)")
+    @Option(name = "--reason", aliases = "-r", required = true,
+            description = "CRL reason\n(required)")
     @Completion(ClientCrlReasonCompleter.class)
     private String reason;
 

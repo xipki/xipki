@@ -64,10 +64,8 @@ public class BenchmarkOcspStatusCmd extends OcspStatusAction {
     @Completion(FilePathCompleter.class)
     private String serialNumberFile;
 
-    @Option(name = "--cert",
-            multiValued = true,
-            description = "certificate\n"
-                    + "(multi-valued)")
+    @Option(name = "--cert", multiValued = true,
+            description = "certificate\n(multi-valued)")
     @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 
@@ -83,15 +81,12 @@ public class BenchmarkOcspStatusCmd extends OcspStatusAction {
             description = "whether to analyze the received OCSP response")
     private Boolean analyzeResponse = Boolean.FALSE;
 
-    @Option(name = "--url",
-            required = true,
-            description = "OCSP responder URL\n"
-                    + "required")
+    @Option(name = "--url", required = true,
+            description = "OCSP responder URL\n(required)")
     private String serverUrl;
 
     @Option(name = "--max-num",
-            description = "maximal number of OCSP queries\n"
-                    + "0 for unlimited")
+            description = "maximal number of OCSP queries\n0 for unlimited")
     private Integer maxRequests = 0;
 
     @Option(name = "--queue-size",

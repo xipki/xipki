@@ -91,11 +91,8 @@ public class OcspResponseOption {
     }
 
     public void setSignatureAlgName(final String signatureAlgName) throws NoSuchAlgorithmException {
-        if (StringUtil.isBlank(signatureAlgName)) {
-            this.signatureAlgName = null;
-        } else {
-            this.signatureAlgName = AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
-        }
+        this.signatureAlgName = StringUtil.isBlank(signatureAlgName) ? null
+                : AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
     }
 
 }

@@ -40,17 +40,13 @@ import org.xipki.scep.client.ScepClient;
 @Service
 public class GetCrlCmd extends ClientAction {
 
-    @Option(name = "--cert", aliases = "-c",
-            required = true,
-            description = "certificate\n"
-                    + "(required)")
+    @Option(name = "--cert", aliases = "-c", required = true,
+            description = "certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String certFile;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outputFile;
 

@@ -140,10 +140,8 @@ public class CmpCaClient {
 
     private X500Name caSubject;
 
-    // Use this constructor only if the CA server has Software XiPKI version 2.2.1 or later.
-    public CmpCaClient(String caUrl,
-            PrivateKey requestorKey, X509Certificate requestorCert, X509Certificate responderCert,
-            String hashAlgo) throws Exception {
+    public CmpCaClient(String caUrl, PrivateKey requestorKey, X509Certificate requestorCert,
+            X509Certificate responderCert, String hashAlgo) throws Exception {
         this(caUrl, null, requestorKey, requestorCert, responderCert, hashAlgo);
     }
 
@@ -172,11 +170,9 @@ public class CmpCaClient {
                 PKCSObjectIdentifiers.sha256WithRSAEncryption,
                 PKCSObjectIdentifiers.sha384WithRSAEncryption,
                 PKCSObjectIdentifiers.sha512WithRSAEncryption,
-                X9ObjectIdentifiers.ecdsa_with_SHA256,
-                X9ObjectIdentifiers.ecdsa_with_SHA384,
+                X9ObjectIdentifiers.ecdsa_with_SHA256,  X9ObjectIdentifiers.ecdsa_with_SHA384,
                 X9ObjectIdentifiers.ecdsa_with_SHA512,
-                NISTObjectIdentifiers.dsa_with_sha256,
-                NISTObjectIdentifiers.dsa_with_sha384,
+                NISTObjectIdentifiers.dsa_with_sha256, NISTObjectIdentifiers.dsa_with_sha384,
                 NISTObjectIdentifiers.dsa_with_sha512};
         for (ASN1ObjectIdentifier oid : oids) {
             trustedProtectionAlgOids.add(oid.getId());

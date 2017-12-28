@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.concurrent.CountLatch;
+import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 
@@ -128,8 +129,7 @@ final class HttpClient {
                 if (th instanceof ClassNotFoundException) {
                     LOG.info("epoll linux is not in classpath");
                 } else {
-                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
-                    LOG.debug("could not use Epoll transport", th);
+                    LogUtil.warn(LOG, th, "could not use Epoll transport");
                 }
             }
         } else if (os.contains("mac os") || os.contains("os x")) {
@@ -141,9 +141,8 @@ final class HttpClient {
                 if (obj instanceof Boolean) {
                     kqueueAvailable = (Boolean) obj;
                 }
-            } catch (Exception ex) {
-                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
-                LOG.debug("could not use KQueue transport", ex);
+            } catch (Throwable th) {
+                LogUtil.warn(LOG, th, "could not use KQueue transport");
             }
         }
     }
@@ -161,17 +160,16 @@ final class HttpClient {
     public void start() throws Exception {
         URI uri = new URI(this.uri);
         String scheme = (uri.getScheme() == null) ? "http" : uri.getScheme();
-        String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
-        int port = uri.getPort();
-        if (port == -1) {
-            if ("http".equalsIgnoreCase(scheme)) {
-                port = 80;
-            }
-        }
 
         if (!"http".equalsIgnoreCase(scheme)) {
             System.err.println("Only HTTP is supported.");
             return;
+        }
+
+        String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
+        int port = uri.getPort();
+        if (port == -1) {
+            port = 80;
         }
 
         Class<? extends SocketChannel> channelClass = NioSocketChannel.class;
@@ -194,8 +192,7 @@ final class HttpClient {
                 if (th instanceof ClassNotFoundException) {
                     LOG.info("epoll linux is not in classpath");
                 } else {
-                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
-                    LOG.debug("could not use Epoll transport", th);
+                    LogUtil.warn(LOG, th, "could not use Epoll transport");
                 }
                 channelClass = null;
                 this.workerGroup = null;
@@ -203,17 +200,16 @@ final class HttpClient {
         } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
             try {
                 channelClass = (Class<? extends SocketChannel>)
-                        Class.forName("io.netty.channel.kqueue.KQueueSocketChannel",
-                                false, loader);
+                                Class.forName("io.netty.channel.kqueue.KQueueSocketChannel",
+                                        false, loader);
 
                 Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
-                                    true, loader);
+                                        true, loader);
                 Constructor<?> constructor = clazz.getConstructor(int.class);
                 this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
                 LOG.info("Use KQueue Transport");
             } catch (Exception ex) {
-                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
-                LOG.debug("could not use KQueue transport", ex);
+                LogUtil.warn(LOG, ex, "could not use KQueue transport");
                 channelClass = null;
                 this.workerGroup = null;
             }

@@ -46,17 +46,13 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CsrEnrollCertCmd extends ClientAction {
 
-    @Option(name = "--csr",
-            required = true,
-            description = "CSR file\n"
-                    + "(required)")
+    @Option(name = "--csr", required = true,
+            description = "CSR file\n(required)")
     @Completion(FilePathCompleter.class)
     private String csrFile;
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "certificate profile\n"
-                    + "(required)")
+    @Option(name = "--profile", aliases = "-p", required = true,
+            description = "certificate profile\n(required)")
     private String profile;
 
     @Option(name = "--not-before",
@@ -67,16 +63,13 @@ public class CsrEnrollCertCmd extends ClientAction {
             description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the certificate\n(required)")
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Option(name = "--ca",
-            description = "CA name\n"
-                    + "(required if the profile is supported by more than one CA)")
+            description = "CA name\n(required if the profile is supported by more than one CA)")
     @Completion(CaNameCompleter.class)
     private String caName;
 
@@ -99,7 +92,7 @@ public class CsrEnrollCertCmd extends ClientAction {
         X509Certificate cert = null;
         if (result != null) {
             String id = result.allIds().iterator().next();
-            CertOrError certOrError = result.getCertificateOrError(id);
+            CertOrError certOrError = result.getCertOrError(id);
             cert = (X509Certificate) certOrError.certificate();
         }
 

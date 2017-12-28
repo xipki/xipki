@@ -332,16 +332,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         XipkiOCSPReqBuilder reqBuilder = new XipkiOCSPReqBuilder();
         List<Extension> extensions = new LinkedList<>();
         if (nonce != null) {
-            Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-                    new DEROctetString(nonce));
-            extensions.add(extn);
+            extensions.add(new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
+                    new DEROctetString(nonce)));
         }
 
         if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
             ASN1EncodableVector vec = new ASN1EncodableVector();
             for (AlgorithmIdentifier algId : prefSigAlgs) {
-                ASN1Sequence prefSigAlgObj = new DERSequence(algId);
-                vec.add(prefSigAlgObj);
+                vec.add(new DERSequence(algId));
             }
 
             ASN1Sequence extnValue = new DERSequence(vec);
@@ -457,12 +455,10 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     public void setSignerCertFile(final String signerCertFile) {
-        if (StringUtil.isBlank(signerCertFile)) {
-            return;
+        if (StringUtil.isNotBlank(signerCertFile)) {
+            this.signer = null;
+            this.signerCertFile = signerCertFile;
         }
-
-        this.signer = null;
-        this.signerCertFile = signerCertFile;
     }
 
     public String signerType() {

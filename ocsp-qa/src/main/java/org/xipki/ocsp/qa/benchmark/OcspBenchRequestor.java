@@ -192,8 +192,7 @@ class OcspBenchRequestor {
         if (requestOptions.isUseNonce() || extensions != null) {
             List<Extension> extns = new ArrayList<>(2);
             if (requestOptions.isUseNonce()) {
-                Extension extn = new Extension(
-                        OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
+                Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
                         new DEROctetString(nextNonce(requestOptions.nonceLen())));
                 extns.add(extn);
             }

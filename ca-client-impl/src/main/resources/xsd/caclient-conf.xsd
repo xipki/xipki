@@ -9,7 +9,6 @@
   <xs:element name="CAClient" type="CAClientType"/>
   <xs:complexType name="CAClientType">
     <xs:all>
-      <xs:element name="devMode" type="xs:boolean" minOccurs="0"/>
       <xs:element name="requestors">
         <xs:complexType>
           <xs:sequence>

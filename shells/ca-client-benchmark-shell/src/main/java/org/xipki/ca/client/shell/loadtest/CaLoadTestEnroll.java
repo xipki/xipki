@@ -117,7 +117,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
             Set<String> ids = result.allIds();
             int numSuccess = 0;
             for (String id : ids) {
-                CertOrError certOrError = result.getCertificateOrError(id);
+                CertOrError certOrError = result.getCertOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.certificate();
 
                 if (cert != null) {

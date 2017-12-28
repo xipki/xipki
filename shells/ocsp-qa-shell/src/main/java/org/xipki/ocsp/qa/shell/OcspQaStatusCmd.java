@@ -63,10 +63,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     @Completion(OcspErrorCompleter.class)
     private String errorText;
 
-    @Option(name = "--exp-status",
-            multiValued = true,
-            description = "expected status\n"
-                    + "(multi-valued)")
+    @Option(name = "--exp-status", multiValued = true,
+            description = "expected status\n(multi-valued)")
     @Completion(CertStatusCompleter.class)
     private List<String> statusTexts;
 

@@ -105,7 +105,7 @@ Feature xipki-security (started by default)
 
      generate CSR with PKCS#11 device
 
-   * `xi:req-p12`
+   * `xi:csr-p12`
 
      generate CSR with PKCS#12 keystore
 

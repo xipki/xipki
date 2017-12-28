@@ -40,16 +40,12 @@ import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 @Service
 public class CaLoadTestEnrollCmd extends CaLoadTestAction {
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description =  "certificate profile that allows duplication of public key\n"
-                + "(required)")
+    @Option(name = "--profile", aliases = "-p", required = true,
+            description =  "certificate profile that allows duplication of public key\n(required)")
     private String certprofile;
 
-    @Option(name = "--subject", aliases = "-s",
-            required = true,
-            description = "subject template\n"
-                    + "(required)")
+    @Option(name = "--subject", aliases = "-s", required = true,
+            description = "subject template\n(required)")
     private String subjectTemplate;
 
     @Option(name = "--random-dn",

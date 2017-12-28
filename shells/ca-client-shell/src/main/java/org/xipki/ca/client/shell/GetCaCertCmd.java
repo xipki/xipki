@@ -37,7 +37,8 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
+@Command(scope = "xi", name = "cmp-cacert",
+        description = "get CA certificate")
 @Service
 public class GetCaCertCmd extends ClientAction {
 
@@ -45,15 +46,12 @@ public class GetCaCertCmd extends ClientAction {
     protected CaClient caClient;
 
     @Option(name = "--ca",
-            description = "CA name\n"
-                    + "(required if multiple CAs are configured)")
+            description = "CA name\n(required if multiple CAs are configured)")
     @Completion(CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the CA certificate\n"
-                    + "(required)")
+    @Option(name = "--out", aliases = "-o", required = true,
+            description = "where to save the CA certificate\n(required)")
     @Completion(FilePathCompleter.class)
     protected String outFile;
 
