@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,9 +40,27 @@ import org.xipki.common.util.StringUtil;
 
 public class CanonicalizeCode {
 
+    private static final List<byte[]> headerLines = new ArrayList<>(20);
+
+    private static Throwable initializationError;
+
     private final String baseDir;
 
     private final int baseDirLen;
+
+    static {
+        try {
+            BufferedReader reader = new BufferedReader(
+                    new FileReader("src/test/resources/HEADER.txt"));
+            String line;
+            while((line = reader.readLine()) != null) {
+                headerLines.add(line.getBytes("utf-8"));
+            }
+            reader.close();
+        } catch (Throwable th) {
+            initializationError = th;
+        }
+    }
 
     private CanonicalizeCode(String baseDir) {
         this.baseDir = baseDir.endsWith(File.separator) ? baseDir : baseDir + File.separator;
@@ -49,6 +68,11 @@ public class CanonicalizeCode {
     }
 
     public static void main(final String[] args) {
+        if (initializationError != null) {
+            initializationError.printStackTrace();
+            return;
+        }
+
         for (String arg : args) {
             try {
                 String baseDir = arg;
@@ -330,40 +354,13 @@ public class CanonicalizeCode {
     }
 
     private static void writeLicenseHeader(OutputStream out, byte[] newLine) throws IOException {
-        writeLine(out, newLine,
-                "/*");
-            writeLine(out, newLine,
-                " *");
-            writeLine(out, newLine,
-                " * Copyright (c) 2013 - 2018 Lijun Liao");
-            writeLine(out, newLine,
-                " *");
-            writeLine(out, newLine,
-                " * Licensed under the Apache License, Version 2.0 (the \"License\");");
-            writeLine(out, newLine,
-                " * you may not use this file except in compliance with the License.");
-            writeLine(out,newLine,
-                " * You may obtain a copy of the License at");
-            writeLine(out, newLine,
-                " *");
-            writeLine(out, newLine,
-                " * http://www.apache.org/licenses/LICENSE-2.0");
-            writeLine(out, newLine,
-                    " *");
-            writeLine(out, newLine,
-                " * Unless required by applicable law or agreed to in writing, software");
-            writeLine(out, newLine,
-                " * distributed under the License is distributed on an \"AS IS\" BASIS,");
-            writeLine(out, newLine,
-                " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
-            writeLine(out, newLine,
-                " * See the License for the specific language governing permissions and");
-            writeLine(out, newLine,
-                " * limitations under the License.");
-            writeLine(out, newLine,
-                " */");
-            writeLine(out, newLine,
-                "");
+        for (byte[] line : headerLines) {
+            if (line.length > 0) {
+                out.write(line);
+            }
+            out.write(newLine);
+        }
+        out.write(newLine);
     }
 
     private static void writeLine(OutputStream out, byte[] newLine, String line)
