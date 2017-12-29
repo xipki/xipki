@@ -51,9 +51,8 @@ public interface OcspRequestor {
      *         if the OCSP responder cannot be reached or the response does not match the requested
      *         certificate.
      */
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-            URL responderUrl, RequestOptions requestOptions,
-            RequestResponseDebug debug)
+    OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
+            RequestOptions requestOptions, RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
     /**
@@ -76,9 +75,8 @@ public interface OcspRequestor {
      *         if the OCSP responder cannot be reached or the response does not match the requested
      *         certificate.
      */
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
-            URL responderUrl, RequestOptions requestOptions,
-            RequestResponseDebug debug)
+    OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
+            RequestOptions requestOptions, RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
     /**
@@ -102,9 +100,8 @@ public interface OcspRequestor {
      *         if the OCSP responder cannot be reached or the response does not match the requested
      *         certificate.
      */
-    OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
-            URL responderUrl, RequestOptions requestOptions,
-            RequestResponseDebug debug)
+    OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
+            RequestOptions requestOptions, RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
     /**
@@ -127,9 +124,8 @@ public interface OcspRequestor {
      *         if the OCSP responder cannot be reached or the response does not match the requested
      *         certificates.
      */
-    OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
-            URL responderUrl, RequestOptions requestOptions,
-            RequestResponseDebug debug)
+    OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
+            RequestOptions requestOptions, RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
 }

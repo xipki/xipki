@@ -31,11 +31,11 @@ public class EnrollCertResultEntry extends ResultEntry {
 
     private final int status;
 
-    public EnrollCertResultEntry(final String id, final CMPCertificate cert) {
+    public EnrollCertResultEntry(String id, CMPCertificate cert) {
         this(id, cert, PKIStatus.GRANTED);
     }
 
-    public EnrollCertResultEntry(final String id, final CMPCertificate cert, final int status) {
+    public EnrollCertResultEntry(String id, CMPCertificate cert, int status) {
         super(id);
         this.cert = cert;
         this.status = status;

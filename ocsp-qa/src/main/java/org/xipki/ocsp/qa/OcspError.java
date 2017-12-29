@@ -34,7 +34,7 @@ public enum OcspError {
 
     private final int status;
 
-    OcspError(final int status) {
+    OcspError(int status) {
         this.status = status;
     }
 
@@ -42,7 +42,7 @@ public enum OcspError {
         return status;
     }
 
-    public static OcspError forName(final String name) {
+    public static OcspError forName(String name) {
         ParamUtil.requireNonNull("name", name);
         for (OcspError entry : values()) {
             if (entry.name().equals(name)) {
@@ -53,7 +53,7 @@ public enum OcspError {
         throw new IllegalArgumentException("unknown OCSP error '" + name + "'");
     }
 
-    public static OcspError forCode(final int status) {
+    public static OcspError forCode(int status) {
         for (OcspError entry : values()) {
             if (entry.status == status) {
                 return entry;

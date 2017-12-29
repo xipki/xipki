@@ -62,7 +62,7 @@ public class P11EnrollCertCmd extends EnrollCertAction {
     private String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
             throws ObjectCreationException {
         byte[] keyIdBytes = null;
         if (keyId != null) {

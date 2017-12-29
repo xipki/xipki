@@ -39,9 +39,9 @@ import org.jscep.transaction.TransactionException;
 public class EnrollCertCmd extends EnrollCertAction {
 
     @Override
-    protected EnrollmentResponse requestCertificate(final Client client,
-            final PKCS10CertificationRequest csr, final PrivateKey identityKey,
-            final X509Certificate identityCert) throws ClientException, TransactionException {
+    protected EnrollmentResponse requestCertificate(Client client, PKCS10CertificationRequest csr,
+            PrivateKey identityKey, X509Certificate identityCert)
+            throws ClientException, TransactionException {
         return client.enrol(identityCert, identityKey, csr);
     }
 

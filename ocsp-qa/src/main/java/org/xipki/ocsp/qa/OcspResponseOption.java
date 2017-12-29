@@ -50,7 +50,7 @@ public class OcspResponseOption {
         return respIssuer;
     }
 
-    public void setRespIssuer(final X509Certificate respIssuer) {
+    public void setRespIssuer(X509Certificate respIssuer) {
         this.respIssuer = respIssuer;
     }
 
@@ -58,7 +58,7 @@ public class OcspResponseOption {
         return nonceOccurrence;
     }
 
-    public void setNonceOccurrence(final Occurrence nonceOccurrence) {
+    public void setNonceOccurrence(Occurrence nonceOccurrence) {
         this.nonceOccurrence = nonceOccurrence;
     }
 
@@ -66,7 +66,7 @@ public class OcspResponseOption {
         return certhashOccurrence;
     }
 
-    public void setCerthashOccurrence(final Occurrence certhashOccurrence) {
+    public void setCerthashOccurrence(Occurrence certhashOccurrence) {
         this.certhashOccurrence = certhashOccurrence;
     }
 
@@ -74,7 +74,7 @@ public class OcspResponseOption {
         return nextUpdateOccurrence;
     }
 
-    public void setNextUpdateOccurrence(final Occurrence nextUpdateOccurrence) {
+    public void setNextUpdateOccurrence(Occurrence nextUpdateOccurrence) {
         this.nextUpdateOccurrence = nextUpdateOccurrence;
     }
 
@@ -82,7 +82,7 @@ public class OcspResponseOption {
         return certhashAlgId;
     }
 
-    public void setCerthashAlgId(final ASN1ObjectIdentifier certhashAlgId) {
+    public void setCerthashAlgId(ASN1ObjectIdentifier certhashAlgId) {
         this.certhashAlgId = certhashAlgId;
     }
 
@@ -90,7 +90,7 @@ public class OcspResponseOption {
         return signatureAlgName;
     }
 
-    public void setSignatureAlgName(final String signatureAlgName) throws NoSuchAlgorithmException {
+    public void setSignatureAlgName(String signatureAlgName) throws NoSuchAlgorithmException {
         this.signatureAlgName = StringUtil.isBlank(signatureAlgName) ? null
                 : AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
     }

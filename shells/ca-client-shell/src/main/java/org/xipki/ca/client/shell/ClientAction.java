@@ -58,7 +58,7 @@ public abstract class ClientAction extends XiAction {
         return null;
     }
 
-    protected void saveRequestResponse(final RequestResponseDebug debug) {
+    protected void saveRequestResponse(RequestResponseDebug debug) {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
         if (!saveReq && !saveResp) {
@@ -98,7 +98,7 @@ public abstract class ClientAction extends XiAction {
         }
     } // method saveRequestResponse
 
-    private static String appendIndex(final String filename, final int index) {
+    private static String appendIndex(String filename, int index) {
         int idx = filename.lastIndexOf('.');
         if (idx == -1 || idx == filename.length() - 1) {
             return filename + "-" + index;

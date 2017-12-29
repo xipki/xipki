@@ -68,15 +68,14 @@ public class OcspQa {
 
     private final SecurityFactory securityFactory;
 
-    public OcspQa(final SecurityFactory securityFactory) {
+    public OcspQa(SecurityFactory securityFactory) {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
-    public ValidationResult checkOcsp(final OCSPResp response, final IssuerHash issuerHash,
-            final List<BigInteger> serialNumbers, final Map<BigInteger, byte[]> encodedCerts,
-            final OcspError expectedOcspError,
-            final Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            final OcspResponseOption responseOption) {
+    public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
+            OcspError expectedOcspError, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+            OcspResponseOption responseOption) {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
         ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
@@ -279,11 +278,10 @@ public class OcspQa {
         return new ValidationResult(resultIssues);
     } // method checkOcsp
 
-    private List<ValidationIssue> checkSingleCert(final int index, final SingleResp singleResp,
-            final IssuerHash issuerHash, final OcspCertStatus expectedStatus,
-            final byte[] encodedCert, final boolean extendedRevoke,
-            final Occurrence nextupdateOccurrence, final Occurrence certhashOccurrence,
-            final ASN1ObjectIdentifier certhashAlg) {
+    private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
+            IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
+            boolean extendedRevoke, Occurrence nextupdateOccurrence, Occurrence certhashOccurrence,
+            ASN1ObjectIdentifier certhashAlg) {
         List<ValidationIssue> issues = new LinkedList<>();
 
         // issuer hash
@@ -416,8 +414,8 @@ public class OcspQa {
         return issues;
     } // method checkSingleCert
 
-    private static ValidationIssue checkOccurrence(final String targetName, final Object target,
-            final Occurrence occurrence) {
+    private static ValidationIssue checkOccurrence(String targetName, Object target,
+            Occurrence occurrence) {
         ValidationIssue issue = new ValidationIssue("OCSP." + targetName, targetName);
         if (occurrence == Occurrence.forbidden) {
             if (target != null) {

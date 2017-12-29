@@ -36,7 +36,7 @@ public class RemoveExpiredCertsResult {
         return numOfCerts;
     }
 
-    public void setNumOfCerts(final int numOfCerts) {
+    public void setNumOfCerts(int numOfCerts) {
         this.numOfCerts = numOfCerts;
     }
 
@@ -44,7 +44,7 @@ public class RemoveExpiredCertsResult {
         return expiredAt;
     }
 
-    public void setExpiredAt(final long expiredAt) {
+    public void setExpiredAt(long expiredAt) {
         this.expiredAt = expiredAt;
     }
 
@@ -52,7 +52,7 @@ public class RemoveExpiredCertsResult {
         return userLike;
     }
 
-    public void setUserLike(final String userLike) {
+    public void setUserLike(String userLike) {
         this.userLike = userLike;
     }
 
@@ -60,7 +60,7 @@ public class RemoveExpiredCertsResult {
         return certprofile;
     }
 
-    public void setCertprofile(final String certprofile) {
+    public void setCertprofile(String certprofile) {
         this.certprofile = certprofile;
     }
 

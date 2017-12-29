@@ -145,9 +145,9 @@ public class CmpCaClient {
         this(caUrl, null, requestorKey, requestorCert, responderCert, hashAlgo);
     }
 
-    public CmpCaClient(String caUrl, X509Certificate caCert,
-            PrivateKey requestorKey, X509Certificate requestorCert, X509Certificate responderCert,
-            String hashAlgo) throws Exception {
+    public CmpCaClient(String caUrl, X509Certificate caCert, PrivateKey requestorKey,
+            X509Certificate requestorCert, X509Certificate responderCert, String hashAlgo)
+            throws Exception {
         this.caUrl = new URL(SdkUtil.requireNonBlank("caUrl", caUrl));
 
         SdkUtil.requireNonNull("requestorKey", requestorKey);
@@ -243,8 +243,8 @@ public class CmpCaClient {
         return cacerts;
     }
 
-    private ASN1Encodable extractGeneralRepContent(final PKIMessage response,
-            final String expectedType) throws Exception {
+    private ASN1Encodable extractGeneralRepContent(PKIMessage response,
+            String expectedType) throws Exception {
         PKIBody respBody = response.getBody();
         int bodyType = respBody.getType();
 

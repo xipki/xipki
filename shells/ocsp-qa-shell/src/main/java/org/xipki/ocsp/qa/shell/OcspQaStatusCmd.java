@@ -109,9 +109,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     private Occurrence expectedNonceOccurrence;
 
     @Override
-    protected void checkParameters(final X509Certificate respIssuer,
-            final List<BigInteger> serialNumbers, final Map<BigInteger, byte[]> encodedCerts)
-            throws Exception {
+    protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts) throws Exception {
         ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
 
         if (isBlank(errorText) && isEmpty(statusTexts)) {
@@ -151,9 +150,9 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     } // method checkParameters
 
     @Override
-    protected Object processResponse(final OCSPResp response, final X509Certificate respIssuer,
-            final IssuerHash issuerHash, final List<BigInteger> serialNumbers, final Map<BigInteger,
-            byte[]> encodedCerts) throws Exception {
+    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
+            IssuerHash issuerHash, List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts) throws Exception {
         OcspResponseOption responseOption = new OcspResponseOption();
         responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
         responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
@@ -190,8 +189,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         return null;
     } // method processResponse
 
-    private static void format(final ValidationIssue issue, final String prefix,
-            final StringBuilder sb) {
+    private static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
         sb.append(prefix);
         sb.append(issue.code());
         sb.append(", ").append(issue.description());

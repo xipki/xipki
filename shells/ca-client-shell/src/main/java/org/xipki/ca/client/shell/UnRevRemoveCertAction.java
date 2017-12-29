@@ -66,7 +66,7 @@ public abstract class UnRevRemoveCertAction extends ClientAction {
         return serialNumber;
     }
 
-    protected String checkCertificate(final X509Certificate cert, final X509Certificate caCert)
+    protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
             throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         ParamUtil.requireNonNull("caCert", caCert);

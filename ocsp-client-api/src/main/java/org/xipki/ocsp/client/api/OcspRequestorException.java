@@ -29,15 +29,15 @@ public class OcspRequestorException extends Exception {
     public OcspRequestorException() {
     }
 
-    public OcspRequestorException(final String message) {
+    public OcspRequestorException(String message) {
         super(message);
     }
 
-    public OcspRequestorException(final Throwable cause) {
+    public OcspRequestorException(Throwable cause) {
         super(cause);
     }
 
-    public OcspRequestorException(final String message, final Throwable cause) {
+    public OcspRequestorException(String message, Throwable cause) {
         super(message, cause);
     }
 

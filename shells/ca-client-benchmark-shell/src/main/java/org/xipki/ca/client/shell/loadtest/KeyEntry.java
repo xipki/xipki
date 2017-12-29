@@ -95,7 +95,7 @@ public abstract class KeyEntry {
 
         private final SubjectPublicKeyInfo spki;
 
-        public RSAKeyEntry(final int keysize) throws Exception {
+        public RSAKeyEntry(int keysize) throws Exception {
             if (keysize % 1024 != 0) {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
             }
@@ -127,7 +127,7 @@ public abstract class KeyEntry {
             }
         }
 
-        private static BigInteger base64ToInt(final String base64Str) {
+        private static BigInteger base64ToInt(String base64Str) {
             return new BigInteger(1, Base64.decode(base64Str));
         }
 
@@ -222,7 +222,7 @@ public abstract class KeyEntry {
 
         private SubjectPublicKeyInfo spki;
 
-        public DSAKeyEntry(final int plength) throws Exception {
+        public DSAKeyEntry(int plength) throws Exception {
             if (plength == 1024) {
                 init(P_1024, Q_1024, G_1024, Y_1024);
             } else if (plength == 2048) {
@@ -250,19 +250,18 @@ public abstract class KeyEntry {
         }
 
         // CHECKSTYLE:OFF
-        private void init(final String p, final String q, final String g, final String y)
-            throws IOException {
+        private void init(String p, String q, String g, String y) throws IOException {
             // CHECKSTYLE:ON
             init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
         }
 
-        private static BigInteger base64ToInt(final String base64Str) {
+        private static BigInteger base64ToInt(String base64Str) {
             return new BigInteger(1, Base64.decode(base64Str));
         }
 
         // CHECKSTYLE:OFF
-        private void init(final BigInteger p, final BigInteger q, final BigInteger g,
-                final BigInteger y) throws IOException {
+        private void init(BigInteger p, BigInteger q, BigInteger g, BigInteger y)
+                throws IOException {
             // CHECKSTYLE:ON
             ASN1EncodableVector vec = new ASN1EncodableVector();
             vec.add(new ASN1Integer(p));

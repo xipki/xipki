@@ -67,8 +67,8 @@ public abstract class EnrollCertAction extends ClientAction {
      *             if there is a problem with the SCEP transaction.
      */
     protected abstract EnrollmentResponse requestCertificate(Client client,
-            PKCS10CertificationRequest csr, PrivateKey identityKey,
-            X509Certificate identityCert) throws ClientException, TransactionException;
+            PKCS10CertificationRequest csr, PrivateKey identityKey, X509Certificate identityCert)
+            throws ClientException, TransactionException;
 
     @Override
     protected Object execute0() throws Exception {

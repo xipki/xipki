@@ -60,7 +60,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
 
     private BigInteger currentSerial;
 
-    public DbGoodCertSerialIterator(final Certificate caCert, final DataSourceWrapper caDataSource)
+    public DbGoodCertSerialIterator(Certificate caCert, DataSourceWrapper caDataSource)
             throws Exception {
         ParamUtil.requireNonNull("caCert", caCert);
         this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);

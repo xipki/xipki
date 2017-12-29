@@ -48,8 +48,7 @@ public class SdkUtil {
     private SdkUtil() {
     }
 
-    public static X509Certificate parseCert(final File file)
-            throws IOException, CertificateException {
+    public static X509Certificate parseCert(File file) throws IOException, CertificateException {
         requireNonNull("file", file);
         FileInputStream in = new FileInputStream(file);
         try {
@@ -59,14 +58,12 @@ public class SdkUtil {
         }
     }
 
-    public static X509Certificate parseCert(final byte[] certBytes)
-            throws CertificateException {
+    public static X509Certificate parseCert(byte[] certBytes) throws CertificateException {
         requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
-    public static X509Certificate parseCert(final InputStream certStream)
-            throws CertificateException {
+    public static X509Certificate parseCert(InputStream certStream) throws CertificateException {
         requireNonNull("certStream", certStream);
         X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
         if (cert == null) {
@@ -85,8 +82,7 @@ public class SdkUtil {
         }
     }
 
-    public static byte[] extractSki(final X509Certificate cert)
-            throws CertificateEncodingException {
+    public static byte[] extractSki(X509Certificate cert) throws CertificateEncodingException {
         byte[] fullExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
         if (fullExtValue == null) {
             return null;
@@ -96,11 +92,11 @@ public class SdkUtil {
         return ASN1OctetString.getInstance(extValue).getOctets();
     }
 
-    public static byte[] read(final File file) throws IOException {
+    public static byte[] read(File file) throws IOException {
         return read(new FileInputStream(file));
     }
 
-    public static byte[] read(final InputStream in) throws IOException {
+    public static byte[] read(InputStream in) throws IOException {
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
@@ -118,7 +114,7 @@ public class SdkUtil {
         }
     }
 
-    public static void save(final File file, final byte[] content) throws IOException {
+    public static void save(File file, byte[] content) throws IOException {
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
             parent.mkdirs();
@@ -132,8 +128,7 @@ public class SdkUtil {
         }
     }
 
-    public static HttpURLConnection openHttpConn(final URL url)
-            throws IOException {
+    public static HttpURLConnection openHttpConn(URL url) throws IOException {
         requireNonNull("url", url);
         URLConnection conn = url.openConnection();
         if (conn instanceof HttpURLConnection) {
@@ -142,11 +137,11 @@ public class SdkUtil {
         throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
     }
 
-    public static <T> T requireNonNull(final String objName, final T obj) {
+    public static <T> T requireNonNull(String objName, T obj) {
         return Objects.requireNonNull(obj, objName + " must not be null");
     }
 
-    public static String requireNonBlank(final String objName, final String obj) {
+    public static String requireNonBlank(String objName, String obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
             throw new IllegalArgumentException(objName + " must not be blank");

@@ -25,7 +25,7 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.operator.ContentSigner;
 
 // CHECKSTYLE:SKIP
-public class XipkiOCSPReqBuilder {
+public class XiOCSPReqBuilder {
     private List<RequestObject> list = new ArrayList<>();
     private GeneralName requestorName = null;
     private Extensions requestExtensions = null;
@@ -34,15 +34,12 @@ public class XipkiOCSPReqBuilder {
         CertID   certId;
         Extensions  extensions;
 
-        public RequestObject(
-            CertID   certId,
-            Extensions  extensions) {
+        public RequestObject(CertID certId, Extensions  extensions) {
             this.certId = certId;
             this.extensions = extensions;
         }
 
-        public Request toRequest()
-            throws Exception {
+        public Request toRequest() throws Exception {
             return new Request(certId, extensions);
         }
     }
@@ -53,8 +50,7 @@ public class XipkiOCSPReqBuilder {
      * @param certId certificate ID of interest
      * @return a reference to this object.
      */
-    public XipkiOCSPReqBuilder addRequest(
-        CertID   certId) {
+    public XiOCSPReqBuilder addRequest(CertID   certId) {
         list.add(new RequestObject(certId, null));
 
         return this;
@@ -67,9 +63,7 @@ public class XipkiOCSPReqBuilder {
      * @param singleRequestExtensions the extensions to attach to the request
      * @return a reference to this object.
      */
-    public XipkiOCSPReqBuilder addRequest(
-        CertID   certId,
-        Extensions singleRequestExtensions) {
+    public XiOCSPReqBuilder addRequest(CertID   certId, Extensions singleRequestExtensions) {
         list.add(new RequestObject(certId, singleRequestExtensions));
 
         return this;
@@ -81,32 +75,27 @@ public class XipkiOCSPReqBuilder {
      * @param requestorName an X500Name representing the requestor name.
      * @return a reference to this object.
      */
-    public XipkiOCSPReqBuilder setRequestorName(
-        X500Name requestorName) {
+    public XiOCSPReqBuilder setRequestorName(X500Name requestorName) {
         this.requestorName = new GeneralName(GeneralName.directoryName, requestorName);
 
         return this;
     }
 
-    public XipkiOCSPReqBuilder setRequestorName(
-        GeneralName requestorName) {
+    public XiOCSPReqBuilder setRequestorName(GeneralName requestorName) {
         this.requestorName = requestorName;
 
         return this;
     }
 
-    public XipkiOCSPReqBuilder setRequestExtensions(
-        Extensions requestExtensions) {
+    public XiOCSPReqBuilder setRequestExtensions(Extensions requestExtensions) {
         this.requestExtensions = requestExtensions;
 
         return this;
     }
 
-    private OCSPRequest generateRequest(
-        ContentSigner contentSigner,
-        Certificate[] chain)
+    private OCSPRequest generateRequest(ContentSigner contentSigner, Certificate[] chain)
             throws OCSPException {
-        Iterator<RequestObject>    it = list.iterator();
+        Iterator<RequestObject> it = list.iterator();
 
         ASN1EncodableVector requests = new ASN1EncodableVector();
 
@@ -161,15 +150,11 @@ public class XipkiOCSPReqBuilder {
      *
      * @return the OCSPRequest
      */
-    public OCSPRequest build()
-            throws OCSPException {
+    public OCSPRequest build() throws OCSPException {
         return generateRequest(null, null);
     }
 
-    public OCSPRequest build(
-        ContentSigner signer,
-        Certificate[] chain)
-            throws OCSPException {
+    public OCSPRequest build(ContentSigner signer, Certificate[] chain) throws OCSPException {
         if (signer == null) {
             throw new IllegalArgumentException("no signer specified");
         }

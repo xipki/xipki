@@ -31,13 +31,12 @@ public class UnrevokeOrRemoveCertEntry extends IssuerSerialEntry {
 
     private byte[] authorityKeyIdentifier;
 
-    public UnrevokeOrRemoveCertEntry(final String id, final X509Certificate cert) {
+    public UnrevokeOrRemoveCertEntry(String id, X509Certificate cert) {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
                 cert.getSerialNumber());
     }
 
-    public UnrevokeOrRemoveCertEntry(final String id, final X500Name issuer,
-            final BigInteger serialNumber) {
+    public UnrevokeOrRemoveCertEntry(String id, X500Name issuer, BigInteger serialNumber) {
         super(id, issuer, serialNumber);
     }
 
@@ -45,7 +44,7 @@ public class UnrevokeOrRemoveCertEntry extends IssuerSerialEntry {
         return authorityKeyIdentifier;
     }
 
-    public void setAuthorityKeyIdentifier(final byte[] authorityKeyIdentifier) {
+    public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
         this.authorityKeyIdentifier = authorityKeyIdentifier;
     }
 

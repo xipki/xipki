@@ -35,23 +35,22 @@ public class PkiErrorException extends Exception {
 
     private final String statusMessage;
 
-    public PkiErrorException(final PKIStatusInfo statusInfo) {
+    public PkiErrorException(PKIStatusInfo statusInfo) {
         this(new org.xipki.cmp.PkiStatusInfo(statusInfo));
     }
 
-    public PkiErrorException(final org.xipki.cmp.PkiStatusInfo statusInfo) {
+    public PkiErrorException(org.xipki.cmp.PkiStatusInfo statusInfo) {
         this(statusInfo.status(), statusInfo.pkiFailureInfo(), statusInfo.statusMessage());
     }
 
-    public PkiErrorException(final int status, final int pkiFailureInfo,
-            final String statusMessage) {
+    public PkiErrorException(int status, int pkiFailureInfo, String statusMessage) {
         super(CmpFailureUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;
     }
 
-    public PkiErrorException(final int status) {
+    public PkiErrorException(int status) {
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;

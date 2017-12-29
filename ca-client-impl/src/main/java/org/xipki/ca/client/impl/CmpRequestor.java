@@ -100,8 +100,8 @@ abstract class CmpRequestor {
 
     private boolean sendRequestorCert;
 
-    public CmpRequestor(final X509Certificate requestorCert, final CmpResponder responder,
-            final SecurityFactory securityFactory) {
+    public CmpRequestor(X509Certificate requestorCert, CmpResponder responder,
+            SecurityFactory securityFactory) {
         ParamUtil.requireNonNull("requestorCert", requestorCert);
         this.responder = ParamUtil.requireNonNull("responder", responder);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -117,8 +117,8 @@ abstract class CmpRequestor {
         this.recipientName = subject;
     }
 
-    public CmpRequestor(final ConcurrentContentSigner requestor,
-            final CmpResponder responder, final SecurityFactory securityFactory) {
+    public CmpRequestor(ConcurrentContentSigner requestor, CmpResponder responder,
+            SecurityFactory securityFactory) {
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         if (requestor.getCertificate() == null) {
             throw new IllegalArgumentException("requestor without certificate is not allowed");
@@ -136,9 +136,9 @@ abstract class CmpRequestor {
         this.recipientName = subject;
     }
 
-    protected abstract byte[] send(final byte[] request) throws IOException;
+    protected abstract byte[] send(byte[] request) throws IOException;
 
-    protected PKIMessage sign(final PKIMessage request) throws CmpRequestorException {
+    protected PKIMessage sign(PKIMessage request) throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
         if (requestor == null) {
             throw new CmpRequestorException("no request signer is configured");
@@ -151,7 +151,7 @@ abstract class CmpRequestor {
         }
     }
 
-    protected PkiResponse signAndSend(final PKIMessage request, final RequestResponseDebug debug)
+    protected PkiResponse signAndSend(PKIMessage request, RequestResponseDebug debug)
             throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
 
@@ -236,16 +236,15 @@ abstract class CmpRequestor {
         return ret;
     } // method signAndSend
 
-    protected ASN1Encodable extractGeneralRepContent(final PkiResponse response,
-            final String expectedType) throws CmpRequestorException, PkiErrorException {
+    protected ASN1Encodable extractGeneralRepContent(PkiResponse response,
+            String expectedType) throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("expectedType", expectedType);
         return extractGeneralRepContent(response, expectedType, true);
     }
 
-    private ASN1Encodable extractGeneralRepContent(final PkiResponse response,
-            final String expectedType, final boolean requireProtectionCheck)
-            throws CmpRequestorException, PkiErrorException {
+    private ASN1Encodable extractGeneralRepContent(PkiResponse response, String expectedType,
+            boolean requireProtectionCheck) throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("expectedType", expectedType);
         if (requireProtectionCheck) {
@@ -285,16 +284,16 @@ abstract class CmpRequestor {
         return itv.getInfoValue();
     } // method extractGeneralRepContent
 
-    protected ASN1Encodable extractXipkiActionRepContent(final PkiResponse response,
-            final int action) throws CmpRequestorException, PkiErrorException {
+    protected ASN1Encodable extractXipkiActionRepContent(PkiResponse response, int action)
+            throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
         ASN1Encodable itvValue = extractGeneralRepContent(response,
                 ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
-        return extractXipkiActionContent(itvValue, action);
+        return extractXiActionContent(itvValue, action);
     }
 
-    protected ASN1Encodable extractXipkiActionContent(final ASN1Encodable itvValue,
-            final int action) throws CmpRequestorException {
+    protected ASN1Encodable extractXiActionContent(ASN1Encodable itvValue, int action)
+            throws CmpRequestorException {
         ParamUtil.requireNonNull("itvValue", itvValue);
         ASN1Sequence seq;
         try {
@@ -322,17 +321,17 @@ abstract class CmpRequestor {
         return (size == 1) ? null : seq.getObjectAt(1);
     } // method extractXipkiActionContent
 
-    protected PKIHeader buildPkiHeader(final ASN1OctetString tid) {
+    protected PKIHeader buildPkiHeader(ASN1OctetString tid) {
         return buildPkiHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
     }
 
-    protected PKIHeader buildPkiHeader(final boolean addImplictConfirm, final ASN1OctetString tid) {
+    protected PKIHeader buildPkiHeader(boolean addImplictConfirm, ASN1OctetString tid) {
         return buildPkiHeader(addImplictConfirm, tid, (CmpUtf8Pairs) null,
                 (InfoTypeAndValue[]) null);
     }
 
-    protected PKIHeader buildPkiHeader(final boolean addImplictConfirm, final ASN1OctetString tid,
-            final CmpUtf8Pairs utf8Pairs, final InfoTypeAndValue... additionalGeneralInfos) {
+    protected PKIHeader buildPkiHeader(boolean addImplictConfirm, ASN1OctetString tid,
+            CmpUtf8Pairs utf8Pairs, InfoTypeAndValue... additionalGeneralInfos) {
         if (additionalGeneralInfos != null) {
             for (InfoTypeAndValue itv : additionalGeneralInfos) {
                 ASN1ObjectIdentifier type = itv.getInfoType();
@@ -380,7 +379,7 @@ abstract class CmpRequestor {
         return hdrBuilder.build();
     } // method buildPkiHeader
 
-    protected PkiErrorException buildErrorResult(final ErrorMsgContent bodyContent) {
+    protected PkiErrorException buildErrorResult(ErrorMsgContent bodyContent) {
         ParamUtil.requireNonNull("bodyContent", bodyContent);
 
         org.xipki.cmp.PkiStatusInfo statusInfo =
@@ -401,8 +400,7 @@ abstract class CmpRequestor {
         return bytes;
     }
 
-    private ProtectionVerificationResult verifyProtection(final String tid,
-            final GeneralPKIMessage pkiMessage)
+    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage)
             throws CMPException, InvalidKeyException, OperatorCreationException {
         ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
@@ -456,7 +454,7 @@ abstract class CmpRequestor {
         return new ProtectionVerificationResult(cert, protRes);
     } // method verifyProtection
 
-    protected PKIMessage buildMessageWithXipkAction(final int action, final ASN1Encodable value)
+    protected PKIMessage buildMessageWithXipkAction(int action, ASN1Encodable value)
             throws CmpRequestorException {
         PKIHeader header = buildPkiHeader(null);
 
@@ -472,8 +470,8 @@ abstract class CmpRequestor {
         return new PKIMessage(header, body);
     }
 
-    protected PKIMessage buildMessageWithGeneralMsgContent(final ASN1ObjectIdentifier type,
-            final ASN1Encodable value) throws CmpRequestorException {
+    protected PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type,
+            ASN1Encodable value) throws CmpRequestorException {
         ParamUtil.requireNonNull("type", type);
 
         PKIHeader header = buildPkiHeader(null);
@@ -484,7 +482,7 @@ abstract class CmpRequestor {
         return new PKIMessage(header, body);
     }
 
-    protected void checkProtection(final PkiResponse response) throws PkiErrorException {
+    protected void checkProtection(PkiResponse response) throws PkiErrorException {
         ParamUtil.requireNonNull("response", response);
 
         if (!response.hasProtection()) {
@@ -505,7 +503,7 @@ abstract class CmpRequestor {
         return sendRequestorCert;
     }
 
-    public void setSendRequestorCert(final boolean sendRequestorCert) {
+    public void setSendRequestorCert(boolean sendRequestorCert) {
         this.sendRequestorCert = sendRequestorCert;
     }
 

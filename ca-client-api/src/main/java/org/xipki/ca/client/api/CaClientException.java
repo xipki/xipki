@@ -29,15 +29,15 @@ public class CaClientException extends Exception {
     public CaClientException() {
     }
 
-    public CaClientException(final String message) {
+    public CaClientException(String message) {
         super(message);
     }
 
-    public CaClientException(final Throwable cause) {
+    public CaClientException(Throwable cause) {
         super(cause);
     }
 
-    public CaClientException(final String message, final Throwable cause) {
+    public CaClientException(String message, Throwable cause) {
         super(message, cause);
     }
 

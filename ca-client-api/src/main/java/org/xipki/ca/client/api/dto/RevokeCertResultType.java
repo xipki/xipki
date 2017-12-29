@@ -35,7 +35,7 @@ public class RevokeCertResultType {
         return resultEntries;
     }
 
-    public void addResultEntry(final ResultEntry resultEntry) {
+    public void addResultEntry(ResultEntry resultEntry) {
         ParamUtil.requireNonNull("resultEntry", resultEntry);
         if (!(resultEntry instanceof RevokeCertResultEntry
                 || resultEntry instanceof ErrorResultEntry)) {

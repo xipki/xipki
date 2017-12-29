@@ -385,7 +385,7 @@ public abstract class EnrollCertAction extends ClientAction {
     } // method execute0
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-            final List<String> oidTexts) throws InvalidOidOrNameException {
+            List<String> oidTexts) throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
         }
@@ -404,7 +404,7 @@ public abstract class EnrollCertAction extends ClientAction {
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOid(final String str) throws InvalidOidOrNameException {
+    private static ASN1ObjectIdentifier toOid(String str) throws InvalidOidOrNameException {
         final int n = str.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {

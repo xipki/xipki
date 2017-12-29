@@ -29,19 +29,18 @@ public class ErrorResultEntry extends ResultEntry {
 
     private final PkiStatusInfo statusInfo;
 
-    public ErrorResultEntry(final String id, final PkiStatusInfo statusInfo) {
+    public ErrorResultEntry(String id, PkiStatusInfo statusInfo) {
         super(id);
 
         this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
     }
 
-    public ErrorResultEntry(final String id, final int status, final int pkiFailureInfo,
-            final String statusMessage) {
+    public ErrorResultEntry(String id, int status, int pkiFailureInfo, String statusMessage) {
         super(id);
         this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
-    public ErrorResultEntry(final String id, final int status) {
+    public ErrorResultEntry(String id, int status) {
         super(id);
         this.statusInfo = new PkiStatusInfo(status);
     }

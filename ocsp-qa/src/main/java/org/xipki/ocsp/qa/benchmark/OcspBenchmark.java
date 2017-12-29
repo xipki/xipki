@@ -72,7 +72,7 @@ public class OcspBenchmark extends LoadExecutor {
             }
         }
 
-        private void testNext(final BigInteger sn) {
+        private void testNext(BigInteger sn) {
             try {
                 requestor.ask(new BigInteger[]{sn});
             } catch (OcspRequestorException ex) {
@@ -104,10 +104,9 @@ public class OcspBenchmark extends LoadExecutor {
 
     private AtomicInteger processedRequests = new AtomicInteger(0);
 
-    public OcspBenchmark(final Certificate issuerCert, final String responderUrl,
-            final RequestOptions requestOptions, final Iterator<BigInteger> serials,
-            final int maxRequests, final boolean parseResponse, int queueSize,
-            final String description) {
+    public OcspBenchmark(Certificate issuerCert, String responderUrl, RequestOptions requestOptions,
+            Iterator<BigInteger> serials, int maxRequests, boolean parseResponse, int queueSize,
+            String description) {
         super(description);
 
         this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);

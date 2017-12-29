@@ -133,8 +133,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
      *          Map of serial number and the corresponding certificate. Could be {@code null}.
      */
     protected abstract void checkParameters(X509Certificate respIssuer,
-            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
-            throws Exception;
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts) throws Exception;
 
     /**
      * @param response
@@ -148,10 +147,9 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
      * @param encodedCerts
      *          Map of serial number and the corresponding certificate. Could be {@code null}.
      */
-    protected abstract Object processResponse(OCSPResp response,
-            X509Certificate respIssuer, IssuerHash issuerHash,
-            List<BigInteger> serialNumbers,  Map<BigInteger, byte[]> encodedCerts)
-            throws Exception;
+    protected abstract Object processResponse(OCSPResp response, X509Certificate respIssuer,
+            IssuerHash issuerHash, List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts) throws Exception;
 
     @Override
     protected final Object execute0() throws Exception {
@@ -300,7 +298,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
         return processResponse(response, respIssuer, issuerHash, sns, encodedCerts);
     } // method execute0
 
-    public static List<String> extractOcspUrls(final X509Certificate cert)
+    public static List<String> extractOcspUrls(X509Certificate cert)
             throws CertificateEncodingException {
         byte[] extnValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
         if (extnValue == null) {
@@ -311,7 +309,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
         return extractOcspUrls(aia);
     }
 
-    public static List<String> extractOcspUrls(final X509AttributeCertificateHolder cert)
+    public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert)
             throws CertificateEncodingException {
         byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
         if (extValue == null) {
@@ -321,7 +319,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
         return extractOcspUrls(aia);
     }
 
-    public static List<String> extractOcspUrls(final AuthorityInformationAccess aia)
+    public static List<String> extractOcspUrls(AuthorityInformationAccess aia)
             throws CertificateEncodingException {
         AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
         List<AccessDescription> ocspAccessDescriptions = new LinkedList<>();

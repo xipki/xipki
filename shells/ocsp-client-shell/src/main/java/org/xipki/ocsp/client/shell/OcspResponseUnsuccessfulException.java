@@ -42,7 +42,7 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
         codeStatusMap.put(6, "unauthorized");
     }
 
-    public OcspResponseUnsuccessfulException(final int status) {
+    public OcspResponseUnsuccessfulException(int status) {
         super(getOcspResponseStatus(status));
         this.status = status;
     }
@@ -55,7 +55,7 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
         return getOcspResponseStatus(status);
     }
 
-    private static String getOcspResponseStatus(final int statusCode) {
+    private static String getOcspResponseStatus(int statusCode) {
         String status = codeStatusMap.get(statusCode);
         return (status == null) ? "undefined" : status;
     }

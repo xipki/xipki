@@ -26,7 +26,7 @@ public class ClientCmpControl {
 
     private final boolean rrAkiRequired;
 
-    public ClientCmpControl(final boolean rrAkiRequired) {
+    public ClientCmpControl(boolean rrAkiRequired) {
         this.rrAkiRequired = rrAkiRequired;
     }
 

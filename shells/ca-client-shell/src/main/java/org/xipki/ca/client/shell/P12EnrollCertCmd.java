@@ -51,7 +51,7 @@ public class P12EnrollCertCmd extends EnrollCertAction {
     private String password;
 
     @Override
-    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
             throws ObjectCreationException {
         if (password == null) {
             try {

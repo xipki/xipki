@@ -32,7 +32,7 @@ public class UnrevokeOrRemoveCertRequest {
 
     private final List<UnrevokeOrRemoveCertEntry> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(final UnrevokeOrRemoveCertEntry requestEntry) {
+    public boolean addRequestEntry(UnrevokeOrRemoveCertEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
         for (UnrevokeOrRemoveCertEntry re : requestEntries) {
             if (re.id().equals(requestEntry.id())) {

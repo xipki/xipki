@@ -36,8 +36,7 @@ class CaInfo {
 
     private final ClientCmpControl cmpControl;
 
-    CaInfo(final X509Certificate cert, final ClientCmpControl cmpControl,
-            final Set<CertprofileInfo> certprofiles) {
+    CaInfo(X509Certificate cert, ClientCmpControl cmpControl, Set<CertprofileInfo> certprofiles) {
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.cmpControl = ParamUtil.requireNonNull("cmpControl", cmpControl);
         this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);

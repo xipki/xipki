@@ -34,13 +34,12 @@ public class IssuerSerialEntry extends ResultEntry {
 
     private final BigInteger serialNumber;
 
-    public IssuerSerialEntry(final String id, final X509Certificate cert) {
+    public IssuerSerialEntry(String id, X509Certificate cert) {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
                 cert.getSerialNumber());
     }
 
-    public IssuerSerialEntry(final String id, final X500Name issuer,
-            final BigInteger serialNumber) {
+    public IssuerSerialEntry(String id, X500Name issuer, BigInteger serialNumber) {
         super(id);
         this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
         this.issuer = ParamUtil.requireNonNull("issuer", issuer);

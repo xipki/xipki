@@ -29,15 +29,15 @@ public class InvalidOcspResponseException extends OcspResponseException {
         super();
     }
 
-    public InvalidOcspResponseException(final String message, final Throwable cause) {
+    public InvalidOcspResponseException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidOcspResponseException(final String message) {
+    public InvalidOcspResponseException(String message) {
         super(message);
     }
 
-    public InvalidOcspResponseException(final Throwable cause) {
+    public InvalidOcspResponseException(Throwable cause) {
         super(cause);
     }
 

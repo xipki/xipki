@@ -65,9 +65,9 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private AtomicInteger processedCerts = new AtomicInteger(0);
 
-    public CaLoadTestRevoke(final CaClient caClient, final Certificate caCert,
-            final Iterator<BigInteger> serialNumberIterator, final int maxCerts, final int num,
-            final String description) throws Exception {
+    public CaLoadTestRevoke(CaClient caClient, Certificate caCert,
+            Iterator<BigInteger> serialNumberIterator, int maxCerts, int num, String description)
+            throws Exception {
         super(description);
         ParamUtil.requireNonNull("caCert", caCert);
         this.num = ParamUtil.requireMin("num", num, 1);
@@ -101,7 +101,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
             }
         }
 
-        private boolean testNext(final List<BigInteger> serialNumbers) {
+        private boolean testNext(List<BigInteger> serialNumbers) {
             RevokeCertRequest request = new RevokeCertRequest();
             int id = 1;
             for (BigInteger serialNumber : serialNumbers) {

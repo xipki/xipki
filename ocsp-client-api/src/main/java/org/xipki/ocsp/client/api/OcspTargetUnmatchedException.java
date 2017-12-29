@@ -29,15 +29,15 @@ public class OcspTargetUnmatchedException extends OcspResponseException {
         super();
     }
 
-    public OcspTargetUnmatchedException(final String message, final Throwable cause) {
+    public OcspTargetUnmatchedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public OcspTargetUnmatchedException(final String message) {
+    public OcspTargetUnmatchedException(String message) {
         super(message);
     }
 
-    public OcspTargetUnmatchedException(final Throwable cause) {
+    public OcspTargetUnmatchedException(Throwable cause) {
         super(cause);
     }
 

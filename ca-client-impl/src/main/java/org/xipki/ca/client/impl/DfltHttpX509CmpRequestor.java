@@ -43,9 +43,8 @@ class DfltHttpX509CmpRequestor extends X509CmpRequestor {
 
     private final URL serverUrl;
 
-    DfltHttpX509CmpRequestor(final X509Certificate requestorCert,
-            final CmpResponder responder, final String serverUrl,
-            final SecurityFactory securityFactory) {
+    DfltHttpX509CmpRequestor(X509Certificate requestorCert, CmpResponder responder,
+            String serverUrl, SecurityFactory securityFactory) {
         super(requestorCert, responder, securityFactory);
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
@@ -56,9 +55,8 @@ class DfltHttpX509CmpRequestor extends X509CmpRequestor {
         }
     }
 
-    DfltHttpX509CmpRequestor(final ConcurrentContentSigner requestor,
-            final CmpResponder responder, final String serverUrl,
-            final SecurityFactory securityFactory) {
+    DfltHttpX509CmpRequestor(ConcurrentContentSigner requestor, CmpResponder responder,
+            String serverUrl, SecurityFactory securityFactory) {
         super(requestor, responder, securityFactory);
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
@@ -70,7 +68,7 @@ class DfltHttpX509CmpRequestor extends X509CmpRequestor {
     }
 
     @Override
-    public byte[] send(final byte[] request) throws IOException {
+    public byte[] send(byte[] request) throws IOException {
         ParamUtil.requireNonNull("request", request);
         HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
         httpUrlConnection.setDoOutput(true);

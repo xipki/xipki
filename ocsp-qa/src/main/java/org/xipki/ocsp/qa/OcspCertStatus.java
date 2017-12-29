@@ -44,7 +44,7 @@ public enum OcspCertStatus {
     sigRequired,
     unauthorized;
 
-    public static OcspCertStatus forName(final String name) {
+    public static OcspCertStatus forName(String name) {
         for (OcspCertStatus entry : values()) {
             if (entry.name().equals(name)) {
                 return entry;

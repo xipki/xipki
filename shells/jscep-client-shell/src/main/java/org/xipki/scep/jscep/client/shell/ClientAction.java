@@ -120,7 +120,7 @@ public abstract class ClientAction extends XiAction {
         this.identityCert = (X509Certificate) ks.getCertificate(keyname);
     }
 
-    protected X509Certificate extractEeCerts(final CertStore certstore) throws CertStoreException {
+    protected X509Certificate extractEeCerts(CertStore certstore) throws CertStoreException {
         ParamUtil.requireNonNull("certstore", certstore);
 
         Iterator<?> it = certstore.getCertificates(null).iterator();

@@ -30,7 +30,7 @@ public enum Occurrence {
     optional,
     forbidden;
 
-    public static Occurrence forName(final String name) {
+    public static Occurrence forName(String name) {
         ParamUtil.requireNonNull("name", name);
         for (Occurrence entry : values()) {
             if (entry.name().equals(name)) {

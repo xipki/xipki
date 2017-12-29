@@ -88,8 +88,7 @@ class OcspBenchRequestor {
     private HttpClient httpClient;
 
     public void init(OcspBenchmark responseHandler, String responderUrl, Certificate issuerCert,
-            RequestOptions requestOptions, int queueSize)
-            throws Exception {
+            RequestOptions requestOptions, int queueSize) throws Exception {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("responseHandler", responseHandler);
         this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
@@ -144,8 +143,7 @@ class OcspBenchRequestor {
         httpClient.shutdown();
     }
 
-    public void ask(final BigInteger[] serialNumbers)
-            throws OcspRequestorException {
+    public void ask(BigInteger[] serialNumbers) throws OcspRequestorException {
         byte[] ocspReq = buildRequest(serialNumbers);
         int size = ocspReq.length;
 
@@ -177,8 +175,7 @@ class OcspBenchRequestor {
         httpClient.send(request);
     } // method ask
 
-    private byte[] buildRequest(final BigInteger[] serialNumbers)
-            throws OcspRequestorException {
+    private byte[] buildRequest(BigInteger[] serialNumbers) throws OcspRequestorException {
         boolean canCache = (serialNumbers.length == 1) && !requestOptions.isUseNonce();
         if (canCache) {
             byte[] request = requests.get(serialNumbers[0]);
@@ -222,7 +219,7 @@ class OcspBenchRequestor {
         }
     } // method buildRequest
 
-    private byte[] nextNonce(final int nonceLen) {
+    private byte[] nextNonce(int nonceLen) {
         byte[] nonce = new byte[nonceLen];
         random.nextBytes(nonce);
         return nonce;

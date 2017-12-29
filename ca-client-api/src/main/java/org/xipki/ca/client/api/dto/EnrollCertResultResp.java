@@ -37,14 +37,14 @@ public class EnrollCertResultResp {
     public EnrollCertResultResp() {
     }
 
-    public void addCaCertificate(final CMPCertificate caCertificate) {
+    public void addCaCertificate(CMPCertificate caCertificate) {
         if (caCertificates == null) {
             caCertificates = new ArrayList<>(1);
         }
         caCertificates.add(caCertificate);
     }
 
-    public void addResultEntry(final ResultEntry resultEntry) {
+    public void addResultEntry(ResultEntry resultEntry) {
         ParamUtil.requireNonNull("resultEntry", resultEntry);
 
         if (!(resultEntry instanceof EnrollCertResultEntry

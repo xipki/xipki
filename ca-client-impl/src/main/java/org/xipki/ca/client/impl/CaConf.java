@@ -66,8 +66,8 @@ class CaConf {
 
     private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-    CaConf(final String name, final String url, final String healthUrl, final String requestorName,
-            final CmpResponder responder) {
+    CaConf(String name, String url, String healthUrl, String requestorName,
+            CmpResponder responder) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.url = ParamUtil.requireNonBlank("url", url);
         this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
@@ -87,14 +87,14 @@ class CaConf {
         return healthUrl;
     }
 
-    public void setCert(final X509Certificate cert) throws CertificateEncodingException {
+    public void setCert(X509Certificate cert) throws CertificateEncodingException {
         this.cert = cert;
         this.subject = (cert == null) ? null
                 : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
         this.subjectKeyIdentifier = X509Util.extractSki(cert);
     }
 
-    public void setCertprofiles(final Set<CertprofileInfo> certProfiles) {
+    public void setCertprofiles(Set<CertprofileInfo> certProfiles) {
         if (profiles == null) {
             this.profiles = Collections.emptyMap();
         } else {
@@ -117,12 +117,12 @@ class CaConf {
         return profiles.keySet();
     }
 
-    public boolean supportsProfile(final String profileName) {
+    public boolean supportsProfile(String profileName) {
         ParamUtil.requireNonNull("profileName", profileName);
         return profiles.containsKey(profileName.toUpperCase());
     }
 
-    public CertprofileInfo profile(final String profileName) {
+    public CertprofileInfo profile(String profileName) {
         ParamUtil.requireNonNull("profileName", profileName);
         return profiles.get(profileName);
     }
@@ -139,7 +139,7 @@ class CaConf {
         return certAutoconf;
     }
 
-    public void setCertAutoconf(final boolean autoconf) {
+    public void setCertAutoconf(boolean autoconf) {
         this.certAutoconf = autoconf;
     }
 
@@ -147,11 +147,11 @@ class CaConf {
         return certprofilesAutoconf;
     }
 
-    public void setCertprofilesAutoconf(final boolean autoconf) {
+    public void setCertprofilesAutoconf(boolean autoconf) {
         this.certprofilesAutoconf = autoconf;
     }
 
-    public void setRequestor(final X509CmpRequestor requestor) {
+    public void setRequestor(X509CmpRequestor requestor) {
         this.requestor = requestor;
     }
 
@@ -163,7 +163,7 @@ class CaConf {
         return requestor;
     }
 
-    public void setCmpControlAutoconf(final boolean autoconf) {
+    public void setCmpControlAutoconf(boolean autoconf) {
         this.cmpControlAutoconf = autoconf;
     }
 
@@ -171,7 +171,7 @@ class CaConf {
         return cmpControlAutoconf;
     }
 
-    public void setCmpControl(final ClientCmpControl cmpControl) {
+    public void setCmpControl(ClientCmpControl cmpControl) {
         this.cmpControl = cmpControl;
     }
 

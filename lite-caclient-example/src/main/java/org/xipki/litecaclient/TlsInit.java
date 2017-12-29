@@ -76,7 +76,7 @@ public class TlsInit {
          * @return true if the host name is acceptable
          */
         @Override
-        public boolean verify(final String hostname, final SSLSession session) {
+        public boolean verify(String hostname, SSLSession session) {
             // TODO: implement the verification
             return true;
         }

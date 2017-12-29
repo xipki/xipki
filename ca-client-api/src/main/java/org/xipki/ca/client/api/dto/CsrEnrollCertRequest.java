@@ -31,8 +31,7 @@ public class CsrEnrollCertRequest extends IdentifiedObject {
 
     private final CertificationRequest csr;
 
-    public CsrEnrollCertRequest(final String id, final String certprofile,
-            final CertificationRequest csr) {
+    public CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
         super(id);
         this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
         this.csr = ParamUtil.requireNonNull("csr", csr);

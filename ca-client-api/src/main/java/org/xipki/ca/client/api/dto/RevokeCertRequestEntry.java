@@ -30,20 +30,20 @@ import org.bouncycastle.asn1.x500.X500Name;
 
 public class RevokeCertRequestEntry extends IssuerSerialEntry {
 
-    private final int reason;
+    private int reason;
 
-    private final Date invalidityDate;
+    private Date invalidityDate;
 
     private byte[] authorityKeyIdentifier;
 
-    public RevokeCertRequestEntry(final String id, final X509Certificate cert, final int reason,
-            final Date invalidityDate) {
+    public RevokeCertRequestEntry(String id, X509Certificate cert, int reason,
+            Date invalidityDate) {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
                 cert.getSerialNumber(), reason, invalidityDate);
     }
 
-    public RevokeCertRequestEntry(final String id, final X500Name issuer,
-            final BigInteger serialNumber, final int reason, final Date invalidityDate) {
+    public RevokeCertRequestEntry(String id, X500Name issuer, BigInteger serialNumber, int reason,
+            Date invalidityDate) {
         super(id, issuer, serialNumber);
 
         if (!(reason >= 0 && reason <= 10 && reason != 7)) {
@@ -66,7 +66,7 @@ public class RevokeCertRequestEntry extends IssuerSerialEntry {
         return authorityKeyIdentifier;
     }
 
-    public void setAuthorityKeyIdentifier(final byte[] authorityKeyIdentifier) {
+    public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
         this.authorityKeyIdentifier = authorityKeyIdentifier;
     }
 
