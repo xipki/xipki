@@ -51,7 +51,7 @@ public class IoUtil {
     private IoUtil() {
     }
 
-    public static void closeStream(final OutputStream stream) {
+    public static void closeStream(OutputStream stream) {
         if (stream == null) {
             return;
         }
@@ -62,15 +62,15 @@ public class IoUtil {
         }
     }
 
-    public static byte[] read(final String fileName) throws IOException {
+    public static byte[] read(String fileName) throws IOException {
         return read(new File(expandFilepath(fileName)));
     }
 
-    public static byte[] read(final File file) throws IOException {
+    public static byte[] read(File file) throws IOException {
         return read(new FileInputStream(expandFilepath(file)));
     }
 
-    public static byte[] read(final InputStream in) throws IOException {
+    public static byte[] read(InputStream in) throws IOException {
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
@@ -89,11 +89,11 @@ public class IoUtil {
         }
     }
 
-    public static void save(final String fileName, final byte[] encoded) throws IOException {
+    public static void save(String fileName, byte[] encoded) throws IOException {
         save(new File(expandFilepath(fileName)), encoded);
     }
 
-    public static void save(final File file, final byte[] content) throws IOException {
+    public static void save(File file, byte[] content) throws IOException {
         File tmpFile = expandFilepath(file);
 
         File parent = tmpFile.getParentFile();
@@ -147,14 +147,14 @@ public class IoUtil {
         }
     }
 
-    public static String expandFilepath(final String path) {
+    public static String expandFilepath(String path) {
         ParamUtil.requireNonBlank("path", path);
 
         return path.startsWith("~" + File.separator)
             ? System.getProperty("user.home") + path.substring(1) : path;
     }
 
-    public static File expandFilepath(final File file) {
+    public static File expandFilepath(File file) {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
         if (path.equals(expandedPath)) {
@@ -164,7 +164,7 @@ public class IoUtil {
         }
     }
 
-    public static String convertSequenceName(final String sequenceName) {
+    public static String convertSequenceName(String sequenceName) {
         StringBuilder sb = new StringBuilder();
         int len = sequenceName.length();
         for (int i = 0; i < len; i++) {
@@ -219,7 +219,7 @@ public class IoUtil {
         return -1;
     }
 
-    public static String base64Encode(final byte[] data, final boolean withLineBreak) {
+    public static String base64Encode(byte[] data, boolean withLineBreak) {
 
         String b64Str = Base64.getEncoder().encodeToString(data);
         if (!withLineBreak) {
@@ -248,7 +248,7 @@ public class IoUtil {
         return sb.toString();
     }
 
-    public static HttpURLConnection openHttpConn(final URL url) throws IOException {
+    public static HttpURLConnection openHttpConn(URL url) throws IOException {
         ParamUtil.requireNonNull("url", url);
         URLConnection conn = url.openConnection();
         if (conn instanceof HttpURLConnection) {

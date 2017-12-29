@@ -73,7 +73,7 @@ public class ProxyP11Module extends AbstractP11Module {
 
     private boolean readOnly;
 
-    private ProxyP11Module(final P11ModuleConf moduleConf) throws P11TokenException {
+    private ProxyP11Module(P11ModuleConf moduleConf) throws P11TokenException {
         super(moduleConf);
 
         final String modulePath = moduleConf.nativeLibrary();
@@ -109,7 +109,7 @@ public class ProxyP11Module extends AbstractP11Module {
         refresh();
     }
 
-    public static P11Module getInstance(final P11ModuleConf moduleConf) throws P11TokenException {
+    public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         return new ProxyP11Module(moduleConf);
     }
@@ -184,7 +184,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     }
 
-    protected byte[] send(final byte[] request) throws IOException {
+    protected byte[] send(byte[] request) throws IOException {
         ParamUtil.requireNonNull("request", request);
         HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
         httpUrlConnection.setDoOutput(true);
@@ -275,8 +275,7 @@ public class ProxyP11Module extends AbstractP11Module {
      * @return result.
      * @throws P11TokenException If error occurred.
      */
-    public byte[] send(final short action, final ASN1Object content)
-            throws P11TokenException {
+    public byte[] send(short action, ASN1Object content) throws P11TokenException {
         byte[] encodedContent;
         if (content == null) {
             encodedContent = null;

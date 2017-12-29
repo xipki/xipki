@@ -110,7 +110,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      *
      * @param listener the IBagStateListener to attach to this bag
      */
-    public ConcurrentBag(final IBagStateListener listener) {
+    public ConcurrentBag(IBagStateListener listener) {
         this.listener = listener;
         this.weakThreadLocals = useWeakThreadLocals();
 
@@ -134,7 +134,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      * @return a borrowed instance from the bag or null if a timeout occurs
      * @throws InterruptedException if interrupted while waiting
      */
-    public T borrow(long timeout, final TimeUnit timeUnit) throws InterruptedException {
+    public T borrow(long timeout, TimeUnit timeUnit) throws InterruptedException {
         // Try the thread-local list first
         final List<Object> list = threadList.get();
         for (int i = list.size() - 1; i >= 0; i--) {
@@ -188,7 +188,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      * @throws NullPointerException if value is null
      * @throws IllegalStateException if the bagEntry was not borrowed from the bag
      */
-    public void requite(final T bagEntry) {
+    public void requite(T bagEntry) {
         bagEntry.setState(STATE_NOT_IN_USE);
 
         for (int i = 0; waiters.get() > 0; i++) {
@@ -210,7 +210,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      *
      * @param bagEntry an object to add to the bag
      */
-    public void add(final T bagEntry) {
+    public void add(T bagEntry) {
         if (closed) {
             LOGGER.info("ConcurrentBag has been closed, ignoring add()");
             throw new IllegalStateException("ConcurrentBag has been closed, ignoring add()");
@@ -233,7 +233,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      * @throws IllegalStateException if an attempt is made to remove an object
      *         from the bag that was not borrowed or reserved first
      */
-    public boolean remove(final T bagEntry) {
+    public boolean remove(T bagEntry) {
         if (!bagEntry.compareAndSet(STATE_IN_USE, STATE_REMOVED)
                 && !bagEntry.compareAndSet(STATE_RESERVED, STATE_REMOVED)
                 && !closed) {
@@ -269,7 +269,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      * @param state one of the {@link IConcurrentBagEntry} states
      * @return a possibly empty list of objects having the state specified
      */
-    public List<T> values(final int state) {
+    public List<T> values(int state) {
         final List<T> list =
                 sharedList.stream().filter(e -> e.getState() == state).collect(Collectors.toList());
         Collections.reverse(list);
@@ -301,7 +301,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      * @param bagEntry the item to reserve
      * @return true if the item was able to be reserved, false otherwise
      */
-    public boolean reserve(final T bagEntry) {
+    public boolean reserve(T bagEntry) {
         return bagEntry.compareAndSet(STATE_NOT_IN_USE, STATE_RESERVED);
     }
 
@@ -311,7 +311,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      *
      * @param bagEntry the item to unreserve
      */
-    public void unreserve(final T bagEntry) {
+    public void unreserve(T bagEntry) {
         if (bagEntry.compareAndSet(STATE_RESERVED, STATE_NOT_IN_USE)) {
             // spin until a thread takes it or none are waiting
             while (waiters.get() > 0 && !handoffQueue.offer(bagEntry)) {
@@ -339,7 +339,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
      * @param state the state of the items to count
      * @return a count of how many items in the bag are in the specified state
      */
-    public int getCount(final int state) {
+    public int getCount(int state) {
         int count = 0;
         for (IConcurrentBagEntry e : sharedList) {
             if (e.getState() == state) {

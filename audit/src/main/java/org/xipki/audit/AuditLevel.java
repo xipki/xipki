@@ -33,9 +33,9 @@ public enum AuditLevel {
 
     private final int value;
 
-    private final String alignedText;
+    private String alignedText;
 
-    AuditLevel(final int value, final String alignedText) {
+    AuditLevel(int value, String alignedText) {
         this.value = value;
         this.alignedText = alignedText;
     }
@@ -44,7 +44,7 @@ public enum AuditLevel {
         return value;
     }
 
-    public static final AuditLevel forName(final String name) {
+    public static AuditLevel forName(String name) {
         Objects.requireNonNull("name", "name must not be null");
         for (AuditLevel value : values()) {
             if (value.name().equals(name)) {
@@ -54,7 +54,7 @@ public enum AuditLevel {
         throw new IllegalArgumentException("invalid AuditLevel name " + name);
     }
 
-    public static final AuditLevel forValue(final int value) {
+    public static AuditLevel forValue(int value) {
         for (AuditLevel v : values()) {
             if (v.value() == value) {
                 return v;

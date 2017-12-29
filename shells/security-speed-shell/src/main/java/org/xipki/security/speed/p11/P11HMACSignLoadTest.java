@@ -34,16 +34,14 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11HMACSignLoadTest extends P11SignLoadTest {
 
-    public P11HMACSignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
-            final String signatureAlgorithm)
-            throws Exception {
+    public P11HMACSignLoadTest(SecurityFactory securityFactory, P11Slot slot,
+            String signatureAlgorithm) throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, signatureAlgorithm),
                 "PKCS#11 HMAC signature creation");
     }
 
-    private static P11ObjectIdentifier generateKey(final P11Slot slot,
-            final String signatureAlgorithm)
+    private static P11ObjectIdentifier generateKey(P11Slot slot, String signatureAlgorithm)
             throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         int keysize = P12HMACSignLoadTest.getKeysize(signatureAlgorithm);

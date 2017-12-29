@@ -26,7 +26,7 @@ import org.xipki.security.pkcs11.P11Slot;
  */
 // CHECKSTYLE:SKIP
 public class P11SM2KeyGenLoadTest extends P11KeyGenLoadTest {
-    public P11SM2KeyGenLoadTest(final P11Slot slot) throws Exception {
+    public P11SM2KeyGenLoadTest(P11Slot slot) throws Exception {
         super(slot, "PKCS#11 SM2 key generation");
     }
 

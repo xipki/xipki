@@ -33,7 +33,7 @@ public class KeyCertPair {
 
     private final X509Certificate certificate;
 
-    public KeyCertPair(final PrivateKey privateKey, final X509Certificate certificate) {
+    public KeyCertPair(PrivateKey privateKey, X509Certificate certificate) {
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
         this.certificate = ParamUtil.requireNonNull("certificate", certificate);
     }

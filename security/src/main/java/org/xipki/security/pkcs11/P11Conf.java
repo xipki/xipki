@@ -57,7 +57,7 @@ public class P11Conf {
 
     private final Set<String> moduleNames;
 
-    public P11Conf(final InputStream confStream, final PasswordResolver passwordResolver)
+    public P11Conf(InputStream confStream, PasswordResolver passwordResolver)
             throws InvalidConfException, IOException {
         ParamUtil.requireNonNull("confStream", confStream);
         try {
@@ -99,11 +99,11 @@ public class P11Conf {
         return moduleNames;
     }
 
-    public P11ModuleConf moduleConf(final String moduleName) {
+    public P11ModuleConf moduleConf(String moduleName) {
         return moduleConfs.get(moduleName);
     }
 
-    private static String getMessage(final JAXBException ex) {
+    private static String getMessage(JAXBException ex) {
         String ret = ex.getMessage();
         if (ret == null && ex.getLinkedException() != null) {
             ret = ex.getLinkedException().getMessage();

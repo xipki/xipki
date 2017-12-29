@@ -64,9 +64,8 @@ public class P11ContentSignerBuilder {
 
     private final P11EntityIdentifier identityId;
 
-    public P11ContentSignerBuilder(final P11CryptService cryptService,
-            final SecurityFactory securityFactory, final P11EntityIdentifier identityId,
-            final X509Certificate[] certificateChain)
+    public P11ContentSignerBuilder(P11CryptService cryptService, SecurityFactory securityFactory,
+            P11EntityIdentifier identityId, X509Certificate[] certificateChain)
             throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -112,8 +111,8 @@ public class P11ContentSignerBuilder {
         }
     } // constructor
 
-    public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
-            final int parallelism) throws XiSecurityException, P11TokenException {
+    public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
+            int parallelism) throws XiSecurityException, P11TokenException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         List<XiContentSigner> signers = new ArrayList<>(parallelism);

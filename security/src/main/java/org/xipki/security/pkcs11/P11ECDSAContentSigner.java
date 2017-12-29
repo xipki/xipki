@@ -101,8 +101,8 @@ class P11ECDSAContentSigner implements XiContentSigner {
         hashMechMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_ECDSA_SHA3_512);
     }
 
-    P11ECDSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
-            final AlgorithmIdentifier signatureAlgId, final boolean plain)
+    P11ECDSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+            AlgorithmIdentifier signatureAlgId, boolean plain)
             throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);

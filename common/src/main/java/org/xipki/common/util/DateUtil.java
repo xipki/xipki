@@ -41,7 +41,7 @@ public class DateUtil {
     private DateUtil() {
     }
 
-    public static Date parseUtcTimeyyyyMMddhhmmss(final String utcTime) {
+    public static Date parseUtcTimeyyyyMMddhhmmss(String utcTime) {
         String coreUtcTime = utcTime;
         if (StringUtil.isNotBlank(utcTime)) {
             char ch = utcTime.charAt(utcTime.length() - 1);
@@ -63,7 +63,7 @@ public class DateUtil {
         }
     }
 
-    public static Date parseUtcTimeyyyyMMdd(final String utcTime) {
+    public static Date parseUtcTimeyyyyMMdd(String utcTime) {
         String coreUtcTime = utcTime;
         if (StringUtil.isNotBlank(utcTime)) {
             char ch = utcTime.charAt(utcTime.length() - 1);
@@ -85,12 +85,12 @@ public class DateUtil {
         }
     }
 
-    public static String toUtcTimeyyyyMMddhhmmss(final Date utcTime) {
+    public static String toUtcTimeyyyyMMddhhmmss(Date utcTime) {
         ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
         return SDF1.format(zd);
     }
 
-    public static String toUtcTimeyyyyMMdd(final Date utcTime) {
+    public static String toUtcTimeyyyyMMdd(Date utcTime) {
         ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
         return SDF2.format(zd);
     }

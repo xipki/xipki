@@ -50,7 +50,7 @@ public class Asn1NewKeyControl extends ASN1Object {
         this.control = ParamUtil.requireNonNull("control", control);
     }
 
-    private Asn1NewKeyControl(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1NewKeyControl(ASN1Sequence seq) throws BadAsn1ObjectException {
         control = new P11NewKeyControl();
         final int size = seq.size();
         for (int i = 0; i < size; i++) {
@@ -68,7 +68,7 @@ public class Asn1NewKeyControl extends ASN1Object {
         }
     }
 
-    public static Asn1NewKeyControl getInstance(final Object obj) throws BadAsn1ObjectException {
+    public static Asn1NewKeyControl getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1NewKeyControl) {
             return (Asn1NewKeyControl) obj;
         }

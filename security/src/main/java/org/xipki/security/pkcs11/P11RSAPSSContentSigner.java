@@ -63,17 +63,17 @@ class P11RSAPSSContentSigner implements XiContentSigner {
         }
 
         @Override
-        public void write(final int oneByte) throws IOException {
+        public void write(int oneByte) throws IOException {
             pssSigner.update((byte) oneByte);
         }
 
         @Override
-        public void write(final byte[] bytes) throws IOException {
+        public void write(byte[] bytes) throws IOException {
             pssSigner.update(bytes, 0, bytes.length);
         }
 
         @Override
-        public void write(final byte[] bytes, final int off, final int len) throws IOException {
+        public void write(byte[] bytes, int off, int len) throws IOException {
             pssSigner.update(bytes, off, len);
         }
 
@@ -113,8 +113,8 @@ class P11RSAPSSContentSigner implements XiContentSigner {
 
     private final OutputStream outputStream;
 
-    P11RSAPSSContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
-            final AlgorithmIdentifier signatureAlgId, final SecureRandom random)
+    P11RSAPSSContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+            AlgorithmIdentifier signatureAlgId, SecureRandom random)
             throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);

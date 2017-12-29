@@ -29,14 +29,12 @@ import org.xipki.security.pkcs11.P11Slot;
 // CHECKSTYLE:SKIP
 public class P11SM2SignLoadTest extends P11SignLoadTest {
 
-    public P11SM2SignLoadTest(final SecurityFactory securityFactory, final P11Slot slot)
-            throws Exception {
+    public P11SM2SignLoadTest(SecurityFactory securityFactory, P11Slot slot) throws Exception {
         super(securityFactory, slot, "SM3WITHSM2", generateKey(slot),
                 "PKCS#11 SM2 signature creation");
     }
 
-    private static P11ObjectIdentifier generateKey(final P11Slot slot)
-            throws Exception {
+    private static P11ObjectIdentifier generateKey(P11Slot slot) throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         return slot.generateSM2Keypair("loadtest-" + System.currentTimeMillis(),
                 getNewKeyControl());

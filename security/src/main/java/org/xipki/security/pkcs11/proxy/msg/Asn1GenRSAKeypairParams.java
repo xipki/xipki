@@ -60,8 +60,8 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
 
     private final BigInteger publicExponent;
 
-    public Asn1GenRSAKeypairParams(final P11SlotIdentifier slotId, final String label,
-            final P11NewKeyControl control, final int keysize, final BigInteger publicExponent) {
+    public Asn1GenRSAKeypairParams(P11SlotIdentifier slotId, String label,
+            P11NewKeyControl control, int keysize, BigInteger publicExponent) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.control = ParamUtil.requireNonNull("control", control);
@@ -69,7 +69,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         this.publicExponent = publicExponent;
     }
 
-    private Asn1GenRSAKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1GenRSAKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 4, 5);
         final int size = seq.size();
         int idx = 0;
@@ -82,7 +82,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         publicExponent = (size > 4) ? Asn1Util.getInteger(seq.getObjectAt(idx++)) : null;
     }
 
-    public static Asn1GenRSAKeypairParams getInstance(final Object obj)
+    public static Asn1GenRSAKeypairParams getInstance(Object obj)
             throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenRSAKeypairParams) {
             return (Asn1GenRSAKeypairParams) obj;

@@ -33,7 +33,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
     private final ASN1ObjectIdentifier curveOid;
 
-    public P12ECKeyGenLoadTest(final String curveNameOrOid, final SecurityFactory securityFactory)
+    public P12ECKeyGenLoadTest(String curveNameOrOid, SecurityFactory securityFactory)
             throws Exception {
         super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
 
@@ -46,7 +46,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
     }
 
     @Override
-    protected void generateKeypair(final SecureRandom random) throws Exception {
+    protected void generateKeypair(SecureRandom random) throws Exception {
         KeyUtil.generateECKeypair(curveOid, random);
 
     }

@@ -26,7 +26,7 @@ package org.xipki.security.speed.cmd;
 public class RSAControl {
     private final int modulusLen;
 
-    public RSAControl(final int modulusLen) {
+    public RSAControl(int modulusLen) {
         this.modulusLen = modulusLen;
     }
 

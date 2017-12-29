@@ -52,14 +52,14 @@ public class Asn1GenSM2KeypairParams extends ASN1Object {
 
     private final P11NewKeyControl control;
 
-    public Asn1GenSM2KeypairParams(final P11SlotIdentifier slotId, final String label,
-            final P11NewKeyControl control) {
+    public Asn1GenSM2KeypairParams(P11SlotIdentifier slotId, String label,
+            P11NewKeyControl control) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.control = ParamUtil.requireNonNull("control", control);
     }
 
-    private Asn1GenSM2KeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1GenSM2KeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 3);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
@@ -67,8 +67,7 @@ public class Asn1GenSM2KeypairParams extends ASN1Object {
         control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
     }
 
-    public static Asn1GenSM2KeypairParams getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1GenSM2KeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenSM2KeypairParams) {
             return (Asn1GenSM2KeypairParams) obj;
         }

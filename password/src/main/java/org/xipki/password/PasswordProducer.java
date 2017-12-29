@@ -41,7 +41,7 @@ public class PasswordProducer {
     private static ConcurrentHashMap<String, Boolean> nameResultMap =
             new ConcurrentHashMap<>();
 
-    public static void registerPasswordConsumer(final String name) {
+    public static void registerPasswordConsumer(String name) {
         assertNameNotBlank(name);
         BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
         nameResultMap.remove(name);
@@ -51,7 +51,7 @@ public class PasswordProducer {
         LOG.info(str);
     }
 
-    public static void unregisterPasswordConsumer(final String name) {
+    public static void unregisterPasswordConsumer(String name) {
         assertNameNotBlank(name);
         namePasswordsMap.remove(name);
         final String str = "unregistered password consumer " + name;
@@ -59,7 +59,7 @@ public class PasswordProducer {
         LOG.info(str);
     }
 
-    public static void setPasswordCorrect(final String name, final boolean correct) {
+    public static void setPasswordCorrect(String name, boolean correct) {
         assertNameNotBlank(name);
         nameResultMap.put(name, correct);
         final String str = "set result of password consumer " + name + ": "
@@ -68,11 +68,11 @@ public class PasswordProducer {
         LOG.info(str);
     }
 
-    public static Boolean removePasswordCorrect(final String name) {
+    public static Boolean removePasswordCorrect(String name) {
         return nameResultMap.remove(name);
     }
 
-    public static char[] takePassword(final String name)
+    public static char[] takePassword(String name)
             throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
@@ -85,7 +85,7 @@ public class PasswordProducer {
         return pwd;
     }
 
-    public static void putPassword(final String name, final char[] password)
+    public static void putPassword(String name, char[] password)
             throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
@@ -99,7 +99,7 @@ public class PasswordProducer {
         System.out.println(str);
     }
 
-    public static boolean needsPassword(final String name) {
+    public static boolean needsPassword(String name) {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
             return false;
@@ -111,7 +111,7 @@ public class PasswordProducer {
         return Collections.unmodifiableSet(namePasswordsMap.keySet());
     }
 
-    private static void assertNameNotBlank(final String name) {
+    private static void assertNameNotBlank(String name) {
         if (name == null) {
             throw new NullPointerException("name must not be null");
         }

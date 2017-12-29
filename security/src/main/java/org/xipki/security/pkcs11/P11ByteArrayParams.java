@@ -26,7 +26,7 @@ public class P11ByteArrayParams implements P11Params {
 
     private final byte[] bytes;
 
-    public P11ByteArrayParams(final byte[] bytes) {
+    public P11ByteArrayParams(byte[] bytes) {
         this.bytes = bytes;
     }
 

@@ -68,7 +68,7 @@ public class CmpFailureUtil {
     }
 
     public static String formatPkiStatusInfo(
-            final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
+            org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
         ParamUtil.requireNonNull("pkiStatusInfo", pkiStatusInfo);
         int status = pkiStatusInfo.getStatus().intValue();
         int failureInfo = pkiStatusInfo.getFailInfo().intValue();
@@ -77,8 +77,7 @@ public class CmpFailureUtil {
         return formatPkiStatusInfo(status, failureInfo, statusMessage);
     }
 
-    public static String formatPkiStatusInfo(final int status, final int failureInfo,
-            final String statusMessage) {
+    public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {
         StringBuilder sb = new StringBuilder(200);
         sb.append("PKIStatusInfo {status = ").append(status);
         sb.append(" (").append(STATUS_TEXT_MAP.get(status)).append("), ");
@@ -88,7 +87,7 @@ public class CmpFailureUtil {
         return sb.toString();
     }
 
-    public static String getFailureInfoText(final int failureInfo) {
+    public static String getFailureInfoText(int failureInfo) {
         BigInteger bi = BigInteger.valueOf(failureInfo);
         final int n = Math.min(bi.bitLength(), FAILUREINFO_TEXTS.length);
 

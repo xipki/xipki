@@ -35,7 +35,7 @@ public class PBEPasswordService {
     public PBEPasswordService() {
     }
 
-    public static char[] decryptPassword(final char[] masterPassword, final String passwordHint)
+    public static char[] decryptPassword(char[] masterPassword, String passwordHint)
             throws PasswordResolverException {
         ParamUtil.requireNonNull("masterPassword", masterPassword);
         ParamUtil.requireNonNull("passwordHint", passwordHint);
@@ -85,9 +85,8 @@ public class PBEPasswordService {
         return ret;
     } // method resolvePassword
 
-    public static String encryptPassword(final PBEAlgo algo,
-            final int iterationCount, final char[] masterPassword,
-            final char[] password) throws PasswordResolverException {
+    public static String encryptPassword(PBEAlgo algo, int iterationCount, char[] masterPassword,
+            char[] password) throws PasswordResolverException {
         ParamUtil.requireRange("iterationCount", iterationCount, 1, 65535);
         ParamUtil.requireNonNull("masterPassword", masterPassword);
         ParamUtil.requireNonNull("password", password);

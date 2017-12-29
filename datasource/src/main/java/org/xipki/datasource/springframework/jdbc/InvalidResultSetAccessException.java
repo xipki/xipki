@@ -43,7 +43,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      * @param sql the offending SQL statement
      * @param ex the root cause
      */
-    public InvalidResultSetAccessException(final String sql, final SQLException ex) {
+    public InvalidResultSetAccessException(String sql, SQLException ex) {
         super("invalid ResultSet access for SQL [" + sql + "]", ex);
         this.sql = sql;
     }
@@ -52,7 +52,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      * Constructor for InvalidResultSetAccessException.
      * @param ex the root cause
      */
-    public InvalidResultSetAccessException(final SQLException ex) {
+    public InvalidResultSetAccessException(SQLException ex) {
         super(ex.getMessage(), ex);
     }
 

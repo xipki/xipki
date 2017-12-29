@@ -42,8 +42,7 @@ public class FilePasswordCallback implements PasswordCallback {
     private String passwordFile;
 
     @Override
-    public char[] getPassword(final String prompt, final String testToken)
-            throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
         if (passwordFile == null) {
             throw new PasswordResolverException("please initialize me first");
         }
@@ -84,7 +83,7 @@ public class FilePasswordCallback implements PasswordCallback {
     } // method getPassword
 
     @Override
-    public void init(final String conf) throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
         passwordFile = pairs.value("file");
@@ -95,7 +94,7 @@ public class FilePasswordCallback implements PasswordCallback {
         passwordFile = expandFilepath(passwordFile);
     }
 
-    private static String expandFilepath(final String path) {
+    private static String expandFilepath(String path) {
         return (path.startsWith("~" + File.separator))
                 ? System.getProperty("user.home") + path.substring(1)
                 : path;

@@ -53,16 +53,16 @@ public class P11SlotRefreshResult {
         return mechanisms;
     }
 
-    public void addIdentity(final P11Identity identity) {
+    public void addIdentity(P11Identity identity) {
         ParamUtil.requireNonNull("identity", identity);
         this.identities.put(identity.identityId().objectId(), identity);
     }
 
-    public void addMechanism(final long mechanism) {
+    public void addMechanism(long mechanism) {
         this.mechanisms.add(mechanism);
     }
 
-    public void addCertificate(final P11ObjectIdentifier objectId, final X509Cert certificate) {
+    public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
         ParamUtil.requireNonNull("objectId", objectId);
         ParamUtil.requireNonNull("certificate", certificate);
         this.certificates.put(objectId, certificate);
@@ -74,7 +74,7 @@ public class P11SlotRefreshResult {
      *          Identifier. Must not be {@code null}.
      * @return the certificate of the given identifier.
      */
-    public X509Cert getCertForId(final byte[] id) {
+    public X509Cert getCertForId(byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
             if (objId.matchesId(id)) {
                 return certificates.get(objId);

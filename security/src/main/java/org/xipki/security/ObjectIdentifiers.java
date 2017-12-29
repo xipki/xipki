@@ -502,13 +502,13 @@ public class ObjectIdentifiers {
     private ObjectIdentifiers() {
     }
 
-    public static String oidToDisplayName(final ASN1ObjectIdentifier type) {
+    public static String oidToDisplayName(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         String name = getName(type);
         return (name == null) ? type.getId() : type.getId() + " (" + name + ")";
     }
 
-    public static String getName(final ASN1ObjectIdentifier type) {
+    public static String getName(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         String name = oidNameMap.get(type);
 
@@ -521,7 +521,7 @@ public class ObjectIdentifiers {
         return name;
     }
 
-    public static ASN1ObjectIdentifier nameToOid(final String name) {
+    public static ASN1ObjectIdentifier nameToOid(String name) {
         ParamUtil.requireNonNull("name", name);
         for (ASN1ObjectIdentifier oid : oidNameMap.keySet()) {
             if (oidNameMap.get(oid).equalsIgnoreCase(name)) {

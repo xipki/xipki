@@ -49,7 +49,7 @@ public class CountLatch {
     private final AtomicLong count;
     private volatile long releaseValue;
 
-    public CountLatch(final long initial, final long releaseValue) {
+    public CountLatch(long initial, long releaseValue) {
         this.releaseValue = releaseValue;
         this.count = new AtomicLong(initial);
         this.sync = new Sync();

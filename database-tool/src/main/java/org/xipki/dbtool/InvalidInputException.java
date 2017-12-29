@@ -28,20 +28,20 @@ public class InvalidInputException extends Exception {
     public InvalidInputException() {
     }
 
-    public InvalidInputException(final String message) {
+    public InvalidInputException(String message) {
         super(message);
     }
 
-    public InvalidInputException(final Throwable cause) {
+    public InvalidInputException(Throwable cause) {
         super(cause);
     }
 
-    public InvalidInputException(final String message, final Throwable cause) {
+    public InvalidInputException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidInputException(final String message, final Throwable cause,
-            final boolean enableSuppression, final boolean writableStackTrace) {
+    public InvalidInputException(String message, Throwable cause,
+            boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

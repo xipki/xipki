@@ -52,14 +52,13 @@ public class SoftTokenMacContentSignerBuilder {
 
     private final SecretKey key;
 
-    public SoftTokenMacContentSignerBuilder(final SecretKey key)
+    public SoftTokenMacContentSignerBuilder(SecretKey key)
             throws XiSecurityException {
         this.key = ParamUtil.requireNonNull("key", key);
     }
 
-    public SoftTokenMacContentSignerBuilder(final String keystoreType,
-            final InputStream keystoreStream, final char[] keystorePassword,
-            final String keyname, final char[] keyPassword)
+    public SoftTokenMacContentSignerBuilder(String keystoreType, InputStream keystoreStream,
+            char[] keystorePassword, String keyname, char[] keyPassword)
             throws XiSecurityException {
         if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
@@ -96,9 +95,8 @@ public class SoftTokenMacContentSignerBuilder {
         }
     }
 
-    public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
-            final int parallelism, final SecureRandom random)
-            throws XiSecurityException {
+    public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
+            int parallelism, SecureRandom random) throws XiSecurityException {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 

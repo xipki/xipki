@@ -33,7 +33,7 @@ public class LogUtil {
     private LogUtil() {
     }
 
-    public static void error(final Logger log, final Throwable th) {
+    public static void error(Logger log, Throwable th) {
         if (!log.isErrorEnabled()) {
             return;
         }
@@ -50,7 +50,7 @@ public class LogUtil {
         log.debug("Exception", th);
     }
 
-    public static void error(final Logger log, final Throwable th, final String msg) {
+    public static void error(Logger log, Throwable th, String msg) {
         if (!log.isErrorEnabled()) {
             return;
         }
@@ -67,7 +67,7 @@ public class LogUtil {
         log.debug(msg, th);
     }
 
-    public static void warn(final Logger log, final Throwable th) {
+    public static void warn(Logger log, Throwable th) {
         if (!log.isWarnEnabled()) {
             return;
         }
@@ -84,7 +84,7 @@ public class LogUtil {
         log.debug("Exception", th);
     }
 
-    public static void warn(final Logger log, final Throwable th, final String msg) {
+    public static void warn(Logger log, Throwable th, String msg) {
         if (!log.isWarnEnabled()) {
             return;
         }
@@ -106,11 +106,11 @@ public class LogUtil {
      * @param serialNumber certificate serial number
      * @return formatted certificate serial number
      */
-    public static String formatCsn(final BigInteger serialNumber) {
+    public static String formatCsn(BigInteger serialNumber) {
         return "0x" + serialNumber.toString(16);
     }
 
-    private static String getMessage(final Throwable th) {
+    private static String getMessage(Throwable th) {
         return (th instanceof JAXBException)
             ? XmlUtil.getMessage((JAXBException) th) : th.getMessage();
     }

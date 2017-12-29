@@ -38,7 +38,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
     private String passwordName;
     private int tries = 3;
 
-    private boolean isPasswordValid(final char[] password, final String testToken) {
+    private boolean isPasswordValid(char[] password, String testToken) {
         if (StringUtil.isBlank(testToken)) {
             return true;
         }
@@ -51,8 +51,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public char[] getPassword(final String prompt, final String testToken)
-            throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
         if (passwordName == null) {
             throw new PasswordResolverException("please initialize me first");
         }
@@ -80,7 +79,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(final String conf) throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.value("name");

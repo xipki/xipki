@@ -29,20 +29,20 @@ public class BadAsn1ObjectException extends Exception {
     public BadAsn1ObjectException() {
     }
 
-    public BadAsn1ObjectException(final String message) {
+    public BadAsn1ObjectException(String message) {
         super(message);
     }
 
-    public BadAsn1ObjectException(final Throwable cause) {
+    public BadAsn1ObjectException(Throwable cause) {
         super(cause);
     }
 
-    public BadAsn1ObjectException(final String message, final Throwable cause) {
+    public BadAsn1ObjectException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public BadAsn1ObjectException(final String message, final Throwable cause,
-            final boolean enableSuppression, final boolean writableStackTrace) {
+    public BadAsn1ObjectException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

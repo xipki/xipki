@@ -112,17 +112,17 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
     }
 
     @Override
-    public boolean canResolveProtocol(final String protocol) {
+    public boolean canResolveProtocol(String protocol) {
         return "PBE".equalsIgnoreCase(protocol);
     }
 
     @Override
-    public char[] resolvePassword(final String passwordHint) throws PasswordResolverException {
+    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
         return PBEPasswordService.decryptPassword(getMasterPassword(passwordHint),
                 passwordHint);
     }
 
-    public void setMasterPasswordCallback(final String masterPasswordCallback) {
+    public void setMasterPasswordCallback(String masterPasswordCallback) {
         this.masterPasswordCallback = ParamUtil.requireNonBlank("masterPasswordCallback",
                 masterPasswordCallback).trim();
     }

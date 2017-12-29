@@ -34,11 +34,11 @@ public class SignatureAlgoControl {
         this(false, false, false);
     }
 
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain) {
+    public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain) {
         this(rsaMgf1, dsaPlain, false);
     }
 
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain, final boolean gm) {
+    public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain, boolean gm) {
         this.rsaMgf1 = rsaMgf1;
         this.dsaPlain = dsaPlain;
         this.gm = gm;

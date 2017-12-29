@@ -49,13 +49,13 @@ public class DSAPlainDigestSigner implements Signer {
 
     private int keyBitLen;
 
-    public DSAPlainDigestSigner(final DSA signer, final Digest digest) {
+    public DSAPlainDigestSigner(DSA signer, Digest digest) {
         this.digest = digest;
         this.dsaSigner = signer;
     }
 
     @Override
-    public void init(final boolean forSigning, final CipherParameters parameters) {
+    public void init(boolean forSigning, CipherParameters parameters) {
         this.forSigning = forSigning;
 
         AsymmetricKeyParameter param;
@@ -93,12 +93,12 @@ public class DSAPlainDigestSigner implements Signer {
     }
 
     @Override
-    public void update(final byte input) {
+    public void update(byte input) {
         digest.update(input);
     }
 
     @Override
-    public void update(final byte[] input, final int inOff, final int length) {
+    public void update(byte[] input, int inOff, int length) {
         digest.update(input, inOff, length);
     }
 
@@ -122,7 +122,7 @@ public class DSAPlainDigestSigner implements Signer {
     }
 
     @Override
-    public boolean verifySignature(final byte[] signature) {
+    public boolean verifySignature(byte[] signature) {
         if (forSigning) {
             throw new IllegalStateException("DSADigestSigner not initialised for verification");
         }
@@ -143,7 +143,7 @@ public class DSAPlainDigestSigner implements Signer {
         digest.reset();
     }
 
-    private BigInteger[] decode(final byte[] encoding) throws IOException {
+    private BigInteger[] decode(byte[] encoding) throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if (encoding.length != 2 * blockSize) {
             throw new IOException("invalid length of signature");

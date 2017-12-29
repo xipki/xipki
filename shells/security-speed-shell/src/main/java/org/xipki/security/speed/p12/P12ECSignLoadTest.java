@@ -31,13 +31,13 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
-    public P12ECSignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm,
-            final String curveNameOrOid) throws Exception {
+    public P12ECSignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
+            String curveNameOrOid) throws Exception {
         super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
                 "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid);
     }
 
-    private static byte[] generateKeystore(final String curveNameOrOid) throws Exception {
+    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
         if (keystoreBytes == null) {
             KeystoreGenerationParameters params = new KeystoreGenerationParameters(

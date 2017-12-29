@@ -51,7 +51,7 @@ public class BigIntegerRange {
         return diff;
     }
 
-    public boolean isInRange(final BigInteger num) {
+    public boolean isInRange(BigInteger num) {
         return num.compareTo(from) >= 0 && num.compareTo(to) <= 0;
     }
 

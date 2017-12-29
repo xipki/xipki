@@ -62,7 +62,7 @@ public class AuditEvent {
      */
     private final List<AuditEventData> eventDatas = new LinkedList<>();
 
-    public AuditEvent(final Date timestamp) {
+    public AuditEvent(Date timestamp) {
         this.timestamp = (timestamp == null) ? new Date() : timestamp;
         this.level = AuditLevel.INFO;
     }
@@ -71,7 +71,7 @@ public class AuditEvent {
         return level;
     }
 
-    public void setLevel(final AuditLevel level) {
+    public void setLevel(AuditLevel level) {
         this.level = level;
     }
 
@@ -79,7 +79,7 @@ public class AuditEvent {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -87,7 +87,7 @@ public class AuditEvent {
         return applicationName;
     }
 
-    public void setApplicationName(final String applicationName) {
+    public void setApplicationName(String applicationName) {
         this.applicationName = Objects.requireNonNull(applicationName,
                 "applicationName must not be null");
     }
@@ -108,7 +108,7 @@ public class AuditEvent {
         return addEventData(new AuditEventData(name, value));
     }
 
-    public AuditEventData addEventData(final AuditEventData eventData) {
+    public AuditEventData addEventData(AuditEventData eventData) {
         Objects.requireNonNull(eventData, "eventData must not be null");
 
         int idx = -1;
@@ -152,7 +152,7 @@ public class AuditEvent {
         return status;
     }
 
-    public void setStatus(final AuditStatus status) {
+    public void setStatus(AuditStatus status) {
         this.status = Objects.requireNonNull(status, "status must not be null");
     }
 

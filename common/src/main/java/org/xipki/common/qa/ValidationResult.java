@@ -37,11 +37,11 @@ public class ValidationResult {
 
     private final List<ValidationIssue> successfulValidationIssues;
 
-    public ValidationResult(final ValidationIssue validationIssues) {
+    public ValidationResult(ValidationIssue validationIssues) {
         this(Arrays.asList(validationIssues));
     }
 
-    public ValidationResult(final List<ValidationIssue> validationIssues) {
+    public ValidationResult(List<ValidationIssue> validationIssues) {
         this.validationIssues = ParamUtil.requireNonEmpty("validationIssues", validationIssues);
 
         List<ValidationIssue> failedIssues = new LinkedList<>();

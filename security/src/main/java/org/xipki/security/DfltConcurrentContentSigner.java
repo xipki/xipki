@@ -91,14 +91,13 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
         }
     }
 
-    public DfltConcurrentContentSigner(final boolean mac, final List<XiContentSigner> signers)
+    public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers)
             throws NoSuchAlgorithmException {
         this(mac, signers, null);
     }
 
-    public DfltConcurrentContentSigner(final boolean mac,
-            final List<XiContentSigner> signers, final Key signingKey)
-            throws NoSuchAlgorithmException {
+    public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers,
+            Key signingKey) throws NoSuchAlgorithmException {
         ParamUtil.requireNonEmpty("signers", signers);
 
         this.mac = mac;
@@ -155,7 +154,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
      * @param soTimeout timeout in milliseconds, 0 for infinitely.
      */
     @Override
-    public ConcurrentBagEntrySigner borrowContentSigner(final int soTimeout)
+    public ConcurrentBagEntrySigner borrowContentSigner(int soTimeout)
             throws NoIdleSignerException {
         ConcurrentBagEntrySigner signer = null;
         try {
@@ -171,12 +170,12 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void requiteContentSigner(final ConcurrentBagEntrySigner signer) {
+    public void requiteContentSigner(ConcurrentBagEntrySigner signer) {
         signers.requite(signer);
     }
 
     @Override
-    public void initialize(final String conf, final PasswordResolver passwordResolver)
+    public void initialize(String conf, PasswordResolver passwordResolver)
             throws XiSecurityException {
     }
 
@@ -186,7 +185,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void setCertificateChain(final X509Certificate[] certificateChain) {
+    public void setCertificateChain(X509Certificate[] certificateChain) {
         if (certificateChain == null || certificateChain.length == 0) {
             this.certificateChain = null;
             this.certificateChainAsBcObjects = null;
@@ -216,7 +215,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void setPublicKey(final PublicKey publicKey) {
+    public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
 
@@ -271,7 +270,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public byte[] sign(final byte[] data) throws NoIdleSignerException, SignatureException {
+    public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
         ConcurrentBagEntrySigner contentSigner = borrowContentSigner();
         try {
             OutputStream signatureStream = contentSigner.value().getOutputStream();

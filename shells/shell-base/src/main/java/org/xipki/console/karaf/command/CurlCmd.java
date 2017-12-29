@@ -225,7 +225,7 @@ public class CurlCmd extends XiAction {
         return null;
     }
 
-    private static String getCharset(final String contentType) {
+    private static String getCharset(String contentType) {
         if (StringUtil.isBlank(contentType) || contentType.indexOf(';') == -1) {
             return null;
         }

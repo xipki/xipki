@@ -45,11 +45,11 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
 
     private final P11SlotIdentifier slotId;
 
-    public Asn1P11SlotIdentifier(final P11SlotIdentifier slotId) {
+    public Asn1P11SlotIdentifier(P11SlotIdentifier slotId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     }
 
-    private Asn1P11SlotIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1P11SlotIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         long id = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
@@ -57,8 +57,7 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
         this.slotId = new P11SlotIdentifier(index, id);
     }
 
-    public static Asn1P11SlotIdentifier getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1P11SlotIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11SlotIdentifier) {
             return (Asn1P11SlotIdentifier) obj;
         }

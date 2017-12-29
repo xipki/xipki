@@ -30,18 +30,17 @@ public class P11UnsupportedMechanismException extends P11TokenException {
 
     private static final long serialVersionUID = 1L;
 
-    public P11UnsupportedMechanismException(final long mechanism, final P11SlotIdentifier slotId) {
+    public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
         super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
             + " is not supported by PKCS11 slot " + slotId);
     }
 
-    public P11UnsupportedMechanismException(final long mechanism,
-            final P11EntityIdentifier entityId) {
+    public P11UnsupportedMechanismException(long mechanism, P11EntityIdentifier entityId) {
         super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
             + " is not supported by PKCS11 entity " + entityId);
     }
 
-    public P11UnsupportedMechanismException(final String message) {
+    public P11UnsupportedMechanismException(String message) {
         super(message);
     }
 

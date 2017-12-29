@@ -47,7 +47,7 @@ class SimpleLruCache<K, V> {
      *     the maximum number of entries in the cache. For all other caches,
      *     this is the maximum sum of the sizes of the entries in this cache.
      */
-    SimpleLruCache(final int maxSize) {
+    SimpleLruCache(int maxSize) {
         if (maxSize < 1) {
             throw new IllegalArgumentException("maxSize must not be less than 1");
         }
@@ -60,7 +60,7 @@ class SimpleLruCache<K, V> {
      * head of the queue. This returns null if a value is not cached and could not
      * be created.
      */
-    final V get(final K key) {
+    final V get(K key) {
         if (key == null) {
             throw new NullPointerException("key == null");
         }
@@ -84,7 +84,7 @@ class SimpleLruCache<K, V> {
      *
      * @return the previous value mapped by {@code key}.
      */
-    final V put(final K key, final V value) {
+    final V put(K key, V value) {
         if (key == null || value == null) {
             throw new NullPointerException("key == null || value == null");
         }
@@ -110,7 +110,7 @@ class SimpleLruCache<K, V> {
      * @param pMaxSize the maximum size of the cache before returning. Could be -1
      *            to evict even 0-sized elements.
      */
-    private void trimToSize(final int maxSize) {
+    private void trimToSize(int maxSize) {
         while (true) {
             K key;
             synchronized (this) {

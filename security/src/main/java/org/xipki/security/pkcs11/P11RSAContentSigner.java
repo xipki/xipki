@@ -66,9 +66,8 @@ class P11RSAContentSigner implements XiContentSigner {
 
     private final int modulusBitLen;
 
-    P11RSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
-            final AlgorithmIdentifier signatureAlgId)
-            throws XiSecurityException, P11TokenException {
+    P11RSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+            AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);

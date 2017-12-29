@@ -49,8 +49,8 @@ public class P11PrivateKey implements PrivateKey {
 
     private final PublicKey publicKey;
 
-    public P11PrivateKey(final P11CryptService p11CryptService,
-            final P11EntityIdentifier identityId) throws P11TokenException {
+    public P11PrivateKey(P11CryptService p11CryptService, P11EntityIdentifier identityId)
+            throws P11TokenException {
         this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
         this.identityId = ParamUtil.requireNonNull("entityId", identityId);
 
@@ -70,7 +70,7 @@ public class P11PrivateKey implements PrivateKey {
         }
     }
 
-    boolean supportsMechanism(final long mechanism) {
+    boolean supportsMechanism(long mechanism) {
         try {
             return p11CryptService.getSlot(identityId.slotId()).supportsMechanism(mechanism);
         } catch (P11TokenException ex) {
@@ -115,8 +115,8 @@ public class P11PrivateKey implements PrivateKey {
      * @throws P11TokenException
      *           if token error happens.
      */
-    public byte[] sign(final long mechanism, final P11Params parameters,
-            final byte[] content) throws XiSecurityException, P11TokenException {
+    public byte[] sign(long mechanism, P11Params parameters, byte[] content)
+            throws XiSecurityException, P11TokenException {
         return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
     }
 

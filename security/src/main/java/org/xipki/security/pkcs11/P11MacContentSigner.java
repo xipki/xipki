@@ -57,9 +57,8 @@ class P11MacContentSigner implements XiContentSigner {
 
     private final ByteArrayOutputStream outputStream;
 
-    P11MacContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
-            final AlgorithmIdentifier macAlgId)
-            throws XiSecurityException, P11TokenException {
+    P11MacContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+            AlgorithmIdentifier macAlgId) throws XiSecurityException, P11TokenException {
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.algorithmIdentifier = ParamUtil.requireNonNull("macAlgId", macAlgId);

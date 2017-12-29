@@ -44,7 +44,7 @@ public class SigAlgCompleter extends AbstractEnumCompleter {
             enums.append(hashAlg).append("withPlainECDSA,");
         }
 
-        enums.deleteCharAt(enums.length() - 1);
+        enums.append("SM3withSM2");
         setTokens(enums.toString());
     }
 

@@ -47,11 +47,11 @@ public class HealthCheckResult {
      *
      * @param name Name of the check result.
      */
-    public HealthCheckResult(final String name) {
+    public HealthCheckResult(String name) {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
 
-    public void setHealthy(final boolean healthy) {
+    public void setHealthy(boolean healthy) {
         this.healthy = healthy;
     }
 
@@ -59,7 +59,7 @@ public class HealthCheckResult {
         this.statuses.clear();
     }
 
-    public Object status(final String statusName) {
+    public Object status(String statusName) {
         return (statusName == null) ? null : statuses.get(statusName);
     }
 
@@ -67,7 +67,7 @@ public class HealthCheckResult {
         this.childChecks.clear();
     }
 
-    public void addChildCheck(final HealthCheckResult childCheck) {
+    public void addChildCheck(HealthCheckResult childCheck) {
         ParamUtil.requireNonNull("childCheck", childCheck);
         this.childChecks.add(childCheck);
     }
@@ -84,11 +84,11 @@ public class HealthCheckResult {
         return Collections.unmodifiableMap(statuses);
     }
 
-    public String toJsonMessage(final boolean pretty) {
+    public String toJsonMessage(boolean pretty) {
         return toJsonMessage(0, pretty);
     }
 
-    private String toJsonMessage(final int level, final boolean pretty) {
+    private String toJsonMessage(int level, boolean pretty) {
         // Non root check requires always a name
         StringBuilder sb = new StringBuilder(1000);
         if (pretty) {
@@ -155,8 +155,8 @@ public class HealthCheckResult {
         return sb.toString();
     } // method toJsonMessage
 
-    private static void append(final StringBuilder sb, final String name, final Object value,
-            final int level, final boolean pretty, final boolean lastElement) {
+    private static void append(StringBuilder sb, String name, Object value,
+            int level, boolean pretty, boolean lastElement) {
         if (pretty) {
             sb.append("\n");
             addIndent(sb, level);
@@ -178,7 +178,7 @@ public class HealthCheckResult {
         }
     } // method append
 
-    private static void addIndent(final StringBuilder buffer, final int level) {
+    private static void addIndent(StringBuilder buffer, int level) {
         if (level == 0) {
             return;
         }
@@ -188,8 +188,7 @@ public class HealthCheckResult {
         }
     }
 
-    public static HealthCheckResult getInstanceFromJsonMessage(final String name,
-            final String jsonMessage) {
+    public static HealthCheckResult getInstanceFromJsonMessage(String name, String jsonMessage) {
         // remove white spaces and line breaks
         String jsonMsg = jsonMessage.replaceAll(" |\t|\r|\n", "");
         if (!jsonMsg.startsWith("{\"healthy\":")) {
@@ -240,7 +239,7 @@ public class HealthCheckResult {
         return result;
     }
 
-    private static Map<String, String> getChildBlocks(final String block) {
+    private static Map<String, String> getChildBlocks(String block) {
         Map<String, String> childBlocks = new HashMap<>();
 
         int offset = 0;
@@ -259,7 +258,7 @@ public class HealthCheckResult {
         return childBlocks;
     } // method getInstanceFromJsonMessage
 
-    private static String getBlock(final String text, final int offset) {
+    private static String getBlock(String text, int offset) {
         if (!text.startsWith("{", offset)) {
             throw new IllegalArgumentException("invalid text: '" + text + "'");
         }

@@ -31,9 +31,8 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12DSASignLoadTest extends P12SignLoadTest {
 
-    public P12DSASignLoadTest(final SecurityFactory securityFactory,
-            final String signatureAlgorithm, final int plength, final int qlength)
-            throws Exception {
+    public P12DSASignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
+            int plength, int qlength) throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(plength, qlength),
                 "PKCS#12 DSA signature creation\n"
@@ -41,7 +40,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest {
                     + "qlength: " + qlength);
     }
 
-    private static byte[] generateKeystore(final int plength, final int qlength) throws Exception {
+    private static byte[] generateKeystore(int plength, int qlength) throws Exception {
         byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
         if (keystoreBytes == null) {
             KeystoreGenerationParameters params = new KeystoreGenerationParameters(

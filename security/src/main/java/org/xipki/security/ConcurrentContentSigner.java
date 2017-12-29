@@ -118,10 +118,10 @@ public interface ConcurrentContentSigner {
      * @throws NoIdleSignerException
      *         If no idle signer is available
      */
-    ConcurrentBagEntrySigner borrowContentSigner(final int soTimeout)
+    ConcurrentBagEntrySigner borrowContentSigner(int soTimeout)
             throws NoIdleSignerException;
 
-    void requiteContentSigner(final ConcurrentBagEntrySigner signer);
+    void requiteContentSigner(ConcurrentBagEntrySigner signer);
 
     boolean isHealthy();
 

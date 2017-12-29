@@ -58,7 +58,7 @@ public class ProcessLog {
 
     private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();
 
-    public ProcessLog(final long total) {
+    public ProcessLog(long total) {
         this.total = total;
         this.hasTotal = total > 0;
         reset();
@@ -156,7 +156,7 @@ public class ProcessLog {
         return endTimeMs;
     }
 
-    public long addNumProcessed(final long numProcessed) {
+    public long addNumProcessed(long numProcessed) {
         return this.numProcessed.addAndGet(numProcessed);
     }
 
@@ -164,7 +164,7 @@ public class ProcessLog {
         printStatus(false);
     }
 
-    private void printStatus(final boolean forcePrint) {
+    private void printStatus(boolean forcePrint) {
         final long nowMs = System.currentTimeMillis();
         final long tmpNumProcessed = numProcessed.get();
 

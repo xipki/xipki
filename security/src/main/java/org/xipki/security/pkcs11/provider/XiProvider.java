@@ -103,7 +103,7 @@ public class XiProvider extends Provider {
 
         private final XiProvider provider;
 
-        MyPrivilegedAction(final XiProvider provider) {
+        MyPrivilegedAction(XiProvider provider) {
             this.provider = provider;
         }
 

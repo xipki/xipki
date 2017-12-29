@@ -31,8 +31,7 @@ public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
     private final int qlength;
 
-    public P11DSAKeyGenLoadTest(final P11Slot slot, final int plength, final int qlength)
-            throws Exception {
+    public P11DSAKeyGenLoadTest(P11Slot slot, int plength, int qlength) throws Exception {
         super(slot, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
         this.plength = plength;
         this.qlength = qlength;

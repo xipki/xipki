@@ -68,11 +68,11 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     private ConcurrentLinkedDeque<SignerFactory> services =
             new ConcurrentLinkedDeque<SignerFactory>();
 
-    public void setP11CryptServiceFactory(final P11CryptServiceFactory p11CryptServiceFactory) {
+    public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
         this.p11CryptServiceFactory = p11CryptServiceFactory;
     }
 
-    public void bindService(final SignerFactory service) {
+    public void bindService(SignerFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -86,7 +86,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         LOG.info("{} SignerFactory binding for {}", action, service);
     }
 
-    public void unbindService(final SignerFactory service) {
+    public void unbindService(SignerFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("unbindService invoked with null.");
@@ -101,9 +101,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     }
 
     @Override
-    public ConcurrentContentSigner newSigner(final SecurityFactory securityFactory,
-            final String type, final SignerConf conf, final X509Certificate[] certificateChain)
-            throws ObjectCreationException {
+    public ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type,
+            SignerConf conf, X509Certificate[] certificateChain) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         if ("PKCS12".equalsIgnoreCase(type)
@@ -126,9 +125,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                 "could not find Factory to create Signer of type '" + type + "'");
     }
 
-    private ConcurrentContentSigner newKeystoreSigner(final SecurityFactory securityFactory,
-            final String type, final SignerConf conf, final X509Certificate[] certificateChain)
-            throws ObjectCreationException {
+    private ConcurrentContentSigner newKeystoreSigner(SecurityFactory securityFactory, String type,
+            SignerConf conf, X509Certificate[] certificateChain) throws ObjectCreationException {
         String str = conf.getConfValue("parallelism");
         int parallelism = securityFactory.getDefaultSignerParallelism();
         if (str != null) {
@@ -218,8 +216,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         }
     }
 
-    public ConcurrentContentSigner newPkcs11Signer(final SecurityFactory securityFactory,
-            final String type, final SignerConf conf, final X509Certificate[] certificateChain)
+    public ConcurrentContentSigner newPkcs11Signer(SecurityFactory securityFactory,
+            String type, SignerConf conf, X509Certificate[] certificateChain)
             throws ObjectCreationException {
         if (p11CryptServiceFactory == null) {
             throw new ObjectCreationException("p11CryptServiceFactory is not set");

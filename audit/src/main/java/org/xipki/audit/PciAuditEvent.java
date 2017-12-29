@@ -93,7 +93,7 @@ public class PciAuditEvent {
      */
     private AuditLevel level;
 
-    public PciAuditEvent(final Date date) {
+    public PciAuditEvent(Date date) {
         Objects.requireNonNull(date, "date must not be null");
         LocalDateTime localDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
         this.date = DATE_FORMATTER.format(localDate);
@@ -105,7 +105,7 @@ public class PciAuditEvent {
         return level;
     }
 
-    public void setLevel(final AuditLevel level) {
+    public void setLevel(AuditLevel level) {
         this.level = Objects.requireNonNull(level, "level must not be null");
     }
 
@@ -117,7 +117,7 @@ public class PciAuditEvent {
         return this.userId;
     }
 
-    public void setUserId(final String userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -129,7 +129,7 @@ public class PciAuditEvent {
         return this.eventType;
     }
 
-    public void setEventType(final String eventType) {
+    public void setEventType(String eventType) {
         this.eventType = eventType;
     }
 
@@ -149,7 +149,7 @@ public class PciAuditEvent {
         return this.status;
     }
 
-    public void setStatus(final String status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -161,7 +161,7 @@ public class PciAuditEvent {
         return origination;
     }
 
-    public void setOrigination(final String origination) {
+    public void setOrigination(String origination) {
         this.origination = origination;
     }
 
@@ -173,11 +173,11 @@ public class PciAuditEvent {
         return this.affectedResource;
     }
 
-    public void setAffectedResource(final String affectedResource) {
+    public void setAffectedResource(String affectedResource) {
         this.affectedResource = affectedResource;
     }
 
-    public CharArrayWriter toCharArrayWriter(final String prefix) {
+    public CharArrayWriter toCharArrayWriter(String prefix) {
         CharArrayWriter buffer = new CharArrayWriter(100);
 
         final char delimiter = DEFAULT_DELIMITER;
@@ -200,7 +200,7 @@ public class PciAuditEvent {
         return buffer;
     }
 
-    private static boolean isBlank(final CharSequence cs) {
+    private static boolean isBlank(CharSequence cs) {
         if (cs == null) {
             return true;
         }
@@ -218,8 +218,8 @@ public class PciAuditEvent {
         return true;
     }
 
-    private static String replaceDelimiter(final String fieldValue, final char delimiter,
-            final String replaceDelimiter) {
+    private static String replaceDelimiter(String fieldValue, char delimiter,
+            String replaceDelimiter) {
         if (replaceDelimiter == null || replaceDelimiter.length() < 1
                 || fieldValue == null || fieldValue.length() < 1) {
             return fieldValue;

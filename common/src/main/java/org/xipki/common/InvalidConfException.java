@@ -29,15 +29,15 @@ public class InvalidConfException extends Exception {
     public InvalidConfException() {
     }
 
-    public InvalidConfException(final String message) {
+    public InvalidConfException(String message) {
         super(message);
     }
 
-    public InvalidConfException(final Throwable cause) {
+    public InvalidConfException(Throwable cause) {
         super(cause);
     }
 
-    public InvalidConfException(final String message, final Throwable cause) {
+    public InvalidConfException(String message, Throwable cause) {
         super(message, cause);
     }
 

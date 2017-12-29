@@ -81,18 +81,16 @@ public class EmulatorP11Identity extends P11Identity {
 
     private final SecureRandom random;
 
-    public EmulatorP11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
-            final SecretKey signingKey, final int maxSessions, final SecureRandom random)
-            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+    public EmulatorP11Identity(P11Slot slot, P11EntityIdentifier identityId,
+            SecretKey signingKey, int maxSessions, SecureRandom random) {
         super(slot, identityId, 0);
         this.signingKey = ParamUtil.requireNonNull("signingKey", signingKey);
         this.random = ParamUtil.requireNonNull("random", random);
     } // constructor
 
-    public EmulatorP11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
-            final PrivateKey privateKey, final PublicKey publicKey,
-            final X509Certificate[] certificateChain, final int maxSessions,
-            final SecureRandom random)
+    public EmulatorP11Identity(P11Slot slot, P11EntityIdentifier identityId, PrivateKey privateKey,
+            PublicKey publicKey, X509Certificate[] certificateChain, int maxSessions,
+            SecureRandom random)
             throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         super(slot, identityId, publicKey, certificateChain);
         this.signingKey = ParamUtil.requireNonNull("privateKey", privateKey);
@@ -154,8 +152,7 @@ public class EmulatorP11Identity extends P11Identity {
     } // constructor
 
     @Override
-    protected byte[] digestSecretKey0(long mechanism)
-            throws P11TokenException {
+    protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
         if (!(signingKey instanceof SecretKey)) {
             throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
         }
@@ -169,7 +166,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] sign0(final long mechanism, final P11Params parameters, final byte[] content)
+    protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
             throws P11TokenException {
         if (PKCS11Constants.CKM_ECDSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
@@ -280,8 +277,7 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    private byte[] hmac(final byte[] contentToSign,
-            final HashAlgoType hashAlgo) {
+    private byte[] hmac(byte[] contentToSign, HashAlgoType hashAlgo) {
         HMac hmac = new HMac(hashAlgo.createDigest());
         hmac.update(contentToSign, 0, contentToSign.length);
         byte[] signature = new byte[hmac.getMacSize()];
@@ -289,8 +285,8 @@ public class EmulatorP11Identity extends P11Identity {
         return signature;
     }
 
-    private byte[] rsaPkcsPssSign(final P11Params parameters, final byte[] contentToSign,
-            final HashAlgoType hashAlgo) throws P11TokenException {
+    private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign,
+            HashAlgoType hashAlgo) throws P11TokenException {
         if (!(parameters instanceof P11RSAPkcsPssParams)) {
             throw new P11TokenException("the parameters is not of "
                     + P11RSAPkcsPssParams.class.getName());
@@ -324,7 +320,7 @@ public class EmulatorP11Identity extends P11Identity {
         return rsaX509Sign(encodedHashValue);
     }
 
-    private byte[] rsaPkcsSign(final byte[] contentToSign, final HashAlgoType hashAlgo)
+    private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgoType hashAlgo)
             throws P11TokenException {
         int modulusBitLen = signatureKeyBitLength();
         byte[] paddedHash;
@@ -342,7 +338,7 @@ public class EmulatorP11Identity extends P11Identity {
         return rsaX509Sign(paddedHash);
     }
 
-    private byte[] rsaX509Sign(final byte[] dataToSign) throws P11TokenException {
+    private byte[] rsaX509Sign(byte[] dataToSign) throws P11TokenException {
         ConcurrentBagEntry<Cipher> cipher;
         try {
             cipher = rsaCiphers.borrow(5000, TimeUnit.MILLISECONDS);
@@ -365,7 +361,7 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    private byte[] dsaAndEcdsaSign(final byte[] dataToSign, final HashAlgoType hashAlgo)
+    private byte[] dsaAndEcdsaSign(byte[] dataToSign, HashAlgoType hashAlgo)
             throws P11TokenException {
         byte[] hash = (hashAlgo == null) ? dataToSign : hashAlgo.hash(dataToSign);
 
@@ -395,7 +391,7 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    private byte[] sm2Sign(final byte[] dataToSign, HashAlgoType hash) throws P11TokenException {
+    private byte[] sm2Sign(byte[] dataToSign, HashAlgoType hash) throws P11TokenException {
         ConcurrentBagEntry<SM2Signer> sig0;
         try {
             sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);

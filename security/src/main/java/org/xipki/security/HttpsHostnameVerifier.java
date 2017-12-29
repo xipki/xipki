@@ -85,7 +85,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
      * @return true if the host name is acceptable
      */
     @Override
-    public boolean verify(final String hostname, final SSLSession session) {
+    public boolean verify(String hostname, SSLSession session) {
         ParamUtil.requireNonNull("hostname", hostname);
         if (trustAll) {
             return true;
@@ -109,7 +109,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
         return (hostnames == null) ? false : hostnames.contains(hostname);
     }
 
-    public void setCommonnameHostMap(final String commonnameHostMap) {
+    public void setCommonnameHostMap(String commonnameHostMap) {
         hostnameMap.clear();
         if (StringUtil.isBlank(commonnameHostMap)) {
             return;
@@ -128,7 +128,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
         return enabled;
     }
 
-    public void setEnabled(final boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -136,7 +136,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
         return trustAll;
     }
 
-    public void setTrustAll(final boolean trustAll) {
+    public void setTrustAll(boolean trustAll) {
         this.trustAll = trustAll;
     }
 

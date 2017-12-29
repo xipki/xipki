@@ -56,7 +56,7 @@ public class PasswordResolverImpl implements PasswordResolver {
         initialized = true;
     }
 
-    public void bindService(final SinglePasswordResolver service) {
+    public void bindService(SinglePasswordResolver service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.debug("bindService invoked with null.");
@@ -69,7 +69,7 @@ public class PasswordResolverImpl implements PasswordResolver {
         LOG.debug("{} SinglePasswordResolver binding for {}", txt, service);
     }
 
-    public void unbindService(final SinglePasswordResolver service) {
+    public void unbindService(SinglePasswordResolver service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.debug("unbindService invoked with null.");
@@ -88,7 +88,7 @@ public class PasswordResolverImpl implements PasswordResolver {
     }
 
     @Override
-    public char[] resolvePassword(final String passwordHint) throws PasswordResolverException {
+    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
         Objects.requireNonNull(passwordHint, "passwordHint must not be null");
         int index = passwordHint.indexOf(':');
         if (index == -1) {
@@ -108,7 +108,7 @@ public class PasswordResolverImpl implements PasswordResolver {
                 + protocol + "'");
     }
 
-    public void setMasterPasswordCallback(final String masterPasswordCallback) {
+    public void setMasterPasswordCallback(String masterPasswordCallback) {
         this.masterPasswordCallback = masterPasswordCallback;
     }
 

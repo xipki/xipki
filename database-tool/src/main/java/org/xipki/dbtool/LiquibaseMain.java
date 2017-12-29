@@ -53,7 +53,7 @@ public class LiquibaseMain {
 
     private Liquibase liquibase;
 
-    public LiquibaseMain(final LiquibaseDatabaseConf dbConf, final String changeLogFile) {
+    public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile) {
         Objects.requireNonNull(dbConf, "dbConf must not be null");
         if (changeLogFile == null || changeLogFile.isEmpty()) {
             throw new IllegalArgumentException("changeLogFile must not be empty");
@@ -63,8 +63,7 @@ public class LiquibaseMain {
         this.changeLogFile = changeLogFile;
     }
 
-    public void changeLogLevel(final String logLevel, String logFile)
-            throws CommandLineParsingException {
+    public void changeLogLevel(String logLevel, String logFile) throws CommandLineParsingException {
         Objects.requireNonNull(logLevel, "logLevel must not be null");
         try {
             Logger log = LogFactory.getInstance().getLog();
@@ -78,7 +77,7 @@ public class LiquibaseMain {
         }
     }
 
-    public void init(final String logLevel, String logFile) throws Exception {
+    public void init(String logLevel, String logFile) throws Exception {
         changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
@@ -161,7 +160,7 @@ public class LiquibaseMain {
         }
     }
 
-    public static boolean loglevelIsSevereOrOff(final String logLevel) {
+    public static boolean loglevelIsSevereOrOff(String logLevel) {
         return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
     }
 

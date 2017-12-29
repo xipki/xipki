@@ -85,8 +85,8 @@ public class CmpUtf8PairsTest {
         check(pairs, expEncoded, expNameValues);
     }
 
-    private static void check(final CmpUtf8Pairs confPairs, final String expEncoded,
-            final Map<String, String> expNameValues) {
+    private static void check(CmpUtf8Pairs confPairs, String expEncoded,
+            Map<String, String> expNameValues) {
         String isEncoded = confPairs.encoded();
         Assert.assertEquals("encoded", expEncoded, isEncoded);
 

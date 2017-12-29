@@ -206,43 +206,43 @@ public interface ClockSource {
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedMillis0(final long startTime) {
+        public long elapsedMillis0(long startTime) {
             return System.currentTimeMillis() - startTime;
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedMillis0(final long startTime, final long endTime) {
+        public long elapsedMillis0(long startTime, long endTime) {
             return endTime - startTime;
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedNanos0(final long startTime) {
+        public long elapsedNanos0(long startTime) {
             return MILLISECONDS.toNanos(System.currentTimeMillis() - startTime);
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedNanos0(final long startTime, final long endTime) {
+        public long elapsedNanos0(long startTime, long endTime) {
             return MILLISECONDS.toNanos(endTime - startTime);
         }
 
         /** {@inheritDoc} */
         @Override
-        public long toMillis0(final long time) {
+        public long toMillis0(long time) {
             return time;
         }
 
         /** {@inheritDoc} */
         @Override
-        public long toNanos0(final long time) {
+        public long toNanos0(long time) {
             return MILLISECONDS.toNanos(time);
         }
 
         /** {@inheritDoc} */
         @Override
-        public long plusMillis0(final long time, final long millis) {
+        public long plusMillis0(long time, long millis) {
             return time + millis;
         }
 
@@ -262,43 +262,43 @@ public interface ClockSource {
 
         /** {@inheritDoc} */
         @Override
-        public long toMillis0(final long time) {
+        public long toMillis0(long time) {
             return NANOSECONDS.toMillis(time);
         }
 
         /** {@inheritDoc} */
         @Override
-        public long toNanos0(final long time) {
+        public long toNanos0(long time) {
             return time;
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedMillis0(final long startTime) {
+        public long elapsedMillis0(long startTime) {
             return NANOSECONDS.toMillis(System.nanoTime() - startTime);
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedMillis0(final long startTime, final long endTime) {
+        public long elapsedMillis0(long startTime, long endTime) {
             return NANOSECONDS.toMillis(endTime - startTime);
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedNanos0(final long startTime) {
+        public long elapsedNanos0(long startTime) {
             return System.nanoTime() - startTime;
         }
 
         /** {@inheritDoc} */
         @Override
-        public long elapsedNanos0(final long startTime, final long endTime) {
+        public long elapsedNanos0(long startTime, long endTime) {
             return endTime - startTime;
         }
 
         /** {@inheritDoc} */
         @Override
-        public long plusMillis0(final long time, final long millis) {
+        public long plusMillis0(long time, long millis) {
             return time + MILLISECONDS.toNanos(millis);
         }
 

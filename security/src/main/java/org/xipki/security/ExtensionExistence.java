@@ -55,8 +55,8 @@ public class ExtensionExistence extends ASN1Object {
 
     private List<ASN1ObjectIdentifier> wantExtensions;
 
-    public ExtensionExistence(final List<ASN1ObjectIdentifier> needExtensions,
-            final List<ASN1ObjectIdentifier> wantExtensions) {
+    public ExtensionExistence(List<ASN1ObjectIdentifier> needExtensions,
+            List<ASN1ObjectIdentifier> wantExtensions) {
         this.needExtensions = needExtensions;
         this.wantExtensions = wantExtensions;
 
@@ -72,7 +72,7 @@ public class ExtensionExistence extends ASN1Object {
 
     }
 
-    private ExtensionExistence(final ASN1Sequence seq) {
+    private ExtensionExistence(ASN1Sequence seq) {
         int size = seq.size();
         if (size > 2) {
             throw new IllegalArgumentException("wrong number of elements in sequence");
@@ -137,7 +137,7 @@ public class ExtensionExistence extends ASN1Object {
         return wantExtensions;
     }
 
-    public static ExtensionExistence getInstance(final Object obj) {
+    public static ExtensionExistence getInstance(Object obj) {
         if (obj == null || obj instanceof ExtensionExistence) {
             return (ExtensionExistence) obj;
         }

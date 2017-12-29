@@ -79,7 +79,7 @@ public class P12CsrGenCmd extends CsrGenAction {
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
             throws ObjectCreationException {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         char[] pwd;

@@ -45,14 +45,14 @@ public class CmpUtf8Pairs {
 
     private final Map<String, String> pairs = new HashMap<>();
 
-    public CmpUtf8Pairs(final String name, final String value) {
+    public CmpUtf8Pairs(String name, String value) {
         putUtf8Pair(name, value);
     }
 
     public CmpUtf8Pairs() {
     }
 
-    public CmpUtf8Pairs(final String encodedCmpUtf8Pairs) {
+    public CmpUtf8Pairs(String encodedCmpUtf8Pairs) {
         String encoded = ParamUtil.requireNonBlank("encodedCmpUtf8Pairs", encodedCmpUtf8Pairs);
         // remove the ending '%'-symbols
         while (encoded.charAt(encoded.length() - 1) == TOKEN_TERM) {
@@ -95,7 +95,7 @@ public class CmpUtf8Pairs {
         }
     } // constructor
 
-    public void putUtf8Pair(final String name, final String value) {
+    public void putUtf8Pair(String name, String value) {
         ParamUtil.requireNonNull("name", name);
         ParamUtil.requireNonNull("value", value);
 
@@ -106,12 +106,12 @@ public class CmpUtf8Pairs {
         pairs.put(name, value);
     }
 
-    public void removeUtf8Pair(final String name) {
+    public void removeUtf8Pair(String name) {
         ParamUtil.requireNonNull("name", name);
         pairs.remove(name);
     }
 
-    public String value(final String name) {
+    public String value(String name) {
         ParamUtil.requireNonNull(name, name);
         return pairs.get(name);
     }
@@ -161,7 +161,7 @@ public class CmpUtf8Pairs {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof CmpUtf8Pairs)) {
             return false;
         }
@@ -170,7 +170,7 @@ public class CmpUtf8Pairs {
         return pairs.equals(objB.pairs);
     }
 
-    private static String encodeNameOrValue(final String str) {
+    private static String encodeNameOrValue(String str) {
         String tmpStr = str;
         if (tmpStr.indexOf("%") != -1) {
             tmpStr = tmpStr.replaceAll("%", "%25");
@@ -183,7 +183,7 @@ public class CmpUtf8Pairs {
         return tmpStr;
     }
 
-    private static String decodeNameOrValue(final String str) {
+    private static String decodeNameOrValue(String str) {
         int idx = str.indexOf(TOKEN_TERM);
         if (idx == -1) {
             return str;

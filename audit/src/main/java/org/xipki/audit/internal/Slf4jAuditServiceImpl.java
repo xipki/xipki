@@ -39,7 +39,7 @@ public class Slf4jAuditServiceImpl extends AuditService {
     }
 
     @Override
-    protected void logEvent0(final AuditEvent event) {
+    protected void logEvent0(AuditEvent event) {
         switch (event.level()) {
         case DEBUG:
             if (LOG.isDebugEnabled()) {
@@ -55,7 +55,7 @@ public class Slf4jAuditServiceImpl extends AuditService {
     }
 
     @Override
-    protected void logEvent0(final PciAuditEvent event) {
+    protected void logEvent0(PciAuditEvent event) {
         CharArrayWriter msg = event.toCharArrayWriter("");
         AuditLevel al = event.level();
         switch (al) {

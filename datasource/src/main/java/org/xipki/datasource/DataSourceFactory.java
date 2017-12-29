@@ -41,16 +41,16 @@ public class DataSourceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
-    public DataSourceWrapper createDataSourceForFile(final String name, final String confFile,
-            final PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSourceForFile(String name, String confFile,
+            PasswordResolver passwordResolver)
             throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);
         FileInputStream fileIn = new FileInputStream(expandFilepath(confFile));
         return createDataSource(name, fileIn, passwordResolver);
     }
 
-    public DataSourceWrapper createDataSource(final String name, final InputStream conf,
-            final PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(String name, InputStream conf,
+            PasswordResolver passwordResolver)
             throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("conf", conf);
         Properties config = new Properties();
@@ -67,8 +67,8 @@ public class DataSourceFactory {
         return createDataSource(name, config, passwordResolver);
     } // method createDataSource
 
-    public DataSourceWrapper createDataSource(final String name, final Properties conf,
-            final PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(String name, Properties conf,
+            PasswordResolver passwordResolver)
             throws DataAccessException, PasswordResolverException {
         ParamUtil.requireNonNull("conf", conf);
         DatabaseType databaseType;
@@ -106,7 +106,7 @@ public class DataSourceFactory {
         return DataSourceWrapper.createDataSource(name, conf, databaseType);
     } // method createDataSource
 
-    private static String expandFilepath(final String path) {
+    private static String expandFilepath(String path) {
         return path.startsWith("~" + File.separator)
                 ? System.getProperty("user.home") + path.substring(1) : path;
     }

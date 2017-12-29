@@ -45,20 +45,19 @@ public class Asn1DigestSecretKeyTemplate extends ASN1Object {
 
     private final Asn1Mechanism mechanism;
 
-    private Asn1DigestSecretKeyTemplate(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1DigestSecretKeyTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
         this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
     }
 
-    public Asn1DigestSecretKeyTemplate(final Asn1P11EntityIdentifier identityId,
-            final long mechanism) {
+    public Asn1DigestSecretKeyTemplate(Asn1P11EntityIdentifier identityId, long mechanism) {
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.mechanism = new Asn1Mechanism(mechanism, null);
     }
 
-    public static Asn1DigestSecretKeyTemplate getInstance(final Object obj)
+    public static Asn1DigestSecretKeyTemplate getInstance(Object obj)
             throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1DigestSecretKeyTemplate) {
             return (Asn1DigestSecretKeyTemplate) obj;

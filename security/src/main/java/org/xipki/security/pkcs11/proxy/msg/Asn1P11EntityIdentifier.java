@@ -50,8 +50,7 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
 
     private final P11EntityIdentifier entityId;
 
-    public Asn1P11EntityIdentifier(final P11SlotIdentifier slotId,
-            final P11ObjectIdentifier objectId) {
+    public Asn1P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
         ParamUtil.requireNonNull("slotId", slotId);
         ParamUtil.requireNonNull("objectId", objectId);
 
@@ -60,20 +59,19 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
         this.entityId = new P11EntityIdentifier(slotId, objectId);
     }
 
-    public Asn1P11EntityIdentifier(final Asn1P11SlotIdentifier slotId,
-            final Asn1P11ObjectIdentifier objectId) {
+    public Asn1P11EntityIdentifier(Asn1P11SlotIdentifier slotId, Asn1P11ObjectIdentifier objectId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.objectId = ParamUtil.requireNonNull("objectId", objectId);
         this.entityId = new P11EntityIdentifier(slotId.slotId(), objectId.objectId());
     }
 
-    public Asn1P11EntityIdentifier(final P11EntityIdentifier entityId) {
+    public Asn1P11EntityIdentifier(P11EntityIdentifier entityId) {
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.slotId = new Asn1P11SlotIdentifier(entityId.slotId());
         this.objectId = new Asn1P11ObjectIdentifier(entityId.objectId());
     }
 
-    private Asn1P11EntityIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1P11EntityIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
@@ -81,8 +79,7 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
         this.entityId = new P11EntityIdentifier(slotId.slotId(), objectId.objectId());
     }
 
-    public static Asn1P11EntityIdentifier getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1P11EntityIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11EntityIdentifier) {
             return (Asn1P11EntityIdentifier) obj;
         }

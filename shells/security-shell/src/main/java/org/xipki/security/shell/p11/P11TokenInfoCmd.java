@@ -69,7 +69,7 @@ public class P11TokenInfoCmd extends SecurityAction {
         return null;
     }
 
-    private void output(final List<P11SlotIdentifier> slots) {
+    private void output(List<P11SlotIdentifier> slots) {
         // list all slots
         final int n = slots.size();
 

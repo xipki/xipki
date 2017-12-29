@@ -31,7 +31,7 @@ public class PkiResponse {
 
     private ProtectionVerificationResult protectionVerificationResult;
 
-    public PkiResponse(final GeneralPKIMessage pkiMessage) {
+    public PkiResponse(GeneralPKIMessage pkiMessage) {
         this.pkiMessage = ParamUtil.requireNonNull("pkiMessage", pkiMessage);
     }
 
@@ -48,7 +48,7 @@ public class PkiResponse {
     }
 
     public void setProtectionVerificationResult(
-            final ProtectionVerificationResult protectionVerificationResult) {
+            ProtectionVerificationResult protectionVerificationResult) {
         this.protectionVerificationResult = protectionVerificationResult;
     }
 

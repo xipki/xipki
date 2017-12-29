@@ -38,12 +38,12 @@ public class P11MechanismFilter {
 
         private final Collection<Long> mechanisms;
 
-        private SingleFilter(final Set<P11SlotIdFilter> slots, final Collection<Long> mechanisms) {
+        private SingleFilter(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
             this.slots = slots;
             this.mechanisms = CollectionUtil.isEmpty(mechanisms) ? null : mechanisms;
         }
 
-        public boolean match(final P11SlotIdentifier slot) {
+        public boolean match(P11SlotIdentifier slot) {
             if (slots == null) {
                 return true;
             }
@@ -56,7 +56,7 @@ public class P11MechanismFilter {
             return false;
         }
 
-        public boolean isMechanismSupported(final long mechanism) {
+        public boolean isMechanismSupported(long mechanism) {
             if (mechanisms == null) {
                 return true;
             }
@@ -72,11 +72,11 @@ public class P11MechanismFilter {
         singleFilters = new LinkedList<>();
     }
 
-    void addEntry(final Set<P11SlotIdFilter> slots, final Collection<Long> mechanisms) {
+    void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
         singleFilters.add(new SingleFilter(slots, mechanisms));
     }
 
-    public boolean isMechanismPermitted(final P11SlotIdentifier slotId, final long mechanism) {
+    public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
         ParamUtil.requireNonNull("slotId", slotId);
         if (CollectionUtil.isEmpty(singleFilters)) {
             return true;

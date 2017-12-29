@@ -53,8 +53,7 @@ public class IaikP11Module extends AbstractP11Module {
 
     private Module module;
 
-    private IaikP11Module(final Module module, final P11ModuleConf moduleConf)
-            throws P11TokenException {
+    private IaikP11Module(Module module, P11ModuleConf moduleConf) throws P11TokenException {
         super(moduleConf);
         this.module = ParamUtil.requireNonNull("module", module);
 
@@ -134,7 +133,7 @@ public class IaikP11Module extends AbstractP11Module {
         setSlots(slots);
     }
 
-    public static P11Module getInstance(final P11ModuleConf moduleConf) throws P11TokenException {
+    public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
 
         Module module;
@@ -186,7 +185,7 @@ public class IaikP11Module extends AbstractP11Module {
         close(conf.nativeLibrary(), module);
     }
 
-    private static void close(final String modulePath, final Module module) {
+    private static void close(String modulePath, Module module) {
         if (module == null) {
             return;
         }

@@ -43,7 +43,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
         return services.isEmpty() ? defaultAuditService : services.getLast();
     }
 
-    public void bindService(final AuditService service) {
+    public void bindService(AuditService service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -57,7 +57,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
         LOG.info("{} AuditService binding for {}", action, service);
     }
 
-    public void unbindService(final AuditService service) {
+    public void unbindService(AuditService service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.debug("unbindService invoked with null.");

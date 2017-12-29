@@ -32,7 +32,7 @@ public class CannotSerializeTransactionException extends PessimisticLockingFailu
      * Constructor for could notSerializeTransactionException.
      * @param msg the detail message
      */
-    public CannotSerializeTransactionException(final String msg) {
+    public CannotSerializeTransactionException(String msg) {
         super(msg);
     }
 
@@ -41,7 +41,7 @@ public class CannotSerializeTransactionException extends PessimisticLockingFailu
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public CannotSerializeTransactionException(final String msg, final Throwable cause) {
+    public CannotSerializeTransactionException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

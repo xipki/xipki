@@ -35,7 +35,7 @@ public class StringUtil {
     private StringUtil() {
     }
 
-    public static List<String> split(final String str, final String delim) {
+    public static List<String> split(String str, String delim) {
         if (str == null) {
             return null;
         }
@@ -54,15 +54,15 @@ public class StringUtil {
         return ret;
     }
 
-    public static boolean isBlank(final String str) {
+    public static boolean isBlank(String str) {
         return str == null || str.isEmpty();
     }
 
-    public static boolean isNotBlank(final String str) {
+    public static boolean isNotBlank(String str) {
         return str != null && !str.isEmpty();
     }
 
-    public static Set<String> splitAsSet(final String str, final String delim) {
+    public static Set<String> splitAsSet(String str, String delim) {
         if (str == null) {
             return null;
         }
@@ -81,7 +81,7 @@ public class StringUtil {
         return ret;
     }
 
-    public static String collectionAsString(final Collection<String> set, final String delim) {
+    public static String collectionAsString(Collection<String> set, String delim) {
         if (set == null) {
             return null;
         }
@@ -97,7 +97,7 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static boolean startsWithIgnoreCase(final String str, final String prefix) {
+    public static boolean startsWithIgnoreCase(String str, String prefix) {
         if (str.length() < prefix.length()) {
             return false;
         }
@@ -105,11 +105,11 @@ public class StringUtil {
         return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
     }
 
-    public static boolean isNumber(final String str) {
+    public static boolean isNumber(String str) {
         return isNumber(str, 10);
     }
 
-    public static boolean isNumber(final String str, final int radix) {
+    public static boolean isNumber(String str, int radix) {
         ParamUtil.requireNonNull("str", str);
         try {
             Integer.parseInt(str, radix);
@@ -119,7 +119,7 @@ public class StringUtil {
         }
     }
 
-    public static String formatText(final String text, final int minLen) {
+    public static String formatText(String text, int minLen) {
         ParamUtil.requireNonNull("text", text);
         int len = text.length();
         if (len >= minLen) {
@@ -134,12 +134,12 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static String formatAccount(final long account, final boolean withPrefix) {
+    public static String formatAccount(long account, boolean withPrefix) {
         int minLen = withPrefix ? 12 : 0;
         return formatAccount(account, minLen);
     }
 
-    public static String formatAccount(final long account, final int minLen) {
+    public static String formatAccount(long account, int minLen) {
         String accountS = Long.toString(account);
 
         final int n = accountS.length();
@@ -168,12 +168,12 @@ public class StringUtil {
         return formatText(accountS, minLen);
     }
 
-    public static String formatTime(final long seconds, final boolean withPrefix) {
+    public static String formatTime(long seconds, boolean withPrefix) {
         int minLen = withPrefix ? 12 : 0;
         return formatTime(seconds, minLen);
     }
 
-    private static String formatTime(final long seconds, final int minLen) {
+    private static String formatTime(long seconds, int minLen) {
         long minutes = seconds / 60;
 
         StringBuilder sb = new StringBuilder();

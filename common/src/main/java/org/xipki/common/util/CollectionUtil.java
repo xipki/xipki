@@ -35,23 +35,23 @@ public class CollectionUtil {
     private CollectionUtil() {
     }
 
-    public static boolean isEmpty(final Collection<?> col) {
+    public static boolean isEmpty(Collection<?> col) {
         return col == null || col.isEmpty();
     }
 
-    public static boolean isEmpty(final Map<?, ?> map) {
+    public static boolean isEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty();
     }
 
-    public static boolean isNonEmpty(final Collection<?> col) {
+    public static boolean isNonEmpty(Collection<?> col) {
         return col != null && !col.isEmpty();
     }
 
-    public static boolean isNonEmpty(final Map<?, ?> map) {
+    public static boolean isNonEmpty(Map<?, ?> map) {
         return map != null && !map.isEmpty();
     }
 
-    public static <K, V> Map<K, V> unmodifiableMap(final Map<? extends K, ? extends V> map) {
+    public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K, ? extends V> map) {
         if (map == null) {
             return Collections.emptyMap();
         }
@@ -59,7 +59,7 @@ public class CollectionUtil {
         return Collections.unmodifiableMap(map);
     }
 
-    public static List<String> toUpperCaseList(final List<String> list) {
+    public static List<String> toUpperCaseList(List<String> list) {
         if (list == null) {
             return list;
         }
@@ -71,7 +71,7 @@ public class CollectionUtil {
         return upperList;
     }
 
-    public static Set<String> toUpperCaseSet(final Set<String> set) {
+    public static Set<String> toUpperCaseSet(Set<String> set) {
         if (set == null) {
             return set;
         }
@@ -83,7 +83,7 @@ public class CollectionUtil {
         return upperSet;
     }
 
-    public static <T> Set<T> unmodifiableSet(final Set<? extends T> set) {
+    public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
         if (set == null) {
             return Collections.emptySet();
         }
@@ -91,7 +91,7 @@ public class CollectionUtil {
         return Collections.unmodifiableSet(set);
     }
 
-    public static <T> Collection<T> unmodifiableCollection(final Collection<? extends T> col) {
+    public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> col) {
         if (col == null) {
             return Collections.emptySet();
         }
@@ -99,7 +99,7 @@ public class CollectionUtil {
         return Collections.unmodifiableCollection(col);
     }
 
-    public static <T> List<T> unmodifiableList(final List<? extends T> list) {
+    public static <T> List<T> unmodifiableList(List<? extends T> list) {
         if (list == null) {
             return Collections.emptyList();
         }

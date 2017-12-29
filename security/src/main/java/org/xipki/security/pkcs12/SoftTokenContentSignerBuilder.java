@@ -91,13 +91,13 @@ public class SoftTokenContentSignerBuilder {
     // CHECKSTYLE:SKIP
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
-        private RSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId)
+        private RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
             throws NoSuchAlgorithmException, NoSuchPaddingException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
         }
 
-        protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
+        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+                throws OperatorCreationException {
             if (!AlgorithmUtil.isRSASigAlgId(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid RSA signature algirthm '"
@@ -123,14 +123,14 @@ public class SoftTokenContentSignerBuilder {
 
         private final boolean plain;
 
-        private DSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
-                final boolean plain) throws NoSuchAlgorithmException {
+        private DSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId, boolean plain)
+                throws NoSuchAlgorithmException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
             this.plain = plain;
         }
 
-        protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
+        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+                throws OperatorCreationException {
             if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid DSA signature algirthm '"
@@ -150,14 +150,14 @@ public class SoftTokenContentSignerBuilder {
 
         private final boolean plain;
 
-        private ECDSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
-                final boolean plain) throws NoSuchAlgorithmException {
+        private ECDSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId, boolean plain)
+                throws NoSuchAlgorithmException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
             this.plain = plain;
         }
 
-        protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
+        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+                throws OperatorCreationException {
             if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid EC signature algorithm '"
@@ -179,8 +179,8 @@ public class SoftTokenContentSignerBuilder {
             super(ALGID_SM2_SM3, ALGID_SM3);
         }
 
-        protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
+        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+                throws OperatorCreationException {
             if (!AlgorithmUtil.isSm2SigAlg(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid EC signature algorithm '"
@@ -198,17 +198,16 @@ public class SoftTokenContentSignerBuilder {
 
     private final X509Certificate[] certificateChain;
 
-    public SoftTokenContentSignerBuilder(final PrivateKey privateKey, final PublicKey publicKey)
+    public SoftTokenContentSignerBuilder(PrivateKey privateKey, PublicKey publicKey)
             throws XiSecurityException {
         this.key = ParamUtil.requireNonNull("privateKey", privateKey);
         this.publicKey = ParamUtil.requireNonNull("publicKey", publicKey);
         this.certificateChain = null;
     }
 
-    public SoftTokenContentSignerBuilder(final String keystoreType,
-            final InputStream keystoreStream, final char[] keystorePassword, final String keyname,
-            final char[] keyPassword, final X509Certificate[] certificateChain)
-            throws XiSecurityException {
+    public SoftTokenContentSignerBuilder(String keystoreType, InputStream keystoreStream,
+            char[] keystorePassword, String keyname, char[] keyPassword,
+            X509Certificate[] certificateChain) throws XiSecurityException {
         if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
@@ -274,9 +273,8 @@ public class SoftTokenContentSignerBuilder {
         }
     }
 
-    public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
-            final int parallelism, final SecureRandom random)
-            throws XiSecurityException, NoSuchPaddingException {
+    public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism,
+            SecureRandom random) throws XiSecurityException, NoSuchPaddingException {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 

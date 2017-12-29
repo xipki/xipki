@@ -52,13 +52,13 @@ public class Asn1ServerCaps extends ASN1Object {
 
     private final boolean readOnly;
 
-    public Asn1ServerCaps(final boolean readOnly, final Set<Short> versions) {
+    public Asn1ServerCaps(boolean readOnly, Set<Short> versions) {
         this.readOnly = readOnly;
         this.versions = Collections.unmodifiableSet(
                 ParamUtil.requireNonEmpty("versions", versions));
     }
 
-    private Asn1ServerCaps(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1ServerCaps(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         try {
             this.readOnly = ASN1Boolean.getInstance(seq.getObjectAt(0)).isTrue();
@@ -88,8 +88,7 @@ public class Asn1ServerCaps extends ASN1Object {
         this.versions = Collections.unmodifiableSet(tmpVersions);
     }
 
-    public static Asn1ServerCaps getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1ServerCaps getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1ServerCaps) {
             return (Asn1ServerCaps) obj;
         }

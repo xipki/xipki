@@ -59,8 +59,8 @@ public class Asn1GenSecretKeyParams extends ASN1Object {
 
     private final int keysize;
 
-    public Asn1GenSecretKeyParams(final P11SlotIdentifier slotId, final String label,
-            final P11NewKeyControl control, final long keyType, final int keysize) {
+    public Asn1GenSecretKeyParams(P11SlotIdentifier slotId, String label,
+            P11NewKeyControl control, long keyType, int keysize) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.control = ParamUtil.requireNonNull("control", control);
@@ -68,7 +68,7 @@ public class Asn1GenSecretKeyParams extends ASN1Object {
         this.keysize = ParamUtil.requireMin("keysize", keysize, 1);
     }
 
-    private Asn1GenSecretKeyParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1GenSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
@@ -79,8 +79,7 @@ public class Asn1GenSecretKeyParams extends ASN1Object {
         ParamUtil.requireMin("keysize", keysize, 1);
     }
 
-    public static Asn1GenSecretKeyParams getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1GenSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenSecretKeyParams) {
             return (Asn1GenSecretKeyParams) obj;
         }

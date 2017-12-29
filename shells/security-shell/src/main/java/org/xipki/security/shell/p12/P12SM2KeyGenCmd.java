@@ -42,8 +42,7 @@ public class P12SM2KeyGenCmd extends P12KeyGenAction {
     @Override
     protected Object execute0() throws Exception {
         P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(
-                GMObjectIdentifiers.sm2p256v1.getId(),
-                getKeyGenParameters(), subject);
+                GMObjectIdentifiers.sm2p256v1.getId(), getKeyGenParameters(), subject);
         saveKey(keypair);
 
         return null;

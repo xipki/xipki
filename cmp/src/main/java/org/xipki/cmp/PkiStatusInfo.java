@@ -34,19 +34,19 @@ public class PkiStatusInfo {
 
     private final String statusMessage;
 
-    public PkiStatusInfo(final int status, final int pkiFailureInfo, final String statusMessage) {
+    public PkiStatusInfo(int status, int pkiFailureInfo, String statusMessage) {
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;
     }
 
-    public PkiStatusInfo(final int status) {
+    public PkiStatusInfo(int status) {
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;
     }
 
-    public PkiStatusInfo(final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
+    public PkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
         ParamUtil.requireNonNull("bcPkiStatusInfo", bcPkiStatusInfo);
 
         this.status = bcPkiStatusInfo.getStatus().intValue();

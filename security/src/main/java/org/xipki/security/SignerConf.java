@@ -40,7 +40,7 @@ public class SignerConf {
 
     private final SignatureAlgoControl signatureAlgoControl;
 
-    public SignerConf(final String conf) {
+    public SignerConf(String conf) {
         this.hashAlgo = null;
         this.signatureAlgoControl = null;
         ParamUtil.requireNonBlank("conf", conf);
@@ -50,8 +50,8 @@ public class SignerConf {
         }
     }
 
-    public SignerConf(final String confWithoutAlgo, final HashAlgoType hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl) {
+    public SignerConf(String confWithoutAlgo, HashAlgoType hashAlgo,
+            SignatureAlgoControl signatureAlgoControl) {
         ParamUtil.requireNonBlank("confWithoutAlgo", confWithoutAlgo);
         this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         this.signatureAlgoControl = signatureAlgoControl;
@@ -69,11 +69,11 @@ public class SignerConf {
         return signatureAlgoControl;
     }
 
-    public void putConfEntry(final String name, final String value) {
+    public void putConfEntry(String name, String value) {
         confPairs.putPair(name, value);
     }
 
-    public void removeConfEntry(final String name) {
+    public void removeConfEntry(String name) {
         confPairs.removePair(name);
     }
 
@@ -90,7 +90,7 @@ public class SignerConf {
         return toString(true, true);
     }
 
-    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         String conf = getConf();
         if (ignoreSensitiveInfo) {
             conf = eraseSensitiveData(conf);
@@ -110,8 +110,7 @@ public class SignerConf {
         return sb.toString();
     }
 
-    public static String toString(final String signerConf, final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
+    public static String toString(String signerConf, boolean verbose, boolean ignoreSensitiveInfo) {
         String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
         if (ignoreSensitiveInfo) {
             tmpSignerConf = eraseSensitiveData(tmpSignerConf);
@@ -125,9 +124,8 @@ public class SignerConf {
         }
     }
 
-    public static SignerConf getKeystoreSignerConf(final InputStream keystoreStream,
-            final String password, final String signatureAlgorithm, final int parallelism)
-            throws IOException {
+    public static SignerConf getKeystoreSignerConf(InputStream keystoreStream,
+            String password, String signatureAlgorithm, int parallelism) throws IOException {
         ParamUtil.requireNonNull("keystoreStream", keystoreStream);
         ParamUtil.requireNonBlank("password", password);
         ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
@@ -140,9 +138,8 @@ public class SignerConf {
         return new SignerConf(conf.getEncoded());
     }
 
-    public static SignerConf getKeystoreSignerConf(final String keystoreFile, final String password,
-            final int parallelism, final HashAlgoType hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl) {
+    public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
+            int parallelism, HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
         ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
         ParamUtil.requireNonBlank("password", password);
         ParamUtil.requireMin("parallelism", parallelism, 1);
@@ -154,8 +151,8 @@ public class SignerConf {
         return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
     }
 
-    public static SignerConf getKeystoreSignerConf(final String keystoreFile, final String password,
-            final HashAlgoType hashAlgo, final SignatureAlgoControl signatureAlgoControl) {
+    public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
+            HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
         ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
         ParamUtil.requireNonBlank("password", password);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -166,10 +163,9 @@ public class SignerConf {
         return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
     }
 
-    public static SignerConf getPkcs11SignerConf(final String pkcs11ModuleName,
-            final Integer slotIndex, final Long slotId, final String keyLabel, final byte[] keyId,
-            final int parallelism, final HashAlgoType hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl) {
+    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+            Long slotId, String keyLabel, byte[] keyId, int parallelism, HashAlgoType hashAlgo,
+            SignatureAlgoControl signatureAlgoControl) {
         ParamUtil.requireMin("parallelism", parallelism, 1);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -208,9 +204,9 @@ public class SignerConf {
         return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
     }
 
-    public static SignerConf getPkcs11SignerConf(final String pkcs11ModuleName,
-            final Integer slotIndex, final Long slotId, final String keyLabel, final byte[] keyId,
-            final String signatureAlgorithm, final int parallelism) {
+    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+            Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm
+            , int parallelism) {
         ParamUtil.requireMin("parallelism", parallelism, 1);
         ParamUtil.requireNonNull("algo", signatureAlgorithm);
         if (slotIndex == null && slotId == null) {
@@ -248,7 +244,7 @@ public class SignerConf {
         return new SignerConf(conf.getEncoded());
     }
 
-    private static String eraseSensitiveData(final String conf) {
+    private static String eraseSensitiveData(String conf) {
         if (conf == null || !conf.contains("password?")) {
             return conf;
         }

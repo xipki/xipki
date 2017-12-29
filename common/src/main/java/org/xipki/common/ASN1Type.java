@@ -51,8 +51,7 @@ public abstract class ASN1Type {
         }
     }
 
-    public static int writeHeader(final byte tag, final int bodyLen,
-            final byte[] out, final int offset) {
+    public static int writeHeader(byte tag, int bodyLen, byte[] out, int offset) {
         int idx = offset;
         out[idx++] = tag;
         if (bodyLen <= 0x7F) {
@@ -79,8 +78,7 @@ public abstract class ASN1Type {
         return idx - offset;
     }
 
-    public static int writeGeneralizedTime(final Date time,
-            final byte[] out, final int offset) {
+    public static int writeGeneralizedTime(Date time, byte[] out, int offset) {
         OffsetDateTime offsetTime = time.toInstant().atOffset(ZoneOffset.UTC);
         int idx = offset;
         out[idx++] = 0x18;

@@ -240,11 +240,9 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
 
-    EmulatorP11Slot(final String moduleName, final File slotDir, final P11SlotIdentifier slotId,
-            final boolean readOnly, final char[] password,
-            final PrivateKeyCryptor privateKeyCryptor,
-            final P11MechanismFilter mechanismFilter, final int maxSessions)
-            throws P11TokenException {
+    EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
+            char[] password, PrivateKeyCryptor privateKeyCryptor,
+            P11MechanismFilter mechanismFilter, int maxSessions) throws P11TokenException {
         super(moduleName, slotId, readOnly, mechanismFilter);
 
         this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
@@ -325,7 +323,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
                             maxSessions, random);
                     LOG.info("added PKCS#11 secret key {}", p11ObjId);
                     ret.addIdentity(identity);
-                } catch (InvalidKeyException | ClassCastException ex) {
+                } catch (ClassCastException ex) {
                     LogUtil.warn(LOG, ex,
                             "InvalidKeyException while initializing key with key-id " + hexId);
                     continue;
@@ -412,7 +410,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return slotDir;
     }
 
-    private PublicKey readPublicKey(final byte[] keyId) throws P11TokenException {
+    private PublicKey readPublicKey(byte[] keyId) throws P11TokenException {
         String hexKeyId = Hex.toHexString(keyId);
         File pubKeyFile = new File(pubKeyDir, hexKeyId + INFO_FILE_SUFFIX);
         Properties props = loadProperties(pubKeyFile);
@@ -459,13 +457,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
-    private X509Cert readCertificate(final byte[] keyId) throws CertificateException, IOException {
+    private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
         byte[] encoded = IoUtil.read(new File(certDir, Hex.toHexString(keyId) + VALUE_FILE_SUFFIX));
         X509Certificate cert = X509Util.parseCert(encoded);
         return new X509Cert(cert, encoded);
     }
 
-    private Properties loadProperties(final File file) throws P11TokenException {
+    private Properties loadProperties(File file) throws P11TokenException {
         try {
             try (InputStream stream = new FileInputStream(file)) {
                 Properties props = new Properties();
@@ -478,7 +476,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
-    private static byte[] getKeyIdFromInfoFilename(final String fileName) {
+    private static byte[] getKeyIdFromInfoFilename(String fileName) {
         return Hex.decode(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
     }
 
@@ -487,11 +485,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
         LOG.info("close slot " + slotId);
     }
 
-    private boolean removePkcs11Cert(final P11ObjectIdentifier objectId) throws P11TokenException {
+    private boolean removePkcs11Cert(P11ObjectIdentifier objectId) throws P11TokenException {
         return removePkcs11Entry(certDir, objectId);
     }
 
-    private boolean removePkcs11Entry(final File dir, final P11ObjectIdentifier objectId)
+    private boolean removePkcs11Entry(File dir, P11ObjectIdentifier objectId)
             throws P11TokenException {
         byte[] id = objectId.id();
         String label = objectId.label();
@@ -533,7 +531,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return deleted;
     }
 
-    private static boolean deletePkcs11Entry(final File dir, final byte[] objectId) {
+    private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
         String hextId = Hex.toHexString(objectId);
         File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
         boolean b1 = true;
@@ -550,8 +548,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return b1 || b2;
     }
 
-    private int deletePkcs11Entry(final File dir, final byte[] id, final String label)
-            throws P11TokenException {
+    private int deletePkcs11Entry(File dir, byte[] id, String label) throws P11TokenException {
         if (StringUtil.isBlank(label)) {
             return deletePkcs11Entry(dir, id) ? 1 : 0;
         }
@@ -595,8 +592,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return ids.size();
     }
 
-    private void savePkcs11SecretKey(final byte[] id, final String label,
-            final SecretKey secretKey) throws P11TokenException {
+    private void savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
+            throws P11TokenException {
         byte[] encrytedValue;
         try {
             KeyStore ks = KeyStore.getInstance("JCEKS");
@@ -614,8 +611,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
         savePkcs11Entry(secKeyDir, id, label, encrytedValue);
     }
 
-    private void savePkcs11PrivateKey(final byte[] id, final String label,
-            final PrivateKey privateKey) throws P11TokenException {
+    private void savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
+            throws P11TokenException {
         PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
         byte[] encoded;
         try {
@@ -627,7 +624,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         savePkcs11Entry(privKeyDir, id, label, encoded);
     }
 
-    private void savePkcs11PublicKey(final byte[] id, final String label, final PublicKey publicKey)
+    private void savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
             throws P11TokenException {
         String hexId = Hex.toHexString(id).toLowerCase();
 
@@ -730,8 +727,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
-    private static void bigIntToBytes(final String numName, final BigInteger num, final byte[] dest,
-            final int destPos, final int length) throws P11TokenException {
+    private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos,
+            int length) throws P11TokenException {
         if (num.signum() != 1) {
             throw new P11TokenException(numName + " is not positive");
         }
@@ -745,13 +742,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
-    private void savePkcs11Cert(final byte[] id, final String label, final X509Certificate cert)
+    private void savePkcs11Cert(byte[] id, String label, X509Certificate cert)
             throws P11TokenException, CertificateException {
         savePkcs11Entry(certDir, id, label, cert.getEncoded());
     }
 
-    private static void savePkcs11Entry(final File dir, final byte[] id, final String label,
-            final byte[] value) throws P11TokenException {
+    private static void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
+            throws P11TokenException {
         ParamUtil.requireNonNull("dir", dir);
         ParamUtil.requireNonNull("id", id);
         ParamUtil.requireNonBlank("label", label);
@@ -773,7 +770,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    public int removeObjects(final byte[] id, final String label) throws P11TokenException {
+    public int removeObjects(byte[] id, String label) throws P11TokenException {
         if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
             throw new IllegalArgumentException("at least one of id and label must not be null");
         }
@@ -786,7 +783,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void removeIdentity0(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException {
         boolean b1 = removePkcs11Entry(certDir, objectId);
         boolean b2 = removePkcs11Entry(privKeyDir, objectId);
         boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
@@ -797,12 +794,12 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void removeCerts0(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
         deletePkcs11Entry(certDir, objectId.id());
     }
 
     @Override
-    protected void addCert0(final P11ObjectIdentifier objectId, final X509Certificate cert)
+    protected void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
             throws P11TokenException, CertificateException {
         savePkcs11Cert(objectId.id(), objectId.label(), cert);
     }
@@ -859,8 +856,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity generateRSAKeypair0(final int keysize, final BigInteger publicExponent,
-            final String label, P11NewKeyControl control) throws P11TokenException {
+    protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
+            String label, P11NewKeyControl control) throws P11TokenException {
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
@@ -873,9 +870,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     // CHECKSTYLE:OFF
-    protected P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
-            final BigInteger g, final String label, P11NewKeyControl control)
-            throws P11TokenException {
+    protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
+            String label, P11NewKeyControl control) throws P11TokenException {
     // CHECKSTYLE:ON
         DSAParameters dsaParams = new DSAParameters(p, q, g);
         KeyPair keypair;
@@ -889,14 +885,14 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity generateSM2Keypair0(
-            final String label, P11NewKeyControl control) throws P11TokenException {
+    protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
+            throws P11TokenException {
         return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
     }
 
     @Override
-    protected P11Identity generateECKeypair0(final ASN1ObjectIdentifier curveId,
-            final String label, P11NewKeyControl control) throws P11TokenException {
+    protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
+            String label, P11NewKeyControl control) throws P11TokenException {
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(), random);
@@ -907,8 +903,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return saveP11Entity(keypair, label);
     }
 
-    private P11Identity saveP11Entity(final KeyPair keypair, final String label)
-            throws P11TokenException {
+    private P11Identity saveP11Entity(KeyPair keypair, String label) throws P11TokenException {
         byte[] id = generateId();
         savePkcs11PrivateKey(id, label, keypair.getPrivate());
         savePkcs11PublicKey(id, label, keypair.getPublic());
@@ -923,23 +918,17 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
-    private P11Identity saveP11Entity(final SecretKey key, final String label)
-            throws P11TokenException {
+    private P11Identity saveP11Entity(SecretKey key, String label) throws P11TokenException {
         byte[] id = generateId();
         savePkcs11SecretKey(id, label, key);
         P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
                 new P11ObjectIdentifier(id, label));
-        try {
-            return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
-            throw new P11TokenException(
-                    "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
-        }
+        return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
     }
 
     @Override
-    protected void updateCertificate0(final P11ObjectIdentifier objectId,
-            final X509Certificate newCert)
+    protected void updateCertificate0(P11ObjectIdentifier objectId,
+            X509Certificate newCert)
             throws P11TokenException, CertificateException {
         removePkcs11Cert(objectId);
         addCert0(objectId, newCert);

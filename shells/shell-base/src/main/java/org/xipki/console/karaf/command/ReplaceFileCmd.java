@@ -75,8 +75,7 @@ public class ReplaceFileCmd extends XiAction {
         return null;
     }
 
-    private void replaceFile(final File file, final String oldText, final String newText)
-            throws Exception {
+    private void replaceFile(File file, String oldText, String newText) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();

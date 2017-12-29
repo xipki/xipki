@@ -117,7 +117,7 @@ public class P11ECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
     } // class SHA3_512
 
-    private P11ECDSASignatureSpi(final HashAlgoType hashAlgo) {
+    private P11ECDSASignatureSpi(HashAlgoType hashAlgo) {
         super(hashAlgo, false);
     }
 

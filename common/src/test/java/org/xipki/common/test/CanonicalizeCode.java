@@ -67,7 +67,7 @@ public class CanonicalizeCode {
         this.baseDirLen = this.baseDir.length();
     }
 
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         if (initializationError != null) {
             initializationError.printStackTrace();
             return;
@@ -90,7 +90,7 @@ public class CanonicalizeCode {
         canonicalizeDir(new File(baseDir), true);
     }
 
-    private void canonicalizeDir(final File dir, boolean root) throws Exception {
+    private void canonicalizeDir(File dir, boolean root) throws Exception {
         if (!root) {
             // skip git submodules
             if (new File(dir, ".git").exists()) {
@@ -121,7 +121,7 @@ public class CanonicalizeCode {
         }
     } // method canonicalizeDir
 
-    private void canonicalizeFile(final File file) throws Exception {
+    private void canonicalizeFile(File file) throws Exception {
         byte[] newLine = detectNewline(file);
 
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -192,7 +192,7 @@ public class CanonicalizeCode {
         checkWarningsInDir(new File(baseDir), true);
     }
 
-    private void checkWarningsInDir(final File dir, boolean root) throws Exception {
+    private void checkWarningsInDir(File dir, boolean root) throws Exception {
         if (!root) {
             // skip git submodules
             if (new File(dir, ".git").exists()) {
@@ -226,7 +226,7 @@ public class CanonicalizeCode {
         }
     } // method checkWarningsInDir
 
-    private void checkWarningsInFile(final File file) throws Exception {
+    private void checkWarningsInFile(File file) throws Exception {
         if (file.getName().equals("package-info.java")) {
             return;
         }
@@ -273,7 +273,7 @@ public class CanonicalizeCode {
     /**
      * replace tab by 4 spaces, delete white spaces at the end.
      */
-    private static String canonicalizeLine(final String line) {
+    private static String canonicalizeLine(String line) {
         if (line.trim().startsWith("//")) {
             // comments
             String nline = line.replace("\t", "    ");
@@ -315,7 +315,7 @@ public class CanonicalizeCode {
         return ret;
     } // end canonicalizeLine
 
-    private static String removeTrailingSpaces(final String line) {
+    private static String removeTrailingSpaces(String line) {
         final int n = line.length();
         int idx;
         for (idx = n - 1; idx >= 0; idx--) {

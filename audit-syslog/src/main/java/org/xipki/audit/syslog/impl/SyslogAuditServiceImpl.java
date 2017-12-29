@@ -105,7 +105,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     }
 
     @Override
-    protected void logEvent0(final AuditEvent event) {
+    protected void logEvent0(AuditEvent event) {
         if (!initialized) {
             LOG.error("syslog audit not initialized");
             return;
@@ -168,7 +168,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     } // method logEvent(AuditEvent)
 
     @Override
-    protected void logEvent0(final PciAuditEvent event) {
+    protected void logEvent0(PciAuditEvent event) {
         if (!initialized) {
             LOG.error("syslog audit not initialiazed");
             return;
@@ -267,36 +267,36 @@ public class SyslogAuditServiceImpl extends AuditService {
         LOG.info("destroyed: {}", SyslogAuditServiceImpl.class);
     }
 
-    public void setFacility(final String facility) {
+    public void setFacility(String facility) {
         this.facility = facility;
     }
 
-    public void setHost(final String host) {
+    public void setHost(String host) {
         this.host = Objects.requireNonNull(host, "host must not be null");
     }
 
-    public void setPort(final int port) {
+    public void setPort(int port) {
         this.port = port;
     }
 
-    public void setProtocol(final String protocol) {
+    public void setProtocol(String protocol) {
         this.protocol = Objects.requireNonNull(protocol, "protocol must not be null");
     }
 
-    public void setLocalname(final String localname) {
+    public void setLocalname(String localname) {
         this.localname = localname;
     }
 
-    public void setMessageFormat(final String messageFormat) {
+    public void setMessageFormat(String messageFormat) {
         this.messageFormat = Objects.requireNonNull(messageFormat,
                 "messageFormat must not be null");
     }
 
-    public void setWriteRetries(final int writeRetries) {
+    public void setWriteRetries(int writeRetries) {
         this.writeRetries = writeRetries;
     }
 
-    public void setPrefix(final String prefix) {
+    public void setPrefix(String prefix) {
         if (notEmpty(prefix)) {
             if (prefix.charAt(prefix.length() - 1) != ' ') {
                 this.prefix = prefix + " ";
@@ -306,19 +306,19 @@ public class SyslogAuditServiceImpl extends AuditService {
         }
     }
 
-    public void setMaxMessageLength(final int maxMessageLength) {
+    public void setMaxMessageLength(int maxMessageLength) {
         this.maxMessageLength = (maxMessageLength <= 0) ? 1023 : maxMessageLength;
     }
 
-    public void setSsl(final boolean ssl) {
+    public void setSsl(boolean ssl) {
         this.ssl = ssl;
     }
 
-    private static boolean notEmpty(final String text) {
+    private static boolean notEmpty(String text) {
         return text != null && !text.isEmpty();
     }
 
-    private static Severity getSeverity(final AuditLevel auditLevel) {
+    private static Severity getSeverity(AuditLevel auditLevel) {
         if (auditLevel == null) {
             return Severity.INFORMATIONAL;
         }

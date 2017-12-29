@@ -44,16 +44,14 @@ class IaikP11Identity extends P11Identity {
 
     private final int expectedSignatureLen;
 
-    IaikP11Identity(final IaikP11Slot slot, final P11EntityIdentifier identityId,
-            final SecretKey signingKey) {
+    IaikP11Identity(IaikP11Slot slot, P11EntityIdentifier identityId, SecretKey signingKey) {
         super(slot, identityId, 0);
         this.signingKey = ParamUtil.requireNonNull("signingKey", signingKey);
         this.expectedSignatureLen = 0;
     }
 
-    IaikP11Identity(final IaikP11Slot slot, final P11EntityIdentifier identityId,
-            final PrivateKey privateKey, final PublicKey publicKey,
-            final X509Certificate[] certificateChain) {
+    IaikP11Identity(IaikP11Slot slot, P11EntityIdentifier identityId, PrivateKey privateKey,
+            PublicKey publicKey, X509Certificate[] certificateChain) {
         super(slot, identityId, publicKey, certificateChain);
         this.signingKey = ParamUtil.requireNonNull("privateKey", privateKey);
 
@@ -73,8 +71,7 @@ class IaikP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] digestSecretKey0(long mechanism)
-            throws P11TokenException {
+    protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
         if (! (signingKey instanceof SecretKey)) {
             throw new P11TokenException("could not digest asymmetric key");
         }
@@ -93,7 +90,7 @@ class IaikP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] sign0(final long mechanism, final P11Params parameters, final byte[] content)
+    protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
             throws P11TokenException {
         return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
     }

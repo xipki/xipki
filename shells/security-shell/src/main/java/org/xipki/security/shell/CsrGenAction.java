@@ -347,7 +347,7 @@ public abstract class CsrGenAction extends SecurityAction {
         return null;
     } // method execute0
 
-    protected X500Name getSubject(final String subjectText) {
+    protected X500Name getSubject(String subjectText) {
         ParamUtil.requireNonBlank("subjectText", subjectText);
         return new X500Name(subjectText);
     }
@@ -375,7 +375,7 @@ public abstract class CsrGenAction extends SecurityAction {
     }
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-            final List<String> oidTexts) throws InvalidOidOrNameException {
+            List<String> oidTexts) throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
         }
@@ -394,7 +394,7 @@ public abstract class CsrGenAction extends SecurityAction {
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOid(final String str) throws InvalidOidOrNameException {
+    private static ASN1ObjectIdentifier toOid(String str) throws InvalidOidOrNameException {
         final int n = str.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {
@@ -418,9 +418,9 @@ public abstract class CsrGenAction extends SecurityAction {
         return oid;
     }
 
-    private PKCS10CertificationRequest generateRequest(final ConcurrentContentSigner signer,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) throws XiSecurityException {
+    private PKCS10CertificationRequest generateRequest(ConcurrentContentSigner signer,
+            SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+            Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) throws XiSecurityException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);

@@ -46,7 +46,7 @@ public abstract class P12KeyGenAction extends KeyGenAction {
             description = "password of the keystore file")
     protected String password;
 
-    protected void saveKey(final P12KeyGenerationResult keyGenerationResult) throws IOException {
+    protected void saveKey(P12KeyGenerationResult keyGenerationResult) throws IOException {
         ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
         File p12File = new File(keyOutFile);
         saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.keystore());

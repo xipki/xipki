@@ -39,14 +39,14 @@ public class ConfPairs {
 
     private final Map<String, String> pairs = new HashMap<>();
 
-    public ConfPairs(final String name, final String value) {
+    public ConfPairs(String name, String value) {
         putPair(name, value);
     }
 
     public ConfPairs() {
     }
 
-    public ConfPairs(final String confPairs) {
+    public ConfPairs(String confPairs) {
         ParamUtil.requireNonBlank("confPairs", confPairs);
         int len = confPairs.length();
         List<String> tokens = new LinkedList<>();
@@ -146,7 +146,7 @@ public class ConfPairs {
         }
     } // constructor
 
-    public void putPair(final String name, final String value) {
+    public void putPair(String name, String value) {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("value", value);
 
@@ -157,12 +157,12 @@ public class ConfPairs {
         pairs.put(name, value);
     }
 
-    public void removePair(final String name) {
+    public void removePair(String name) {
         ParamUtil.requireNonNull("name", name);
         pairs.remove(name);
     }
 
-    public String value(final String name) {
+    public String value(String name) {
         ParamUtil.requireNonNull("name", name);
         return pairs.get(name);
     }
@@ -213,7 +213,7 @@ public class ConfPairs {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof ConfPairs)) {
             return false;
         }
@@ -222,7 +222,7 @@ public class ConfPairs {
         return pairs.equals(cp.pairs);
     }
 
-    private static String encodeNameOrValue(final String str) {
+    private static String encodeNameOrValue(String str) {
         if (str.indexOf(NAME_TERM) == -1 && str.indexOf(TOKEN_TERM) == -1) {
             return str;
         }

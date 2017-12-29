@@ -160,7 +160,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
         private boolean oddTime = true;
 
-        NullPssDigest(final Digest mgfDigest) {
+        NullPssDigest(Digest mgfDigest) {
             this.baseDigest = mgfDigest;
         }
 
@@ -175,17 +175,17 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
         }
 
         @Override
-        public void update(final byte in) {
+        public void update(byte in) {
             baOut.write(in);
         }
 
         @Override
-        public void update(final byte[] in, final int inOff, final int len) {
+        public void update(byte[] in, int inOff, int len) {
             baOut.write(in, inOff, len);
         }
 
         @Override
-        public int doFinal(final byte[] out, final int outOff) {
+        public int doFinal(byte[] out, int outOff) {
             byte[] res = baOut.toByteArray();
 
             if (oddTime) {
@@ -230,11 +230,11 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     private org.bouncycastle.crypto.signers.PSSSigner pss;
 
-    protected P11RSAPSSSignatureSpi(final PSSParameterSpec paramSpecArg) {
+    protected P11RSAPSSSignatureSpi(PSSParameterSpec paramSpecArg) {
         this(paramSpecArg, false);
     }
 
-    protected P11RSAPSSSignatureSpi(final PSSParameterSpec baseParamSpec, final boolean isRaw) {
+    protected P11RSAPSSSignatureSpi(PSSParameterSpec baseParamSpec, boolean isRaw) {
         this.originalSpec = baseParamSpec;
         this.paramSpec = (baseParamSpec == null) ? PSSParameterSpec.DEFAULT : baseParamSpec;
         this.mgfDigest = DigestFactory.getDigest(paramSpec.getDigestAlgorithm());
@@ -245,11 +245,11 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
         setupContentDigest();
     }
 
-    protected void engineInitVerify(final PublicKey publicKey) throws InvalidKeyException {
+    protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
-    protected void engineInitSign(final PrivateKey privateKey, final SecureRandom random)
+    protected void engineInitSign(PrivateKey privateKey, SecureRandom random)
             throws InvalidKeyException {
         if (!(privateKey instanceof P11PrivateKey)) {
             throw new InvalidKeyException("privateKey is not instanceof "
@@ -276,18 +276,17 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineInitSign(final PrivateKey privateKey) throws InvalidKeyException {
+    protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
         engineInitSign(privateKey, null);
     }
 
     @Override
-    protected void engineUpdate(final byte input) throws SignatureException {
+    protected void engineUpdate(byte input) throws SignatureException {
         pss.update(input);
     }
 
     @Override
-    protected void engineUpdate(final byte[] input, final int off, final int len)
-            throws SignatureException {
+    protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
         pss.update(input, off, len);
     }
 
@@ -301,12 +300,12 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected boolean engineVerify(final byte[] sigBytes) throws SignatureException {
+    protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     @Override
-    protected void engineSetParameter(final AlgorithmParameterSpec params)
+    protected void engineSetParameter(AlgorithmParameterSpec params)
             throws InvalidParameterException {
         if (params instanceof PSSParameterSpec) {
             PSSParameterSpec newParamSpec = (PSSParameterSpec) params;
@@ -356,7 +355,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     } // method engineSetParameter
 
     @Override
-    protected void engineSetParameter(final String param, final Object value) {
+    protected void engineSetParameter(String param, Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
@@ -377,11 +376,11 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected Object engineGetParameter(final String param) {
+    protected Object engineGetParameter(String param) {
         throw new UnsupportedOperationException("engineGetParameter unsupported");
     }
 
-    private byte getTrailer(final int trailerField) {
+    private byte getTrailer(int trailerField) {
         if (trailerField == 1) {
             return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
         }

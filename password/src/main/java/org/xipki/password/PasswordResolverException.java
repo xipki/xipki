@@ -29,15 +29,15 @@ public class PasswordResolverException extends Exception {
     public PasswordResolverException() {
     }
 
-    public PasswordResolverException(final String message) {
+    public PasswordResolverException(String message) {
         super(message);
     }
 
-    public PasswordResolverException(final Throwable cause) {
+    public PasswordResolverException(Throwable cause) {
         super(cause);
     }
 
-    public PasswordResolverException(final String message, final Throwable cause) {
+    public PasswordResolverException(String message, Throwable cause) {
         super(message, cause);
     }
 

@@ -36,7 +36,7 @@ public abstract class AuditService {
      * @param event
      *          Audit event. Must not be {@code null}-
      */
-    public final void logEvent(AuditEvent event) {
+    public void logEvent(AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
         /*
@@ -62,7 +62,7 @@ public abstract class AuditService {
      * @param event
      *          Audit event. Must not be {@code null}-
      */
-    public final void logEvent(PciAuditEvent event) {
+    public void logEvent(PciAuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
         /*
@@ -85,7 +85,7 @@ public abstract class AuditService {
         logEvent0(event);
     }
 
-    protected static String createMessage(final AuditEvent event) {
+    protected static String createMessage(AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
         String applicationName = event.applicationName();
         if (applicationName == null) {

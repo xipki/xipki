@@ -76,10 +76,9 @@ class P11SM2ContentSigner implements XiContentSigner {
         hashMechMap.put(HashAlgoType.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
     }
 
-    P11SM2ContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
-            final AlgorithmIdentifier signatureAlgId, final ASN1ObjectIdentifier curveOid,
-            final BigInteger pubPointX, final BigInteger pubPointY)
-            throws XiSecurityException, P11TokenException {
+    P11SM2ContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+            AlgorithmIdentifier signatureAlgId, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
+            BigInteger pubPointY) throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);

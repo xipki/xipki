@@ -32,8 +32,7 @@ public class OBFPasswordCallback implements PasswordCallback {
     private char[] password;
 
     @Override
-    public char[] getPassword(final String prompt, final String testToken)
-            throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
         if (password == null) {
             throw new PasswordResolverException("please initialize me first");
         }
@@ -42,7 +41,7 @@ public class OBFPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(final String conf) throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
     }

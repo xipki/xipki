@@ -81,9 +81,8 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     private final P11MechanismFilter mechanismFilter;
 
-    protected AbstractP11Slot(final String moduleName, final P11SlotIdentifier slotId,
-            final boolean readOnly, final P11MechanismFilter mechanismFilter)
-            throws P11TokenException {
+    protected AbstractP11Slot(String moduleName, P11SlotIdentifier slotId, boolean readOnly,
+            P11MechanismFilter mechanismFilter) throws P11TokenException {
         this.mechanismFilter = ParamUtil.requireNonNull("mechanismFilter", mechanismFilter);
         this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
@@ -97,18 +96,18 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Data to be encoded. Must not be {@code null}.
      * @return the hex representation of the bytes.
      */
-    protected static String hex(final byte[] bytes) {
+    protected static String hex(byte[] bytes) {
         return Hex.toHexString(bytes).toUpperCase();
     }
 
-    protected static String getDescription(final byte[] keyId, final char[] keyLabel) {
+    protected static String getDescription(byte[] keyId, char[] keyLabel) {
         StringBuilder sb = new StringBuilder();
         sb.append("id ").append((keyId == null) ? "null" : Hex.toHexString(keyId));
         sb.append(" and label ").append((keyLabel == null) ? "null" : new String(keyLabel));
         return sb.toString();
     }
 
-    protected static String getDescription(final byte[] keyId, final String keyLabel) {
+    protected static String getDescription(byte[] keyId, String keyLabel) {
         StringBuilder sb = new StringBuilder();
         sb.append("id ").append((keyId == null) ? "null" : Hex.toHexString(keyId));
         sb.append(" and label ").append(keyLabel);
@@ -128,8 +127,8 @@ public abstract class AbstractP11Slot implements P11Slot {
      * @throws P11TokenException
      *         if PKCS#11 token exception occurs.
      */
-    protected abstract void updateCertificate0(final P11ObjectIdentifier objectId,
-            final X509Certificate newCert) throws P11TokenException, CertificateException;
+    protected abstract void updateCertificate0(P11ObjectIdentifier objectId,
+            X509Certificate newCert) throws P11TokenException, CertificateException;
 
     /**
      * Removes the key (private key, public key, secret key, and certificates) associated with
@@ -154,8 +153,8 @@ public abstract class AbstractP11Slot implements P11Slot {
      * @throws P11TokenException
      *         if PKCS#11 token exception occurs.
      */
-    protected abstract void addCert0(final P11ObjectIdentifier objectId,
-            final X509Certificate cert) throws P11TokenException, CertificateException;
+    protected abstract void addCert0(P11ObjectIdentifier objectId,
+            X509Certificate cert) throws P11TokenException, CertificateException;
 
     /**
      * Generates a secret key in the PKCS#11 token.
@@ -212,8 +211,8 @@ public abstract class AbstractP11Slot implements P11Slot {
      *         if PKCS#11 token exception occurs.
      */
     // CHECKSTYLE:OFF
-    protected abstract P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
-            final BigInteger g, final String label, P11NewKeyControl control)
+    protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q,
+            BigInteger g, String label, P11NewKeyControl control)
             throws P11TokenException;
     // CHECKSTYLE:ON
 
@@ -246,8 +245,8 @@ public abstract class AbstractP11Slot implements P11Slot {
      *         if PKCS#11 token exception occurs.
      */
     // CHECKSTYLE:SKIP
-    protected abstract P11Identity generateSM2Keypair0(
-            String label, P11NewKeyControl control) throws P11TokenException;
+    protected abstract P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
+            throws P11TokenException;
 
     /**
      *
@@ -266,15 +265,12 @@ public abstract class AbstractP11Slot implements P11Slot {
      *         if PKCS#11 token exception occurs.
      */
     // CHECKSTYLE:SKIP
-    protected abstract P11Identity generateRSAKeypair0(int keysize,
-            BigInteger publicExponent, String label, P11NewKeyControl control)
-            throws P11TokenException;
+    protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
+            String label, P11NewKeyControl control) throws P11TokenException;
 
-    protected abstract P11SlotRefreshResult refresh0()
-            throws P11TokenException;
+    protected abstract P11SlotRefreshResult refresh0() throws P11TokenException;
 
-    protected abstract void removeCerts0(final P11ObjectIdentifier objectId)
-            throws P11TokenException;
+    protected abstract void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException;
 
     /**
      * Gets certificate with the given identifier {@code id}.
@@ -282,7 +278,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Identifier of the certificate. Must not be {@code null}.
      * @return certificate with the given identifier.
      */
-    protected X509Cert getCertForId(final byte[] id) {
+    protected X509Cert getCertForId(byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
             if (objId.matchesId(id)) {
                 return certificates.get(objId);
@@ -297,7 +293,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    private void updateCaCertsOfIdentity(final P11Identity identity) {
+    private void updateCaCertsOfIdentity(P11Identity identity) {
         X509Certificate[] certchain = identity.certificateChain();
         if (certchain == null || certchain.length == 0) {
             return;
@@ -313,7 +309,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    private X509Certificate[] buildCertPath(final X509Certificate cert) {
+    private X509Certificate[] buildCertPath(X509Certificate cert) {
         List<X509Certificate> certs = new LinkedList<>();
         X509Certificate cur = cert;
         while (cur != null) {
@@ -323,7 +319,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         return certs.toArray(new X509Certificate[0]);
     }
 
-    private X509Certificate getIssuerForCert(final X509Certificate cert) {
+    private X509Certificate getIssuerForCert(X509Certificate cert) {
         try {
             if (X509Util.isSelfSigned(cert)) {
                 return null;
@@ -417,7 +413,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    protected void addIdentity(final P11Identity identity) throws P11DuplicateEntityException {
+    protected void addIdentity(P11Identity identity) throws P11DuplicateEntityException {
         if (!slotId.equals(identity.identityId().slotId())) {
             throw new IllegalArgumentException("invalid identity");
         }
@@ -432,7 +428,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public boolean hasIdentity(final P11ObjectIdentifier objectId) {
+    public boolean hasIdentity(P11ObjectIdentifier objectId) {
         return identities.containsKey(objectId);
     }
 
@@ -442,12 +438,12 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public boolean supportsMechanism(final long mechanism) {
+    public boolean supportsMechanism(long mechanism) {
         return mechanisms.contains(mechanism);
     }
 
     @Override
-    public void assertMechanismSupported(final long mechanism)
+    public void assertMechanismSupported(long mechanism)
             throws P11UnsupportedMechanismException {
         if (!mechanisms.contains(mechanism)) {
             throw new P11UnsupportedMechanismException(mechanism, slotId);
@@ -480,8 +476,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11Identity getIdentity(final P11ObjectIdentifier objectId)
-            throws P11UnknownEntityException {
+    public P11Identity getIdentity(P11ObjectIdentifier objectId) throws P11UnknownEntityException {
         P11Identity ident = identities.get(objectId);
         if (ident == null) {
             throw new P11UnknownEntityException(slotId, objectId);
@@ -490,7 +485,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier getObjectIdForId(final byte[] id) {
+    public P11ObjectIdentifier getObjectIdForId(byte[] id) {
         for (P11ObjectIdentifier objectId : identities.keySet()) {
             if (objectId.matchesId(id)) {
                 return objectId;
@@ -507,7 +502,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier getObjectIdForLabel(final String label) {
+    public P11ObjectIdentifier getObjectIdForLabel(String label) {
         for (P11ObjectIdentifier objectId : identities.keySet()) {
             if (objectId.label().equals(label)) {
                 return objectId;
@@ -524,7 +519,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public X509Certificate exportCert(final P11ObjectIdentifier objectId)
+    public X509Certificate exportCert(P11ObjectIdentifier objectId)
             throws P11TokenException, CertificateException {
         ParamUtil.requireNonNull("objectId", objectId);
         try {
@@ -541,7 +536,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public void removeCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
+    public void removeCerts(P11ObjectIdentifier objectId) throws P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         assertWritable("removeCerts");
 
@@ -559,7 +554,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public void removeIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
+    public void removeIdentity(P11ObjectIdentifier objectId) throws P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         assertWritable("removeIdentity");
 
@@ -574,7 +569,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier addCert(final X509Certificate cert)
+    public P11ObjectIdentifier addCert(X509Certificate cert)
             throws P11TokenException, CertificateException {
         ParamUtil.requireNonNull("cert", cert);
         assertWritable("addCert");
@@ -596,7 +591,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public void addCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
+    public void addCert(P11ObjectIdentifier objectId, X509Certificate cert)
             throws P11TokenException, CertificateException {
         addCert0(objectId, cert);
         certificates.put(objectId, new X509Cert(cert));
@@ -632,7 +627,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    protected String generateLabel(final String label) throws P11TokenException {
+    protected String generateLabel(String label) throws P11TokenException {
 
         String tmpLabel = label;
         int idx = 0;
@@ -702,9 +697,8 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier generateRSAKeypair(final int keysize,
-            final BigInteger publicExponent, final String label, P11NewKeyControl control)
-            throws P11TokenException {
+    public P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
+            String label, P11NewKeyControl control) throws P11TokenException {
         ParamUtil.requireNonBlank("label", label);
         ParamUtil.requireMin("keysize", keysize, 1024);
         if (keysize % 1024 != 0) {
@@ -730,8 +724,8 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier generateDSAKeypair(final int plength, final int qlength,
-            final String label, P11NewKeyControl control) throws P11TokenException {
+    public P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, String label,
+            P11NewKeyControl control) throws P11TokenException {
         ParamUtil.requireMin("plength", plength, 1024);
         if (plength % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
@@ -755,9 +749,8 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     // CHECKSTYLE:OFF
-    public P11ObjectIdentifier generateDSAKeypair(final BigInteger p, final BigInteger q,
-            final BigInteger g, final String label, P11NewKeyControl control)
-            throws P11TokenException {
+    public P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
+            String label, P11NewKeyControl control) throws P11TokenException {
     // CHECKSTYLE:ON
         ParamUtil.requireNonBlank("label", label);
         ParamUtil.requireNonNull("p", p);
@@ -778,9 +771,8 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier generateECKeypair(final String curveNameOrOid, final String label,
-            P11NewKeyControl control)
-            throws P11TokenException {
+    public P11ObjectIdentifier generateECKeypair(String curveNameOrOid, String label,
+            P11NewKeyControl control) throws P11TokenException {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateECKeypair");
@@ -802,7 +794,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier generateSM2Keypair(final String label, P11NewKeyControl control)
+    public P11ObjectIdentifier generateSM2Keypair(String label, P11NewKeyControl control)
             throws P11TokenException {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateSM2Keypair");
@@ -820,7 +812,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public void updateCertificate(final P11ObjectIdentifier objectId, final X509Certificate newCert)
+    public void updateCertificate(P11ObjectIdentifier objectId, X509Certificate newCert)
             throws P11TokenException, CertificateException {
         ParamUtil.requireNonNull("objectId", objectId);
         ParamUtil.requireNonNull("newCert", newCert);
@@ -844,7 +836,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public void showDetails(final OutputStream stream, final boolean verbose)
+    public void showDetails(OutputStream stream, boolean verbose)
             throws IOException, P11TokenException {
         ParamUtil.requireNonNull("stream", stream);
 
@@ -897,14 +889,14 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    protected void assertWritable(final String operationName) throws P11PermissionException {
+    protected void assertWritable(String operationName) throws P11PermissionException {
         if (readOnly) {
             throw new P11PermissionException("Operation " + operationName + " is not permitted");
         }
     }
 
-    private static void formatString(final Integer index, final boolean verbose,
-            final StringBuilder sb, final X509Certificate cert) {
+    private static void formatString(Integer index, boolean verbose, StringBuilder sb,
+            X509Certificate cert) {
         String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
         sb.append("\t\tCertificate");
         if (index != null) {

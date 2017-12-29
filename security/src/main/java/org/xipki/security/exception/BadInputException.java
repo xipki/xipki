@@ -29,15 +29,15 @@ public class BadInputException extends Exception {
     public BadInputException() {
     }
 
-    public BadInputException(final String message) {
+    public BadInputException(String message) {
         super(message);
     }
 
-    public BadInputException(final Throwable cause) {
+    public BadInputException(Throwable cause) {
         super(cause);
     }
 
-    public BadInputException(final String message, final Throwable cause) {
+    public BadInputException(String message, Throwable cause) {
         super(message, cause);
     }
 

@@ -59,12 +59,11 @@ public abstract class XiAction implements Action {
         }
     }
 
-    protected boolean isTrue(final Boolean bo) {
+    protected boolean isTrue(Boolean bo) {
         return bo != null && bo.booleanValue();
     }
 
-    protected void saveVerbose(final String promptPrefix, final File file, final byte[] encoded)
-            throws IOException {
+    protected void saveVerbose(String promptPrefix, File file, byte[] encoded) throws IOException {
         File saveTo = expandFilepath(file);
 
         if (saveTo.exists()) {
@@ -137,7 +136,7 @@ public abstract class XiAction implements Action {
         println(tmpPromptPrefix + " " + saveTo.getPath());
     } // method saveVerbose
 
-    protected void save(final File file, final byte[] encoded) throws IOException {
+    protected void save(File file, byte[] encoded) throws IOException {
         File tmpFile = expandFilepath(file);
         File parent = tmpFile.getParentFile();
         if (parent != null) {
@@ -158,19 +157,18 @@ public abstract class XiAction implements Action {
         }
     }
 
-    private static String randomHex(final int numOfBytes) {
+    private static String randomHex(int numOfBytes) {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[numOfBytes];
         random.nextBytes(bytes);
         return new BigInteger(1, bytes).toString(16);
     }
 
-    protected static boolean isEnabled(final String enabledS, final boolean defaultEnabled,
-            final String optionName) {
+    protected static boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName) {
         return (enabledS == null) ? defaultEnabled : isEnabled(enabledS, optionName);
     }
 
-    private static boolean isEnabled(final String enabledS, final String optionName) {
+    private static boolean isEnabled(String enabledS, String optionName) {
         if ("yes".equalsIgnoreCase(enabledS)
                 || "enabled".equalsIgnoreCase(enabledS)
                 || "true".equalsIgnoreCase(enabledS)) {
@@ -184,7 +182,7 @@ public abstract class XiAction implements Action {
         }
     }
 
-    protected String readPrompt(final String prompt) throws IOException {
+    protected String readPrompt(String prompt) throws IOException {
         String tmpPrompt = prompt;
         if (StringUtil.isNotBlank(prompt)) {
             if (!prompt.endsWith(" ")) {
@@ -194,12 +192,11 @@ public abstract class XiAction implements Action {
         return readLine(tmpPrompt, null);
     }
 
-    protected char[] readPasswordIfNotSet(final String password) throws IOException {
+    protected char[] readPasswordIfNotSet(String password) throws IOException {
         return readPasswordIfNotSet(null, password);
     }
 
-    protected char[] readPasswordIfNotSet(final String prompt, final String password)
-            throws IOException {
+    protected char[] readPasswordIfNotSet(String prompt, String password) throws IOException {
         if (password != null) {
             return password.toCharArray();
         }
@@ -211,7 +208,7 @@ public abstract class XiAction implements Action {
         return readPassword(null);
     }
 
-    protected char[] readPassword(final String prompt) throws IOException {
+    protected char[] readPassword(String prompt) throws IOException {
         String tmpPrompt = (prompt == null) ? "Password:" : prompt.trim();
 
         if (!tmpPrompt.endsWith(":")) {
@@ -238,47 +235,47 @@ public abstract class XiAction implements Action {
         }
     }
 
-    protected static String expandFilepath(final String path) {
+    protected static String expandFilepath(String path) {
         return IoUtil.expandFilepath(path);
     }
 
-    protected static File expandFilepath(final File file) {
+    protected static File expandFilepath(File file) {
         return IoUtil.expandFilepath(file);
     }
 
-    protected void println(final String message) {
+    protected void println(String message) {
         System.out.println(message);
     }
 
-    protected void print(final String message) {
+    protected void print(String message) {
         System.out.print(message);
     }
 
-    protected static boolean isBlank(final String str) {
+    protected static boolean isBlank(String str) {
         return StringUtil.isBlank(str);
     }
 
-    protected static boolean isNotBlank(final String str) {
+    protected static boolean isNotBlank(String str) {
         return StringUtil.isNotBlank(str);
     }
 
-    protected static boolean isEmpty(final Collection<?> col) {
+    protected static boolean isEmpty(Collection<?> col) {
         return CollectionUtil.isEmpty(col);
     }
 
-    protected static boolean isNotEmpty(final Collection<?> col) {
+    protected static boolean isNotEmpty(Collection<?> col) {
         return CollectionUtil.isNonEmpty(col);
     }
 
-    protected static List<String> split(final String str, final String delim) {
+    protected static List<String> split(String str, String delim) {
         return StringUtil.split(str, delim);
     }
 
-    protected static BigInteger toBigInt(final String str) {
+    protected static BigInteger toBigInt(String str) {
         return toBigInt(str, false);
     }
 
-    protected static BigInteger toBigInt(final String str, boolean defaultHex) {
+    protected static BigInteger toBigInt(String str, boolean defaultHex) {
         String tmpStr = str.trim();
 
         if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
@@ -291,7 +288,7 @@ public abstract class XiAction implements Action {
         return new BigInteger(tmpStr, defaultHex ? 16 : 10);
     }
 
-    protected boolean confirm(final String prompt, final int maxTries) throws IOException {
+    protected boolean confirm(String prompt, int maxTries) throws IOException {
         String tmpPrompt;
         if (prompt == null || prompt.isEmpty()) {
             tmpPrompt = "[yes/no]? ";

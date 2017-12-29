@@ -30,15 +30,15 @@ public class CryptException extends Exception {
         super();
     }
 
-    public CryptException(final String message, final Throwable cause) {
+    public CryptException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CryptException(final String message) {
+    public CryptException(String message) {
         super(message);
     }
 
-    public CryptException(final Throwable cause) {
+    public CryptException(Throwable cause) {
         super(cause);
     }
 

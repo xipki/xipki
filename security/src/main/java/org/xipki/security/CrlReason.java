@@ -108,7 +108,7 @@ public enum CrlReason {
     private final int code;
     private final String desription;
 
-    CrlReason(final int code, final String description) {
+    CrlReason(int code, String description) {
         this.code = code;
         this.desription = description;
     }
@@ -127,7 +127,7 @@ public enum CrlReason {
         }
     }
 
-    public static CrlReason forReasonCode(final int reasonCode) {
+    public static CrlReason forReasonCode(int reasonCode) {
         CrlReason ret = REASONS.get(reasonCode);
         if (ret != null) {
             return ret;
@@ -162,7 +162,7 @@ public enum CrlReason {
         }
     }
 
-    public static CrlReason forNameOrText(final String text) {
+    public static CrlReason forNameOrText(String text) {
         ParamUtil.requireNonNull("text", text);
         for (CrlReason value : values()) {
             if (value.desription.equalsIgnoreCase(text)

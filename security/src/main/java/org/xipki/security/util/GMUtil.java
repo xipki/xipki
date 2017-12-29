@@ -57,7 +57,7 @@ public class GMUtil {
     }
 
     public static byte[] getSM2Z(byte[] userID, ASN1ObjectIdentifier curveOid,
-            final BigInteger pubPointX, final BigInteger pubPointY) {
+            BigInteger pubPointX, BigInteger pubPointY) {
         SM3Digest digest = new SM3Digest();
 
         addUserID(digest, userID);

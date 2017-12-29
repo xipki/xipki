@@ -34,7 +34,7 @@ public class XiProviderRegister {
         }
     }
 
-    public void setP11CryptServiceFactory(final P11CryptServiceFactory p11CryptServiceFactory) {
+    public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
         XiKeyStoreSpi.setP11CryptServiceFactory(p11CryptServiceFactory);
     }
 

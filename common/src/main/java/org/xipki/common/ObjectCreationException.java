@@ -26,11 +26,11 @@ public class ObjectCreationException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public ObjectCreationException(final String msg, final Throwable cause) {
+    public ObjectCreationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    public ObjectCreationException(final String msg) {
+    public ObjectCreationException(String msg) {
         super(msg);
     }
 }

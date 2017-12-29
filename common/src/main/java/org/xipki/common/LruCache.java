@@ -47,7 +47,7 @@ public class LruCache<K, V> {
      *     the maximum number of entries in the cache. For all other caches,
      *     this is the maximum sum of the sizes of the entries in this cache.
      */
-    public LruCache(final int maxSize) {
+    public LruCache(int maxSize) {
         this.maxSize = ParamUtil.requireMin("maxSize", maxSize, 1);
         this.map = new LinkedHashMap<>(0, 0.75f, true);
     }
@@ -57,7 +57,7 @@ public class LruCache<K, V> {
      *
      * @param maxSize the new maximum size.
      */
-    public void resize(final int maxSize) {
+    public void resize(int maxSize) {
         synchronized (this) {
             this.maxSize = ParamUtil.requireMin("maxSize", maxSize, 1);
         }
@@ -74,7 +74,7 @@ public class LruCache<K, V> {
      * created by {@code #create}.
      * @return the
      */
-    public final V get(final K key) {
+    public final V get(K key) {
         if (key == null) {
             throw new NullPointerException("key == null");
         }
@@ -129,7 +129,7 @@ public class LruCache<K, V> {
      * @param value the value.
      * @return the previous value mapped by {@code key}.
      */
-    public final V put(final K key, final V value) {
+    public final V put(K key, V value) {
         if (key == null || value == null) {
             throw new NullPointerException("key == null || value == null");
         }
@@ -159,7 +159,7 @@ public class LruCache<K, V> {
      * @param maxSize the maximum size of the cache before returning. Could be -1
      *            to evict even 0-sized elements.
      */
-    public void trimToSize(final int maxSize) {
+    public void trimToSize(int maxSize) {
         while (true) {
             K key;
             V value;
@@ -190,7 +190,7 @@ public class LruCache<K, V> {
      * @param key the key
      * @return the previous value mapped by {@code key}.
      */
-    public final V remove(final K key) {
+    public final V remove(K key) {
         if (key == null) {
             throw new NullPointerException("key == null");
         }
@@ -227,8 +227,7 @@ public class LruCache<K, V> {
      *     this removal was caused by a {@link #put}. Otherwise it was caused by
      *     an eviction or a {@link #remove}.
      */
-    protected void entryRemoved(final boolean evicted, final K key, final V oldValue,
-            final V newValue) {
+    protected void entryRemoved(boolean evicted, K key, V oldValue, V newValue) {
     }
 
     /**
@@ -249,11 +248,11 @@ public class LruCache<K, V> {
      * @param key the key
      * @return the created computed value or null if no value can be computed
      */
-    protected V create(final K key) {
+    protected V create(K key) {
         return null;
     }
 
-    private int safeSizeOf(final K key, final V value) {
+    private int safeSizeOf(K key, V value) {
         int result = sizeOf(key, value);
         if (result < 0) {
             throw new IllegalStateException("Negative size: " + key + "=" + value);
@@ -272,7 +271,7 @@ public class LruCache<K, V> {
      * @return he size of the entry for {@code key} and {@code value} in
      *   user-defined units
      */
-    protected int sizeOf(final K key, final V value) {
+    protected int sizeOf(K key, V value) {
         return 1;
     }
 

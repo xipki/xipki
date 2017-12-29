@@ -29,15 +29,15 @@ public class CmdFailure extends Exception {
     public CmdFailure() {
     }
 
-    public CmdFailure(final String message) {
+    public CmdFailure(String message) {
         super(message);
     }
 
-    public CmdFailure(final Throwable cause) {
+    public CmdFailure(Throwable cause) {
         super(cause);
     }
 
-    public CmdFailure(final String message, final Throwable cause) {
+    public CmdFailure(String message, Throwable cause) {
         super(message, cause);
     }
 

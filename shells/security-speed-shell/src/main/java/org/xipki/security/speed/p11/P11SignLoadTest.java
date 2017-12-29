@@ -71,9 +71,8 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     private final P11ObjectIdentifier objectId;
 
-    public P11SignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
-            final String signatureAlgorithm, final P11ObjectIdentifier objectId,
-            final String description) throws ObjectCreationException {
+    public P11SignLoadTest(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
+            P11ObjectIdentifier objectId, String description) throws ObjectCreationException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
         ParamUtil.requireNonNull("securityFactory", securityFactory);

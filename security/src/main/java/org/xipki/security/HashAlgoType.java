@@ -89,8 +89,8 @@ public enum HashAlgoType {
         map.put("SM3", SM3);
     }
 
-    private HashAlgoType(final int length, final AlgorithmCode algorithmCode, final String oid,
-            final String name, final String shortName) {
+    private HashAlgoType(int length, AlgorithmCode algorithmCode, String oid,
+            String name, String shortName) {
         this.length = length;
         this.algorithmCode = algorithmCode;
         this.oid = new ASN1ObjectIdentifier(oid).intern();
@@ -124,7 +124,7 @@ public enum HashAlgoType {
         return shortName;
     }
 
-    public static HashAlgoType getHashAlgoType(final ASN1ObjectIdentifier oid) {
+    public static HashAlgoType getHashAlgoType(ASN1ObjectIdentifier oid) {
         ParamUtil.requireNonNull("oid", oid);
         for (HashAlgoType hashAlgo : values()) {
             if (hashAlgo.oid.equals(oid)) {
@@ -134,11 +134,11 @@ public enum HashAlgoType {
         return null;
     }
 
-    public static HashAlgoType getHashAlgoType(final String nameOrOid) {
+    public static HashAlgoType getHashAlgoType(String nameOrOid) {
         return map.get(nameOrOid.toUpperCase());
     }
 
-    public static HashAlgoType getNonNullHashAlgoType(final ASN1ObjectIdentifier oid) {
+    public static HashAlgoType getNonNullHashAlgoType(ASN1ObjectIdentifier oid) {
         HashAlgoType type = getHashAlgoType(oid);
         if (type == null) {
             throw new IllegalArgumentException("Unknown HashAlgo OID '" + oid.getId() + "'");
@@ -146,7 +146,7 @@ public enum HashAlgoType {
         return type;
     }
 
-    public static HashAlgoType getNonNullHashAlgoType(final String nameOrOid) {
+    public static HashAlgoType getNonNullHashAlgoType(String nameOrOid) {
         HashAlgoType type = getHashAlgoType(nameOrOid);
         if (type == null) {
             throw new IllegalArgumentException("Unknown HashAlgo OID/name '" + nameOrOid + "'");
@@ -154,7 +154,7 @@ public enum HashAlgoType {
         return type;
     }
 
-    public static HashAlgoType getInstanceForPkcs11HashMech(final long hashMech) {
+    public static HashAlgoType getInstanceForPkcs11HashMech(long hashMech) {
         if (hashMech == PKCS11Constants.CKM_SHA_1) {
             return HashAlgoType.SHA1;
         } else if (hashMech == PKCS11Constants.CKM_SHA224) {
@@ -182,7 +182,7 @@ public enum HashAlgoType {
         }
     }
 
-    public static HashAlgoType getInstanceForPkcs11MgfMech(final long hashMech) {
+    public static HashAlgoType getInstanceForPkcs11MgfMech(long hashMech) {
         if (hashMech == PKCS11Constants.CKG_MGF1_SHA1) {
             return HashAlgoType.SHA1;
         } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA224) {
@@ -264,15 +264,15 @@ public enum HashAlgoType {
         }
     }
 
-    public String hexHash(final byte[] data) {
+    public String hexHash(byte[] data) {
         return HashCalculator.hexHash(this, data);
     }
 
-    public String base64Hash(final byte[] data) {
+    public String base64Hash(byte[] data) {
         return HashCalculator.base64Hash(this, data);
     }
 
-    public byte[] hash(final byte[] data) {
+    public byte[] hash(byte[] data) {
         return HashCalculator.hash(this, data);
     }
 

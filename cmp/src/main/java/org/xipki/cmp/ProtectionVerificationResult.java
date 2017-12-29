@@ -30,8 +30,7 @@ public class ProtectionVerificationResult {
 
     private final ProtectionResult protectionResult;
 
-    public ProtectionVerificationResult(final Object requestor,
-            final ProtectionResult protectionResult) {
+    public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
         this.requestor = requestor;
         this.protectionResult = ParamUtil.requireNonNull("protectionResult", protectionResult);
     }

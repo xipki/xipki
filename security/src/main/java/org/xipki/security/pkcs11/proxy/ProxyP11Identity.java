@@ -42,17 +42,17 @@ import org.xipki.security.pkcs11.proxy.msg.Asn1SignTemplate;
 
 class ProxyP11Identity extends P11Identity {
 
-    ProxyP11Identity(final P11Slot slot, final P11EntityIdentifier entityId) {
+    ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId) {
         super(slot, entityId, 0);
     }
 
-    ProxyP11Identity(final P11Slot slot, final P11EntityIdentifier entityId,
-            final PublicKey publicKey, final X509Certificate[] certificateChain) {
+    ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId,
+            PublicKey publicKey, X509Certificate[] certificateChain) {
         super(slot, entityId, publicKey, certificateChain);
     }
 
     @Override
-    protected byte[] sign0(final long mechanism, final P11Params parameters, final byte[] content)
+    protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
             throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1P11Params p11Param = null;

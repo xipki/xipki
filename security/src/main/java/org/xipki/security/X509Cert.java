@@ -48,11 +48,11 @@ public class X509Cert {
 
     private X509CertificateHolder certHolder;
 
-    public X509Cert(final X509Certificate cert) {
+    public X509Cert(X509Certificate cert) {
         this(cert, null);
     }
 
-    public X509Cert(final X509Certificate cert, final byte[] encodedCert) {
+    public X509Cert(X509Certificate cert, byte[] encodedCert) {
         this.cert = ParamUtil.requireNonNull("cert", cert);
 
         X500Principal x500Subject = cert.getSubjectX500Principal();

@@ -45,7 +45,7 @@ public class Asn1P11Params extends ASN1Object {
     private final int tagNo;
     private final ASN1Encodable p11Params;
 
-    public Asn1P11Params(final ASN1Encodable p11Params) {
+    public Asn1P11Params(ASN1Encodable p11Params) {
         if (p11Params instanceof Asn1RSAPkcsPssParams) {
             this.tagNo = 0;
         } else if (p11Params instanceof ASN1OctetString) {
@@ -56,7 +56,7 @@ public class Asn1P11Params extends ASN1Object {
         this.p11Params = p11Params;
     }
 
-    private Asn1P11Params(final ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
+    private Asn1P11Params(ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
         this.tagNo = taggedObject.getTagNo();
         if (tagNo == 0) {
             this.p11Params = Asn1RSAPkcsPssParams.getInstance(taggedObject.getObject());
@@ -67,7 +67,7 @@ public class Asn1P11Params extends ASN1Object {
         }
     }
 
-    public static Asn1P11Params getInstance(final Object obj) throws BadAsn1ObjectException {
+    public static Asn1P11Params getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11Params) {
             return (Asn1P11Params) obj;
         }

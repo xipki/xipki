@@ -68,8 +68,8 @@ public class HmacContentSigner implements XiContentSigner {
 
     private final int outLen;
 
-    public HmacContentSigner(AlgorithmIdentifier algorithmIdentifier,
-            SecretKey signingKey) throws XiSecurityException {
+    public HmacContentSigner(AlgorithmIdentifier algorithmIdentifier, SecretKey signingKey)
+            throws XiSecurityException {
         this(null, algorithmIdentifier, signingKey);
     }
 

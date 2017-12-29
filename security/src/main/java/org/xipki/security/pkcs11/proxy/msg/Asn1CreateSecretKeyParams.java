@@ -62,8 +62,8 @@ public class Asn1CreateSecretKeyParams extends ASN1Object {
 
     private final byte[] keyValue;
 
-    public Asn1CreateSecretKeyParams(final P11SlotIdentifier slotId, final String label,
-            final P11NewKeyControl control, final long keyType, final byte[] keyValue) {
+    public Asn1CreateSecretKeyParams(P11SlotIdentifier slotId, String label,
+            P11NewKeyControl control, long keyType, byte[] keyValue) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.control = ParamUtil.requireNonNull("control", control);
@@ -71,7 +71,7 @@ public class Asn1CreateSecretKeyParams extends ASN1Object {
         this.keyValue = ParamUtil.requireNonNull("keyValue", keyValue);
     }
 
-    private Asn1CreateSecretKeyParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1CreateSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
@@ -81,8 +81,7 @@ public class Asn1CreateSecretKeyParams extends ASN1Object {
         keyValue = ASN1OctetString.getInstance(seq.getObjectAt(idx++)).getOctets();
     }
 
-    public static Asn1CreateSecretKeyParams getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1CreateSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1CreateSecretKeyParams) {
             return (Asn1CreateSecretKeyParams) obj;
         }

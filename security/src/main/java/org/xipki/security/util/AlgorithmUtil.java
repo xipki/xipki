@@ -451,7 +451,7 @@ public class AlgorithmUtil {
 
     }
 
-    private static final void addOidNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
+    private static void addOidNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
             Map<String, ASN1ObjectIdentifier> nameOidMap, ASN1ObjectIdentifier oid,
             String... names) {
         oidNameMap.put(oid, names[0].toUpperCase());
@@ -461,7 +461,7 @@ public class AlgorithmUtil {
         }
     }
 
-    private static final void addHashAlgoNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
+    private static void addHashAlgoNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
             Map<String, HashAlgoType> nameOidMap, HashAlgoType hashAlgo, String... names) {
         oidNameMap.put(hashAlgo.oid(), names[0].toUpperCase());
         nameOidMap.put(hashAlgo.oid().getId(), hashAlgo);
@@ -473,7 +473,7 @@ public class AlgorithmUtil {
     private AlgorithmUtil() {
     }
 
-    public static ASN1ObjectIdentifier getHashAlg(final String hashAlgName)
+    public static ASN1ObjectIdentifier getHashAlg(String hashAlgName)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgName", hashAlgName);
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(hashAlgName.toUpperCase());
@@ -483,7 +483,7 @@ public class AlgorithmUtil {
         return hashAlgo.oid();
     } // method getHashAlg
 
-    public static int getHashOutputSizeInOctets(final ASN1ObjectIdentifier hashAlgo)
+    public static int getHashOutputSizeInOctets(ASN1ObjectIdentifier hashAlgo)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
@@ -493,7 +493,7 @@ public class AlgorithmUtil {
         return hashAlgoType.length();
     } // method getHashOutputSizeInOctets
 
-    public static AlgorithmCode getSigOrMacAlgoCode(final AlgorithmIdentifier algId)
+    public static AlgorithmCode getSigOrMacAlgoCode(AlgorithmIdentifier algId)
             throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         AlgorithmCode code = algOidToCodeMap.get(oid);
@@ -515,7 +515,7 @@ public class AlgorithmUtil {
         }
     } // method getSignatureAlgoName
 
-    public static String getSigOrMacAlgoName(final AlgorithmIdentifier sigAlgId)
+    public static String getSigOrMacAlgoName(AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
@@ -523,7 +523,7 @@ public class AlgorithmUtil {
         return (name != null) ? name : getSignatureAlgoName(sigAlgId);
     }
 
-    public static String getSignatureAlgoName(final AlgorithmIdentifier sigAlgId)
+    public static String getSignatureAlgoName(AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
 
@@ -547,16 +547,16 @@ public class AlgorithmUtil {
     } // method getSignatureAlgoName
 
     // CHECKSTYLE:SKIP
-    public static boolean isDSAPlainSigAlg(final AlgorithmIdentifier algId) {
+    public static boolean isDSAPlainSigAlg(AlgorithmIdentifier algId) {
         return isPlainECDSASigAlg(algId);
     }
 
-    public static String canonicalizeSignatureAlgo(final String algoName)
+    public static String canonicalizeSignatureAlgo(String algoName)
             throws NoSuchAlgorithmException {
         return getSignatureAlgoName(getSigAlgId(algoName));
     }
 
-    public static AlgorithmIdentifier getMacAlgId(final String macAlgName)
+    public static AlgorithmIdentifier getMacAlgId(String macAlgName)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("macAlgName", macAlgName);
         String algoS = macAlgName.toUpperCase();
@@ -569,7 +569,7 @@ public class AlgorithmUtil {
         return new AlgorithmIdentifier(oid, DERNull.INSTANCE);
     } // method getMacAlgId
 
-    public static AlgorithmIdentifier getSigAlgId(final String sigAlgName)
+    public static AlgorithmIdentifier getSigAlgId(String sigAlgName)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("sigAlgName", sigAlgName);
         String algoS = sigAlgName.toUpperCase();
@@ -596,8 +596,8 @@ public class AlgorithmUtil {
         return signatureAlgId;
     } // method getSigAlgId
 
-    public static AlgorithmIdentifier getSigAlgId(final PublicKey pubKey,
-            final SignerConf signerConf) throws NoSuchAlgorithmException {
+    public static AlgorithmIdentifier getSigAlgId(PublicKey pubKey, SignerConf signerConf)
+            throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("signerConf", signerConf);
         if (signerConf.hashAlgo() == null) {
             return getSigAlgId(signerConf.getConfValue("algo"));
@@ -621,9 +621,8 @@ public class AlgorithmUtil {
         }
     }
 
-    public static AlgorithmIdentifier getSigAlgId(final PublicKey pubKey,
-            final HashAlgoType hashAlgo, final SignatureAlgoControl algoControl)
-            throws NoSuchAlgorithmException {
+    public static AlgorithmIdentifier getSigAlgId(PublicKey pubKey, HashAlgoType hashAlgo,
+            SignatureAlgoControl algoControl) throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
         if (pubKey instanceof RSAPublicKey) {
@@ -642,7 +641,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isRSASigAlgId(final AlgorithmIdentifier algId) {
+    public static boolean isRSASigAlgId(AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid)
@@ -662,12 +661,12 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isECSigAlg(final AlgorithmIdentifier algId) {
+    public static boolean isECSigAlg(AlgorithmIdentifier algId) {
         return isECDSASigAlg(algId) || isPlainECDSASigAlg(algId);
     }
 
     // CHECKSTYLE:SKIP
-    private static boolean isECDSASigAlg(final AlgorithmIdentifier algId) {
+    private static boolean isECDSASigAlg(AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
@@ -687,7 +686,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isPlainECDSASigAlg(final AlgorithmIdentifier algId) {
+    public static boolean isPlainECDSASigAlg(AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
@@ -703,7 +702,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isSm2SigAlg(final AlgorithmIdentifier algId) {
+    public static boolean isSm2SigAlg(AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
@@ -717,7 +716,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isDSASigAlg(final AlgorithmIdentifier algId) {
+    public static boolean isDSASigAlg(AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
@@ -737,8 +736,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    private static AlgorithmIdentifier getRSASigAlgId(final HashAlgoType hashAlgo,
-            final boolean mgf1)
+    private static AlgorithmIdentifier getRSASigAlgId(HashAlgoType hashAlgo, boolean mgf1)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         if (mgf1) {
@@ -754,7 +752,7 @@ public class AlgorithmUtil {
     } // method getRSASigAlgId
 
     // CHECKSTYLE:SKIP
-    private static AlgorithmIdentifier getDSASigAlgId(final HashAlgoType hashAlgo)
+    private static AlgorithmIdentifier getDSASigAlgId(HashAlgoType hashAlgo)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -767,9 +765,8 @@ public class AlgorithmUtil {
     } // method getDSASigAlgId
 
     // CHECKSTYLE:SKIP
-    private static AlgorithmIdentifier getECSigAlgId(final HashAlgoType hashAlgo,
-            final boolean plainSignature, final boolean gm)
-            throws NoSuchAlgorithmException {
+    private static AlgorithmIdentifier getECSigAlgId(HashAlgoType hashAlgo, boolean plainSignature,
+            boolean gm) throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         if (gm && plainSignature) {
             throw new IllegalArgumentException("plainSignature and gm cannot be both true");
@@ -811,8 +808,7 @@ public class AlgorithmUtil {
         return hashAlgo;
     }
 
-    public static AlgorithmIdentifier extractDigesetAlgFromSigAlg(
-            final AlgorithmIdentifier sigAlgId)
+    public static AlgorithmIdentifier extractDigesetAlgFromSigAlg( AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
@@ -832,7 +828,7 @@ public class AlgorithmUtil {
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
     } // method extractDigesetAlgorithmIdentifier
 
-    public static boolean equalsAlgoName(final String algoNameA, final String algoNameB) {
+    public static boolean equalsAlgoName(String algoNameA, String algoNameB) {
         ParamUtil.requireNonBlank("algoNameA", algoNameA);
         ParamUtil.requireNonBlank("algoNameB", algoNameB);
         if (algoNameA.equalsIgnoreCase(algoNameB)) {
@@ -856,7 +852,7 @@ public class AlgorithmUtil {
         return splitAlgoNameTokens(tmpA).equals(splitAlgoNameTokens(tmpB));
     }
 
-    private static Set<String> splitAlgoNameTokens(final String algoName) {
+    private static Set<String> splitAlgoNameTokens(String algoName) {
         ParamUtil.requireNonNull("algoName", algoName);
         String tmpAlgoName = algoName.toUpperCase();
         int idx = tmpAlgoName.indexOf("AND");
@@ -889,14 +885,14 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    private static AlgorithmIdentifier buildRSAPSSAlgId(final HashAlgoType digestAlg)
+    private static AlgorithmIdentifier buildRSAPSSAlgId(HashAlgoType digestAlg)
             throws NoSuchAlgorithmException {
         RSASSAPSSparams params = createPSSRSAParams(digestAlg);
         return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
     }
 
     // CHECKSTYLE:SKIP
-    private static RSASSAPSSparams createPSSRSAParams(final HashAlgoType digestAlg)
+    private static RSASSAPSSparams createPSSRSAParams(HashAlgoType digestAlg)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("digestAlg", digestAlg);
         int saltSize = digestAlg.length();
@@ -907,7 +903,7 @@ public class AlgorithmUtil {
             new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     } // method createPSSRSAParams
 
-    private static ASN1ObjectIdentifier getCurveOidForName(final String curveName) {
+    private static ASN1ObjectIdentifier getCurveOidForName(String curveName) {
         ParamUtil.requireNonBlank("curveName", curveName);
         return curveNameToOidMap.get(curveName.toLowerCase());
     }
@@ -917,12 +913,12 @@ public class AlgorithmUtil {
         return curveNames;
     }
 
-    public static String getCurveName(final ASN1ObjectIdentifier curveOid) {
+    public static String getCurveName(ASN1ObjectIdentifier curveOid) {
         ParamUtil.requireNonNull("curveOid", curveOid);
         return curveOidToNameMap.get(curveOid);
     }
 
-    public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(final String curveNameOrOid) {
+    public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(String curveNameOrOid) {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ASN1ObjectIdentifier oid;
         try {

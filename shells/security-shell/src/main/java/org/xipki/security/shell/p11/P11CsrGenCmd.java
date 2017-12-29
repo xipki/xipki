@@ -62,7 +62,7 @@ public class P11CsrGenCmd extends CsrGenAction {
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
             throws Exception {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
 

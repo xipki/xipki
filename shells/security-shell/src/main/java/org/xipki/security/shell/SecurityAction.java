@@ -48,14 +48,14 @@ public abstract class SecurityAction extends XiAction {
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    protected P11Slot getSlot(final String moduleName, final int slotIndex)
+    protected P11Slot getSlot(String moduleName, int slotIndex)
             throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         P11Module module = getP11Module(moduleName);
         P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
         return module.getSlot(slotId);
     }
 
-    protected P11Module getP11Module(final String moduleName)
+    protected P11Module getP11Module(String moduleName)
             throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
@@ -64,7 +64,7 @@ public abstract class SecurityAction extends XiAction {
         return p11Service.module();
     }
 
-    protected String toUtcTimeyyyyMMddhhmmssZ(final Date date) {
+    protected String toUtcTimeyyyyMMddhhmmssZ(Date date) {
         return DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z";
     }
 

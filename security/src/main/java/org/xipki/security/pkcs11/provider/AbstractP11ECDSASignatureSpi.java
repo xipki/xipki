@@ -57,18 +57,18 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
      * @param hashAlgo
      *          hash algorithm. Could be {@code null}.
      */
-    AbstractP11ECDSASignatureSpi(final HashAlgoType hashAlgo, final boolean plain) {
+    AbstractP11ECDSASignatureSpi(HashAlgoType hashAlgo, boolean plain) {
         this.hashAlgo = hashAlgo;
         this.plain = plain;
     }
 
     @Override
-    protected void engineInitVerify(final PublicKey publicKey) throws InvalidKeyException {
+    protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     @Override
-    protected void engineInitSign(final PrivateKey privateKey) throws InvalidKeyException {
+    protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
         if (!(privateKey instanceof P11PrivateKey)) {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
@@ -124,7 +124,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineUpdate(final byte input) throws SignatureException {
+    protected void engineUpdate(byte input) throws SignatureException {
         try {
             outputStream.write((int) input);
         } catch (IOException ex) {
@@ -133,8 +133,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineUpdate(final byte[] input, final int off, final int len)
-            throws SignatureException {
+    protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
         try {
             outputStream.write(input, off, len);
         } catch (IOException ex) {
@@ -162,22 +161,22 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineSetParameter(final AlgorithmParameterSpec params) {
+    protected void engineSetParameter(AlgorithmParameterSpec params) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     @Override
-    protected void engineSetParameter(final String param, final Object value) {
+    protected void engineSetParameter(String param, Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     @Override
-    protected Object engineGetParameter(final String param) {
+    protected Object engineGetParameter(String param) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     @Override
-    protected boolean engineVerify(final byte[] sigBytes) throws SignatureException {
+    protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 

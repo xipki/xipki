@@ -33,13 +33,12 @@ public class GuiPasswordCallback implements PasswordCallback {
 
     private int tries = 3;
 
-    protected boolean isPasswordValid(final char[] password, final String testToken) {
+    protected boolean isPasswordValid(char[] password, String testToken) {
         return true;
     }
 
     @Override
-    public char[] getPassword(final String prompt, final String testToken)
-            throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
         String tmpPrompt = prompt;
         if (StringUtil.isBlank(tmpPrompt)) {
             tmpPrompt = "Password required";
@@ -73,7 +72,7 @@ public class GuiPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(final String conf) throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
         if (StringUtil.isBlank(conf)) {
             quorum = 1;
             return;

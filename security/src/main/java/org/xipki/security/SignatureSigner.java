@@ -45,7 +45,7 @@ public class SignatureSigner implements XiContentSigner {
         }
 
         @Override
-        public void write(final int singleByte) throws IOException {
+        public void write(int singleByte) throws IOException {
             try {
                 signer.update((byte) singleByte);
             } catch (SignatureException ex) {
@@ -54,7 +54,7 @@ public class SignatureSigner implements XiContentSigner {
         }
 
         @Override
-        public void write(final byte[] bytes) throws IOException {
+        public void write(byte[] bytes) throws IOException {
             try {
                 signer.update(bytes);
             } catch (SignatureException ex) {
@@ -63,7 +63,7 @@ public class SignatureSigner implements XiContentSigner {
         }
 
         @Override
-        public void write(final byte[] bytes, final int off, final int len) throws IOException {
+        public void write(byte[] bytes, int off, int len) throws IOException {
             try {
                 signer.update(bytes, off, len);
             } catch (SignatureException ex) {
@@ -83,8 +83,8 @@ public class SignatureSigner implements XiContentSigner {
 
     private final PrivateKey key;
 
-    public SignatureSigner(final AlgorithmIdentifier sigAlgId, final Signature signer,
-            final PrivateKey key) throws XiSecurityException {
+    public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
+            throws XiSecurityException {
         this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         this.signer = ParamUtil.requireNonNull("signer", signer);
         this.key = ParamUtil.requireNonNull("key", key);

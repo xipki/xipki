@@ -65,7 +65,7 @@ public class P11ModuleConf {
 
     private final long userType;
 
-    public P11ModuleConf(final ModuleType moduleType, final PasswordResolver passwordResolver)
+    public P11ModuleConf(ModuleType moduleType, PasswordResolver passwordResolver)
             throws InvalidConfException {
         ParamUtil.requireNonNull("moduleType", moduleType);
         this.name = moduleType.getName();
@@ -182,7 +182,7 @@ public class P11ModuleConf {
         return passwordRetriever;
     }
 
-    public boolean isSlotIncluded(final P11SlotIdentifier slotId) {
+    public boolean isSlotIncluded(P11SlotIdentifier slotId) {
         ParamUtil.requireNonNull("slotId", slotId);
         boolean included;
         if (CollectionUtil.isEmpty(includeSlots)) {
@@ -218,7 +218,7 @@ public class P11ModuleConf {
         return mechanismFilter;
     }
 
-    private static Set<P11SlotIdFilter> getSlotIdFilters(final SlotsType type)
+    private static Set<P11SlotIdFilter> getSlotIdFilters(SlotsType type)
             throws InvalidConfException {
         if (type == null || CollectionUtil.isEmpty(type.getSlot())) {
             return null;

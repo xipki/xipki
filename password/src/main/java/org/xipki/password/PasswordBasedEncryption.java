@@ -55,8 +55,8 @@ public class PasswordBasedEncryption {
      * @throws GeneralSecurityException
      *         if error occurs.
      */
-    public static byte[] encrypt(final PBEAlgo algo, byte[] plaintext, final char[] password,
-            final int iterationCount, final byte[] salt) throws GeneralSecurityException {
+    public static byte[] encrypt(PBEAlgo algo, byte[] plaintext, char[] password,
+            int iterationCount, byte[] salt) throws GeneralSecurityException {
         ParamUtil.requireNonNull("plaintext", plaintext);
         ParamUtil.requireNonNull("password", password);
         ParamUtil.requireMin("iterationCount", iterationCount, 1);
@@ -90,9 +90,8 @@ public class PasswordBasedEncryption {
         return ret;
     }
 
-    public static byte[] decrypt(final PBEAlgo algo, final byte[] cipherTextWithIv,
-            final char[] password, final int iterationCount, final byte[] salt)
-            throws GeneralSecurityException {
+    public static byte[] decrypt(PBEAlgo algo, byte[] cipherTextWithIv, char[] password,
+            int iterationCount, byte[] salt) throws GeneralSecurityException {
         ParamUtil.requireNonNull("cipherTextWithIv", cipherTextWithIv);
         ParamUtil.requireNonNull("password", password);
         ParamUtil.requireMin("iterationCount", iterationCount, 1);

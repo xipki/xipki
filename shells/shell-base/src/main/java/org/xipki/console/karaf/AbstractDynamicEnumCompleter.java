@@ -35,8 +35,7 @@ public abstract class AbstractDynamicEnumCompleter implements Completer {
     protected abstract Set<String> getEnums();
 
     @Override
-    public int complete(final Session session, final CommandLine commandLine,
-            final List<String> candidates) {
+    public int complete(Session session, CommandLine commandLine, List<String> candidates) {
         StringsCompleter delegate = new StringsCompleter();
 
         for (String s : getEnums()) {

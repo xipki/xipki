@@ -30,16 +30,15 @@ public class P11DuplicateEntityException extends P11TokenException {
 
     private static final long serialVersionUID = 1L;
 
-    public P11DuplicateEntityException(final P11EntityIdentifier entityId) {
+    public P11DuplicateEntityException(P11EntityIdentifier entityId) {
         super("duplicate entity '" + entityId + "'");
     }
 
-    public P11DuplicateEntityException(final P11SlotIdentifier slotId,
-            final P11ObjectIdentifier objectId) {
+    public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
         super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
     }
 
-    public P11DuplicateEntityException(final String message) {
+    public P11DuplicateEntityException(String message) {
         super(message);
     }
 

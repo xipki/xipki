@@ -37,8 +37,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
      * @param objectId
      *          Object identifier. Must not be {@code null}.
      */
-    public P11EntityIdentifier(final P11SlotIdentifier slotId,
-            final P11ObjectIdentifier objectId) {
+    public P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.objectId = ParamUtil.requireNonNull("objectId", objectId);
     }
@@ -52,7 +51,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     }
 
     @Override
-    public int compareTo(final P11EntityIdentifier obj) {
+    public int compareTo(P11EntityIdentifier obj) {
         int ct = slotId.compareTo(obj.slotId);
         if (ct != 0) {
             return ct;
@@ -61,7 +60,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof P11EntityIdentifier)) {
             return false;
         }
@@ -70,7 +69,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
         return this.slotId.equals(ei.slotId) && this.objectId.equals(ei.objectId);
     }
 
-    public boolean match(final P11SlotIdentifier slotId, final String objectLabel) {
+    public boolean match(P11SlotIdentifier slotId, String objectLabel) {
         ParamUtil.requireNonNull("objectLabel", objectLabel);
         return this.slotId.equals(slotId)
                 && objectLabel.equals(this.objectId.label());

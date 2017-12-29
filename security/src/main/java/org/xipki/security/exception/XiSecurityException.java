@@ -30,15 +30,15 @@ public class XiSecurityException extends Exception {
         super();
     }
 
-    public XiSecurityException(final String message, final Throwable cause) {
+    public XiSecurityException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public XiSecurityException(final String message) {
+    public XiSecurityException(String message) {
         super(message);
     }
 
-    public XiSecurityException(final Throwable cause) {
+    public XiSecurityException(Throwable cause) {
         super(cause);
     }
 

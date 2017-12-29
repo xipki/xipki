@@ -46,11 +46,11 @@ public class Asn1P11ObjectIdentifier extends ASN1Object {
 
     private final P11ObjectIdentifier objectId;
 
-    public Asn1P11ObjectIdentifier(final P11ObjectIdentifier objectId) {
+    public Asn1P11ObjectIdentifier(P11ObjectIdentifier objectId) {
         this.objectId = ParamUtil.requireNonNull("objectId", objectId);
     }
 
-    private Asn1P11ObjectIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1P11ObjectIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         byte[] id = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
@@ -58,8 +58,7 @@ public class Asn1P11ObjectIdentifier extends ASN1Object {
         this.objectId = new P11ObjectIdentifier(id, label);
     }
 
-    public static Asn1P11ObjectIdentifier getInstance(final Object obj)
-            throws BadAsn1ObjectException {
+    public static Asn1P11ObjectIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11ObjectIdentifier) {
             return (Asn1P11ObjectIdentifier) obj;
         }

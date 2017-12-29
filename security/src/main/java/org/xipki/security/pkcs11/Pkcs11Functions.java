@@ -25,7 +25,7 @@ import iaik.pkcs.pkcs11.wrapper.Functions;
  */
 
 public class Pkcs11Functions {
-    public static String mechanismCodeToString(final long mechanism) {
+    public static String mechanismCodeToString(long mechanism) {
         return Functions.mechanismCodeToString(mechanism);
     }
 
@@ -35,12 +35,12 @@ public class Pkcs11Functions {
      *          Mechanism name. Must not be {@code null}.
      * @return the code if could be found, -1 otherwise.
      */
-    public static long mechanismStringToCode(final String mechanismName) {
+    public static long mechanismStringToCode(String mechanismName) {
         Long mech = Functions.mechanismStringToCode(mechanismName);
         return mech == null ? -1 : mech.longValue();
     }
 
-    public static String getMechanismDesc(final long mechanism) {
+    public static String getMechanismDesc(long mechanism) {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%#010x", mechanism));
         String name = Functions.mechanismCodeToString(mechanism);

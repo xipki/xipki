@@ -32,7 +32,7 @@ public class RequestResponsePair {
         return request;
     }
 
-    public void setRequest(final byte[] request) {
+    public void setRequest(byte[] request) {
         this.request = request;
     }
 
@@ -40,7 +40,7 @@ public class RequestResponsePair {
         return response;
     }
 
-    public void setResponse(final byte[] response) {
+    public void setResponse(byte[] response) {
         this.response = response;
     }
 

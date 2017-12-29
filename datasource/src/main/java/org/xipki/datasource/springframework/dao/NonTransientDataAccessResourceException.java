@@ -32,7 +32,7 @@ public class NonTransientDataAccessResourceException extends NonTransientDataAcc
      * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
      */
-    public NonTransientDataAccessResourceException(final String msg) {
+    public NonTransientDataAccessResourceException(String msg) {
         super(msg);
     }
 
@@ -41,7 +41,7 @@ public class NonTransientDataAccessResourceException extends NonTransientDataAcc
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public NonTransientDataAccessResourceException(final String msg, final Throwable cause) {
+    public NonTransientDataAccessResourceException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

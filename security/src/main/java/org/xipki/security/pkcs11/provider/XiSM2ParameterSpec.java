@@ -27,9 +27,7 @@ import org.bouncycastle.util.Arrays;
  * @author Lijun Liao
  *
  */
-public class XiSM2ParameterSpec
-    implements AlgorithmParameterSpec
-{
+public class XiSM2ParameterSpec implements AlgorithmParameterSpec {
     private byte[] id;
 
     /**
@@ -37,11 +35,8 @@ public class XiSM2ParameterSpec
      *
      * @param id the ID string associated with this usage of SM2.
      */
-    public XiSM2ParameterSpec(
-        byte[] id)
-    {
-        if (id == null)
-        {
+    public XiSM2ParameterSpec(byte[] id) {
+        if (id == null) {
             throw new NullPointerException("id string cannot be null");
         }
 
@@ -53,8 +48,7 @@ public class XiSM2ParameterSpec
      *
      * @return the ID string.
      */
-    public byte[] getID()
-    {
+    public byte[] getID() {
         return Arrays.clone(id);
     }
 }

@@ -77,7 +77,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static RSAKeyParameters generateRSAPrivateKeyParameter(final RSAPrivateKey key) {
+    public static RSAKeyParameters generateRSAPrivateKeyParameter(RSAPrivateKey key) {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
@@ -92,15 +92,14 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static PSSSigner createPSSRSASigner(final AlgorithmIdentifier sigAlgId)
+    public static PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId)
             throws XiSecurityException {
         return createPSSRSASigner(sigAlgId, null);
     }
 
     // CHECKSTYLE:SKIP
-    public static PSSSigner createPSSRSASigner(final AlgorithmIdentifier sigAlgId,
-            final AsymmetricBlockCipher cipher)
-            throws XiSecurityException {
+    public static PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId,
+            AsymmetricBlockCipher cipher) throws XiSecurityException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             throw new XiSecurityException("signature algorithm " + sigAlgId.getAlgorithm()
@@ -129,7 +128,7 @@ public class SignerUtil {
         return new PSSSigner(tmpCipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }
 
-    private static byte getTrailer(final int trailerField) {
+    private static byte getTrailer(int trailerField) {
         if (trailerField == 1) {
             return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
         }
@@ -138,9 +137,8 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PKCS1_v1_5_encoding(final byte[] hashValue,
-            final int modulusBigLength, final HashAlgoType hashAlgo)
-            throws XiSecurityException {
+    public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
+            HashAlgoType hashAlgo) throws XiSecurityException {
         ParamUtil.requireNonNull("hashValue", hashValue);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -175,8 +173,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PKCS1_v1_5_encoding(final byte[] encodedDigestInfo,
-            final int modulusBigLength)
+    public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] encodedDigestInfo, int modulusBigLength)
             throws XiSecurityException {
         ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
 
@@ -206,9 +203,8 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PSS_ENCODE(final HashAlgoType contentDigest, final byte[] hashValue,
-            final HashAlgoType mgfDigest, final int saltLen, final int modulusBitLength,
-            final SecureRandom random)
+    public static byte[] EMSA_PSS_ENCODE(HashAlgoType contentDigest, byte[] hashValue,
+            HashAlgoType mgfDigest, int saltLen, int modulusBitLength, SecureRandom random)
             throws XiSecurityException {
         final int hLen = contentDigest.length();
         final byte[] salt = new byte[saltLen];
@@ -251,9 +247,7 @@ public class SignerUtil {
     /**
      * int to octet string.
      */
-    private static void ItoOSP( // CHECKSTYLE:SKIP
-        final int i, // CHECKSTYLE:SKIP
-        final byte[] sp, final int spOffset) {
+    private static void ItoOSP(int i, byte[] sp, int spOffset) { // CHECKSTYLE:SKIP
         sp[spOffset    ] = (byte)(i >>> 24);
         sp[spOffset + 1] = (byte)(i >>> 16);
         sp[spOffset + 2] = (byte)(i >>> 8);
@@ -263,9 +257,9 @@ public class SignerUtil {
     /**
      * mask generator function, as described in PKCS1v2.
      */
-    private static byte[] maskGeneratorFunction1(final HashAlgoType mgfDigest,
-            final byte[] Z, // CHECKSTYLE:SKIP
-            final int length) {
+    private static byte[] maskGeneratorFunction1(HashAlgoType mgfDigest,
+            byte[] Z, // CHECKSTYLE:SKIP
+            int length) {
         int mgfhLen = mgfDigest.length();
         byte[] mask = new byte[length];
         int counter = 0;
@@ -291,8 +285,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] dsaSigPlainToX962(final byte[] signature)
-            throws XiSecurityException {
+    public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
         ParamUtil.requireNonNull("signature", signature);
         if (signature.length % 2 != 0) {
             throw new XiSecurityException("signature.lenth must be even, but is odd");
@@ -315,7 +308,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] dsaSigX962ToPlain(final byte[] x962Signature, final int keyBitLen)
+    public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int keyBitLen)
             throws XiSecurityException {
         ParamUtil.requireNonNull("x962Signature", x962Signature);
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
@@ -328,8 +321,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] dsaSigToPlain(final BigInteger sigR, final BigInteger sigS,
-            final int keyBitLen)
+    public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int keyBitLen)
             throws XiSecurityException {
         ParamUtil.requireNonNull("sigR", sigR);
         ParamUtil.requireNonNull("sigS", sigS);
@@ -348,8 +340,7 @@ public class SignerUtil {
         return plainSignature;
     }
 
-    private static void bigIntToBytes(final BigInteger num, final byte[] dest, final int destPos,
-            final int length) {
+    private static void bigIntToBytes(BigInteger num, byte[] dest, int destPos, int length) {
         byte[] bytes = num.toByteArray();
         if (bytes.length == length) {
             System.arraycopy(bytes, 0, dest, destPos, length);
@@ -360,7 +351,7 @@ public class SignerUtil {
         }
     }
 
-    private static Digest getDigest(final AlgorithmIdentifier hashAlgo) throws XiSecurityException {
+    private static Digest getDigest(AlgorithmIdentifier hashAlgo) throws XiSecurityException {
         HashAlgoType hat = HashAlgoType.getHashAlgoType(hashAlgo.getAlgorithm());
         if (hat != null) {
             return hat.createDigest();

@@ -55,8 +55,7 @@ public abstract class P11KeyGenAction extends KeyGenAction {
 
     protected abstract boolean getDefaultExtractable();
 
-    protected void finalize(final String keyType, final P11ObjectIdentifier objectId)
-            throws Exception {
+    protected void finalize(String keyType, P11ObjectIdentifier objectId) throws Exception {
         ParamUtil.requireNonNull("objectId", objectId);
         println("generated " + keyType + " key " + objectId);
     }

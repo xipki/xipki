@@ -28,7 +28,7 @@ import org.xipki.common.util.ParamUtil;
 public class ECControl {
     private final String curveName;
 
-    public ECControl(final String curveName) {
+    public ECControl(String curveName) {
         this.curveName = ParamUtil.requireNonBlank("curveName", curveName);
     }
 

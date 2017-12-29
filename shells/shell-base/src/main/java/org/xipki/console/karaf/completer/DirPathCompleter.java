@@ -38,8 +38,8 @@ public class DirPathCompleter extends FileCompleter {
     // This method is for karaf 4.0.*
     /*
     @Override
-    protected int matchFiles(final String buffer, final String translated, final File[] files,
-            final List<String> candidates) {
+    protected int matchFiles(String buffer, String translated, File[] files,
+            List<String> candidates) {
         if (files == null) {
             return -1;
         }
@@ -60,7 +60,7 @@ public class DirPathCompleter extends FileCompleter {
             }
         }
 
-        final int index = buffer.lastIndexOf(separator());
+        int index = buffer.lastIndexOf(separator());
 
         return index + separator().length();
     }

@@ -71,8 +71,8 @@ public class P12KeyGenerator {
 
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
-        KeyPairWithSubjectPublicKeyInfo(final KeyPair keypair,
-                final SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeySpecException {
+        KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
+                throws InvalidKeySpecException {
             super();
             this.keypair = keypair;
             this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
@@ -96,7 +96,7 @@ public class P12KeyGenerator {
 
         private final PrivateKey key;
 
-        KeyAndCertPair(final X509CertificateHolder cert, final PrivateKey key)
+        KeyAndCertPair(X509CertificateHolder cert, PrivateKey key)
             throws CertificateException {
             this.cert = cert;
             this.key = key;
@@ -125,34 +125,29 @@ public class P12KeyGenerator {
     }
 
     // CHECKSTYLE:SKIP
-    public P12KeyGenerationResult generateRSAKeypair(final int keysize,
-            final BigInteger publicExponent, final KeystoreGenerationParameters params,
-            final String selfSignedCertSubject)
-            throws Exception {
+    public P12KeyGenerationResult generateRSAKeypair(int keysize, BigInteger publicExponent,
+            KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent,
                 params.random());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
     // CHECKSTYLE:SKIP
-    public P12KeyGenerationResult generateDSAKeypair(final int plength, final int qlength,
-            final KeystoreGenerationParameters params, final String selfSignedCertSubject)
-            throws Exception {
+    public P12KeyGenerationResult generateDSAKeypair(int plength, int qlength,
+            KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.random());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
     // CHECKSTYLE:SKIP
-    public P12KeyGenerationResult generateECKeypair(final String curveNameOrOid,
-            final KeystoreGenerationParameters params, final String selfSignedCertSubject)
-            throws Exception {
+    public P12KeyGenerationResult generateECKeypair(String curveNameOrOid,
+            KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.random());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
-    public P12KeyGenerationResult generateSecretKey(final String algorithm, final int keyBitLen,
-            final KeystoreGenerationParameters params)
-            throws Exception {
+    public P12KeyGenerationResult generateSecretKey(String algorithm, int keyBitLen,
+            KeystoreGenerationParameters params) throws Exception {
         if (keyBitLen % 8 != 0) {
             throw new IllegalArgumentException(
                     "keyBitLen (" + keyBitLen + ") must be multiple of 8");
@@ -185,8 +180,8 @@ public class P12KeyGenerator {
     }
 
     // CHECKSTYLE:SKIP
-    private KeyPairWithSubjectPublicKeyInfo genECKeypair(final String curveNameOrOid,
-            final SecureRandom random) throws Exception {
+    private KeyPairWithSubjectPublicKeyInfo genECKeypair(String curveNameOrOid,
+            SecureRandom random) throws Exception {
         ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (curveOid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
@@ -202,8 +197,8 @@ public class P12KeyGenerator {
     }
 
     // CHECKSTYLE:SKIP
-    private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(final int keysize,
-            final BigInteger publicExponent, final SecureRandom random) throws Exception {
+    private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(int keysize,
+            BigInteger publicExponent, SecureRandom random) throws Exception {
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
         java.security.interfaces.RSAPublicKey rsaPubKey =
                 (java.security.interfaces.RSAPublicKey) kp.getPublic();
@@ -215,18 +210,16 @@ public class P12KeyGenerator {
     }
 
     // CHECKSTYLE:SKIP
-    private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(final int plength, final int qlength,
-            final SecureRandom random) throws Exception {
+    private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(int plength, int qlength,
+            SecureRandom random) throws Exception {
         KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
         SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(
                 (DSAPublicKey) kp.getPublic());
         return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
     }
 
-    private static P12KeyGenerationResult generateIdentity(
-            final KeyPairWithSubjectPublicKeyInfo kp, final KeystoreGenerationParameters params,
-            final String selfSignedCertSubject)
-            throws Exception {
+    private static P12KeyGenerationResult generateIdentity(KeyPairWithSubjectPublicKeyInfo kp,
+            KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
         Date now = new Date();
         Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
         Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
@@ -261,7 +254,7 @@ public class P12KeyGenerator {
         return result;
     } // method generateIdentity
 
-    private static ContentSigner getContentSigner(final PrivateKey key) throws Exception {
+    private static ContentSigner getContentSigner(PrivateKey key) throws Exception {
         BcContentSignerBuilder builder;
 
         if (key instanceof RSAPrivateKey) {
@@ -306,7 +299,7 @@ public class P12KeyGenerator {
         return builder.build(KeyUtil.generatePrivateKeyParameter(key));
     } // method getContentSigner
 
-    private static AlgorithmIdentifier buildAlgId(final ASN1ObjectIdentifier identifier) {
+    private static AlgorithmIdentifier buildAlgId(ASN1ObjectIdentifier identifier) {
         return new AlgorithmIdentifier(identifier, DERNull.INSTANCE);
     }
 

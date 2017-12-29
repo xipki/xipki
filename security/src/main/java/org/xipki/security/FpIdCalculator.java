@@ -56,7 +56,7 @@ public class FpIdCalculator {
      * @param data data over which the hash value is calculated.
      * @return long represented of the first 8 bytes
      */
-    public static long hash(final String data) {
+    public static long hash(String data) {
         ParamUtil.requireNonNull("data", data);
         byte[] encoded;
         try {
@@ -72,7 +72,7 @@ public class FpIdCalculator {
      * @param data data over which the hash value is calculated.
      * @return long represented of the first 8 bytes
      */
-    public static long hash(final byte[] data) {
+    public static long hash(byte[] data) {
         ParamUtil.requireNonNull("data", data);
 
         ConcurrentBagEntry<Digest> md0 = null;
@@ -101,7 +101,7 @@ public class FpIdCalculator {
         }
     }
 
-    private static long bytesToLong(final byte[] bytes) {
+    private static long bytesToLong(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(bytes, 0, 8);
         buffer.flip(); //need flip

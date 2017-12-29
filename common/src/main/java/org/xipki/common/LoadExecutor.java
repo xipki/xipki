@@ -56,7 +56,7 @@ public abstract class LoadExecutor {
 
     private String unit = "";
 
-    public LoadExecutor(final String description) {
+    public LoadExecutor(String description) {
         this.description = ParamUtil.requireNonNull("description", description);
         this.processLog = new ProcessLog(0);
     }
@@ -125,7 +125,7 @@ public abstract class LoadExecutor {
         return interrupted;
     }
 
-    public void setDuration(final String duration) {
+    public void setDuration(String duration) {
         ParamUtil.requireNonBlank("duration", duration);
         char unit = duration.charAt(duration.length() - 1);
 
@@ -163,7 +163,7 @@ public abstract class LoadExecutor {
         }
     }
 
-    public void setThreads(final int threads) {
+    public void setThreads(int threads) {
         if (threads > 0) {
             this.threads = threads;
         }
@@ -173,7 +173,7 @@ public abstract class LoadExecutor {
         return errorAccount.get();
     }
 
-    public void account(final int all, final int failed) {
+    public void account(int all, int failed) {
         processLog.addNumProcessed(all);
         errorAccount.addAndGet(failed);
     }
@@ -196,7 +196,7 @@ public abstract class LoadExecutor {
         processLog.printStatus();
     }
 
-    public void setUnit(final String unit) {
+    public void setUnit(String unit) {
         this.unit = ParamUtil.requireNonNull("unit", unit);
     }
 

@@ -32,15 +32,14 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12RSASignLoadTest extends P12SignLoadTest {
 
-    public P12RSASignLoadTest(final SecurityFactory securityFactory,
-            final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
-            throws Exception {
+    public P12RSASignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
+            int keysize, BigInteger publicExponent) throws Exception {
         super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
                 "PKCS#12 RSA signature creation\nkeysize: " + keysize + "\n"
                         + "public exponent: " + publicExponent);
     }
 
-    private static byte[] generateKeystore(final int keysize, final BigInteger publicExponent)
+    private static byte[] generateKeystore(int keysize, BigInteger publicExponent)
             throws Exception {
         byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
         if (keystoreBytes == null) {

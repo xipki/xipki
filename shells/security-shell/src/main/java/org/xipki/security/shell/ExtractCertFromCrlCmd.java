@@ -108,7 +108,7 @@ public class ExtractCertFromCrlCmd extends SecurityAction {
         return null;
     } // method execute0
 
-    private static byte[] removingTagAndLenFromExtensionValue(final byte[] encodedExtensionValue) {
+    private static byte[] removingTagAndLenFromExtensionValue(byte[] encodedExtensionValue) {
         DEROctetString derOctet = (DEROctetString) DEROctetString.getInstance(
                 encodedExtensionValue);
         return derOctet.getOctets();

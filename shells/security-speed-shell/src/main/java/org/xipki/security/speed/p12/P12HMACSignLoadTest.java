@@ -29,15 +29,13 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12HMACSignLoadTest extends P12SignLoadTest {
 
-    public P12HMACSignLoadTest(final SecurityFactory securityFactory,
-            final String signatureAlgorithm)
+    public P12HMACSignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm)
             throws Exception {
         super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
                 "JCEKS HMAC signature creation");
     }
 
-    private static byte[] generateKeystore(final String signatureAlgorithm)
-            throws Exception {
+    private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {
         int keysize = getKeysize(signatureAlgorithm);
         P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
                 "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));

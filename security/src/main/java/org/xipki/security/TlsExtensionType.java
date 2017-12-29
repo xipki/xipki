@@ -37,7 +37,7 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
     private final int code;
     private final String name;
 
-    private TlsExtensionType(final int code, final String name) {
+    private TlsExtensionType(int code, String name) {
         this.code = code;
         this.name = name;
     }
@@ -51,7 +51,7 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
     }
 
     @Override
-    public int compareTo(final TlsExtensionType obj) {
+    public int compareTo(TlsExtensionType obj) {
         return Integer.valueOf(code).compareTo(obj.code);
     }
 

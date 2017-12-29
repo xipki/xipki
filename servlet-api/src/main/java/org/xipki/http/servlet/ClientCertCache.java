@@ -50,9 +50,8 @@ class ClientCertCache {
     private static final SimpleLruCache<String, X509Certificate> clientCerts =
             new SimpleLruCache<>(100);
 
-    public static X509Certificate getTlsClientCert(
-            final HttpRequest request, final SSLSession session, final SslReverseProxyMode mode)
-            throws IOException {
+    public static X509Certificate getTlsClientCert(HttpRequest request, SSLSession session,
+            SslReverseProxyMode mode) throws IOException {
         if (mode == SslReverseProxyMode.NONE || mode == null) {
             if (session == null) {
                 return null;
