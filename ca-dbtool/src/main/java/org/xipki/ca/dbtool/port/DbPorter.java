@@ -54,8 +54,7 @@ public class DbPorter extends DbToolBase {
 
         private final float sqlBatchFactor;
 
-        private OcspDbEntryType(final String dirName, final String tableName,
-                final float sqlBatchFactor) {
+        private OcspDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
             this.dirName = dirName;
             this.tableName = tableName;
             this.sqlBatchFactor = sqlBatchFactor;
@@ -89,8 +88,7 @@ public class DbPorter extends DbToolBase {
 
         private final float sqlBatchFactor;
 
-        private CaDbEntryType(final String dirName, final String tableName,
-                final float sqlBatchFactor) {
+        private CaDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
             this.dirName = dirName;
             this.tableName = tableName;
             this.sqlBatchFactor = sqlBatchFactor;
@@ -136,8 +134,8 @@ public class DbPorter extends DbToolBase {
 
     protected final int maxX500nameLen;
 
-    public DbPorter(final DataSourceWrapper datasource, final String baseDir,
-            final AtomicBoolean stopMe, final boolean evaluateOnly) throws DataAccessException {
+    public DbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
+            boolean evaluateOnly) throws DataAccessException {
         super(datasource, baseDir, stopMe);
 
         this.evaulateOnly = evaluateOnly;
@@ -149,8 +147,7 @@ public class DbPorter extends DbToolBase {
         this.maxX500nameLen = Integer.parseInt(str);
     }
 
-    protected FileOrValueType buildFileOrValue(final String content, final String fileName)
-            throws IOException {
+    protected FileOrValueType buildFileOrValue(String content, String fileName) throws IOException {
         if (content == null) {
             return null;
         }
@@ -175,7 +172,7 @@ public class DbPorter extends DbToolBase {
         return ret;
     }
 
-    protected String value(final FileOrValueType fileOrValue) throws IOException {
+    protected String value(FileOrValueType fileOrValue) throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -188,15 +185,15 @@ public class DbPorter extends DbToolBase {
         return new String(IoUtil.read(file), "UTF-8");
     }
 
-    protected FileOrBinaryType buildFileOrBase64Binary(final String base64Content,
-            final String fileName) throws IOException {
+    protected FileOrBinaryType buildFileOrBase64Binary(String base64Content, String fileName)
+            throws IOException {
         if (base64Content == null) {
             return null;
         }
         return buildFileOrBinary(Base64.decode(base64Content), fileName);
     }
 
-    protected FileOrBinaryType buildFileOrBinary(final byte[] content, final String fileName)
+    protected FileOrBinaryType buildFileOrBinary(byte[] content, String fileName)
             throws IOException {
         if (content == null) {
             return null;
@@ -222,7 +219,7 @@ public class DbPorter extends DbToolBase {
         return ret;
     }
 
-    protected byte[] binary(final FileOrBinaryType fileOrValue) throws IOException {
+    protected byte[] binary(FileOrBinaryType fileOrValue) throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -251,7 +248,7 @@ public class DbPorter extends DbToolBase {
         return evaulateOnly ? " evaluated export " : " exported ";
     }
 
-    public static final Schema retrieveSchema(final String schemaPath) throws JAXBException {
+    public static final Schema retrieveSchema(String schemaPath) throws JAXBException {
         ParamUtil.requireNonNull("schemaPath", schemaPath);
 
         URL schemaUrl = DbPorter.class.getResource(schemaPath);
@@ -265,7 +262,7 @@ public class DbPorter extends DbToolBase {
         }
     }
 
-    public static void echoToFile(final String content, final File file) throws IOException {
+    public static void echoToFile(String content, File file) throws IOException {
         ParamUtil.requireNonNull("content", content);
         ParamUtil.requireNonNull("file", file);
 

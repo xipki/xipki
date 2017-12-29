@@ -48,8 +48,7 @@ public class CmpResponderEntry {
 
     private X509Certificate certificate;
 
-    public CmpResponderEntry(final String name, final String type, final String conf,
-            final String base64Cert) {
+    public CmpResponderEntry(String name, String type, String conf, String base64Cert) {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
@@ -86,7 +85,7 @@ public class CmpResponderEntry {
         return certificate;
     }
 
-    public void setCertificate(final X509Certificate certificate) {
+    public void setCertificate(X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already specified by base64Cert");
         }
@@ -101,7 +100,7 @@ public class CmpResponderEntry {
         return confFaulty || certFaulty;
     }
 
-    public void setConfFaulty(final boolean confFaulty) {
+    public void setConfFaulty(boolean confFaulty) {
         this.confFaulty = confFaulty;
     }
 
@@ -110,11 +109,11 @@ public class CmpResponderEntry {
         return toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');

@@ -94,10 +94,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     private final boolean resume;
 
-    CaCertStoreDbExporter(final DataSourceWrapper datasource, final Marshaller marshaller,
-            final Unmarshaller unmarshaller, final String baseDir, final int numCertsInBundle,
-            final int numCertsPerSelect, final boolean resume, final AtomicBoolean stopMe,
-            final boolean evaluateOnly) throws DataAccessException {
+    CaCertStoreDbExporter(DataSourceWrapper datasource, Marshaller marshaller,
+            Unmarshaller unmarshaller, String baseDir, int numCertsInBundle, int numCertsPerSelect,
+            boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws DataAccessException {
         super(datasource, baseDir, stopMe, evaluateOnly);
         this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -193,8 +192,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     } // method export
 
-    private Exception exportEntries(final CaDbEntryType type, final CertStoreType certstore,
-            final File processLogFile, final Long idProcessedInLastProcess) {
+    private Exception exportEntries(CaDbEntryType type, CertStoreType certstore,
+            File processLogFile, Long idProcessedInLastProcess) {
         String tablesText = (CaDbEntryType.CERT == type)
                 ? "tables CERT and CRAW" : "table " + type.tableName();
 
@@ -222,9 +221,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    private void exportEntries(final CaDbEntryType type, final CertStoreType certstore,
-            final File processLogFile, final FileOutputStream filenameListOs,
-            final Long idProcessedInLastProcess) throws Exception {
+    private void exportEntries(CaDbEntryType type, CertStoreType certstore, File processLogFile,
+            FileOutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
         final int numEntriesPerSelect = Math.max(1,
                 Math.round(type.sqlBatchFactor() * numCertsPerSelect));
         final int numEntriesPerZip = Math.max(1,
@@ -266,12 +264,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             throw new RuntimeException("unknown CaDbEntryType " + type);
         }
 
-        Long minId = null;
-        if (idProcessedInLastProcess != null) {
-            minId = idProcessedInLastProcess + 1;
-        } else {
-            minId = min(tableName, "ID");
-        }
+        Long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1
+                : min(tableName, "ID");
 
         String tablesText = (CaDbEntryType.CERT == type)
                 ? "tables " + tableName + " and CRAW" : "table " + type.tableName();
@@ -592,8 +586,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(exportedText() + sum + " entries from " + tablesText);
     } // method exportEntries
 
-    private void exportPublishQueue(final CertStoreType certstore)
-            throws DataAccessException, IOException, JAXBException {
+    private void exportPublishQueue(CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table PUBLISHQUEUE");
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT CID,PID,CA_ID");
@@ -642,8 +635,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table PUBLISHQUEUE");
     } // method exportPublishQueue
 
-    private void exportDeltaCrlCache(final CertStoreType certstore)
-            throws DataAccessException, IOException, JAXBException {
+    private void exportDeltaCrlCache(CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table DELTACRL_CACHE");
 
         final String sql = "SELECT SN,CA_ID FROM DELTACRL_CACHE";
@@ -677,8 +669,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table DELTACRL_CACHE");
     } // method exportDeltaCrlCache
 
-    private void finalizeZip(final ZipOutputStream zipOutStream, final String filename,
-            final DbiXmlWriter os) throws JAXBException, IOException, XMLStreamException {
+    private void finalizeZip(ZipOutputStream zipOutStream, String filename, DbiXmlWriter os)
+            throws IOException, XMLStreamException {
         ZipEntry certZipEntry = new ZipEntry(filename);
         zipOutStream.putNextEntry(certZipEntry);
         try {
@@ -690,7 +682,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         zipOutStream.close();
     }
 
-    private static DbiXmlWriter createWriter(final CaDbEntryType type)
+    private static DbiXmlWriter createWriter(CaDbEntryType type)
             throws IOException, XMLStreamException {
         switch (type) {
         case CERT:
@@ -710,8 +702,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    private static void setCount(final CaDbEntryType type, final CertStoreType certstore,
-            final int num) {
+    private static void setCount(CaDbEntryType type, CertStoreType certstore, int num) {
         switch (type) {
         case CERT:
             certstore.setCountCerts(num);

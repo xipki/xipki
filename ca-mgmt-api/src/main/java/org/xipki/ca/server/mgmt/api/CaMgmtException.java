@@ -34,20 +34,19 @@ public class CaMgmtException extends Exception {
         super();
     }
 
-    public CaMgmtException(final String message, final Throwable cause) {
+    public CaMgmtException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CaMgmtException(final String message) {
+    public CaMgmtException(String message) {
         super(message);
     }
 
-    public CaMgmtException(final DataSourceWrapper datasource, final String sql,
-            final SQLException sqlEx) {
+    public CaMgmtException(DataSourceWrapper datasource, String sql, SQLException sqlEx) {
         this(datasource.translate(sql, sqlEx));
     }
 
-    public CaMgmtException(final Throwable cause) {
+    public CaMgmtException(Throwable cause) {
         super(cause.getMessage(), cause);
     }
 

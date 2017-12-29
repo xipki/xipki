@@ -61,7 +61,6 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
-import org.xipki.password.PasswordResolverException;
 
 /**
  * @author Lijun Liao
@@ -72,9 +71,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
     private final Marshaller marshaller;
 
-    CaConfigurationDbExporter(final DataSourceWrapper datasource, final Marshaller marshaller,
-            final String destDir, final AtomicBoolean stopMe, final boolean evaluateOnly)
-            throws DataAccessException, PasswordResolverException, IOException {
+    CaConfigurationDbExporter(DataSourceWrapper datasource, Marshaller marshaller, String destDir,
+            AtomicBoolean stopMe, boolean evaluateOnly) throws DataAccessException {
         super(datasource, destDir, stopMe, evaluateOnly);
         this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
     }
@@ -109,7 +107,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported CA configuration from database");
     }
 
-    private void exportCmpcontrol(final CAConfigurationType caconf) throws DataAccessException {
+    private void exportCmpcontrol(CAConfigurationType caconf) throws DataAccessException {
         Cmpcontrols cmpcontrols = new Cmpcontrols();
         caconf.setCmpcontrols(cmpcontrols);
         System.out.println("exporting table CMPCONTROL");
@@ -140,7 +138,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table CMPCONTROL");
     } // method exportCmpcontrol
 
-    private void exportEnvironment(final CAConfigurationType caconf) throws DataAccessException {
+    private void exportEnvironment(CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table ENVIRONMENT");
         Environments environments = new Environments();
         final String sql = "SELECT NAME,VALUE2 FROM ENVIRONMENT";
@@ -170,7 +168,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table ENVIRONMENT");
     } // method exportEnvironment
 
-    private void exportCrlsigner(final CAConfigurationType caconf)
+    private void exportCrlsigner(CAConfigurationType caconf)
             throws DataAccessException, IOException {
         System.out.println("exporting table CRLSIGNER");
         Crlsigners crlsigners = new Crlsigners();
@@ -214,7 +212,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table CRLSIGNER");
     } // method exportCrlsigner
 
-    private void exportCaalias(final CAConfigurationType caconf) throws DataAccessException {
+    private void exportCaalias(CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CAALIAS");
         Caaliases caaliases = new Caaliases();
         final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
@@ -245,7 +243,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table CAALIAS");
     } // method exportCaalias
 
-    private void exportRequestor(final CAConfigurationType caconf)
+    private void exportRequestor(CAConfigurationType caconf)
             throws DataAccessException, IOException {
         System.out.println("exporting table REQUESTOR");
         Requestors requestors = new Requestors();
@@ -278,7 +276,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table REQUESTOR");
     } // method exportRequestor
 
-    private void exportResponder(final CAConfigurationType caconf)
+    private void exportResponder(CAConfigurationType caconf)
             throws DataAccessException, IOException {
         System.out.println("exporting table RESPONDER");
 
@@ -316,7 +314,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table RESPONDER");
     } // method exportResponder
 
-    private void exportPublisher(final CAConfigurationType caconf)
+    private void exportPublisher(CAConfigurationType caconf)
             throws DataAccessException, IOException {
         System.out.println("exporting table PUBLISHER");
         Publishers publishers = new Publishers();
@@ -352,8 +350,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table PUBLISHER");
     } // method exportPublisher
 
-    private void exportProfile(final CAConfigurationType caconf)
-            throws DataAccessException, IOException {
+    private void exportProfile(CAConfigurationType caconf) throws DataAccessException, IOException {
         System.out.println("exporting table PROFILE");
         Profiles profiles = new Profiles();
         final String sql = "SELECT ID,NAME,ART,TYPE,CONF FROM PROFILE";
@@ -390,8 +387,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table PROFILE");
     } // method exportProfile
 
-    private void exportCa(final CAConfigurationType caconf)
-            throws DataAccessException, IOException {
+    private void exportCa(CAConfigurationType caconf) throws DataAccessException, IOException {
         System.out.println("exporting table CA");
         Cas cas = new Cas();
         StringBuilder sqlBuilder = new StringBuilder(400);
@@ -490,7 +486,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table CA");
     } // method exportCa
 
-    private void exportCaHasRequestor(final CAConfigurationType caconf) throws DataAccessException {
+    private void exportCaHasRequestor(CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_REQUESTOR");
         CaHasRequestors caHasRequestors = new CaHasRequestors();
         final String sql = "SELECT CA_ID,REQUESTOR_ID,RA,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
@@ -527,7 +523,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table CA_HAS_REQUESTOR");
     } // method exportCaHasRequestor
 
-    private void exportCaHasPublisher(final CAConfigurationType caconf) throws DataAccessException {
+    private void exportCaHasPublisher(CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_PUBLISHER");
         CaHasPublishers caHasPublishers = new CaHasPublishers();
         final String sql = "SELECT CA_ID,PUBLISHER_ID FROM CA_HAS_PUBLISHER";
@@ -558,8 +554,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table CA_HAS_PUBLISHER");
     } // method exportCaHasPublisher
 
-    private void exportScep(final CAConfigurationType caconf)
-            throws DataAccessException, IOException {
+    private void exportScep(CAConfigurationType caconf) throws DataAccessException, IOException {
         System.out.println("exporting table SCEP");
         Sceps sceps = new Sceps();
         caconf.setSceps(sceps);
@@ -606,7 +601,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println(" exported table SCEP");
     } // method exportScep
 
-    private void exportCaHasProfile(final CAConfigurationType caconf) throws DataAccessException {
+    private void exportCaHasProfile(CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_PROFILE");
         CaHasProfiles caHasProfiles = new CaHasProfiles();
         StringBuilder sqlBuilder = new StringBuilder(100);

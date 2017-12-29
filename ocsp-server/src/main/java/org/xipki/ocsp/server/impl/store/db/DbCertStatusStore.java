@@ -75,12 +75,12 @@ public class DbCertStatusStore extends OcspStore {
 
         private final Long revocationTimeMs;
 
-        SimpleIssuerEntry(final int id, final Long revocationTimeMs) {
+        SimpleIssuerEntry(int id, Long revocationTimeMs) {
             this.id = id;
             this.revocationTimeMs = revocationTimeMs;
         }
 
-        public boolean match(final IssuerEntry issuer) {
+        public boolean match(IssuerEntry issuer) {
             if (id != issuer.id()) {
                 return false;
             }
@@ -246,11 +246,9 @@ public class DbCertStatusStore extends OcspStore {
     } // method initIssuerStore
 
     @Override
-    public CertStatusInfo getCertStatus(final Date time, final RequestIssuer reqIssuer,
-            final BigInteger serialNumber, final boolean includeCertHash,
-            final boolean includeRit, boolean inheritCaRevocation,
-            final HashAlgoType certHashAlg)
-            throws OcspStoreException {
+    public CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
+            BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
+            boolean inheritCaRevocation, HashAlgoType certHashAlg) throws OcspStoreException {
         if (serialNumber.signum() != 1) { // non-positive serial number
             return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
         }
@@ -445,8 +443,7 @@ public class DbCertStatusStore extends OcspStore {
      * @return the next idle preparedStatement, {@code null} will be returned if no
      *     PreparedStatement can be created within 5 seconds.
      */
-    private PreparedStatement preparedStatement(final String sqlQuery)
-            throws DataAccessException {
+    private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
         return datasource.prepareStatement(datasource.getConnection(), sqlQuery);
     }
 
@@ -477,13 +474,12 @@ public class DbCertStatusStore extends OcspStore {
         }
     }
 
-    private void releaseDbResources(final Statement ps, final ResultSet rs) {
+    private void releaseDbResources(Statement ps, ResultSet rs) {
         datasource.releaseResources(ps, rs);
     }
 
     @Override
-    public void init(final String conf, final DataSourceWrapper datasource)
-            throws OcspStoreException {
+    public void init(String conf, DataSourceWrapper datasource) throws OcspStoreException {
         ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
@@ -563,12 +559,12 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public boolean canResolveIssuer(final RequestIssuer reqIssuer) {
+    public boolean canResolveIssuer(RequestIssuer reqIssuer) {
         return null != issuerStore.getIssuerForFp(reqIssuer);
     }
 
     @Override
-    public X509Certificate getIssuerCert(final RequestIssuer reqIssuer) {
+    public X509Certificate getIssuerCert(RequestIssuer reqIssuer) {
         IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
         return (issuer == null) ? null : issuer.cert();
     }
@@ -581,7 +577,7 @@ public class DbCertStatusStore extends OcspStore {
         return initializationFailed;
     }
 
-    private static Set<X509Certificate> parseCerts(final Set<String> certFiles)
+    private static Set<X509Certificate> parseCerts(Set<String> certFiles)
             throws OcspStoreException {
         Set<X509Certificate> certs = new HashSet<>(certFiles.size());
         for (String certFile : certFiles) {

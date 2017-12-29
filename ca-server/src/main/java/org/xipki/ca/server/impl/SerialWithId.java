@@ -30,7 +30,7 @@ public class SerialWithId {
 
     private BigInteger serial;
 
-    public SerialWithId(final long id, final BigInteger serial) {
+    public SerialWithId(long id, BigInteger serial) {
         this.id = id;
         this.serial = serial;
     }

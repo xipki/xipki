@@ -94,7 +94,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return iid;
     }
 
-    public void setIid(final Integer iid) {
+    public void setIid(Integer iid) {
         this.iid = iid;
     }
 
@@ -102,7 +102,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return sn;
     }
 
-    public void setSn(final String sn) {
+    public void setSn(String sn) {
         this.sn = sn;
     }
 
@@ -110,7 +110,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return profile;
     }
 
-    public void setProfile(final String profile) {
+    public void setProfile(String profile) {
         this.profile = profile;
     }
 
@@ -118,7 +118,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return update;
     }
 
-    public void setUpdate(final Long update) {
+    public void setUpdate(Long update) {
         this.update = update;
     }
 
@@ -126,7 +126,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return rev;
     }
 
-    public void setRev(final Boolean rev) {
+    public void setRev(Boolean rev) {
         this.rev = rev;
     }
 
@@ -134,7 +134,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return rr;
     }
 
-    public void setRr(final Integer rr) {
+    public void setRr(Integer rr) {
         this.rr = rr;
     }
 
@@ -142,7 +142,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return rt;
     }
 
-    public void setRt(final Long rt) {
+    public void setRt(Long rt) {
         this.rt = rt;
     }
 
@@ -150,7 +150,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return rit;
     }
 
-    public void setRit(final Long rit) {
+    public void setRit(Long rit) {
         this.rit = rit;
     }
 
@@ -158,7 +158,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         return file;
     }
 
-    public void setFile(final String file) {
+    public void setFile(String file) {
         this.file = file;
     }
 
@@ -178,8 +178,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     }
 
     @Override
-    public void writeTo(final DbiXmlWriter writer)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
 
         validate();

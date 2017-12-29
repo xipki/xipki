@@ -49,19 +49,19 @@ public class OperationException extends Exception {
 
     private final String errorMessage;
 
-    public OperationException(final ErrorCode errorCode) {
+    public OperationException(ErrorCode errorCode) {
         super(String.format("error code: %s", errorCode));
         this.errorCode = errorCode;
         this.errorMessage = null;
     }
 
-    public OperationException(final ErrorCode errorCode, final String errorMessage) {
+    public OperationException(ErrorCode errorCode, String errorMessage) {
         super(String.format("error code: %s, error message: %s", errorCode, errorMessage));
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
 
-    public OperationException(final ErrorCode errorCode, final Throwable throwable) {
+    public OperationException(ErrorCode errorCode, Throwable throwable) {
         this(errorCode, getMessage(throwable));
     }
 
@@ -73,7 +73,7 @@ public class OperationException extends Exception {
         return errorMessage;
     }
 
-    private static final String getMessage(final Throwable throwable) {
+    private static final String getMessage(Throwable throwable) {
         if (throwable == null) {
             return null;
         }

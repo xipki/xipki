@@ -28,7 +28,7 @@ public class Range {
 
     private Integer max;
 
-    public Range(final Integer min, final Integer max) {
+    public Range(Integer min, Integer max) {
         setRange(min, max);
     }
 
@@ -40,7 +40,7 @@ public class Range {
         return max;
     }
 
-    public void setRange(final Integer min, final Integer max) {
+    public void setRange(Integer min, Integer max) {
         if (min == null && max == null) {
             throw new IllegalArgumentException("min and max must not be both null");
         }
@@ -52,7 +52,7 @@ public class Range {
         this.max = max;
     }
 
-    public boolean match(final int val) {
+    public boolean match(int val) {
         if (min != null && val < min) {
             return false;
         }

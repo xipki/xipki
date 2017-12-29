@@ -59,7 +59,7 @@ public class UniqueIdGenerator {
 
     private final IntBinaryOperator accumulatorFunction;
 
-    public UniqueIdGenerator(final long epoch, final int shardId) {
+    public UniqueIdGenerator(long epoch, int shardId) {
         this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
         this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 127);
         this.accumulatorFunction = new OffsetIncrement();

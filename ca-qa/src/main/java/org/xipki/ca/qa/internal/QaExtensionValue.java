@@ -32,7 +32,7 @@ public class QaExtensionValue {
 
     private final byte[] value;
 
-    public QaExtensionValue(final boolean critical, final byte[] value) {
+    public QaExtensionValue(boolean critical, byte[] value) {
         ParamUtil.requireNonNull("value", value);
         this.critical = critical;
         this.value = Arrays.copyOf(value, value.length);

@@ -33,7 +33,7 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class OcspCertsReader extends DbiXmlReader {
 
-    public OcspCertsReader(final InputStream xmlStream)
+    public OcspCertsReader(InputStream xmlStream)
             throws XMLStreamException, InvalidDataObjectException {
         super(OcspCertType.TAG_PARENT, xmlStream);
     }

@@ -77,8 +77,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
 
     @Override
     public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode)
-            throws Exception {
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
         HttpVersion httpVersion = request.protocolVersion();
         HttpMethod method = request.method();
         if (method != HttpMethod.POST) {
@@ -171,16 +170,16 @@ public class HttpCmpServlet extends AbstractHttpServlet {
         }
     } // method service
 
-    public void setResponderManager(final CmpResponderManager responderManager) {
+    public void setResponderManager(CmpResponderManager responderManager) {
         this.responderManager = responderManager;
     }
 
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    private static void audit(final AuditService auditService, final AuditEvent event,
-            final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
+    private static void audit(AuditService auditService, AuditEvent event,
+            AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
         if (auditLevel != null) {
             event.setLevel(auditLevel);
         }

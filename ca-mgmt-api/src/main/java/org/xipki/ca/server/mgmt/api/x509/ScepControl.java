@@ -55,7 +55,7 @@ public class ScepControl {
 
     private boolean supportGetCrl = false;
 
-    public ScepControl(final String conf) throws InvalidConfException {
+    public ScepControl(String conf) throws InvalidConfException {
         if (StringUtil.isBlank(conf)) {
             return;
         }
@@ -84,7 +84,7 @@ public class ScepControl {
         return includeCaCert;
     }
 
-    public void setIncludeCaCert(final boolean includeCaCert) {
+    public void setIncludeCaCert(boolean includeCaCert) {
         this.includeCaCert = includeCaCert;
     }
 
@@ -92,7 +92,7 @@ public class ScepControl {
         return includeSignerCert;
     }
 
-    public void setIncludeSignerCert(final boolean includeSignerCert) {
+    public void setIncludeSignerCert(boolean includeSignerCert) {
         this.includeSignerCert = includeSignerCert;
     }
 
@@ -100,7 +100,7 @@ public class ScepControl {
         return supportGetCrl;
     }
 
-    public void setSupportGetCrl(final boolean supportGetCrl) {
+    public void setSupportGetCrl(boolean supportGetCrl) {
         this.supportGetCrl = supportGetCrl;
     }
 
@@ -115,7 +115,7 @@ public class ScepControl {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof ScepControl)) {
             return false;
         }
@@ -129,8 +129,8 @@ public class ScepControl {
         return true;
     }
 
-    private static boolean getBoolean(final ConfPairs props, final String propKey,
-            final boolean dfltValue) throws InvalidConfException {
+    private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
+            throws InvalidConfException {
         String str = props.value(propKey);
         if (str != null) {
             str = str.trim();

@@ -32,7 +32,7 @@ public class OperationExceptionWithIndex extends OperationException {
 
     private final int index;
 
-    public OperationExceptionWithIndex(final int index, OperationException underlying) {
+    public OperationExceptionWithIndex(int index, OperationException underlying) {
         super(underlying.errorCode());
         this.index = index;
         this.underlying = underlying;

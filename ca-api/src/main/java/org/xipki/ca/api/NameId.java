@@ -30,11 +30,11 @@ public class NameId {
 
     private final String name;
 
-    public NameId(final Integer id, final String name) {
+    public NameId(Integer id, String name) {
         this(id, name, true);
     }
 
-    public NameId(final Integer id, final String name, boolean uppercase) {
+    public NameId(Integer id, String name, boolean uppercase) {
         this.id = id;
         ParamUtil.requireNonBlank("name", name);
         this.name = uppercase ? name.toUpperCase() : name;

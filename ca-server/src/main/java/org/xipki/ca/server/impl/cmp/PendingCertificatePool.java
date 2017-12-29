@@ -47,8 +47,7 @@ class PendingCertificatePool {
 
         private final byte[] certHash;
 
-        MyEntry(final BigInteger certReqId, final long waitForConfirmTill,
-                final X509CertificateInfo certInfo) {
+        MyEntry(BigInteger certReqId, long waitForConfirmTill, X509CertificateInfo certInfo) {
             this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
             this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
             this.waitForConfirmTill = waitForConfirmTill;
@@ -61,7 +60,7 @@ class PendingCertificatePool {
         }
 
         @Override
-        public boolean equals(final Object obj) {
+        public boolean equals(Object obj) {
             if (!(obj instanceof MyEntry)) {
                 return false;
             }
@@ -77,8 +76,8 @@ class PendingCertificatePool {
     PendingCertificatePool() {
     }
 
-    void addCertificate(final byte[] transactionId, final BigInteger certReqId,
-            final X509CertificateInfo certInfo, final long waitForConfirmTill) {
+    void addCertificate(byte[] transactionId, BigInteger certReqId, X509CertificateInfo certInfo,
+            long waitForConfirmTill) {
         ParamUtil.requireNonNull("transactionId", transactionId);
         ParamUtil.requireNonNull("certInfo", certInfo);
         if (certInfo.isAlreadyIssued()) {
@@ -97,8 +96,8 @@ class PendingCertificatePool {
         }
     }
 
-    X509CertificateInfo removeCertificate(final byte[] transactionId,
-            final BigInteger certReqId, final byte[] certHash) {
+    X509CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId,
+            byte[] certHash) {
         ParamUtil.requireNonNull("transactionId", transactionId);
         ParamUtil.requireNonNull("certReqId", certReqId);
         ParamUtil.requireNonNull("certHash", certHash);
@@ -133,7 +132,7 @@ class PendingCertificatePool {
         return (retEntry == null) ? null : retEntry.certInfo;
     }
 
-    Set<X509CertificateInfo> removeCertificates(final byte[] transactionId) {
+    Set<X509CertificateInfo> removeCertificates(byte[] transactionId) {
         ParamUtil.requireNonNull("transactionId", transactionId);
 
         String hexId = Hex.toHexString(transactionId);

@@ -150,7 +150,7 @@ class IdentifiedX509Certprofile {
     private final CertprofileEntry dbEntry;
     private final X509Certprofile certprofile;
 
-    IdentifiedX509Certprofile(final CertprofileEntry dbEntry, final X509Certprofile certProfile)
+    IdentifiedX509Certprofile(CertprofileEntry dbEntry, X509Certprofile certProfile)
             throws CertprofileException {
         this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
         this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
@@ -198,13 +198,13 @@ class IdentifiedX509Certprofile {
         return certprofile.specialCertprofileBehavior();
     }
 
-    public void setEnvParameterResolver(final EnvParameterResolver envParameterResolver) {
+    public void setEnvParameterResolver(EnvParameterResolver envParameterResolver) {
         if (certprofile != null) {
             certprofile.setEnvParameterResolver(envParameterResolver);
         }
     }
 
-    public Date notBefore(final Date notBefore) {
+    public Date notBefore(Date notBefore) {
         return certprofile.getNotBefore(notBefore);
     }
 
@@ -220,7 +220,7 @@ class IdentifiedX509Certprofile {
         return certprofile.timezone();
     }
 
-    public SubjectInfo getSubject(final X500Name requestedSubject)
+    public SubjectInfo getSubject(X500Name requestedSubject)
             throws CertprofileException, BadCertTemplateException {
         SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
         RDN[] countryRdns = subjectInfo.grantedSubject().getRDNs(ObjectIdentifiers.DN_C);
@@ -256,11 +256,9 @@ class IdentifiedX509Certprofile {
      *          NotAfter. Must not be {@code null}.
      * @return the extensions of the certificate to be issued.
      */
-    public ExtensionValues getExtensions(final X500Name requestedSubject,
-            final X500Name grantedSubject, final Extensions requestedExtensions,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final PublicCaInfo publicCaInfo, final X509Certificate crlSignerCert,
-            final Date notBefore, final Date notAfter)
+    public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
+            Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo,
+            PublicCaInfo publicCaInfo, X509Certificate crlSignerCert, Date notBefore, Date notAfter)
             throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ExtensionValues values = new ExtensionValues();
@@ -515,7 +513,7 @@ class IdentifiedX509Certprofile {
         return certprofile.isOnlyForRa();
     }
 
-    public SubjectPublicKeyInfo checkPublicKey(final SubjectPublicKeyInfo publicKey)
+    public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
             throws BadCertTemplateException {
         ParamUtil.requireNonNull("publicKey", publicKey);
         return certprofile.checkPublicKey(publicKey);
@@ -535,7 +533,7 @@ class IdentifiedX509Certprofile {
         return certprofile.includeIssuerAndSerialInAki();
     }
 
-    public String incSerialNumber(final String currentSerialNumber) throws BadFormatException {
+    public String incSerialNumber(String currentSerialNumber) throws BadFormatException {
         return certprofile.incSerialNumber(currentSerialNumber);
     }
 
@@ -551,7 +549,7 @@ class IdentifiedX509Certprofile {
         return certprofile.isSerialNumberInReqPermitted();
     }
 
-    public String parameter(final String paramName) {
+    public String parameter(String paramName) {
         return certprofile.parameter(paramName);
     }
 
@@ -708,7 +706,7 @@ class IdentifiedX509Certprofile {
         }
     } // method validate
 
-    private static String toString(final Set<ASN1ObjectIdentifier> oids) {
+    private static String toString(Set<ASN1ObjectIdentifier> oids) {
         if (oids == null) {
             return "null";
         }
@@ -736,8 +734,7 @@ class IdentifiedX509Certprofile {
         return sb.toString();
     } // method toString
 
-    private static boolean containsKeyusage(final Set<KeyUsageControl> usageControls,
-            final KeyUsage usage) {
+    private static boolean containsKeyusage(Set<KeyUsageControl> usageControls, KeyUsage usage) {
         for (KeyUsageControl entry : usageControls) {
             if (usage == entry.keyUsage()) {
                 return true;
@@ -746,9 +743,8 @@ class IdentifiedX509Certprofile {
         return false;
     }
 
-    private static boolean addMe(final ASN1ObjectIdentifier extType,
-            final ExtensionControl extControl, final Set<ASN1ObjectIdentifier> neededExtTypes,
-            final Set<ASN1ObjectIdentifier> wantedExtTypes) {
+    private static boolean addMe(ASN1ObjectIdentifier extType, ExtensionControl extControl,
+            Set<ASN1ObjectIdentifier> neededExtTypes, Set<ASN1ObjectIdentifier> wantedExtTypes) {
         boolean addMe = extControl.isRequired();
         if (addMe) {
             return true;
@@ -757,8 +753,8 @@ class IdentifiedX509Certprofile {
         return neededExtTypes.contains(extType) || wantedExtTypes.contains(extType);
     } // method addMe
 
-    private static void addRequestedKeyusage(final Set<KeyUsage> usages,
-            final Extensions requestedExtensions, final Set<KeyUsageControl> usageOccs) {
+    private static void addRequestedKeyusage(Set<KeyUsage> usages, Extensions requestedExtensions,
+            Set<KeyUsageControl> usageOccs) {
         Extension extension = requestedExtensions.getExtension(Extension.keyUsage);
         if (extension == null) {
             return;
@@ -777,8 +773,8 @@ class IdentifiedX509Certprofile {
         }
     } // method addRequestedKeyusage
 
-    private static void addRequestedExtKeyusage(final List<ASN1ObjectIdentifier> usages,
-            final Extensions requestedExtensions, final Set<ExtKeyUsageControl> usageOccs) {
+    private static void addRequestedExtKeyusage(List<ASN1ObjectIdentifier> usages,
+            Extensions requestedExtensions, Set<ExtKeyUsageControl> usageOccs) {
         Extension extension = requestedExtensions.getExtension(Extension.extendedKeyUsage);
         if (extension == null) {
             return;
@@ -797,8 +793,8 @@ class IdentifiedX509Certprofile {
         }
     } // method addRequestedExtKeyusage
 
-    private static ASN1Sequence createSubjectInfoAccess(final Extensions requestedExtensions,
-            final Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
+    private static ASN1Sequence createSubjectInfoAccess(Extensions requestedExtensions,
+            Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
             throws BadCertTemplateException {
         if (modes == null) {
             return null;
@@ -832,10 +828,10 @@ class IdentifiedX509Certprofile {
         return vec.size() > 0 ? new DERSequence(vec) : null;
     } // method createSubjectInfoAccess
 
-    private static void addExtension(final ExtensionValues values,
-            final ASN1ObjectIdentifier extType, final ExtensionValue extValue,
-            final ExtensionControl extControl, final Set<ASN1ObjectIdentifier> neededExtensionTypes,
-            final Set<ASN1ObjectIdentifier> wantedExtensionTypes) throws CertprofileException {
+    private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
+            ExtensionValue extValue, ExtensionControl extControl,
+            Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            Set<ASN1ObjectIdentifier> wantedExtensionTypes) throws CertprofileException {
         if (extValue != null) {
             values.addExtension(extType, extValue);
             neededExtensionTypes.remove(extType);
@@ -854,10 +850,10 @@ class IdentifiedX509Certprofile {
         throw new CertprofileException("could not add required extension " + description);
     } // method addExtension
 
-    private static void addExtension(final ExtensionValues values,
-            final ASN1ObjectIdentifier extType, final ASN1Encodable extValue,
-            final ExtensionControl extControl, final Set<ASN1ObjectIdentifier> neededExtensionTypes,
-            final Set<ASN1ObjectIdentifier> wantedExtensionTypes) throws CertprofileException {
+    private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
+            ASN1Encodable extValue, ExtensionControl extControl,
+            Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            Set<ASN1ObjectIdentifier> wantedExtensionTypes) throws CertprofileException {
         if (extValue != null) {
             values.addExtension(extType, extControl.isCritical(), extValue);
             neededExtensionTypes.remove(extType);

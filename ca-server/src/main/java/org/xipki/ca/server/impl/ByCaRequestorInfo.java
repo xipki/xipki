@@ -31,7 +31,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
 
     private final NameId ident;
 
-    public ByCaRequestorInfo(final NameId ident) {
+    public ByCaRequestorInfo(NameId ident) {
         this.ident = ParamUtil.requireNonNull("ident", ident);
     }
 

@@ -32,7 +32,7 @@ public class IdentifiedDbDigestEntry {
 
     private final long id;
 
-    public IdentifiedDbDigestEntry(final DbDigestEntry content, final long id) {
+    public IdentifiedDbDigestEntry(DbDigestEntry content, long id) {
         this.content = ParamUtil.requireNonNull("content", content);
         this.id = id;
     }

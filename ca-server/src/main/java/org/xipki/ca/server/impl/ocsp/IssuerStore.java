@@ -31,7 +31,7 @@ class IssuerStore {
 
     private final List<IssuerEntry> entries;
 
-    IssuerStore(final List<IssuerEntry> entries) {
+    IssuerStore(List<IssuerEntry> entries) {
         ParamUtil.requireNonNull("entries", entries);
         this.entries = new ArrayList<>(entries.size());
 
@@ -40,7 +40,7 @@ class IssuerStore {
         }
     }
 
-    void addIdentityEntry(final IssuerEntry entry) {
+    void addIdentityEntry(IssuerEntry entry) {
         ParamUtil.requireNonNull("entry", entry);
         for (IssuerEntry existingEntry : entries) {
             if (existingEntry.id() == entry.id()) {
@@ -52,7 +52,7 @@ class IssuerStore {
         entries.add(entry);
     }
 
-    Integer getIdForSubject(final String subject) {
+    Integer getIdForSubject(String subject) {
         ParamUtil.requireNonBlank("subject", subject);
         for (IssuerEntry entry : entries) {
             if (entry.subject().equals(subject)) {
@@ -63,7 +63,7 @@ class IssuerStore {
         return null;
     }
 
-    Integer getIdForSha1Fp(final byte[] sha1FpCert) {
+    Integer getIdForSha1Fp(byte[] sha1FpCert) {
         ParamUtil.requireNonNull("sha1FpCert", sha1FpCert);
         for (IssuerEntry entry : entries) {
             if (entry.matchSha1Fp(sha1FpCert)) {
@@ -74,7 +74,7 @@ class IssuerStore {
         return null;
     }
 
-    Integer getIdForCert(final byte[] encodedCert) {
+    Integer getIdForCert(byte[] encodedCert) {
         ParamUtil.requireNonNull("encodedCert", encodedCert);
         for (IssuerEntry entry : entries) {
             if (entry.matchCert(encodedCert)) {

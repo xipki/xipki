@@ -74,10 +74,9 @@ class OcspCertStoreDbExporter extends DbPorter {
 
     private final boolean resume;
 
-    OcspCertStoreDbExporter(final DataSourceWrapper datasource, final Marshaller marshaller,
-            final Unmarshaller unmarshaller, final String baseDir, final int numCertsInBundle,
-            final int numCertsPerSelect, final boolean resume, final AtomicBoolean stopMe,
-            final boolean evaluateOnly) throws Exception {
+    OcspCertStoreDbExporter(DataSourceWrapper datasource, Marshaller marshaller,
+            Unmarshaller unmarshaller, String baseDir, int numCertsInBundle, int numCertsPerSelect,
+            boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
         super(datasource, baseDir, stopMe, evaluateOnly);
 
         this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
@@ -136,8 +135,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
     } // method export
 
-    private void exportIssuer(final CertStoreType certstore)
-            throws DataAccessException, IOException {
+    private void exportIssuer(CertStoreType certstore) throws DataAccessException, IOException {
         System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
@@ -188,7 +186,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         System.out.println(" exported table ISSUER");
     } // method exportIssuer
 
-    private Exception exportCert(final CertStoreType certstore, final File processLogFile) {
+    private Exception exportCert(CertStoreType certstore, File processLogFile) {
         final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
         entriesDir.mkdirs();
 
@@ -211,8 +209,8 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
     } // method exportCert
 
-    private void exportCert0(final CertStoreType certstore, final File processLogFile,
-            final FileOutputStream certsFileOs) throws Exception {
+    private void exportCert0(CertStoreType certstore, File processLogFile,
+            FileOutputStream certsFileOs) throws Exception {
         File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
         Long minId = null;
         if (processLogFile.exists()) {
@@ -411,8 +409,8 @@ class OcspCertStoreDbExporter extends DbPorter {
                 + " certificates from tables CERT, CHASH and CRAW");
     } // method exportCert0
 
-    private void finalizeZip(final ZipOutputStream zipOutStream, final DbiXmlWriter certsType)
-            throws JAXBException, IOException, XMLStreamException {
+    private void finalizeZip(ZipOutputStream zipOutStream, DbiXmlWriter certsType)
+            throws IOException, XMLStreamException {
         ZipEntry certZipEntry = new ZipEntry("certs.xml");
         zipOutStream.putNextEntry(certZipEntry);
         try {

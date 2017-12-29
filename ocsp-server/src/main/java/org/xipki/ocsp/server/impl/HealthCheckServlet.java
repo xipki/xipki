@@ -53,7 +53,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
     public HealthCheckServlet() {
     }
 
-    public void setServer(final OcspServer server) {
+    public void setServer(OcspServer server) {
         this.server = server;
     }
 

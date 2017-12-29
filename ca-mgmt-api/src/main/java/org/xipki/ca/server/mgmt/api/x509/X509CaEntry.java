@@ -65,16 +65,15 @@ public class X509CaEntry extends CaEntry {
 
     private String hexSha1OfCert;
 
-    public X509CaEntry(final NameId nameId, final int serialNoBitLen,
-            final long nextCrlNumber, final String signerType, final String signerConf,
-            final X509CaUris caUris, final int numCrls, final int expirationPeriod)
+    public X509CaEntry(NameId nameId, int serialNoBitLen, long nextCrlNumber, String signerType,
+            String signerConf, X509CaUris caUris, int numCrls, int expirationPeriod)
             throws CaMgmtException {
         super(nameId, signerType, signerConf, expirationPeriod);
         init(serialNoBitLen, nextCrlNumber, caUris, numCrls);
     }
 
-    private void init(final int serialNoBitLen, final long nextCrlNumber, final X509CaUris caUris,
-            final int numCrls) throws CaMgmtException {
+    private void init(int serialNoBitLen, long nextCrlNumber, X509CaUris caUris, int numCrls)
+            throws CaMgmtException {
         this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 1);
         this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
         this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
@@ -85,7 +84,7 @@ public class X509CaEntry extends CaEntry {
         this.deltaCrlUris = caUris.deltaCrlUris();
     }
 
-    public void setCertificate(final X509Certificate certificate) throws CaMgmtException {
+    public void setCertificate(X509Certificate certificate) throws CaMgmtException {
         if (certificate == null) {
             this.cert = null;
             this.subject = null;
@@ -110,7 +109,7 @@ public class X509CaEntry extends CaEntry {
         return serialNoBitLen;
     }
 
-    public void setSerialNoBitLen(final int serialNoBitLen) {
+    public void setSerialNoBitLen(int serialNoBitLen) {
         this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
     }
 
@@ -118,7 +117,7 @@ public class X509CaEntry extends CaEntry {
         return nextCrlNumber;
     }
 
-    public void setNextCrlNumber(final long crlNumber) {
+    public void setNextCrlNumber(long crlNumber) {
         this.nextCrlNumber = crlNumber;
     }
 
@@ -166,11 +165,11 @@ public class X509CaEntry extends CaEntry {
         return crlSignerName;
     }
 
-    public void setCrlSignerName(final String crlSignerName) {
+    public void setCrlSignerName(String crlSignerName) {
         this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toUpperCase();
     }
 
-    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append(super.toString(verbose, ignoreSensitiveInfo));
         if (sb.charAt(sb.length() - 1) != '\n') {
@@ -221,7 +220,7 @@ public class X509CaEntry extends CaEntry {
         return revocationInfo;
     }
 
-    public void setRevocationInfo(final CertRevocationInfo revocationInfo) {
+    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
         this.revocationInfo = revocationInfo;
     }
 
@@ -238,7 +237,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     @Override
-    public void setExtraControl(final String extraControl) {
+    public void setExtraControl(String extraControl) {
         super.setExtraControl(extraControl);
     }
 

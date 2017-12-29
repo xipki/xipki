@@ -143,7 +143,7 @@ class SQLs {
 
     private final LruCache<Integer, String> cacheSqlSerialsRevoked = new LruCache<>(5);
 
-    SQLs(final DataSourceWrapper datasource) {
+    SQLs(DataSourceWrapper datasource) {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
         this.sqlCaHasCrl = datasource.buildSelectFirstSql(1,
@@ -198,7 +198,7 @@ class SQLs {
                 "DATA FROM REQUEST WHERE ID=?");
     } // constructor
 
-    String getSqlCidFromPublishQueue(final int numEntries) {
+    String getSqlCidFromPublishQueue(int numEntries) {
         String sql = cacheSqlCidFromPublishQueue.get(numEntries);
         if (sql == null) {
             sql = datasource.buildSelectFirstSql(numEntries, "CID ASC",
@@ -208,7 +208,7 @@ class SQLs {
         return sql;
     }
 
-    String getSqlExpiredSerials(final int numEntries) {
+    String getSqlExpiredSerials(int numEntries) {
         String sql = cacheSqlExpiredSerials.get(numEntries);
         if (sql == null) {
             sql = datasource.buildSelectFirstSql(numEntries,
@@ -218,7 +218,7 @@ class SQLs {
         return sql;
     }
 
-    String getSqlSuspendedSerials(final int numEntries) {
+    String getSqlSuspendedSerials(int numEntries) {
         String sql = cacheSqlSuspendedSerials.get(numEntries);
         if (sql == null) {
             sql = datasource.buildSelectFirstSql(numEntries,
@@ -228,7 +228,7 @@ class SQLs {
         return sql;
     }
 
-    String getSqlDeltaCrlCacheIds(final int numEntries) {
+    String getSqlDeltaCrlCacheIds(int numEntries) {
         String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
         if (sql == null) {
             sql = datasource.buildSelectFirstSql(numEntries, "ID ASC",
@@ -238,7 +238,7 @@ class SQLs {
         return sql;
     }
 
-    String getSqlRevokedCerts(final int numEntries, final boolean withEe) {
+    String getSqlRevokedCerts(int numEntries, boolean withEe) {
         LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe
                 : cacheSqlRevokedCerts;
         String sql = cache.get(numEntries);
@@ -254,7 +254,7 @@ class SQLs {
         return sql;
     }
 
-    String getSqlSerials(final int numEntries, final boolean onlyRevoked) {
+    String getSqlSerials(int numEntries, boolean onlyRevoked) {
         LruCache<Integer, String> cache = onlyRevoked ? cacheSqlSerialsRevoked :
             cacheSqlSerials;
         String sql = cache.get(numEntries);
@@ -269,8 +269,7 @@ class SQLs {
         return sql;
     }
 
-    String getSqlSerials(final int numEntries, final Date notExpiredAt,
-            final boolean onlyRevoked, final boolean withEe) {
+    String getSqlSerials(int numEntries, Date notExpiredAt, boolean onlyRevoked, boolean withEe) {
         StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CS=?");
         if (notExpiredAt != null) {
             sb.append(" AND NAFTER>?");

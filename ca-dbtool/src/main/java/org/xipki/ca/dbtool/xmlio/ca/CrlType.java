@@ -48,7 +48,7 @@ public class CrlType extends IdentifidDbObjectType {
         return caId;
     }
 
-    public void setCaId(final Integer caId) {
+    public void setCaId(Integer caId) {
         this.caId = caId;
     }
 
@@ -56,7 +56,7 @@ public class CrlType extends IdentifidDbObjectType {
         return crlNo;
     }
 
-    public void setCrlNo(final String crlNo) {
+    public void setCrlNo(String crlNo) {
         this.crlNo = crlNo;
     }
 
@@ -64,7 +64,7 @@ public class CrlType extends IdentifidDbObjectType {
         return file;
     }
 
-    public void setFile(final String file) {
+    public void setFile(String file) {
         this.file = file;
     }
 
@@ -77,8 +77,7 @@ public class CrlType extends IdentifidDbObjectType {
     }
 
     @Override
-    public void writeTo(final DbiXmlWriter writer)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
         validate();
 
         writer.writeStartElement(TAG_ROOT);

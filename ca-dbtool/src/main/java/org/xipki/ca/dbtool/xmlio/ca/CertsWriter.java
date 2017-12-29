@@ -36,7 +36,7 @@ public class CertsWriter extends DbiXmlWriter {
         super(CertType.TAG_PARENT, "1");
     }
 
-    public void add(final CertType cert) throws InvalidDataObjectException, XMLStreamException {
+    public void add(CertType cert) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("cert", cert);
         cert.validate();
         cert.writeTo(this);

@@ -96,8 +96,8 @@ public abstract class X509CertPublisher {
      *          Revocation information. Must not be {@code null}.
      * @return whether the revocation is published.
      */
-    public abstract boolean certificateRevoked(X509Cert caCert,
-            X509CertWithDbId cert, String certprofile, CertRevocationInfo revInfo);
+    public abstract boolean certificateRevoked(X509Cert caCert, X509CertWithDbId cert,
+            String certprofile, CertRevocationInfo revInfo);
 
     /**
      * Publishes the unrevocation of a certificate.

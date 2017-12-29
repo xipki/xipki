@@ -41,7 +41,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
             new ConcurrentLinkedDeque<X509CertprofileFactory>();
 
     @Override
-    public X509Certprofile newCertprofile(final String type) throws ObjectCreationException {
+    public X509Certprofile newCertprofile(String type) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         for (X509CertprofileFactory service : services) {
@@ -54,7 +54,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
                 "could not find factory to create Certprofile of type '" + type + "'");
     }
 
-    public void bindService(final X509CertprofileFactory service) {
+    public void bindService(X509CertprofileFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -68,7 +68,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         LOG.info("{} X509CertprofileFactory binding for {}", action, service);
     }
 
-    public void unbindService(final X509CertprofileFactory service) {
+    public void unbindService(X509CertprofileFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.debug("unbindService invoked with null.");

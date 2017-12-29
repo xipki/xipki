@@ -44,7 +44,7 @@ class SQLs {
     final String sqlSelectUserId;
     final String sqlSelectUser;
 
-    SQLs(final DataSourceWrapper datasource) {
+    SQLs(DataSourceWrapper datasource) {
         this.sqlSelectProfileId = datasource.buildSelectFirstSql(1,
                 "ID FROM PROFILE WHERE NAME=?");
 

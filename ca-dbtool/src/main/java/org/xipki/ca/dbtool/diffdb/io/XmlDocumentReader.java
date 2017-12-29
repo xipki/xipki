@@ -49,7 +49,7 @@ public class XmlDocumentReader {
 
     private final XPathFactory xpathfactory;
 
-    public XmlDocumentReader(final InputStream xmlStream, final boolean namespaceAware)
+    public XmlDocumentReader(InputStream xmlStream, boolean namespaceAware)
             throws ParserConfigurationException, SAXException, IOException {
         ParamUtil.requireNonNull("xmlStream", xmlStream);
 
@@ -62,23 +62,23 @@ public class XmlDocumentReader {
         xpathfactory = XPathFactory.newInstance();
     }
 
-    private static void disableDtdValidation(final DocumentBuilder db) {
+    private static void disableDtdValidation(DocumentBuilder db) {
         db.setEntityResolver(new EntityResolver() {
             @Override
-            public InputSource resolveEntity(final String publicId, final String systemId)
+            public InputSource resolveEntity(String publicId, String systemId)
                     throws SAXException, IOException {
                 return new InputSource(new StringReader(""));
             }
         });
     }
 
-    public String value(final String xpathExpression) throws XPathExpressionException {
+    public String value(String xpathExpression) throws XPathExpressionException {
         ParamUtil.requireNonNull("xpathExpression", xpathExpression);
         Node node = getNode(xpathExpression);
         return (node != null) ? node.getFirstChild().getTextContent() : null;
     }
 
-    private Node getNode(final String xpathExpression) throws XPathExpressionException {
+    private Node getNode(String xpathExpression) throws XPathExpressionException {
         XPath xpath = xpathfactory.newXPath();
         XPathExpression xpathE = xpath.compile(xpathExpression);
         NodeList nl = (NodeList) xpathE.evaluate(doc.getDocumentElement(), XPathConstants.NODESET);

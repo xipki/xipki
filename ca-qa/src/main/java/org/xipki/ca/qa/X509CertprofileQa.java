@@ -95,11 +95,11 @@ public class X509CertprofileQa {
 
     private final XmlX509Certprofile certProfile;
 
-    public X509CertprofileQa(final String data) throws CertprofileException {
+    public X509CertprofileQa(String data) throws CertprofileException {
         this(ParamUtil.requireNonNull("data", data).getBytes());
     }
 
-    public X509CertprofileQa(final byte[] dataBytes) throws CertprofileException {
+    public X509CertprofileQa(byte[] dataBytes) throws CertprofileException {
         ParamUtil.requireNonNull("dataBytes", dataBytes);
         try {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(
@@ -119,9 +119,9 @@ public class X509CertprofileQa {
         }
     } // constructor
 
-    public ValidationResult checkCert(final byte[] certBytes, final X509IssuerInfo issuerInfo,
-            final X500Name requestedSubject, final SubjectPublicKeyInfo requestedPublicKey,
-            final Extensions requestedExtensions) {
+    public ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
+            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
+            Extensions requestedExtensions) {
         ParamUtil.requireNonNull("certBytes", certBytes);
         ParamUtil.requireNonNull("issuerInfo", issuerInfo);
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
@@ -316,7 +316,7 @@ public class X509CertprofileQa {
         return new ValidationResult(resultIssues);
     } // method checkCert
 
-    static Set<Range> buildParametersMap(final RangesType ranges) {
+    static Set<Range> buildParametersMap(RangesType ranges) {
         if (ranges == null) {
             return null;
         }
@@ -331,7 +331,7 @@ public class X509CertprofileQa {
     }
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-            final ExtensionsType extensionsType) throws CertprofileException {
+            ExtensionsType extensionsType) throws CertprofileException {
         if (extensionsType == null) {
             return null;
         }

@@ -273,7 +273,7 @@ public class ScepServlet extends AbstractHttpServlet {
         }
     } // method service
 
-    protected PKIMessage generatePkiMessage(final InputStream is) throws IOException {
+    protected PKIMessage generatePkiMessage(InputStream is) throws IOException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
         try {
@@ -287,16 +287,16 @@ public class ScepServlet extends AbstractHttpServlet {
         }
     } // method generatePKIMessage
 
-    public void setResponderManager(final CaManagerImpl responderManager) {
+    public void setResponderManager(CaManagerImpl responderManager) {
         this.responderManager = responderManager;
     }
 
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    private static void audit(final AuditService auditService, final AuditEvent event,
-            final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
+    private static void audit(AuditService auditService, AuditEvent event,
+            AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
         event.setLevel(auditLevel);
 
         if (auditStatus != null) {

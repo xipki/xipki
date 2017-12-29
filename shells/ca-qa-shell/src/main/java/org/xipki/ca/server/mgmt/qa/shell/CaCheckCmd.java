@@ -237,8 +237,7 @@ public class CaCheckCmd extends CaUpdateCmd {
         return null;
     } // method execute0
 
-    private CmdFailure buildUnexpectedException(final String field, final Object is,
-            final Object expected) {
+    private CmdFailure buildUnexpectedException(String field, Object is, Object expected) {
         return new CmdFailure(field + ": is '" + is + "', but expected '" + expected + "'");
     }
 

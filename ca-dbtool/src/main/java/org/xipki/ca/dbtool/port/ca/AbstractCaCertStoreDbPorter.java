@@ -30,8 +30,8 @@ import org.xipki.datasource.springframework.dao.DataAccessException;
 
 class AbstractCaCertStoreDbPorter extends DbPorter {
 
-    AbstractCaCertStoreDbPorter(final DataSourceWrapper datasource, final String baseDir,
-            final AtomicBoolean stopMe, final boolean evaluateOnly) throws DataAccessException {
+    AbstractCaCertStoreDbPorter(DataSourceWrapper datasource, String baseDir,
+            AtomicBoolean stopMe, boolean evaluateOnly) throws DataAccessException {
         super(datasource, baseDir, stopMe, evaluateOnly);
     }
 

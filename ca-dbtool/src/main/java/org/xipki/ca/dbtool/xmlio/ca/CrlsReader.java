@@ -33,7 +33,7 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class CrlsReader extends DbiXmlReader {
 
-    public CrlsReader(final InputStream xmlStream)
+    public CrlsReader(InputStream xmlStream)
             throws XMLStreamException, InvalidDataObjectException {
         super(CrlType.TAG_PARENT, xmlStream);
     }

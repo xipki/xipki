@@ -36,7 +36,7 @@ public class DfltEnvParameterResolver implements EnvParameterResolver {
     }
 
     @Override
-    public String parameter(final String parameterName) {
+    public String parameter(String parameterName) {
         ParamUtil.requireNonNull("parameterName", parameterName);
         return envParameters.get(parameterName);
     }
@@ -46,12 +46,12 @@ public class DfltEnvParameterResolver implements EnvParameterResolver {
         return envParameters.keySet();
     }
 
-    public void addParameter(final String name, final String value) {
+    public void addParameter(String name, String value) {
         ParamUtil.requireNonNull("name", name);
         envParameters.put(name, value);
     }
 
-    public String removeParamater(final String name) {
+    public String removeParamater(String name) {
         ParamUtil.requireNonNull("name", name);
         return envParameters.remove(name);
     }

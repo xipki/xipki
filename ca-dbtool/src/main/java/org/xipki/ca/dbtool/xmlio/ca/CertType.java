@@ -135,7 +135,7 @@ public class CertType extends IdentifidDbObjectType {
         return art;
     }
 
-    public void setArt(final Integer art) {
+    public void setArt(Integer art) {
         this.art = art;
     }
 
@@ -143,7 +143,7 @@ public class CertType extends IdentifidDbObjectType {
         return caId;
     }
 
-    public void setCaId(final Integer caId) {
+    public void setCaId(Integer caId) {
         this.caId = caId;
     }
 
@@ -151,7 +151,7 @@ public class CertType extends IdentifidDbObjectType {
         return sn;
     }
 
-    public void setSn(final String sn) {
+    public void setSn(String sn) {
         this.sn = sn;
     }
 
@@ -159,7 +159,7 @@ public class CertType extends IdentifidDbObjectType {
         return ee;
     }
 
-    public void setEe(final Boolean ee) {
+    public void setEe(Boolean ee) {
         this.ee = ee;
     }
 
@@ -167,7 +167,7 @@ public class CertType extends IdentifidDbObjectType {
         return pid;
     }
 
-    public void setPid(final Integer pid) {
+    public void setPid(Integer pid) {
         this.pid = pid;
     }
 
@@ -175,7 +175,7 @@ public class CertType extends IdentifidDbObjectType {
         return rid;
     }
 
-    public void setRid(final Integer rid) {
+    public void setRid(Integer rid) {
         this.rid = rid;
     }
 
@@ -183,7 +183,7 @@ public class CertType extends IdentifidDbObjectType {
         return update;
     }
 
-    public void setUpdate(final Long update) {
+    public void setUpdate(Long update) {
         this.update = update;
     }
 
@@ -191,7 +191,7 @@ public class CertType extends IdentifidDbObjectType {
         return rev;
     }
 
-    public void setRev(final Boolean rev) {
+    public void setRev(Boolean rev) {
         this.rev = rev;
     }
 
@@ -199,7 +199,7 @@ public class CertType extends IdentifidDbObjectType {
         return rr;
     }
 
-    public void setRr(final Integer rr) {
+    public void setRr(Integer rr) {
         this.rr = rr;
     }
 
@@ -207,7 +207,7 @@ public class CertType extends IdentifidDbObjectType {
         return rt;
     }
 
-    public void setRt(final Long rt) {
+    public void setRt(Long rt) {
         this.rt = rt;
     }
 
@@ -215,7 +215,7 @@ public class CertType extends IdentifidDbObjectType {
         return rit;
     }
 
-    public void setRit(final Long rit) {
+    public void setRit(Long rit) {
         this.rit = rit;
     }
 
@@ -223,7 +223,7 @@ public class CertType extends IdentifidDbObjectType {
         return tid;
     }
 
-    public void setTid(final String tid) {
+    public void setTid(String tid) {
         this.tid = tid;
     }
 
@@ -231,7 +231,7 @@ public class CertType extends IdentifidDbObjectType {
         return reqType;
     }
 
-    public void setReqType(final Integer reqType) {
+    public void setReqType(Integer reqType) {
         this.reqType = reqType;
     }
 
@@ -239,7 +239,7 @@ public class CertType extends IdentifidDbObjectType {
         return fpRs;
     }
 
-    public void setFpRs(final Long fpRs) {
+    public void setFpRs(Long fpRs) {
         this.fpRs = fpRs;
     }
 
@@ -247,7 +247,7 @@ public class CertType extends IdentifidDbObjectType {
         return rs;
     }
 
-    public void setRs(final String rs) {
+    public void setRs(String rs) {
         this.rs = rs;
     }
 
@@ -255,7 +255,7 @@ public class CertType extends IdentifidDbObjectType {
         return file;
     }
 
-    public void setFile(final String file) {
+    public void setFile(String file) {
         this.file = file;
     }
 
@@ -283,12 +283,12 @@ public class CertType extends IdentifidDbObjectType {
         return uid;
     }
 
-    public void setUid(final Integer uid) {
+    public void setUid(Integer uid) {
         this.uid = uid;
     }
 
     @Override
-    public void writeTo(final DbiXmlWriter writer)
+    public void writeTo(DbiXmlWriter writer)
             throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
 

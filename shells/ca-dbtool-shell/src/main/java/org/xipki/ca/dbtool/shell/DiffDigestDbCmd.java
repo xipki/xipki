@@ -26,7 +26,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.dbtool.diffdb.DbDigestDiffWorker;
-import org.xipki.ca.dbtool.diffdb.NumThreads;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.DirPathCompleter;
@@ -89,9 +88,8 @@ public class DiffDigestDbCmd extends DbPortAction {
             }
         }
 
-        NumThreads numThreads = new NumThreads(numTargetThreads);
         return new DbDigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly, refDir,
-                refDbConf, dbconfFile, reportDir, numCertsPerSelect, numThreads, caCerts);
+                refDbConf, dbconfFile, reportDir, numCertsPerSelect, numTargetThreads, caCerts);
     }
 
 }

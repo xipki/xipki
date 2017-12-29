@@ -59,7 +59,7 @@ public class TargetDigestRetriever {
 
         private PreparedStatement inArraySelectStmt;
 
-        Retriever(final boolean revokedOnly) throws DataAccessException {
+        Retriever(boolean revokedOnly) throws DataAccessException {
             this.revokedOnly = revokedOnly;
             conn = datasource.getConnection();
 
@@ -131,7 +131,7 @@ public class TargetDigestRetriever {
         } // method run
 
         private Map<BigInteger, DbDigestEntry> query(CertsBundle bundle)
-            throws DataAccessException {
+                throws DataAccessException {
             List<BigInteger> serialNumbers = bundle.serialNumbers();
             int size = serialNumbers.size();
             boolean batchSupported = datasource.databaseType() != DatabaseType.H2;
@@ -167,11 +167,9 @@ public class TargetDigestRetriever {
 
     private final List<Retriever> retrievers;
 
-    public TargetDigestRetriever(final boolean revokedOnly, final ProcessLog processLog,
-            final DigestReader reader, final DbDigestReporter reporter,
-            final DataSourceWrapper datasource, final XipkiDbControl dbControl, final int caId,
-            final int numPerSelect, final int numThreads, final StopMe stopMe)
-            throws DataAccessException {
+    public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog, DigestReader reader,
+            DbDigestReporter reporter, DataSourceWrapper datasource, XipkiDbControl dbControl,
+            int caId, int numPerSelect, int numThreads, StopMe stopMe) throws DataAccessException {
         this.processLog = ParamUtil.requireNonNull("processLog", processLog);
         this.numPerSelect = numPerSelect;
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
@@ -228,7 +226,7 @@ public class TargetDigestRetriever {
     }
 
     private Map<BigInteger, DbDigestEntry> getCertsViaSingleSelectInB(
-            final PreparedStatement singleSelectStmt, final List<BigInteger> serialNumbers)
+            PreparedStatement singleSelectStmt, List<BigInteger> serialNumbers)
             throws DataAccessException {
         Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
@@ -243,7 +241,7 @@ public class TargetDigestRetriever {
     }
 
     private Map<BigInteger, DbDigestEntry> getCertsViaInArraySelectInB(
-            final PreparedStatement batchSelectStmt, final List<BigInteger> serialNumbers)
+            PreparedStatement batchSelectStmt, List<BigInteger> serialNumbers)
             throws DataAccessException {
         final int n = serialNumbers.size();
         if (n != numPerSelect) {
@@ -268,8 +266,8 @@ public class TargetDigestRetriever {
         }
     }
 
-    private Map<BigInteger, DbDigestEntry> buildResult(final ResultSet rs,
-            final List<BigInteger> serialNumbers) throws SQLException {
+    private Map<BigInteger, DbDigestEntry> buildResult(ResultSet rs, List<BigInteger> serialNumbers)
+            throws SQLException {
         Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
         while (rs.next()) {
@@ -300,8 +298,8 @@ public class TargetDigestRetriever {
         return ret;
     }
 
-    private DbDigestEntry getSingleCert(final PreparedStatement singleSelectStmt,
-            final BigInteger serialNumber) throws DataAccessException {
+    private DbDigestEntry getSingleCert(PreparedStatement singleSelectStmt,
+            BigInteger serialNumber) throws DataAccessException {
         ResultSet rs = null;
         try {
             singleSelectStmt.setString(1, serialNumber.toString(16));
@@ -330,7 +328,7 @@ public class TargetDigestRetriever {
         }
     }
 
-    private void releaseResources(final Statement ps, final ResultSet rs) {
+    private void releaseResources(Statement ps, ResultSet rs) {
         DbToolBase.releaseResources(datasource, ps, rs);
     }
 

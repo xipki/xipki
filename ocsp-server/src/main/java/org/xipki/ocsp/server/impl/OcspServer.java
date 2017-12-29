@@ -229,15 +229,15 @@ public class OcspServer {
         this.datasourceFactory = new DataSourceFactory();
     }
 
-    public void setSecurityFactory(final SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
-    public void setConfFile(final String confFile) {
+    public void setConfFile(String confFile) {
         this.confFile = confFile;
     }
 
-    Responder getResponder(final ServletURI servletUri) throws UnsupportedEncodingException {
+    Responder getResponder(ServletURI servletUri) throws UnsupportedEncodingException {
         String path = servletUri.path();
         for (String servletPath : servletPaths) {
             if (path.startsWith(servletPath)) {
@@ -247,7 +247,7 @@ public class OcspServer {
         return null;
     }
 
-    Object[] getServletPathAndResponder(final ServletURI servletUri)
+    Object[] getServletPathAndResponder(ServletURI servletUri)
             throws UnsupportedEncodingException {
         String path = servletUri.path();
         for (String servletPath : servletPaths) {
@@ -258,7 +258,7 @@ public class OcspServer {
         return null;
     }
 
-    public Responder getResponder(final String name) {
+    public Responder getResponder(String name) {
         ParamUtil.requireNonBlank("name", name);
         return responders.get(name);
     }
@@ -569,8 +569,7 @@ public class OcspServer {
         }
     }
 
-    public OcspRespWithCacheInfo answer(final Responder responder, final byte[] request,
-            final boolean viaGet) {
+    public OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet) {
         RequestOption reqOpt = responder.requestOption();
 
         int version;
@@ -950,7 +949,7 @@ public class OcspServer {
         return null;
     }
 
-    public HealthCheckResult healthCheck(final Responder responder) {
+    public HealthCheckResult healthCheck(Responder responder) {
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
         boolean healthy = true;
 
@@ -975,12 +974,11 @@ public class OcspServer {
         return result;
     } // method healthCheck
 
-    public void setOcspStoreFactoryRegister(
-            final OcspStoreFactoryRegister ocspStoreFactoryRegister) {
+    public void setOcspStoreFactoryRegister(OcspStoreFactoryRegister ocspStoreFactoryRegister) {
         this.ocspStoreFactoryRegister = ocspStoreFactoryRegister;
     }
 
-    private ResponderSigner initSigner(final SignerType signerType) throws InvalidConfException {
+    private ResponderSigner initSigner(SignerType signerType) throws InvalidConfException {
         X509Certificate[] explicitCertificateChain = null;
 
         X509Certificate explicitResponderCert = null;
@@ -1025,8 +1023,7 @@ public class OcspServer {
         }
     } // method initSigner
 
-    private OcspStore newStore(final StoreType conf,
-            final Map<String, DataSourceWrapper> datasources)
+    private OcspStore newStore(StoreType conf, Map<String, DataSourceWrapper> datasources)
             throws InvalidConfException {
         OcspStore store;
         String type = conf.getSource().getType();
@@ -1073,7 +1070,7 @@ public class OcspServer {
         return store;
     } // method initStore
 
-    private Object checkSignature(final byte[] request, final RequestOption requestOption)
+    private Object checkSignature(byte[] request, RequestOption requestOption)
             throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException {
         OCSPRequest req;
         try {
@@ -1136,8 +1133,8 @@ public class OcspServer {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     } // method checkSignature
 
-    private static boolean canBuildCertpath(final X509CertificateHolder[] certsInReq,
-            final RequestOption requestOption, final Date referenceTime) {
+    private static boolean canBuildCertpath(X509CertificateHolder[] certsInReq,
+            RequestOption requestOption, Date referenceTime) {
         X509Certificate target;
         try {
             target = X509Util.toX509Cert(certsInReq[0].toASN1Structure());
@@ -1197,23 +1194,23 @@ public class OcspServer {
         return false;
     } // method canBuildCertpath
 
-    private static boolean getBoolean(final Boolean bo, final boolean defaultValue) {
+    private static boolean getBoolean(Boolean bo, boolean defaultValue) {
         return (bo == null) ? defaultValue : bo.booleanValue();
     }
 
-    private static InputStream getInputStream(final FileOrValueType conf) throws IOException {
+    private static InputStream getInputStream(FileOrValueType conf) throws IOException {
         return (conf.getFile() != null)
                 ? new FileInputStream(IoUtil.expandFilepath(conf.getFile()))
                 : new ByteArrayInputStream(conf.getValue());
     }
 
-    private static InputStream getInputStream(final FileOrPlainValueType conf) throws IOException {
+    private static InputStream getInputStream(FileOrPlainValueType conf) throws IOException {
         return (conf.getFile() != null)
                 ? new FileInputStream(IoUtil.expandFilepath(conf.getFile()))
                 : new ByteArrayInputStream(conf.getValue().getBytes());
     }
 
-    private static void close(final InputStream stream) {
+    private static void close(InputStream stream) {
         if (stream == null) {
             return;
         }
@@ -1225,8 +1222,7 @@ public class OcspServer {
         }
     }
 
-    private static X509Certificate parseCert(final FileOrValueType certConf)
-            throws InvalidConfException {
+    private static X509Certificate parseCert(FileOrValueType certConf) throws InvalidConfException {
         InputStream is = null;
         try {
             is = getInputStream(certConf);
@@ -1242,7 +1238,7 @@ public class OcspServer {
         }
     }
 
-    private static OCSPServer parseConf(final String confFilename) throws InvalidConfException {
+    private static OCSPServer parseConf(String confFilename) throws InvalidConfException {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

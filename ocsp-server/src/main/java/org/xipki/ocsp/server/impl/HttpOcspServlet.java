@@ -57,7 +57,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
     public HttpOcspServlet() {
     }
 
-    public void setServer(final OcspServer server) {
+    public void setServer(OcspServer server) {
         this.server = ParamUtil.requireNonNull("server", server);
     }
 

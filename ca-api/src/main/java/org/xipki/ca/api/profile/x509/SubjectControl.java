@@ -47,7 +47,7 @@ public class SubjectControl {
 
     private final List<ASN1ObjectIdentifier> types;
 
-    public SubjectControl(final List<RdnControl> controls, final boolean keepRdnOrder) {
+    public SubjectControl(List<RdnControl> controls, boolean keepRdnOrder) {
         ParamUtil.requireNonEmpty("controls", controls);
         this.typeGroups = new HashMap<>();
 
@@ -104,17 +104,17 @@ public class SubjectControl {
         this.groups = Collections.unmodifiableSet(groupSet);
     } // constructor
 
-    public RdnControl getControl(final ASN1ObjectIdentifier type) {
+    public RdnControl getControl(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         return controls.isEmpty() ? SubjectDnSpec.getRdnControl(type) : controls.get(type);
     }
 
-    public String getGroup(final ASN1ObjectIdentifier type) {
+    public String getGroup(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         return typeGroups.get(type);
     }
 
-    public Set<ASN1ObjectIdentifier> getTypesForGroup(final String group) {
+    public Set<ASN1ObjectIdentifier> getTypesForGroup(String group) {
         ParamUtil.requireNonNull("group", group);
         return groupTypes.get(group);
     }

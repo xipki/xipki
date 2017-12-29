@@ -50,8 +50,8 @@ public class X509CertprofileUtil {
      * @throws BadCertTemplateException
      *         If requestedName is invalid or contains entries which are not allowed in the modes.
      */
-    public static GeneralName createGeneralName(final GeneralName requestedName,
-            final Set<GeneralNameMode> modes) throws BadCertTemplateException {
+    public static GeneralName createGeneralName(GeneralName requestedName,
+            Set<GeneralNameMode> modes) throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedName", requestedName);
 
         int tag = requestedName.getTagNo();

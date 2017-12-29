@@ -47,7 +47,7 @@ public class RequestCertType extends IdentifidDbObjectType {
         return rid;
     }
 
-    public void setRid(final long rid) {
+    public void setRid(long rid) {
         this.rid = rid;
     }
 
@@ -55,7 +55,7 @@ public class RequestCertType extends IdentifidDbObjectType {
         return cid;
     }
 
-    public void setCid(final long cid) {
+    public void setCid(long cid) {
         this.cid = cid;
     }
 
@@ -67,8 +67,7 @@ public class RequestCertType extends IdentifidDbObjectType {
     }
 
     @Override
-    public void writeTo(final DbiXmlWriter writer)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
         validate();
 

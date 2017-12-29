@@ -68,8 +68,8 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public void initialize(final String conf, final PasswordResolver passwordResolver,
-            final Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
+    public void initialize(String conf, PasswordResolver passwordResolver,
+            Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
         ParamUtil.requireNonNull("conf", conf);
         ParamUtil.requireNonEmpty("datasources", datasources);
 
@@ -101,12 +101,12 @@ public class OcspCertPublisher extends X509CertPublisher {
     } // method initialize
 
     @Override
-    public void setEnvParameterResolver(final EnvParameterResolver parameterResolver) {
+    public void setEnvParameterResolver(EnvParameterResolver parameterResolver) {
         this.envParameterResolver = parameterResolver;
     }
 
     @Override
-    public boolean caAdded(final X509Cert issuer) {
+    public boolean caAdded(X509Cert issuer) {
         try {
             queryExecutor.addIssuer(issuer);
             return true;
@@ -117,7 +117,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean certificateAdded(final X509CertificateInfo certInfo) {
+    public boolean certificateAdded(X509CertificateInfo certInfo) {
         X509Cert caCert = certInfo.issuerCert();
         X509CertWithDbId cert = certInfo.cert();
 
@@ -132,8 +132,8 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean certificateRevoked(final X509Cert caCert, final X509CertWithDbId cert,
-            final String certprofile, final CertRevocationInfo revInfo) {
+    public boolean certificateRevoked(X509Cert caCert, X509CertWithDbId cert,
+            String certprofile, CertRevocationInfo revInfo) {
         try {
             queryExecutor.revokeCert(caCert, cert, certprofile, revInfo);
             return true;
@@ -144,7 +144,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean certificateUnrevoked(final X509Cert caCert, final X509CertWithDbId cert) {
+    public boolean certificateUnrevoked(X509Cert caCert, X509CertWithDbId cert) {
         try {
             queryExecutor.unrevokeCert(caCert, cert);
             return true;
@@ -155,8 +155,7 @@ public class OcspCertPublisher extends X509CertPublisher {
         }
     }
 
-    private void logAndAudit(final String issuer, final X509Cert cert, final Exception ex,
-            final String messagePrefix) {
+    private void logAndAudit(String issuer, X509Cert cert, Exception ex, String messagePrefix) {
         String subjectText = cert.subject();
         String serialText = LogUtil.formatCsn(cert.cert().getSerialNumber());
 
@@ -183,7 +182,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     } // method logAndAudit
 
     @Override
-    public boolean crlAdded(final X509Cert caCert, final X509CRL crl) {
+    public boolean crlAdded(X509Cert caCert, X509CRL crl) {
         return true;
     }
 
@@ -193,13 +192,13 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",
                 auditServiceRegister);
     }
 
     @Override
-    public boolean caRevoked(final X509Cert caCert, final CertRevocationInfo revInfo) {
+    public boolean caRevoked(X509Cert caCert, CertRevocationInfo revInfo) {
         try {
             queryExecutor.revokeCa(caCert, revInfo);
             return true;
@@ -211,7 +210,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean caUnrevoked(final X509Cert caCert) {
+    public boolean caUnrevoked(X509Cert caCert) {
         try {
             queryExecutor.unrevokeCa(caCert);
             return true;
@@ -223,7 +222,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean certificateRemoved(final X509Cert issuerCert, final X509CertWithDbId cert) {
+    public boolean certificateRemoved(X509Cert issuerCert, X509CertWithDbId cert) {
         try {
             queryExecutor.removeCert(issuerCert, cert);
             return true;

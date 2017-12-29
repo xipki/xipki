@@ -31,7 +31,7 @@ public enum RequestType {
 
     private final int code;
 
-    RequestType(final int code) {
+    RequestType(int code) {
         this.code = code;
     }
 
@@ -39,7 +39,7 @@ public enum RequestType {
         return code;
     }
 
-    public static RequestType getInstance(final int code) {
+    public static RequestType getInstance(int code) {
         for (RequestType value : values()) {
             if (code == value.code) {
                 return value;

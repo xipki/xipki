@@ -60,7 +60,7 @@ public class PasswordHash {
      * @return a salted PBKDF2 hash of the password
      *
      */
-    public static String createHash(final String password) {
+    public static String createHash(String password) {
         ParamUtil.requireNonBlank("password", password);
         return createHash(password.getBytes());
     }
@@ -71,7 +71,7 @@ public class PasswordHash {
      * @param password - the password to hash
      * @return a salted PBKDF2 hash of the password
      */
-    public static String createHash(final byte[] password) {
+    public static String createHash(byte[] password) {
         return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
     }
 
@@ -84,8 +84,7 @@ public class PasswordHash {
      * @param dkSize - the length of the derived key
      * @return a salted PBKDF2 hash of the password
      */
-    public static String createHash(final byte[] password, final int saltSize, final int iterations,
-            final int dkSize) {
+    public static String createHash(byte[] password, int saltSize, int iterations, int dkSize) {
         ParamUtil.requireNonNull("password", password);
         // Generate a random salt
         SecureRandom random = new SecureRandom();
@@ -105,7 +104,7 @@ public class PasswordHash {
      * @param correctHash - the hash of the valid password
      * @return true if the password is correct, false if not
      */
-    public static boolean validatePassword(final String password, final String correctHash) {
+    public static boolean validatePassword(String password, String correctHash) {
         ParamUtil.requireNonBlank("password", password);
         return validatePassword(password.getBytes(), correctHash);
     }
@@ -117,7 +116,7 @@ public class PasswordHash {
      * @param correctHash - the hash of the valid password
      * @return true if the password is correct, false if not
      */
-    public static boolean validatePassword(final byte[] password, final String correctHash) {
+    public static boolean validatePassword(byte[] password, String correctHash) {
         ParamUtil.requireNonNull("password", password);
         // Decode the hash into its parameters
         String[] params = correctHash.split(":");
@@ -141,7 +140,7 @@ public class PasswordHash {
      * @param arrayB - the second byte array
      * @return true if both byte arrays are the same, false if not
      */
-    private static boolean slowEquals(final byte[] arrayA, final byte[] arrayB) {
+    private static boolean slowEquals(byte[] arrayA, byte[] arrayB) {
         int diff = arrayA.length ^ arrayB.length;
         for (int i = 0; i < arrayA.length && i < arrayB.length; i++) {
             diff |= arrayA[i] ^ arrayB[i];
@@ -158,8 +157,7 @@ public class PasswordHash {
      * @param bytes - the length of the hash to compute in bytes
      * @return the PBDKF2 hash of the password
      */
-    public static byte[] pbkdf2(final byte[] password, final byte[] salt, final int iterations,
-            final int bytes) {
+    public static byte[] pbkdf2(byte[] password, byte[] salt, int iterations, int bytes) {
         byte[] pwdBytes;
         try {
             pwdBytes = new String(password).getBytes("UTF-8");
@@ -179,7 +177,7 @@ public class PasswordHash {
      * @param hex - the hex string
      * @return the hex string decoded into a byte array
      */
-    private static byte[] fromHex(final String hex) {
+    private static byte[] fromHex(String hex) {
         byte[] binary = new byte[hex.length() / 2];
         for (int i = 0; i < binary.length; i++) {
             binary[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
@@ -193,7 +191,7 @@ public class PasswordHash {
      * @param array - the byte array to convert
      * @return a length*2 character string encoding the byte array
      */
-    private static String toHex(final byte[] array) {
+    private static String toHex(byte[] array) {
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
         int paddingLength = (array.length * 2) - hex.length();

@@ -36,7 +36,7 @@ public class UsersWriter extends DbiXmlWriter {
         super(UserType.TAG_PARENT, "1");
     }
 
-    public void add(final UserType user) throws InvalidDataObjectException, XMLStreamException {
+    public void add(UserType user) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("user", user);
         user.validate();
         user.writeTo(this);

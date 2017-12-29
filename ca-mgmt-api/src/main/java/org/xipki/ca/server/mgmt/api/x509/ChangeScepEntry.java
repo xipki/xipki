@@ -46,7 +46,7 @@ public class ChangeScepEntry {
 
     private String control;
 
-    public ChangeScepEntry(final String name) {
+    public ChangeScepEntry(String name) {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
     }
 
@@ -54,7 +54,7 @@ public class ChangeScepEntry {
         return name;
     }
 
-    public void setCa(final NameId caIdent) {
+    public void setCa(NameId caIdent) {
         this.caIdent = caIdent;
     }
 
@@ -74,7 +74,7 @@ public class ChangeScepEntry {
         return responderType;
     }
 
-    public void setResponderType(final String responderType) {
+    public void setResponderType(String responderType) {
         this.responderType = responderType;
     }
 
@@ -82,7 +82,7 @@ public class ChangeScepEntry {
         return responderConf;
     }
 
-    public void setResponderConf(final String responderConf) {
+    public void setResponderConf(String responderConf) {
         this.responderConf = responderConf;
     }
 
@@ -90,7 +90,7 @@ public class ChangeScepEntry {
         return base64Cert;
     }
 
-    public void setBase64Cert(final String base64Cert) {
+    public void setBase64Cert(String base64Cert) {
         this.base64Cert = base64Cert;
     }
 
@@ -111,7 +111,7 @@ public class ChangeScepEntry {
         return control;
     }
 
-    public void setControl(final String control) {
+    public void setControl(String control) {
         this.control = control;
     }
 

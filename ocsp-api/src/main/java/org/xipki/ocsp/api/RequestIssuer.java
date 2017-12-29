@@ -104,7 +104,7 @@ public class RequestIssuer {
         return len;
     }
 
-    public int write(final byte[] out, final int offset) {
+    public int write(byte[] out, int offset) {
         System.arraycopy(data, from, out, offset, len);
         return len;
     }

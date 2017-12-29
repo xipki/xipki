@@ -39,9 +39,8 @@ public class ShellUtil {
     private ShellUtil() {
     }
 
-    public static String canonicalizeSignerConf(final String keystoreType, final String signerConf,
-            final PasswordResolver passwordResolver, final SecurityFactory securityFactory)
-            throws Exception {
+    public static String canonicalizeSignerConf(String keystoreType, String signerConf,
+            PasswordResolver passwordResolver, SecurityFactory securityFactory) throws Exception {
         ParamUtil.requireNonBlank("keystoreType", keystoreType);
         ParamUtil.requireNonBlank("signerConf", signerConf);
         ParamUtil.requireNonNull("securityFactory", securityFactory);

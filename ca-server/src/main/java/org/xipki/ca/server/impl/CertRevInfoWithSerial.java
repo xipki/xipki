@@ -35,15 +35,15 @@ public class CertRevInfoWithSerial extends CertRevocationInfo {
 
     private final BigInteger serial;
 
-    public CertRevInfoWithSerial(final long id, final BigInteger serial, final CrlReason reason,
-            final Date revocationTime, final Date invalidityTime) {
+    public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
+            Date revocationTime, Date invalidityTime) {
         super(reason, revocationTime, invalidityTime);
         this.id = id;
         this.serial = serial;
     }
 
-    public CertRevInfoWithSerial(final long id, final BigInteger serial, final int reasonCode,
-            final Date revocationTime, final Date invalidityTime) {
+    public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
+            Date revocationTime, Date invalidityTime) {
         super(reasonCode, revocationTime, invalidityTime);
         this.id = id;
         this.serial = ParamUtil.requireNonNull("serial", serial);

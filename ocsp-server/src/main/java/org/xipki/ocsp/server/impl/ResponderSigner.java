@@ -61,7 +61,7 @@ class ResponderSigner {
 
     private final boolean macSigner;
 
-    ResponderSigner(final List<ConcurrentContentSigner> signers)
+    ResponderSigner(List<ConcurrentContentSigner> signers)
             throws CertificateException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
         ConcurrentContentSigner firstSigner = signers.get(0);
@@ -126,7 +126,7 @@ class ResponderSigner {
     }
 
     public ConcurrentContentSigner getSignerForPreferredSigAlgs(
-            final List<AlgorithmIdentifier> prefSigAlgs) {
+            List<AlgorithmIdentifier> prefSigAlgs) {
         if (prefSigAlgs == null) {
             return signers.get(0);
         }
@@ -140,7 +140,7 @@ class ResponderSigner {
         return null;
     }
 
-    public ResponderID getResponderId(final boolean byName) {
+    public ResponderID getResponderId(boolean byName) {
         return byName ? responderIdByName :  responderIdByKey;
     }
 
@@ -170,7 +170,7 @@ class ResponderSigner {
         return true;
     }
 
-    private static String getSignatureAlgorithmName(final AlgorithmIdentifier sigAlgId) {
+    private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId) {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
             return algOid.getId();

@@ -29,15 +29,15 @@ public class OcspStoreException extends Exception {
     public OcspStoreException() {
     }
 
-    public OcspStoreException(final String message) {
+    public OcspStoreException(String message) {
         super(message);
     }
 
-    public OcspStoreException(final Throwable cause) {
+    public OcspStoreException(Throwable cause) {
         super(cause);
     }
 
-    public OcspStoreException(final String message, final Throwable cause) {
+    public OcspStoreException(String message, Throwable cause) {
         super(message, cause);
     }
 

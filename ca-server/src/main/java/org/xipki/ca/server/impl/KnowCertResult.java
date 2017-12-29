@@ -30,7 +30,7 @@ public class KnowCertResult {
 
     private final Integer userId;
 
-    public KnowCertResult(final boolean known, final Integer userId) {
+    public KnowCertResult(boolean known, Integer userId) {
         this.known = known;
         this.userId = userId;
     }

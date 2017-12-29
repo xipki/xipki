@@ -35,8 +35,7 @@ public class ExtensionValues {
 
     private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
-    public boolean addExtension(final ASN1ObjectIdentifier type, final boolean critical,
-            final ASN1Encodable value) {
+    public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value) {
         ParamUtil.requireNonNull("type", type);
         ParamUtil.requireNonNull("value", value);
 
@@ -47,7 +46,7 @@ public class ExtensionValues {
         return true;
     }
 
-    public boolean addExtension(final ASN1ObjectIdentifier type, final ExtensionValue value) {
+    public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value) {
         ParamUtil.requireNonNull("type", type);
         ParamUtil.requireNonNull("value", value);
 
@@ -62,17 +61,17 @@ public class ExtensionValues {
         return Collections.unmodifiableSet(extensions.keySet());
     }
 
-    public ExtensionValue getExtensionValue(final ASN1ObjectIdentifier type) {
+    public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         return extensions.get(type);
     }
 
-    public boolean removeExtensionTuple(final ASN1ObjectIdentifier type) {
+    public boolean removeExtensionTuple(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         return extensions.remove(type) != null;
     }
 
-    public boolean containsExtension(final ASN1ObjectIdentifier type) {
+    public boolean containsExtension(ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         return extensions.containsKey(type);
     }

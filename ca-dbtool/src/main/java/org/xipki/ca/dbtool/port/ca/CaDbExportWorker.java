@@ -66,10 +66,9 @@ public class CaDbExportWorker extends DbPortWorker {
 
     private final boolean evaluateOnly;
 
-    public CaDbExportWorker(final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver, final String dbConfFile,
-            final String destFolder, final boolean resume, final int numCertsInBundle,
-            final int numCertsPerSelect, final boolean evaluateOnly)
+    public CaDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+            String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
+            int numCertsPerSelect, boolean evaluateOnly)
             throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonBlank("dbConfFile", dbConfFile);
         ParamUtil.requireNonBlank("destFolder", destFolder);

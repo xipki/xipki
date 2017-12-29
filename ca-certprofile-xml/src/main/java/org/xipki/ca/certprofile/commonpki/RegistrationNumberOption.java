@@ -30,7 +30,7 @@ public class RegistrationNumberOption {
 
     private final String constant;
 
-    public RegistrationNumberOption(final String regex, final String constant) {
+    public RegistrationNumberOption(String regex, String constant) {
         if (regex != null) {
             if (constant != null) {
                 throw new IllegalArgumentException(

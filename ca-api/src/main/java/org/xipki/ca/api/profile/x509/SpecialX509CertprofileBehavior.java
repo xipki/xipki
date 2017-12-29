@@ -30,7 +30,7 @@ public enum SpecialX509CertprofileBehavior {
 
     public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
 
-    public static SpecialX509CertprofileBehavior forName(final String behavior) {
+    public static SpecialX509CertprofileBehavior forName(String behavior) {
         ParamUtil.requireNonNull("behavior", behavior);
         for (SpecialX509CertprofileBehavior b : values()) {
             if (b.name().equalsIgnoreCase(behavior)) {

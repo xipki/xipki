@@ -272,7 +272,7 @@ public class CaUpdateCmd extends CaAction {
         return null;
     }
 
-    private static List<String> getUris(final List<String> uris) {
+    private static List<String> getUris(List<String> uris) {
         if (uris == null) {
             return null;
         }

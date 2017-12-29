@@ -33,8 +33,7 @@ public class AddUserEntry {
 
     private final String password;
 
-    public AddUserEntry(final NameId ident, final boolean active, final String password)
-            throws CaMgmtException {
+    public AddUserEntry(NameId ident, boolean active, String password) throws CaMgmtException {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         this.active = active;
         this.password = ParamUtil.requireNonBlank("password", password);

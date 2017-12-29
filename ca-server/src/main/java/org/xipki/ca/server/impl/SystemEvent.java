@@ -32,7 +32,7 @@ class SystemEvent {
 
     private final long eventTime;
 
-    SystemEvent(final String name, final String owner, final long eventTime) {
+    SystemEvent(String name, String owner, long eventTime) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.owner = ParamUtil.requireNonBlank("owner", owner);
         this.eventTime = eventTime;

@@ -31,7 +31,7 @@ public class ExtKeyUsageControl {
 
     private final boolean required;
 
-    public ExtKeyUsageControl(final ASN1ObjectIdentifier extKeyUsage, final boolean required) {
+    public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
         this.extKeyUsage = ParamUtil.requireNonNull("extKeyUsage", extKeyUsage);
         this.required = required;
     }

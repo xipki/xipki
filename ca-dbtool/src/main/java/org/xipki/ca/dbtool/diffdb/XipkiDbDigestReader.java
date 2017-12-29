@@ -143,14 +143,13 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     } // class XipkiDbRetriever
 
-    private XipkiDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
-            final int totalAccount, final long minId, final int numBlocksToRead,
-            final int numPerSelect, final StopMe stopMe) throws Exception {
+    private XipkiDbDigestReader(DataSourceWrapper datasource, X509Certificate caCert,
+            int totalAccount, long minId, int numBlocksToRead, int numPerSelect, StopMe stopMe)
+            throws Exception {
         super(datasource, caCert, totalAccount, minId, numBlocksToRead, stopMe);
     } // constructor
 
-    private void init(final DbSchemaType dbSchemaType, final int caId, final int numPerSelect)
-            throws Exception {
+    private void init(DbSchemaType dbSchemaType, int caId, int numPerSelect) throws Exception {
         this.caId = caId;
         this.conn = datasource.getConnection();
         this.dbControl = new XipkiDbControl(dbSchemaType);
@@ -178,9 +177,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
         return new XipkiDbRetriever();
     }
 
-    public static XipkiDbDigestReader getInstance(final DataSourceWrapper datasource,
-            final DbSchemaType dbSchemaType, final int caId, final int numBlocksToRead,
-            final int numPerSelect, final StopMe stopMe) throws Exception {
+    public static XipkiDbDigestReader getInstance(DataSourceWrapper datasource,
+            DbSchemaType dbSchemaType, int caId, int numBlocksToRead, int numPerSelect,
+            StopMe stopMe) throws Exception {
         ParamUtil.requireNonNull("datasource", datasource);
 
         Connection conn = datasource.getConnection();

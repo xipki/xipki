@@ -77,8 +77,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         final PreparedStatement psCerthash;
         final PreparedStatement psRawCert;
 
-        ImportStatements(final PreparedStatement psCert, final PreparedStatement psCerthash,
-                final PreparedStatement psRawCert) {
+        ImportStatements(PreparedStatement psCert, PreparedStatement psCerthash,
+                PreparedStatement psRawCert) {
             this.psCert = psCert;
             this.psCerthash = psCerthash;
             this.psRawCert = psRawCert;
@@ -95,10 +95,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
     private final int numCertsPerCommit;
 
-    OcspCertStoreFromCaDbImporter(final DataSourceWrapper datasource,
-            final Unmarshaller unmarshaller, final String srcDir, final String publisherName,
-            final int numCertsPerCommit, final boolean resume, final AtomicBoolean stopMe,
-            final boolean evaluateOnly) throws Exception {
+    OcspCertStoreFromCaDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller,
+            String srcDir, String publisherName, int numCertsPerCommit, boolean resume,
+            AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -223,8 +222,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(" imported OCSP certstore to database");
     } // method importToDb
 
-    private List<Integer> getIssuerIds(final List<CaType> cas)
-            throws IOException {
+    private List<Integer> getIssuerIds(List<CaType> cas) throws IOException {
         List<Integer> relatedCaIds = new LinkedList<>();
         for (CaType issuer : cas) {
             byte[] encodedCert = binary(issuer.getCert());
@@ -246,7 +244,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         return relatedCaIds;
     }
 
-    private List<Integer> importIssuer(final List<CaType> cas)
+    private List<Integer> importIssuer(List<CaType> cas)
             throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table ISSUER");
         final String sql = SQL_ADD_ISSUER;
@@ -266,8 +264,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         return relatedCaIds;
     }
 
-    private void importIssuer0(final CaType issuer, final String sql,
-            final PreparedStatement ps, final List<CaType> cas, final List<Integer> relatedCaIds)
+    private void importIssuer0(CaType issuer, String sql, PreparedStatement ps, List<CaType> cas,
+            List<Integer> relatedCaIds)
             throws IOException, DataAccessException, CertificateException {
         try {
             byte[] encodedCert = binary(issuer.getCert());
@@ -322,9 +320,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         }
     } // method importIssuer0
 
-    private void importCert(final CertStoreType certstore, final Map<Integer, String> profileMap,
-            final boolean revokedOnly, final List<Integer> caIds, final File processLogFile)
-            throws Exception {
+    private void importCert(CertStoreType certstore, Map<Integer, String> profileMap,
+            boolean revokedOnly, List<Integer> caIds, File processLogFile) throws Exception {
         int numProcessedBefore = 0;
         long minId = 1;
         if (processLogFile.exists()) {
@@ -406,11 +403,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 + importedText() + importLog.numProcessed() + " certificates");
     } // method importCert
 
-    private long importCert0(final ImportStatements statments, final String certsZipFile,
-            final Map<Integer, String> profileMap, final boolean revokedOnly,
-            final List<Integer> caIds, final long minId, final File processLogFile,
-            final ProcessLog processLog, final int numProcessedInLastProcess,
-            final ProcessLog importLog) throws Exception {
+    private long importCert0(ImportStatements statments, String certsZipFile,
+            Map<Integer, String> profileMap, boolean revokedOnly, List<Integer> caIds, long minId,
+            File processLogFile,ProcessLog processLog, int numProcessedInLastProcess,
+            ProcessLog importLog) throws Exception {
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("overview.xml");
 

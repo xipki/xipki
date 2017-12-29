@@ -108,7 +108,7 @@ public class CrlControl {
         interval,
         onDemand;
 
-        public static UpdateMode forName(final String mode) {
+        public static UpdateMode forName(String mode) {
             ParamUtil.requireNonNull("mode", mode);
             for (UpdateMode v : values()) {
                 if (v.name().equalsIgnoreCase(mode)) {
@@ -127,7 +127,7 @@ public class CrlControl {
 
         private final int minute;
 
-        public HourMinute(final int hour, final int minute) {
+        public HourMinute(int hour, int minute) {
             this.hour = ParamUtil.requireRange("hour", hour, 0, 23);
             this.minute = ParamUtil.requireRange("minute", minute, 0, 59);
         }
@@ -236,7 +236,7 @@ public class CrlControl {
 
     private final Set<String> extensionOids;
 
-    public CrlControl(final String conf) throws InvalidConfException {
+    public CrlControl(String conf) throws InvalidConfException {
         ConfPairs props;
         try {
             props = new ConfPairs(conf);
@@ -454,7 +454,7 @@ public class CrlControl {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof CrlControl)) {
             return false;
         }
@@ -507,7 +507,7 @@ public class CrlControl {
         return true;
     } // method equals
 
-    private static int getInteger(final ConfPairs props, final String propKey, final int dfltValue)
+    private static int getInteger(ConfPairs props, String propKey, int dfltValue)
             throws InvalidConfException {
         String str = props.value(propKey);
         if (str != null) {
@@ -520,8 +520,8 @@ public class CrlControl {
         return dfltValue;
     }
 
-    private static boolean getBoolean(final ConfPairs props, final String propKey,
-            final boolean dfltValue) throws InvalidConfException {
+    private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
+            throws InvalidConfException {
         String str = props.value(propKey);
         if (str != null) {
             str = str.trim();

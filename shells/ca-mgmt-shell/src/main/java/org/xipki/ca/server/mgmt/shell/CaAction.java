@@ -40,11 +40,11 @@ public abstract class CaAction extends XiAction {
     @Reference
     protected SecurityFactory securityFactory;
 
-    protected static String getRealString(final String str) {
+    protected static String getRealString(String str) {
         return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
     }
 
-    protected static String toString(final Collection<? extends Object> col) {
+    protected static String toString(Collection<? extends Object> col) {
         if (col == null) {
             return "null";
         }
@@ -65,8 +65,8 @@ public abstract class CaAction extends XiAction {
         return sb.toString();
     }
 
-    protected void output(final boolean successful, final String posPrefix, final String negPrefix,
-            final String message) throws CmdFailure {
+    protected void output(boolean successful, String posPrefix, String negPrefix, String message)
+            throws CmdFailure {
         if (successful) {
             println(posPrefix + " " + message);
         } else {

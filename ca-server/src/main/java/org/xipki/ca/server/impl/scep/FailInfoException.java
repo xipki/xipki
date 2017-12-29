@@ -42,7 +42,7 @@ public class FailInfoException extends Exception {
 
     private final FailInfo failInfo;
 
-    private FailInfoException(final FailInfo failInfo) {
+    private FailInfoException(FailInfo failInfo) {
         this.failInfo = ParamUtil.requireNonNull("failInfo", failInfo);
     }
 

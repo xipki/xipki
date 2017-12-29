@@ -60,13 +60,13 @@ public class PublicKeyChecker {
 
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    public PublicKeyChecker(final Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms)
+    public PublicKeyChecker(Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms)
             throws CertprofileException {
         this.keyAlgorithms = keyAlgorithms;
     }
 
-    public List<ValidationIssue> checkPublicKey(final SubjectPublicKeyInfo publicKey,
-            final SubjectPublicKeyInfo requestedPublicKey) {
+    public List<ValidationIssue> checkPublicKey(SubjectPublicKeyInfo publicKey,
+            SubjectPublicKeyInfo requestedPublicKey) {
         ParamUtil.requireNonNull("publicKey", publicKey);
         ParamUtil.requireNonNull("requestedPublicKey", requestedPublicKey);
 
@@ -99,8 +99,7 @@ public class PublicKeyChecker {
         return resultIssues;
     } // method checkPublicKey
 
-    private void checkPublicKey(final SubjectPublicKeyInfo publicKey)
-            throws BadCertTemplateException {
+    private void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException {
         if (CollectionUtil.isEmpty(keyAlgorithms)) {
             return;
         }
@@ -209,9 +208,8 @@ public class PublicKeyChecker {
     } // method checkPublicKey
 
     // CHECKSTYLE:SKIP
-    private static void checkECSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid,
-            final byte[] encoded)
-            throws BadCertTemplateException {
+    private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid,
+            byte[] encoded) throws BadCertTemplateException {
         Integer expectedLength = EC_CURVEFIELD_SIZES.get(curveOid);
         if (expectedLength == null) {
             X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);

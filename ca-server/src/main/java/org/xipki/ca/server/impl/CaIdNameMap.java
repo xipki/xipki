@@ -45,22 +45,22 @@ public class CaIdNameMap {
 
     private final Map<String, NameId> nameCaMap = new HashMap<>();
 
-    public void addCertprofile(final NameId nameId) {
+    public void addCertprofile(NameId nameId) {
         idCertprofileMap.put(nameId.id(), nameId);
         nameCertprofileMap.put(nameId.name(), nameId);
     }
 
-    public void addPublisher(final NameId nameId) {
+    public void addPublisher(NameId nameId) {
         idPublisherMap.put(nameId.id(), nameId);
         namePublisherMap.put(nameId.name(), nameId);
     }
 
-    public void addRequestor(final NameId nameId) {
+    public void addRequestor(NameId nameId) {
         idRequestorMap.put(nameId.id(), nameId);
         nameRequestorMap.put(nameId.name(), nameId);
     }
 
-    public void addCa(final NameId nameId) {
+    public void addCa(NameId nameId) {
         idCaMap.put(nameId.id(), nameId);
         nameCaMap.put(nameId.name(), nameId);
     }

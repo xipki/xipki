@@ -58,7 +58,7 @@ public class ChangeCaEntry {
 
     private String extraControl;
 
-    public ChangeCaEntry(final NameId ident) throws CaMgmtException {
+    public ChangeCaEntry(NameId ident) throws CaMgmtException {
         this.ident = ParamUtil.requireNonNull("ident", ident);
     }
 
@@ -70,7 +70,7 @@ public class ChangeCaEntry {
         return status;
     }
 
-    public void setStatus(final CaStatus status) {
+    public void setStatus(CaStatus status) {
         this.status = status;
     }
 
@@ -78,7 +78,7 @@ public class ChangeCaEntry {
         return maxValidity;
     }
 
-    public void setMaxValidity(final CertValidity maxValidity) {
+    public void setMaxValidity(CertValidity maxValidity) {
         this.maxValidity = maxValidity;
     }
 
@@ -86,7 +86,7 @@ public class ChangeCaEntry {
         return signerType;
     }
 
-    public void setSignerType(final String signerType) {
+    public void setSignerType(String signerType) {
         this.signerType = signerType;
     }
 
@@ -94,7 +94,7 @@ public class ChangeCaEntry {
         return signerConf;
     }
 
-    public void setSignerConf(final String signerConf) {
+    public void setSignerConf(String signerConf) {
         this.signerConf = signerConf;
     }
 
@@ -102,7 +102,7 @@ public class ChangeCaEntry {
         return cmpControlName;
     }
 
-    public void setCmpControlName(final String cmpControlName) {
+    public void setCmpControlName(String cmpControlName) {
         this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toUpperCase();
     }
 
@@ -110,7 +110,7 @@ public class ChangeCaEntry {
         return responderName;
     }
 
-    public void setResponderName(final String responderName) {
+    public void setResponderName(String responderName) {
         this.responderName = (responderName == null) ? null : responderName.toUpperCase();
     }
 
@@ -118,7 +118,7 @@ public class ChangeCaEntry {
         return duplicateKeyPermitted;
     }
 
-    public void setDuplicateKeyPermitted(final Boolean duplicateKeyPermitted) {
+    public void setDuplicateKeyPermitted(Boolean duplicateKeyPermitted) {
         this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
@@ -126,7 +126,7 @@ public class ChangeCaEntry {
         return duplicateSubjectPermitted;
     }
 
-    public void setDuplicateSubjectPermitted(final Boolean duplicateSubjectPermitted) {
+    public void setDuplicateSubjectPermitted(Boolean duplicateSubjectPermitted) {
         this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
@@ -134,7 +134,7 @@ public class ChangeCaEntry {
         return validityMode;
     }
 
-    public void setValidityMode(final ValidityMode validityMode) {
+    public void setValidityMode(ValidityMode validityMode) {
         this.validityMode = validityMode;
     }
 
@@ -150,7 +150,7 @@ public class ChangeCaEntry {
         return permission;
     }
 
-    public void setPermission(final Integer permission) {
+    public void setPermission(Integer permission) {
         this.permission = permission;
     }
 
@@ -158,7 +158,7 @@ public class ChangeCaEntry {
         return expirationPeriod;
     }
 
-    public void setExpirationPeriod(final Integer expirationPeriod) {
+    public void setExpirationPeriod(Integer expirationPeriod) {
         this.expirationPeriod = expirationPeriod;
     }
 
@@ -166,7 +166,7 @@ public class ChangeCaEntry {
         return keepExpiredCertInDays;
     }
 
-    public void setKeepExpiredCertInDays(final Integer days) {
+    public void setKeepExpiredCertInDays(Integer days) {
         this.keepExpiredCertInDays = days;
     }
 
@@ -174,7 +174,7 @@ public class ChangeCaEntry {
         return extraControl;
     }
 
-    public void setExtraControl(final String extraControl) {
+    public void setExtraControl(String extraControl) {
         this.extraControl = extraControl;
     }
 

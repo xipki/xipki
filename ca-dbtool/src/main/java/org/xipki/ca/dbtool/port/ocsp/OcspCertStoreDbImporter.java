@@ -66,9 +66,9 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
     private final int numCertsPerCommit;
 
-    OcspCertStoreDbImporter(final DataSourceWrapper datasource, final Unmarshaller unmarshaller,
-            final String srcDir, final int numCertsPerCommit, final boolean resume,
-            final AtomicBoolean stopMe, final boolean evaluateOnly) throws Exception {
+    OcspCertStoreDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller, String srcDir,
+            int numCertsPerCommit, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
+            throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -121,7 +121,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(" imported OCSP certstore to database");
     } // method importToDB
 
-    private void importIssuer(final Issuers issuers)
+    private void importIssuer(Issuers issuers)
             throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
@@ -136,7 +136,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(" imported table ISSUER");
     }
 
-    private void importIssuer0(final IssuerType issuer, final PreparedStatement ps)
+    private void importIssuer0(IssuerType issuer, PreparedStatement ps)
             throws DataAccessException, CertificateException, IOException {
         try {
             String certFilename = issuer.getCertFile();
@@ -179,8 +179,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         }
     } // method importIssuer0
 
-    private void importCert(final CertStoreType certstore, final File processLogFile)
-            throws Exception {
+    private void importCert(CertStoreType certstore, File processLogFile) throws Exception {
         int numProcessedBefore = 0;
         long minId = 1;
         if (processLogFile.exists()) {
@@ -259,10 +258,9 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(importedText() + processLog.numProcessed() + " certificates");
     } // method importCert
 
-    private long importCert0(final PreparedStatement psCert, final PreparedStatement psCerthash,
-            final PreparedStatement psRawcert, final String certsZipFile, final long minId,
-            final File processLogFile, final ProcessLog processLog,
-            final int numProcessedInLastProcess) throws Exception {
+    private long importCert0(PreparedStatement psCert, PreparedStatement psCerthash,
+            PreparedStatement psRawcert, String certsZipFile, long minId, File processLogFile,
+            ProcessLog processLog, int numProcessedInLastProcess) throws Exception {
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 

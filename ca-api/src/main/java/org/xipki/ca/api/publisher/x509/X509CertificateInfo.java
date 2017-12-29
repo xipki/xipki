@@ -60,9 +60,9 @@ public class X509CertificateInfo {
 
     private boolean alreadyIssued;
 
-    public X509CertificateInfo(final X509CertWithDbId cert, final NameId issuer,
-            final X509Cert issuerCert, final byte[] subjectPublicKey, final NameId profile,
-            final NameId requestor) throws CertificateEncodingException {
+    public X509CertificateInfo(X509CertWithDbId cert, NameId issuer, X509Cert issuerCert,
+            byte[] subjectPublicKey, NameId profile, NameId requestor)
+            throws CertificateEncodingException {
         this.profile = ParamUtil.requireNonNull("profile", profile);
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
@@ -95,7 +95,7 @@ public class X509CertificateInfo {
         return warningMessage;
     }
 
-    public void setWarningMessage(final String warningMessage) {
+    public void setWarningMessage(String warningMessage) {
         this.warningMessage = warningMessage;
     }
 
@@ -107,7 +107,7 @@ public class X509CertificateInfo {
         return user;
     }
 
-    public void setUser(final Integer user) {
+    public void setUser(Integer user) {
         this.user = user;
     }
 
@@ -119,7 +119,7 @@ public class X509CertificateInfo {
         return revocationInfo;
     }
 
-    public void setRevocationInfo(final CertRevocationInfo revocationInfo) {
+    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
         this.revocationInfo = revocationInfo;
     }
 
@@ -127,7 +127,7 @@ public class X509CertificateInfo {
         return alreadyIssued;
     }
 
-    public void setAlreadyIssued(final boolean alreadyIssued) {
+    public void setAlreadyIssued(boolean alreadyIssued) {
         this.alreadyIssued = alreadyIssued;
     }
 
@@ -139,11 +139,11 @@ public class X509CertificateInfo {
         return transactionId;
     }
 
-    public void setReqType(final RequestType reqType) {
+    public void setReqType(RequestType reqType) {
         this.reqType = reqType;
     }
 
-    public void setTransactionId(final byte[] transactionId) {
+    public void setTransactionId(byte[] transactionId) {
         this.transactionId = transactionId;
     }
 
@@ -151,7 +151,7 @@ public class X509CertificateInfo {
         return requestedSubject;
     }
 
-    public void setRequestedSubject(final X500Name requestedSubject) {
+    public void setRequestedSubject(X500Name requestedSubject) {
         this.requestedSubject = requestedSubject;
     }
 

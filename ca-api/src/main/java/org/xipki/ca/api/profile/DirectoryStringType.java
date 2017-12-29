@@ -36,7 +36,7 @@ public enum DirectoryStringType {
     utf8String,
     bmpString;
 
-    public ASN1Encodable createDirectoryString(final String text) {
+    public ASN1Encodable createDirectoryString(String text) {
         ParamUtil.requireNonNull("text", text);
 
         if (teletexString == this) {

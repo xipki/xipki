@@ -52,8 +52,7 @@ public class IssuerEntry {
 
     private CrlInfo crlInfo;
 
-    public IssuerEntry(final int id, final X509Certificate cert)
-            throws CertificateEncodingException {
+    public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
         this.id = id;
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.notBefore = cert.getNotBefore();
@@ -101,7 +100,7 @@ public class IssuerEntry {
         return Arrays.copyOf(data, data.length);
     }
 
-    public boolean matchHash(final RequestIssuer reqIssuer) {
+    public boolean matchHash(RequestIssuer reqIssuer) {
         byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
         if (issuerHash == null) {
             return false;
@@ -111,7 +110,7 @@ public class IssuerEntry {
                 reqIssuer.nameHashFrom(), issuerHash.length);
     }
 
-    public void setRevocationInfo(final Date revocationTime) {
+    public void setRevocationInfo(Date revocationTime) {
         ParamUtil.requireNonNull("revocationTime", revocationTime);
         this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
                 revocationTime, null);

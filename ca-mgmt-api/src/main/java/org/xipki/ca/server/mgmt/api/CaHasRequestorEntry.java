@@ -40,7 +40,7 @@ public class CaHasRequestorEntry {
 
     private Set<String> profiles;
 
-    public CaHasRequestorEntry(final NameId requestorIdent) {
+    public CaHasRequestorEntry(NameId requestorIdent) {
         this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
     }
 
@@ -48,7 +48,7 @@ public class CaHasRequestorEntry {
         return ra;
     }
 
-    public void setRa(final boolean ra) {
+    public void setRa(boolean ra) {
         this.ra = ra;
     }
 
@@ -56,7 +56,7 @@ public class CaHasRequestorEntry {
         return permission;
     }
 
-    public void setPermission(final int permission) {
+    public void setPermission(int permission) {
         this.permission = permission;
     }
 
@@ -64,7 +64,7 @@ public class CaHasRequestorEntry {
         return requestorIdent;
     }
 
-    public void setProfiles(final Set<String> profiles) {
+    public void setProfiles(Set<String> profiles) {
         if (CollectionUtil.isEmpty(profiles)) {
             this.profiles = Collections.emptySet();
         } else {

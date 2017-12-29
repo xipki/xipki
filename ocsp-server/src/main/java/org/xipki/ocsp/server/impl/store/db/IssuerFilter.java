@@ -36,7 +36,7 @@ public class IssuerFilter {
 
     private final Set<String> excludeSha1Fps;
 
-    public IssuerFilter(final Set<X509Certificate> includes, final Set<X509Certificate> excludes)
+    public IssuerFilter(Set<X509Certificate> includes, Set<X509Certificate> excludes)
             throws CertificateEncodingException {
         if (includes == null) {
             includeSha1Fps = null;
@@ -59,7 +59,7 @@ public class IssuerFilter {
         }
     }
 
-    public boolean includeIssuerWithSha1Fp(final String sha1Fp) {
+    public boolean includeIssuerWithSha1Fp(String sha1Fp) {
         ParamUtil.requireNonBlank("sha1Fp", sha1Fp);
         if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
             return (excludeSha1Fps == null) ? true : !excludeSha1Fps.contains(sha1Fp);

@@ -450,22 +450,22 @@ public class SubjectDnSpec {
     private SubjectDnSpec() {
     }
 
-    public static Range getStringLengthRange(final ASN1ObjectIdentifier rdnType) {
+    public static Range getStringLengthRange(ASN1ObjectIdentifier rdnType) {
         ParamUtil.requireNonNull("rdnType", rdnType);
         return RANGES.get(rdnType);
     }
 
-    public static Pattern getPattern(final ASN1ObjectIdentifier rdnType) {
+    public static Pattern getPattern(ASN1ObjectIdentifier rdnType) {
         ParamUtil.requireNonNull("rdnType", rdnType);
         return PATTERNS.get(rdnType);
     }
 
-    public static StringType getStringType(final ASN1ObjectIdentifier rdnType) {
+    public static StringType getStringType(ASN1ObjectIdentifier rdnType) {
         ParamUtil.requireNonNull("rdnType", rdnType);
         return DFLT_STRING_TYPES.get(rdnType);
     }
 
-    public static RdnControl getRdnControl(final ASN1ObjectIdentifier rdnType) {
+    public static RdnControl getRdnControl(ASN1ObjectIdentifier rdnType) {
         ParamUtil.requireNonNull("rdnType", rdnType);
         RdnControl control = CONTROLS.get(rdnType);
         if (control == null) {
@@ -476,7 +476,7 @@ public class SubjectDnSpec {
         return control;
     } // static
 
-    public static void fixRdnControl(final RdnControl control) throws CertprofileException {
+    public static void fixRdnControl(RdnControl control) throws CertprofileException {
         ParamUtil.requireNonNull("control", control);
 
         ASN1ObjectIdentifier type = control.type();
@@ -545,7 +545,7 @@ public class SubjectDnSpec {
         return countryAreaCodes.isEmpty() ? true : countryAreaCodes.contains(code.toUpperCase());
     }
 
-    private static BufferedReader getReader(final String propKey, final String fallbackResource) {
+    private static BufferedReader getReader(String propKey, String fallbackResource) {
         String confFile = System.getProperty(propKey);
         if (StringUtil.isNotBlank(confFile)) {
             LOG.info("read from file " + confFile);

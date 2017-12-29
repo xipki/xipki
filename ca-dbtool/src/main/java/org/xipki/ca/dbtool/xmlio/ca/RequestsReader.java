@@ -33,7 +33,7 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class RequestsReader extends DbiXmlReader {
 
-    public RequestsReader(final InputStream xmlStream)
+    public RequestsReader(InputStream xmlStream)
             throws XMLStreamException, InvalidDataObjectException {
         super("requests", xmlStream);
     }

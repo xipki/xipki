@@ -253,8 +253,7 @@ class ResponseCacher {
     }
 
     OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
-            AlgorithmCode sigAlg, AlgorithmCode certHashAlg)
-            throws DataAccessException {
+            AlgorithmCode sigAlg, AlgorithmCode certHashAlg) throws DataAccessException {
         final String sql = sqlSelectOcsp;
         byte[] identBytes = buildIdent(serialNumber, sigAlg, certHashAlg);
         long id = deriveId(issuerId, identBytes);
@@ -304,9 +303,8 @@ class ResponseCacher {
         }
     }
 
-    void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
-            Long nextUpdate, AlgorithmCode sigAlgCode, AlgorithmCode certHashAlgCode,
-            byte[] response) {
+    void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate, Long nextUpdate,
+            AlgorithmCode sigAlgCode, AlgorithmCode certHashAlgCode, byte[] response) {
         byte[] identBytes = buildIdent(serialNumber, sigAlgCode, certHashAlgCode);
         String ident = Base64.encodeToString(identBytes);
         try {

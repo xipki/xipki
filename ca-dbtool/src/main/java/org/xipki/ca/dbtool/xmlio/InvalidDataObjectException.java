@@ -29,7 +29,7 @@ public class InvalidDataObjectException extends Exception {
     public InvalidDataObjectException() {
     }
 
-    public InvalidDataObjectException(final String message) {
+    public InvalidDataObjectException(String message) {
         super(message);
     }
 

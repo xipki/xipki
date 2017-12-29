@@ -45,7 +45,7 @@ public class RequestType extends IdentifidDbObjectType {
         return update;
     }
 
-    public void setUpdate(final Long update) {
+    public void setUpdate(Long update) {
         this.update = update;
     }
 
@@ -53,7 +53,7 @@ public class RequestType extends IdentifidDbObjectType {
         return file;
     }
 
-    public void setFile(final String file) {
+    public void setFile(String file) {
         this.file = file;
     }
 
@@ -65,8 +65,7 @@ public class RequestType extends IdentifidDbObjectType {
     }
 
     @Override
-    public void writeTo(final DbiXmlWriter writer)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
 
         validate();

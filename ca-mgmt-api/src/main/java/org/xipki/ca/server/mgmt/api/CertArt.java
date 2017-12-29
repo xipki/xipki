@@ -30,7 +30,7 @@ public enum CertArt {
 
     private final int code;
 
-    CertArt(final int code) {
+    CertArt(int code) {
         this.code = code;
     }
 
@@ -38,7 +38,7 @@ public enum CertArt {
         return code;
     }
 
-    public static CertArt forValue(final int code) {
+    public static CertArt forValue(int code) {
         for (CertArt value : values()) {
             if (value.code == code) {
                 return value;

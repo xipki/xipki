@@ -63,13 +63,13 @@ public class CertificateStore {
 
     private final CertStoreQueryExecutor queryExecutor;
 
-    public CertificateStore(final DataSourceWrapper datasource,
-            final UniqueIdGenerator idGenerator) throws DataAccessException {
+    public CertificateStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
+            throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
         this.queryExecutor = new CertStoreQueryExecutor(datasource, idGenerator);
     }
 
-    public boolean addCertificate(final X509CertificateInfo certInfo) {
+    public boolean addCertificate(X509CertificateInfo certInfo) {
         ParamUtil.requireNonNull("certInfo", certInfo);
         try {
             queryExecutor.addCert(certInfo.issuer(), certInfo.cert(),
@@ -88,8 +88,8 @@ public class CertificateStore {
         return true;
     }
 
-    public void addToPublishQueue(final NameId publisher, final long certId,
-            final NameId ca) throws OperationException {
+    public void addToPublishQueue(NameId publisher, long certId, NameId ca)
+            throws OperationException {
         try {
             queryExecutor.addToPublishQueue(publisher, certId, ca);
         } catch (DataAccessException ex) {
@@ -101,8 +101,7 @@ public class CertificateStore {
         }
     }
 
-    public void removeFromPublishQueue(final NameId publisher, final long certId)
-            throws OperationException {
+    public void removeFromPublishQueue(NameId publisher, long certId) throws OperationException {
         try {
             queryExecutor.removeFromPublishQueue(publisher, certId);
         } catch (DataAccessException ex) {
@@ -114,8 +113,7 @@ public class CertificateStore {
         }
     }
 
-    public void clearPublishQueue(final NameId ca, final NameId publisher)
-            throws OperationException {
+    public void clearPublishQueue(NameId ca, NameId publisher) throws OperationException {
         try {
             queryExecutor.clearPublishQueue(ca, publisher);
         } catch (DataAccessException ex) {
@@ -127,7 +125,7 @@ public class CertificateStore {
         }
     }
 
-    public long getMaxIdOfDeltaCrlCache(final NameId ca) throws OperationException {
+    public long getMaxIdOfDeltaCrlCache(NameId ca) throws OperationException {
         try {
             return queryExecutor.getMaxIdOfDeltaCrlCache(ca);
         } catch (DataAccessException ex) {
@@ -139,8 +137,7 @@ public class CertificateStore {
         }
     }
 
-    public void clearDeltaCrlCache(final NameId ca, final long maxId)
-            throws OperationException {
+    public void clearDeltaCrlCache(NameId ca, long maxId) throws OperationException {
         try {
             queryExecutor.clearDeltaCrlCache(ca, maxId);
         } catch (DataAccessException ex) {
@@ -152,10 +149,9 @@ public class CertificateStore {
         }
     }
 
-    public X509CertWithRevocationInfo revokeCertificate(final NameId ca,
-            final BigInteger serialNumber, final CertRevocationInfo revInfo, final boolean force,
-            final boolean publishToDeltaCrlCache, final CaIdNameMap idNameMap)
-            throws OperationException {
+    public X509CertWithRevocationInfo revokeCertificate(NameId ca, BigInteger serialNumber,
+            CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCrlCache,
+            CaIdNameMap idNameMap) throws OperationException {
         try {
             X509CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(ca, serialNumber,
                     revInfo, force, publishToDeltaCrlCache, idNameMap);
@@ -177,9 +173,8 @@ public class CertificateStore {
         }
     }
 
-    public X509CertWithRevocationInfo revokeSuspendedCert(final NameId ca,
-            final BigInteger serialNumber, final CrlReason reason,
-            final boolean publishToDeltaCrlCache, final CaIdNameMap idNameMap)
+    public X509CertWithRevocationInfo revokeSuspendedCert(NameId ca, BigInteger serialNumber,
+            CrlReason reason, boolean publishToDeltaCrlCache, CaIdNameMap idNameMap)
             throws OperationException {
         try {
             X509CertWithRevocationInfo revokedCert = queryExecutor.revokeSuspendedCert(ca,
@@ -202,10 +197,8 @@ public class CertificateStore {
         }
     }
 
-    public X509CertWithDbId unrevokeCertificate(final NameId ca,
-            final BigInteger serialNumber, final boolean force,
-            final boolean publishToDeltaCrlCache, final CaIdNameMap idNameMap)
-            throws OperationException {
+    public X509CertWithDbId unrevokeCertificate(NameId ca, BigInteger serialNumber, boolean force,
+            boolean publishToDeltaCrlCache, CaIdNameMap idNameMap) throws OperationException {
         try {
             X509CertWithDbId unrevokedCert = queryExecutor.unrevokeCert(ca, serialNumber, force,
                     publishToDeltaCrlCache, idNameMap);
@@ -227,8 +220,8 @@ public class CertificateStore {
         }
     }
 
-    X509CertWithDbId getCert(final NameId ca, final BigInteger serialNumber,
-            final CaIdNameMap idNameMap) throws OperationException {
+    X509CertWithDbId getCert(NameId ca, BigInteger serialNumber, CaIdNameMap idNameMap)
+            throws OperationException {
         try {
             return queryExecutor.getCert(ca, serialNumber, idNameMap);
         } catch (DataAccessException ex) {
@@ -240,8 +233,7 @@ public class CertificateStore {
         }
     }
 
-    public void removeCertificate(final NameId ca, final BigInteger serialNumber)
-            throws OperationException {
+    public void removeCertificate(NameId ca, BigInteger serialNumber) throws OperationException {
         try {
             queryExecutor.removeCertificate(ca, serialNumber);
         } catch (DataAccessException ex) {
@@ -253,7 +245,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean addCrl(final NameId ca, final X509CRL crl) {
+    public boolean addCrl(NameId ca, X509CRL crl) {
         try {
             queryExecutor.addCrl(ca, crl);
             return true;
@@ -265,7 +257,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean hasCrl(final NameId ca) throws OperationException {
+    public boolean hasCrl(NameId ca) throws OperationException {
         try {
             return queryExecutor.hasCrl(ca);
         } catch (DataAccessException ex) {
@@ -277,7 +269,7 @@ public class CertificateStore {
         }
     }
 
-    public long getMaxCrlNumber(final NameId ca) throws OperationException {
+    public long getMaxCrlNumber(NameId ca) throws OperationException {
         try {
             return queryExecutor.getMaxCrlNumber(ca);
         } catch (DataAccessException ex) {
@@ -289,7 +281,7 @@ public class CertificateStore {
         }
     }
 
-    public long getThisUpdateOfCurrentCrl(final NameId ca) throws OperationException {
+    public long getThisUpdateOfCurrentCrl(NameId ca) throws OperationException {
         try {
             return queryExecutor.getThisUpdateOfCurrentCrl(ca);
         } catch (DataAccessException ex) {
@@ -301,7 +293,7 @@ public class CertificateStore {
         }
     }
 
-    public byte[] getEncodedCrl(final NameId ca, final BigInteger crlNumber) {
+    public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) {
         try {
             return queryExecutor.getEncodedCrl(ca, crlNumber);
         } catch (Exception ex) {
@@ -311,7 +303,7 @@ public class CertificateStore {
         }
     }
 
-    public int cleanupCrls(final NameId ca, final int numCrls) {
+    public int cleanupCrls(NameId ca, int numCrls) {
         try {
             return queryExecutor.cleanupCrls(ca, numCrls);
         } catch (Exception ex) {
@@ -322,8 +314,7 @@ public class CertificateStore {
         }
     }
 
-    public CertStatus getCertStatusForSubject(final NameId ca,
-            final X500Principal subject) {
+    public CertStatus getCertStatusForSubject(NameId ca, X500Principal subject) {
         try {
             return queryExecutor.getCertStatusForSubject(ca, subject);
         } catch (DataAccessException ex) {
@@ -334,7 +325,7 @@ public class CertificateStore {
         }
     }
 
-    public CertStatus getCertStatusForSubject(final NameId ca, final X500Name subject) {
+    public CertStatus getCertStatusForSubject(NameId ca, X500Name subject) {
         try {
             return queryExecutor.getCertStatusForSubject(ca, subject);
         } catch (DataAccessException ex) {
@@ -364,9 +355,8 @@ public class CertificateStore {
      * @throws OperationException
      *         if error occurs
      */
-    public List<CertRevInfoWithSerial> getRevokedCerts(final NameId ca,
-            final Date notExpiredAt, final long startId, final int numEntries,
-            final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {
+    public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,
+            int numEntries, boolean onlyCaCerts, boolean onlyUserCerts) throws OperationException {
         try {
             return queryExecutor.getRevokedCertificates(ca, notExpiredAt, startId,
                     numEntries, onlyCaCerts, onlyUserCerts);
@@ -379,9 +369,8 @@ public class CertificateStore {
         }
     }
 
-    public List<CertRevInfoWithSerial> getCertsForDeltaCrl(final NameId ca,
-            final long startId, final int numEntries, final boolean onlyCaCerts,
-            final boolean onlyUserCerts) throws OperationException {
+    public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, long startId, int numEntries,
+            boolean onlyCaCerts, boolean onlyUserCerts) throws OperationException {
         try {
             return queryExecutor.getCertificatesForDeltaCrl(ca, startId, numEntries,
                     onlyCaCerts, onlyUserCerts);
@@ -394,8 +383,7 @@ public class CertificateStore {
         }
     }
 
-    public long getCountOfCerts(final NameId ca, final boolean onlyRevoked)
-            throws OperationException {
+    public long getCountOfCerts(NameId ca, boolean onlyRevoked) throws OperationException {
         try {
             return queryExecutor.getCountOfCerts(ca, onlyRevoked);
         } catch (DataAccessException ex) {
@@ -407,8 +395,8 @@ public class CertificateStore {
         }
     }
 
-    public List<SerialWithId> getCertSerials(final NameId ca, final long startId,
-            final int numEntries, final boolean onlyRevoked) throws OperationException {
+    public List<SerialWithId> getCertSerials(NameId ca, long startId, int numEntries,
+            boolean onlyRevoked) throws OperationException {
         try {
             return queryExecutor.getSerialNumbers(ca, startId, numEntries, onlyRevoked);
         } catch (DataAccessException ex) {
@@ -420,9 +408,9 @@ public class CertificateStore {
         }
     }
 
-    public List<SerialWithId> getCertSerials(final NameId ca, final Date notExpiredAt,
-            final long startId, final int numEntries, final boolean onlyRevoked,
-            final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {
+    public List<SerialWithId> getCertSerials(NameId ca, Date notExpiredAt, long startId,
+            int numEntries, boolean onlyRevoked, boolean onlyCaCerts, boolean onlyUserCerts)
+            throws OperationException {
         try {
             return queryExecutor.getSerialNumbers(ca, notExpiredAt, startId, numEntries,
                     onlyRevoked, onlyCaCerts, onlyUserCerts);
@@ -435,8 +423,8 @@ public class CertificateStore {
         }
     }
 
-    public List<BigInteger> getExpiredCertSerials(final NameId ca, final long expiredAt,
-            final int numEntries) throws OperationException {
+    public List<BigInteger> getExpiredCertSerials(NameId ca, long expiredAt, int numEntries)
+            throws OperationException {
         try {
             return queryExecutor.getExpiredSerialNumbers(ca, expiredAt, numEntries);
         } catch (DataAccessException ex) {
@@ -448,8 +436,8 @@ public class CertificateStore {
         }
     }
 
-    public List<BigInteger> getSuspendedCertSerials(final NameId ca,
-            final long latestLastUpdate, final int numEntries) throws OperationException {
+    public List<BigInteger> getSuspendedCertSerials(NameId ca, long latestLastUpdate,
+            int numEntries) throws OperationException {
         try {
             return queryExecutor.getSuspendedCertSerials(ca, latestLastUpdate, numEntries);
         } catch (DataAccessException ex) {
@@ -461,8 +449,8 @@ public class CertificateStore {
         }
     }
 
-    public List<Long> getPublishQueueEntries(final NameId ca,
-            final NameId publisher, final int numEntries) throws OperationException {
+    public List<Long> getPublishQueueEntries(NameId ca, NameId publisher, int numEntries)
+            throws OperationException {
         try {
             return queryExecutor.getPublishQueueEntries(ca, publisher, numEntries);
         } catch (DataAccessException ex) {
@@ -473,8 +461,8 @@ public class CertificateStore {
         }
     }
 
-    public X509CertWithRevocationInfo getCertWithRevocationInfo(final NameId ca,
-            final BigInteger serial, final CaIdNameMap idNameMap) throws OperationException {
+    public X509CertWithRevocationInfo getCertWithRevocationInfo(NameId ca,
+            BigInteger serial, CaIdNameMap idNameMap) throws OperationException {
         try {
             return queryExecutor.getCertWithRevocationInfo(ca, serial, idNameMap);
         } catch (DataAccessException ex) {
@@ -486,8 +474,8 @@ public class CertificateStore {
         }
     }
 
-    public X509CertificateInfo getCertificateInfoForSerial(final NameId ca,
-            final X509Cert caCert, final BigInteger serial, final CaIdNameMap idNameMap)
+    public X509CertificateInfo getCertificateInfoForSerial(NameId ca, X509Cert caCert,
+            BigInteger serial, CaIdNameMap idNameMap)
             throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertificateInfo(ca, caCert, serial, idNameMap);
@@ -500,8 +488,7 @@ public class CertificateStore {
         }
     }
 
-    public Integer getCertProfileForId(final NameId ca, final long id)
-            throws OperationException {
+    public Integer getCertProfileForId(NameId ca, long id) throws OperationException {
         try {
             return queryExecutor.getCertProfileForCertId(ca, id);
         } catch (DataAccessException ex) {
@@ -513,8 +500,7 @@ public class CertificateStore {
         }
     }
 
-    public Integer getCertProfileForSerial(final NameId ca, final BigInteger serial)
-            throws OperationException {
+    public Integer getCertProfileForSerial(NameId ca, BigInteger serial) throws OperationException {
         try {
             return queryExecutor.getCertProfileForSerial(ca, serial);
         } catch (DataAccessException ex) {
@@ -526,8 +512,8 @@ public class CertificateStore {
         }
     }
 
-    public List<X509Certificate> getCertificate(final X500Name subjectName,
-            final byte[] transactionId) throws OperationException {
+    public List<X509Certificate> getCertificate(X500Name subjectName, byte[] transactionId)
+            throws OperationException {
         try {
             return queryExecutor.getCertificate(subjectName, transactionId);
         } catch (DataAccessException ex) {
@@ -539,8 +525,7 @@ public class CertificateStore {
         }
     }
 
-    public byte[] getCertRequest(final NameId ca, final BigInteger serialNumber)
-            throws OperationException {
+    public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
         try {
             return queryExecutor.getCertRequest(ca, serialNumber);
         } catch (DataAccessException ex) {
@@ -552,10 +537,8 @@ public class CertificateStore {
         }
     }
 
-    public List<CertListInfo> listCertificates(final NameId ca,
-            final X500Name subjectPattern,
-            final Date validFrom, final Date validTo, final CertListOrderBy orderBy,
-            final int numEntries) throws OperationException {
+    public List<CertListInfo> listCertificates(NameId ca, X500Name subjectPattern, Date validFrom,
+            Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
         try {
             return queryExecutor.listCertificates(ca, subjectPattern, validFrom, validTo,
                     orderBy, numEntries);
@@ -568,8 +551,7 @@ public class CertificateStore {
         }
     }
 
-    public NameId authenticateUser(final String user, final byte[] password)
-            throws OperationException {
+    public NameId authenticateUser(String user, byte[] password) throws OperationException {
         try {
             return queryExecutor.authenticateUser(user, password);
         } catch (DataAccessException ex) {
@@ -581,8 +563,7 @@ public class CertificateStore {
         }
     }
 
-    public NameId getUserIdent(final int userId)
-            throws OperationException {
+    public NameId getUserIdent(int userId) throws OperationException {
         try {
             String name = queryExecutor.getUsername(userId);
             return (name == null) ? null : new NameId(userId, name);
@@ -595,8 +576,7 @@ public class CertificateStore {
         }
     }
 
-    public CaHasUserEntry getCaHasUser(final NameId ca, final NameId user)
-            throws OperationException {
+    public CaHasUserEntry getCaHasUser(NameId ca, NameId user) throws OperationException {
         try {
             return queryExecutor.getCaHasUser(ca, user);
         } catch (DataAccessException ex) {
@@ -608,7 +588,7 @@ public class CertificateStore {
         }
     }
 
-    public KnowCertResult knowsCertForSerial(final NameId ca, final BigInteger serial)
+    public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial)
             throws OperationException {
         try {
             return queryExecutor.knowsCertForSerial(ca, serial);
@@ -625,8 +605,7 @@ public class CertificateStore {
         return queryExecutor.isHealthy();
     }
 
-    public boolean isCertForSubjectIssued(final NameId ca, final long subjectFp)
-            throws OperationException {
+    public boolean isCertForSubjectIssued(NameId ca, long subjectFp) throws OperationException {
         try {
             return queryExecutor.isCertForSubjectIssued(ca, subjectFp);
         } catch (DataAccessException ex) {
@@ -638,8 +617,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean isCertForKeyIssued(final NameId ca, final long keyFp)
-            throws OperationException {
+    public boolean isCertForKeyIssued(NameId ca, long keyFp) throws OperationException {
         try {
             return queryExecutor.isCertForKeyIssued(ca, keyFp);
         } catch (DataAccessException ex) {
@@ -651,9 +629,8 @@ public class CertificateStore {
         }
     }
 
-    public X509CertificateInfo getCertificateInfoForId(final NameId ca,
-            final X509Cert caCert,final long certId, final CaIdNameMap idNameMap)
-            throws OperationException, CertificateException {
+    public X509CertificateInfo getCertificateInfoForId(NameId ca, X509Cert caCert,long certId,
+            CaIdNameMap idNameMap) throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertForId(ca, caCert, certId, idNameMap);
         } catch (DataAccessException ex) {
@@ -665,7 +642,7 @@ public class CertificateStore {
         }
     }
 
-    public X509CertWithDbId getCertForId(final long certId) throws OperationException {
+    public X509CertWithDbId getCertForId(long certId) throws OperationException {
         try {
             return queryExecutor.getCertForId(certId);
         } catch (DataAccessException ex) {
@@ -677,8 +654,7 @@ public class CertificateStore {
         }
     }
 
-    public String getLatestSerialNumber(final X500Name nameWithSerialNumber)
-            throws OperationException {
+    public String getLatestSerialNumber(X500Name nameWithSerialNumber) throws OperationException {
         try {
             return queryExecutor.getLatestSerialNumber(nameWithSerialNumber);
         } catch (RuntimeException ex) {
@@ -687,8 +663,8 @@ public class CertificateStore {
         }
     }
 
-    public Long getNotBeforeOfFirstCertStartsWithCommonName(final String commonName,
-            final NameId profile) throws OperationException {
+    public Long getNotBeforeOfFirstCertStartsWithCommonName(String commonName, NameId profile)
+            throws OperationException {
         try {
             return queryExecutor.getNotBeforeOfFirstCertStartsWithCommonName(commonName, profile);
         } catch (DataAccessException ex) {
@@ -700,7 +676,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean containsCaCertificates(final NameId ca) throws OperationException {
+    public boolean containsCaCertificates(NameId ca) throws OperationException {
         try {
             return queryExecutor.containsCertificates(ca, false);
         } catch (DataAccessException ex) {
@@ -711,7 +687,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean containsEeCertificates(final NameId ca) throws OperationException {
+    public boolean containsEeCertificates(NameId ca) throws OperationException {
         try {
             return queryExecutor.containsCertificates(ca, true);
         } catch (DataAccessException ex) {

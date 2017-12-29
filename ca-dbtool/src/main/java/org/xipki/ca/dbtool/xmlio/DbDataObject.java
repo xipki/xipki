@@ -31,22 +31,20 @@ public abstract class DbDataObject {
     protected DbDataObject() {
     }
 
-    protected void assertNotBlank(final String name, final String value)
-            throws InvalidDataObjectException {
+    protected void assertNotBlank(String name, String value) throws InvalidDataObjectException {
         if (StringUtil.isBlank(value)) {
             throw new InvalidDataObjectException(name + " must not be blank");
         }
     }
 
-    protected void assertNotNull(final String name, final Object value)
-            throws InvalidDataObjectException {
+    protected void assertNotNull(String name, Object value) throws InvalidDataObjectException {
         if (value == null) {
             throw new InvalidDataObjectException(name + " must not be null");
         }
     }
 
-    protected static void writeIfNotNull(final DbiXmlWriter writer, final String tag,
-            final Object value) throws XMLStreamException, InvalidDataObjectException {
+    protected static void writeIfNotNull(DbiXmlWriter writer, String tag, Object value)
+            throws XMLStreamException, InvalidDataObjectException {
         if (value == null) {
             return;
         }

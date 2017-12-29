@@ -28,7 +28,7 @@ public class AuthorityInfoAccessControl {
 
     private final boolean includesOcsp;
 
-    public AuthorityInfoAccessControl(final boolean includesCaIssuers, final boolean includesOcsp) {
+    public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp) {
         this.includesCaIssuers = includesCaIssuers;
         this.includesOcsp = includesOcsp;
     }

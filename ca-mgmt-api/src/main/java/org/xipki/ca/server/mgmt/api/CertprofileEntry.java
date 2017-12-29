@@ -36,7 +36,7 @@ public class CertprofileEntry {
 
     private boolean faulty;
 
-    public CertprofileEntry(final NameId ident, final String type, final String conf) {
+    public CertprofileEntry(NameId ident, String type, String conf) {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
@@ -62,7 +62,7 @@ public class CertprofileEntry {
         return faulty;
     }
 
-    public void setFaulty(final boolean faulty) {
+    public void setFaulty(boolean faulty) {
         this.faulty = faulty;
     }
 
@@ -71,7 +71,7 @@ public class CertprofileEntry {
         return toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         StringBuilder sb = new StringBuilder(200);
         sb.append("id: ").append(ident.id()).append('\n');
         sb.append("name: ").append(ident.name()).append('\n');

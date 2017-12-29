@@ -67,8 +67,7 @@ public class DbDigestReporter {
 
     private AtomicInteger numError = new AtomicInteger(0);
 
-    public DbDigestReporter(final String reportDirname, final byte[] caCertBytes)
-            throws IOException {
+    public DbDigestReporter(String reportDirname, byte[] caCertBytes) throws IOException {
         this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
         File dir = new File(reportDirname);
         dir.mkdirs();
@@ -96,23 +95,22 @@ public class DbDigestReporter {
         return reportDirname;
     }
 
-    public void addMissing(final BigInteger serialNumber) throws IOException {
+    public void addMissing(BigInteger serialNumber) throws IOException {
         numMissing.incrementAndGet();
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
-    public void addGood(final BigInteger serialNumber) throws IOException {
+    public void addGood(BigInteger serialNumber) throws IOException {
         numGood.incrementAndGet();
         writeSerialNumberLine(goodWriter, serialNumber);
     }
 
-    public void addUnexpected(final BigInteger serialNumber) throws IOException {
+    public void addUnexpected(BigInteger serialNumber) throws IOException {
         numUnexpected.incrementAndGet();
         writeSerialNumberLine(unexpectedWriter, serialNumber);
     }
 
-    public void addDiff(final DbDigestEntry refCert, final DbDigestEntry targetCert)
-            throws IOException {
+    public void addDiff(DbDigestEntry refCert, DbDigestEntry targetCert) throws IOException {
         ParamUtil.requireNonNull("refCert", refCert);
         ParamUtil.requireNonNull("targetCert", targetCert);
 
@@ -132,7 +130,7 @@ public class DbDigestReporter {
         }
     }
 
-    public void addError(final String errorMessage) throws IOException {
+    public void addError(String errorMessage) throws IOException {
         ParamUtil.requireNonNull("errorMessage", errorMessage);
 
         numError.incrementAndGet();
@@ -157,7 +155,7 @@ public class DbDigestReporter {
         closeWriter(goodWriter);
         closeWriter(errorWriter);
 
-        final int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
+        int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
                 + numError.get();
         Date now = new Date();
         int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
@@ -195,8 +193,7 @@ public class DbDigestReporter {
         }
     } // method close
 
-    private static void writeSerialNumberLine(final BufferedWriter writer,
-            final BigInteger serialNumber)
+    private static void writeSerialNumberLine(BufferedWriter writer, BigInteger serialNumber)
             throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(serialNumber.toString(16)).append('\n');
@@ -206,7 +203,7 @@ public class DbDigestReporter {
         }
     }
 
-    private static void closeWriter(final Writer writer) {
+    private static void closeWriter(Writer writer) {
         try {
             writer.close();
         } catch (Exception ex) {

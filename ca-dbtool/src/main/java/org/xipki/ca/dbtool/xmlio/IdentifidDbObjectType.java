@@ -34,7 +34,7 @@ public abstract class IdentifidDbObjectType extends DbDataObject {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

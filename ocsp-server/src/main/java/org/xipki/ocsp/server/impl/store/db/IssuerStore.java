@@ -36,7 +36,7 @@ public class IssuerStore {
 
     private Set<Integer> ids;
 
-    public IssuerStore(final List<IssuerEntry> entries) {
+    public IssuerStore(List<IssuerEntry> entries) {
         this.entries = new ArrayList<>(entries.size());
         Set<Integer> idSet = new HashSet<>(entries.size());
 
@@ -67,7 +67,7 @@ public class IssuerStore {
         return (issuerEntry == null) ? null : issuerEntry.id();
     }
 
-    public IssuerEntry getIssuerForId(final int id) {
+    public IssuerEntry getIssuerForId(int id) {
         for (IssuerEntry entry : entries) {
             if (entry.id() == id) {
                 return entry;
@@ -77,7 +77,7 @@ public class IssuerStore {
         return null;
     }
 
-    public IssuerEntry getIssuerForFp(final RequestIssuer reqIssuer) {
+    public IssuerEntry getIssuerForFp(RequestIssuer reqIssuer) {
         for (IssuerEntry entry : entries) {
             if (entry.matchHash(reqIssuer)) {
                 return entry;

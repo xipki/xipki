@@ -49,8 +49,8 @@ public class CertStatusInfo {
 
     private Date archiveCutOff;
 
-    private CertStatusInfo(final CertStatus certStatus, final Date thisUpdate,
-            final Date nextUpdate, final String certprofile) {
+    private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate,
+            String certprofile) {
         this.certStatus = ParamUtil.requireNonNull("certStatus", certStatus);
         this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
         this.nextUpdate = nextUpdate;
@@ -89,7 +89,7 @@ public class CertStatusInfo {
         return crlId;
     }
 
-    public void setCrlId(final CrlID crlId) {
+    public void setCrlId(CrlID crlId) {
         this.crlId = crlId;
     }
 
@@ -97,28 +97,24 @@ public class CertStatusInfo {
         return archiveCutOff;
     }
 
-    public void setArchiveCutOff(final Date archiveCutOff) {
+    public void setArchiveCutOff(Date archiveCutOff) {
         this.archiveCutOff = archiveCutOff;
     }
 
-    public static CertStatusInfo getUnknownCertStatusInfo(final Date thisUpdate,
-            final Date nextUpdate) {
+    public static CertStatusInfo getUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate) {
         return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
-    public static CertStatusInfo getIgnoreCertStatusInfo(final Date thisUpdate,
-            final Date nextUpdate) {
+    public static CertStatusInfo getIgnoreCertStatusInfo(Date thisUpdate, Date nextUpdate) {
         return new CertStatusInfo(CertStatus.IGNORE, thisUpdate, nextUpdate, null);
     }
 
-    public static CertStatusInfo getIssuerUnknownCertStatusInfo(final Date thisUpdate,
-            final Date nextUpdate) {
+    public static CertStatusInfo getIssuerUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate) {
         return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
-    public static CertStatusInfo getGoodCertStatusInfo(final HashAlgoType certHashAlgo,
-            final byte[] certHash, final Date thisUpdate, final Date nextUpdate,
-            final String certprofile) {
+    public static CertStatusInfo getGoodCertStatusInfo(HashAlgoType certHashAlgo, byte[] certHash,
+            Date thisUpdate, Date nextUpdate, String certprofile) {
         CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate,
                 certprofile);
         ret.certHashAlgo = certHashAlgo;
@@ -126,9 +122,9 @@ public class CertStatusInfo {
         return ret;
     }
 
-    public static CertStatusInfo getRevokedCertStatusInfo(final CertRevocationInfo revocationInfo,
-            final HashAlgoType certHashAlgo, final byte[] certHash, final Date thisUpdate,
-            final Date nextUpdate, final String certprofile) {
+    public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
+            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
+            String certprofile) {
         if (revocationInfo == null) {
             throw new IllegalArgumentException("revocationInfo must not be null");
         }

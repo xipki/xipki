@@ -92,7 +92,7 @@ class RequestOption {
 
     private final CertpathValidationModel certpathValidationModel;
 
-    RequestOption(final RequestOptionType conf) throws InvalidConfException {
+    RequestOption(RequestOptionType conf) throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
 
         supportsHttpGet = conf.isSupportsHttpGet();
@@ -245,7 +245,7 @@ class RequestOption {
         return nonceMaxLen;
     }
 
-    public boolean allows(final HashAlgoType hashAlgo) {
+    public boolean allows(HashAlgoType hashAlgo) {
         return (hashAlgo == null) ? false : hashAlgos.contains(hashAlgo);
     }
 
@@ -261,11 +261,11 @@ class RequestOption {
         return certs;
     }
 
-    public boolean isVersionAllowed(final Integer version) {
+    public boolean isVersionAllowed(Integer version) {
         return versions == null || versions.contains(version);
     }
 
-    private static Set<X509Certificate> getCerts(final CertCollectionType conf)
+    private static Set<X509Certificate> getCerts(CertCollectionType conf)
             throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
                 CertificateException, IOException {
         ParamUtil.requireNonNull("conf", conf);

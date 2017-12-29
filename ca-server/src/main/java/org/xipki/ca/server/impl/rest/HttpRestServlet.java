@@ -502,16 +502,16 @@ public class HttpRestServlet extends AbstractHttpServlet {
         }
     } // method service
 
-    public void setResponderManager(final CmpResponderManager responderManager) {
+    public void setResponderManager(CmpResponderManager responderManager) {
         this.responderManager = responderManager;
     }
 
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    private static void audit(final AuditService auditService, final AuditEvent event,
-            final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
+    private static void audit(AuditService auditService, AuditEvent event,
+            AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
         if (auditLevel != null) {
             event.setLevel(auditLevel);
         }
@@ -528,7 +528,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
         auditService.logEvent(event);
     } // method audit
 
-    private static BigInteger toBigInt(final String str) {
+    private static BigInteger toBigInt(String str) {
         String tmpStr = str.trim();
         if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
             if (tmpStr.length() > 2) {

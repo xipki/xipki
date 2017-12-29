@@ -77,7 +77,7 @@ abstract class CmpResponder {
 
     private final SecureRandom random = new SecureRandom();
 
-    protected CmpResponder(final SecurityFactory securityFactory) {
+    protected CmpResponder(SecurityFactory securityFactory) {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
@@ -105,7 +105,7 @@ abstract class CmpResponder {
 
     public abstract CmpRequestorInfo getRequestor(X509Certificate requestorCert);
 
-    private CmpRequestorInfo getRequestor(final PKIHeader reqHeader) {
+    private CmpRequestorInfo getRequestor(PKIHeader reqHeader) {
         GeneralName requestSender = reqHeader.getSender();
         if (requestSender.getTagNo() != GeneralName.directoryName) {
             return null;
@@ -130,12 +130,12 @@ abstract class CmpResponder {
      *          Audit event. Must not be {@code null}.
      * @return the response
      */
-    protected abstract PKIMessage processPkiMessage0(PKIMessage request,
-            RequestorInfo requestor, ASN1OctetString transactionId,
-            GeneralPKIMessage pkiMessage, String msgId, AuditEvent event);
+    protected abstract PKIMessage processPkiMessage0(PKIMessage request, RequestorInfo requestor,
+            ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId,
+            AuditEvent event);
 
-    public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
-            final X509Certificate tlsClientCert, final AuditEvent event) {
+    public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
+            AuditEvent event) {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         ParamUtil.requireNonNull("event", event);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -306,8 +306,8 @@ abstract class CmpResponder {
         return bytes;
     }
 
-    private ProtectionVerificationResult verifyProtection(final String tid,
-            final GeneralPKIMessage pkiMessage, final CmpControl cmpControl)
+    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
+            CmpControl cmpControl)
             throws CMPException, InvalidKeyException, OperatorCreationException {
         ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
@@ -344,7 +344,7 @@ abstract class CmpResponder {
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     } // method verifyProtection
 
-    private PKIMessage addProtection(final PKIMessage pkiMessage, final AuditEvent event) {
+    private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent event) {
         try {
             return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
                     getCmpControl().isSendResponderCert());
@@ -361,8 +361,8 @@ abstract class CmpResponder {
         }
     } // method addProtection
 
-    protected PKIMessage buildErrorPkiMessage(final ASN1OctetString tid,
-            final PKIHeader requestHeader, final int failureCode, final String statusText) {
+    protected PKIMessage buildErrorPkiMessage(ASN1OctetString tid,
+            PKIHeader requestHeader, int failureCode, String statusText) {
         GeneralName respRecipient = requestHeader.getSender();
 
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -384,13 +384,12 @@ abstract class CmpResponder {
         return new PKIMessage(respHeader.build(), body);
     } // method buildErrorPkiMessage
 
-    protected PKIStatusInfo generateRejectionStatus(final Integer info,
-            final String errorMessage) {
+    protected PKIStatusInfo generateRejectionStatus(Integer info, String errorMessage) {
         return generateRejectionStatus(PKIStatus.rejection, info, errorMessage);
     } // method generateCmpRejectionStatus
 
-    protected PKIStatusInfo generateRejectionStatus(final PKIStatus status, final Integer info,
-            final String errorMessage) {
+    protected PKIStatusInfo generateRejectionStatus(PKIStatus status, Integer info,
+            String errorMessage) {
         PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
         PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
         return new PKIStatusInfo(status, statusMessage, failureInfo);

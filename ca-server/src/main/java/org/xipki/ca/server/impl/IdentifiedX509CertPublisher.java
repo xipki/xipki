@@ -45,34 +45,34 @@ class IdentifiedX509CertPublisher {
 
     private final X509CertPublisher certPublisher;
 
-    IdentifiedX509CertPublisher(final PublisherEntry entry, final X509CertPublisher certPublisher) {
+    IdentifiedX509CertPublisher(PublisherEntry entry, X509CertPublisher certPublisher) {
         this.entry = ParamUtil.requireNonNull("entry", entry);
         this.certPublisher = ParamUtil.requireNonNull("certPublisher", certPublisher);
     }
 
-    public void initialize(final PasswordResolver passwordResolver,
-            final Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
+    public void initialize(PasswordResolver passwordResolver,
+            Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
         certPublisher.initialize(entry.conf(), passwordResolver, datasources);
     }
 
-    public void setEnvParameterResolver(final EnvParameterResolver parameterResolver) {
+    public void setEnvParameterResolver(EnvParameterResolver parameterResolver) {
         certPublisher.setEnvParameterResolver(parameterResolver);
     }
 
-    public boolean caAdded(final X509Cert caCert) {
+    public boolean caAdded(X509Cert caCert) {
         return certPublisher.caAdded(caCert);
     }
 
-    public boolean certificateAdded(final X509CertificateInfo certInfo) {
+    public boolean certificateAdded(X509CertificateInfo certInfo) {
         return certPublisher.certificateAdded(certInfo);
     }
 
-    public boolean certificateRevoked(final X509Cert caCert, final X509CertWithDbId cert,
-            final String certprofile, final CertRevocationInfo revInfo) {
+    public boolean certificateRevoked(X509Cert caCert, X509CertWithDbId cert,
+            String certprofile, CertRevocationInfo revInfo) {
         return certPublisher.certificateRevoked(caCert, cert, certprofile, revInfo);
     }
 
-    public boolean crlAdded(final X509Cert caCert, final X509CRL crl) {
+    public boolean crlAdded(X509Cert caCert, X509CRL crl) {
         return certPublisher.crlAdded(caCert, crl);
     }
 
@@ -88,23 +88,23 @@ class IdentifiedX509CertPublisher {
         return certPublisher.isHealthy();
     }
 
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
         certPublisher.setAuditServiceRegister(auditServiceRegister);
     }
 
-    public boolean caRevoked(final X509Cert caCert, final CertRevocationInfo revocationInfo) {
+    public boolean caRevoked(X509Cert caCert, CertRevocationInfo revocationInfo) {
         return certPublisher.caRevoked(caCert, revocationInfo);
     }
 
-    public boolean caUnrevoked(final X509Cert caCert) {
+    public boolean caUnrevoked(X509Cert caCert) {
         return certPublisher.caUnrevoked(caCert);
     }
 
-    public boolean certificateUnrevoked(final X509Cert caCert, final X509CertWithDbId cert) {
+    public boolean certificateUnrevoked(X509Cert caCert, X509CertWithDbId cert) {
         return certPublisher.certificateUnrevoked(caCert, cert);
     }
 
-    public boolean certificateRemoved(final X509Cert caCert, final X509CertWithDbId cert) {
+    public boolean certificateRemoved(X509Cert caCert, X509CertWithDbId cert) {
         return certPublisher.certificateRemoved(caCert, cert);
     }
 

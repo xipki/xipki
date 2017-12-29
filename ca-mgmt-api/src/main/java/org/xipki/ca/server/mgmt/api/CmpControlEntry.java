@@ -32,7 +32,7 @@ public class CmpControlEntry {
 
     private boolean faulty;
 
-    public CmpControlEntry(final String name, final String conf) {
+    public CmpControlEntry(String name, String conf) {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.conf = ParamUtil.requireNonBlank("conf", conf);
     }
@@ -41,7 +41,7 @@ public class CmpControlEntry {
         return faulty;
     }
 
-    public void setFaulty(final boolean faulty) {
+    public void setFaulty(boolean faulty) {
         this.faulty = faulty;
     }
 

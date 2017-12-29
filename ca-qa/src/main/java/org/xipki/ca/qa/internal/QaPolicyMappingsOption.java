@@ -34,7 +34,7 @@ public class QaPolicyMappingsOption extends QaExtension {
 
     private final Map<String, String> policyMappings;
 
-    public QaPolicyMappingsOption(final PolicyMappings jaxb) {
+    public QaPolicyMappingsOption(PolicyMappings jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         this.policyMappings = new HashMap<>();
         for (PolicyIdMappingType type : jaxb.getMapping()) {
@@ -44,7 +44,7 @@ public class QaPolicyMappingsOption extends QaExtension {
         }
     }
 
-    public String subjectDomainPolicy(final String issuerDomainPolicy) {
+    public String subjectDomainPolicy(String issuerDomainPolicy) {
         ParamUtil.requireNonNull("issuerDomainPolicy", issuerDomainPolicy);
         return policyMappings.get(issuerDomainPolicy);
     }

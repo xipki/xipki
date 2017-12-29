@@ -36,9 +36,8 @@ public class AdmissionsOption {
 
     private final List<ProfessionInfoOption> professionInfos;
 
-    public AdmissionsOption(final GeneralName admissionAuthority,
-            final NamingAuthority namingAuthority,
-            final List<ProfessionInfoOption> professionInfos) {
+    public AdmissionsOption(GeneralName admissionAuthority, NamingAuthority namingAuthority,
+            List<ProfessionInfoOption> professionInfos) {
         this.admissionAuthority = admissionAuthority;
         this.namingAuthority = namingAuthority;
         this.professionInfos = ParamUtil.requireNonEmpty("professionInfos", professionInfos);

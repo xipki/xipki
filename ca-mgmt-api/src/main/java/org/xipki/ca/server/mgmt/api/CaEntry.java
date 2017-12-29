@@ -70,15 +70,15 @@ public class CaEntry {
 
     private String extraControl;
 
-    public CaEntry(final NameId ident, final String signerType, final String signerConf,
-            final int expirationPeriod) throws CaMgmtException {
+    public CaEntry(NameId ident, String signerType, String signerConf, int expirationPeriod)
+            throws CaMgmtException {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
         this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
     }
 
-    public static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
+    public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
         ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.value("algo");
         if (str == null) {
@@ -113,7 +113,7 @@ public class CaEntry {
         return maxValidity;
     }
 
-    public void setMaxValidity(final CertValidity maxValidity) {
+    public void setMaxValidity(CertValidity maxValidity) {
         this.maxValidity = maxValidity;
     }
 
@@ -121,7 +121,7 @@ public class CaEntry {
         return keepExpiredCertInDays;
     }
 
-    public void setKeepExpiredCertInDays(final int days) {
+    public void setKeepExpiredCertInDays(int days) {
         this.keepExpiredCertInDays = days;
     }
 
@@ -137,7 +137,7 @@ public class CaEntry {
         return status;
     }
 
-    public void setStatus(final CaStatus status) {
+    public void setStatus(CaStatus status) {
         this.status = status;
     }
 
@@ -145,7 +145,7 @@ public class CaEntry {
         return signerType;
     }
 
-    public void setCmpControlName(final String cmpControlName) {
+    public void setCmpControlName(String cmpControlName) {
         this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toUpperCase();
     }
 
@@ -157,7 +157,7 @@ public class CaEntry {
         return responderName;
     }
 
-    public void setResponderName(final String responderName) {
+    public void setResponderName(String responderName) {
         this.responderName = (responderName == null) ? null : responderName.toUpperCase();
     }
 
@@ -165,7 +165,7 @@ public class CaEntry {
         return duplicateKeyPermitted;
     }
 
-    public void setDuplicateKeyPermitted(final boolean duplicateKeyPermitted) {
+    public void setDuplicateKeyPermitted(boolean duplicateKeyPermitted) {
         this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
@@ -173,7 +173,7 @@ public class CaEntry {
         return duplicateSubjectPermitted;
     }
 
-    public void setDuplicateSubjectPermitted(final boolean duplicateSubjectPermitted) {
+    public void setDuplicateSubjectPermitted(boolean duplicateSubjectPermitted) {
         this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
@@ -189,7 +189,7 @@ public class CaEntry {
         return validityMode;
     }
 
-    public void setValidityMode(final ValidityMode mode) {
+    public void setValidityMode(ValidityMode mode) {
         this.validityMode = ParamUtil.requireNonNull("mode", mode);
     }
 
@@ -197,7 +197,7 @@ public class CaEntry {
         return permission;
     }
 
-    public void setPermission(final int permission) {
+    public void setPermission(int permission) {
         this.permission = permission;
     }
 
@@ -209,7 +209,7 @@ public class CaEntry {
         return extraControl;
     }
 
-    public void setExtraControl(final String extraControl) {
+    public void setExtraControl(String extraControl) {
         this.extraControl = extraControl;
     }
 
@@ -218,11 +218,11 @@ public class CaEntry {
         return toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(500);
         sb.append("id: ").append(ident.id()).append('\n');
         sb.append("name: ").append(ident.name()).append('\n');
@@ -256,7 +256,7 @@ public class CaEntry {
         return sb.toString();
     } // method toString
 
-    protected static String toString(final Collection<? extends Object> tokens) {
+    protected static String toString(Collection<? extends Object> tokens) {
         if (CollectionUtil.isEmpty(tokens)) {
             return null;
         }

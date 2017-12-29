@@ -38,14 +38,8 @@ public class PermissionConstants {
     public static final int GEN_CRL = 32;
     public static final int GET_CRL = 64;
     public static final int ENROLL_CROSS = 128;
-    public static final int ALL = ENROLL_CERT
-            | REVOKE_CERT
-            | UNREVOKE_CERT
-            | REMOVE_CERT
-            | KEY_UPDATE
-            | GEN_CRL
-            | GET_CRL
-            | ENROLL_CROSS;
+    public static final int ALL = ENROLL_CERT | REVOKE_CERT | UNREVOKE_CERT | REMOVE_CERT
+            | KEY_UPDATE | GEN_CRL | GET_CRL | ENROLL_CROSS;
 
     static {
         codeTextMap.put(ENROLL_CERT, "ENROLL_CERT");
@@ -66,7 +60,7 @@ public class PermissionConstants {
     private PermissionConstants() {
     }
 
-    public static boolean contains(final int permissionA, final int permissionB) {
+    public static boolean contains(int permissionA, int permissionB) {
         return (permissionA & permissionB) == permissionB;
     }
 

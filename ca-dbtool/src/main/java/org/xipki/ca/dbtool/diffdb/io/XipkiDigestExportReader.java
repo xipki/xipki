@@ -51,8 +51,8 @@ public class XipkiDigestExportReader {
 
     private final int numRowsPerSelect;
 
-    public XipkiDigestExportReader(final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl, final int numRowsPerSelect) throws Exception {
+    public XipkiDigestExportReader(DataSourceWrapper datasource,
+            XipkiDbControl dbControl, int numRowsPerSelect) throws Exception {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
         this.numRowsPerSelect = ParamUtil.requireMin("numRowsPerSelect", numRowsPerSelect, 1);
@@ -68,8 +68,7 @@ public class XipkiDigestExportReader {
         }
     }
 
-    public List<IdentifiedDbDigestEntry> readCerts(final long startId)
-            throws DataAccessException {
+    public List<IdentifiedDbDigestEntry> readCerts(long startId) throws DataAccessException {
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numRowsPerSelect);
 
         ResultSet rs = null;

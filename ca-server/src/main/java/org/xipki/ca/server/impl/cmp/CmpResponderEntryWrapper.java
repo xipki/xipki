@@ -46,7 +46,7 @@ public class CmpResponderEntryWrapper {
     public CmpResponderEntryWrapper() {
     }
 
-    public void setDbEntry(final CmpResponderEntry dbEntry) {
+    public void setDbEntry(CmpResponderEntry dbEntry) {
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         signer = null;
         if (dbEntry.certificate() != null) {
@@ -60,7 +60,7 @@ public class CmpResponderEntryWrapper {
         return signer;
     }
 
-    public void initSigner(final SecurityFactory securityFactory) throws ObjectCreationException {
+    public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;

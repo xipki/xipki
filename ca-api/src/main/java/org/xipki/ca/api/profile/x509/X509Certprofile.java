@@ -87,8 +87,7 @@ public abstract class X509Certprofile {
      * @throws BadFormatException
      *         If the currentSerialNumber is not a non-negative decimal long.
      */
-    public String incSerialNumber(final String currentSerialNumber)
-            throws BadFormatException {
+    public String incSerialNumber(String currentSerialNumber) throws BadFormatException {
         try {
             long currentSn = (currentSerialNumber == null) ? 0
                     : Long.parseLong(currentSerialNumber.trim());
@@ -125,7 +124,7 @@ public abstract class X509Certprofile {
      *          Parameter name. Must not be {@code null}.
      * @return parameter value.
      */
-    public String parameter(final String paramName) {
+    public String parameter(String paramName) {
         return null;
     }
 

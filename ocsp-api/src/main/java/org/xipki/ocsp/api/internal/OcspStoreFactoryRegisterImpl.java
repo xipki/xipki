@@ -41,7 +41,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
             new ConcurrentLinkedDeque<OcspStoreFactory>();
 
     @Override
-    public OcspStore newOcspStore(final String type) throws ObjectCreationException {
+    public OcspStore newOcspStore(String type) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         for (OcspStoreFactory service : services) {
@@ -55,7 +55,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
                 "could not find factory to create OcspStore of type '" + type + "'");
     }
 
-    public void bindService(final OcspStoreFactory service) {
+    public void bindService(OcspStoreFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -69,7 +69,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
         LOG.info("{} CertStatusStoreFactory binding for {}", action, service);
     }
 
-    public void unbindService(final OcspStoreFactory service) {
+    public void unbindService(OcspStoreFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("unbindService invoked with null.");

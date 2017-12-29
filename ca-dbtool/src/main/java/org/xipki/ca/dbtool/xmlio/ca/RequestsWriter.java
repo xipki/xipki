@@ -36,8 +36,7 @@ public class RequestsWriter extends DbiXmlWriter {
         super("requests", "1");
     }
 
-    public void add(final RequestType request)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void add(RequestType request) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("request", request);
         request.validate();
         request.writeTo(this);

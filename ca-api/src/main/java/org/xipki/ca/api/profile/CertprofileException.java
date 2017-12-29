@@ -29,15 +29,15 @@ public class CertprofileException extends Exception {
     public CertprofileException() {
     }
 
-    public CertprofileException(final String message) {
+    public CertprofileException(String message) {
         super(message);
     }
 
-    public CertprofileException(final Throwable cause) {
+    public CertprofileException(Throwable cause) {
         super(cause);
     }
 
-    public CertprofileException(final String message, final Throwable cause) {
+    public CertprofileException(String message, Throwable cause) {
         super(message, cause);
     }
 

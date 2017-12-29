@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
@@ -61,17 +59,16 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
     private final int numCertsPerSelect;
 
-    private final NumThreads numThreads;
+    private final int numThreads;
 
-    public DbDigestDiffWorker(final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver, final boolean revokedOnly,
-            final String refDirname, final String refDbConfFile, final String dbConfFile,
-            final String reportDirName, final int numCertsPerSelect, final NumThreads numThreads,
-            final Set<byte[]> includeCaCerts)
-            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    public DbDigestDiffWorker(DataSourceFactory datasourceFactory,
+            PasswordResolver passwordResolver, boolean revokedOnly, String refDirname,
+            String refDbConfFile, String dbConfFile, String reportDirName, int numCertsPerSelect,
+            int numThreads, Set<byte[]> includeCaCerts)
+            throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         this.reportDir = ParamUtil.requireNonBlank("reportDirName", reportDirName);
-        this.numThreads = ParamUtil.requireNonNull("numThreads", numThreads);
+        this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
         this.numCertsPerSelect = numCertsPerSelect;
         boolean validRef = (refDirname == null) ? (refDbConfFile != null) : (refDbConfFile == null);
 

@@ -28,7 +28,7 @@ public class IdRange {
 
     private final long to;
 
-    public IdRange(final long from, final long to) {
+    public IdRange(long from, long to) {
         if (from > to) {
             throw new IllegalArgumentException(
                     "from must not be greater than to: " + from + " > " + to);

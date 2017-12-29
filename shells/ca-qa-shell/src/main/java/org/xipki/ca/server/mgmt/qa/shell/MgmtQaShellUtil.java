@@ -32,8 +32,7 @@ public class MgmtQaShellUtil {
     private MgmtQaShellUtil() {
     }
 
-    public static void assertEquals(final String desc, final String ex, final String is)
-            throws CmdFailure {
+    public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
 
         String tmpEx = ex;
         if (CaManager.NULL.equals(tmpEx)) {
@@ -46,7 +45,7 @@ public class MgmtQaShellUtil {
         }
     }
 
-    public static void assertEquals(final String desc, final Collection<?> ex, Collection<?> is)
+    public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
             throws CmdFailure {
         boolean bo = (ex == null) ? (is == null) : ex.equals(is);
         if (!bo) {

@@ -88,8 +88,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     private boolean crlUpdateFailed;
 
     @Override
-    public void init(final String conf, final DataSourceWrapper datasource)
-            throws OcspStoreException {
+    public void init(String conf, DataSourceWrapper datasource) throws OcspStoreException {
         ParamUtil.requireNonBlank("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
@@ -126,7 +125,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         return crlUpdateFailed || super.isInitializationFailed();
     }
 
-    private static X509Certificate parseCert(final String certFile) throws OcspStoreException {
+    private static X509Certificate parseCert(String certFile) throws OcspStoreException {
         try {
             return X509Util.parseCert(certFile);
         } catch (CertificateException | IOException ex) {

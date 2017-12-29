@@ -20,7 +20,6 @@ package org.xipki.ca.server.impl;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -85,7 +84,7 @@ class X509SelfSignedCertBuilder {
 
         private final X509Certificate cert;
 
-        GenerateSelfSignedResult(final String signerConf, final X509Certificate cert) {
+        GenerateSelfSignedResult(String signerConf, X509Certificate cert) {
             this.signerConf = signerConf;
             this.cert = cert;
         }
@@ -105,12 +104,11 @@ class X509SelfSignedCertBuilder {
     private X509SelfSignedCertBuilder() {
     }
 
-    public static GenerateSelfSignedResult generateSelfSigned(final SecurityFactory securityFactory,
-            final String signerType, final String signerConf,
-            final IdentifiedX509Certprofile certprofile, final CertificationRequest csr,
-            final BigInteger serialNumber, final List<String> cacertUris,
-            final List<String> ocspUris, final List<String> crlUris,
-            final List<String> deltaCrlUris) throws OperationException, InvalidConfException {
+    public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
+            String signerType, String signerConf, IdentifiedX509Certprofile certprofile,
+            CertificationRequest csr, BigInteger serialNumber, List<String> cacertUris,
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
+            throws OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonBlank("signerType", signerType);
         ParamUtil.requireNonNull("certprofile", certprofile);
@@ -201,11 +199,11 @@ class X509SelfSignedCertBuilder {
         return new GenerateSelfSignedResult(signerConf, newCert);
     } // method generateSelfSigned
 
-    private static X509Certificate generateCertificate(final ConcurrentContentSigner signer,
-            final IdentifiedX509Certprofile certprofile, final CertificationRequest csr,
-            final BigInteger serialNumber, final SubjectPublicKeyInfo publicKeyInfo,
-            final List<String> cacertUris, final List<String> ocspUris, final List<String> crlUris,
-            final List<String> deltaCrlUris) throws OperationException {
+    private static X509Certificate generateCertificate(ConcurrentContentSigner signer,
+            IdentifiedX509Certprofile certprofile, CertificationRequest csr,
+            BigInteger serialNumber, SubjectPublicKeyInfo publicKeyInfo,
+            List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
+            List<String> deltaCrlUris) throws OperationException {
 
         SubjectPublicKeyInfo tmpPublicKeyInfo;
         try {
@@ -282,18 +280,16 @@ class X509SelfSignedCertBuilder {
         } catch (BadCertTemplateException ex) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         } catch (NoIdleSignerException | CertificateException | IOException
-                | CertprofileException | NoSuchAlgorithmException ex) {
+                | CertprofileException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method generateCertificate
 
-    private static void addExtensions(final X509v3CertificateBuilder certBuilder,
-            final IdentifiedX509Certprofile profile, final X500Name requestedSubject,
-            final X500Name grantedSubject, final Extensions extensions,
-            final SubjectPublicKeyInfo requestedPublicKeyInfo, final PublicCaInfo publicCaInfo,
-            final Date notBefore, final Date notAfter)
-            throws CertprofileException, IOException, BadCertTemplateException,
-                NoSuchAlgorithmException {
+    private static void addExtensions(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509Certprofile profile, X500Name requestedSubject, X500Name grantedSubject,
+            Extensions extensions, SubjectPublicKeyInfo requestedPublicKeyInfo,
+            PublicCaInfo publicCaInfo, Date notBefore, Date notAfter)
+            throws CertprofileException, IOException, BadCertTemplateException {
         ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, grantedSubject,
                 extensions, requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
         if (extensionTuples == null) {
@@ -306,7 +302,7 @@ class X509SelfSignedCertBuilder {
         }
     } // method addExtensions
 
-    public static AsymmetricKeyParameter generatePublicKeyParameter(final PublicKey key)
+    public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
             throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPublicKey) {

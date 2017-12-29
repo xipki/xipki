@@ -37,7 +37,7 @@ public class X509ChangeCrlSignerEntry {
 
     private String crlControl;
 
-    public X509ChangeCrlSignerEntry(final String name) throws InvalidConfException {
+    public X509ChangeCrlSignerEntry(String name) throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
     }
 
@@ -49,7 +49,7 @@ public class X509ChangeCrlSignerEntry {
         return signerType;
     }
 
-    public void setSignerType(final String signerType) {
+    public void setSignerType(String signerType) {
         this.signerType = signerType;
     }
 
@@ -57,7 +57,7 @@ public class X509ChangeCrlSignerEntry {
         return signerConf;
     }
 
-    public void setSignerConf(final String signerConf) {
+    public void setSignerConf(String signerConf) {
         this.signerConf = signerConf;
     }
 
@@ -65,7 +65,7 @@ public class X509ChangeCrlSignerEntry {
         return base64Cert;
     }
 
-    public void setBase64Cert(final String base64Cert) {
+    public void setBase64Cert(String base64Cert) {
         this.base64Cert = base64Cert;
     }
 
@@ -73,7 +73,7 @@ public class X509ChangeCrlSignerEntry {
         return crlControl;
     }
 
-    public void setCrlControl(final String crlControl) {
+    public void setCrlControl(String crlControl) {
         this.crlControl = crlControl;
     }
 

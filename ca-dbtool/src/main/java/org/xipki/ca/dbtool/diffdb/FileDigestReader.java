@@ -66,7 +66,7 @@ public class FileDigestReader implements DigestReader {
 
     private final int numCertsInOneBlock;
 
-    public FileDigestReader(final String caDirname, int numCertsInOneBlock)
+    public FileDigestReader(String caDirname, int numCertsInOneBlock)
             throws IOException, CertificateException {
         this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
         this.numCertsInOneBlock = ParamUtil.requireMin("numCertsInOneBlock", numCertsInOneBlock, 1);
@@ -140,7 +140,7 @@ public class FileDigestReader implements DigestReader {
         return ret;
     }
 
-    private DbDigestEntry retrieveNext(final boolean firstTime) throws IOException {
+    private DbDigestEntry retrieveNext(boolean firstTime) throws IOException {
         String line = firstTime ? null : certsReader.readLine();
         if (line == null) {
             closeReader(certsReader);
@@ -166,7 +166,7 @@ public class FileDigestReader implements DigestReader {
         return next != null;
     }
 
-    private static void closeReader(final Reader reader) {
+    private static void closeReader(Reader reader) {
         if (reader == null) {
             return;
         }

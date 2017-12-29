@@ -15,26 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.diffdb;
-
-import org.xipki.common.util.ParamUtil;
-
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-public class NumThreads {
-
-    private final int numTargetThreads;
-
-    public NumThreads(final int numTargetThreads) {
-        this.numTargetThreads = ParamUtil.requireMin("numTargetThreads", numTargetThreads, 1);
-    }
-
-    public int numTargetThreads() {
-        return numTargetThreads;
-    }
-
-}
-
+package org.xipki.ca.server.impl.rest;

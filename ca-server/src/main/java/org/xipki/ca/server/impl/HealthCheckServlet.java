@@ -122,7 +122,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
         }
     } // method service0
 
-    public void setResponderManager(final CmpResponderManager responderManager) {
+    public void setResponderManager(CmpResponderManager responderManager) {
         this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
     }
 

@@ -33,7 +33,7 @@ public class QaTlsFeature extends QaExtension {
 
     private final Set<Integer> features;
 
-    public QaTlsFeature(final TlsFeature jaxb) {
+    public QaTlsFeature(TlsFeature jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         this.features = new HashSet<>();
         for (IntWithDescType m : jaxb.getFeature()) {

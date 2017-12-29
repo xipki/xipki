@@ -37,7 +37,7 @@ public class EjbcaCaInfo {
 
     private final String caDirname;
 
-    public EjbcaCaInfo(final int caId, final byte[] certBytes, final String caDirname) {
+    public EjbcaCaInfo(int caId, byte[] certBytes, String caDirname) {
         ParamUtil.requireNonNull("certBytes", certBytes);
 
         this.caId = caId;

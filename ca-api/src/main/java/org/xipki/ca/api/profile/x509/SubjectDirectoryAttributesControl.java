@@ -32,7 +32,7 @@ public class SubjectDirectoryAttributesControl {
 
     private final List<ASN1ObjectIdentifier> types;
 
-    public SubjectDirectoryAttributesControl(final List<ASN1ObjectIdentifier> types) {
+    public SubjectDirectoryAttributesControl(List<ASN1ObjectIdentifier> types) {
         ParamUtil.requireNonEmpty("types", types);
         this.types = new ArrayList<>(types);
     }

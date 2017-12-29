@@ -55,7 +55,7 @@ public class CaUtil {
     private CaUtil() {
     }
 
-    public static Extensions getExtensions(final CertificationRequestInfo csr) {
+    public static Extensions getExtensions(CertificationRequestInfo csr) {
         ParamUtil.requireNonNull("csr", csr);
         ASN1Set attrs = csr.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
@@ -67,7 +67,7 @@ public class CaUtil {
         return null;
     }
 
-    public static String getChallengePassword(final CertificationRequestInfo csr) {
+    public static String getChallengePassword(CertificationRequestInfo csr) {
         ParamUtil.requireNonNull("csr", csr);
         ASN1Set attrs = csr.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
@@ -80,8 +80,7 @@ public class CaUtil {
         return null;
     }
 
-    public static BasicConstraints createBasicConstraints(final X509CertLevel level,
-            final Integer pathLen) {
+    public static BasicConstraints createBasicConstraints(X509CertLevel level, Integer pathLen) {
         BasicConstraints basicConstraints;
         if (level == X509CertLevel.RootCA || level == X509CertLevel.SubCA) {
             basicConstraints = (pathLen != null)  ? new BasicConstraints(pathLen)
@@ -95,7 +94,7 @@ public class CaUtil {
     }
 
     public static AuthorityInformationAccess createAuthorityInformationAccess(
-            final List<String> caIssuerUris, final List<String> ocspUris) {
+            List<String> caIssuerUris, List<String> ocspUris) {
         if (CollectionUtil.isEmpty(caIssuerUris) && CollectionUtil.isEmpty(ocspUris)) {
             throw new IllegalArgumentException("caIssuerUris and ospUris must not be both empty");
         }
@@ -121,8 +120,8 @@ public class CaUtil {
         return AuthorityInformationAccess.getInstance(seq);
     }
 
-    public static CRLDistPoint createCrlDistributionPoints(final List<String> crlUris,
-            final X500Name caSubject, final X500Name crlSignerSubject) {
+    public static CRLDistPoint createCrlDistributionPoints(List<String> crlUris, X500Name caSubject,
+            X500Name crlSignerSubject) {
         ParamUtil.requireNonEmpty("crlUris", crlUris);
         int size = crlUris.size();
         DistributionPoint[] points = new DistributionPoint[1];
@@ -146,7 +145,7 @@ public class CaUtil {
         return new CRLDistPoint(points);
     }
 
-    public static X500Name sortX509Name(final X500Name name) {
+    public static X500Name sortX509Name(X500Name name) {
         ParamUtil.requireNonNull("name", name);
         RDN[] requstedRdns = name.getRDNs();
 
@@ -172,7 +171,7 @@ public class CaUtil {
         return new X500Name(rdns.toArray(new RDN[0]));
     }
 
-    private static RDN[] getRdns(final RDN[] rdns, final ASN1ObjectIdentifier type) {
+    private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("rdns", rdns);
         ParamUtil.requireNonNull("type", type);
         List<RDN> ret = new ArrayList<>(1);

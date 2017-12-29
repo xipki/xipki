@@ -44,8 +44,7 @@ public class DbiXmlWriter {
 
     private boolean flushed;
 
-    public DbiXmlWriter(final String rootElementName, final String version)
-            throws XMLStreamException {
+    public DbiXmlWriter(String rootElementName, String version) throws XMLStreamException {
         this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
         ParamUtil.requireNonBlank("version", version);
 
@@ -65,7 +64,7 @@ public class DbiXmlWriter {
         return rootElementName;
     }
 
-    public void writeStartElement(final String localName) throws XMLStreamException {
+    public void writeStartElement(String localName) throws XMLStreamException {
         ParamUtil.requireNonNull("localName", localName);
         writer.writeStartElement(localName);
     }
@@ -74,7 +73,7 @@ public class DbiXmlWriter {
         writer.writeEndElement();
     }
 
-    public void writeElement(final String localName, final String value) throws XMLStreamException {
+    public void writeElement(String localName, String value) throws XMLStreamException {
         ParamUtil.requireNonNull("localName", localName);
         ParamUtil.requireNonNull("value", value);
         writer.writeStartElement(localName);
@@ -98,7 +97,7 @@ public class DbiXmlWriter {
         flushed = true;
     }
 
-    public void rewriteToZipStream(final ZipOutputStream zipStream)
+    public void rewriteToZipStream(ZipOutputStream zipStream)
             throws IOException, XMLStreamException {
         ParamUtil.requireNonNull("zipStream", zipStream);
         flush();

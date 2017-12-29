@@ -286,7 +286,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     } // method reset
 
     @Override
-    public void initialize(final String data) throws CertprofileException {
+    public void initialize(String data) throws CertprofileException {
         ParamUtil.requireNonBlank("data", data);
 
         reset();
@@ -1112,15 +1112,15 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    public String parameter(final String paramName) {
+    public String parameter(String paramName) {
         return (parameters == null) ? null : parameters.get(paramName);
     }
 
     @Override
     public ExtensionValues getExtensions(
-            final Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-            final X500Name requestedSubject, final X500Name grantedSubject,
-            final Extensions requestedExtensions, final Date notBefore, final Date notAfter)
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
+            X500Name requestedSubject, X500Name grantedSubject,
+            Extensions requestedExtensions, Date notBefore, Date notAfter)
             throws CertprofileException, BadCertTemplateException {
         ExtensionValues values = new ExtensionValues();
         if (CollectionUtil.isEmpty(extensionOccurences)) {
@@ -1616,8 +1616,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         return values;
     } // method getExtensions
 
-    private GeneralNames createRequestedSubjectAltNames(final X500Name requestedSubject,
-            final X500Name grantedSubject, final Extensions requestedExtensions)
+    private GeneralNames createRequestedSubjectAltNames(X500Name requestedSubject,
+            X500Name grantedSubject, Extensions requestedExtensions)
             throws BadCertTemplateException {
         ASN1Encodable extValue = (requestedExtensions == null) ? null :
             requestedExtensions.getExtensionParsedValue(Extension.subjectAlternativeName);
@@ -1898,8 +1898,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         return subjectDirAttrsControl;
     }
 
-    private static Object getExtensionValue(final ASN1ObjectIdentifier type,
-            final ExtensionsType extensionsType, final Class<?> expectedClass)
+    private static Object getExtensionValue(ASN1ObjectIdentifier type,
+            ExtensionsType extensionsType, Class<?> expectedClass)
             throws CertprofileException {
         for (ExtensionType m : extensionsType.getExtension()) {
             if (!m.getType().getValue().equals(type.getId())) {
@@ -1927,8 +1927,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 + ObjectIdentifiers.oidToDisplayName(type));
     } // method getExtensionValue
 
-    private static ASN1Encodable readAsn1Encodable(final byte[] encoded)
-            throws CertprofileException {
+    private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
         try {
             return parser.readObject();

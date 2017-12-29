@@ -78,9 +78,9 @@ abstract class DbDigestReader implements DigestReader {
 
     protected long lastProcessedId;
 
-    DbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
-            final int totalAccount, final long minId, final int numBlocksToRead,
-            final StopMe stopMe) throws DataAccessException, CertificateException, IOException {
+    DbDigestReader(DataSourceWrapper datasource, X509Certificate caCert, int totalAccount,
+            long minId, int numBlocksToRead, StopMe stopMe)
+            throws DataAccessException, CertificateException, IOException {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
@@ -168,7 +168,7 @@ abstract class DbDigestReader implements DigestReader {
         }
     }
 
-    protected void releaseResources(final Statement ps, final ResultSet rs) {
+    protected void releaseResources(Statement ps, ResultSet rs) {
         DbToolBase.releaseResources(datasource, ps, rs);
     }
 

@@ -72,9 +72,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private final int numThreads;
 
-    public EjbcaDigestExporter(final DataSourceWrapper datasource, final String baseDir,
-            final AtomicBoolean stopMe, final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType, final int numThreads) throws Exception {
+    public EjbcaDigestExporter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
+            int numCertsPerSelect, DbSchemaType dbSchemaType, int numThreads) throws Exception {
         super(datasource, baseDir, stopMe);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
 
@@ -211,9 +210,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         return cas;
     } // method getCas
 
-    private void digestNoTableId(final ProcessLog processLog,
-            final CaEntryContainer caEntryContainer, final Map<String, EjbcaCaInfo> caInfos)
-            throws Exception {
+    private void digestNoTableId(ProcessLog processLog, CaEntryContainer caEntryContainer,
+            Map<String, EjbcaCaInfo> caInfos) throws Exception {
         int skippedAccount = 0;
         String lastProcessedHexCertFp;
 
@@ -338,9 +336,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         System.out.println(sb.toString());
     } // method digestNoTableId
 
-    private void digestWithTableId(final EjbcaDigestExportReader certsReader,
-            final ProcessLog processLog, final CaEntryContainer caEntryContainer,
-            final Map<String, EjbcaCaInfo> caInfos) throws Exception {
+    private void digestWithTableId(EjbcaDigestExportReader certsReader,
+            ProcessLog processLog, CaEntryContainer caEntryContainer,
+            Map<String, EjbcaCaInfo> caInfos) throws Exception {
         final int minCertId = (int) min("CertificateData", "id");
         final int maxCertId = (int) max("CertificateData", "id");
         System.out.println("digesting certificates from id " + minCertId);

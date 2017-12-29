@@ -55,8 +55,8 @@ public class X509CrlSignerEntry {
 
     private String crlControl;
 
-    public X509CrlSignerEntry(final String name, final String signerType, final String signerConf,
-            final String base64Cert, final String crlControl) throws InvalidConfException {
+    public X509CrlSignerEntry(String name, String signerType, String signerConf,
+            String base64Cert, String crlControl) throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.signerConf = signerConf;
@@ -78,7 +78,7 @@ public class X509CrlSignerEntry {
         return name;
     }
 
-    public void setConfFaulty(final boolean faulty) {
+    public void setConfFaulty(boolean faulty) {
         this.confFaulty = faulty;
     }
 
@@ -106,7 +106,7 @@ public class X509CrlSignerEntry {
         return cert;
     }
 
-    public void setCertificate(final X509Certificate certificate) {
+    public void setCertificate(X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
@@ -122,11 +122,11 @@ public class X509CrlSignerEntry {
         return toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');

@@ -37,7 +37,7 @@ public class CaHasUserEntry {
 
     private Set<String> profiles;
 
-    public CaHasUserEntry(final NameId userIdent) {
+    public CaHasUserEntry(NameId userIdent) {
         this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
     }
 
@@ -45,7 +45,7 @@ public class CaHasUserEntry {
         return permission;
     }
 
-    public void setPermission(final int permission) {
+    public void setPermission(int permission) {
         this.permission = permission;
     }
 
@@ -53,7 +53,7 @@ public class CaHasUserEntry {
         return userIdent;
     }
 
-    public void setProfiles(final Set<String> profiles) {
+    public void setProfiles(Set<String> profiles) {
         this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
     }
 

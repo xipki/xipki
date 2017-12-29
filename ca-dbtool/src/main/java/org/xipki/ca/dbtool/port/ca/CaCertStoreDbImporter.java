@@ -118,9 +118,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     private final int numCertsPerCommit;
 
-    CaCertStoreDbImporter(final DataSourceWrapper datasource, final Unmarshaller unmarshaller,
-            final String srcDir, final int numCertsPerCommit, final boolean resume,
-            final AtomicBoolean stopMe, final boolean evaluateOnly) throws Exception {
+    CaCertStoreDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller, String srcDir,
+            int numCertsPerCommit, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
+            throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -251,7 +251,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported CA certstore to database");
     } // method importToDb
 
-    private void importPublishQueue(final PublishQueue publishQueue) throws DataAccessException {
+    private void importPublishQueue(PublishQueue publishQueue) throws DataAccessException {
         final String sql = "INSERT INTO PUBLISHQUEUE (CID,PID,CA_ID) VALUES (?,?,?)";
         System.out.println("importing table PUBLISHQUEUE");
         PreparedStatement ps = prepareStatement(sql);
@@ -278,7 +278,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table PUBLISHQUEUE");
     } // method importPublishQueue
 
-    private void importDeltaCrlCache(final DeltaCRLCache deltaCrlCache) throws DataAccessException {
+    private void importDeltaCrlCache(DeltaCRLCache deltaCrlCache) throws DataAccessException {
         final String sql = "INSERT INTO DELTACRL_CACHE (ID,SN,CA_ID) VALUES (?,?,?)";
         System.out.println("importing table DELTACRL_CACHE");
         PreparedStatement ps = prepareStatement(sql);
@@ -306,9 +306,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table DELTACRL_CACHE");
     } // method importDeltaCRLCache
 
-    private Exception importEntries(final CaDbEntryType type, final CertStoreType certstore,
-            final File processLogFile, final Integer numProcessedInLastProcess,
-            final Long idProcessedInLastProcess) {
+    private Exception importEntries(CaDbEntryType type, CertStoreType certstore,
+            File processLogFile, Integer numProcessedInLastProcess, Long idProcessedInLastProcess) {
         String tablesText = (CaDbEntryType.CERT == type)
                 ? "tables CERT and CRAW" : "table " + type.tableName();
 
@@ -437,11 +436,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    private long importEntries(final CaDbEntryType type, final String entriesZipFile,
-            final long minId, final File processLogFile, final ProcessLog processLog,
-            final int numProcessedInLastProcess, final PreparedStatement[] statements,
-            final String[] sqls)
-            throws Exception {
+    private long importEntries(CaDbEntryType type, String entriesZipFile, long minId,
+            File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
+            PreparedStatement[] statements, String[] sqls) throws Exception {
         final int numEntriesPerCommit = Math.max(1,
                 Math.round(type.sqlBatchFactor() * numCertsPerCommit));
 
@@ -771,7 +768,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     } // method importEntries
 
-    private static DbiXmlReader createReader(final CaDbEntryType type, final InputStream is)
+    private static DbiXmlReader createReader(CaDbEntryType type, InputStream is)
             throws XMLStreamException, InvalidDataObjectException {
         switch (type) {
         case CERT:

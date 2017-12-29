@@ -85,7 +85,7 @@ public class CmpControl {
 
     private final CollectionAlgorithmValidator popoAlgoValidator;
 
-    public CmpControl(final CmpControlEntry dbEntry) throws InvalidConfException {
+    public CmpControl(CmpControlEntry dbEntry) throws InvalidConfException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
 
         ConfPairs pairs = new ConfPairs(dbEntry.conf());
@@ -127,11 +127,10 @@ public class CmpControl {
         this.dbEntry = new CmpControlEntry(dbEntry.name(), pairs.getEncoded());
     } // constructor
 
-    public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
-            final Boolean messageTimeRequired, final Boolean sendResponderCert,
-            final Boolean rrAkiRequired, final Integer messageTimeBias,
-            final Integer confirmWaitTime, final Boolean groupEnroll, final Set<String> sigAlgos,
-            final Set<String> popoAlgos) throws InvalidConfException {
+    public CmpControl(String name, Boolean confirmCert, Boolean sendCaCert,
+            Boolean messageTimeRequired, Boolean sendResponderCert, Boolean rrAkiRequired,
+            Integer messageTimeBias, Integer confirmWaitTime, Boolean groupEnroll,
+            Set<String> sigAlgos, Set<String> popoAlgos) throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
         if (confirmWaitTime != null) {
             ParamUtil.requireMin("confirmWaitTime", confirmWaitTime, 0);
@@ -259,15 +258,14 @@ public class CmpControl {
         return sb.toString();
     }
 
-    private static boolean getBoolean(final ConfPairs pairs, final String key,
-            final boolean defaultValue) {
+    private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
         String str = pairs.value(key);
         boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
         pairs.putPair(key, Boolean.toString(ret));
         return ret;
     }
 
-    private static int getInt(final ConfPairs pairs, final String key, final int defaultValue) {
+    private static int getInt(ConfPairs pairs, String key, int defaultValue) {
         String str = pairs.value(key);
         int ret = StringUtil.isBlank(str) ? defaultValue : Integer.parseInt(str);
         pairs.putPair(key, Integer.toString(ret));

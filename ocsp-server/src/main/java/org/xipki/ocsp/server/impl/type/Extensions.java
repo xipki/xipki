@@ -51,7 +51,7 @@ public class Extensions extends ASN1Type {
     }
 
     @Override
-    public int write(final byte[] out, final int offset) {
+    public int write(byte[] out, int offset) {
         int idx = offset;
         idx += writeHeader((byte) 0x30, bodyLen, out, idx);
         for (Extension m : extensions) {

@@ -34,8 +34,7 @@ public class CertsBundle {
 
     private List<BigInteger> serialNumbers;
 
-    public CertsBundle(final Map<BigInteger, DbDigestEntry> certs,
-            final List<BigInteger> serialNumbers) {
+    public CertsBundle(Map<BigInteger, DbDigestEntry> certs, List<BigInteger> serialNumbers) {
         this.certs = ParamUtil.requireNonEmpty("certs", certs);
         this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
     }

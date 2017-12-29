@@ -82,7 +82,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
         return confFile;
     }
 
-    public void setConfFile(final String confFile) {
+    public void setConfFile(String confFile) {
         this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
     }
 
@@ -179,7 +179,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     }
 
     @Override
-    public X509IssuerInfo getIssuer(final String issuerName) {
+    public X509IssuerInfo getIssuer(String issuerName) {
         ParamUtil.requireNonNull("issuerName", issuerName);
         return x509IssuerInfoMap.get(issuerName);
     }
@@ -190,12 +190,12 @@ public class QaSystemManagerImpl implements QaSystemManager {
     }
 
     @Override
-    public X509CertprofileQa getCertprofile(final String certprofileName) {
+    public X509CertprofileQa getCertprofile(String certprofileName) {
         ParamUtil.requireNonNull("certprofileName", certprofileName);
         return x509ProfileMap.get(certprofileName);
     }
 
-    private QAConfType parseQaConf(final InputStream confStream)
+    private QAConfType parseQaConf(InputStream confStream)
             throws IOException, JAXBException, SAXException {
         JAXBElement<?> rootElement;
         try {
@@ -212,7 +212,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
         }
     }
 
-    private static byte[] readData(final FileOrValueType fileOrValue) throws IOException {
+    private static byte[] readData(FileOrValueType fileOrValue) throws IOException {
         byte[] data = fileOrValue.getValue();
         if (data == null) {
             data = IoUtil.read(fileOrValue.getFile());

@@ -33,7 +33,7 @@ public class EjbcaCaCertExtractor {
     private EjbcaCaCertExtractor() {
     }
 
-    public static X509Certificate extractCaCert(final String caData) throws Exception {
+    public static X509Certificate extractCaCert(String caData) throws Exception {
         ParamUtil.requireNonNull("caData", caData);
 
         XmlDocumentReader cadataReader = new XmlDocumentReader(

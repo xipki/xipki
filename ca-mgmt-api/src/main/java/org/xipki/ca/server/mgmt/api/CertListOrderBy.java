@@ -41,7 +41,7 @@ public enum CertListOrderBy {
         return text;
     }
 
-    public static CertListOrderBy forValue(final String value) {
+    public static CertListOrderBy forValue(String value) {
         for (CertListOrderBy m : values()) {
             if (m.name().equalsIgnoreCase(value) || m.text.equalsIgnoreCase(value)) {
                 return m;

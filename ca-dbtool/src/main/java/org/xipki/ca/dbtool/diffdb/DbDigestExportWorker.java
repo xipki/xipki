@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.diffdb.io.DbSchemaType;
@@ -56,10 +54,10 @@ public class DbDigestExportWorker extends DbPortWorker {
 
     private final int numThreads;
 
-    public DbDigestExportWorker(final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver, final String dbConfFile,
-            final String destFolder, final int numCertsPerSelect, final int numThreads)
-            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    public DbDigestExportWorker(DataSourceFactory datasourceFactory,
+            PasswordResolver passwordResolver, String dbConfFile, String destFolder,
+            int numCertsPerSelect, int numThreads)
+            throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         ParamUtil.requireNonNull("dbConfFile", dbConfFile);
         this.destFolder = ParamUtil.requireNonNull("destFolder", destFolder);
@@ -117,7 +115,7 @@ public class DbDigestExportWorker extends DbPortWorker {
         }
     } // method run0
 
-    public static DbSchemaType detectDbSchemaType(final DataSourceWrapper datasource)
+    public static DbSchemaType detectDbSchemaType(DataSourceWrapper datasource)
             throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {

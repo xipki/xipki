@@ -86,8 +86,7 @@ public class InitDbCmd extends XiAction {
         return null;
     }
 
-    private void resetAndInit(final LiquibaseDatabaseConf dbConf, final String schemaFile)
-            throws Exception {
+    private void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
         ParamUtil.requireNonNull("dbConf", dbConf);
         ParamUtil.requireNonNull("schemaFile", schemaFile);
 
@@ -118,7 +117,7 @@ public class InitDbCmd extends XiAction {
         return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
     }
 
-    private void printDatabaseInfo(final LiquibaseDatabaseConf dbParams, final String schemaFile) {
+    private void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile) {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
         msg.append("     driver: ").append(dbParams.driver()).append("\n");
@@ -132,12 +131,12 @@ public class InitDbCmd extends XiAction {
         System.out.println(msg);
     }
 
-    private boolean confirm(final String command) throws IOException {
+    private boolean confirm(String command) throws IOException {
         String text = read("\nDo you wish to " + command + " the database", YES_NO);
         return "yes".equalsIgnoreCase(text);
     }
 
-    private String read(final String prompt, final List<String> validValues) throws IOException {
+    private String read(String prompt, List<String> validValues) throws IOException {
         String tmpPrompt = prompt;
         List<String> tmpValidValues = validValues;
         if (tmpValidValues == null) {

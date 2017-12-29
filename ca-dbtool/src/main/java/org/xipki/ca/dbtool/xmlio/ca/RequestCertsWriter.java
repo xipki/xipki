@@ -36,8 +36,7 @@ public class RequestCertsWriter extends DbiXmlWriter {
         super(RequestCertType.TAG_PARENT, "1");
     }
 
-    public void add(final RequestCertType entry)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void add(RequestCertType entry) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("entry", entry);
         entry.validate();
         entry.writeTo(this);

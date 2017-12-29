@@ -39,7 +39,7 @@ class CaCertRespBytes {
 
     private final byte[] bytes;
 
-    CaCertRespBytes(final X509Certificate caCert, final X509Certificate responderCert)
+    CaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
             throws CMSException, CertificateException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("responderCert", responderCert);

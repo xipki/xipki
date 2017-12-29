@@ -36,12 +36,12 @@ public class GeneralNameMode {
     // not applied to all tags, currently only for tag otherName
     private final Set<ASN1ObjectIdentifier> allowedTypes;
 
-    public GeneralNameMode(final GeneralNameTag tag) {
+    public GeneralNameMode(GeneralNameTag tag) {
         this.tag = ParamUtil.requireNonNull("tag", tag);
         this.allowedTypes = null;
     }
 
-    public GeneralNameMode(final GeneralNameTag tag, final Set<ASN1ObjectIdentifier> allowedTypes) {
+    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes) {
         this.tag = ParamUtil.requireNonNull("tag", tag);
         this.allowedTypes = CollectionUtil.isEmpty(allowedTypes) ? Collections.emptySet()
                 : CollectionUtil.unmodifiableSet(allowedTypes);

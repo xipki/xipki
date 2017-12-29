@@ -120,7 +120,7 @@ public class CaConf {
 
     private final Map<String, ScepEntry> sceps = new HashMap<>();
 
-    public CaConf(final String confFilename, final SecurityFactory securityFactory)
+    public CaConf(String confFilename, SecurityFactory securityFactory)
             throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
         ParamUtil.requireNonBlank("confFilename", confFilename);
         ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -191,7 +191,7 @@ public class CaConf {
         }
     }
 
-    public static void marshal(final CAConfType jaxb, final OutputStream out)
+    public static void marshal(CAConfType jaxb, OutputStream out)
             throws JAXBException, SAXException {
         ParamUtil.requireNonNull("jaxb", jaxb);
         ParamUtil.requireNonNull("out", out);
@@ -211,8 +211,8 @@ public class CaConf {
         }
     }
 
-    private void init(final CAConfType jaxb, final String baseDir, final ZipFile zipFile,
-            final SecurityFactory securityFactory)
+    private void init(CAConfType jaxb, String baseDir, ZipFile zipFile,
+            SecurityFactory securityFactory)
             throws IOException, InvalidConfException, CaMgmtException {
         // Properties
         if (baseDir != null) {
@@ -440,7 +440,7 @@ public class CaConf {
 
     }
 
-    public void addCmpControl(final CmpControlEntry cmpControl) {
+    public void addCmpControl(CmpControlEntry cmpControl) {
         ParamUtil.requireNonNull("cmpControl", cmpControl);
         this.cmpControls.put(cmpControl.name(), cmpControl);
     }
@@ -449,11 +449,11 @@ public class CaConf {
         return Collections.unmodifiableSet(cmpControls.keySet());
     }
 
-    public CmpControlEntry getCmpControl(final String name) {
+    public CmpControlEntry getCmpControl(String name) {
         return cmpControls.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addResponder(final CmpResponderEntry responder) {
+    public void addResponder(CmpResponderEntry responder) {
         ParamUtil.requireNonNull("responder", responder);
         this.responders.put(responder.name(), responder);
     }
@@ -462,11 +462,11 @@ public class CaConf {
         return Collections.unmodifiableSet(responders.keySet());
     }
 
-    public CmpResponderEntry getResponder(final String name) {
+    public CmpResponderEntry getResponder(String name) {
         return responders.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addEnvironment(final String name, final String value) {
+    public void addEnvironment(String name, String value) {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonBlank("value", value);
         this.environments.put(name, value);
@@ -476,11 +476,11 @@ public class CaConf {
         return Collections.unmodifiableSet(environments.keySet());
     }
 
-    public String getEnvironment(final String name) {
+    public String getEnvironment(String name) {
         return environments.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addCrlSigner(final X509CrlSignerEntry crlSigner) {
+    public void addCrlSigner(X509CrlSignerEntry crlSigner) {
         ParamUtil.requireNonNull("crlSigner", crlSigner);
         this.crlSigners.put(crlSigner.name(), crlSigner);
     }
@@ -489,11 +489,11 @@ public class CaConf {
         return Collections.unmodifiableSet(crlSigners.keySet());
     }
 
-    public X509CrlSignerEntry getCrlSigner(final String name) {
+    public X509CrlSignerEntry getCrlSigner(String name) {
         return crlSigners.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addRequestor(final CmpRequestorEntry requestor) {
+    public void addRequestor(CmpRequestorEntry requestor) {
         ParamUtil.requireNonNull("requestor", requestor);
         this.requestors.put(requestor.ident().name(), requestor);
     }
@@ -502,11 +502,11 @@ public class CaConf {
         return Collections.unmodifiableSet(requestors.keySet());
     }
 
-    public CmpRequestorEntry getRequestor(final String name) {
+    public CmpRequestorEntry getRequestor(String name) {
         return requestors.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addPublisher(final PublisherEntry publisher) {
+    public void addPublisher(PublisherEntry publisher) {
         ParamUtil.requireNonNull("publisher", publisher);
         this.publishers.put(publisher.ident().name(), publisher);
     }
@@ -515,11 +515,11 @@ public class CaConf {
         return Collections.unmodifiableSet(publishers.keySet());
     }
 
-    public PublisherEntry getPublisher(final String name) {
+    public PublisherEntry getPublisher(String name) {
         return publishers.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addProfile(final CertprofileEntry profile) {
+    public void addProfile(CertprofileEntry profile) {
         ParamUtil.requireNonNull("profile", profile);
         this.certprofiles.put(profile.ident().name(), profile);
     }
@@ -528,11 +528,11 @@ public class CaConf {
         return Collections.unmodifiableSet(certprofiles.keySet());
     }
 
-    public CertprofileEntry getCertProfile(final String name) {
+    public CertprofileEntry getCertProfile(String name) {
         return certprofiles.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addSingleCa(final SingleCaConf singleCa) {
+    public void addSingleCa(SingleCaConf singleCa) {
         ParamUtil.requireNonNull("singleCa", singleCa);
         this.cas.put(singleCa.name(), singleCa);
     }
@@ -541,11 +541,11 @@ public class CaConf {
         return Collections.unmodifiableSet(cas.keySet());
     }
 
-    public SingleCaConf getCa(final String name) {
+    public SingleCaConf getCa(String name) {
         return cas.get(ParamUtil.requireNonNull("name", name));
     }
 
-    public void addScep(final ScepEntry scep) {
+    public void addScep(ScepEntry scep) {
         ParamUtil.requireNonNull("scep", scep);
         this.sceps.put(scep.name(), scep);
     }
@@ -554,12 +554,11 @@ public class CaConf {
         return Collections.unmodifiableSet(sceps.keySet());
     }
 
-    public ScepEntry getScep(final String name) {
+    public ScepEntry getScep(String name) {
         return sceps.get(ParamUtil.requireNonNull("name", name));
     }
 
-    private String getValue(final FileOrValueType fileOrValue, final ZipFile zipFile)
-            throws IOException {
+    private String getValue(FileOrValueType fileOrValue, ZipFile zipFile) throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -584,14 +583,13 @@ public class CaConf {
         return expandConf(new String(binary, "UTF-8"));
     }
 
-    private String getBase64Binary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)
+    private String getBase64Binary(FileOrBinaryType fileOrBinary, ZipFile zipFile)
             throws IOException {
         byte[] binary = getBinary(fileOrBinary, zipFile);
         return (binary == null) ? null : Base64.encodeToString(binary);
     }
 
-    private byte[] getBinary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)
-            throws IOException {
+    private byte[] getBinary(FileOrBinaryType fileOrBinary, ZipFile zipFile) throws IOException {
         if (fileOrBinary == null) {
             return null;
         }
@@ -627,7 +625,7 @@ public class CaConf {
         return ret;
     }
 
-    private final String expandConf(String confStr) {
+    private String expandConf(String confStr) {
         if (confStr == null || !confStr.contains("${") || confStr.indexOf('}') == -1) {
             return confStr;
         }

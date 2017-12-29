@@ -53,8 +53,8 @@ public class AdmissionSyntaxOption {
 
     private final ExtensionValue extensionValue;
 
-    public AdmissionSyntaxOption(final boolean critical, final GeneralName admissionAuthority,
-            final List<AdmissionsOption> admissionsList) {
+    public AdmissionSyntaxOption(boolean critical, GeneralName admissionAuthority,
+            List<AdmissionsOption> admissionsList) {
         this.critical = critical;
         this.admissionAuthority = admissionAuthority;
         this.admissionsList = ParamUtil.requireNonEmpty("admissionsList", admissionsList);
@@ -125,7 +125,7 @@ public class AdmissionSyntaxOption {
         return inputFromRequestRequired;
     }
 
-    public ExtensionValue extensionValue(final List<List<String>> registrationNumbersList)
+    public ExtensionValue extensionValue(List<List<String>> registrationNumbersList)
             throws BadCertTemplateException {
         if (!this.inputFromRequestRequired) {
             return this.extensionValue;

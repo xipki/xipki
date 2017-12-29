@@ -33,7 +33,7 @@ public class ChangeUserEntry {
 
     private String password;
 
-    public ChangeUserEntry(final NameId ident) throws CaMgmtException {
+    public ChangeUserEntry(NameId ident) throws CaMgmtException {
         this.ident = ParamUtil.requireNonNull("ident", ident);
     }
 
@@ -45,11 +45,11 @@ public class ChangeUserEntry {
         return active;
     }
 
-    public void setActive(final Boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
-    public void setPassword(final String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

@@ -64,9 +64,8 @@ public class ScepEntry {
 
     private boolean confFaulty;
 
-    public ScepEntry(final String name, final NameId caIdent, final boolean active,
-            final String responderType, final String responderConf, final String base64Cert,
-            final Set<String> certProfiles, final String control)
+    public ScepEntry(String name, NameId caIdent, boolean active, String responderType,
+            String responderConf, String base64Cert, Set<String> certProfiles, String control)
             throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.caIdent = ParamUtil.requireNonNull("caIdent", caIdent);
@@ -129,7 +128,7 @@ public class ScepEntry {
         return certFaulty || confFaulty;
     }
 
-    public void setConfFaulty(final boolean faulty) {
+    public void setConfFaulty(boolean faulty) {
         this.confFaulty = faulty;
     }
 
@@ -137,7 +136,7 @@ public class ScepEntry {
         return caIdent;
     }
 
-    public void setCertificate(final X509Certificate certificate) {
+    public void setCertificate(X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
@@ -149,11 +148,11 @@ public class ScepEntry {
         return toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(100);
         sb.append("ca: ").append(caIdent).append('\n');
         sb.append("active: ").append(active).append('\n');

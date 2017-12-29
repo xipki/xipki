@@ -38,9 +38,8 @@ public class CertTemplateData {
     private final String certprofileName;
     private final Extensions extensions;
 
-    public CertTemplateData(final X500Name subject, final SubjectPublicKeyInfo publicKeyInfo,
-            final Date notBefore, final Date notAfter, final Extensions extensions,
-            final String certprofileName) {
+    public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
+            Date notAfter, Extensions extensions, String certprofileName) {
         this.subject = ParamUtil.requireNonNull("subject", subject);
         this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)

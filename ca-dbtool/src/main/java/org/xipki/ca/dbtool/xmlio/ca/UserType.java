@@ -51,7 +51,7 @@ public class UserType extends IdentifidDbObjectType {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -67,7 +67,7 @@ public class UserType extends IdentifidDbObjectType {
         return password;
     }
 
-    public void setPassword(final String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
@@ -80,8 +80,7 @@ public class UserType extends IdentifidDbObjectType {
     }
 
     @Override
-    public void writeTo(final DbiXmlWriter writer)
-            throws InvalidDataObjectException, XMLStreamException {
+    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
         validate();
 

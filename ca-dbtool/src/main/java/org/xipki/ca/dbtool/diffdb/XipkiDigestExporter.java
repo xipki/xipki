@@ -61,9 +61,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private final XipkiDbControl dbControl;
 
-    public XipkiDigestExporter(final DataSourceWrapper datasource, final String baseDir,
-            final AtomicBoolean stopMe, final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType)
+    public XipkiDigestExporter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
+            int numCertsPerSelect, DbSchemaType dbSchemaType)
             throws DataAccessException, IOException {
         super(datasource, baseDir, stopMe);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
@@ -149,8 +148,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         return caIdDirMap;
     } // method getCaIds
 
-    private void digest0(final XipkiDigestExportReader certsReader, final ProcessLog processLog,
-            final CaEntryContainer caEntryContainer) throws Exception {
+    private void digest0(XipkiDigestExportReader certsReader, ProcessLog processLog,
+            CaEntryContainer caEntryContainer) throws Exception {
         long lastProcessedId = 0;
         System.out.println("digesting certificates from ID " + (lastProcessedId + 1));
         processLog.printHeader();
@@ -188,7 +187,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         System.out.println(" digested " + processLog.numProcessed() + " certificates");
     } // method digest0
 
-    static String toAsciiFilename(final String filename) {
+    static String toAsciiFilename(String filename) {
         final int n = filename.length();
         StringBuilder sb = new StringBuilder(n);
         for (int i = 0; i < n; i++) {

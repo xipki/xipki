@@ -244,8 +244,7 @@ public class OcspRequest {
         return signatureIndex < request.length;
     }
 
-    static Header readHeader(final byte[] encoded, final int readerIndex)
-            throws EncodingException {
+    static Header readHeader(byte[] encoded, int readerIndex) throws EncodingException {
         int off = readerIndex;
         byte tag = encoded[off++];
         int len = 0xFF & encoded[off++];

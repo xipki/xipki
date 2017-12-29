@@ -43,7 +43,7 @@ public class CmpRequestorEntry {
 
     private X509Certificate cert;
 
-    public CmpRequestorEntry(final NameId ident, final String base64Cert) {
+    public CmpRequestorEntry(NameId ident, String base64Cert) {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(ident.name())
                 || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(ident.name())) {
@@ -77,7 +77,7 @@ public class CmpRequestorEntry {
         return toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         StringBuilder sb = new StringBuilder(500);
         sb.append("id: ").append(ident.id()).append('\n');
         sb.append("name: ").append(ident.name()).append('\n');

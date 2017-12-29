@@ -36,7 +36,7 @@ public class CrlsWriter extends DbiXmlWriter {
         super(CrlType.TAG_PARENT, "1");
     }
 
-    public void add(final CrlType crl) throws InvalidDataObjectException, XMLStreamException {
+    public void add(CrlType crl) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("crl", crl);
         crl.validate();
         crl.writeTo(this);

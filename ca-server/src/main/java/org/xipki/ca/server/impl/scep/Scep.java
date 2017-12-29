@@ -150,7 +150,7 @@ public class Scep {
         AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
     }
 
-    public Scep(final ScepEntry dbEntry, final CaManagerImpl caManager) throws CaMgmtException {
+    public Scep(ScepEntry dbEntry, CaManagerImpl caManager) throws CaMgmtException {
         this.caManager = ParamUtil.requireNonNull("caManager", caManager);
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         this.name = dbEntry.name();
@@ -211,7 +211,7 @@ public class Scep {
      * @param ms signing time bias in milliseconds. non-positive value deactivate the check of
      *     signing time.
      */
-    public void setMaxSigningTimeBias(final long ms) {
+    public void setMaxSigningTimeBias(long ms) {
         this.maxSigningTimeBiasInMs = ms;
     }
 
@@ -236,7 +236,7 @@ public class Scep {
         return caCertRespBytes;
     }
 
-    public boolean supportsCertProfile(final String profileName) throws CaMgmtException {
+    public boolean supportsCertProfile(String profileName) throws CaMgmtException {
         if (certProfiles.contains("ALL") || certProfiles.contains(profileName.toUpperCase())) {
             return caManager.x509Ca(caIdent).supportsCertProfile(profileName);
         } else {
@@ -256,8 +256,8 @@ public class Scep {
         }
     }
 
-    public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
-            final String certProfileName, final String msgId, final AuditEvent event)
+    public ContentInfo servicePkiOperation(CMSSignedData requestContent,
+            String certProfileName, String msgId, AuditEvent event)
             throws MessageDecodingException, OperationException {
         CaStatus status = status();
 
@@ -280,9 +280,8 @@ public class Scep {
         return encodeResponse(rep, req);
     } // method servicePkiOperation
 
-    private PkiMessage servicePkiOperation0(final CMSSignedData requestContent,
-            final DecodedPkiMessage req, final String certProfileName, final String msgId,
-            final AuditEvent event)
+    private PkiMessage servicePkiOperation0(CMSSignedData requestContent,
+            DecodedPkiMessage req, String certProfileName, String msgId, AuditEvent event)
             throws MessageDecodingException, OperationException {
         ParamUtil.requireNonNull("requestContent", requestContent);
         ParamUtil.requireNonNull("req", req);
@@ -578,7 +577,7 @@ public class Scep {
         return rep;
     } // method servicePkiOperation0
 
-    private SignedData getCert(final X509Ca ca, final BigInteger serialNumber)
+    private SignedData getCert(X509Ca ca, BigInteger serialNumber)
             throws FailInfoException, OperationException {
         X509Certificate cert;
         try {
@@ -595,7 +594,7 @@ public class Scep {
         return buildSignedData(cert);
     } // method getCert
 
-    private SignedData pollCert(final X509Ca ca, final X500Name subject, final TransactionId tid)
+    private SignedData pollCert(X509Ca ca, X500Name subject, TransactionId tid)
             throws FailInfoException, OperationException {
         byte[] tidBytes = getTransactionIdBytes(tid.id());
         List<X509Certificate> certs = ca.getCertificate(subject, tidBytes);
@@ -616,7 +615,7 @@ public class Scep {
         return buildSignedData(certs.get(0));
     } // method pollCert
 
-    private SignedData buildSignedData(final X509Certificate cert) throws OperationException {
+    private SignedData buildSignedData(X509Certificate cert) throws OperationException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
             X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
@@ -633,7 +632,7 @@ public class Scep {
         }
     } // method buildSignedData
 
-    private SignedData getCrl(final X509Ca ca, final BigInteger serialNumber)
+    private SignedData getCrl(X509Ca ca, BigInteger serialNumber)
             throws FailInfoException, OperationException {
         if (!control.supportGetCrl()) {
             throw FailInfoException.BAD_REQUEST;
@@ -656,7 +655,7 @@ public class Scep {
         return SignedData.getInstance(signedData.toASN1Structure().getContent());
     } // method getCrl
 
-    private ContentInfo encodeResponse(final PkiMessage response, final DecodedPkiMessage request)
+    private ContentInfo encodeResponse(PkiMessage response, DecodedPkiMessage request)
             throws OperationException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("request", request);
@@ -693,8 +692,7 @@ public class Scep {
         }
     }
 
-    private static String getSignatureAlgorithm(final PrivateKey key,
-            final ASN1ObjectIdentifier digestOid) {
+    private static String getSignatureAlgorithm(PrivateKey key, ASN1ObjectIdentifier digestOid) {
         ScepHashAlgoType hashAlgo = ScepHashAlgoType.forNameOrOid(digestOid.getId());
         if (hashAlgo == null) {
             hashAlgo = ScepHashAlgoType.SHA256;
@@ -708,14 +706,14 @@ public class Scep {
         }
     } // method getSignatureAlgorithm
 
-    private static void ensureIssuedByThisCa(final X500Name thisCaX500Name,
-            final X500Name caX500Name) throws FailInfoException {
+    private static void ensureIssuedByThisCa(X500Name thisCaX500Name, X500Name caX500Name)
+            throws FailInfoException {
         if (!thisCaX500Name.equals(caX500Name)) {
             throw FailInfoException.BAD_CERTID;
         }
     }
 
-    static CMSSignedData createDegeneratedSigendData(final X509Certificate... certs)
+    static CMSSignedData createDegeneratedSigendData(X509Certificate... certs)
             throws CMSException, CertificateException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
@@ -728,8 +726,7 @@ public class Scep {
         }
     }
 
-    private static byte[] getTransactionIdBytes(final String tid)
-            throws OperationException {
+    private static byte[] getTransactionIdBytes(String tid) throws OperationException {
         byte[] bytes = null;
         final int n = tid.length();
         if (n % 2 != 0) { // neither hex nor base64 encoded
@@ -760,7 +757,7 @@ public class Scep {
         return bytes;
     } // method getTransactionIdBytes
 
-    private static void audit(final AuditEvent audit, final String name, final String value) {
+    private static void audit(AuditEvent audit, String name, String value) {
         audit.addEventData(name, (value == null) ? "null" : value);
     }
 

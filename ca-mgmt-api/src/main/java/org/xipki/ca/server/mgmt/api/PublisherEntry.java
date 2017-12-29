@@ -36,7 +36,7 @@ public class PublisherEntry {
 
     private boolean faulty;
 
-    public PublisherEntry(final NameId ident, final String type, final String conf) {
+    public PublisherEntry(NameId ident, String type, String conf) {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
@@ -58,7 +58,7 @@ public class PublisherEntry {
         return faulty;
     }
 
-    public void setFaulty(final boolean faulty) {
+    public void setFaulty(boolean faulty) {
         this.faulty = faulty;
     }
 

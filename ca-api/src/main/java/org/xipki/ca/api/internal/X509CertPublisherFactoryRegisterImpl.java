@@ -41,7 +41,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
             new ConcurrentLinkedDeque<X509CertPublisherFactory>();
 
     @Override
-    public X509CertPublisher newPublisher(final String type) throws ObjectCreationException {
+    public X509CertPublisher newPublisher(String type) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         for (X509CertPublisherFactory service : services) {
@@ -54,7 +54,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
                 "could not find factory to create Publisher of type " + type);
     }
 
-    public void bindService(final X509CertPublisherFactory service) {
+    public void bindService(X509CertPublisherFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -68,7 +68,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
         LOG.info("{} X509CertPublisherFactory binding for {}", action, service);
     }
 
-    public void unbindService(final X509CertPublisherFactory service) {
+    public void unbindService(X509CertPublisherFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("unbindService invoked with null.");

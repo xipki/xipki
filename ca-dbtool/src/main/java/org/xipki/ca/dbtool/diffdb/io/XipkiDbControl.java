@@ -39,7 +39,7 @@ public class XipkiDbControl {
 
     private final String certCoreSql;
 
-    public XipkiDbControl(final DbSchemaType dbSchemaType) {
+    public XipkiDbControl(DbSchemaType dbSchemaType) {
         ParamUtil.requireNonNull("dbSchemaType", dbSchemaType);
 
         if (dbSchemaType == DbSchemaType.XIPKI_CA_v2) {
@@ -89,7 +89,7 @@ public class XipkiDbControl {
         return caSql;
     }
 
-    public String certSql(final DataSourceWrapper datasource, final int rows) {
+    public String certSql(DataSourceWrapper datasource, int rows) {
         return datasource.buildSelectFirstSql(rows, "ID ASC", certCoreSql);
     }
 

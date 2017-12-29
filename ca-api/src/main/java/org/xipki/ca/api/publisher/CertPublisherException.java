@@ -29,15 +29,15 @@ public class CertPublisherException extends Exception {
     public CertPublisherException() {
     }
 
-    public CertPublisherException(final String message) {
+    public CertPublisherException(String message) {
         super(message);
     }
 
-    public CertPublisherException(final Throwable cause) {
+    public CertPublisherException(Throwable cause) {
         super(cause);
     }
 
-    public CertPublisherException(final String message, final Throwable cause) {
+    public CertPublisherException(String message, Throwable cause) {
         super(message, cause);
     }
 

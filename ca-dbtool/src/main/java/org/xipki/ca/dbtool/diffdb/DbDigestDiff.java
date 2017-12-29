@@ -76,10 +76,10 @@ public class DbDigestDiff {
 
     private final int numTargetThreads;
 
-    private DbDigestDiff(final String refDir, final DataSourceWrapper refDatasource,
-            final DataSourceWrapper targetDatasource, final String reportDirName,
-            final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
-            final NumThreads numThreads) throws IOException, DataAccessException {
+    private DbDigestDiff(String refDir, DataSourceWrapper refDatasource,
+            DataSourceWrapper targetDatasource, String reportDirName,
+            boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
+            int numThreads) throws IOException, DataAccessException {
         if (refDir == null && refDatasource == null) {
             throw new IllegalArgumentException("refDir and refDatasource must not be both null");
         } else if (refDir != null && refDatasource != null) {
@@ -99,10 +99,9 @@ public class DbDigestDiff {
         this.targetDbControl = new XipkiDbControl(dbSchemaType);
 
         // number of threads
-        this.numTargetThreads = Math.min(numThreads.numTargetThreads(),
-                        targetDatasource.maximumPoolSize() - 1);
+        this.numTargetThreads = Math.min(numThreads, targetDatasource.maximumPoolSize() - 1);
 
-        if (this.numTargetThreads != numThreads.numTargetThreads()) {
+        if (this.numTargetThreads != numThreads) {
             LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
                     this.numTargetThreads);
         }
@@ -112,7 +111,7 @@ public class DbDigestDiff {
         return includeCaCerts;
     }
 
-    public void setIncludeCaCerts(final Set<byte[]> includeCaCerts) {
+    public void setIncludeCaCerts(Set<byte[]> includeCaCerts) {
         this.includeCaCerts = includeCaCerts;
     }
 
@@ -169,8 +168,7 @@ public class DbDigestDiff {
         }
     } // method diff
 
-    private void diffSingleCa(final DigestReader refReader,
-            final Map<Integer, byte[]> caIdCertBytesMap)
+    private void diffSingleCa(DigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
             throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.caCert();
         byte[] caCertBytes = caCert.getEncoded();
@@ -242,24 +240,24 @@ public class DbDigestDiff {
         }
     } // method diffSingleCa
 
-    public static DbDigestDiff getInstanceForDirRef(final String refDirname,
-            final DataSourceWrapper targetDatasource, final String reportDirName,
-            final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
-            final NumThreads numThreads) throws IOException, DataAccessException {
+    public static DbDigestDiff getInstanceForDirRef(String refDirname,
+            DataSourceWrapper targetDatasource, String reportDirName, boolean revokedOnly,
+            AtomicBoolean stopMe, int numPerSelect, int numThreads)
+            throws IOException, DataAccessException {
         return new DbDigestDiff(refDirname, null, targetDatasource, reportDirName, revokedOnly,
                 stopMe, numPerSelect, numThreads);
     }
 
-    public static DbDigestDiff getInstanceForDbRef(final DataSourceWrapper refDatasource,
-            final DataSourceWrapper targetDatasource, final String reportDirName,
-            final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
-            final NumThreads numThreads) throws IOException, DataAccessException {
+    public static DbDigestDiff getInstanceForDbRef(DataSourceWrapper refDatasource,
+            DataSourceWrapper targetDatasource, String reportDirName,
+            boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
+            int numThreads) throws IOException, DataAccessException {
         return new DbDigestDiff(null, refDatasource, targetDatasource, reportDirName, revokedOnly,
                 stopMe, numPerSelect, numThreads);
     }
 
-    private static Map<Integer, byte[]> getCas(final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl) throws DataAccessException {
+    private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource,
+            XipkiDbControl dbControl) throws DataAccessException {
         // get a list of available CAs in the target database
         String sql = "SELECT ID,CERT FROM " + dbControl.tblCa();
         Connection conn = datasource.getConnection();

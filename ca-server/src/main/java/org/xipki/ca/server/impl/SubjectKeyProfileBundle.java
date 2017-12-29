@@ -34,8 +34,8 @@ public class SubjectKeyProfileBundle {
 
     private final boolean revoked;
 
-    public SubjectKeyProfileBundle(final int certId, final long subjectFp, final long keyFp,
-            final String profile, final boolean revoked) {
+    public SubjectKeyProfileBundle(int certId, long subjectFp, long keyFp, String profile,
+            boolean revoked) {
         this.certId = certId;
         this.subjectFp = subjectFp;
         this.keyFp = keyFp;

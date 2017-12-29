@@ -47,8 +47,7 @@ public class RevokeSuspendedCertsControl {
 
     private final CertValidity unchangedSince;
 
-    public RevokeSuspendedCertsControl(final CrlReason targetReason,
-            final CertValidity unchangedSince) {
+    public RevokeSuspendedCertsControl(CrlReason targetReason, CertValidity unchangedSince) {
         this.targetReason = ParamUtil.requireNonNull("targetReason", targetReason);
         this.unchangedSince = ParamUtil.requireNonNull("unchangedSince", unchangedSince);
 
@@ -87,7 +86,7 @@ public class RevokeSuspendedCertsControl {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof RevokeSuspendedCertsControl)) {
             return false;
         }

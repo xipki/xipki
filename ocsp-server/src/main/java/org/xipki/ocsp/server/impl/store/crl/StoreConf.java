@@ -86,7 +86,7 @@ class StoreConf {
      */
     private String certsDir;
 
-    StoreConf(final String propsConf) throws OcspStoreException {
+    StoreConf(String propsConf) throws OcspStoreException {
         Properties props = new Properties();
         try {
             props.load(new ByteArrayInputStream(propsConf.getBytes()));
@@ -141,7 +141,7 @@ class StoreConf {
         return certsDir;
     }
 
-    private String getRequiredProperty(final Properties props, final String propKey)
+    private String getRequiredProperty(Properties props, String propKey)
             throws OcspStoreException {
         String str = props.getProperty(propKey);
         if (str == null) {
@@ -154,8 +154,7 @@ class StoreConf {
         return str.trim();
     }
 
-    private String getOptionalProperty(final Properties props, final String propKey)
-            throws OcspStoreException {
+    private String getOptionalProperty(Properties props, String propKey) throws OcspStoreException {
         String str = props.getProperty(propKey);
         if (str == null) {
             return null;

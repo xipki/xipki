@@ -142,8 +142,7 @@ public class CheckCertCmd extends XiAction {
         return null;
     } // method execute0
 
-    private static void format(final ValidationIssue issue, final String prefix,
-            final StringBuilder sb) {
+    private static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
         sb.append(prefix).append(issue.code());
         sb.append(", ").append(issue.description());
         sb.append(", ").append(issue.isFailed() ? "failed" : "successful");

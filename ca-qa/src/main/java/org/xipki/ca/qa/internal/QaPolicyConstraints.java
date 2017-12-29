@@ -31,7 +31,7 @@ public class QaPolicyConstraints extends QaExtension {
 
     private final Integer inhibitPolicyMapping;
 
-    public QaPolicyConstraints(final PolicyConstraints jaxb) {
+    public QaPolicyConstraints(PolicyConstraints jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
             throw new IllegalArgumentException(

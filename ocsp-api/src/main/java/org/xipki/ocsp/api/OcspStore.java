@@ -106,7 +106,7 @@ public abstract class OcspStore {
 
     public abstract boolean isHealthy();
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
 
@@ -118,7 +118,7 @@ public abstract class OcspStore {
         return unknownSerialAsGood;
     }
 
-    public void setUnknownSerialAsGood(final boolean unknownSerialAsGood) {
+    public void setUnknownSerialAsGood(boolean unknownSerialAsGood) {
         this.unknownSerialAsGood = unknownSerialAsGood;
     }
 
@@ -126,7 +126,7 @@ public abstract class OcspStore {
         return includeArchiveCutoff;
     }
 
-    public void setIncludeArchiveCutoff(final boolean includeArchiveCutoff) {
+    public void setIncludeArchiveCutoff(boolean includeArchiveCutoff) {
         this.includeArchiveCutoff = includeArchiveCutoff;
     }
 
@@ -134,7 +134,7 @@ public abstract class OcspStore {
         return retentionInterval;
     }
 
-    public void setRetentionInterval(final int retentionInterval) {
+    public void setRetentionInterval(int retentionInterval) {
         this.retentionInterval = retentionInterval;
     }
 
@@ -142,7 +142,7 @@ public abstract class OcspStore {
         return includeCrlId;
     }
 
-    public void setIncludeCrlId(final boolean includeCrlId) {
+    public void setIncludeCrlId(boolean includeCrlId) {
         this.includeCrlId = includeCrlId;
     }
 

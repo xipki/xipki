@@ -38,7 +38,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
 
     private final CaHasUserEntry caHasUser;
 
-    public ByUserRequestorInfo(final NameId ident, final CaHasUserEntry caHasUser) {
+    public ByUserRequestorInfo(NameId ident, CaHasUserEntry caHasUser) {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         this.caHasUser = ParamUtil.requireNonNull("caHasUser", caHasUser);
     }

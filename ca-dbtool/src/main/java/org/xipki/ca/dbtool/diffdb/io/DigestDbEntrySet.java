@@ -35,11 +35,11 @@ public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet
 
     private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
-    public DigestDbEntrySet(final long startId) {
+    public DigestDbEntrySet(long startId) {
         this.startId = startId;
     }
 
-    public void setException(final Exception exception) {
+    public void setException(Exception exception) {
         this.exception = exception;
     }
 
@@ -47,7 +47,7 @@ public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet
         return exception;
     }
 
-    public void addEntry(final IdentifiedDbDigestEntry entry) {
+    public void addEntry(IdentifiedDbDigestEntry entry) {
         entries.add(entry);
     }
 

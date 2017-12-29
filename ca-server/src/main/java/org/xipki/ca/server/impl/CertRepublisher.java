@@ -51,7 +51,7 @@ class CertRepublisher {
 
         private final SerialWithId serialWithId;
 
-        public SerialWithIdQueueEntry(final SerialWithId serialWithId) {
+        public SerialWithIdQueueEntry(SerialWithId serialWithId) {
             this.serialWithId = ParamUtil.requireNonNull("serialWithId", serialWithId);
         }
 
@@ -197,9 +197,9 @@ class CertRepublisher {
 
     private ProcessLog processLog;
 
-    CertRepublisher(final NameId ca, final X509Cert caCert, final CaIdNameMap caIdNameMap,
-            final CertificateStore certstore, final List<IdentifiedX509CertPublisher> publishers,
-            final boolean onlyRevokedCerts, final int numThreads) {
+    CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertificateStore certstore,
+            List<IdentifiedX509CertPublisher> publishers, boolean onlyRevokedCerts,
+            int numThreads) {
         this.ca = ParamUtil.requireNonNull("ca", ca);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.caIdNameMap = ParamUtil.requireNonNull("caIdNameMap", caIdNameMap);

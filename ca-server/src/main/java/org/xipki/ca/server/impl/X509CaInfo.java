@@ -83,8 +83,7 @@ public class X509CaInfo {
 
     private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
-    public X509CaInfo(final X509CaEntry caEntry, final CertificateStore certStore)
-            throws OperationException {
+    public X509CaInfo(X509CaEntry caEntry, CertificateStore certStore) throws OperationException {
         this.caEntry = ParamUtil.requireNonNull("caEntry", caEntry);
         this.certStore = ParamUtil.requireNonNull("certStore", certStore);
 
@@ -184,7 +183,7 @@ public class X509CaInfo {
         return caEntry.maxValidity();
     }
 
-    public void setMaxValidity(final CertValidity maxValidity) {
+    public void setMaxValidity(CertValidity maxValidity) {
         caEntry.setMaxValidity(maxValidity);
     }
 
@@ -200,7 +199,7 @@ public class X509CaInfo {
         return caEntry.crlSignerName();
     }
 
-    public void setCrlSignerName(final String crlSignerName) {
+    public void setCrlSignerName(String crlSignerName) {
         caEntry.setCrlSignerName(crlSignerName);
     }
 
@@ -208,7 +207,7 @@ public class X509CaInfo {
         return caEntry.cmpControlName();
     }
 
-    public void setCmpControlName(final String name) {
+    public void setCmpControlName(String name) {
         caEntry.setCmpControlName(name);
     }
 
@@ -216,7 +215,7 @@ public class X509CaInfo {
         return caEntry.responderName();
     }
 
-    public void setResponderName(final String name) {
+    public void setResponderName(String name) {
         caEntry.setResponderName(name);
     }
 
@@ -228,7 +227,7 @@ public class X509CaInfo {
         return caEntry.status();
     }
 
-    public void setStatus(final CaStatus status) {
+    public void setStatus(CaStatus status) {
         caEntry.setStatus(status);
     }
 
@@ -241,7 +240,7 @@ public class X509CaInfo {
         return caEntry.toString(false);
     }
 
-    public String toString(final boolean verbose) {
+    public String toString(boolean verbose) {
         return caEntry.toString(verbose);
     }
 
@@ -249,7 +248,7 @@ public class X509CaInfo {
         return caEntry.isDuplicateKeyPermitted();
     }
 
-    public void setDuplicateKeyPermitted(final boolean permitted) {
+    public void setDuplicateKeyPermitted(boolean permitted) {
         caEntry.setDuplicateKeyPermitted(permitted);
     }
 
@@ -257,7 +256,7 @@ public class X509CaInfo {
         return caEntry.isDuplicateSubjectPermitted();
     }
 
-    public void setDuplicateSubjectPermitted(final boolean permitted) {
+    public void setDuplicateSubjectPermitted(boolean permitted) {
         caEntry.setDuplicateSubjectPermitted(permitted);
     }
 
@@ -265,7 +264,7 @@ public class X509CaInfo {
         return caEntry.isSaveRequest();
     }
 
-    public void setSaveRequest(final boolean saveRequest) {
+    public void setSaveRequest(boolean saveRequest) {
         caEntry.setSaveRequest(saveRequest);
     }
 
@@ -273,7 +272,7 @@ public class X509CaInfo {
         return caEntry.validityMode();
     }
 
-    public void setValidityMode(final ValidityMode mode) {
+    public void setValidityMode(ValidityMode mode) {
         caEntry.setValidityMode(mode);
     }
 
@@ -281,7 +280,7 @@ public class X509CaInfo {
         return caEntry.permission();
     }
 
-    public void setPermission(final int permission) {
+    public void setPermission(int permission) {
         caEntry.setPermission(permission);
     }
 
@@ -289,7 +288,7 @@ public class X509CaInfo {
         return caEntry.revocationInfo();
     }
 
-    public void setRevocationInfo(final CertRevocationInfo revocationInfo) {
+    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
         caEntry.setRevocationInfo(revocationInfo);
     }
 
@@ -323,7 +322,7 @@ public class X509CaInfo {
         return BigInteger.valueOf(crlNo);
     }
 
-    public ConcurrentContentSigner getSigner(final List<String> algoNames) {
+    public ConcurrentContentSigner getSigner(List<String> algoNames) {
         if (CollectionUtil.isEmpty(algoNames)) {
             return dfltSigner;
         }
@@ -337,7 +336,7 @@ public class X509CaInfo {
         return null;
     }
 
-    public boolean initSigner(final SecurityFactory securityFactory) throws XiSecurityException {
+    public boolean initSigner(SecurityFactory securityFactory) throws XiSecurityException {
         if (signers != null) {
             return true;
         }

@@ -566,7 +566,7 @@ public class ImportCrl {
 
             File[] certFiles = certsDir.listFiles(new FilenameFilter() {
                 @Override
-                public boolean accept(final File dir, final String name) {
+                public boolean accept(File dir, String name) {
                     return name.endsWith(".der") || name.endsWith(".crt");
                 }
             });
@@ -593,7 +593,7 @@ public class ImportCrl {
 
     }
 
-    private static byte[] extractCoreValue(final byte[] encodedExtensionValue) {
+    private static byte[] extractCoreValue(byte[] encodedExtensionValue) {
         return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
     }
 
@@ -616,8 +616,7 @@ public class ImportCrl {
     }
 
     private void addCertificate(AtomicLong maxId, int caId, Certificate cert, String profileName,
-            final String certLogId)
-            throws DataAccessException, ImportCrlException {
+            String certLogId) throws DataAccessException, ImportCrlException {
         // not issued by the given issuer
         if (!caSubject.equals(cert.getIssuer())) {
             LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
@@ -760,7 +759,7 @@ public class ImportCrl {
         }
     }
 
-    private void releaseResources(final Statement ps, final ResultSet rs) {
+    private void releaseResources(Statement ps, ResultSet rs) {
         datasource.releaseResources(ps, rs, false);
     }
 
