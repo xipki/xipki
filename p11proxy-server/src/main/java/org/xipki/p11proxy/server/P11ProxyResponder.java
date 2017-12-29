@@ -132,7 +132,7 @@ class P11ProxyResponder {
      *
      * </pre>
      */
-    byte[] processRequest(final LocalP11CryptServicePool pool, final byte[] request) {
+    byte[] processRequest(LocalP11CryptServicePool pool, byte[] request) {
         int reqLen = request.length;
 
         // TransactionID
@@ -416,17 +416,17 @@ class P11ProxyResponder {
         }
     } // method processPkiMessage
 
-    private static final String buildErrorMsg(short action, byte[] transactionId) {
+    private static String buildErrorMsg(short action, byte[] transactionId) {
         return "could not process action " + P11ProxyConstants.getActionName(action)
                 + " (tid=" + Hex.toHexString(transactionId) + ")";
     }
 
-    private P11Slot getSlot(final P11CryptService p11Service,
-            final Asn1P11EntityIdentifier entityId) throws P11TokenException {
+    private P11Slot getSlot(P11CryptService p11Service, Asn1P11EntityIdentifier entityId)
+            throws P11TokenException {
         return p11Service.module().getSlot(entityId.slotId().slotId());
     }
 
-    private P11Slot getSlot(final P11CryptService p11Service, final P11SlotIdentifier slotId)
+    private P11Slot getSlot(P11CryptService p11Service, P11SlotIdentifier slotId)
             throws P11TokenException {
         return p11Service.module().getSlot(slotId);
     }
