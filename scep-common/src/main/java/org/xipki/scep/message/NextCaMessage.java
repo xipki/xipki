@@ -61,7 +61,7 @@ public class NextCaMessage {
         return caCert;
     }
 
-    public void setCaCert(final X509Certificate caCert) {
+    public void setCaCert(X509Certificate caCert) {
         this.caCert = caCert;
     }
 
@@ -69,13 +69,13 @@ public class NextCaMessage {
         return raCerts;
     }
 
-    public void setRaCerts(final List<X509Certificate> raCerts) {
+    public void setRaCerts(List<X509Certificate> raCerts) {
         this.raCerts = (raCerts == null || raCerts.isEmpty()) ? null
                 : Collections.unmodifiableList(new ArrayList<X509Certificate>(raCerts));
     }
 
-    public ContentInfo encode(final PrivateKey signingKey, final X509Certificate signerCert,
-            final X509Certificate[] cmsCertSet) throws MessageEncodingException {
+    public ContentInfo encode(PrivateKey signingKey, X509Certificate signerCert,
+            X509Certificate[] cmsCertSet) throws MessageEncodingException {
         ScepUtil.requireNonNull("signingKey", signingKey);
         ScepUtil.requireNonNull("signerCert", signerCert);
 
@@ -130,8 +130,7 @@ public class NextCaMessage {
         }
     } // method encode
 
-    private static String getSignatureAlgorithm(final PrivateKey key,
-            final ScepHashAlgoType hashAlgo) {
+    private static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgoType hashAlgo) {
         String algorithm = key.getAlgorithm();
         if ("RSA".equalsIgnoreCase(algorithm)) {
             return hashAlgo.getName() + "withRSA";

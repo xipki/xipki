@@ -97,7 +97,7 @@ public class ScepUtil {
     private ScepUtil() {
     }
 
-    public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(final PublicKey publicKey)
+    public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
             throws IOException {
         requireNonNull("publicKey", publicKey);
         if (publicKey instanceof java.security.interfaces.RSAPublicKey) {
@@ -111,9 +111,9 @@ public class ScepUtil {
         }
     }
 
-    public static PKCS10CertificationRequest generateRequest(final PrivateKey privatekey,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    public static PKCS10CertificationRequest generateRequest(PrivateKey privatekey,
+            SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+            Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
             throws OperatorCreationException {
         requireNonNull("privatekey", privatekey);
         requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
@@ -133,9 +133,9 @@ public class ScepUtil {
         return csrBuilder.build(contentSigner);
     }
 
-    public static PKCS10CertificationRequest generateRequest(final PrivateKey privatekey,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
-            final String challengePassword, final List<Extension> extensions)
+    public static PKCS10CertificationRequest generateRequest(PrivateKey privatekey,
+            SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+            String challengePassword, List<Extension> extensions)
             throws OperatorCreationException {
         requireNonNull("privatekey", privatekey);
         requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
@@ -157,15 +157,15 @@ public class ScepUtil {
         return generateRequest(privatekey, subjectPublicKeyInfo, subjectDn, attributes);
     }
 
-    public static X509Certificate generateSelfsignedCert(final CertificationRequest csr,
-            final PrivateKey identityKey) throws CertificateException {
+    public static X509Certificate generateSelfsignedCert(CertificationRequest csr,
+            PrivateKey identityKey) throws CertificateException {
         requireNonNull("csr", csr);
         return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
                 csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
     }
 
-    public static X509Certificate generateSelfsignedCert(final X500Name subjectDn,
-            final PublicKey pubKey, final PrivateKey identityKey) throws CertificateException {
+    public static X509Certificate generateSelfsignedCert(X500Name subjectDn,
+            PublicKey pubKey, PrivateKey identityKey) throws CertificateException {
         SubjectPublicKeyInfo pubKeyInfo;
         try {
             pubKeyInfo = createSubjectPublicKeyInfo(pubKey);
@@ -175,9 +175,8 @@ public class ScepUtil {
         return generateSelfsignedCert(subjectDn, pubKeyInfo, identityKey);
     }
 
-    public static X509Certificate generateSelfsignedCert(final X500Name subjectDn,
-            final SubjectPublicKeyInfo pubKeyInfo, final PrivateKey identityKey)
-            throws CertificateException {
+    public static X509Certificate generateSelfsignedCert(X500Name subjectDn,
+            SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey) throws CertificateException {
         requireNonNull("subjectDn", subjectDn);
         requireNonNull("pubKeyInfo", pubKeyInfo);
         requireNonNull("identityKey", identityKey);
@@ -213,7 +212,7 @@ public class ScepUtil {
     /**
      * The first one is a non-CA certificate if there exists one non-CA certificate.
      */
-    public static List<X509Certificate> getCertsFromSignedData(final SignedData signedData)
+    public static List<X509Certificate> getCertsFromSignedData(SignedData signedData)
             throws CertificateException {
         requireNonNull("signedData", signedData);
         ASN1Set set = signedData.getCertificates();
@@ -251,7 +250,7 @@ public class ScepUtil {
         return certs;
     } // method getCertsFromSignedData
 
-    public static X509CRL getCrlFromPkiMessage(final SignedData signedData) throws CRLException {
+    public static X509CRL getCrlFromPkiMessage(SignedData signedData) throws CRLException {
         requireNonNull("signedData", signedData);
         ASN1Set set = signedData.getCRLs();
         if (set == null || set.size() == 0) {
@@ -266,8 +265,7 @@ public class ScepUtil {
         }
     }
 
-    public static String getSignatureAlgorithm(final PrivateKey key,
-            final ScepHashAlgoType hashAlgo) {
+    public static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgoType hashAlgo) {
         requireNonNull("key", key);
         requireNonNull("hashAlgo", hashAlgo);
         String algorithm = key.getAlgorithm();
@@ -279,8 +277,7 @@ public class ScepUtil {
         }
     }
 
-    public static X509Certificate toX509Cert(
-            final org.bouncycastle.asn1.x509.Certificate asn1Cert)
+    public static X509Certificate toX509Cert(org.bouncycastle.asn1.x509.Certificate asn1Cert)
             throws CertificateException {
         byte[] encodedCert;
         try {
@@ -291,7 +288,7 @@ public class ScepUtil {
         return parseCert(encodedCert);
     }
 
-    public static X509CRL toX509Crl(final CertificateList asn1CertList)
+    public static X509CRL toX509Crl(CertificateList asn1CertList)
             throws CertificateException, CRLException {
         byte[] encodedCrl;
         try {
@@ -302,13 +299,12 @@ public class ScepUtil {
         return parseCrl(encodedCrl);
     }
 
-    public static X509CRL parseCrl(final byte[] encodedCrl)
-            throws CertificateException, CRLException {
+    public static X509CRL parseCrl(byte[] encodedCrl) throws CertificateException, CRLException {
         requireNonNull("encodedCrl", encodedCrl);
         return parseCrl(new ByteArrayInputStream(encodedCrl));
     }
 
-    public static X509CRL parseCrl(final InputStream crlStream)
+    public static X509CRL parseCrl(InputStream crlStream)
             throws CertificateException, CRLException {
         requireNonNull("crlStream", crlStream);
         X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
@@ -319,20 +315,17 @@ public class ScepUtil {
         return crl;
     }
 
-    public static X509Certificate parseCert(final byte[] certBytes)
-            throws CertificateException {
+    public static X509Certificate parseCert(byte[] certBytes) throws CertificateException {
         requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
-    private static X509Certificate parseCert(final InputStream certStream)
-            throws CertificateException {
+    private static X509Certificate parseCert(InputStream certStream) throws CertificateException {
         requireNonNull("certStream", certStream);
         return (X509Certificate) getCertFactory().generateCertificate(certStream);
     }
 
-    private static byte[] extractSki(final X509Certificate cert)
-            throws CertificateEncodingException {
+    private static byte[] extractSki(X509Certificate cert) throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
         if (extValue == null) {
             return null;
@@ -345,8 +338,7 @@ public class ScepUtil {
         }
     }
 
-    private static byte[] extractAki(final X509Certificate cert)
-            throws CertificateEncodingException {
+    private static byte[] extractAki(X509Certificate cert) throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
         if (extValue == null) {
             return null;
@@ -361,7 +353,7 @@ public class ScepUtil {
         }
     }
 
-    public static boolean hasKeyusage(final X509Certificate cert, final KeyUsage usage) {
+    public static boolean hasKeyusage(X509Certificate cert, KeyUsage usage) {
         boolean[] keyusage = cert.getKeyUsage();
         if (keyusage != null && keyusage.length > usage.bit()) {
             return keyusage[usage.bit()];
@@ -369,8 +361,8 @@ public class ScepUtil {
         return false;
     }
 
-    private static byte[] getCoreExtValue(final X509Certificate cert,
-            final ASN1ObjectIdentifier type) throws CertificateEncodingException {
+    private static byte[] getCoreExtValue(X509Certificate cert,
+            ASN1ObjectIdentifier type) throws CertificateEncodingException {
         requireNonNull("cert", cert);
         requireNonNull("type", type);
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
@@ -385,7 +377,7 @@ public class ScepUtil {
         }
     }
 
-    public static boolean isSelfSigned(final X509Certificate cert) {
+    public static boolean isSelfSigned(X509Certificate cert) {
         requireNonNull("cert", cert);
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (!equals) {
@@ -402,7 +394,7 @@ public class ScepUtil {
         }
     }
 
-    public static boolean issues(final X509Certificate issuerCert, final X509Certificate cert)
+    public static boolean issues(X509Certificate issuerCert, X509Certificate cert)
             throws CertificateEncodingException {
         requireNonNull("issuerCert", issuerCert);
         requireNonNull("cert", cert);
@@ -430,8 +422,8 @@ public class ScepUtil {
         return issues;
     }
 
-    public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(final String sigOid,
-            final byte[] sigParams) throws NoSuchAlgorithmException {
+    public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(String sigOid,
+            byte[] sigParams) throws NoSuchAlgorithmException {
         requireNonBlank("sigOid", sigOid);
 
         ASN1ObjectIdentifier algOid = new ASN1ObjectIdentifier(sigOid);
@@ -459,8 +451,7 @@ public class ScepUtil {
         return digestAlgOid;
     }
 
-    public static ASN1Encodable getFirstAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type) {
+    public static ASN1Encodable getFirstAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type) {
         requireNonNull("attrs", attrs);
         requireNonNull("type", type);
         Attribute attr = attrs.get(type);
@@ -471,7 +462,7 @@ public class ScepUtil {
         return (set.size() == 0) ? null : set.getObjectAt(0);
     }
 
-    public static byte[] read(final InputStream in) throws IOException {
+    public static byte[] read(InputStream in) throws IOException {
         requireNonNull("in", in);
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -491,8 +482,8 @@ public class ScepUtil {
         }
     }
 
-    public static void addCmsCertSet(final CMSSignedDataGenerator generator,
-            final X509Certificate[] cmsCertSet) throws CertificateEncodingException, CMSException {
+    public static void addCmsCertSet(CMSSignedDataGenerator generator, X509Certificate[] cmsCertSet)
+            throws CertificateEncodingException, CMSException {
         if (cmsCertSet == null || cmsCertSet.length == 0) {
             return;
         }
@@ -506,8 +497,7 @@ public class ScepUtil {
         generator.addCertificates(certStore);
     }
 
-    private static CertificateFactory getCertFactory()
-            throws CertificateException {
+    private static CertificateFactory getCertFactory() throws CertificateException {
         synchronized (certFactLock) {
             if (certFact == null) {
                 try {
@@ -520,11 +510,11 @@ public class ScepUtil {
         }
     }
 
-    public static <T> T requireNonNull(final String objName, final T obj) {
+    public static <T> T requireNonNull(String objName, T obj) {
         return Objects.requireNonNull(obj, objName + " must not be null");
     }
 
-    public static String requireNonBlank(final String objName, final String obj) {
+    public static String requireNonBlank(String objName, String obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
             throw new IllegalArgumentException(objName + " must not be blank");
@@ -532,8 +522,7 @@ public class ScepUtil {
         return obj;
     }
 
-    public static <T> Collection<T> requireNonEmpty(final String objName,
-            final Collection<T> obj) {
+    public static <T> Collection<T> requireNonEmpty(String objName, Collection<T> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
             throw new IllegalArgumentException(objName + " must not be empty");

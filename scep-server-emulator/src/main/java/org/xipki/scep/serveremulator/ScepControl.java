@@ -35,8 +35,8 @@ public class ScepControl {
 
     private final String secret;
 
-    public ScepControl(final boolean sendCaCert, final boolean pendingCert,
-            final boolean sendSignerCert, final boolean useInsecureAlg, final String secret) {
+    public ScepControl(boolean sendCaCert, boolean pendingCert, boolean sendSignerCert,
+            boolean useInsecureAlg, String secret) {
         this.secret = ScepUtil.requireNonBlank("secret", secret);
         this.sendCaCert = sendCaCert;
         this.pendingCert = pendingCert;

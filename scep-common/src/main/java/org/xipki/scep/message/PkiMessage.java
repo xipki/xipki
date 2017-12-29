@@ -74,6 +74,12 @@ public class PkiMessage {
     private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES
             = new HashSet<ASN1ObjectIdentifier>();
 
+    private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes =
+            new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+
+    private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes =
+            new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+
     private final MessageType messageType;
 
     private final Nonce senderNonce;
@@ -88,12 +94,6 @@ public class PkiMessage {
 
     private ASN1Encodable messageData;
 
-    private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes =
-            new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
-
-    private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes =
-            new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
-
     static {
         SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_FAILINFO);
         SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_MESSAGE_TYPE);
@@ -104,12 +104,11 @@ public class PkiMessage {
         SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
     }
 
-    public PkiMessage(final TransactionId transactionId, final MessageType messageType) {
+    public PkiMessage(TransactionId transactionId, MessageType messageType) {
         this(transactionId, messageType, Nonce.randomNonce());
     }
 
-    public PkiMessage(final TransactionId transactionId, final MessageType messageType,
-            final Nonce senderNonce) {
+    public PkiMessage(TransactionId transactionId, MessageType messageType, Nonce senderNonce) {
         this.transactionId = ScepUtil.requireNonNull("transactionId", transactionId);
         this.messageType = ScepUtil.requireNonNull("messageType", messageType);
         this.senderNonce = ScepUtil.requireNonNull("senderNonce", senderNonce);
@@ -123,7 +122,7 @@ public class PkiMessage {
         return senderNonce;
     }
 
-    public final MessageType messageType() {
+    public MessageType messageType() {
         return messageType;
     }
 
@@ -131,7 +130,7 @@ public class PkiMessage {
         return recipientNonce;
     }
 
-    public void setRecipientNonce(final Nonce recipientNonce) {
+    public void setRecipientNonce(Nonce recipientNonce) {
         this.recipientNonce = recipientNonce;
     }
 
@@ -139,7 +138,7 @@ public class PkiMessage {
         return pkiStatus;
     }
 
-    public void setPkiStatus(final PkiStatus pkiStatus) {
+    public void setPkiStatus(PkiStatus pkiStatus) {
         this.pkiStatus = pkiStatus;
     }
 
@@ -147,7 +146,7 @@ public class PkiMessage {
         return failInfo;
     }
 
-    public void setFailInfo(final FailInfo failInfo) {
+    public void setFailInfo(FailInfo failInfo) {
         this.failInfo = failInfo;
     }
 
@@ -155,12 +154,11 @@ public class PkiMessage {
         return messageData;
     }
 
-    public void setMessageData(final ASN1Encodable messageData) {
+    public void setMessageData(ASN1Encodable messageData) {
         this.messageData = messageData;
     }
 
-    public ASN1Encodable addSignendAttribute(final ASN1ObjectIdentifier type,
-            final ASN1Encodable value) {
+    public ASN1Encodable addSignendAttribute(ASN1ObjectIdentifier type, ASN1Encodable value) {
         if (SCEP_ATTR_TYPES.contains(type)) {
             throw new IllegalArgumentException(
                     "Adding SCEP attribute via addSignedAttribute() method is not permitted");
@@ -168,24 +166,23 @@ public class PkiMessage {
         return signedAttributes.put(type, value);
     }
 
-    public ASN1Encodable addUnsignendAttribute(final ASN1ObjectIdentifier type,
-            final ASN1Encodable value) {
+    public ASN1Encodable addUnsignendAttribute(ASN1ObjectIdentifier type, ASN1Encodable value) {
         return unsignedAttributes.put(type, value);
     }
 
-    public ASN1Encodable removeSignedAttribute(final ASN1ObjectIdentifier type) {
+    public ASN1Encodable removeSignedAttribute(ASN1ObjectIdentifier type) {
         return signedAttributes.remove(type);
     }
 
-    public ASN1Encodable removeUnsignedAttribute(final ASN1ObjectIdentifier type) {
+    public ASN1Encodable removeUnsignedAttribute(ASN1ObjectIdentifier type) {
         return unsignedAttributes.remove(type);
     }
 
-    public ASN1Encodable getSignedAtrributeValue(final ASN1ObjectIdentifier type) {
+    public ASN1Encodable getSignedAtrributeValue(ASN1ObjectIdentifier type) {
         return signedAttributes.get(type);
     }
 
-    public ASN1Encodable getUnsignedAtrributeValue(final ASN1ObjectIdentifier type) {
+    public ASN1Encodable getUnsignedAtrributeValue(ASN1ObjectIdentifier type) {
         return unsignedAttributes.get(type);
     }
 
@@ -239,9 +236,9 @@ public class PkiMessage {
         return new AttributeTable(vec);
     }
 
-    public ContentInfo encode(final PrivateKey signerKey, final String signatureAlgorithm,
-            final X509Certificate signerCert, final X509Certificate[] signerCertSet,
-            final X509Certificate recipientCert, final ASN1ObjectIdentifier encAlgId)
+    public ContentInfo encode(PrivateKey signerKey, String signatureAlgorithm,
+            X509Certificate signerCert, X509Certificate[] signerCertSet,
+            X509Certificate recipientCert, ASN1ObjectIdentifier encAlgId)
             throws MessageEncodingException {
         ScepUtil.requireNonNull("signerKey", signerKey);
         ContentSigner signer;
@@ -253,9 +250,9 @@ public class PkiMessage {
         return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
     }
 
-    public ContentInfo encode(final ContentSigner signer, final X509Certificate signerCert,
-            final X509Certificate[] cmsCertSet, final X509Certificate recipientCert,
-            final ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
+    public ContentInfo encode(ContentSigner signer, X509Certificate signerCert,
+            X509Certificate[] cmsCertSet, X509Certificate recipientCert,
+            ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
         ScepUtil.requireNonNull("signer", signer);
         ScepUtil.requireNonNull("signerCert", signerCert);
         if (messageData != null) {
@@ -314,8 +311,8 @@ public class PkiMessage {
         }
     } // method encode
 
-    private CMSEnvelopedData encrypt(final X509Certificate recipient,
-            final ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
+    private CMSEnvelopedData encrypt(X509Certificate recipient, ASN1ObjectIdentifier encAlgId)
+            throws MessageEncodingException {
         ScepUtil.requireNonNull("recipient", recipient);
         ScepUtil.requireNonNull("encAlgId", encAlgId);
 
@@ -344,8 +341,8 @@ public class PkiMessage {
         }
     }
 
-    private static void addAttribute(final ASN1EncodableVector vector,
-            final ASN1ObjectIdentifier attrType, final ASN1Encodable attrValue) {
+    private static void addAttribute(ASN1EncodableVector vector,
+            ASN1ObjectIdentifier attrType, ASN1Encodable attrValue) {
         vector.add(new Attribute(attrType, new DERSet(attrValue)));
     }
 

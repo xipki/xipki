@@ -35,18 +35,18 @@ public final class EnvelopedDataDecryptor {
 
     private final List<EnvelopedDataDecryptorInstance> decryptors;
 
-    public EnvelopedDataDecryptor(final List<EnvelopedDataDecryptorInstance> decryptors) {
+    public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
         ScepUtil.requireNonEmpty("decryptors", decryptors);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
     }
 
-    public EnvelopedDataDecryptor(final EnvelopedDataDecryptorInstance decryptor) {
+    public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
         ScepUtil.requireNonNull("decryptor", decryptor);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
         this.decryptors.add(decryptor);
     }
 
-    public byte[] decrypt(final CMSEnvelopedData envData) throws MessageDecodingException {
+    public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {
         ScepUtil.requireNonNull("envData", envData);
         final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
         RecipientInformation recipientInfo = null;

@@ -113,7 +113,7 @@ public class CaEmulator {
 
     private CertificateList crl;
 
-    public CaEmulator(final PrivateKey caKey, final Certificate caCert, final boolean generateCrl)
+    public CaEmulator(PrivateKey caKey, Certificate caCert, boolean generateCrl)
             throws CertificateEncodingException {
         this.caKey = ScepUtil.requireNonNull("caKey", caKey);
         this.caCert = ScepUtil.requireNonNull("caCert", caCert);
@@ -142,7 +142,7 @@ public class CaEmulator {
         return generateCrl;
     }
 
-    public Certificate generateCert(final CertificationRequest csr) throws Exception {
+    public Certificate generateCert(CertificationRequest csr) throws Exception {
         if (!verifyPopo(csr)) {
             throw new Exception("CSR invalid");
         }
@@ -150,14 +150,14 @@ public class CaEmulator {
         return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
     }
 
-    public Certificate generateCert(final SubjectPublicKeyInfo pubKeyInfo, final X500Name subjectDn)
+    public Certificate generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
             throws Exception {
         return generateCert(pubKeyInfo, subjectDn,
                 new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     }
 
-    public Certificate generateCert(final SubjectPublicKeyInfo pubKeyInfo, final X500Name subjectDn,
-            final Date notBefore) throws Exception {
+    public Certificate generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn,
+            Date notBefore) throws Exception {
         ScepUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
         ScepUtil.requireNonNull("subjectDn", subjectDn);
         ScepUtil.requireNonNull("notBefore", notBefore);
@@ -183,7 +183,7 @@ public class CaEmulator {
         return asn1Cert;
     }
 
-    public Certificate getCert(final X500Name issuer, final BigInteger serialNumber) {
+    public Certificate getCert(X500Name issuer, BigInteger serialNumber) {
         if (!caSubject.equals(issuer)) {
             return null;
         }
@@ -191,7 +191,7 @@ public class CaEmulator {
         return serialCertMap.get(serialNumber);
     }
 
-    public Certificate pollCert(final X500Name issuer, final X500Name subject) {
+    public Certificate pollCert(X500Name issuer, X500Name subject) {
         ScepUtil.requireNonNull("issuer", issuer);
         ScepUtil.requireNonNull("subject", subject);
         if (!caSubject.equals(issuer)) {
@@ -201,7 +201,7 @@ public class CaEmulator {
         return reqSubjectCertMap.get(subject);
     }
 
-    public synchronized CertificateList getCrl(final X500Name issuer, final BigInteger serialNumber)
+    public synchronized CertificateList getCrl(X500Name issuer, BigInteger serialNumber)
             throws Exception {
         if (crl != null) {
             return crl;
@@ -226,7 +226,7 @@ public class CaEmulator {
         return crl.toASN1Structure();
     }
 
-    private boolean verifyPopo(final CertificationRequest csr) {
+    private boolean verifyPopo(CertificationRequest csr) {
         ScepUtil.requireNonNull("csr", csr);
         try {
             PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(csr);
@@ -242,7 +242,7 @@ public class CaEmulator {
         }
     }
 
-    public ContentVerifierProvider getContentVerifierProvider(final PublicKey publicKey)
+    public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
             throws InvalidKeyException {
         ScepUtil.requireNonNull("publicKey", publicKey);
 
@@ -274,7 +274,7 @@ public class CaEmulator {
         }
     }
 
-    private static PublicKey generatePublicKey(final SubjectPublicKeyInfo pkInfo)
+    private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         ScepUtil.requireNonNull("pkInfo", pkInfo);
 
@@ -308,7 +308,7 @@ public class CaEmulator {
         return kf.generatePublic(keyspec);
     }
 
-    private static AsymmetricKeyParameter generatePublicKeyParameter(final PublicKey key)
+    private static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
             throws InvalidKeyException {
         ScepUtil.requireNonNull("key", key);
 

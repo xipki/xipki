@@ -32,7 +32,7 @@ public class RaEmulator {
 
     private final Certificate raCert;
 
-    public RaEmulator(final PrivateKey raKey, final Certificate raCert) {
+    public RaEmulator(PrivateKey raKey, Certificate raCert) {
         this.raKey = ScepUtil.requireNonNull("raKey", raKey);
         this.raCert = ScepUtil.requireNonNull("raCert", raCert);
     }

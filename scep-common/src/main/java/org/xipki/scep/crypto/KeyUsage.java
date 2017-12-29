@@ -42,7 +42,7 @@ public enum KeyUsage {
 
     private String[] names;
 
-    KeyUsage(final int bit, final int bcUsage, final String... names) {
+    KeyUsage(int bit, int bcUsage, String... names) {
         this.bit = bit;
         this.bcUsage = bcUsage;
         this.names = names;
@@ -60,7 +60,7 @@ public enum KeyUsage {
         return names[0];
     }
 
-    public static KeyUsage getKeyUsage(final String usage) {
+    public static KeyUsage getKeyUsage(String usage) {
         ScepUtil.requireNonBlank("usage", usage);
 
         for (KeyUsage ku : KeyUsage.values()) {
@@ -74,7 +74,7 @@ public enum KeyUsage {
         throw new IllegalArgumentException("invalid KeyUsage " + usage);
     }
 
-    public static KeyUsage getKeyUsage(final int bit) {
+    public static KeyUsage getKeyUsage(int bit) {
         for (KeyUsage ku : KeyUsage.values()) {
             if (ku.bit == bit) {
                 return ku;
@@ -84,7 +84,7 @@ public enum KeyUsage {
         throw new IllegalArgumentException("invalid KeyUsage(bit) " + bit);
     }
 
-    public static KeyUsage getKeyUsageFromBcUsage(final int bcUsage) {
+    public static KeyUsage getKeyUsageFromBcUsage(int bcUsage) {
         for (KeyUsage ku : KeyUsage.values()) {
             if (ku.bcUsage == bcUsage) {
                 return ku;

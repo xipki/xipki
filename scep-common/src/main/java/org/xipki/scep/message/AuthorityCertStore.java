@@ -34,8 +34,8 @@ public class AuthorityCertStore {
 
     private final X509Certificate encryptionCert;
 
-    private AuthorityCertStore(final X509Certificate caCert, final X509Certificate signatureCert,
-            final X509Certificate encryptionCert) {
+    private AuthorityCertStore(X509Certificate caCert, X509Certificate signatureCert,
+            X509Certificate encryptionCert) {
         this.caCert = caCert;
         this.signatureCert = signatureCert;
         this.encryptionCert = encryptionCert;
@@ -53,8 +53,8 @@ public class AuthorityCertStore {
         return caCert;
     }
 
-    public static AuthorityCertStore getInstance(final X509Certificate caCert,
-            final X509Certificate... raCerts) {
+    public static AuthorityCertStore getInstance(X509Certificate caCert,
+            X509Certificate... raCerts) {
         ScepUtil.requireNonNull("caCert", caCert);
 
         X509Certificate encryptionCert = null;
@@ -98,7 +98,7 @@ public class AuthorityCertStore {
         return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
     } // method getInstance
 
-    private static boolean hasKeyusage(final boolean[] keyusage, final KeyUsage usage) {
+    private static boolean hasKeyusage(boolean[] keyusage, KeyUsage usage) {
         if (keyusage != null && keyusage.length > usage.bit()) {
             return keyusage[usage.bit()];
         }

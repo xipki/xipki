@@ -33,7 +33,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
 
     private final Collection<String> certHashes;
 
-    public CollectionCertificateValidator(final Collection<X509Certificate> certs) {
+    public CollectionCertificateValidator(Collection<X509Certificate> certs) {
         ScepUtil.requireNonEmpty("certs", certs);
 
         certHashes = new HashSet<String>(certs.size());
@@ -49,7 +49,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
         }
     }
 
-    public CollectionCertificateValidator(final X509Certificate cert) {
+    public CollectionCertificateValidator(X509Certificate cert) {
         ScepUtil.requireNonNull("cert", cert);
 
         certHashes = new HashSet<String>(1);
@@ -64,8 +64,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     }
 
     @Override
-    public boolean trustCertificate(final X509Certificate signerCert,
-            final X509Certificate[] otherCerts) {
+    public boolean trustCertificate(X509Certificate signerCert, X509Certificate[] otherCerts) {
         ScepUtil.requireNonNull("signerCert", signerCert);
 
         String hash;

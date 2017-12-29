@@ -27,8 +27,7 @@ import org.xipki.scep.message.CertificateValidator;
 
 public class TrustAllCertValidator implements CertificateValidator {
 
-    public boolean trustCertificate(final X509Certificate target,
-            final X509Certificate[] otherCerts) {
+    public boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts) {
         return true;
     }
 

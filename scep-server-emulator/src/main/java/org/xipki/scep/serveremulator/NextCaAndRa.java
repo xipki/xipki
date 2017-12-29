@@ -30,7 +30,7 @@ public class NextCaAndRa {
 
     private final Certificate raCert;
 
-    public NextCaAndRa(final Certificate caCert, final Certificate raCert) {
+    public NextCaAndRa(Certificate caCert, Certificate raCert) {
         this.caCert = ScepUtil.requireNonNull("caCert", caCert);
         this.raCert = raCert;
     }

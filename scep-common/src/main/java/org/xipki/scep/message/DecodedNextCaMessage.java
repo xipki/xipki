@@ -76,7 +76,7 @@ public class DecodedNextCaMessage {
         return authorityCertStore;
     }
 
-    public void setAuthorityCertStore(final AuthorityCertStore authorityCertStore) {
+    public void setAuthorityCertStore(AuthorityCertStore authorityCertStore) {
         this.authorityCertStore = authorityCertStore;
     }
 
@@ -84,15 +84,15 @@ public class DecodedNextCaMessage {
         return signatureCert;
     }
 
-    public void setSignatureCert(final X509Certificate signatureCert) {
+    public void setSignatureCert(X509Certificate signatureCert) {
         this.signatureCert = signatureCert;
     }
 
-    public void setDigestAlgorithm(final ASN1ObjectIdentifier digestAlgorithm) {
+    public void setDigestAlgorithm(ASN1ObjectIdentifier digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
 
-    public void setSignatureValid(final Boolean signatureValid) {
+    public void setSignatureValid(Boolean signatureValid) {
         this.signatureValid = signatureValid;
     }
 
@@ -104,7 +104,7 @@ public class DecodedNextCaMessage {
         return failureMessage;
     }
 
-    public void setFailureMessage(final String failureMessage) {
+    public void setFailureMessage(String failureMessage) {
         this.failureMessage = failureMessage;
     }
 
@@ -116,13 +116,13 @@ public class DecodedNextCaMessage {
         return signingTime;
     }
 
-    public void setSigningTime(final Date signingTime) {
+    public void setSigningTime(Date signingTime) {
         this.signingTime = signingTime;
     }
 
     @SuppressWarnings("unchecked")
-    public static DecodedNextCaMessage decode(final CMSSignedData pkiMessage,
-            final CollectionStore<X509CertificateHolder> certStore)
+    public static DecodedNextCaMessage decode(CMSSignedData pkiMessage,
+            CollectionStore<X509CertificateHolder> certStore)
             throws MessageDecodingException {
         ScepUtil.requireNonNull("pkiMessage", pkiMessage);
 

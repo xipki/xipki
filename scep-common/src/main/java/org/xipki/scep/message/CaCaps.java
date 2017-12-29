@@ -45,7 +45,7 @@ public class CaCaps {
         this.capabilities = new HashSet<CaCapability>();
     }
 
-    public CaCaps(final Set<CaCapability> capabilities) {
+    public CaCaps(Set<CaCapability> capabilities) {
         this.capabilities = ((capabilities == null || capabilities.isEmpty()))
              ? new HashSet<CaCapability>() : new HashSet<CaCapability>(capabilities);
         refresh();
@@ -55,25 +55,25 @@ public class CaCaps {
         return Collections.unmodifiableSet(capabilities);
     }
 
-    public void removeCapabilities(final CaCaps caCaps) {
+    public void removeCapabilities(CaCaps caCaps) {
         ScepUtil.requireNonNull("caCaps", caCaps);
         this.capabilities.retainAll(caCaps.capabilities);
         refresh();
     }
 
-    public void addCapability(final CaCapability cap) {
+    public void addCapability(CaCapability cap) {
         ScepUtil.requireNonNull("cap", cap);
         capabilities.add(cap);
         refresh();
     }
 
-    public void removeCapability(final CaCapability cap) {
+    public void removeCapability(CaCapability cap) {
         ScepUtil.requireNonNull("cap", cap);
         capabilities.remove(cap);
         refresh();
     }
 
-    public boolean containsCapability(final CaCapability cap) {
+    public boolean containsCapability(CaCapability cap) {
         ScepUtil.requireNonNull("cap", cap);
         return capabilities.contains(cap);
     }
@@ -124,7 +124,7 @@ public class CaCaps {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof CaCaps)) {
             return false;
         }
@@ -136,7 +136,7 @@ public class CaCaps {
         return Arrays.copyOf(bytes, bytes.length);
     }
 
-    public static CaCaps getInstance(final String scepMessage) {
+    public static CaCaps getInstance(String scepMessage) {
         CaCaps ret = new CaCaps();
         if (scepMessage == null || scepMessage.isEmpty()) {
             return ret;

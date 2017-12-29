@@ -35,13 +35,13 @@ public class IssuerAndSubject extends ASN1Object {
 
     private X500Name subject;
 
-    private IssuerAndSubject(final ASN1Sequence seq) {
+    private IssuerAndSubject(ASN1Sequence seq) {
         ScepUtil.requireNonNull("seq", seq);
         this.issuer = X500Name.getInstance(seq.getObjectAt(0));
         this.subject = X500Name.getInstance(seq.getObjectAt(1));
     }
 
-    public IssuerAndSubject(final X500Name issuer, final X500Name subject) {
+    public IssuerAndSubject(X500Name issuer, X500Name subject) {
         this.issuer = ScepUtil.requireNonNull("issuer", issuer);
         this.subject = ScepUtil.requireNonNull("subject", subject);
     }
@@ -63,7 +63,7 @@ public class IssuerAndSubject extends ASN1Object {
         return new DERSequence(vec);
     }
 
-    public static IssuerAndSubject getInstance(final Object obj) {
+    public static IssuerAndSubject getInstance(Object obj) {
         if (obj instanceof IssuerAndSubject) {
             return (IssuerAndSubject) obj;
         } else if (obj != null) {

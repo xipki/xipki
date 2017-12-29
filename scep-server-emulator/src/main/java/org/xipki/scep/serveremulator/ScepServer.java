@@ -68,8 +68,8 @@ public class ScepServer {
 
     private Certificate nextRaCert;
 
-    public ScepServer(final String name, final CaCaps caCaps, final boolean withRa,
-            final boolean withNextCa, final boolean generateCrl, final ScepControl control) {
+    public ScepServer(String name, CaCaps caCaps, boolean withRa, boolean withNextCa,
+            boolean generateCrl, ScepControl control) {
         this.name = ScepUtil.requireNonBlank("name", name);
         this.caCaps = ScepUtil.requireNonNull("caCaps", caCaps);
         this.control = ScepUtil.requireNonNull("control", control);
@@ -82,7 +82,7 @@ public class ScepServer {
         return name;
     }
 
-    public void setMaxSigningTimeBias(final long ms) {
+    public void setMaxSigningTimeBias(long ms) {
         this.maxSigningTimeBiasInMs = ms;
     }
 
@@ -182,10 +182,9 @@ public class ScepServer {
         return generateCrl;
     }
 
-    private static Certificate issueSubCaCert(final PrivateKey rcaKey, final X500Name issuer,
-            final SubjectPublicKeyInfo pubKeyInfo, final X500Name subject,
-            final BigInteger serialNumber, final Date startTime)
-            throws CertIOException, OperatorCreationException {
+    private static Certificate issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
+            SubjectPublicKeyInfo pubKeyInfo, X500Name subject, BigInteger serialNumber,
+            Date startTime) throws CertIOException, OperatorCreationException {
         Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer,
                 serialNumber, startTime, notAfter, subject, pubKeyInfo);

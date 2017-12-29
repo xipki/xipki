@@ -95,8 +95,8 @@ public class DecodedPkiMessage extends PkiMessage {
         SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
     }
 
-    public DecodedPkiMessage(final TransactionId transactionId, final MessageType messageType,
-            final Nonce senderNonce) {
+    public DecodedPkiMessage(TransactionId transactionId, MessageType messageType,
+            Nonce senderNonce) {
         super(transactionId, messageType, senderNonce);
     }
 
@@ -104,15 +104,15 @@ public class DecodedPkiMessage extends PkiMessage {
         return signatureCert;
     }
 
-    public void setSignatureCert(final X509Certificate signatureCert) {
+    public void setSignatureCert(X509Certificate signatureCert) {
         this.signatureCert = signatureCert;
     }
 
-    public void setDigestAlgorithm(final ASN1ObjectIdentifier digestAlgorithm) {
+    public void setDigestAlgorithm(ASN1ObjectIdentifier digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
 
-    public void setSignatureValid(final Boolean signatureValid) {
+    public void setSignatureValid(Boolean signatureValid) {
         this.signatureValid = signatureValid;
     }
 
@@ -120,7 +120,7 @@ public class DecodedPkiMessage extends PkiMessage {
         return digestAlgorithm;
     }
 
-    public void setContentEncryptionAlgorithm(final ASN1ObjectIdentifier encryptionAlgorithm) {
+    public void setContentEncryptionAlgorithm(ASN1ObjectIdentifier encryptionAlgorithm) {
         this.contentEncryptionAlgorithm = encryptionAlgorithm;
     }
 
@@ -128,7 +128,7 @@ public class DecodedPkiMessage extends PkiMessage {
         return failureMessage;
     }
 
-    public void setFailureMessage(final String failureMessage) {
+    public void setFailureMessage(String failureMessage) {
         this.failureMessage = failureMessage;
     }
 
@@ -140,7 +140,7 @@ public class DecodedPkiMessage extends PkiMessage {
         return decryptionSuccessful;
     }
 
-    public void setDecryptionSuccessful(final Boolean decryptionSuccessful) {
+    public void setDecryptionSuccessful(Boolean decryptionSuccessful) {
         this.decryptionSuccessful = decryptionSuccessful;
     }
 
@@ -152,13 +152,12 @@ public class DecodedPkiMessage extends PkiMessage {
         return signingTime;
     }
 
-    public void setSigningTime(final Date signingTime) {
+    public void setSigningTime(Date signingTime) {
         this.signingTime = signingTime;
     }
 
-    public static DecodedPkiMessage decode(final CMSSignedData pkiMessage,
-            final PrivateKey recipientKey, final X509Certificate recipientCert,
-            final CollectionStore<X509CertificateHolder> certStore)
+    public static DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey,
+            X509Certificate recipientCert, CollectionStore<X509CertificateHolder> certStore)
             throws MessageDecodingException {
         EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(
                 recipientCert, recipientKey);
@@ -167,9 +166,8 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     @SuppressWarnings("unchecked")
-    public static DecodedPkiMessage decode(final CMSSignedData pkiMessage,
-            final EnvelopedDataDecryptor recipient,
-            final CollectionStore<X509CertificateHolder> certStore)
+    public static DecodedPkiMessage decode(CMSSignedData pkiMessage,
+            EnvelopedDataDecryptor recipient, CollectionStore<X509CertificateHolder> certStore)
             throws MessageDecodingException {
         ScepUtil.requireNonNull("pkiMessage", pkiMessage);
         ScepUtil.requireNonNull("recipient", recipient);
@@ -472,8 +470,8 @@ public class DecodedPkiMessage extends PkiMessage {
         return ret;
     } // method decode
 
-    private static String getPrintableStringAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type) throws MessageDecodingException {
+    private static String getPrintableStringAttrValue(AttributeTable attrs,
+            ASN1ObjectIdentifier type) throws MessageDecodingException {
         ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
         if (value instanceof DERPrintableString) {
             return ((DERPrintableString) value).getString();
@@ -485,8 +483,8 @@ public class DecodedPkiMessage extends PkiMessage {
         }
     }
 
-    private static Integer getIntegerPrintStringAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type) throws MessageDecodingException {
+    private static Integer getIntegerPrintStringAttrValue(AttributeTable attrs,
+            ASN1ObjectIdentifier type) throws MessageDecodingException {
         String str = getPrintableStringAttrValue(attrs, type);
         if (str == null) {
             return null;
@@ -499,8 +497,8 @@ public class DecodedPkiMessage extends PkiMessage {
         }
     }
 
-    private static Nonce getNonceAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type) throws MessageDecodingException {
+    private static Nonce getNonceAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
+            throws MessageDecodingException {
         ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
         if (value instanceof ASN1OctetString) {
             byte[] bytes = ((ASN1OctetString) value).getOctets();

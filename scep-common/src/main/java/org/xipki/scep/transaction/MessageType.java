@@ -62,7 +62,7 @@ public enum MessageType {
 
     private final int code;
 
-    MessageType(final int code) {
+    MessageType(int code) {
         this.code = code;
     }
 
@@ -70,7 +70,7 @@ public enum MessageType {
         return code;
     }
 
-    public static MessageType forValue(final int code) {
+    public static MessageType forValue(int code) {
         for (MessageType m : values()) {
             if (m.code == code) {
                 return m;

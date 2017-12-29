@@ -36,12 +36,12 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
         return hashAlgo;
     }
 
-    public void setHashAlgo(final ScepHashAlgoType hashAlgo) {
+    public void setHashAlgo(ScepHashAlgoType hashAlgo) {
         this.hashAlgo = hashAlgo;
     }
 
     @Override
-    public boolean isTrusted(final X509Certificate cert) {
+    public boolean isTrusted(X509Certificate cert) {
         ScepHashAlgoType algo = (hashAlgo == null) ? DEFAULT_HASHALGO : hashAlgo;
         byte[] actual;
         try {

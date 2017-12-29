@@ -33,7 +33,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
 
     private final Set<String> fpOfCerts;
 
-    public PreprovisionedCaCertValidator(final X509Certificate cert) {
+    public PreprovisionedCaCertValidator(X509Certificate cert) {
         ScepUtil.requireNonNull("cert", cert);
         fpOfCerts = new HashSet<String>(1);
         String hexFp;
@@ -46,7 +46,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         fpOfCerts.add(hexFp);
     }
 
-    public PreprovisionedCaCertValidator(final Set<X509Certificate> certs) {
+    public PreprovisionedCaCertValidator(Set<X509Certificate> certs) {
         ScepUtil.requireNonNull("certs", certs);
         fpOfCerts = new HashSet<String>(certs.size());
         for (X509Certificate m : certs) {
@@ -62,7 +62,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
     }
 
     @Override
-    public boolean isTrusted(final X509Certificate cert) {
+    public boolean isTrusted(X509Certificate cert) {
         ScepUtil.requireNonNull("cert", cert);
         String hextFp;
         try {

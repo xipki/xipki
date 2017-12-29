@@ -34,13 +34,13 @@ import org.xipki.scep.util.ScepUtil;
 
 public class ScepClient extends Client {
 
-    public ScepClient(final CaIdentifier caId, final CaCertValidator caCertValidator)
+    public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator)
             throws MalformedURLException {
         super(caId, caCertValidator);
     }
 
     @Override
-    protected ScepHttpResponse httpGet(final String url) throws ScepClientException {
+    protected ScepHttpResponse httpGet(String url) throws ScepClientException {
         ScepUtil.requireNonNull("url", url);
         try {
             HttpURLConnection httpConn = openHttpConn(new URL(url));
@@ -52,8 +52,8 @@ public class ScepClient extends Client {
     }
 
     @Override
-    protected ScepHttpResponse httpPost(final String url, final String requestContentType,
-            final byte[] request) throws ScepClientException {
+    protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
+            throws ScepClientException {
         ScepUtil.requireNonNull("url", url);
         try {
             HttpURLConnection httpConn = openHttpConn(new URL(url));
@@ -77,8 +77,7 @@ public class ScepClient extends Client {
         }
     }
 
-    protected ScepHttpResponse parseResponse(final HttpURLConnection conn)
-            throws ScepClientException {
+    protected ScepHttpResponse parseResponse(HttpURLConnection conn) throws ScepClientException {
         ScepUtil.requireNonNull("conn", conn);
         try {
             InputStream inputstream = conn.getInputStream();
@@ -102,7 +101,7 @@ public class ScepClient extends Client {
         }
     }
 
-    private static HttpURLConnection openHttpConn(final URL url) throws IOException {
+    private static HttpURLConnection openHttpConn(URL url) throws IOException {
         ScepUtil.requireNonNull("url", url);
         URLConnection conn = url.openConnection();
         if (conn instanceof HttpURLConnection) {

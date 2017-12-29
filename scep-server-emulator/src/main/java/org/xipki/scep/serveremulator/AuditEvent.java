@@ -59,7 +59,7 @@ public class AuditEvent {
         return level;
     }
 
-    public void setLevel(final AuditLevel level) {
+    public void setLevel(AuditLevel level) {
         this.level = level;
     }
 
@@ -67,7 +67,7 @@ public class AuditEvent {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

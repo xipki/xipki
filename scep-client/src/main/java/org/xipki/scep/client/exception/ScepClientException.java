@@ -25,15 +25,15 @@ public class ScepClientException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public ScepClientException(final String message, final Throwable cause) {
+    public ScepClientException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ScepClientException(final String message) {
+    public ScepClientException(String message) {
         super(message);
     }
 
-    public ScepClientException(final Throwable cause) {
+    public ScepClientException(Throwable cause) {
         super(cause.getMessage(), cause);
     }
 

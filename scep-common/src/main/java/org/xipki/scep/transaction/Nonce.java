@@ -34,7 +34,7 @@ public class Nonce {
 
     private final byte[] bytes;
 
-    private Nonce(final byte[] bytes, final boolean cloneBytes) {
+    private Nonce(byte[] bytes, boolean cloneBytes) {
         ScepUtil.requireNonNull("bytes", bytes);
         if (bytes.length != 16) {
             throw new IllegalArgumentException("bytes.length is not of 16");
@@ -42,7 +42,7 @@ public class Nonce {
         this.bytes = cloneBytes ? Arrays.copyOf(bytes, bytes.length) : bytes;
     }
 
-    public Nonce(final byte[] bytes) {
+    public Nonce(byte[] bytes) {
         this(bytes, true);
     }
 

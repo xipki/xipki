@@ -37,7 +37,7 @@ public enum CaCapability {
 
     private String text;
 
-    CaCapability(final String text) {
+    CaCapability(String text) {
         this.text = text;
     }
 
@@ -45,7 +45,7 @@ public enum CaCapability {
         return text;
     }
 
-    public static CaCapability forValue(final String text) {
+    public static CaCapability forValue(String text) {
         ScepUtil.requireNonNull("text", text);
         for (CaCapability m : values()) {
             if (m.text.equalsIgnoreCase(text)) {

@@ -100,9 +100,8 @@ public class ScepResponder {
         AES_ENC_ALGS.add(CMSAlgorithm.AES256_GCM);
     }
 
-    public ScepResponder(final CaCaps caCaps, final CaEmulator caEmulator,
-            final RaEmulator raEmulator, final NextCaAndRa nextCaAndRa, final ScepControl control)
-            throws Exception {
+    public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
+            NextCaAndRa nextCaAndRa, ScepControl control) throws Exception {
         this.caCaps = ScepUtil.requireNonNull("caCaps", caCaps);
         this.caEmulator = ScepUtil.requireNonNull("caEmulator", caEmulator);
         this.control = ScepUtil.requireNonNull("control", control);
@@ -122,12 +121,12 @@ public class ScepResponder {
     * @param ms signing time bias in milliseconds. non-positive value deactivate
     *        the check of signing time.
     */
-    public void setMaxSigningTimeBias(final long ms) {
+    public void setMaxSigningTimeBias(long ms) {
         this.maxSigningTimeBiasInMs = ms;
     }
 
-    public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
-            final AuditEvent event) throws MessageDecodingException, CaException {
+    public ContentInfo servicePkiOperation(CMSSignedData requestContent, AuditEvent event)
+            throws MessageDecodingException, CaException {
         ScepUtil.requireNonNull("requestContent", requestContent);
         PrivateKey recipientKey = (raEmulator != null) ? raEmulator.raKey()
                 : caEmulator.caKey();
@@ -172,7 +171,7 @@ public class ScepResponder {
         }
     } // method servicePkiOperation
 
-    public ContentInfo encode(final NextCaMessage nextCaMsg) throws CaException {
+    public ContentInfo encode(NextCaMessage nextCaMsg) throws CaException {
         ScepUtil.requireNonNull("nextCAMsg", nextCaMsg);
         try {
             X509Certificate jceSignerCert = ScepUtil.toX509Cert(signingCert());
@@ -184,9 +183,8 @@ public class ScepResponder {
         }
     }
 
-    private PkiMessage servicePkiOperation0(final DecodedPkiMessage req,
-            final AuditEvent event) throws MessageDecodingException, CaException {
-
+    private PkiMessage servicePkiOperation0(DecodedPkiMessage req, AuditEvent event)
+            throws MessageDecodingException, CaException {
         TransactionId tid = req.transactionId();
         PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
         rep.setPkiStatus(PkiStatus.SUCCESS);
@@ -401,7 +399,7 @@ public class ScepResponder {
         return rep;
     } // method servicePkiOperation0
 
-    private ContentInfo createSignedData(final CertificateList crl) throws CaException {
+    private ContentInfo createSignedData(CertificateList crl) throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
 
@@ -416,7 +414,7 @@ public class ScepResponder {
 
     }
 
-    private ContentInfo createSignedData(final Certificate cert) throws CaException {
+    private ContentInfo createSignedData(Certificate cert) throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
 
         CMSSignedData cmsSigneddata;
@@ -458,7 +456,7 @@ public class ScepResponder {
         return nextCaAndRa;
     }
 
-    private static String getChallengePassword(final CertificationRequestInfo csr) {
+    private static String getChallengePassword(CertificationRequestInfo csr) {
         ASN1Set attrs = csr.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
@@ -470,8 +468,8 @@ public class ScepResponder {
         return null;
     }
 
-    private static PkiMessage buildPkiMessage(PkiMessage message,
-            PkiStatus status, FailInfo failInfo) {
+    private static PkiMessage buildPkiMessage(PkiMessage message, PkiStatus status,
+            FailInfo failInfo) {
         message.setPkiStatus(PkiStatus.FAILURE);
         message.setFailInfo(FailInfo.badRequest);
         return message;

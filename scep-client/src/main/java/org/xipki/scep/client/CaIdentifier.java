@@ -36,7 +36,7 @@ public class CaIdentifier {
 
     private final String profile;
 
-    public CaIdentifier(final String serverUrl, final String profile) throws MalformedURLException {
+    public CaIdentifier(String serverUrl, String profile) throws MalformedURLException {
         ScepUtil.requireNonBlank("serverUrl", serverUrl);
         URL tmpUrl = new URL(serverUrl);
         final String protocol = tmpUrl.getProtocol();
@@ -61,12 +61,12 @@ public class CaIdentifier {
         return profile;
     }
 
-    public String buildGetUrl(final Operation operation) throws TransactionException {
+    public String buildGetUrl(Operation operation) throws TransactionException {
         return buildGetUrl(operation, null);
     }
 
     @SuppressWarnings("deprecation")
-    public String buildGetUrl(final Operation operation, final String message) {
+    public String buildGetUrl(Operation operation, String message) {
         ScepUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.code());
@@ -82,7 +82,7 @@ public class CaIdentifier {
         return ub.toString();
     }
 
-    public String buildPostUrl(final Operation operation) {
+    public String buildPostUrl(Operation operation) {
         ScepUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.code());
@@ -100,7 +100,7 @@ public class CaIdentifier {
     }
 
     @Override
-    public boolean equals(final Object object) {
+    public boolean equals(Object object) {
         if (object instanceof CaIdentifier) {
             CaIdentifier objB = (CaIdentifier) object;
             return url == objB.url && profile == objB.profile;

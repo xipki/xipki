@@ -64,7 +64,7 @@ public class ScepServlet extends HttpServlet {
 
     private ScepResponder responder;
 
-    public ScepServlet(final ScepResponder responder) {
+    public ScepServlet(ScepResponder responder) {
         this.responder = ScepUtil.requireNonNull("responder", responder);
     }
 
@@ -223,7 +223,7 @@ public class ScepServlet extends HttpServlet {
         resp.getOutputStream().write(body);
     }
 
-    protected PKIMessage generatePkiMessage(final InputStream is) throws IOException {
+    protected PKIMessage generatePkiMessage(InputStream is) throws IOException {
         ASN1InputStream asn1Stream = new ASN1InputStream(ScepUtil.requireNonNull("is", is));
 
         try {

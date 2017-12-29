@@ -36,8 +36,7 @@ public final class EnvelopedDataDecryptorInstance {
 
     private final KeyTransRecipient recipient;
 
-    public EnvelopedDataDecryptorInstance(final X509Certificate recipientCert,
-            final PrivateKey privKey) {
+    public EnvelopedDataDecryptorInstance(X509Certificate recipientCert, PrivateKey privKey) {
         ScepUtil.requireNonNull("recipientCert", recipientCert);
         ScepUtil.requireNonNull("privKey", privKey);
 

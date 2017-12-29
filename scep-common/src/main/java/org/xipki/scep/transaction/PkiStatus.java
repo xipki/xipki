@@ -40,7 +40,7 @@ public enum PkiStatus {
 
     private final int code;
 
-    PkiStatus(final int code) {
+    PkiStatus(int code) {
         this.code = code;
     }
 
@@ -48,7 +48,7 @@ public enum PkiStatus {
         return code;
     }
 
-    public static PkiStatus forValue(final int code) {
+    public static PkiStatus forValue(int code) {
         for (PkiStatus m : values()) {
             if (m.code == code) {
                 return m;

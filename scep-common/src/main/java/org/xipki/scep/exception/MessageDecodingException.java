@@ -25,15 +25,15 @@ public class MessageDecodingException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public MessageDecodingException(final String message, final Throwable cause) {
+    public MessageDecodingException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public MessageDecodingException(final String message) {
+    public MessageDecodingException(String message) {
         super(message);
     }
 
-    public MessageDecodingException(final Throwable cause) {
+    public MessageDecodingException(Throwable cause) {
         super(cause.getMessage(), cause);
     }
 

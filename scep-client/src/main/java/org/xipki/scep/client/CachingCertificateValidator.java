@@ -34,13 +34,13 @@ public final class CachingCertificateValidator implements CaCertValidator {
 
     private final CaCertValidator delegate;
 
-    public CachingCertificateValidator(final CaCertValidator delegate) {
+    public CachingCertificateValidator(CaCertValidator delegate) {
         this.delegate = ScepUtil.requireNonNull("delegate", delegate);
         this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
     }
 
     @Override
-    public boolean isTrusted(final X509Certificate cert) {
+    public boolean isTrusted(X509Certificate cert) {
         ScepUtil.requireNonNull("cert", cert);
         String hexFp;
         try {

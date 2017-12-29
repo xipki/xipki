@@ -33,12 +33,11 @@ public class ScepServerContainer {
 
     private Server server;
 
-    public ScepServerContainer(final int port, final ScepServer scepServer) throws Exception {
+    public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
         this(port, Arrays.asList(ScepUtil.requireNonNull("scepServer", scepServer)));
     }
 
-    public ScepServerContainer(final int port, final List<ScepServer> scepServers)
-            throws Exception {
+    public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {
         ScepUtil.requireNonEmpty("scepServers", scepServers);
         server = new Server(port);
         ServletHandler handler = new ServletHandler();

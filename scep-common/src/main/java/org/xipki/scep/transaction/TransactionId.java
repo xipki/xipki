@@ -36,11 +36,11 @@ public class TransactionId {
 
     private final String id;
 
-    public TransactionId(final String id) {
+    public TransactionId(String id) {
         this.id = ScepUtil.requireNonBlank("id", id);
     }
 
-    private TransactionId(final byte[] bytes) {
+    private TransactionId(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
             throw new IllegalArgumentException("bytes must not be empty");
         }
@@ -57,7 +57,7 @@ public class TransactionId {
         return new TransactionId(bytes);
     }
 
-    public static TransactionId sha1TransactionId(final SubjectPublicKeyInfo spki)
+    public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki)
             throws InvalidKeySpecException {
         ScepUtil.requireNonNull("spki", spki);
 
@@ -71,7 +71,7 @@ public class TransactionId {
         return sha1TransactionId(encoded);
     }
 
-    public static TransactionId sha1TransactionId(final byte[] content) {
+    public static TransactionId sha1TransactionId(byte[] content) {
         ScepUtil.requireNonNull("content", content);
 
         SHA1Digest dgst = new SHA1Digest();
