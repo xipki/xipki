@@ -23,8 +23,8 @@
     <bundle start-level="70">mvn:org.xipki.tk/http-server/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-pkcs11-proxy" version="${project.version}" description="PKCS#11 proxy">
-    <bundle>mvn:org.xipki.bc/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.bc/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.tk/common/${xitk.version}</bundle>
     <bundle>mvn:org.xipki.tk/password/${xitk.version}</bundle>
