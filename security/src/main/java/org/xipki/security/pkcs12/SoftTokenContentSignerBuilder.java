@@ -55,6 +55,7 @@ import org.bouncycastle.crypto.signers.DSADigestSigner;
 import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
+import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
@@ -66,7 +67,6 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.bc.XiContentSigner;
-import org.xipki.security.bc.XiSM2Signer;
 import org.xipki.security.bc.XiWrappedContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -187,7 +187,7 @@ public class SoftTokenContentSignerBuilder {
                         + sigAlgId.getAlgorithm().getId() + "'");
             }
 
-            return new XiSM2Signer();
+            return new SM2Signer();
         }
 
     } // class ECDSAContentSignerBuilder

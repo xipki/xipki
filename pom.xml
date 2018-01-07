@@ -32,7 +32,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <karaf.version>4.1.4</karaf.version>
     <netty.version>4.1.18.Final</netty.version>
-    <bc.version>1.59.0.9-SNAPSHOT</bc.version>
+    <bc.version>1.59</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.1-SNAPSHOT</pkcs11-wrapper.version>
@@ -72,7 +72,7 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.xipki.bc</groupId>
+        <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>
         <version>${bc.version}</version>
       </dependency>
@@ -82,7 +82,7 @@
         <version>${pkcs11-wrapper.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.xipki.bc</groupId>
+        <groupId>org.bouncycastle</groupId>
         <artifactId>bcpkix-jdk15on</artifactId>
         <version>${bc.version}</version>
       </dependency>
