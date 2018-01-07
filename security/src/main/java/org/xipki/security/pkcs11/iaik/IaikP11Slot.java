@@ -578,13 +578,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         try {
-            if (userType == PKCS11Constants.CKU_USER) {
-                session.login(Session.UserType.USER, tmpPin);
-            } else if (userType == PKCS11Constants.CKU_SO) {
-                session.login(Session.UserType.SO, tmpPin);
-            } else {
-                session.login(userType, tmpPin);
-            }
+            session.login(userType, tmpPin);
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }
