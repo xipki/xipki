@@ -93,7 +93,7 @@ public class X509CertprofileUtil {
 
             ASN1Encodable asn1 = reqSeq.getObjectAt(1);
             if (! (asn1 instanceof ASN1TaggedObject)) {
-                throw new BadCertTemplateException("otherName.value is not tagged PKCS11Object");
+                throw new BadCertTemplateException("otherName.value is not tagged Object");
             }
 
             int tagNo = ASN1TaggedObject.getInstance(asn1).getTagNo();
