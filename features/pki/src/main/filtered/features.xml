@@ -47,8 +47,8 @@
   <feature name="xipki-security" version="${xitk.version}" description="security">
     <bundle start-level="80">mvn:org.xipki.tk/common/${xitk.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.tk/password/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.bc/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.bc/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle start-level="80">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle start-level="80">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.tk/security/${xitk.version}</bundle>
   </feature>
