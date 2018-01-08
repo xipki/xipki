@@ -76,9 +76,9 @@ import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECPublicKey;
-import iaik.pkcs.pkcs11.objects.GenericSecretKey;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.KeyPair;
+import iaik.pkcs.pkcs11.objects.PKCS11Object;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
@@ -87,6 +87,7 @@ import iaik.pkcs.pkcs11.objects.SM2PrivateKey;
 import iaik.pkcs.pkcs11.objects.SM2PublicKey;
 import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
+import iaik.pkcs.pkcs11.objects.ValuedSecretKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
 import iaik.pkcs.pkcs11.parameters.Parameters;
@@ -714,12 +715,12 @@ class IaikP11Slot extends AbstractP11Slot {
             session.findObjectsInit(template);
 
             while (objList.size() < maxNo) {
-                iaik.pkcs.pkcs11.objects.Object[] foundObjects = session.findObjects(1);
+                PKCS11Object[] foundObjects = session.findObjects(1);
                 if (foundObjects == null || foundObjects.length == 0) {
                     break;
                 }
 
-                for (iaik.pkcs.pkcs11.objects.Object object : foundObjects) {
+                for (PKCS11Object object : foundObjects) {
                     if (LOG.isTraceEnabled()) {
                         LOG.debug("found object: {}", object);
                     }
@@ -835,7 +836,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         List<X509PublicKeyCertificate> certs = new ArrayList<>(tmpObjects.size());
-        for (iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects) {
+        for (PKCS11Object tmpObject : tmpObjects) {
             X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObject;
             certs.add(cert);
         }
@@ -933,8 +934,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
         // The SecretKey class does not support the specification of valueLen
         // So we use GenericSecretKey and set the KeyType manual.
-        GenericSecretKey template = new GenericSecretKey();
-        template.getKeyType().setLongValue(keyType);
+        ValuedSecretKey template = new ValuedSecretKey(keyType);
 
         template.getToken().setBooleanValue(true);
         template.getLabel().setCharArrayValue(label.toCharArray());
@@ -998,15 +998,14 @@ class IaikP11Slot extends AbstractP11Slot {
             throws P11TokenException {
         // The SecretKey class does not support the specification of valueLen
         // So we use GenericSecretKey and set the KeyType manual.
-        GenericSecretKey template = new GenericSecretKey();
-        template.getKeyType().setLongValue(keyType);
-
+        ValuedSecretKey template = new ValuedSecretKey(keyType);
         template.getToken().setBooleanValue(true);
         template.getLabel().setCharArrayValue(label.toCharArray());
         template.getSign().setBooleanValue(true);
         template.getSensitive().setBooleanValue(true);
         template.getExtractable().setBooleanValue(control.isExtractable());
         template.getValue().setByteArrayValue(keyValue);
+        template.getValueLen().setLongValue((long) keyValue.length);
 
         SecretKey key;
         Session session = borrowWritableSession();
