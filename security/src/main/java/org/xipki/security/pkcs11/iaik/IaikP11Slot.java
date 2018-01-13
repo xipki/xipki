@@ -90,9 +90,9 @@ import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.ValuedSecretKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
-import iaik.pkcs.pkcs11.parameters.Parameters;
-import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
+import iaik.pkcs.pkcs11.params.OpaqueParams;
+import iaik.pkcs.pkcs11.params.Params;
+import iaik.pkcs.pkcs11.params.RSAPkcsPssParams;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
@@ -458,20 +458,20 @@ class IaikP11Slot extends AbstractP11Slot {
             return ret;
         }
 
-        Parameters paramObj;
+        Params paramObj;
         if (parameters instanceof P11RSAPkcsPssParams) {
             P11RSAPkcsPssParams param = (P11RSAPkcsPssParams) parameters;
-            paramObj = new RSAPkcsPssParameters(
+            paramObj = new RSAPkcsPssParams(
                     Mechanism.get(param.hashAlgorithm()), param.maskGenerationFunction(),
                     param.saltLength());
         } else if (parameters instanceof P11ByteArrayParams) {
-            paramObj = new OpaqueParameters(((P11ByteArrayParams) parameters).getBytes());
+            paramObj = new OpaqueParams(((P11ByteArrayParams) parameters).getBytes());
         } else {
             throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
         }
 
         if (paramObj != null) {
-            ret.setParameters(paramObj);
+            ret.setParams(paramObj);
         }
 
         return ret;
