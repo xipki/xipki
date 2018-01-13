@@ -70,6 +70,7 @@ import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.State;
 import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
+import iaik.pkcs.pkcs11.Util;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
@@ -92,7 +93,6 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
 import iaik.pkcs.pkcs11.parameters.Parameters;
 import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
-import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
@@ -961,8 +961,8 @@ class IaikP11Slot extends AbstractP11Slot {
                 || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
             mechanism = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
         } else {
-            throw new IllegalArgumentException("unsupported key type "
-                    + Functions.toFullHexString((int)keyType));
+            throw new IllegalArgumentException("unsupported key type 0x"
+                    + Util.toFullHex((int)keyType));
         }
 
         Mechanism mech = Mechanism.get(mechanism);
