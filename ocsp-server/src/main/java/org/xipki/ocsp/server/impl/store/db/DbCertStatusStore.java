@@ -25,7 +25,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,8 +64,13 @@ import org.xipki.security.util.X509Util;
 
 public class DbCertStatusStore extends OcspStore {
 
-    private static final Set<HashAlgoType> certHashAlgos = new HashSet<>(
-            Arrays.asList(HashAlgoType.SHA1, HashAlgoType.SHA256, HashAlgoType.SHA3_256));
+    private static final Map<HashAlgoType, String> certHashAlgoColNameMap = new HashMap<>();
+
+    {
+        certHashAlgoColNameMap.put(HashAlgoType.SHA1, "S1");
+        certHashAlgoColNameMap.put(HashAlgoType.SHA256, "S256");
+        certHashAlgoColNameMap.put(HashAlgoType.SHA3_256, "S3_256");
+    }
 
     private static class SimpleIssuerEntry {
 
@@ -344,7 +348,8 @@ public class DbCertStatusStore extends OcspStore {
 
                     if (!ignore) {
                         if (certHashAlgo != null) {
-                            b64CertHash = rs.getString(certHashAlgo.getShortName());
+                            String colName = certHashAlgoColNameMap.get(certHashAlgo);
+                            b64CertHash = rs.getString(colName);
                         }
 
                         revoked = rs.getBoolean("REV");
@@ -500,12 +505,14 @@ public class DbCertStatusStore extends OcspStore {
         sqlCsMap = new HashMap<>();
         sqlCsNoRitMap = new HashMap<>();
 
-        for (HashAlgoType hashAlgo : certHashAlgos) {
-            String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT," + hashAlgo.getShortName()
+        Set<HashAlgoType> hashAlgos = certHashAlgoColNameMap.keySet();
+        for (HashAlgoType hashAlgo : hashAlgos) {
+            String shortName = certHashAlgoColNameMap.get(hashAlgo);
+            String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT," + shortName
                 + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
             sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
 
-            coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT," + hashAlgo.getShortName()
+            coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT," + shortName
                 + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
             sqlCsNoRitMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
         }
