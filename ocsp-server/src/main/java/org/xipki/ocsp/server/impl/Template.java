@@ -63,7 +63,7 @@ class Template {
             byte[] encoded;
             try {
                 CertHash certHash = new CertHash(algId, new byte[hlen]);
-                org.bouncycastle.asn1.x509.Extension extn 
+                org.bouncycastle.asn1.x509.Extension extn
                     = new org.bouncycastle.asn1.x509.Extension(
                             ISISMTTObjectIdentifiers.id_isismtt_at_certHash, false,
                             certHash.getEncoded());
