@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
@@ -61,7 +62,12 @@ class Template {
             AlgorithmIdentifier algId = new AlgorithmIdentifier(h.oid(), DERNull.INSTANCE);
             byte[] encoded;
             try {
-                encoded = new CertHash(algId, new byte[hlen]).getEncoded();
+                CertHash certHash = new CertHash(algId, new byte[hlen]);
+                org.bouncycastle.asn1.x509.Extension extn 
+                    = new org.bouncycastle.asn1.x509.Extension(
+                            ISISMTTObjectIdentifiers.id_isismtt_at_certHash, false,
+                            certHash.getEncoded());
+                encoded = extn.getEncoded();
             } catch (IOException ex) {
                 throw new ExceptionInInitializerError("could not processing encoding of CertHash");
             }
@@ -85,6 +91,7 @@ class Template {
         if (hashAlgo.length() != certHash.length) {
             throw new IllegalArgumentException("hashAlgo and certHash do not match");
         }
+
         byte[] encodedPrefix = extnCerthashPrefixMap.get(hashAlgo);
         byte[] rv = new byte[encodedPrefix.length + certHash.length];
         System.arraycopy(encodedPrefix, 0, rv, 0, encodedPrefix.length);
