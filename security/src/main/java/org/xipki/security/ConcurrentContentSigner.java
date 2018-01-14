@@ -46,7 +46,7 @@ public interface ConcurrentContentSigner {
 
     boolean isMac();
 
-    byte[] getSha1DigestOfMacKey();
+    byte[] getSha1OfMacKey();
 
     /**
      * Get the signing key.
@@ -65,7 +65,7 @@ public interface ConcurrentContentSigner {
 
     X509Certificate getCertificate();
 
-    X509CertificateHolder getCertificateAsBcObject();
+    X509CertificateHolder getBcCertificate();
 
     /**
      *
@@ -76,7 +76,7 @@ public interface ConcurrentContentSigner {
 
     X509Certificate[] getCertificateChain();
 
-    X509CertificateHolder[] getCertificateChainAsBcObjects();
+    X509CertificateHolder[] getBcCertificateChain();
 
     /**
      * Initializes me.
@@ -108,8 +108,7 @@ public interface ConcurrentContentSigner {
      * @throws NoIdleSignerException
      *         If no idle signer is available
      */
-    ConcurrentBagEntrySigner borrowContentSigner()
-            throws NoIdleSignerException;
+    ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException;
 
     /**
      * Borrows a signer with the given {@code soTimeout}.
@@ -118,10 +117,10 @@ public interface ConcurrentContentSigner {
      * @throws NoIdleSignerException
      *         If no idle signer is available
      */
-    ConcurrentBagEntrySigner borrowContentSigner(int soTimeout)
+    ConcurrentBagEntrySigner borrowSigner(int soTimeout)
             throws NoIdleSignerException;
 
-    void requiteContentSigner(ConcurrentBagEntrySigner signer);
+    void requiteSigner(ConcurrentBagEntrySigner signer);
 
     boolean isHealthy();
 

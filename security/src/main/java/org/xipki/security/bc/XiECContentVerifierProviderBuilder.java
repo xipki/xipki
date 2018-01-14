@@ -60,6 +60,9 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
             AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
             if (GMObjectIdentifiers.sm3.equals(digAlg.getAlgorithm())) {
                 return new SM2Signer();
+            } else {
+                throw new OperatorCreationException("cannot create SM2 signer for hash algorithm "
+                        + digAlg.getAlgorithm().getId());
             }
         }
 

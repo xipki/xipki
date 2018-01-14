@@ -434,7 +434,7 @@ public abstract class CsrGenAction extends SecurityAction {
 
         ConcurrentBagEntrySigner signer0;
         try {
-            signer0 = signer.borrowContentSigner();
+            signer0 = signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }
@@ -442,7 +442,7 @@ public abstract class CsrGenAction extends SecurityAction {
         try {
             return csrBuilder.build(signer0.value());
         } finally {
-            signer.requiteContentSigner(signer0);
+            signer.requiteSigner(signer0);
         }
     }
 }

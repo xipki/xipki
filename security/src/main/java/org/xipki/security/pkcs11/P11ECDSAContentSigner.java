@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
-import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SignerUtil;

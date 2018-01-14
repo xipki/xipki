@@ -28,7 +28,7 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
-import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 

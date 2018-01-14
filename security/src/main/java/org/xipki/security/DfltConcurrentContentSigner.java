@@ -38,7 +38,6 @@ import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -64,7 +63,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     private final boolean mac;
 
-    private byte[] sha1DigestOfMacKey;
+    private byte[] sha1OfMacKey;
 
     private final Key signingKey;
 
@@ -74,7 +73,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     private X509Certificate[] certificateChain;
 
-    private X509CertificateHolder[] certificateChainAsBcObjects;
+    private X509CertificateHolder[] bcCertificateChain;
 
     static {
         final String propKey = "org.xipki.security.signservice.timeout";
@@ -125,9 +124,9 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     public void setSha1DigestOfMacKey(byte[] sha1Digest) {
         if (sha1Digest == null) {
-            this.sha1DigestOfMacKey = null;
+            this.sha1OfMacKey = null;
         } else if (sha1Digest.length == 20) {
-            this.sha1DigestOfMacKey = Arrays.copyOf(sha1Digest, 20);
+            this.sha1OfMacKey = Arrays.copyOf(sha1Digest, 20);
         } else {
             throw new IllegalArgumentException("invalid sha1Digest.length ("
                     + sha1Digest.length + " != 20)");
@@ -135,8 +134,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public byte[] getSha1DigestOfMacKey() {
-        return (sha1DigestOfMacKey == null) ? null : Arrays.copyOf(sha1DigestOfMacKey, 20);
+    public byte[] getSha1OfMacKey() {
+        return (sha1OfMacKey == null) ? null : Arrays.copyOf(sha1OfMacKey, 20);
     }
 
     @Override
@@ -145,16 +144,16 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public ConcurrentBagEntrySigner borrowContentSigner()
+    public ConcurrentBagEntrySigner borrowSigner()
             throws NoIdleSignerException {
-        return borrowContentSigner(defaultSignServiceTimeout);
+        return borrowSigner(defaultSignServiceTimeout);
     }
 
     /**
      * @param soTimeout timeout in milliseconds, 0 for infinitely.
      */
     @Override
-    public ConcurrentBagEntrySigner borrowContentSigner(int soTimeout)
+    public ConcurrentBagEntrySigner borrowSigner(int soTimeout)
             throws NoIdleSignerException {
         ConcurrentBagEntrySigner signer = null;
         try {
@@ -170,7 +169,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void requiteContentSigner(ConcurrentBagEntrySigner signer) {
+    public void requiteSigner(ConcurrentBagEntrySigner signer) {
         signers.requite(signer);
     }
 
@@ -188,7 +187,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     public void setCertificateChain(X509Certificate[] certificateChain) {
         if (certificateChain == null || certificateChain.length == 0) {
             this.certificateChain = null;
-            this.certificateChainAsBcObjects = null;
+            this.bcCertificateChain = null;
             return;
         }
 
@@ -196,11 +195,11 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
         setPublicKey(certificateChain[0].getPublicKey());
         final int n = certificateChain.length;
 
-        this.certificateChainAsBcObjects = new X509CertificateHolder[n];
+        this.bcCertificateChain = new X509CertificateHolder[n];
         for (int i = 0; i < n; i++) {
             X509Certificate cert = this.certificateChain[i];
             try {
-                this.certificateChainAsBcObjects[i] = new X509CertificateHolder(cert.getEncoded());
+                this.bcCertificateChain[i] = new X509CertificateHolder(cert.getEncoded());
             } catch (CertificateEncodingException | IOException ex) {
                 throw new IllegalArgumentException(
                         String.format("%s occurred while parsing certificate at index %d: %s",
@@ -226,9 +225,9 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CertificateHolder getCertificateAsBcObject() {
-        return (certificateChainAsBcObjects != null && certificateChainAsBcObjects.length > 0)
-                ? certificateChainAsBcObjects[0] : null;
+    public X509CertificateHolder getBcCertificate() {
+        return (bcCertificateChain != null && bcCertificateChain.length > 0)
+                ? bcCertificateChain[0] : null;
     }
 
     @Override
@@ -237,15 +236,15 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CertificateHolder[] getCertificateChainAsBcObjects() {
-        return certificateChainAsBcObjects;
+    public X509CertificateHolder[] getBcCertificateChain() {
+        return bcCertificateChain;
     }
 
     @Override
     public boolean isHealthy() {
         ConcurrentBagEntrySigner signer = null;
         try {
-            signer = borrowContentSigner();
+            signer = borrowSigner();
             OutputStream stream = signer.value().getOutputStream();
             stream.write(new byte[]{1, 2, 3, 4});
             byte[] signature = signer.value().getSignature();
@@ -255,7 +254,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
             return false;
         } finally {
             if (signer != null) {
-                requiteContentSigner(signer);
+                requiteSigner(signer);
             }
         }
     }
@@ -271,7 +270,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
-        ConcurrentBagEntrySigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntrySigner contentSigner = borrowSigner();
         try {
             OutputStream signatureStream = contentSigner.value().getOutputStream();
             try {
@@ -282,7 +281,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
             }
             return contentSigner.value().getSignature();
         } finally {
-            requiteContentSigner(contentSigner);
+            requiteSigner(contentSigner);
         }
     }
 

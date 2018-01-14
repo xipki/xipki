@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.bc;
+package org.xipki.security;
 
 import org.bouncycastle.operator.ContentSigner;
 

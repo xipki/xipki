@@ -113,16 +113,16 @@ public class CmpUtil {
         builder.setBody(pkiMessage.getBody());
 
         if (addSignerCert) {
-            X509CertificateHolder signerCert = signer.getCertificateAsBcObject();
+            X509CertificateHolder signerCert = signer.getBcCertificate();
             builder.addCMPCertificate(signerCert);
         }
 
-        ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+        ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
         ProtectedPKIMessage signedMessage;
         try {
             signedMessage = builder.build(signer0.value());
         } finally {
-            signer.requiteContentSigner(signer0);
+            signer.requiteSigner(signer0);
         }
         return signedMessage.toASN1Structure();
     } // method addProtection

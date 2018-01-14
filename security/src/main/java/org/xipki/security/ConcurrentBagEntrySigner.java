@@ -18,7 +18,6 @@
 package org.xipki.security;
 
 import org.xipki.common.concurrent.ConcurrentBagEntry;
-import org.xipki.security.bc.XiContentSigner;
 
 /**
  * @author Lijun Liao

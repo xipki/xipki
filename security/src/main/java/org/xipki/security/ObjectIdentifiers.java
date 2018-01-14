@@ -62,34 +62,6 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts
             = id_xipki_cmp.branch("2");
 
-    // Signature
-    public static final String id_alg_SHA1withRSA = "1.2.840.113549.1.1.5";
-
-    public static final String id_alg_SHA224withRSA = "1.2.840.113549.1.1.14";
-
-    public static final String id_alg_SHA256withRSA = "1.2.840.113549.1.1.11";
-
-    public static final String id_alg_SHA384withRSA = "1.2.840.113549.1.1.12";
-
-    public static final String id_alg_SHA512withRSA = "1.2.840.113549.1.1.13";
-
-    public static final String id_alg_SHA1withDSA = "1.2.840.10040.4.3";
-
-    public static final String id_alg_SHA1withECDSA = "1.2.840.10045.4.1";
-
-    public static final String id_alg_SHA224withECDSA = "1.2.840.10045.4.3.1";
-
-    public static final String id_alg_SHA256withECDSA = "1.2.840.10045.4.3.2";
-
-    public static final String id_alg_SHA384withECDSA = "1.2.840.10045.4.3.3";
-
-    public static final String id_alg_SHA512withECDSA = "1.2.840.10045.4.3.4";
-
-    // Asymmetric Encryption
-    public static final String id_alg_RSAENC = "1.2.840.113549.1.1.1";
-
-    public static final String id_alg_DSAENC = "1.2.840.10040.4.1";
-
     /**
      * country code - StringType(SIZE(2)).
      */
