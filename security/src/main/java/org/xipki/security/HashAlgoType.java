@@ -44,16 +44,16 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 public enum HashAlgoType {
 
-    SHA1(20, AlgorithmCode.SHA1, "1.3.14.3.2.26", "SHA1", "S1"),
-    SHA224(28, AlgorithmCode.SHA224, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
-    SHA256(32, AlgorithmCode.SHA256, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
-    SHA384(48, AlgorithmCode.SHA384, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
-    SHA512(64, AlgorithmCode.SHA512, "2.16.840.1.101.3.4.2.3", "SHA512", "S512"),
-    SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7", "SHA3-224", "S3-224"),
-    SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8", "SHA3-256", "S3-256"),
-    SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9", "SHA3-384", "S3-384"),
-    SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512", "S3-512"),
-    SM3(32, AlgorithmCode.SM3, "1.2.156.10197.1.401", "SM3", "SM3");
+    SHA1(20, AlgorithmCode.SHA1, "1.3.14.3.2.26", "SHA1"),
+    SHA224(28, AlgorithmCode.SHA224, "2.16.840.1.101.3.4.2.4", "SHA224"),
+    SHA256(32, AlgorithmCode.SHA256, "2.16.840.1.101.3.4.2.1", "SHA256"),
+    SHA384(48, AlgorithmCode.SHA384, "2.16.840.1.101.3.4.2.2", "SHA384"),
+    SHA512(64, AlgorithmCode.SHA512, "2.16.840.1.101.3.4.2.3", "SHA512"),
+    SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7", "SHA3-224"),
+    SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8", "SHA3-256"),
+    SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9", "SHA3-384"),
+    SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
+    SM3(32, AlgorithmCode.SM3, "1.2.156.10197.1.401", "SM3");
 
     private static final Map<String, HashAlgoType> map = new HashMap<>();
 
@@ -64,8 +64,6 @@ public enum HashAlgoType {
     private final AlgorithmIdentifier algId;
 
     private final String name;
-
-    private final String shortName;
 
     private final AlgorithmCode algorithmCode;
 
@@ -89,14 +87,12 @@ public enum HashAlgoType {
         map.put("SM3", SM3);
     }
 
-    private HashAlgoType(int length, AlgorithmCode algorithmCode, String oid,
-            String name, String shortName) {
+    private HashAlgoType(int length, AlgorithmCode algorithmCode, String oid, String name) {
         this.length = length;
         this.algorithmCode = algorithmCode;
         this.oid = new ASN1ObjectIdentifier(oid).intern();
         this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
         this.name = name;
-        this.shortName = shortName;
         try {
             this.encoded = new ASN1ObjectIdentifier(oid).getEncoded();
         } catch (IOException ex) {
@@ -118,10 +114,6 @@ public enum HashAlgoType {
 
     public String getName() {
         return name;
-    }
-
-    public String getShortName() {
-        return shortName;
     }
 
     public static HashAlgoType getHashAlgoType(ASN1ObjectIdentifier oid) {
