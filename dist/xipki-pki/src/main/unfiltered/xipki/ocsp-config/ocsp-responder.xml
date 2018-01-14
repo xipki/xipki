@@ -114,6 +114,7 @@
       <includeRevReason>true</includeRevReason>
       <includeInvalidityDate>false</includeInvalidityDate>
       <includeCertHash>false</includeCertHash>
+      <!--Valid values are SHA1, SHA256, SHA3-256-->
       <!--certhashAlgorithm>SHA1</certhashAlgorithm-->
     </responseOption>
   </responseOptions>

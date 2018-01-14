@@ -218,8 +218,10 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="certhashAlgorithm" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            CertHash algorithm in the response, If this element is not present,
-            the hash algorithm in the request will be applied.
+            CertHash algorithm in the response. Valid algorithms are SHA1,
+            SHA256 and SHA3-256.
+            If this element is not present, the system choose the most
+            appropriate algorithm.
           </xs:documentation>
         </xs:annotation>
       </xs:element>

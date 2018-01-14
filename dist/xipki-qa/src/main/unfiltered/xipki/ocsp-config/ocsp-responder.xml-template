@@ -34,7 +34,7 @@
       <inheritCaRevocation>true</inheritCaRevocation>
       <signer>signer1</signer>
       <request>request1</request>
-      <response>response1</response>
+      <response>response2</response>
       <stores>
         <store>crlstore1</store>
       </stores>
@@ -173,7 +173,17 @@ certs.dir = output
       <embedCertsMode>SIGNER_AND_CA</embedCertsMode>
       <includeRevReason>true</includeRevReason>
       <includeInvalidityDate>false</includeInvalidityDate>
+      <includeCertHash>true</includeCertHash>
+      <!--Valid values are SHA1, SHA256, SHA3-256-->
+      <!--certhashAlgorithm>SHA1</certhashAlgorithm-->
+    </responseOption>
+    <responseOption name="response2">
+      <responderIdByName>true</responderIdByName>
+      <embedCertsMode>SIGNER_AND_CA</embedCertsMode>
+      <includeRevReason>true</includeRevReason>
+      <includeInvalidityDate>false</includeInvalidityDate>
       <includeCertHash>false</includeCertHash>
+      <!--Valid values are SHA1, SHA256, SHA3-256-->
       <!--certhashAlgorithm>SHA1</certhashAlgorithm-->
     </responseOption>
   </responseOptions>
