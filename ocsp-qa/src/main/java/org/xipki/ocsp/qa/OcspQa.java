@@ -282,6 +282,13 @@ public class OcspQa {
             IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
             boolean extendedRevoke, Occurrence nextupdateOccurrence, Occurrence certhashOccurrence,
             ASN1ObjectIdentifier certhashAlg) {
+        if (expectedStatus == OcspCertStatus.unknown
+                || expectedStatus == OcspCertStatus.issuerUnknown) {
+            if (certhashOccurrence != Occurrence.forbidden) {
+                certhashOccurrence = Occurrence.forbidden;
+            }
+        }
+
         List<ValidationIssue> issues = new LinkedList<>();
 
         // issuer hash
@@ -369,11 +376,15 @@ public class OcspQa {
 
         // nextUpdate
         Date nextUpdate = singleResp.getNextUpdate();
-        checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate, nextupdateOccurrence);
+        issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE",
+                    nextUpdate, nextupdateOccurrence);
+        issues.add(issue);
 
         Extension extension = singleResp.getExtension(
                 ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-        checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH", extension, certhashOccurrence);
+        issue = checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH",
+                    extension, certhashOccurrence);
+        issues.add(issue);
 
         if (extension != null) {
             ASN1Encodable extensionValue = extension.getParsedValue();
@@ -416,14 +427,14 @@ public class OcspQa {
 
     private static ValidationIssue checkOccurrence(String targetName, Object target,
             Occurrence occurrence) {
-        ValidationIssue issue = new ValidationIssue("OCSP." + targetName, targetName);
+        ValidationIssue issue = new ValidationIssue(targetName, targetName);
         if (occurrence == Occurrence.forbidden) {
             if (target != null) {
-                issue.setFailureMessage(" is present, but none is expected");
+                issue.setFailureMessage("is present, but none is expected");
             }
         } else if (occurrence == Occurrence.required) {
             if (target == null) {
-                issue.setFailureMessage(" is absent, but it is expected");
+                issue.setFailureMessage("is absent, but it is expected");
             }
         }
         return issue;

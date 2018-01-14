@@ -79,7 +79,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "--exp-certhash",
-            description = "occurrence of certHash")
+            description = "occurrence of certHash, "
+                    + "will be set to forbidden for status unknown and issuerUnknown")
     @Completion(OccurrenceCompleter.class)
     private String certhashOccurrenceText = Occurrence.optional.name();
 
