@@ -404,8 +404,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                     } // end if
                 } // end synchronized
 
-                reqBuilder.setRequestorName(signer.getCertificateAsBcObject().getSubject());
-                X509CertificateHolder[] certChain0 = signer.getCertificateChainAsBcObjects();
+                reqBuilder.setRequestorName(signer.getBcCertificate().getSubject());
+                X509CertificateHolder[] certChain0 = signer.getBcCertificateChain();
                 Certificate[] certChain = new Certificate[certChain0.length];
                 for (int i = 0; i < certChain.length; i++) {
                     certChain[i] = certChain0[i].toASN1Structure();
@@ -413,7 +413,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
                 ConcurrentBagEntrySigner signer0;
                 try {
-                    signer0 = signer.borrowContentSigner();
+                    signer0 = signer.borrowSigner();
                 } catch (NoIdleSignerException ex) {
                     throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
                 }
@@ -421,7 +421,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                 try {
                     return reqBuilder.build(signer0.value(), certChain);
                 } finally {
-                    signer.requiteContentSigner(signer0);
+                    signer.requiteSigner(signer0);
                 }
             } else {
                 return reqBuilder.build();

@@ -204,7 +204,7 @@ public abstract class EnrollCertAction extends ClientAction {
 
         ConcurrentContentSigner signer = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
-        X509CertificateHolder ssCert = signer.getCertificateAsBcObject();
+        X509CertificateHolder ssCert = signer.getBcCertificate();
 
         X500Name x500Subject = new X500Name(subject);
         certTemplateBuilder.setSubject(x500Subject);
@@ -345,12 +345,12 @@ public abstract class EnrollCertAction extends ClientAction {
 
         ProofOfPossessionSigningKeyBuilder popoBuilder
                 = new ProofOfPossessionSigningKeyBuilder(certReq);
-        ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+        ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
         POPOSigningKey popoSk;
         try {
             popoSk = popoBuilder.build(signer0.value());
         } finally {
-            signer.requiteContentSigner(signer0);
+            signer.requiteSigner(signer0);
         }
 
         ProofOfPossession popo = new ProofOfPossession(popoSk);
