@@ -338,10 +338,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     int idx = 1;
                     psCerthash.setLong(idx++, cert.id());
                     psCerthash.setString(idx++, sha1(encodedCert));
-                    psCerthash.setString(idx++, sha224(encodedCert));
                     psCerthash.setString(idx++, sha256(encodedCert));
-                    psCerthash.setString(idx++, sha384(encodedCert));
-                    psCerthash.setString(idx++, sha512(encodedCert));
+                    psCerthash.setString(idx++, sha3_256(encodedCert));
                     psCerthash.addBatch();
                 } catch (SQLException ex) {
                     throw translate(SQL_ADD_CHASH, ex);

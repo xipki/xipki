@@ -47,7 +47,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         "DELETE FROM CERT WHERE ID>?";
 
     protected static final String SQL_ADD_CHASH =
-        "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
+        "INSERT INTO CHASH (CID,S1,S256,S3_256) VALUES (?,?,?,?)";
 
     protected static final String SQL_DEL_CHASH =
         "DELETE FROM CHASH WHERE ID>?";
@@ -67,20 +67,12 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         return HashAlgoType.SHA1.base64Hash(data);
     }
 
-    protected String sha224(byte[] data) {
-        return HashAlgoType.SHA224.base64Hash(data);
-    }
-
     protected String sha256(byte[] data) {
         return HashAlgoType.SHA256.base64Hash(data);
     }
 
-    protected String sha384(byte[] data) {
-        return HashAlgoType.SHA384.base64Hash(data);
-    }
-
-    protected String sha512(byte[] data) {
-        return HashAlgoType.SHA512.base64Hash(data);
+    protected String sha3_256(byte[] data) {
+        return HashAlgoType.SHA3_256.base64Hash(data);
     }
 
     protected void deleteCertGreatherThan(long id, Logger log) {

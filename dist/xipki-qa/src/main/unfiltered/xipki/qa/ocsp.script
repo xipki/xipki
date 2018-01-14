@@ -54,7 +54,7 @@ xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP1.der \
   --exp-status good \
-  --exp-certhash required \
+  --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der
@@ -64,7 +64,7 @@ xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP2.der \
   --exp-status keyCompromise \
-  --exp-certhash required \
+  --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der
@@ -150,7 +150,7 @@ xiqa:ocsp-status \
   --cert output/OCSP1.der \
   --http-get \
   --exp-status good \
-  --exp-certhash required \
+  --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der
@@ -161,7 +161,7 @@ xiqa:ocsp-status \
   --cert output/OCSP2.der \
   --http-get \
   --exp-status keyCompromise \
-  --exp-certhash required \
+  --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der
@@ -250,7 +250,7 @@ xiqa:ocsp-status \
   --cert output/OCSP1.der \
   --sign \
   --exp-status good \
-  --exp-certhash required \
+  --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der
@@ -260,7 +260,7 @@ xiqa:ocsp-status \
   --issuer output/SubCAwithCRL1.der \
   --cert output/OCSP2.der --sign \
   --exp-status keyCompromise \
-  --exp-certhash required \
+  --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der

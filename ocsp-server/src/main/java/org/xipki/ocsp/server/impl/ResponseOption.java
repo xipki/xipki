@@ -17,6 +17,9 @@
 
 package org.xipki.ocsp.server.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -31,6 +34,14 @@ import org.xipki.security.HashAlgoType;
  */
 
 class ResponseOption {
+
+    static final Set<HashAlgoType> SUPPORTED_CERTHASH_ALGORITHMS = new HashSet<>();
+
+    static {
+        SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA1);
+        SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA256);
+        SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA3_256);
+    }
 
     private final boolean responderIdByName;
 
@@ -61,20 +72,28 @@ class ResponseOption {
             this.cacheMaxAge = null;
         }
 
-        HashAlgoType tmpCertHashAlgo = null;
         String str = conf.getCerthashAlgorithm();
-        if (str != null) {
+        if (str == null) {
+            this.certHashAlgo = null;
+        } else {
             String token = str.trim();
+
+            HashAlgoType tmpCertHashAlgo = null;
             if (StringUtil.isNotBlank(token)) {
-                HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if (algo != null && RequestOption.SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
-                    tmpCertHashAlgo = algo;
-                } else {
-                    throw new InvalidConfException("hash algorithm " + token + " is unsupported");
-                }
+                tmpCertHashAlgo = HashAlgoType.getHashAlgoType(token);
             }
+
+            if (tmpCertHashAlgo == null) {
+                throw new InvalidConfException("Invalid hash algorithm '" + str + "'");
+            }
+
+            if (!SUPPORTED_CERTHASH_ALGORITHMS.contains(tmpCertHashAlgo)) {
+                throw new InvalidConfException("Only hash algorithm "
+                        + SUPPORTED_CERTHASH_ALGORITHMS + " is unsupported for CertHash");
+            }
+
+            this.certHashAlgo = tmpCertHashAlgo;
         }
-        this.certHashAlgo = tmpCertHashAlgo;
     }
 
     public boolean isResponderIdByName() {

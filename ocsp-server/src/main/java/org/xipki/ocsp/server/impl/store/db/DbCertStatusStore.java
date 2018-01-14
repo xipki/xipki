@@ -66,8 +66,7 @@ import org.xipki.security.util.X509Util;
 public class DbCertStatusStore extends OcspStore {
 
     private static final Set<HashAlgoType> certHashAlgos = new HashSet<>(
-            Arrays.asList(HashAlgoType.SHA1, HashAlgoType.SHA224,
-                    HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512));
+            Arrays.asList(HashAlgoType.SHA1, HashAlgoType.SHA256, HashAlgoType.SHA3_256));
 
     private static class SimpleIssuerEntry {
 
@@ -272,8 +271,18 @@ public class DbCertStatusStore extends OcspStore {
             HashAlgoType certHashAlgo = null;
             if (includeCertHash) {
                 certHashAlgo = (certHashAlg == null) ? reqIssuer.hashAlgorithm() : certHashAlg;
-                if (!certHashAlgos.contains(certHashAlgo)) {
-                    certHashAlgo = HashAlgoType.SHA256;
+                switch(certHashAlgo) {
+                    case SHA1:
+                    case SHA256:
+                    case SHA3_256:
+                        break;
+                    case SHA3_224:
+                    case SHA3_384:
+                    case SHA3_512:
+                        certHashAlgo = HashAlgoType.SHA3_256;
+                        break;
+                    default:
+                        certHashAlgo = HashAlgoType.SHA256;
                 }
                 sql = (includeRit ? sqlCsMap : sqlCsNoRitMap).get(certHashAlgo);
             } else {
@@ -491,9 +500,7 @@ public class DbCertStatusStore extends OcspStore {
         sqlCsMap = new HashMap<>();
         sqlCsNoRitMap = new HashMap<>();
 
-        HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
-            HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
-        for (HashAlgoType hashAlgo : hashAlgos) {
+        for (HashAlgoType hashAlgo : certHashAlgos) {
             String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT," + hashAlgo.getShortName()
                 + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
             sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));

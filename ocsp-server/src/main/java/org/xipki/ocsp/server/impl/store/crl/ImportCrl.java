@@ -106,7 +106,7 @@ public class ImportCrl {
               + "VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String SQL_INSERT_CERTHASH
-            = "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES(?,?,?,?,?,?)";
+            = "INSERT INTO CHASH (CID,S1,S256,S3_256) VALUES(?,?,?,?)";
 
     private static final String CORE_SQL_SELECT_ID_CERT
             = "ID FROM CERT WHERE IID=? AND SN=?";
@@ -731,10 +731,8 @@ public class ImportCrl {
                 int offset = 1;
                 ps.setLong(offset++, id);
                 ps.setString(offset++, HashAlgoType.SHA1.base64Hash(encodedCert));
-                ps.setString(offset++, HashAlgoType.SHA224.base64Hash(encodedCert));
                 ps.setString(offset++, HashAlgoType.SHA256.base64Hash(encodedCert));
-                ps.setString(offset++, HashAlgoType.SHA384.base64Hash(encodedCert));
-                ps.setString(offset++, HashAlgoType.SHA512.base64Hash(encodedCert));
+                ps.setString(offset++, HashAlgoType.SHA3_256.base64Hash(encodedCert));
                 ps.executeUpdate();
             } catch (SQLException ex) {
                 throw datasource.translate(sql, ex);

@@ -101,7 +101,7 @@
     <addUniqueConstraint tableName="CERT" columnNames="IID, SN" constraintName="CONST_ISSUER_SN"/>
     <!-- table CERTHASH -->
     <createTable tableName="CHASH"
-        remarks="hashes of certificates">
+        remarks="hash of certificates">
       <column name="CID" type="BIGINT"
           remarks="certificate id">
         <constraints primaryKey="true" nullable="false"/>
@@ -110,20 +110,12 @@
           remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="S224" type="CHAR(40)"
-          remarks="base64 enoded SHA1 sum of the certificate">
-        <constraints nullable="false"/>
-      </column>
       <column name="S256" type="CHAR(44)"
-          remarks="base64 enoded SHA1 sum of the certificate">
+          remarks="base64 enoded SHA256 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="S384" type="CHAR(64)"
-          remarks="base64 enoded SHA1 sum of the certificate">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S512" type="CHAR(88)"
-          remarks="base64 enoded SHA1 sum of the certificate">
+      <column name="S3_256" type="CHAR(44)"
+          remarks="base64 enoded SHA3-256 sum of the certificate">
         <constraints nullable="false"/>
       </column>
     </createTable>

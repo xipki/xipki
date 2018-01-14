@@ -499,15 +499,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                         try {
                             int idx = 1;
                             psCerthash.setLong(idx++, id);
-                            psCerthash.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedCert));
-                            psCerthash.setString(idx++,
-                                    HashAlgoType.SHA224.base64Hash(encodedCert));
-                            psCerthash.setString(idx++,
-                                    HashAlgoType.SHA256.base64Hash(encodedCert));
-                            psCerthash.setString(idx++,
-                                    HashAlgoType.SHA384.base64Hash(encodedCert));
-                            psCerthash.setString(idx++,
-                                    HashAlgoType.SHA512.base64Hash(encodedCert));
+                            psCerthash.setString(idx++, sha1(encodedCert));
+                            psCerthash.setString(idx++, sha256(encodedCert));
+                            psCerthash.setString(idx++, sha3_256(encodedCert));
                             psCerthash.addBatch();
                         } catch (SQLException ex) {
                             throw translate(SQL_ADD_CHASH, ex);

@@ -64,7 +64,7 @@ class OcspStoreQueryExecutor {
     private static final String SQL_ADD_CRAW = "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
 
     private static final String SQL_ADD_CHASH =
-            "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
+            "INSERT INTO CHASH (CID,S1,S256,S3_256) VALUES (?,?,?,?)";
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
@@ -184,10 +184,8 @@ class OcspStoreQueryExecutor {
         byte[] encodedCert = certificate.encodedCert();
         String b64Cert = Base64.encodeToString(encodedCert);
         String sha1Fp = HashAlgoType.SHA1.base64Hash(encodedCert);
-        String sha224Fp = HashAlgoType.SHA224.base64Hash(encodedCert);
         String sha256Fp = HashAlgoType.SHA256.base64Hash(encodedCert);
-        String sha384Fp = HashAlgoType.SHA384.base64Hash(encodedCert);
-        String sha512Fp = HashAlgoType.SHA512.base64Hash(encodedCert);
+        String sha3_256Fp = HashAlgoType.SHA3_256.base64Hash(encodedCert);
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
         X509Certificate cert = certificate.cert();
@@ -237,10 +235,8 @@ class OcspStoreQueryExecutor {
 
             idx = 2;
             psAddCerthash.setString(idx++, sha1Fp);
-            psAddCerthash.setString(idx++, sha224Fp);
             psAddCerthash.setString(idx++, sha256Fp);
-            psAddCerthash.setString(idx++, sha384Fp);
-            psAddCerthash.setString(idx++, sha512Fp);
+            psAddCerthash.setString(idx++, sha3_256Fp);
 
             psAddcert.setLong(1, certId);
             psAddCerthash.setLong(1, certId);

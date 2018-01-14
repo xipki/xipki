@@ -466,22 +466,20 @@ public class OcspServer {
 
             // required HashAlgorithms for certificate
             ResponseOption respOpt = responseOptions.get(respOptName);
-            Set<HashAlgoType> certHashAlgos = new HashSet<>(5);
+            Set<HashAlgoType> certHashAlgos = new HashSet<>(3);
             if (respOpt.isIncludeCerthash()) {
                 if (respOpt.certHashAlgo() != null) {
                     certHashAlgos.add(respOpt.certHashAlgo());
                 } else {
-                    RequestOption reqOpt = requestOptions.get(reqOptName);
-                    Set<HashAlgoType> algs = reqOpt.hashAlgos();
-                    if (!CollectionUtil.isEmpty(algs)) {
-                        certHashAlgos.addAll(algs);
-                    } else {
-                        HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,
-                            HashAlgoType.SHA224, HashAlgoType.SHA256, HashAlgoType.SHA384,
-                            HashAlgoType.SHA512};
-                        for (HashAlgoType hashAlgo : hashAlgos) {
-                            certHashAlgos.add(hashAlgo);
+                    Set<HashAlgoType> algs = requestOptions.get(reqOptName).hashAlgos();
+                    if (CollectionUtil.isNonEmpty(algs)) {
+                        for (HashAlgoType h : algs) {
+                            if (ResponseOption.SUPPORTED_CERTHASH_ALGORITHMS.contains(h)) {
+                                certHashAlgos.add(h);
+                            }
                         }
+                    } else {
+                        certHashAlgos.addAll(ResponseOption.SUPPORTED_CERTHASH_ALGORITHMS);
                     }
                 }
             }
