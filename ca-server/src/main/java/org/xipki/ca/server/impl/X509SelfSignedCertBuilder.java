@@ -268,12 +268,12 @@ class X509SelfSignedCertBuilder {
             addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, extensions,
                     tmpPublicKeyInfo, publicCaInfo, notBefore, notAfter);
 
-            ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+            ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
             X509CertificateHolder certHolder;
             try {
                 certHolder = certBuilder.build(signer0.value());
             } finally {
-                signer.requiteContentSigner(signer0);
+                signer.requiteSigner(signer0);
             }
             Certificate bcCert = certHolder.toASN1Structure();
             return X509Util.parseCert(bcCert.getEncoded());

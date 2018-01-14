@@ -896,7 +896,7 @@ public class X509Ca {
 
             ConcurrentBagEntrySigner signer0;
             try {
-                signer0 = concurrentSigner.borrowContentSigner();
+                signer0 = concurrentSigner.borrowSigner();
             } catch (NoIdleSignerException ex) {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, "NoIdleSignerException: "
                         + ex.getMessage());
@@ -906,7 +906,7 @@ public class X509Ca {
             try {
                 crlHolder = crlBuilder.build(signer0.value());
             } finally {
-                concurrentSigner.requiteContentSigner(signer0);
+                concurrentSigner.requiteSigner(signer0);
             }
 
             try {
@@ -1815,7 +1815,7 @@ public class X509Ca {
 
                 ConcurrentBagEntrySigner signer0;
                 try {
-                    signer0 = gct.signer.borrowContentSigner();
+                    signer0 = gct.signer.borrowSigner();
                 } catch (NoIdleSignerException ex) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
                 }
@@ -1824,7 +1824,7 @@ public class X509Ca {
                 try {
                     certHolder = certBuilder.build(signer0.value());
                 } finally {
-                    gct.signer.requiteContentSigner(signer0);
+                    gct.signer.requiteSigner(signer0);
                 }
 
                 Certificate bcCert = certHolder.toASN1Structure();

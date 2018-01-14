@@ -74,7 +74,7 @@ class ResponderSigner {
             this.sequenceOfCertificate = null;
             this.sequenceOfCertificateChain = null;
 
-            byte[] keySha1 = firstSigner.getSha1DigestOfMacKey();
+            byte[] keySha1 = firstSigner.getSha1OfMacKey();
             this.responderIdByKey = new ResponderID(keySha1);
         } else {
             X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();

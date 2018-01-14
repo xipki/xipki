@@ -34,7 +34,7 @@ import org.xipki.ocsp.server.impl.type.SingleResponse;
 import org.xipki.ocsp.server.impl.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 
 /**
@@ -97,7 +97,7 @@ public class OCSPRespBuilder {
         byte[] tbs = new byte[responseData.encodedLength()];
         responseData.write(tbs, 0);
 
-        ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+        ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
 
         byte[] signature;
         byte[] sigAlgId;
@@ -115,7 +115,7 @@ public class OCSPRespBuilder {
             signature = csigner0.getSignature();
             sigAlgId = csigner0.getEncodedAlgorithmIdentifier();
         } finally {
-            signer.requiteContentSigner(signer0);
+            signer.requiteSigner(signer0);
         }
 
         // ----- Get the length -----
