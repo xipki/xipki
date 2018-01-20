@@ -185,8 +185,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult refresh0()
-            throws P11TokenException {
+    protected P11SlotRefreshResult refresh0() throws P11TokenException {
         Mechanism[] mechanisms;
         try {
             mechanisms = slot.getToken().getMechanismList();
@@ -794,8 +793,7 @@ class IaikP11Slot extends AbstractP11Slot {
         return labelStr;
     }
 
-    private static X509Cert parseCert(X509PublicKeyCertificate p11Cert)
-            throws P11TokenException {
+    private static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
         try {
             byte[] encoded = p11Cert.getValue().getByteArrayValue();
             return new X509Cert(X509Util.parseCert(encoded), encoded);
@@ -926,8 +924,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
-            P11NewKeyControl control)
-            throws P11TokenException {
+            P11NewKeyControl control) throws P11TokenException {
         if (keysize % 8 != 0) {
             throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
         }
@@ -994,8 +991,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
-            P11NewKeyControl control)
-            throws P11TokenException {
+            P11NewKeyControl control) throws P11TokenException {
         // The SecretKey class does not support the specification of valueLen
         // So we use GenericSecretKey and set the KeyType manual.
         ValuedSecretKey template = new ValuedSecretKey(keyType);

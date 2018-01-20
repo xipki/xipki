@@ -175,8 +175,7 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineUpdate(byte[] input, int off, int len)
-            throws SignatureException {
+    protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
         digest.update(input, off, len);
     }
 

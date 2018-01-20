@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.datasource.internal;
+package org.xipki.datasource;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.DatabaseType;
 
 /**
  * JDBC state codes for a particular database. It is the first two digits (the SQL state "class").
@@ -134,15 +133,15 @@ public class SqlStateCodes {
     // concurrency failure
     private static final String CF_TRANSACTION_ROLLBACK = "40";
 
-    protected Set<String> badSqlGrammarCodes;
+    Set<String> badSqlGrammarCodes;
 
-    protected Set<String> dataIntegrityViolationCodes;
+    Set<String> dataIntegrityViolationCodes;
 
-    protected Set<String> dataAccessResourceFailureCodes;
+    Set<String> dataAccessResourceFailureCodes;
 
-    protected Set<String> transientDataAccessResourceCodes;
+    Set<String> transientDataAccessResourceCodes;
 
-    protected Set<String> concurrencyFailureCodes;
+    Set<String> concurrencyFailureCodes;
 
     private SqlStateCodes() {
         badSqlGrammarCodes = toSet(BGE_DYNAMIC_SQL_ERROR, BGE_CARDINALITY_VIOLATION,
@@ -154,26 +153,6 @@ public class SqlStateCodes {
         dataAccessResourceFailureCodes = toSet(DRF_CONNECTION_EXCEPTION);
         transientDataAccessResourceCodes = toSet(TDR_COMMUNICATION_FAILURE);
         concurrencyFailureCodes = toSet(CF_TRANSACTION_ROLLBACK);
-    }
-
-    public Set<String> badSqlGrammarCodes() {
-        return badSqlGrammarCodes;
-    }
-
-    public Set<String> dataIntegrityViolationCodes() {
-        return dataIntegrityViolationCodes;
-    }
-
-    public Set<String> dataAccessResourceFailureCodes() {
-        return dataAccessResourceFailureCodes;
-    }
-
-    public Set<String> transientDataAccessResourceCodes() {
-        return transientDataAccessResourceCodes;
-    }
-
-    public Set<String> concurrencyFailureCodes() {
-        return concurrencyFailureCodes;
     }
 
     public static SqlStateCodes newInstance(DatabaseType dbType) {

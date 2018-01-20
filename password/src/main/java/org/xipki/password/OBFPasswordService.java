@@ -18,7 +18,8 @@
 package org.xipki.password;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -30,7 +31,7 @@ public class OBFPasswordService {
     public static final String OBFUSCATE = "OBF:";
 
     public static String obfuscate(String str) {
-        Objects.requireNonNull(str, "str must not be null");
+        ParamUtil.requireNonNull("str", str);
         StringBuilder buf = new StringBuilder();
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
@@ -57,24 +58,23 @@ public class OBFPasswordService {
     }
 
     public static String deobfuscate(String str) {
-        Objects.requireNonNull(str, "str must not be null");
-        String tmpStr = str;
+        ParamUtil.requireNonNull("str", str);
 
-        if (startsWithIgnoreCase(tmpStr, OBFUSCATE)) {
-            tmpStr = tmpStr.substring(4);
+        if (startsWithIgnoreCase(str, OBFUSCATE)) {
+            str = str.substring(4);
         }
 
-        byte[] bytes = new byte[tmpStr.length() / 2];
+        byte[] bytes = new byte[str.length() / 2];
         int idx = 0;
-        for (int i = 0; i < tmpStr.length(); i += 4) {
-            if (tmpStr.charAt(i) == 'U') {
+        for (int i = 0; i < str.length(); i += 4) {
+            if (str.charAt(i) == 'U') {
                 i++;
-                String sx = tmpStr.substring(i, i + 4);
+                String sx = str.substring(i, i + 4);
                 int i0 = Integer.parseInt(sx, 36);
                 byte bx = (byte) (i0 >> 8);
                 bytes[idx++] = bx;
             } else {
-                String sx = tmpStr.substring(i, i + 4);
+                String sx = str.substring(i, i + 4);
                 int i0 = Integer.parseInt(sx, 36);
                 int i1 = (i0 / 256);
                 int i2 = (i0 % 256);
@@ -87,10 +87,7 @@ public class OBFPasswordService {
     }
 
     private static boolean startsWithIgnoreCase(String str, String prefix) {
-        if (str.length() < prefix.length()) {
-            return false;
-        }
-
-        return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
+        return (str.length() < prefix.length()) ? false
+                : prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
     }
 }

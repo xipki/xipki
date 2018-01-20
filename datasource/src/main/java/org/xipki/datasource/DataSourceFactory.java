@@ -17,7 +17,6 @@
 
 package org.xipki.datasource;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +26,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
@@ -43,15 +42,14 @@ public class DataSourceFactory {
 
     public DataSourceWrapper createDataSourceForFile(String name, String confFile,
             PasswordResolver passwordResolver)
-            throws DataAccessException, PasswordResolverException, IOException {
+            throws PasswordResolverException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);
-        FileInputStream fileIn = new FileInputStream(expandFilepath(confFile));
+        FileInputStream fileIn = new FileInputStream(IoUtil.expandFilepath(confFile));
         return createDataSource(name, fileIn, passwordResolver);
     }
 
     public DataSourceWrapper createDataSource(String name, InputStream conf,
-            PasswordResolver passwordResolver)
-            throws DataAccessException, PasswordResolverException, IOException {
+            PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
         ParamUtil.requireNonNull("conf", conf);
         Properties config = new Properties();
         try {
@@ -68,8 +66,7 @@ public class DataSourceFactory {
     } // method createDataSource
 
     public DataSourceWrapper createDataSource(String name, Properties conf,
-            PasswordResolver passwordResolver)
-            throws DataAccessException, PasswordResolverException {
+            PasswordResolver passwordResolver) throws PasswordResolverException {
         ParamUtil.requireNonNull("conf", conf);
         DatabaseType databaseType;
         String className = conf.getProperty("dataSourceClassName");
@@ -105,10 +102,5 @@ public class DataSourceFactory {
 
         return DataSourceWrapper.createDataSource(name, conf, databaseType);
     } // method createDataSource
-
-    private static String expandFilepath(String path) {
-        return path.startsWith("~" + File.separator)
-                ? System.getProperty("user.home") + path.substring(1) : path;
-    }
 
 }

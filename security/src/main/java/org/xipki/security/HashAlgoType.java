@@ -84,7 +84,6 @@ public enum HashAlgoType {
         map.put("SHA3256", SHA3_256);
         map.put("SHA3384", SHA3_384);
         map.put("SHA3512", SHA3_512);
-        map.put("SM3", SM3);
     }
 
     private HashAlgoType(int length, AlgorithmCode algorithmCode, String oid, String name) {

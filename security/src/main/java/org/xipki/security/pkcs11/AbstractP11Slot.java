@@ -519,8 +519,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public X509Certificate exportCert(P11ObjectIdentifier objectId)
-            throws P11TokenException, CertificateException {
+    public X509Certificate exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         try {
             return getIdentity(objectId).certificate();
@@ -907,18 +906,16 @@ public abstract class AbstractP11Slot implements P11Slot {
         if (!verbose) {
             sb.append(subject).append("\n");
             return;
-        } else {
-            sb.append("\n");
         }
 
-        sb.append("\t\t\tSubject: ").append(subject).append("\n");
+        sb.append("\n\t\t\tSubject: ").append(subject);
 
         String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());
-        sb.append("\t\t\tIssuer: ").append(issuer).append("\n");
-        sb.append("\t\t\tSerial: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append("\n");
-        sb.append("\t\t\tStart time: ").append(cert.getNotBefore()).append("\n");
-        sb.append("\t\t\tEnd time: ").append(cert.getNotAfter()).append("\n");
-        sb.append("\t\t\tSHA1 Sum: ");
+        sb.append("\n\t\t\tIssuer: ").append(issuer);
+        sb.append("\n\t\t\tSerial: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
+        sb.append("\n\t\t\tStart time: ").append(cert.getNotBefore());
+        sb.append("\n\t\t\tEnd time: ").append(cert.getNotAfter());
+        sb.append("\n\t\t\tSHA1 Sum: ");
         try {
             sb.append(HashAlgoType.SHA1.hexHash(cert.getEncoded()));
         } catch (CertificateEncodingException ex) {

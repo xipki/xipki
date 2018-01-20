@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -50,6 +52,10 @@ class P11RSAContentSigner implements XiContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
 
+    private static final Map<ASN1ObjectIdentifier, HashAlgoType> sigAlgHashAlgMap = new HashMap<>();
+
+    private static final Map<HashAlgoType, Long> hashAlgMecMap = new HashMap<>();
+
     private final AlgorithmIdentifier algorithmIdentifier;
 
     private final byte[] encodedAlgorithmIdentifier;
@@ -66,6 +72,32 @@ class P11RSAContentSigner implements XiContentSigner {
 
     private final int modulusBitLen;
 
+    static {
+        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, HashAlgoType.SHA1);
+        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, HashAlgoType.SHA224);
+        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgoType.SHA256);
+        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgoType.SHA384);
+        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgoType.SHA512);
+        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
+                HashAlgoType.SHA3_224);
+        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
+                HashAlgoType.SHA3_256);
+        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
+                HashAlgoType.SHA3_384);
+        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
+                HashAlgoType.SHA3_512);
+
+        hashAlgMecMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_SHA512_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_SHA3_224_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS);
+    }
+
     P11RSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
             AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
@@ -78,26 +110,8 @@ class P11RSAContentSigner implements XiContentSigner {
         }
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
-        HashAlgoType hashAlgo;
-        if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA1;
-        } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA224;
-        } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA256;
-        } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA384;
-        } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA512;
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA3_224;
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA3_256;
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA3_384;
-        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.equals(algOid)) {
-            hashAlgo = HashAlgoType.SHA3_512;
-        } else {
+        HashAlgoType hashAlgo = sigAlgHashAlgMap.get(algOid);
+        if (hashAlgo == null) {
             throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
         }
 
@@ -108,39 +122,12 @@ class P11RSAContentSigner implements XiContentSigner {
         } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
             this.mechanism = PKCS11Constants.CKM_RSA_X_509;
         } else {
-            switch (hashAlgo) {
-            case SHA1:
-                this.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS;
-                break;
-            case SHA224:
-                this.mechanism = PKCS11Constants.CKM_SHA224_RSA_PKCS;
-                break;
-            case SHA256:
-                this.mechanism = PKCS11Constants.CKM_SHA256_RSA_PKCS;
-                break;
-            case SHA384:
-                this.mechanism = PKCS11Constants.CKM_SHA384_RSA_PKCS;
-                break;
-            case SHA512:
-                this.mechanism = PKCS11Constants.CKM_SHA512_RSA_PKCS;
-                break;
-            case SHA3_224:
-                this.mechanism = PKCS11Constants.CKM_SHA3_224_RSA_PKCS;
-                break;
-            case SHA3_256:
-                this.mechanism = PKCS11Constants.CKM_SHA3_256_RSA_PKCS;
-                break;
-            case SHA3_384:
-                this.mechanism = PKCS11Constants.CKM_SHA3_384_RSA_PKCS;
-                break;
-            case SHA3_512:
-                this.mechanism = PKCS11Constants.CKM_SHA3_512_RSA_PKCS;
-                break;
-            default:
+            Long mech = hashAlgMecMap.get(hashAlgo);
+            if (mech == null) {
                 throw new RuntimeException("should not reach here, unknown HashAlgoType "
                         + hashAlgo);
             }
-
+            this.mechanism = mech.longValue();
             if (!slot.supportsMechanism(this.mechanism)) {
                 throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
             }

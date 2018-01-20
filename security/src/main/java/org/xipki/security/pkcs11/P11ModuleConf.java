@@ -95,7 +95,9 @@ public class P11ModuleConf {
                             value = value.substring(2);
                         }
 
-                        if (value.endsWith("l")) {
+                        if (value.endsWith("ul")) {
+                            value = value.substring(0, value.length() - 2);
+                        } else if (value.endsWith("l")) {
                             value = value.substring(0, value.length() - 1);
                         }
 
@@ -132,8 +134,7 @@ public class P11ModuleConf {
 
         final String osName = System.getProperty("os.name").toLowerCase();
         String nativeLibraryPath = null;
-        for (NativeLibraryType library
-                : moduleType.getNativeLibraries().getNativeLibrary()) {
+        for (NativeLibraryType library : moduleType.getNativeLibraries().getNativeLibrary()) {
             List<String> osNames = library.getOs();
             if (CollectionUtil.isEmpty(osNames)) {
                 nativeLibraryPath = library.getPath();
@@ -152,8 +153,7 @@ public class P11ModuleConf {
         } // end for (NativeLibraryType library)
 
         if (nativeLibraryPath == null) {
-            throw new InvalidConfException("could not find PKCS#11 library for OS "
-                    + osName);
+            throw new InvalidConfException("could not find PKCS#11 library for OS " + osName);
         }
         this.nativeLibrary = nativeLibraryPath;
     }

@@ -15,20 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-
-/**
- * @author Lijun Liao
- * @since 2.2.0
- */
-
-public class XiAlgorithmIdentifier extends AlgorithmIdentifier {
-
-    public XiAlgorithmIdentifier(ASN1ObjectIdentifier algorithm) {
-        super(algorithm);
-    }
-
-}
+package org.xipki.common.concurrent;

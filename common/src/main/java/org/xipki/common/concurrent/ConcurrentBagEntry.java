@@ -31,10 +31,6 @@ public class ConcurrentBagEntry<T> implements IConcurrentBagEntry {
     @SuppressWarnings("rawtypes")
     private static final AtomicIntegerFieldUpdater<ConcurrentBagEntry> stateUpdater;
 
-    // this field is used by the stateUpdater
-    @SuppressWarnings("unused")
-    private volatile int state = 0;
-
     private final T value;
 
     static {
@@ -49,19 +45,16 @@ public class ConcurrentBagEntry<T> implements IConcurrentBagEntry {
         return value;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int getState() {
         return stateUpdater.get(this);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean compareAndSet(int expect, int update) {
         return stateUpdater.compareAndSet(this, expect, update);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void setState(int update) {
         stateUpdater.set(this, update);

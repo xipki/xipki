@@ -159,8 +159,7 @@ public interface P11Slot {
      */
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
-            String label, P11NewKeyControl control)
-            throws P11TokenException;
+            String label, P11NewKeyControl control) throws P11TokenException;
 
     /**
      * Generates an RSA keypair.
@@ -179,8 +178,7 @@ public interface P11Slot {
      */
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, String label,
-            P11NewKeyControl control)
-            throws P11TokenException;
+            P11NewKeyControl control) throws P11TokenException;
 
     /**
      * Generates a DSA keypair.
@@ -201,8 +199,7 @@ public interface P11Slot {
      */
     // CHECKSTYLE:OFF
     P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-            String label, P11NewKeyControl control)
-            throws P11TokenException;
+            String label, P11NewKeyControl control) throws P11TokenException;
     // CHECKSTYLE:ON
 
     /**
@@ -220,8 +217,7 @@ public interface P11Slot {
      */
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateECKeypair(String curveNameOrOid, String label,
-            P11NewKeyControl control)
-            throws P11TokenException;
+            P11NewKeyControl control) throws P11TokenException;
 
     /**
      * Generates an SM2 keypair.
@@ -254,8 +250,7 @@ public interface P11Slot {
      *         if PKCS#11 token exception occurs.
      */
     P11ObjectIdentifier generateSecretKey(long keyType, int keysize, String label,
-            P11NewKeyControl control)
-            throws P11TokenException;
+            P11NewKeyControl control) throws P11TokenException;
 
     /**
      * Creates secret key object in the PKCS#11 token. The key itself will not be generated
@@ -274,8 +269,7 @@ public interface P11Slot {
      *         if PKCS#11 token exception occurs.
      */
     P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, String label,
-            P11NewKeyControl control)
-            throws P11TokenException;
+            P11NewKeyControl control) throws P11TokenException;
 
     /**
      * Exports the certificate of the given identifier {@code objectId}.

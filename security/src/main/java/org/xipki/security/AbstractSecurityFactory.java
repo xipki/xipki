@@ -34,8 +34,8 @@ import org.xipki.common.util.ParamUtil;
 public abstract class AbstractSecurityFactory implements SecurityFactory {
 
     @Override
-    public ConcurrentContentSigner createSigner(String type, SignerConf conf,
-            X509Certificate cert) throws ObjectCreationException {
+    public ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
+            throws ObjectCreationException {
         X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert};
         return createSigner(type, conf, certs);
     }

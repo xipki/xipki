@@ -23,6 +23,8 @@ import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -53,6 +55,21 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  */
 // CHECKSTYLE:SKIP
 class P11RSAPSSContentSigner implements XiContentSigner {
+
+    private static final Map<HashAlgoType, Long> hashAlgMecMap = new HashMap<>();
+
+    static {
+        hashAlgMecMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS);
+        hashAlgMecMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
+    }
+
     // CHECKSTYLE:SKIP
     private static class PSSSignerOutputStream extends OutputStream {
 
@@ -159,44 +176,16 @@ class P11RSAPSSContentSigner implements XiContentSigner {
             pssSigner.init(true, new ParametersWithRandom(keyParam, random));
             this.outputStream = new PSSSignerOutputStream(pssSigner);
         } else {
-            switch (hashAlgo) {
-            case SHA1:
-                this.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS;
-                break;
-            case SHA224:
-                this.mechanism = PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS;
-                break;
-            case SHA256:
-                this.mechanism = PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS;
-                break;
-            case SHA384:
-                this.mechanism = PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS;
-                break;
-            case SHA512:
-                this.mechanism = PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS;
-                break;
-            case SHA3_224:
-                this.mechanism = PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS;
-                break;
-            case SHA3_256:
-                this.mechanism = PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS;
-                break;
-            case SHA3_384:
-                this.mechanism = PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS;
-                break;
-            case SHA3_512:
-                this.mechanism = PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS;
-                break;
-            default:
+            Long mech = hashAlgMecMap.get(hashAlgo);
+            if (mech == null) {
                 throw new RuntimeException("should not reach here, unknown HashAlgoType "
                         + hashAlgo);
             }
-
+            this.mechanism = mech.longValue();
             if (!slot.supportsMechanism(this.mechanism)) {
                 throw new XiSecurityException("unsupported signature algorithm "
                         + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
             }
-
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             this.outputStream = new ByteArrayOutputStream();
         }

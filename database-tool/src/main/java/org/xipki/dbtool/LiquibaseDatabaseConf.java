@@ -20,6 +20,8 @@ package org.xipki.dbtool;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
@@ -71,7 +73,7 @@ public class LiquibaseDatabaseConf {
 
     public static LiquibaseDatabaseConf getInstance(Properties dbProps,
             PasswordResolver passwordResolver) throws PasswordResolverException {
-        Objects.requireNonNull(dbProps, "dbProps must no be null");
+        ParamUtil.requireNonNull("dbProps", dbProps);
 
         String schema = dbProps.getProperty("liquibase.schema");
         if (schema != null) {
@@ -107,7 +109,7 @@ public class LiquibaseDatabaseConf {
         } else if (datasourceClassName.contains("mariadb.")) {
             driverClassName = "org.mariadb.jdbc.Driver";
             String str = dbProps.getProperty("dataSource.URL");
-            if (isNotBlank(str)) {
+            if (StringUtil.isNotBlank(str)) {
                 urlBuilder.append(str);
             } else {
                 urlBuilder.append("jdbc:mariadb://")
@@ -118,7 +120,7 @@ public class LiquibaseDatabaseConf {
         } else if (datasourceClassName.contains("oracle.")) {
             driverClassName = "oracle.jdbc.driver.OracleDriver";
             String str = dbProps.getProperty("dataSource.URL");
-            if (isNotBlank(str)) {
+            if (StringUtil.isNotBlank(str)) {
                 urlBuilder.append(str);
             } else {
                 urlBuilder.append("jdbc:oracle:thin:@")
@@ -169,9 +171,5 @@ public class LiquibaseDatabaseConf {
 
         return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
     } // method getInstance
-
-    public static boolean isNotBlank(String str) {
-        return str != null && !str.isEmpty();
-    }
 
 }

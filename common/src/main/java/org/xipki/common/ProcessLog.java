@@ -79,12 +79,9 @@ public class ProcessLog {
         if (hasTotal) {
             sb.append(formatText("%"));
         }
-        sb.append(formatText("average"));
-        sb.append(formatText("current"));
-        sb.append(formatText("time"));
+        sb.append(formatText("average")).append(formatText("current")).append(formatText("time"));
         if (hasTotal) {
-            sb.append(formatText("time"));
-            sb.append(formatText("finish"));
+            sb.append(formatText("time")).append(formatText("finish"));
         }
         sb.append('\n');
 
@@ -93,12 +90,9 @@ public class ProcessLog {
         if (hasTotal) {
             sb.append(formatText(""));
         }
-        sb.append(formatText("speed"));
-        sb.append(formatText("speed"));
-        sb.append(formatText("spent"));
+        sb.append(formatText("speed")).append(formatText("speed")).append(formatText("spent"));
         if (hasTotal) {
-            sb.append(formatText("left"));
-            sb.append(formatText("at"));
+            sb.append(formatText("left")).append(formatText("at"));
         }
         sb.append('\n');
 

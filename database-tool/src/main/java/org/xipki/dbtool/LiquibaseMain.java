@@ -17,7 +17,7 @@
 
 package org.xipki.dbtool;
 
-import java.util.Objects;
+import org.xipki.common.util.ParamUtil;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
@@ -54,17 +54,15 @@ public class LiquibaseMain {
     private Liquibase liquibase;
 
     public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile) {
-        Objects.requireNonNull(dbConf, "dbConf must not be null");
-        if (changeLogFile == null || changeLogFile.isEmpty()) {
-            throw new IllegalArgumentException("changeLogFile must not be empty");
-        }
+        ParamUtil.requireNonNull("dbConf", dbConf);
+        ParamUtil.requireNonBlank("changeLogFile", changeLogFile);
 
         this.dbConf = dbConf;
         this.changeLogFile = changeLogFile;
     }
 
     public void changeLogLevel(String logLevel, String logFile) throws CommandLineParsingException {
-        Objects.requireNonNull(logLevel, "logLevel must not be null");
+        ParamUtil.requireNonNull("logLevel", logLevel);
         try {
             Logger log = LogFactory.getInstance().getLog();
             if (logFile != null && logFile.length() > 0) {
@@ -85,8 +83,7 @@ public class LiquibaseMain {
         ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
 
         String defaultSchemaName = dbConf.schema();
-        this.database = CommandLineUtils.createDatabaseObject(
-            clOpener, // resourceAccessor
+        this.database = CommandLineUtils.createDatabaseObject(clOpener, // resourceAccessor
             dbConf.url(), dbConf.username(), dbConf.password(), dbConf.driver(),
             (String) null, // defaultCatalogName
             defaultSchemaName, // defaultSchemaName
@@ -99,6 +96,7 @@ public class LiquibaseMain {
             (String) null, // liquibaseSchemaName
             (String) null, // databaseChangeLogTableName
             (String) null); // databaseChangeLogLockTableName
+
         try {
             CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener,
                     clOpener);

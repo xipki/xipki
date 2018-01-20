@@ -1,4 +1,4 @@
-// #THIRDPARTY#
+// #THIRDPARTY# HikariCP
 
 /*
  * Copyright (C) 2013, 2014 Brett Wooldridge
@@ -33,6 +33,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
+ *
  * Fast list without range checking.
  *
  * @author Brett Wooldridge
@@ -88,7 +89,6 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void add(int index, T element) {
         throw new UnsupportedOperationException();
@@ -140,13 +140,11 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
         return size;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
-    /** {@inheritDoc} */
     @Override
     public T set(int index, T element) {
         T old = elementData[index];
@@ -154,7 +152,6 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
         return old;
     }
 
-    /** {@inheritDoc} */
     @Override
     public T remove(int index) {
         if (size == 0) {
@@ -196,13 +193,11 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean contains(Object obj) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
@@ -224,109 +219,91 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
         };
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object[] toArray() {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public <E> E[] toArray(E[] ar) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean containsAll(Collection<?> co) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean addAll(Collection<? extends T> co) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean addAll(int index, Collection<? extends T> co) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean removeAll(Collection<?> cc) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean retainAll(Collection<?> co) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public int indexOf(Object ob) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public int lastIndexOf(Object ob) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public ListIterator<T> listIterator() {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public ListIterator<T> listIterator(int index) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object clone() {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void forEach(Consumer<? super T> action) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public Spliterator<T> spliterator() {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean removeIf(Predicate<? super T> filter) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void replaceAll(UnaryOperator<T> operator) {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void sort(Comparator<? super T> co) {
         throw new UnsupportedOperationException();

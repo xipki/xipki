@@ -25,6 +25,7 @@ import java.security.interfaces.RSAPublicKey;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.P11UnsupportedMechanismException;
@@ -68,8 +69,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
-        this.certificateChain = (certificateChain != null && certificateChain.length > 0)
-                        ? certificateChain : null;
+        this.certificateChain = CollectionUtil.isEmpty(certificateChain) ? null : certificateChain;
         if (publicKey != null) {
             this.publicKey = publicKey;
         } else {
@@ -156,7 +156,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     public void setCertificates(X509Certificate[] certificateChain) throws P11TokenException {
-        if (certificateChain == null || certificateChain.length == 0) {
+        if (CollectionUtil.isEmpty(certificateChain)) {
             this.certificateChain = null;
         } else {
             PublicKey pk = certificateChain[0].getPublicKey();

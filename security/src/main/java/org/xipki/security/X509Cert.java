@@ -67,14 +67,13 @@ public class X509Cert {
 
         if (encodedCert != null) {
             this.encodedCert = encodedCert;
-            return;
-        }
-
-        try {
-            this.encodedCert = cert.getEncoded();
-        } catch (CertificateEncodingException ex) {
-            throw new RuntimeException(String.format(
-                    "CertificateEncodingException: %s", ex.getMessage()));
+        } else {
+            try {
+                this.encodedCert = cert.getEncoded();
+            } catch (CertificateEncodingException ex) {
+                throw new RuntimeException(
+                        String.format("CertificateEncodingException: %s", ex.getMessage()));
+            }
         }
     }
 

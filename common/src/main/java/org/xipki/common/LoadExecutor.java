@@ -156,7 +156,7 @@ public abstract class LoadExecutor {
             this.duration = num * 60;
             break;
         case 'h':
-            this.duration = num * 60 * 24;
+            this.duration = num * 1440; // 1440 = 60 * 24
             break;
         default:
             throw new RuntimeException("invalid duration unit " + unit);
@@ -183,8 +183,7 @@ public abstract class LoadExecutor {
     }
 
     protected boolean stop() {
-        return interrupted
-                || errorAccount.get() > 0
+        return interrupted || errorAccount.get() > 0
                 || System.currentTimeMillis() - processLog.startTimeMs() >= duration * 1000L;
     }
 

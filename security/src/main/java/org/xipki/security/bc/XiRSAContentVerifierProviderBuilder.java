@@ -19,7 +19,6 @@ package org.xipki.security.bc;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
@@ -53,9 +52,7 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
             }
         } else {
             AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-            Digest dig = digestProvider.get(digAlg);
-
-            return new RSADigestSigner(dig);
+            return new RSADigestSigner(digestProvider.get(digAlg));
         }
     }
 

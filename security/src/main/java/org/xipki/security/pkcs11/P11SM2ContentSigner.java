@@ -72,7 +72,6 @@ class P11SM2ContentSigner implements XiContentSigner {
 
     static {
         sigAlgHashMap.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(), HashAlgoType.SM3);
-
         hashMechMap.put(HashAlgoType.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
     }
 

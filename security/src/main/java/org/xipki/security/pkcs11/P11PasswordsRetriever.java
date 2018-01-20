@@ -89,8 +89,7 @@ public class P11PasswordsRetriever {
         singleRetrievers.add(new SingleRetriever(slots, passwords));
     }
 
-    public List<char[]> getPassword(P11SlotIdentifier slotId)
-            throws PasswordResolverException {
+    public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
         ParamUtil.requireNonNull("slotId", slotId);
         if (CollectionUtil.isEmpty(singleRetrievers)) {
             return null;

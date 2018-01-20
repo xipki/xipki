@@ -212,8 +212,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         // SM2
         PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
         PKCS11VendorConstants.CKM_VENDOR_SM2_SM3,
-        PKCS11VendorConstants.CKM_VENDOR_SM2
-        };
+        PKCS11VendorConstants.CKM_VENDOR_SM2};
 
     private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
@@ -283,8 +282,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult refresh0()
-            throws P11TokenException {
+    protected P11SlotRefreshResult refresh0() throws P11TokenException {
         P11SlotRefreshResult ret = new P11SlotRefreshResult();
         for (long mech : supportedMechs) {
             ret.addMechanism(mech);
@@ -806,8 +804,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
-            P11NewKeyControl control)
-            throws P11TokenException {
+            P11NewKeyControl control) throws P11TokenException {
         if (keysize % 8 != 0) {
             throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
         }
@@ -819,8 +816,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
-            P11NewKeyControl control)
-            throws P11TokenException {
+            P11NewKeyControl control) throws P11TokenException {
         SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
         return saveP11Entity(key, label);
     }
@@ -928,8 +924,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     protected void updateCertificate0(P11ObjectIdentifier objectId,
-            X509Certificate newCert)
-            throws P11TokenException, CertificateException {
+            X509Certificate newCert) throws P11TokenException, CertificateException {
         removePkcs11Cert(objectId);
         addCert0(objectId, newCert);
     }

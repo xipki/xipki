@@ -25,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -42,7 +43,7 @@ public class PasswordProducer {
             new ConcurrentHashMap<>();
 
     public static void registerPasswordConsumer(String name) {
-        assertNameNotBlank(name);
+        ParamUtil.requireNonBlank("name", name);
         BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
         nameResultMap.remove(name);
         namePasswordsMap.put(name, queue);
@@ -52,7 +53,7 @@ public class PasswordProducer {
     }
 
     public static void unregisterPasswordConsumer(String name) {
-        assertNameNotBlank(name);
+        ParamUtil.requireNonBlank("name", name);
         namePasswordsMap.remove(name);
         final String str = "unregistered password consumer " + name;
         System.out.println(str);
@@ -60,7 +61,7 @@ public class PasswordProducer {
     }
 
     public static void setPasswordCorrect(String name, boolean correct) {
-        assertNameNotBlank(name);
+        ParamUtil.requireNonBlank("name", name);
         nameResultMap.put(name, correct);
         final String str = "set result of password consumer " + name + ": "
                 + (correct ? "valid" : "invalid");
@@ -74,7 +75,7 @@ public class PasswordProducer {
 
     public static char[] takePassword(String name)
             throws InterruptedException, PasswordResolverException {
-        assertNameNotBlank(name);
+        ParamUtil.requireNonBlank("name", name);
         if (!namePasswordsMap.containsKey(name)) {
             throw new PasswordResolverException("password consumer '" + name
                     + "' is not registered ");
@@ -82,12 +83,13 @@ public class PasswordProducer {
         char[] pwd = namePasswordsMap.get(name).take();
         final String str = "took password consumer " + name;
         System.out.println(str);
+        LOG.info(str);
         return pwd;
     }
 
     public static void putPassword(String name, char[] password)
             throws InterruptedException, PasswordResolverException {
-        assertNameNotBlank(name);
+        ParamUtil.requireNonBlank("name", name);
         if (!namePasswordsMap.containsKey(name)) {
             throw new PasswordResolverException("password consumer '" + name
                     + "' is not registered ");
@@ -97,10 +99,11 @@ public class PasswordProducer {
         namePasswordsMap.get(name).put(password);
         final String str = "provided password consumer " + name;
         System.out.println(str);
+        LOG.info(str);
     }
 
     public static boolean needsPassword(String name) {
-        assertNameNotBlank(name);
+        ParamUtil.requireNonBlank("name", name);
         if (!namePasswordsMap.containsKey(name)) {
             return false;
         }
@@ -111,13 +114,4 @@ public class PasswordProducer {
         return Collections.unmodifiableSet(namePasswordsMap.keySet());
     }
 
-    private static void assertNameNotBlank(String name) {
-        if (name == null) {
-            throw new NullPointerException("name must not be null");
-        }
-
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name must not be empty");
-        }
-    }
 }

@@ -407,12 +407,9 @@ public class EmulatorP11Identity extends P11Identity {
         try {
             SM2Signer sig = sig0.value();
 
-            byte[] x962Signature;
-            if (hash == null) {
-                x962Signature = sig.generateSignatureForHash(dataToSign);
-            } else {
-                x962Signature = sig.generateSignatureForMessage(dataToSign);
-            }
+            byte[] x962Signature = (hash == null)
+                ? sig.generateSignatureForHash(dataToSign)
+                : sig.generateSignatureForMessage(dataToSign);
             return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
         } catch (CryptoException ex) {
             throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);

@@ -129,8 +129,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public void engineLoad(InputStream stream, char[] password)
-            throws IOException, NoSuchAlgorithmException, CertificateException {
+    public void engineLoad(InputStream stream, char[] password) {
         this.creationDate = new Date();
 
         Set<String> moduleNames = p11CryptServiceFactory.moduleNames();

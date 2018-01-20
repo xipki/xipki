@@ -203,8 +203,7 @@ public final class HttpServer {
         ClassLoader loader = HttpServer.class.getClassLoader();
         if (os.contains("linux")) {
             try {
-                Class<?> checkClazz = Class.forName(
-                        "io.netty.channel.epoll.Epoll", false, loader);
+                Class<?> checkClazz = clazz("io.netty.channel.epoll.Epoll", false, loader);
                 Method mt = checkClazz.getMethod("isAvailable");
                 Object obj = mt.invoke(null);
 
@@ -221,8 +220,7 @@ public final class HttpServer {
             }
         } else if (os.contains("mac os") || os.contains("os x")) {
             try {
-                Class<?> checkClazz = Class.forName(
-                        "io.netty.channel.epoll.kqueue.KQueue", false, loader);
+                Class<?> checkClazz = clazz("io.netty.channel.epoll.kqueue.KQueue", false, loader);
                 Method mt = checkClazz.getMethod("isAvailable");
                 Object obj = mt.invoke(null);
                 if (obj instanceof Boolean) {
@@ -245,11 +243,9 @@ public final class HttpServer {
         if (epollAvailable != null && epollAvailable.booleanValue()) {
             try {
                 channelClass = (Class<? extends ServerSocketChannel>)
-                        Class.forName("io.netty.channel.epoll.EpollServerSocketChannel",
-                                false, loader);
+                        clazz("io.netty.channel.epoll.EpollServerSocketChannel", false, loader);
 
-                Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup",
-                                    true, loader);
+                Class<?> clazz = clazz("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
                 Constructor<?> constructor = clazz.getConstructor(int.class);
                 this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
                 this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
@@ -267,11 +263,10 @@ public final class HttpServer {
         } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
             try {
                 channelClass = (Class<? extends ServerSocketChannel>)
-                        Class.forName("io.netty.channel.kqueue.KQueueServerSocketChannel",
-                                false, loader);
+                        clazz("io.netty.channel.kqueue.KQueueServerSocketChannel", false, loader);
 
-                Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
-                                    true, loader);
+                Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup",
+                        true, loader);
                 Constructor<?> constructor = clazz.getConstructor(int.class);
                 this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
                 this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
@@ -306,5 +301,11 @@ public final class HttpServer {
         bossGroup = null;
         workerGroup.shutdownGracefully();
         workerGroup = null;
+    }
+
+    private static Class<?> clazz(String clazzName, boolean initialize, ClassLoader clazzLoader)
+            throws ClassNotFoundException {
+        return Class.forName("io.netty.channel.epoll.EpollServerSocketChannel",
+                initialize, clazzLoader);
     }
 }

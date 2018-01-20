@@ -48,7 +48,7 @@ public class SimpleXpath {
         /**
          *
          * @param step the step
-         * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to null if
+         * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to {@code null} if
          *        namespace will not be evaluated.
          */
         SimpleXpathStep(String step, Map<String, String> nsPrefixUriMap)

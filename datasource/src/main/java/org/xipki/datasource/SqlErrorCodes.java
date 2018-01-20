@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.datasource.internal;
+package org.xipki.datasource;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.DatabaseType;
 
 /**
  * JDBC error codes for a particular database.
@@ -30,7 +29,7 @@ import org.xipki.datasource.DatabaseType;
  * @author Lijun Liao
  * @since 2.0.0
  */
-public class SqlErrorCodes {
+class SqlErrorCodes {
 
     // CHECKSTYLE:SKIP
     private static class DB2 extends SqlErrorCodes {
@@ -136,27 +135,27 @@ public class SqlErrorCodes {
 
     } // class PostgreSQL
 
-    protected boolean useSqlStateForTranslation;
+    boolean useSqlStateForTranslation;
 
-    protected Set<String> badSqlGrammarCodes;
+    Set<String> badSqlGrammarCodes;
 
-    protected Set<String> invalidResultSetAccessCodes;
+    Set<String> invalidResultSetAccessCodes;
 
-    protected Set<String> duplicateKeyCodes;
+    Set<String> duplicateKeyCodes;
 
-    protected Set<String> dataIntegrityViolationCodes;
+    Set<String> dataIntegrityViolationCodes;
 
-    protected Set<String> permissionDeniedCodes;
+    Set<String> permissionDeniedCodes;
 
-    protected Set<String> dataAccessResourceFailureCodes;
+    Set<String> dataAccessResourceFailureCodes;
 
-    protected Set<String> transientDataAccessResourceCodes;
+    Set<String> transientDataAccessResourceCodes;
 
-    protected Set<String> cannotAcquireLockCodes;
+    Set<String> cannotAcquireLockCodes;
 
-    protected Set<String> deadlockLoserCodes;
+    Set<String> deadlockLoserCodes;
 
-    protected Set<String> cannotSerializeTransactionCodes;
+    Set<String> cannotSerializeTransactionCodes;
 
     private SqlErrorCodes() {
         badSqlGrammarCodes = Collections.emptySet();
@@ -171,51 +170,7 @@ public class SqlErrorCodes {
         cannotSerializeTransactionCodes = Collections.emptySet();
     }
 
-    public boolean isUseSqlStateForTranslation() {
-        return useSqlStateForTranslation;
-    }
-
-    public Set<String> badSqlGrammarCodes() {
-        return badSqlGrammarCodes;
-    }
-
-    public Set<String> invalidResultSetAccessCodes() {
-        return invalidResultSetAccessCodes;
-    }
-
-    public Set<String> duplicateKeyCodes() {
-        return duplicateKeyCodes;
-    }
-
-    public Set<String> dataIntegrityViolationCodes() {
-        return dataIntegrityViolationCodes;
-    }
-
-    public Set<String> permissionDeniedCodes() {
-        return permissionDeniedCodes;
-    }
-
-    public Set<String> dataAccessResourceFailureCodes() {
-        return dataAccessResourceFailureCodes;
-    }
-
-    public Set<String> transientDataAccessResourceCodes() {
-        return transientDataAccessResourceCodes;
-    }
-
-    public Set<String> cannotAcquireLockCodes() {
-        return cannotAcquireLockCodes;
-    }
-
-    public Set<String> deadlockLoserCodes() {
-        return deadlockLoserCodes;
-    }
-
-    public Set<String> cannotSerializeTransactionCodes() {
-        return cannotSerializeTransactionCodes;
-    }
-
-    public static SqlErrorCodes newInstance(DatabaseType dbType) {
+    static SqlErrorCodes newInstance(DatabaseType dbType) {
         ParamUtil.requireNonNull("dbType", dbType);
         switch (dbType) {
         case DB2:

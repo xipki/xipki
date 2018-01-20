@@ -70,9 +70,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(50);
-        sb.append("(id = ").append(idHex).append(", label = ").append(label).append(")");
-        return sb.toString();
+        return String.format("(id = %s, label = %s)", idHex, label);
     }
 
     @Override

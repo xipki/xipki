@@ -74,18 +74,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
     @Override
     public int compareTo(P11SlotIdentifier obj) {
         ParamUtil.requireNonNull("obj", obj);
-        if (this == obj) {
-            return 0;
-        }
-
-        int sign = index - obj.index;
-        if (sign > 0) {
-            return 1;
-        } else if (sign < 0) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return (this == obj)  ? 0 : Integer.signum(index - obj.index);
     }
 
 }

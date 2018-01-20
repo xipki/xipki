@@ -1,4 +1,4 @@
-// #THIRDPARTY#
+// #THIRDPARTY# HikariCP
 
 /*
  * Copyright (C) 2013, 2014 Brett Wooldridge
@@ -29,6 +29,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.concurrent.TimeUnit;
 
 /**
+ *
  * A resolution-independent provider of current time-stamps and elapsed time
  * calculations.
  *
@@ -254,55 +255,46 @@ public interface ClockSource {
     }
 
     class NanosecondClockSource implements ClockSource {
-        /** {@inheritDoc}  */
         @Override
         public long currentTime0() {
             return System.nanoTime();
         }
 
-        /** {@inheritDoc} */
         @Override
         public long toMillis0(long time) {
             return NANOSECONDS.toMillis(time);
         }
 
-        /** {@inheritDoc} */
         @Override
         public long toNanos0(long time) {
             return time;
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedMillis0(long startTime) {
             return NANOSECONDS.toMillis(System.nanoTime() - startTime);
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedMillis0(long startTime, long endTime) {
             return NANOSECONDS.toMillis(endTime - startTime);
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedNanos0(long startTime) {
             return System.nanoTime() - startTime;
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedNanos0(long startTime, long endTime) {
             return endTime - startTime;
         }
 
-        /** {@inheritDoc} */
         @Override
         public long plusMillis0(long time, long millis) {
             return time + MILLISECONDS.toNanos(millis);
         }
 
-        /** {@inheritDoc} */
         @Override
         public TimeUnit getSourceTimeUnit0() {
             return NANOSECONDS;

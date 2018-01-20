@@ -114,8 +114,7 @@ public class PasswordBasedEncryption {
         } else {
             byte[] iv = new byte[ivLen];
             System.arraycopy(cipherTextWithIv, 1, iv, 0, ivLen);
-            pbeParameterSpec = new PBEParameterSpec(salt, iterationCount,
-                    new IvParameterSpec(iv));
+            pbeParameterSpec = new PBEParameterSpec(salt, iterationCount, new IvParameterSpec(iv));
         }
 
         int cipherTextOffset = 1 + ivLen;

@@ -53,8 +53,7 @@ public class FileHttpServersConf implements HttpServersConf {
 
             root = jaxbUnmarshaller.unmarshal(new File(confFile));
         } catch (Exception ex) {
-            throw new Exception("parsing configuration file failed, message: " + ex.getMessage(),
-                    ex);
+            throw new Exception("parsing config file failed, message: " + ex.getMessage(), ex);
         }
 
         if (root instanceof Httpservers) {

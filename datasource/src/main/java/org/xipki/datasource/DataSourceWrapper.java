@@ -33,8 +33,6 @@ import org.xipki.common.LruCache;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.internal.SqlErrorCodes;
-import org.xipki.datasource.internal.SqlStateCodes;
 import org.xipki.datasource.springframework.dao.CannotAcquireLockException;
 import org.xipki.datasource.springframework.dao.CannotSerializeTransactionException;
 import org.xipki.datasource.springframework.dao.ConcurrencyFailureException;
@@ -79,8 +77,7 @@ public abstract class DataSourceWrapper {
             int size = coreSql.length() + 18;
             if (StringUtil.isNotBlank(orderBy)) {
                 // ' ORDER BY ': 10
-                size += 10;
-                size += orderBy.length();
+                size += 10 + orderBy.length();
             }
             StringBuilder sql = new StringBuilder(size);
             sql.append("SELECT ").append(coreSql);
@@ -200,8 +197,7 @@ public abstract class DataSourceWrapper {
             int size = coreSql.length() + 36;
             if (StringUtil.isNotBlank(orderBy)) {
                 // ' ORDER BY ': 10
-                size += 10;
-                size += orderBy.length();
+                size += 10 + orderBy.length();
             }
             StringBuilder sql = new StringBuilder(size);
 
@@ -253,8 +249,7 @@ public abstract class DataSourceWrapper {
             int size = coreSql.length() + 34;
             if (StringUtil.isNotBlank(orderBy)) {
                 // ' ORDER BY ': 10
-                size += 10;
-                size += orderBy.length();
+                size += 10 + orderBy.length();
             }
             StringBuilder sql = new StringBuilder(size);
 
@@ -331,14 +326,9 @@ public abstract class DataSourceWrapper {
 
             if (StringUtil.isBlank(orderBy)) {
                 sql.append("SELECT ").append(coreSql);
-                if (coreSql.contains(" WHERE")) {
-                    sql.append(" AND");
-                } else {
-                    sql.append(" WHERE");
-                }
+                sql.append(coreSql.contains(" WHERE") ? " AND" : " WHERE");
             } else {
-                sql.append("SELECT * FROM (SELECT ");
-                sql.append(coreSql);
+                sql.append("SELECT * FROM (SELECT ").append(coreSql);
                 sql.append(" ORDER BY ").append(orderBy).append(" ) WHERE");
             }
 
@@ -426,8 +416,7 @@ public abstract class DataSourceWrapper {
             int size = coreSql.length() + 18;
             if (StringUtil.isNotBlank(orderBy)) {
                 // ' ORDER BY ': 10
-                size += 10;
-                size += orderBy.length();
+                size += 10 + orderBy.length();
             }
             StringBuilder sql = new StringBuilder(size);
 
@@ -478,8 +467,7 @@ public abstract class DataSourceWrapper {
             int size = coreSql.length() + 18;
             if (StringUtil.isNotBlank(orderBy)) {
                 // ' ORDER BY ': 10
-                size += 10;
-                size += orderBy.length();
+                size += 10 + orderBy.length();
             }
             StringBuilder sql = new StringBuilder(size);
 
@@ -526,8 +514,7 @@ public abstract class DataSourceWrapper {
 
     private final Object lastUsedSeqValuesLock = new Object();
 
-    private final ConcurrentHashMap<String, Long> lastUsedSeqValues
-            = new ConcurrentHashMap<String, Long>();
+    private final ConcurrentHashMap<String, Long> lastUsedSeqValues = new ConcurrentHashMap<>();
 
     private final SqlErrorCodes sqlErrorCodes;
 
@@ -1195,9 +1182,8 @@ public abstract class DataSourceWrapper {
     public DataAccessException translate(String sql, SQLException ex) {
         ParamUtil.requireNonNull("ex", ex);
 
-        String tmpSql = sql;
-        if (tmpSql == null) {
-            tmpSql = "";
+        if (sql == null) {
+            sql = "";
         }
 
         SQLException sqlEx = ex;
@@ -1213,7 +1199,7 @@ public abstract class DataSourceWrapper {
         String errorCode;
         String sqlState;
 
-        if (sqlErrorCodes.isUseSqlStateForTranslation()) {
+        if (sqlErrorCodes.useSqlStateForTranslation) {
             errorCode = sqlEx.getSQLState();
             sqlState = null;
         } else {
@@ -1229,65 +1215,65 @@ public abstract class DataSourceWrapper {
 
         if (errorCode != null) {
             // look for grouped error codes.
-            if (sqlErrorCodes.badSqlGrammarCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new BadSqlGrammarException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.invalidResultSetAccessCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new InvalidResultSetAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.duplicateKeyCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new DuplicateKeyException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.dataIntegrityViolationCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new DataIntegrityViolationException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.permissionDeniedCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new PermissionDeniedDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.dataAccessResourceFailureCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new DataAccessResourceFailureException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.transientDataAccessResourceCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new TransientDataAccessResourceException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.cannotAcquireLockCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new CannotAcquireLockException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.deadlockLoserCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new DeadlockLoserDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.cannotSerializeTransactionCodes().contains(errorCode)) {
-                logTranslation(tmpSql, sqlEx);
-                return new CannotSerializeTransactionException(buildMessage(tmpSql, sqlEx), sqlEx);
+            if (sqlErrorCodes.badSqlGrammarCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new BadSqlGrammarException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.invalidResultSetAccessCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new InvalidResultSetAccessException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.duplicateKeyCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new DuplicateKeyException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.dataIntegrityViolationCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new DataIntegrityViolationException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.permissionDeniedCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new PermissionDeniedDataAccessException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.dataAccessResourceFailureCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new DataAccessResourceFailureException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.transientDataAccessResourceCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new TransientDataAccessResourceException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.cannotAcquireLockCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new CannotAcquireLockException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.deadlockLoserCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new DeadlockLoserDataAccessException(buildMessage(sql, sqlEx), sqlEx);
+            } else if (sqlErrorCodes.cannotSerializeTransactionCodes.contains(errorCode)) {
+                logTranslation(sql, sqlEx);
+                return new CannotSerializeTransactionException(buildMessage(sql, sqlEx), sqlEx);
             }
         } // end if (errorCode)
 
         // try SQLState
         if (sqlState != null && sqlState.length() >= 2) {
             String classCode = sqlState.substring(0, 2);
-            if (sqlStateCodes.badSqlGrammarCodes().contains(classCode)) {
-                return new BadSqlGrammarException(buildMessage(tmpSql, sqlEx), ex);
-            } else if (sqlStateCodes.dataIntegrityViolationCodes().contains(classCode)) {
-                return new DataIntegrityViolationException(buildMessage(tmpSql, ex), ex);
-            } else if (sqlStateCodes.dataAccessResourceFailureCodes().contains(classCode)) {
-                return new DataAccessResourceFailureException(buildMessage(tmpSql, ex), ex);
-            } else if (sqlStateCodes.transientDataAccessResourceCodes().contains(classCode)) {
-                return new TransientDataAccessResourceException(buildMessage(tmpSql, ex), ex);
-            } else if (sqlStateCodes.concurrencyFailureCodes().contains(classCode)) {
-                return new ConcurrencyFailureException(buildMessage(tmpSql, ex), ex);
+            if (sqlStateCodes.badSqlGrammarCodes.contains(classCode)) {
+                return new BadSqlGrammarException(buildMessage(sql, sqlEx), ex);
+            } else if (sqlStateCodes.dataIntegrityViolationCodes.contains(classCode)) {
+                return new DataIntegrityViolationException(buildMessage(sql, ex), ex);
+            } else if (sqlStateCodes.dataAccessResourceFailureCodes.contains(classCode)) {
+                return new DataAccessResourceFailureException(buildMessage(sql, ex), ex);
+            } else if (sqlStateCodes.transientDataAccessResourceCodes.contains(classCode)) {
+                return new TransientDataAccessResourceException(buildMessage(sql, ex), ex);
+            } else if (sqlStateCodes.concurrencyFailureCodes.contains(classCode)) {
+                return new ConcurrencyFailureException(buildMessage(sql, ex), ex);
             }
         }
 
         // For MySQL: exception class name indicating a timeout?
         // (since MySQL doesn't throw the JDBC 4 SQLTimeoutException)
         if (ex.getClass().getName().contains("Timeout")) {
-            return new QueryTimeoutException(buildMessage(tmpSql, ex), ex);
+            return new QueryTimeoutException(buildMessage(sql, ex), ex);
         }
 
         // We couldn't identify it more precisely
         if (LOG.isDebugEnabled()) {
             String codes;
-            if (sqlErrorCodes.isUseSqlStateForTranslation()) {
+            if (sqlErrorCodes.useSqlStateForTranslation) {
                 codes = new StringBuilder(60).append("SQL state '").append(sqlEx.getSQLState())
                         .append("', error code '").append(sqlEx.getErrorCode()).toString();
             } else {
@@ -1296,7 +1282,7 @@ public abstract class DataSourceWrapper {
             LOG.debug("Unable to translate SQLException with " + codes);
         }
 
-        return new UncategorizedSqlException(buildMessage(tmpSql, sqlEx), sqlEx);
+        return new UncategorizedSqlException(buildMessage(sql, sqlEx), sqlEx);
     } // method translate
 
     private void logTranslation(String sql, SQLException sqlEx) {

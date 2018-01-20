@@ -53,8 +53,7 @@ class HashCalculator {
             HashAlgoType hashAlgo) {
         ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
         for (int i = 0; i < PARALLELISM; i++) {
-            Digest md = hashAlgo.createDigest();
-            mds.add(new ConcurrentBagEntry<Digest>(md));
+            mds.add(new ConcurrentBagEntry<Digest>(hashAlgo.createDigest()));
         }
         return mds;
     }

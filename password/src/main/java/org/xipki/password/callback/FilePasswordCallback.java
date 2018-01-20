@@ -18,13 +18,13 @@
 package org.xipki.password.callback;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.OBFPasswordService;
@@ -50,7 +50,7 @@ public class FilePasswordCallback implements PasswordCallback {
         String passwordHint = null;
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(expandFilepath(passwordFile)));
+            reader = new BufferedReader(new FileReader(IoUtil.expandFilepath(passwordFile)));
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -91,13 +91,7 @@ public class FilePasswordCallback implements PasswordCallback {
             throw new PasswordResolverException("invalid configuration " + conf
                     + ", no file is specified");
         }
-        passwordFile = expandFilepath(passwordFile);
-    }
-
-    private static String expandFilepath(String path) {
-        return (path.startsWith("~" + File.separator))
-                ? System.getProperty("user.home") + path.substring(1)
-                : path;
+        passwordFile = IoUtil.expandFilepath(passwordFile);
     }
 
 }

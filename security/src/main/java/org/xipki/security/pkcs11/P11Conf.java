@@ -77,7 +77,7 @@ public class P11Conf {
             for (ModuleType moduleType : modulesType.getModule()) {
                 P11ModuleConf conf = new P11ModuleConf(moduleType, passwordResolver);
                 confs.put(conf.name(), conf);
-            } // end for (ModuleType moduleType
+            }
 
             if (!confs.containsKey(P11CryptServiceFactory.DEFAULT_P11MODULE_NAME)) {
                 throw new InvalidConfException("module '"

@@ -39,12 +39,20 @@ public class CollectionUtil {
         return col == null || col.isEmpty();
     }
 
+    public static boolean isEmpty(Object[] arrays) {
+        return arrays == null || arrays.length == 0;
+    }
+
     public static boolean isEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty();
     }
 
     public static boolean isNonEmpty(Collection<?> col) {
         return col != null && !col.isEmpty();
+    }
+
+    public static boolean isNonEmpty(Object[] arrays) {
+        return arrays != null && arrays.length > 0;
     }
 
     public static boolean isNonEmpty(Map<?, ?> map) {

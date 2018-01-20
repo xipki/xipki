@@ -22,8 +22,9 @@ package org.xipki.security.exception;
  * @since 2.0.0
  */
 
-@SuppressWarnings("serial")
 public class InvalidOidOrNameException extends Exception {
+
+    private static final long serialVersionUID = 1L;
 
     public InvalidOidOrNameException(String declaredOidOrName) {
         super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");

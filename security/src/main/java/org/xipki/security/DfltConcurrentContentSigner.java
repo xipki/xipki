@@ -35,6 +35,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
@@ -55,11 +56,11 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
+    private final ConcurrentBag<ConcurrentBagEntrySigner> signers = new ConcurrentBag<>();
+
     private final String name;
 
     private final String algorithmName;
-
-    private final ConcurrentBag<ConcurrentBagEntrySigner> signers = new ConcurrentBag<>();
 
     private final boolean mac;
 
@@ -144,8 +145,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public ConcurrentBagEntrySigner borrowSigner()
-            throws NoIdleSignerException {
+    public ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException {
         return borrowSigner(defaultSignServiceTimeout);
     }
 
@@ -185,7 +185,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public void setCertificateChain(X509Certificate[] certificateChain) {
-        if (certificateChain == null || certificateChain.length == 0) {
+        if (CollectionUtil.isEmpty(certificateChain)) {
             this.certificateChain = null;
             this.bcCertificateChain = null;
             return;
@@ -220,14 +220,12 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public X509Certificate getCertificate() {
-        return (certificateChain != null && certificateChain.length > 0)
-                ? certificateChain[0] : null;
+        return CollectionUtil.isEmpty(certificateChain) ? null : certificateChain[0];
     }
 
     @Override
     public X509CertificateHolder getBcCertificate() {
-        return (bcCertificateChain != null && bcCertificateChain.length > 0)
-                ? bcCertificateChain[0] : null;
+        return CollectionUtil.isEmpty(bcCertificateChain) ? null : bcCertificateChain[0];
     }
 
     @Override
@@ -270,18 +268,18 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
-        ConcurrentBagEntrySigner contentSigner = borrowSigner();
+        ConcurrentBagEntrySigner signer = borrowSigner();
         try {
-            OutputStream signatureStream = contentSigner.value().getOutputStream();
+            OutputStream signatureStream = signer.value().getOutputStream();
             try {
                 signatureStream.write(data);
             } catch (IOException ex) {
                 throw new SignatureException(
                         "could not write data to SignatureStream: " + ex.getMessage(), ex);
             }
-            return contentSigner.value().getSignature();
+            return signer.value().getSignature();
         } finally {
-            requiteSigner(contentSigner);
+            requiteSigner(signer);
         }
     }
 
