@@ -95,7 +95,7 @@ public class CaRequestorCheckCmd extends CaAction {
         }
 
         boolean ra = isEnabled(raS, false, "ra");
-        boolean bo = entry.isRa();
+        boolean bo = entry.ra();
         if (ra != bo) {
             throw new CmdFailure("ra: is '" + bo + "', expected '" + ra + "'");
         }

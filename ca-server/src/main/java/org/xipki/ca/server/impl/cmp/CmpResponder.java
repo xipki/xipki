@@ -188,7 +188,7 @@ abstract class CmpResponder {
             failureCode = PKIFailureInfo.badRequest;
             statusText = "I am not the intended recipient";
         } else if (messageTime == null) {
-            if (cmpControl.isMessageTimeRequired()) {
+            if (cmpControl.messageTimeRequired()) {
                 failureCode = PKIFailureInfo.missingTimeStamp;
                 statusText = "missing time-stamp";
             }
@@ -347,7 +347,7 @@ abstract class CmpResponder {
     private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent event) {
         try {
             return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
-                    getCmpControl().isSendResponderCert());
+                    getCmpControl().sendResponderCert());
         } catch (Exception ex) {
             LogUtil.error(LOG, ex, "could not add protection to the PKI message");
             PKIStatusInfo status = generateRejectionStatus(

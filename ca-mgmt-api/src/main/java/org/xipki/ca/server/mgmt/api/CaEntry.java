@@ -161,7 +161,7 @@ public class CaEntry {
         this.responderName = (responderName == null) ? null : responderName.toUpperCase();
     }
 
-    public boolean isDuplicateKeyPermitted() {
+    public boolean duplicateKeyPermitted() {
         return duplicateKeyPermitted;
     }
 
@@ -169,7 +169,7 @@ public class CaEntry {
         this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
-    public boolean isDuplicateSubjectPermitted() {
+    public boolean duplicateSubjectPermitted() {
         return duplicateSubjectPermitted;
     }
 
@@ -177,7 +177,7 @@ public class CaEntry {
         this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
-    public boolean isSaveRequest() {
+    public boolean saveRequest() {
         return saveRequest;
     }
 

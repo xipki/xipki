@@ -37,7 +37,7 @@ public class CmpControlEntry {
         this.conf = ParamUtil.requireNonBlank("conf", conf);
     }
 
-    public boolean isFaulty() {
+    public boolean faulty() {
         return faulty;
     }
 

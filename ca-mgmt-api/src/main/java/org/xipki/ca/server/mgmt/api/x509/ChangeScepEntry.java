@@ -62,7 +62,7 @@ public class ChangeScepEntry {
         return caIdent;
     }
 
-    public Boolean isActive() {
+    public Boolean active() {
         return active;
     }
 

@@ -188,11 +188,11 @@ public class CmpControl {
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     } // constructor
 
-    public boolean isMessageTimeRequired() {
+    public boolean messageTimeRequired() {
         return messageTimeRequired;
     }
 
-    public boolean isConfirmCert() {
+    public boolean confirmCert() {
         return confirmCert;
     }
 
@@ -208,19 +208,19 @@ public class CmpControl {
         return confirmWaitTimeMs;
     }
 
-    public boolean isSendCaCert() {
+    public boolean sendCaCert() {
         return sendCaCert;
     }
 
-    public boolean isRrAkiRequired() {
+    public boolean rrAkiRequired() {
         return rrAkiRequired;
     }
 
-    public boolean isSendResponderCert() {
+    public boolean sendResponderCert() {
         return sendResponderCert;
     }
 
-    public boolean isGroupEnroll() {
+    public boolean groupEnroll() {
         return groupEnroll;
     }
 

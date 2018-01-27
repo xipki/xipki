@@ -92,7 +92,7 @@ public class ScepEntry {
         return name;
     }
 
-    public boolean isActive() {
+    public boolean active() {
         return active;
     }
 
@@ -124,7 +124,7 @@ public class ScepEntry {
         return responderConf;
     }
 
-    public boolean isFaulty() {
+    public boolean faulty() {
         return certFaulty || confFaulty;
     }
 
@@ -156,7 +156,7 @@ public class ScepEntry {
         StringBuilder sb = new StringBuilder(100);
         sb.append("ca: ").append(caIdent).append('\n');
         sb.append("active: ").append(active).append('\n');
-        sb.append("faulty: ").append(isFaulty()).append('\n');
+        sb.append("faulty: ").append(faulty()).append('\n');
         sb.append("responderType: ").append(responderType).append('\n');
         sb.append("responderConf: ");
         if (responderConf == null) {

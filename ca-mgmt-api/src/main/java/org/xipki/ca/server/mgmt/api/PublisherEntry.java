@@ -54,7 +54,7 @@ public class PublisherEntry {
         return conf;
     }
 
-    public boolean isFaulty() {
+    public boolean faulty() {
         return faulty;
     }
 

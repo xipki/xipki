@@ -44,7 +44,7 @@ public class CaHasRequestorEntry {
         this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
     }
 
-    public boolean isRa() {
+    public boolean ra() {
         return ra;
     }
 

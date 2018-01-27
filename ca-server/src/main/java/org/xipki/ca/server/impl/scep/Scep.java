@@ -245,7 +245,7 @@ public class Scep {
     }
 
     public CaStatus status() {
-        if (!dbEntry.isActive() || dbEntry.isFaulty()) {
+        if (!dbEntry.active() || dbEntry.faulty()) {
             return CaStatus.INACTIVE;
         }
         try {

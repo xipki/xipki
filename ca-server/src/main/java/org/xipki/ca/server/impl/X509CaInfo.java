@@ -244,24 +244,24 @@ public class X509CaInfo {
         return caEntry.toString(verbose);
     }
 
-    public boolean isDuplicateKeyPermitted() {
-        return caEntry.isDuplicateKeyPermitted();
+    public boolean duplicateKeyPermitted() {
+        return caEntry.duplicateKeyPermitted();
     }
 
     public void setDuplicateKeyPermitted(boolean permitted) {
         caEntry.setDuplicateKeyPermitted(permitted);
     }
 
-    public boolean isDuplicateSubjectPermitted() {
-        return caEntry.isDuplicateSubjectPermitted();
+    public boolean duplicateSubjectPermitted() {
+        return caEntry.duplicateSubjectPermitted();
     }
 
     public void setDuplicateSubjectPermitted(boolean permitted) {
         caEntry.setDuplicateSubjectPermitted(permitted);
     }
 
-    public boolean isSaveRequest() {
-        return caEntry.isSaveRequest();
+    public boolean saveRequest() {
+        return caEntry.saveRequest();
     }
 
     public void setSaveRequest(boolean saveRequest) {

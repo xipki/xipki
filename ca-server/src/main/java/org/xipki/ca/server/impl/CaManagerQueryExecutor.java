@@ -771,9 +771,9 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.crlSignerName());
             ps.setString(idx++, entry.responderName());
             ps.setString(idx++, entry.cmpControlName());
-            setBoolean(ps, idx++, entry.isDuplicateKeyPermitted());
-            setBoolean(ps, idx++, entry.isDuplicateSubjectPermitted());
-            setBoolean(ps, idx++, entry.isSaveRequest());
+            setBoolean(ps, idx++, entry.duplicateKeyPermitted());
+            setBoolean(ps, idx++, entry.duplicateSubjectPermitted());
+            setBoolean(ps, idx++, entry.saveRequest());
             ps.setInt(idx++, entry.permission());
             ps.setInt(idx++, entry.numCrls());
             ps.setInt(idx++, entry.expirationPeriod());
@@ -959,7 +959,7 @@ class CaManagerQueryExecutor {
             ps.setInt(idx++, ca.id());
             ps.setInt(idx++, requestorIdent.id());
 
-            boolean ra = requestor.isRa();
+            boolean ra = requestor.ra();
             setBoolean(ps, idx++, ra);
             int permission = requestor.permission();
             ps.setInt(idx++, permission);
@@ -1826,7 +1826,7 @@ class CaManagerQueryExecutor {
 
         ScepEntry dbEntry = getScep(name, caManager.idNameMap());
 
-        boolean tmpActive = (active == null) ? dbEntry.isActive() : active;
+        boolean tmpActive = (active == null) ? dbEntry.active() : active;
 
         String tmpResponderType = (responderType ==  null)
                 ? dbEntry.responderType() : responderType;
@@ -2259,7 +2259,7 @@ class CaManagerQueryExecutor {
             int idx = 1;
             ps.setString(idx++, scepEntry.name());
             ps.setInt(idx++, scepEntry.caIdent().id());
-            setBoolean(ps, idx++, scepEntry.isActive());
+            setBoolean(ps, idx++, scepEntry.active());
             ps.setString(idx++, StringUtil.collectionAsString(scepEntry.certProfiles(), ","));
             ps.setString(idx++, scepEntry.control());
             ps.setString(idx++, scepEntry.responderType());
@@ -2359,7 +2359,7 @@ class CaManagerQueryExecutor {
             int idx = 1;
             ps.setLong(idx++, id);
             ps.setString(idx++, name);
-            setBoolean(ps, idx++, userEntry.isActive());
+            setBoolean(ps, idx++, userEntry.active());
             ps.setString(idx++, hashedPassword);
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -2402,7 +2402,7 @@ class CaManagerQueryExecutor {
 
         AtomicInteger index = new AtomicInteger(1);
 
-        Boolean active = userEntry.isActive();
+        Boolean active = userEntry.active();
         Integer idxActive = null;
         if (active != null) {
             idxActive = index.getAndIncrement();

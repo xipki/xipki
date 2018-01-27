@@ -392,7 +392,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
         // pre-process requests
         for (int i = 0; i < n; i++) {
-            if (cmpControl.isGroupEnroll() && certTemplateDatas.size() != i) {
+            if (cmpControl.groupEnroll() && certTemplateDatas.size() != i) {
                 // last certReqMsg cannot be used to enroll certificate
                 break;
             }
@@ -464,7 +464,7 @@ public class X509CaCmpResponder extends CmpResponder {
             return new CertRepMessage(null, certResps);
         }
 
-        if (cmpControl.isGroupEnroll() && certTemplateDatas.size() != n) {
+        if (cmpControl.groupEnroll() && certTemplateDatas.size() != n) {
             // at least one certRequest cannot be used to enroll certificate
             int lastFailureIndex = certTemplateDatas.size();
             BigInteger failCertReqId = certReqIds.get(lastFailureIndex).getPositiveValue();
@@ -525,7 +525,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         CMPCertificate[] caPubs = null;
-        if (anyCertEnrolled && cmpControl.isSendCaCert()) {
+        if (anyCertEnrolled && cmpControl.sendCaCert()) {
             caPubs = new CMPCertificate[]{getCa().caInfo().certInCmpFormat()};
         }
 
@@ -600,7 +600,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         CMPCertificate[] caPubs = null;
-        if (certGenerated && cmpControl.isSendCaCert()) {
+        if (certGenerated && cmpControl.sendCaCert()) {
             caPubs = new CMPCertificate[]{ca.caInfo().certInCmpFormat()};
         }
         CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
@@ -617,7 +617,7 @@ public class X509CaCmpResponder extends CmpResponder {
         final int n = certTemplates.size();
         List<CertResponse> ret = new ArrayList<>(n);
 
-        if (cmpControl.isGroupEnroll()) {
+        if (cmpControl.groupEnroll()) {
             try {
                 List<X509CertificateInfo> certInfos;
                 if (keyUpdate) {
@@ -630,7 +630,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 // save the request
                 Long reqDbId = null;
-                if (ca.caInfo().isSaveRequest()) {
+                if (ca.caInfo().saveRequest()) {
                     try {
                         byte[] encodedRequest = request.getEncoded();
                         reqDbId = ca.addRequest(encodedRequest);
@@ -669,7 +669,7 @@ public class X509CaCmpResponder extends CmpResponder {
                                 RequestType.CMP, tid.getOctets(), msgId);
                     }
 
-                    if (ca.caInfo().isSaveRequest()) {
+                    if (ca.caInfo().saveRequest()) {
                         if (reqDbId == null && !savingRequestFailed) {
                             try {
                                 byte[] encodedRequest = request.getEncoded();
@@ -697,7 +697,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
     private CertResponse postProcessCertInfo(ASN1Integer certReqId, X509CertificateInfo certInfo,
             ASN1OctetString tid, CmpControl cmpControl) {
-        if (cmpControl.isConfirmCert()) {
+        if (cmpControl.confirmCert()) {
             pendingCertPool.addCertificate(tid.getOctets(), certReqId.getPositiveValue(), certInfo,
                 System.currentTimeMillis() + cmpControl.confirmWaitTimeMs());
         }
@@ -766,7 +766,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 }
 
                 if (certDetails.getExtensions() == null) {
-                    if (cmpControl.isRrAkiRequired()) {
+                    if (cmpControl.rrAkiRequired()) {
                         return buildErrorMsgPkiBody(PKIStatus.rejection,
                                 PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
                     }
@@ -840,7 +840,7 @@ public class X509CaCmpResponder extends CmpResponder {
         } // end for
 
         byte[] encodedRequest = null;
-        if (getCa().caInfo().isSaveRequest()) {
+        if (getCa().caInfo().saveRequest()) {
             try {
                 encodedRequest = request.getEncoded();
             } catch (IOException ex) {
@@ -918,7 +918,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
                 }
 
-                if (certDbId != null && ca.caInfo().isSaveRequest()) {
+                if (certDbId != null && ca.caInfo().saveRequest()) {
                     if (reqDbId == null) {
                         reqDbId = ca.addRequest(encodedRequest);
                     }
@@ -1203,7 +1203,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             // CMP control
             sb.append("<cmpControl>");
-            sb.append("<rrAkiRequired>").append(getCmpControl().isRrAkiRequired())
+            sb.append("<rrAkiRequired>").append(getCmpControl().rrAkiRequired())
                 .append("</rrAkiRequired>");
             sb.append("</cmpControl>");
 
@@ -1335,7 +1335,7 @@ public class X509CaCmpResponder extends CmpResponder {
         } // switch type
 
         InfoTypeAndValue tv = null;
-        if (!cmpControl.isConfirmCert() && CmpUtil.isImplictConfirm(reqHeader)) {
+        if (!cmpControl.confirmCert() && CmpUtil.isImplictConfirm(reqHeader)) {
             pendingCertPool.removeCertificates(tid.getOctets());
             tv = CmpUtil.getImplictConfirmGeneralInfo();
         } else {

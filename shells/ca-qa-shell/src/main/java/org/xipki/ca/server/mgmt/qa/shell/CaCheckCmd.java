@@ -94,13 +94,13 @@ public class CaCheckCmd extends CaUpdateCmd {
         // Duplicate key mode
         if (ey.duplicateKeyPermitted() != null) {
             assertObjEquals("Duplicate key permitted",
-                    ey.duplicateKeyPermitted(), ca.isDuplicateKeyPermitted());
+                    ey.duplicateKeyPermitted(), ca.duplicateKeyPermitted());
         }
 
         // Duplicate subject mode
         if (ey.duplicateSubjectPermitted() != null) {
             assertObjEquals("Duplicate subject permitted",
-                    ey.duplicateSubjectPermitted(), ca.isDuplicateSubjectPermitted());
+                    ey.duplicateSubjectPermitted(), ca.duplicateSubjectPermitted());
         }
 
         // Expiration period

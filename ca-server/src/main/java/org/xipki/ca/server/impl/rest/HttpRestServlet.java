@@ -271,7 +271,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 X509CertificateInfo certInfo = ca.generateCertificate(certTemplate,
                         requestor, RequestType.REST, null, msgId);
 
-                if (ca.caInfo().isSaveRequest()) {
+                if (ca.caInfo().saveRequest()) {
                     long dbId = ca.addRequest(encodedCsr);
                     ca.addRequestCert(dbId, certInfo.cert().certId());
                 }

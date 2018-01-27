@@ -317,7 +317,7 @@ public class X509Ca {
                 if (nextDeltaCrlInterval == 0) {
                     intervalOfNextUpdate = nextFullCrlInterval;
                 } else {
-                    intervalOfNextUpdate = control.isExtendedNextUpdate() ? nextFullCrlInterval
+                    intervalOfNextUpdate = control.extendedNextUpdate() ? nextFullCrlInterval
                             : Math.min(nextFullCrlInterval, nextDeltaCrlInterval);
                 }
             }
@@ -757,7 +757,7 @@ public class X509Ca {
             boolean isFirstCrlEntry = true;
 
             Date notExpireAt;
-            if (control.isIncludeExpiredCerts()) {
+            if (control.includeExpiredCerts()) {
                 notExpireAt = new Date(0);
             } else {
                 // 10 minutes buffer
@@ -768,11 +768,11 @@ public class X509Ca {
             do {
                 if (deltaCrl) {
                     revInfos = certstore.getCertsForDeltaCrl(caIdent, startId, numEntries,
-                            control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
+                            control.onlyContainsCaCerts(), control.onlyContainsUserCerts());
                 } else {
                     revInfos = certstore.getRevokedCerts(caIdent, notExpireAt, startId,
-                            numEntries, control.isOnlyContainsCaCerts(),
-                            control.isOnlyContainsUserCerts());
+                            numEntries, control.onlyContainsCaCerts(),
+                            control.onlyContainsUserCerts());
                 }
 
                 long maxId = 1;
@@ -783,7 +783,7 @@ public class X509Ca {
                     }
 
                     CrlReason reason = revInfo.reason();
-                    if (crlControl.isExcludeReason() && reason != CrlReason.REMOVE_FROM_CRL) {
+                    if (crlControl.excludeReason() && reason != CrlReason.REMOVE_FROM_CRL) {
                         reason = CrlReason.UNSPECIFIED;
                     }
 
@@ -846,8 +846,8 @@ public class X509Ca {
             BigInteger crlNumber = caInfo.nextCrlNumber();
             event.addEventData(CaAuditConstants.NAME_crlNumber, crlNumber);
 
-            boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
-            boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
+            boolean onlyUserCerts = crlControl.onlyContainsUserCerts();
+            boolean onlyCaCerts = crlControl.onlyContainsCaCerts();
             if (onlyUserCerts && onlyCaCerts) {
                 throw new RuntimeException(
                         "should not reach here, onlyUserCerts and onlyCACerts are both true");
@@ -950,7 +950,7 @@ public class X509Ca {
     private void addXipkiCertset(X509v2CRLBuilder crlBuilder, boolean deltaCrl, CrlControl control,
             Date notExpireAt, boolean onlyCaCerts, boolean onlyUserCerts)
             throws OperationException {
-        if (deltaCrl || !control.isXipkiCertsetIncluded()) {
+        if (deltaCrl || !control.xipkiCertsetIncluded()) {
             return;
         }
 
@@ -974,7 +974,7 @@ public class X509Ca {
 
                 Integer profileId = null;
 
-                if (control.isXipkiCertsetCertIncluded()) {
+                if (control.xipkiCertsetCertIncluded()) {
                     X509CertificateInfo certInfo;
                     try {
                         certInfo = certstore.getCertificateInfoForId(caIdent, caCert,
@@ -987,10 +987,10 @@ public class X509Ca {
                     Certificate cert = Certificate.getInstance(certInfo.cert().encodedCert());
                     vec.add(new DERTaggedObject(true, 0, cert));
 
-                    if (control.isXipkiCertsetProfilenameIncluded()) {
+                    if (control.xipkiCertsetProfilenameIncluded()) {
                         profileId = certInfo.profile().id();
                     }
-                } else if (control.isXipkiCertsetProfilenameIncluded()) {
+                } else if (control.xipkiCertsetProfilenameIncluded()) {
                     profileId = certstore.getCertProfileForId(caIdent, sid.id());
                 }
 
@@ -1888,7 +1888,7 @@ public class X509Ca {
     } // method generateCertificate0
 
     private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
-        boolean duplicateSubjectPermitted = caInfo.isDuplicateSubjectPermitted();
+        boolean duplicateSubjectPermitted = caInfo.duplicateSubjectPermitted();
         if (duplicateSubjectPermitted && !gct.certprofile.isDuplicateSubjectPermitted()) {
             duplicateSubjectPermitted = false;
         }
@@ -2101,7 +2101,7 @@ public class X509Ca {
                     "certificate with the same subject as CA is not allowed");
         }
 
-        boolean duplicateKeyPermitted = caInfo.isDuplicateKeyPermitted();
+        boolean duplicateKeyPermitted = caInfo.duplicateKeyPermitted();
         if (duplicateKeyPermitted && !certprofile.isDuplicateKeyPermitted()) {
             duplicateKeyPermitted = false;
         }
@@ -2282,7 +2282,7 @@ public class X509Ca {
             if (i % control.fullCrlIntervals() == 0) {
                 intervalsTillNextCrl = i;
                 break;
-            } else if (!control.isExtendedNextUpdate() && control.deltaCrlIntervals() > 0) {
+            } else if (!control.extendedNextUpdate() && control.deltaCrlIntervals() > 0) {
                 if (i % control.deltaCrlIntervals() == 0) {
                     intervalsTillNextCrl = i;
                     break;

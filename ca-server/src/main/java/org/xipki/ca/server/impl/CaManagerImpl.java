@@ -2555,7 +2555,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException(ex.getMessage(), ex);
         }
 
-        if (ca.caInfo().isSaveRequest()) {
+        if (ca.caInfo().saveRequest()) {
             try {
                 long dbId = ca.addRequest(encodedCsr);
                 ca.addRequestCert(dbId, certInfo.cert().certId());
@@ -2684,14 +2684,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setCertificate(caCert);
         entry.setCmpControlName(caEntry.cmpControlName());
         entry.setCrlSignerName(caEntry.crlSignerName());
-        entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
-        entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
+        entry.setDuplicateKeyPermitted(caEntry.duplicateKeyPermitted());
+        entry.setDuplicateSubjectPermitted(caEntry.duplicateSubjectPermitted());
         entry.setExtraControl(caEntry.extraControl());
         entry.setKeepExpiredCertInDays(caEntry.keepExpiredCertInDays());
         entry.setMaxValidity(caEntry.maxValidity());
         entry.setPermission(caEntry.permission());
         entry.setResponderName(caEntry.responderName());
-        entry.setSaveRequest(caEntry.isSaveRequest());
+        entry.setSaveRequest(caEntry.saveRequest());
         entry.setStatus(status);
         entry.setValidityMode(caEntry.validityMode());
 
@@ -2934,7 +2934,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         String name = scepEntry.name();
         NameId caId = scepEntry.caIdent();
-        Boolean active = scepEntry.isActive();
+        Boolean active = scepEntry.active();
         String type = scepEntry.responderType();
         String conf = scepEntry.responderConf();
         String base64Cert = scepEntry.base64Cert();
@@ -3525,7 +3525,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
                             CaHasRequestorType jaxb2 = new CaHasRequestorType();
                             jaxb2.setRequestorName(requestorName);
-                            jaxb2.setRa(m.isRa());
+                            jaxb2.setRa(m.ra());
                             jaxb2.setProfiles(createStrings(m.profiles()));
                             jaxb2.setPermission(m.permission());
 
@@ -3557,8 +3557,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
                     ciJaxb.setCrlUris(createStrings(entry.crlUris()));
                     ciJaxb.setDeltacrlUris(createStrings(entry.deltaCrlUris()));
-                    ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
-                    ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
+                    ciJaxb.setDuplicateKey(entry.duplicateKeyPermitted());
+                    ciJaxb.setDuplicateSubject(entry.duplicateSubjectPermitted());
                     ciJaxb.setExpirationPeriod(entry.expirationPeriod());
                     ciJaxb.setExtraControl(
                             createFileOrValue(zipStream, entry.extraControl(),
@@ -3573,7 +3573,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         includeResponderNames.add(entry.responderName());
                         ciJaxb.setResponderName(entry.responderName());
                     }
-                    ciJaxb.setSaveReq(entry.isSaveRequest());
+                    ciJaxb.setSaveReq(entry.saveRequest());
                     ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.signerConf(),
                             "files/ca-" + name + "-signerconf.conf"));
                     ciJaxb.setSignerType(entry.signerType());

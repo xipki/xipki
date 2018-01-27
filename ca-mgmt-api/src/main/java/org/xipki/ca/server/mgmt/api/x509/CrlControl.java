@@ -361,19 +361,19 @@ public class CrlControl {
         return updateMode;
     }
 
-    public boolean isXipkiCertsetIncluded() {
+    public boolean xipkiCertsetIncluded() {
         return xipkiCertsetIncluded;
     }
 
-    public boolean isXipkiCertsetCertIncluded() {
+    public boolean xipkiCertsetCertIncluded() {
         return xipkiCertsetCertIncluded;
     }
 
-    public boolean isXipkiCertsetProfilenameIncluded() {
+    public boolean xipkiCertsetProfilenameIncluded() {
         return xipkiCertsetProfilenameIncluded;
     }
 
-    public boolean isIncludeExpiredCerts() {
+    public boolean includeExpiredCerts() {
         return includeExpiredCerts;
     }
 
@@ -401,19 +401,19 @@ public class CrlControl {
         return extensionOids;
     }
 
-    public boolean isExtendedNextUpdate() {
+    public boolean extendedNextUpdate() {
         return extendedNextUpdate;
     }
 
-    public boolean isOnlyContainsUserCerts() {
+    public boolean onlyContainsUserCerts() {
         return onlyContainsUserCerts;
     }
 
-    public boolean isOnlyContainsCaCerts() {
+    public boolean onlyContainsCaCerts() {
         return onlyContainsCaCerts;
     }
 
-    public boolean isExcludeReason() {
+    public boolean excludeReason() {
         return excludeReason;
     }
 

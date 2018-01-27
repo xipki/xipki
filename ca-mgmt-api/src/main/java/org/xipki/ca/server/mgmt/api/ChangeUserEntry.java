@@ -41,7 +41,7 @@ public class ChangeUserEntry {
         return ident;
     }
 
-    public Boolean isActive() {
+    public Boolean active() {
         return active;
     }
 

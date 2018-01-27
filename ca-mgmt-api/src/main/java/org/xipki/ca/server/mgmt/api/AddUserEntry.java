@@ -43,7 +43,7 @@ public class AddUserEntry {
         return ident;
     }
 
-    public boolean isActive() {
+    public boolean active() {
         return active;
     }
 

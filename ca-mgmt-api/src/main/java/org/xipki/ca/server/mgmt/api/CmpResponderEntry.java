@@ -96,7 +96,7 @@ public class CmpResponderEntry {
         return base64Cert;
     }
 
-    public boolean isFaulty() {
+    public boolean faulty() {
         return confFaulty || certFaulty;
     }
 
@@ -116,7 +116,7 @@ public class CmpResponderEntry {
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("name: ").append(name).append('\n');
-        sb.append("faulty: ").append(isFaulty()).append('\n');
+        sb.append("faulty: ").append(faulty()).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
         if (conf == null) {
