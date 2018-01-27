@@ -201,7 +201,7 @@ public class X509Ca {
                     System.currentTimeMillis() - DAY_IN_MS * (keepDays + 1));
 
             try {
-                int num = removeExpirtedCerts(expiredAt, CaAuditConstants.MSGID_CA_routine);
+                int num = removeExpirtedCerts(expiredAt, CaAuditConstants.MSGID_ca_routine);
                 LOG.info("removed {} certificates expired at {}", num, expiredAt.toString());
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not remove expired certificates");
@@ -343,7 +343,7 @@ public class X509Ca {
             long maxIdOfDeltaCrlCache;
             try {
                 maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
-                generateCrl(deltaCrl, thisUpdate, nextUpdate, CaAuditConstants.MSGID_CA_routine);
+                generateCrl(deltaCrl, thisUpdate, nextUpdate, CaAuditConstants.MSGID_ca_routine);
             } catch (Throwable th) {
                 LogUtil.error(LOG, th);
                 return;
@@ -375,7 +375,7 @@ public class X509Ca {
             inProcess = true;
             try {
                 LOG.debug("revoking suspended certificates");
-                int num = revokeSuspendedCerts(CaAuditConstants.MSGID_CA_routine);
+                int num = revokeSuspendedCerts(CaAuditConstants.MSGID_ca_routine);
                 if (num == 0) {
                     LOG.debug("revoked {} suspended certificates of CA '{}'", num, caIdent);
                 } else {
@@ -639,7 +639,7 @@ public class X509Ca {
         LOG.info("     START cleanupCrls: ca={}, numCrls={}", caIdent, numCrls);
 
         boolean successful = false;
-        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_cleanup_CRL, msgId);
+        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_cleanup_crl, msgId);
 
         try {
             int num = (numCrls <= 0) ? 0
@@ -695,7 +695,7 @@ public class X509Ca {
     private X509CRL generateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate, String msgId)
             throws OperationException {
         boolean successful = false;
-        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_CRL, msgId);
+        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_crl, msgId);
         try {
             X509CRL crl = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event, msgId);
             successful = true;
@@ -1302,7 +1302,7 @@ public class X509Ca {
                     "insufficient permission unrevoke CA certificate");
         }
 
-        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_unrevoke_CERT, msgId);
+        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_unrevoke_cert, msgId);
         boolean successful = true;
         try {
             X509CertWithDbId ret = unrevokeCertificate0(serialNumber, false, event);
@@ -1599,7 +1599,7 @@ public class X509Ca {
     public void unrevokeCa(String msgId) throws OperationException {
         caInfo.setRevocationInfo(null);
         if (caInfo.isSelfSigned()) {
-            AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_unrevoke_CERT, msgId);
+            AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_unrevoke_cert, msgId);
             boolean successful = true;
             try {
                 unrevokeCertificate0(caInfo.serialNumber(), true, event);
@@ -2498,7 +2498,7 @@ public class X509Ca {
         AuditEvent event = new AuditEvent(new Date());
         event.setApplicationName(CaAuditConstants.APPNAME);
         event.setName(name);
-        event.addEventData(CaAuditConstants.NAME_CA, caIdent.name());
+        event.addEventData(CaAuditConstants.NAME_ca, caIdent.name());
         event.addEventType(eventType);
         event.addEventData(CaAuditConstants.NAME_mid, msgId);
         return event;

@@ -2333,7 +2333,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         try {
-            ca.revokeCa(revocationInfo, CaAuditConstants.MSGID_CA_mgmt);
+            ca.revokeCa(revocationInfo, CaAuditConstants.MSGID_ca_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException("could not revoke CA " + ex.getMessage(), ex);
         }
@@ -2361,7 +2361,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         X509Ca ca = x509cas.get(caName);
         try {
-            ca.unrevokeCa(CaAuditConstants.MSGID_CA_mgmt);
+            ca.unrevokeCa(CaAuditConstants.MSGID_ca_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException("could not unrevoke of CA " + ex.getMessage(), ex);
         }
@@ -2464,7 +2464,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509Ca ca = x509Ca(caName);
         try {
             return ca.revokeCertificate(serialNumber, reason, invalidityTime,
-                    CaAuditConstants.MSGID_CA_mgmt) != null;
+                    CaAuditConstants.MSGID_ca_mgmt) != null;
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2478,7 +2478,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         try {
-            return ca.unrevokeCertificate(serialNumber, CaAuditConstants.MSGID_CA_mgmt) != null;
+            return ca.unrevokeCertificate(serialNumber, CaAuditConstants.MSGID_ca_mgmt) != null;
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2497,7 +2497,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         try {
-            return ca.removeCertificate(serialNumber, CaAuditConstants.MSGID_CA_mgmt) != null;
+            return ca.removeCertificate(serialNumber, CaAuditConstants.MSGID_ca_mgmt) != null;
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2550,7 +2550,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CertificateInfo certInfo;
         try {
             certInfo = ca.generateCertificate(certTemplateData, byCaRequestor, RequestType.CA,
-                    (byte[]) null, CaAuditConstants.MSGID_CA_mgmt);
+                    (byte[]) null, CaAuditConstants.MSGID_ca_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2845,7 +2845,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         X509Ca ca = x509Ca(caName);
         try {
-            return ca.generateCrlOnDemand(CaAuditConstants.MSGID_CA_mgmt);
+            return ca.generateCrlOnDemand(CaAuditConstants.MSGID_ca_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }

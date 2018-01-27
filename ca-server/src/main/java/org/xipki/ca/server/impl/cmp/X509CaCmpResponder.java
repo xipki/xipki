@@ -156,7 +156,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 try {
                     serialNumber = remainingCert.cert().cert().getSerialNumber();
                     ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION,
-                            invalidityDate, CaAuditConstants.MSGID_CA_routine);
+                            invalidityDate, CaAuditConstants.MSGID_ca_routine);
                 } catch (Throwable th) {
                     LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
                             ca.caInfo().ident(), LogUtil.formatCsn(serialNumber),

@@ -160,7 +160,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_CA, ca.caIdent().name());
+            event.addEventData(CaAuditConstants.NAME_ca, ca.caIdent().name());
             event.addEventType(command);
 
             RequestorInfo requestor;

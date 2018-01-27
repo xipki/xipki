@@ -135,7 +135,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().caIdent().name());
+            event.addEventData(CaAuditConstants.NAME_ca, responder.getCa().caIdent().name());
 
             byte[] reqContent = readContent(request);
             PKIMessage pkiReq;
