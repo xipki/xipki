@@ -17,15 +17,9 @@
 
 package org.xipki.ca.server.mgmt.qa.shell;
 
-import java.security.cert.X509Certificate;
-import java.util.List;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.api.CaStatus;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
 import org.xipki.ca.server.mgmt.shell.CaUpdateCmd;
@@ -61,148 +55,98 @@ public class CaCheckCmd extends CaUpdateCmd {
 
         // CA cert uris
         if (ey.caCertUris() != null) {
-            List<String> ex = ey.caCertUris();
-            List<String> is = ca.cacertUris();
-            MgmtQaShellUtil.assertEquals("CA cert URIs", ex, is);
+            MgmtQaShellUtil.assertEquals("CA cert URIs", ey.caCertUris(), ca.cacertUris());
         }
 
         // CA certificate
         if (ey.cert() != null) {
-            X509Certificate ex = ey.cert();
-            X509Certificate is = ca.certificate();
-            if (!ex.equals(is)) {
+            if (!ey.cert().equals(ca.certificate())) {
                 throw new CmdFailure("CA cert is not as expected");
             }
         }
 
         // SN size
         if (ey.serialNoBitLen() != null) {
-            Integer ex = ey.serialNoBitLen();
-            int is = ca.serialNoBitLen();
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("serial number bit length", is, ex);
-            }
+            assertObjEquals("serial number bit length", ey.serialNoBitLen(), ca.serialNoBitLen());
         }
 
         // CMP control name
         if (ey.cmpControlName() != null) {
-            String ex = ey.cmpControlName();
-            String is = ca.cmpControlName();
-            MgmtQaShellUtil.assertEquals("CMP control name", ex, is);
+            MgmtQaShellUtil.assertEquals("CMP control name",
+                    ey.cmpControlName(), ca.cmpControlName());
         }
 
         // CRL signer name
         if (ey.crlSignerName() != null) {
-            String ex = ey.crlSignerName();
-            String is = ca.crlSignerName();
-            MgmtQaShellUtil.assertEquals("CRL signer name", ex, is);
+            MgmtQaShellUtil.assertEquals("CRL signer name", ey.crlSignerName(), ca.crlSignerName());
         }
 
         // CRL uris
         if (ey.crlUris() != null) {
-            List<String> ex = ey.crlUris();
-            List<String> is = ca.crlUris();
-            MgmtQaShellUtil.assertEquals("CRL URIs", ex, is);
+            MgmtQaShellUtil.assertEquals("CRL URIs", ey.crlUris(), ca.crlUris());
         }
 
         // DeltaCRL uris
         if (ey.deltaCrlUris() != null) {
-            List<String> ex = ey.deltaCrlUris();
-            List<String> is = ca.deltaCrlUris();
-            MgmtQaShellUtil.assertEquals("Delta CRL URIs", ex, is);
+            MgmtQaShellUtil.assertEquals("Delta CRL URIs", ey.deltaCrlUris(), ca.deltaCrlUris());
         }
 
         // Duplicate key mode
         if (ey.duplicateKeyPermitted() != null) {
-            boolean ex = ey.duplicateKeyPermitted().booleanValue();
-            boolean is = ca.isDuplicateKeyPermitted();
-            if (ex != is) {
-                throw buildUnexpectedException("Duplicate key permitted", is, ex);
-            }
+            assertObjEquals("Duplicate key permitted",
+                    ey.duplicateKeyPermitted(), ca.isDuplicateKeyPermitted());
         }
 
         // Duplicate subject mode
         if (ey.duplicateSubjectPermitted() != null) {
-            boolean ex = ey.duplicateSubjectPermitted().booleanValue();
-            boolean is = ca.isDuplicateSubjectPermitted();
-            if (ex != is) {
-                throw buildUnexpectedException("Duplicate subject mode", is, ex);
-            }
+            assertObjEquals("Duplicate subject permitted",
+                    ey.duplicateSubjectPermitted(), ca.isDuplicateSubjectPermitted());
         }
 
         // Expiration period
         if (ey.expirationPeriod() != null) {
-            Integer ex = ey.expirationPeriod();
-            Integer is = ca.expirationPeriod();
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("Expiration period", is, ex);
-            }
+            assertObjEquals("Expiration period", ey.expirationPeriod(), ca.expirationPeriod());
         }
 
         // Extra control
         if (ey.extraControl() != null) {
-            String ex = ey.extraControl();
-            String is = ca.extraControl();
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("Extra control", is, ex);
-            }
+            MgmtQaShellUtil.assertEquals("Extra control", ey.extraControl(), ca.extraControl());
         }
 
         // Max validity
         if (ey.maxValidity() != null) {
-            CertValidity ex = ey.maxValidity();
-            CertValidity is = ca.maxValidity();
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("Max validity", is, ex);
-            }
+            assertObjEquals("Max validity", ey.maxValidity(), ca.maxValidity());
         }
 
         // Keep expired certificate
         if (ey.keepExpiredCertInDays() != null) {
-            Integer ex = ey.keepExpiredCertInDays();
-            int is = ca.keepExpiredCertInDays();
-            if (ex.intValue() != is) {
-                throw buildUnexpectedException("keepExiredCertInDays", is, ex);
-            }
+            assertObjEquals("keepExiredCertInDays",
+                    ey.keepExpiredCertInDays(), ca.keepExpiredCertInDays());
         }
 
         // Num CRLs
         if (ey.numCrls() != null) {
-            int ex = ey.numCrls();
-            int is = ca.numCrls();
-            if (ex != is) {
-                throw buildUnexpectedException("num CRLs", is, ex);
-            }
+            assertObjEquals("num CRLs", ey.numCrls(), ca.numCrls());
         }
 
         // OCSP uris
         if (ey.ocspUris() != null) {
-            List<String> ex = ey.ocspUris();
-            List<String> is = ca.ocspUris();
-            MgmtQaShellUtil.assertEquals("OCSP URIs", ex, is);
+            MgmtQaShellUtil.assertEquals("OCSP URIs", ey.ocspUris(), ca.ocspUris());
         }
 
         // Permissions
         if (ey.permission() != null) {
-            int ex = ey.permission();
-            int is = ca.permission();
-            if (ex != is) {
-                throw buildUnexpectedException("permission", is, ex);
-            }
+            assertObjEquals("permission", ey.permission(), ca.permission());
         }
 
         // Responder name
         if (ey.responderName() != null) {
-            String ex = ey.responderName();
-            String is = ca.responderName();
-            MgmtQaShellUtil.assertEquals("responder name", ex, is);
+            MgmtQaShellUtil.assertEquals("responder name", ey.responderName(), ca.responderName());
         }
 
         // Signer Type
         if (ey.signerType() != null) {
-            String ex = ey.signerType();
-            String is = ca.signerType();
-            MgmtQaShellUtil.assertEquals("signer type", ex, is);
+            MgmtQaShellUtil.assertEquals("signer type", ey.signerType(), ca.signerType());
         }
 
         if (ey.signerConf() != null) {
@@ -210,35 +154,28 @@ public class CaCheckCmd extends CaUpdateCmd {
             ex.removePair("keystore");
             ConfPairs is = new ConfPairs(ca.signerConf());
             is.removePair("keystore");
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("signer conf", is, ex);
-            }
+            assertObjEquals("signer conf", ex, is);
         }
 
         // Status
         if (ey.status() != null) {
-            CaStatus ex = ey.status();
-            CaStatus is = ca.status();
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("status", is, ex);
-            }
+            assertObjEquals("status", ey.status(), ca.status());
         }
 
         // validity mode
         if (ey.validityMode() != null) {
-            ValidityMode ex = ey.validityMode();
-            ValidityMode is = ca.validityMode();
-            if (!ex.equals(is)) {
-                throw buildUnexpectedException("validity mode", is, ex);
-            }
+            assertObjEquals("validity mode", ey.validityMode(), ca.validityMode());
         }
 
         println(" checked CA" + caName);
         return null;
     } // method execute0
 
-    private CmdFailure buildUnexpectedException(String field, Object is, Object expected) {
-        return new CmdFailure(field + ": is '" + is + "', but expected '" + expected + "'");
+    public static void assertObjEquals(String desc, Object ex, Object is) throws CmdFailure {
+        boolean bo = (ex == null) ? (is == null) : ex.equals(is);
+        if (!bo) {
+            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
+        }
     }
 
 }

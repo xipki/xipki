@@ -33,7 +33,6 @@ public class MgmtQaShellUtil {
     }
 
     public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
-
         String tmpEx = ex;
         if (CaManager.NULL.equals(tmpEx)) {
             tmpEx = null;

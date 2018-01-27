@@ -43,15 +43,11 @@ public class PublisherCheckCmd extends PublisherUpdateCmd {
         }
 
         if (cp.type() != null) {
-            String ex = type;
-            String is = cp.type();
-            MgmtQaShellUtil.assertEquals("type", ex, is);
+            MgmtQaShellUtil.assertEquals("type", type, cp.type());
         }
 
         if (cp.conf() != null) {
-            String ex = conf;
-            String is = cp.conf();
-            MgmtQaShellUtil.assertEquals("signer conf", ex, is);
+            MgmtQaShellUtil.assertEquals("signer conf", conf, cp.conf());
         }
 
         println(" checked publisher " + name);

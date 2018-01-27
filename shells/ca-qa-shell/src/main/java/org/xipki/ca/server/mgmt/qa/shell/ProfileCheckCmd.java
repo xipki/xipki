@@ -53,14 +53,10 @@ public class ProfileCheckCmd extends ProfileUpdateCmd {
         }
 
         if (cp.type() != null) {
-            String ex = type;
-            String is = cp.type();
-            MgmtQaShellUtil.assertEquals("type", ex, is);
+            MgmtQaShellUtil.assertEquals("type", type, cp.type());
         }
 
-        String ex = conf;
-        String is = cp.conf();
-        MgmtQaShellUtil.assertEquals("conf", ex, is);
+        MgmtQaShellUtil.assertEquals("conf", conf, cp.conf());
 
         println(" checked profile " + name);
         return null;

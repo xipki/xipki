@@ -47,15 +47,11 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
         }
 
         if (ey.signerType() != null) {
-            String ex = ey.signerType();
-            String is = cs.type();
-            MgmtQaShellUtil.assertEquals("signer type", ex, is);
+            MgmtQaShellUtil.assertEquals("signer type", ey.signerType(), cs.type());
         }
 
         if (ey.signerConf() != null) {
-            String ex = ey.signerConf();
-            String is = cs.conf();
-            MgmtQaShellUtil.assertEquals("signer conf", ex, is);
+            MgmtQaShellUtil.assertEquals("signer conf", ey.signerConf(), cs.conf());
         }
 
         if (ey.crlControl() != null) {
@@ -69,9 +65,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
         }
 
         if (ey.base64Cert() != null) {
-            String ex = ey.base64Cert();
-            String is = cs.base64Cert();
-            MgmtQaShellUtil.assertEquals("certificate", ex, is);
+            MgmtQaShellUtil.assertEquals("certificate", ey.base64Cert(), cs.base64Cert());
         }
 
         println(" checked CRL signer " + name);
