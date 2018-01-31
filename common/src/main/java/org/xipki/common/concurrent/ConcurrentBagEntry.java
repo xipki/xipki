@@ -28,6 +28,9 @@ import org.xipki.common.concurrent.ConcurrentBag.IConcurrentBagEntry;
 
 public class ConcurrentBagEntry<T> implements IConcurrentBagEntry {
 
+    @SuppressWarnings({ "unused" })
+    private volatile int state = 0;
+
     @SuppressWarnings("rawtypes")
     private static final AtomicIntegerFieldUpdater<ConcurrentBagEntry> stateUpdater;
 
