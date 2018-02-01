@@ -3,13 +3,14 @@
   <fileSets>
     <fileSet>
       <directory>${output.directory}</directory>
+      <excludes>
+        <exclude>branches/**</exclude>
+        <exclude>bin/*.bat</exclude>
+      </excludes>
       <includes>
         <include>bin/**</include>
         <include>**/*.sh</include>
       </includes>
-      <excludes>
-        <exclude>bin/*.bat</exclude>
-      </excludes>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -17,6 +18,9 @@
     </fileSet>
     <fileSet>
       <directory>${output.directory}</directory>
+      <excludes>
+        <exclude>branches/**</exclude>
+      </excludes>
       <includes>
         <include>bin/*.bat</include>
       </includes>
@@ -28,6 +32,7 @@
     <fileSet>
       <directory>${output.directory}</directory>
       <excludes>
+        <exclude>branches/**</exclude>
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
       </excludes>

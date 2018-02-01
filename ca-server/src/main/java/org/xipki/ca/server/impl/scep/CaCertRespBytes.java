@@ -35,7 +35,7 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-class CaCertRespBytes {
+public class CaCertRespBytes {
 
     private final byte[] bytes;
 
@@ -55,7 +55,7 @@ class CaCertRespBytes {
         }
     }
 
-    byte[] bytes() {
+    public byte[] bytes() {
         return Arrays.copyOf(bytes, bytes.length);
     }
 

@@ -33,7 +33,7 @@ import org.xipki.security.HashAlgoType;
  * @since 2.0.0
  */
 
-class ResponseOption {
+public class ResponseOption {
 
     static final Set<HashAlgoType> SUPPORTED_CERTHASH_ALGORITHMS = new HashSet<>();
 

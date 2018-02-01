@@ -73,7 +73,6 @@ import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
-import org.xipki.http.servlet.ServletURI;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.OcspMode;
 import org.xipki.ocsp.api.OcspStore;
@@ -237,8 +236,7 @@ public class OcspServer {
         this.confFile = confFile;
     }
 
-    Responder getResponder(ServletURI servletUri) throws UnsupportedEncodingException {
-        String path = servletUri.path();
+    public Responder getResponderForPath(String path) throws UnsupportedEncodingException {
         for (String servletPath : servletPaths) {
             if (path.startsWith(servletPath)) {
                 return path2responderMap.get(servletPath);
@@ -247,9 +245,8 @@ public class OcspServer {
         return null;
     }
 
-    Object[] getServletPathAndResponder(ServletURI servletUri)
+    public Object[] getServletPathAndResponderForPath(String path)
             throws UnsupportedEncodingException {
-        String path = servletUri.path();
         for (String servletPath : servletPaths) {
             if (path.startsWith(servletPath)) {
                 return new Object[]{servletPath, path2responderMap.get(servletPath)};

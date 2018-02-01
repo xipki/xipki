@@ -231,13 +231,13 @@
         <extensions>true</extensions>
         <executions>
           <execution>
-            <id>add-features-to-repo</id>
+            <id>add-features-to-repo-main</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${output.directory}/system</repository>
+              <repository>${output.directory}/branches/main/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
@@ -259,6 +259,32 @@
               </features>
             </configuration>
           </execution>
+          <execution>
+            <id>add-features-to-repo-jetty</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <repository>${output.directory}/branches/jetty/system</repository>
+              <descriptors>
+                <descriptor>mvn:org.xipki.pki.features/pki-jetty/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <feature>aries-blueprint</feature>
+                <feature>wrap</feature>
+                <feature>http-whiteboard</feature>
+                <!-- project-core features -->
+                <feature>xipki-caserver</feature>
+                <feature>xipki-camgmt-shell</feature>
+                <feature>xipki-security-shell</feature>
+                <feature>xipki-ocspserver</feature>
+                <feature>xipki-database-tool</feature>
+                <feature>xipki-audit-syslog</feature>
+              </features>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -266,7 +292,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>unix-bin</id>
+            <id>bin-main</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
@@ -276,6 +302,22 @@
                 <descriptor>src/main/descriptors/assembly-main.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
+              <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
+            </configuration>
+          </execution>
+          <execution>
+            <id>bin-jetty</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/descriptors/assembly-jetty.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>true</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
               <!-- Don't install/publish the result -->
               <attach>false</attach>

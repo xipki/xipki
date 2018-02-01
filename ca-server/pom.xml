@@ -11,6 +11,9 @@
   <artifactId>ca-server</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <Export-Package>org.xipki.ca.server.impl,org.xipki.ca.server.impl.*</Export-Package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -26,11 +29,6 @@
       <groupId>org.xipki.scep</groupId>
       <artifactId>scep-common</artifactId>
       <version>${xiscep.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.tk</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>${xitk.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

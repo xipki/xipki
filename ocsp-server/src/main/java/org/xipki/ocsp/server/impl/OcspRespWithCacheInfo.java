@@ -22,9 +22,9 @@ package org.xipki.ocsp.server.impl;
  * @since 2.0.0
  */
 
-class OcspRespWithCacheInfo {
+public class OcspRespWithCacheInfo {
 
-    static final class ResponseCacheInfo {
+    public static final class ResponseCacheInfo {
 
         private final long thisUpdate;
 

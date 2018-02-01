@@ -11,17 +11,20 @@
   <artifactId>ocsp-server</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <Export-Package>org.xipki.ocsp.server.impl,org.xipki.ocsp.server.impl.*</Export-Package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ocsp-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.xipki.tk</groupId>
       <artifactId>servlet-api</artifactId>
       <version>${xitk.version}</version>
-    </dependency>
+    </dependency -->
   </dependencies>
   <build>
     <plugins>

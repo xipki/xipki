@@ -54,7 +54,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class RequestOption {
+public class RequestOption {
 
     static final Set<HashAlgoType> SUPPORTED_HASH_ALGORITHMS = new HashSet<>();
 

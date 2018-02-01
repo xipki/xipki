@@ -70,7 +70,8 @@
     <bundle start-level="80">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
-    <bundle start-level="75">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-server-netty/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" description="CA management shell">
     <feature>xipki-caserver</feature>
@@ -87,6 +88,7 @@
     <feature>xipki-security</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ocsp-server-netty/${project.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}" description="Database tool">
     <feature>xipki-datasource</feature>

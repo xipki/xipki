@@ -32,6 +32,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xiscep.version>3.0.1-SNAPSHOT</xiscep.version>
     <xitk.version>3.0.1-SNAPSHOT</xitk.version>
+    <servlet.version>3.1.0</servlet.version>
     <xisdk.version>3.0.1-SNAPSHOT</xisdk.version>
     <karaf.version>4.1.4</karaf.version>
     <netty.version>4.1.18.Final</netty.version>
@@ -52,9 +53,13 @@
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
+    <module>ca-server-netty</module>
+    <module>ca-server-servlet</module>
     <module>ca-dbtool</module>
     <module>ocsp-api</module>
     <module>ocsp-server</module>
+    <module>ocsp-server-servlet</module>
+    <module>ocsp-server-netty</module>
     <module>shells</module>
     <module>features</module>
   </modules>

@@ -27,7 +27,7 @@ import org.xipki.ocsp.api.OcspStore;
  * @since 2.0.0
  */
 
-class Responder {
+public class Responder {
 
     private final ResponderOption responderOption;
 

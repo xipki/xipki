@@ -178,10 +178,6 @@ HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 
      - Adapt the CA configuration file `xipki/setup/cacert-present-ca-conf.xml`
 
- - If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA
-   configuration file `xipki/setup/cacert-none-ca-conf.xml` and the scripts in
-   `xipki/setup/cacert-none-setup.script`
-
 2. Start XiPKI
 
 2.1 Alternative: Start XiPKI as a normal application

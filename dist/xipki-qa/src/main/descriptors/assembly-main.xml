@@ -4,6 +4,14 @@
   <formats>
     <format>tar.gz</format>
   </formats>
+  <fileSets>
+    <fileSet>
+      <directory>${output.directory}/branches/main</directory>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
   <files>
     <file>
       <source>${output.directory}/xipki/ca-config/example/ca-db.properties-h2</source>
