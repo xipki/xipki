@@ -17,6 +17,8 @@
 
 package org.xipki.common.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -215,4 +217,26 @@ public class StringUtil {
         }
         return ret;
     }
+
+    @SuppressWarnings("deprecation")
+    public static String getRelativeRequestUri(String servletPath, String requestUri) {
+        String path = "";
+        int len = servletPath.length();
+        if (requestUri.length() > len + 1) {
+            path = requestUri.substring(len + 1);
+        }
+
+        if (path.isEmpty()) {
+            path = "/";
+        } else if (path.charAt(0) != '/') {
+            path = "/" + path;
+        }
+
+        try {
+            return URLDecoder.decode(path, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            return URLDecoder.decode(path);
+        }
+    }
+
 }
