@@ -33,20 +33,7 @@ import org.xipki.common.LruCache;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.springframework.dao.CannotAcquireLockException;
-import org.xipki.datasource.springframework.dao.CannotSerializeTransactionException;
-import org.xipki.datasource.springframework.dao.ConcurrencyFailureException;
-import org.xipki.datasource.springframework.dao.DataAccessException;
-import org.xipki.datasource.springframework.dao.DataAccessResourceFailureException;
-import org.xipki.datasource.springframework.dao.DataIntegrityViolationException;
-import org.xipki.datasource.springframework.dao.DeadlockLoserDataAccessException;
-import org.xipki.datasource.springframework.dao.PermissionDeniedDataAccessException;
-import org.xipki.datasource.springframework.dao.QueryTimeoutException;
-import org.xipki.datasource.springframework.dao.TransientDataAccessResourceException;
-import org.xipki.datasource.springframework.jdbc.BadSqlGrammarException;
-import org.xipki.datasource.springframework.jdbc.DuplicateKeyException;
-import org.xipki.datasource.springframework.jdbc.InvalidResultSetAccessException;
-import org.xipki.datasource.springframework.jdbc.UncategorizedSqlException;
+import org.xipki.datasource.DataAccessException.Reason;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -131,7 +118,7 @@ public abstract class DataSourceWrapper {
                 if (rs.next()) {
                     ret = rs.getLong(1);
                 } else {
-                    throw new DataAccessException(
+                    throw new DataAccessException(Reason.Root,
                             "could not increment the sequence " + sequenceName);
                 }
             } catch (SQLException ex) {
@@ -557,8 +544,8 @@ public abstract class DataSourceWrapper {
             if (ex instanceof SQLException) {
                 throw translate(null, (SQLException) ex);
             } else {
-                throw new DataAccessException("error occured while getting Connection: "
-                        + ex.getMessage(), ex);
+                throw new DataAccessException(Reason.Root,
+                        "error occured while getting Connection: " + ex.getMessage(), ex);
             }
         }
     }
@@ -1002,7 +989,7 @@ public abstract class DataSourceWrapper {
                             }
                         }
                     } else {
-                        throw new DataAccessException(
+                        throw new DataAccessException(Reason.Root,
                                 "could not increment the sequence " + sequenceName);
                     }
                 } finally {
@@ -1217,34 +1204,44 @@ public abstract class DataSourceWrapper {
             // look for grouped error codes.
             if (sqlErrorCodes.badSqlGrammarCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new BadSqlGrammarException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.BadSqlGrammar,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.invalidResultSetAccessCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new InvalidResultSetAccessException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.InvalidResultSetAccess,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.duplicateKeyCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new DuplicateKeyException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.DuplicateKey,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.dataIntegrityViolationCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new DataIntegrityViolationException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.DataIntegrityViolation,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.permissionDeniedCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new PermissionDeniedDataAccessException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.PermissionDeniedDataAccess,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.dataAccessResourceFailureCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new DataAccessResourceFailureException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.DataAccessResourceFailure,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.transientDataAccessResourceCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new TransientDataAccessResourceException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.TransientDataAccessResource,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.cannotAcquireLockCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new CannotAcquireLockException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.CannotAcquireLock,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.deadlockLoserCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new DeadlockLoserDataAccessException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.DeadlockLoserDataAccess,
+                        buildMessage(sql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.cannotSerializeTransactionCodes.contains(errorCode)) {
                 logTranslation(sql, sqlEx);
-                return new CannotSerializeTransactionException(buildMessage(sql, sqlEx), sqlEx);
+                return new DataAccessException(Reason.CannotSerializeTransaction,
+                        buildMessage(sql, sqlEx), sqlEx);
             }
         } // end if (errorCode)
 
@@ -1252,22 +1249,27 @@ public abstract class DataSourceWrapper {
         if (sqlState != null && sqlState.length() >= 2) {
             String classCode = sqlState.substring(0, 2);
             if (sqlStateCodes.badSqlGrammarCodes.contains(classCode)) {
-                return new BadSqlGrammarException(buildMessage(sql, sqlEx), ex);
+                return new DataAccessException(Reason.BadSqlGrammar,
+                        buildMessage(sql, sqlEx), ex);
             } else if (sqlStateCodes.dataIntegrityViolationCodes.contains(classCode)) {
-                return new DataIntegrityViolationException(buildMessage(sql, ex), ex);
+                return new DataAccessException(Reason.DataIntegrityViolation,
+                        buildMessage(sql, ex), ex);
             } else if (sqlStateCodes.dataAccessResourceFailureCodes.contains(classCode)) {
-                return new DataAccessResourceFailureException(buildMessage(sql, ex), ex);
+                return new DataAccessException(Reason.DataAccessResourceFailure,
+                        buildMessage(sql, ex), ex);
             } else if (sqlStateCodes.transientDataAccessResourceCodes.contains(classCode)) {
-                return new TransientDataAccessResourceException(buildMessage(sql, ex), ex);
+                return new DataAccessException(Reason.TransientDataAccessResource,
+                        buildMessage(sql, ex), ex);
             } else if (sqlStateCodes.concurrencyFailureCodes.contains(classCode)) {
-                return new ConcurrencyFailureException(buildMessage(sql, ex), ex);
+                return new DataAccessException(Reason.ConcurrencyFailure,
+                        buildMessage(sql, ex), ex);
             }
         }
 
         // For MySQL: exception class name indicating a timeout?
         // (since MySQL doesn't throw the JDBC 4 SQLTimeoutException)
         if (ex.getClass().getName().contains("Timeout")) {
-            return new QueryTimeoutException(buildMessage(sql, ex), ex);
+            return new DataAccessException(Reason.QueryTimeout, buildMessage(sql, ex), ex);
         }
 
         // We couldn't identify it more precisely
@@ -1282,7 +1284,7 @@ public abstract class DataSourceWrapper {
             LOG.debug("Unable to translate SQLException with " + codes);
         }
 
-        return new UncategorizedSqlException(buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.UncategorizedSql, buildMessage(sql, sqlEx), sqlEx);
     } // method translate
 
     private void logTranslation(String sql, SQLException sqlEx) {
