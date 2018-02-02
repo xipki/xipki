@@ -244,7 +244,7 @@ class ResponseCacher {
                 datasource.releaseResources(ps, null);
             }
         } catch (DataAccessException ex) {
-            if (ex.getReason() == Reason.DuplicateKey) {
+            if (ex.getReason().isDescendantOrSelfOf(Reason.DuplicateKey)) {
                 return id;
             }
             throw ex;
@@ -331,7 +331,7 @@ class ResponseCacher {
                     ps.execute();
                 } catch (SQLException ex) {
                     DataAccessException dex = datasource.translate(sql, ex);
-                    if (dex.getReason() == Reason.DataIntegrityViolation) {
+                    if (dex.getReason().isDescendantOrSelfOf(Reason.DataIntegrityViolation)) {
                         dataIntegrityViolationException = Boolean.TRUE;
                     } else {
                         throw dex;
