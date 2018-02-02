@@ -184,9 +184,18 @@ public class DataAccessException extends Exception {
             }
         }
 
+        public boolean isAncestorOrSelfOf(Reason reason) {
+            return (this == reason) ? true : isAncestorOf(reason);
+        }
+
         public boolean isDescendantOf(Reason reason) {
             return reason.isAncestorOf(this);
         }
+
+        public boolean isDescendantOrSelfOf(Reason reason) {
+            return (this == reason) ? true : isDescendantOf(reason);
+        }
+
     }
 
     private Reason reason;

@@ -118,7 +118,7 @@ public abstract class DataSourceWrapper {
                 if (rs.next()) {
                     ret = rs.getLong(1);
                 } else {
-                    throw new DataAccessException(Reason.Root,
+                    throw new DataAccessException(
                             "could not increment the sequence " + sequenceName);
                 }
             } catch (SQLException ex) {
@@ -544,7 +544,7 @@ public abstract class DataSourceWrapper {
             if (ex instanceof SQLException) {
                 throw translate(null, (SQLException) ex);
             } else {
-                throw new DataAccessException(Reason.Root,
+                throw new DataAccessException(
                         "error occured while getting Connection: " + ex.getMessage(), ex);
             }
         }
@@ -989,7 +989,7 @@ public abstract class DataSourceWrapper {
                             }
                         }
                     } else {
-                        throw new DataAccessException(Reason.Root,
+                        throw new DataAccessException(
                                 "could not increment the sequence " + sequenceName);
                     }
                 } finally {
