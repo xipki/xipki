@@ -30,8 +30,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

@@ -37,7 +37,7 @@ import org.xipki.ca.client.api.dto.RevokeCertRequestEntry;
 import org.xipki.common.LoadExecutor;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.springframework.dao.DataAccessException;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.security.CrlReason;
 
 /**
