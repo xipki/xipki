@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.DbToolBase;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

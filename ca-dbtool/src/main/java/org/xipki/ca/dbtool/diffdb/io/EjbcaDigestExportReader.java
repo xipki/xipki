@@ -43,8 +43,8 @@ import org.xipki.ca.dbtool.IdRange;
 import org.xipki.ca.dbtool.diffdb.EjbcaConstants;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

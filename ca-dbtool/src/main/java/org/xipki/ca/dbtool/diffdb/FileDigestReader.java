@@ -38,7 +38,7 @@ import org.xipki.ca.dbtool.diffdb.io.CaEntry;
 import org.xipki.ca.dbtool.diffdb.io.CertsBundle;
 import org.xipki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.springframework.dao.DataAccessException;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.security.util.X509Util;
 
 /**

@@ -20,8 +20,8 @@ package org.xipki.ca.dbtool.port.ca;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.xipki.ca.dbtool.port.DbPorter;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

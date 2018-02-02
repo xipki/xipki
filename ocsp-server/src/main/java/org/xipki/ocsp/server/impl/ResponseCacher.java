@@ -42,10 +42,9 @@ import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataAccessException.Reason;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
-import org.xipki.datasource.springframework.dao.DataIntegrityViolationException;
-import org.xipki.datasource.springframework.jdbc.DuplicateKeyException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.server.impl.store.db.IssuerEntry;
@@ -245,7 +244,7 @@ class ResponseCacher {
                 datasource.releaseResources(ps, null);
             }
         } catch (DataAccessException ex) {
-            if (ex instanceof DuplicateKeyException) {
+            if (ex.getReason() == Reason.DuplicateKey) {
                 return id;
             }
             throw ex;
@@ -332,7 +331,7 @@ class ResponseCacher {
                     ps.execute();
                 } catch (SQLException ex) {
                     DataAccessException dex = datasource.translate(sql, ex);
-                    if (dex instanceof DataIntegrityViolationException) {
+                    if (dex.getReason() == Reason.DataIntegrityViolation) {
                         dataIntegrityViolationException = Boolean.TRUE;
                     } else {
                         throw dex;

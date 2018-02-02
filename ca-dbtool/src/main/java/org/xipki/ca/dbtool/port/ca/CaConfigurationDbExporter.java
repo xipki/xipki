@@ -59,8 +59,8 @@ import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

@@ -36,8 +36,8 @@ import org.xipki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 import org.xipki.ca.dbtool.diffdb.io.XipkiDbControl;
 import org.xipki.common.EndOfQueue;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.security.util.X509Util;
 
 /**

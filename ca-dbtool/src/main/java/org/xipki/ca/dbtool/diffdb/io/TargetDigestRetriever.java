@@ -38,9 +38,9 @@ import org.xipki.ca.dbtool.diffdb.DbDigestReporter;
 import org.xipki.ca.dbtool.diffdb.DigestReader;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
-import org.xipki.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao
