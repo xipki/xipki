@@ -27,6 +27,10 @@
       <!-- must be the length of x500name.type -->
       <column name="VALUE2" value="350"/>
     </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="CERTHASH.ALGO"/>
+      <column name="VALUE2" value="SHA256"/>
+    </insert>
     <!-- table ISSUER -->
     <createTable tableName="ISSUER">
       <column name="ID" type="INT">
@@ -97,44 +101,15 @@
           remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="PN" type="VARCHAR(45)"
           remarks="certificate profile name"/>
-    </createTable>
-    <addUniqueConstraint tableName="CERT" columnNames="IID, SN" constraintName="CONST_ISSUER_SN"/>
-    <!-- table CERTHASH -->
-    <createTable tableName="CHASH"
-        remarks="hash of certificates">
-      <column name="CID" type="BIGINT"
-          remarks="certificate id">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="S1" type="CHAR(28)"
-          remarks="base64 enoded SHA1 sum of the certificate">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S256" type="CHAR(44)"
-          remarks="base64 enoded SHA256 sum of the certificate">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S3_256" type="CHAR(44)"
-          remarks="base64 enoded SHA3-256 sum of the certificate">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    <!-- table RAWCERT -->
-    <createTable tableName="CRAW"
-        remarks="raw certificates">
-      <column name="CID" type="BIGINT"
-          remarks="certificate id">
-        <constraints primaryKey="true" nullable="false"/>
+      <!-- For maximal 512 bit hash value -->
+      <column name="HASH" type="CHAR(86)"
+          remarks="base64 enoded hash value of the DER encoded certificate. Algorithm is defined by CERTHASH.ALGO in table DBSchema">
       </column>
       <column name="SUBJECT" type="${x500name.type}"
           remarks="subject of the certificate">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CERT" type="VARCHAR(4000)"
-          remarks="Base64 encoded Certificate">
-        <constraints nullable="false"/>
       </column>
     </createTable>
+    <addUniqueConstraint tableName="CERT" columnNames="IID, SN" constraintName="CONST_ISSUER_SN"/>
   </changeSet>
   <!-- foreign key -->
   <changeSet author="xipki" id="2">
@@ -143,15 +118,5 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="IID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="ISSUER"/>
-    <addForeignKeyConstraint constraintName="FK_CHASH_CERT1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CID" baseTableName="CHASH"
-      referencedColumnNames="ID" referencedTableName="CERT"/>
-    <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CID" baseTableName="CRAW"
-      referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
 </databaseChangeLog>

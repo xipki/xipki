@@ -55,16 +55,12 @@ import org.xipki.security.util.X509Util;
 class OcspStoreQueryExecutor {
 
     private static final String SQL_ADD_REVOKED_CERT =
-            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR)"
-            + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT,RT,RIT,RR)"
+            + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_CERT =
-            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN) VALUES (?,?,?,?,?,?,?,?)";
-
-    private static final String SQL_ADD_CRAW = "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
-
-    private static final String SQL_ADD_CHASH =
-            "INSERT INTO CHASH (CID,S1,S256,S3_256) VALUES (?,?,?,?)";
+            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
@@ -80,6 +76,8 @@ class OcspStoreQueryExecutor {
     private final int dbSchemaVersion;
 
     private final int maxX500nameLen;
+
+    private final HashAlgoType certhashAlgo;
 
     OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
             throws DataAccessException, NoSuchAlgorithmException {
@@ -121,6 +119,9 @@ class OcspStoreQueryExecutor {
         this.dbSchemaVersion = Integer.parseInt(str);
         str = variables.get("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
+
+        str = variables.get("CERTHASH.ALGO");
+        this.certhashAlgo = HashAlgoType.getNonNullHashAlgoType(str);
     } // constructor
 
     private IssuerStore initIssuerStore() throws DataAccessException {
@@ -178,14 +179,11 @@ class OcspStoreQueryExecutor {
             return;
         }
 
-        final String sqlAddCert = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
+        final String sql = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
         long certId = certificate.certId();
         byte[] encodedCert = certificate.encodedCert();
-        String b64Cert = Base64.encodeToString(encodedCert);
-        String sha1Fp = HashAlgoType.SHA1.base64Hash(encodedCert);
-        String sha256Fp = HashAlgoType.SHA256.base64Hash(encodedCert);
-        String sha3_256Fp = HashAlgoType.SHA3_256.base64Hash(encodedCert);
+        String certHash = certhashAlgo.base64Hash(encodedCert);
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
         X509Certificate cert = certificate.cert();
@@ -193,76 +191,37 @@ class OcspStoreQueryExecutor {
         long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
         String cuttedSubject = X509Util.cutText(certificate.subject(), maxX500nameLen);
 
-        PreparedStatement[] pss = borrowPreparedStatements(sqlAddCert, SQL_ADD_CRAW, SQL_ADD_CHASH);
-        // all statements have the same connection
-        Connection conn = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            PreparedStatement psAddcert = pss[0];
-            conn = psAddcert.getConnection();
-
             // CERT
             int idx = 2;
-            psAddcert.setLong(idx++, currentTimeSeconds);
-            psAddcert.setString(idx++, serialNumber.toString(16));
-            psAddcert.setLong(idx++, notBeforeSeconds);
-            psAddcert.setLong(idx++, notAfterSeconds);
-            setBoolean(psAddcert, idx++, revoked);
-            psAddcert.setInt(idx++, issuerId);
-            psAddcert.setString(idx++, certprofile);
+            ps.setLong(idx++, currentTimeSeconds);
+            ps.setString(idx++, serialNumber.toString(16));
+            ps.setLong(idx++, notBeforeSeconds);
+            ps.setLong(idx++, notAfterSeconds);
+            setBoolean(ps, idx++, revoked);
+            ps.setInt(idx++, issuerId);
+            ps.setString(idx++, certprofile);
+            ps.setString(idx++, certHash);
+            ps.setString(idx++, cuttedSubject);
 
             if (revoked) {
                 long revTime = revInfo.revocationTime().getTime() / 1000;
-                psAddcert.setLong(idx++, revTime);
+                ps.setLong(idx++, revTime);
                 if (revInfo.invalidityTime() != null) {
-                    psAddcert.setLong(idx++, revInfo.invalidityTime().getTime() / 1000);
+                    ps.setLong(idx++, revInfo.invalidityTime().getTime() / 1000);
                 } else {
-                    psAddcert.setNull(idx++, Types.BIGINT);
+                    ps.setNull(idx++, Types.BIGINT);
                 }
                 int reasonCode = (revInfo.reason() == null) ? 0 : revInfo.reason().code();
-                psAddcert.setInt(idx++, reasonCode);
+                ps.setInt(idx++, reasonCode);
             }
 
-            // CRAW
-            PreparedStatement psAddRawcert = pss[1];
-
-            idx = 2;
-            psAddRawcert.setString(idx++, cuttedSubject);
-            psAddRawcert.setString(idx++, b64Cert);
-
-            // CHASH
-            PreparedStatement psAddCerthash = pss[2];
-
-            idx = 2;
-            psAddCerthash.setString(idx++, sha1Fp);
-            psAddCerthash.setString(idx++, sha256Fp);
-            psAddCerthash.setString(idx++, sha3_256Fp);
-
-            psAddcert.setLong(1, certId);
-            psAddCerthash.setLong(1, certId);
-            psAddRawcert.setLong(1, certId);
-
-            final boolean origAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
-            String sql = null;
-
             try {
-                sql = sqlAddCert;
-                psAddcert.executeUpdate();
-
-                sql = SQL_ADD_CHASH;
-                psAddRawcert.executeUpdate();
-
-                sql = SQL_ADD_CHASH;
-                psAddCerthash.executeUpdate();
-
-                sql = "(commit add cert to OCSP)";
-                conn.commit();
+                ps.executeUpdate();
             } catch (Throwable th) {
-                conn.rollback();
                 // more secure
-                datasource.deleteFromTable(null, "CRAW", "CID", certId);
-                datasource.deleteFromTable(null, "CHASH", "CID", certId);
                 datasource.deleteFromTable(null, "CERT", "ID", certId);
 
                 if (th instanceof SQLException) {
@@ -273,23 +232,11 @@ class OcspStoreQueryExecutor {
                 } else {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
                 }
-            } finally {
-                conn.setAutoCommit(origAutoCommit);
             }
         } catch (SQLException ex) {
             throw datasource.translate(null, ex);
         } finally {
-            for (PreparedStatement ps : pss) {
-                try {
-                    ps.close();
-                } catch (Throwable th) {
-                    LOG.warn("could not close PreparedStatement", th);
-                }
-
-            }
-            if (conn != null) {
-                datasource.returnConnection(conn);
-            }
+            datasource.releaseResources(ps, null);
         }
     } // method addOrUpdateCert
 
@@ -525,41 +472,6 @@ class OcspStoreQueryExecutor {
         }
         return ps;
     }
-
-    private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
-            throws DataAccessException {
-        PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
-
-        Connection conn = datasource.getConnection();
-        if (conn != null) {
-            int n = sqlQueries.length;
-            for (int i = 0; i < n; i++) {
-                pss[i] = datasource.prepareStatement(conn, sqlQueries[i]);
-                if (pss[i] != null) {
-                    continue;
-                }
-
-                for (int j = 0; j < i; j++) {
-                    try {
-                        pss[j].close();
-                    } catch (Throwable th) {
-                        LOG.warn("could not close preparedStatement", th);
-                    }
-                }
-
-                try {
-                    conn.close();
-                } catch (Throwable th) {
-                    LOG.warn("could not close connection", th);
-                }
-
-                throw new DataAccessException(
-                        "could not create prepared statement for " + sqlQueries[i]);
-            }
-        } // end if
-
-        return pss;
-    } // method borrowPreparedStatements
 
     /**
      * Returns the database Id for the given issuer and serialNumber.

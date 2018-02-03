@@ -73,11 +73,11 @@ public class OcspCertPublisher extends X509CertPublisher {
         ParamUtil.requireNonNull("conf", conf);
         ParamUtil.requireNonEmpty("datasources", datasources);
 
-        ConfPairs utf8pairs = new ConfPairs(conf);
-        String str = utf8pairs.value("publish.goodcerts");
+        ConfPairs pairs = new ConfPairs(conf);
+        String str = pairs.value("publish.goodcerts");
         this.publishsGoodCert = (str == null) ? true : Boolean.parseBoolean(str);
 
-        str = utf8pairs.value("asyn");
+        str = pairs.value("asyn");
         this.asyn = (str == null) ? false : Boolean.parseBoolean(str);
 
         ConfPairs confPairs = new ConfPairs(conf);

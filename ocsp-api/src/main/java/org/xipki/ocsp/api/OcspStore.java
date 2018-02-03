@@ -23,7 +23,6 @@ import java.util.Date;
 
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -82,14 +81,11 @@ public abstract class OcspStore {
      *          Whether to include the revocation invalidity time in the response.
      * @param inheritCaRevocation
      *          Whether to inherit CA revocation
-     * @param certHashAlg
-     *          Hash algorithm of the certHash. If {@code null}, the algorithm specified
-     *          in the parameter hashAlgo will be applied.
      * @return the certificate status.
      */
     public abstract CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
             BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-            boolean inheritCaRevocation, HashAlgoType certHashAlg)
+            boolean inheritCaRevocation)
             throws OcspStoreException;
 
     /**

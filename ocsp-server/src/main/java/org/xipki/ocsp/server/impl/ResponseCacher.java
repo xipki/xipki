@@ -252,9 +252,9 @@ class ResponseCacher {
     }
 
     OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
-            AlgorithmCode sigAlg, AlgorithmCode certHashAlg) throws DataAccessException {
+            AlgorithmCode sigAlg) throws DataAccessException {
         final String sql = sqlSelectOcsp;
-        byte[] identBytes = buildIdent(serialNumber, sigAlg, certHashAlg);
+        byte[] identBytes = buildIdent(serialNumber, sigAlg);
         long id = deriveId(issuerId, identBytes);
         PreparedStatement ps = prepareStatement(sql);
         ResultSet rs = null;
@@ -303,8 +303,8 @@ class ResponseCacher {
     }
 
     void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate, Long nextUpdate,
-            AlgorithmCode sigAlgCode, AlgorithmCode certHashAlgCode, byte[] response) {
-        byte[] identBytes = buildIdent(serialNumber, sigAlgCode, certHashAlgCode);
+            AlgorithmCode sigAlgCode, byte[] response) {
+        byte[] identBytes = buildIdent(serialNumber, sigAlgCode);
         String ident = Base64.encodeToString(identBytes);
         try {
             long id = deriveId(issuerId, identBytes);
@@ -551,13 +551,11 @@ class ResponseCacher {
         }
     }
 
-    private static byte[] buildIdent(BigInteger serialNumber,
-            AlgorithmCode sigAlg, AlgorithmCode certHashAlg) {
+    private static byte[] buildIdent(BigInteger serialNumber, AlgorithmCode sigAlg) {
         byte[] snBytes = serialNumber.toByteArray();
-        byte[] bytes = new byte[2 + snBytes.length];
+        byte[] bytes = new byte[1 + snBytes.length];
         bytes[0] = sigAlg.code();
-        bytes[1] = (certHashAlg == null) ? 0 : certHashAlg.code();
-        System.arraycopy(snBytes, 0, bytes, 2, snBytes.length);
+        System.arraycopy(snBytes, 0, bytes, 1, snBytes.length);
         return bytes;
     }
 

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -63,14 +64,6 @@ import org.xipki.security.util.X509Util;
  */
 
 public class DbCertStatusStore extends OcspStore {
-
-    private static final Map<HashAlgoType, String> certHashAlgoColNameMap = new HashMap<>();
-
-    {
-        certHashAlgoColNameMap.put(HashAlgoType.SHA1, "S1");
-        certHashAlgoColNameMap.put(HashAlgoType.SHA256, "S256");
-        certHashAlgoColNameMap.put(HashAlgoType.SHA3_256, "S3_256");
-    }
 
     private static class SimpleIssuerEntry {
 
@@ -117,13 +110,15 @@ public class DbCertStatusStore extends OcspStore {
 
     private String sqlCs;
 
-    private Map<HashAlgoType, String> sqlCsNoRitMap;
+    private String sqlCsNoRitWithCertHash;
 
-    private Map<HashAlgoType, String> sqlCsMap;
+    private String sqlCsWithCertHash;
 
     private IssuerFilter issuerFilter;
 
     private IssuerStore issuerStore;
+
+    private HashAlgoType certHashAlgo;
 
     private boolean initialized;
 
@@ -251,7 +246,7 @@ public class DbCertStatusStore extends OcspStore {
     @Override
     public CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
             BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-            boolean inheritCaRevocation, HashAlgoType certHashAlg) throws OcspStoreException {
+            boolean inheritCaRevocation) throws OcspStoreException {
         if (serialNumber.signum() != 1) { // non-positive serial number
             return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
         }
@@ -272,23 +267,8 @@ public class DbCertStatusStore extends OcspStore {
                 return null;
             }
 
-            HashAlgoType certHashAlgo = null;
             if (includeCertHash) {
-                certHashAlgo = (certHashAlg == null) ? reqIssuer.hashAlgorithm() : certHashAlg;
-                switch(certHashAlgo) {
-                    case SHA1:
-                    case SHA256:
-                    case SHA3_256:
-                        break;
-                    case SHA3_224:
-                    case SHA3_384:
-                    case SHA3_512:
-                        certHashAlgo = HashAlgoType.SHA3_256;
-                        break;
-                    default:
-                        certHashAlgo = HashAlgoType.SHA256;
-                }
-                sql = (includeRit ? sqlCsMap : sqlCsNoRitMap).get(certHashAlgo);
+                sql = includeRit ? sqlCsWithCertHash : sqlCsNoRitWithCertHash;
             } else {
                 sql = includeRit ? sqlCs : sqlCsNoRit;
             }
@@ -347,9 +327,8 @@ public class DbCertStatusStore extends OcspStore {
                     }
 
                     if (!ignore) {
-                        if (certHashAlgo != null) {
-                            String colName = certHashAlgoColNameMap.get(certHashAlgo);
-                            b64CertHash = rs.getString(colName);
+                        if (includeCertHash) {
+                            b64CertHash = rs.getString("HASH");
                         }
 
                         revoked = rs.getBoolean("REV");
@@ -502,19 +481,16 @@ public class DbCertStatusStore extends OcspStore {
         sqlCsNoRit = datasource.buildSelectFirstSql(1,
                 "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE IID=? AND SN=?");
 
-        sqlCsMap = new HashMap<>();
-        sqlCsNoRitMap = new HashMap<>();
+        sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
+                "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=? AND SN=?");
+        sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
+                "NBEFORE,NAFTER,REV,RR,RT,HASH FROM CERT WHERE IID=? AND SN=?");
 
-        Set<HashAlgoType> hashAlgos = certHashAlgoColNameMap.keySet();
-        for (HashAlgoType hashAlgo : hashAlgos) {
-            String shortName = certHashAlgoColNameMap.get(hashAlgo);
-            String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT," + shortName
-                + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
-            sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
-
-            coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT," + shortName
-                + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
-            sqlCsNoRitMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
+        try {
+            this.certHashAlgo = getCertHashAlgo(datasource);
+        } catch (DataAccessException ex) {
+            throw new OcspStoreException(
+                    "Could not retrieve the CERTHASH.ALGO from the database", ex);
         }
 
         StoreConf storeConf = new StoreConf(conf);
@@ -603,6 +579,41 @@ public class DbCertStatusStore extends OcspStore {
             }
         }
         return certs;
+    }
+
+    public static HashAlgoType getCertHashAlgo(DataSourceWrapper datasource)
+            throws DataAccessException {
+        // analyse the database
+        final String sql = "SELECT VALUE2 FROM DBSCHEMA WHERE NAME='CERTHASH.ALGO'";
+        Connection conn = datasource.getConnection();
+        if (conn == null) {
+            throw new DataAccessException("could not get connection");
+        }
+
+        String certHashAlgoStr = null;
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = datasource.createStatement(conn);
+            if (stmt == null) {
+                throw new DataAccessException("could not create statement");
+            }
+
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                certHashAlgoStr = rs.getString("VALUE2");
+            } else {
+                throw new DataAccessException(
+                        "Column with NAME='CERTHASH.ALGO' is not defined in table DBSCHEMA");
+            }
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            datasource.releaseResources(stmt, rs);
+        }
+
+        return HashAlgoType.getNonNullHashAlgoType(certHashAlgoStr);
     }
 
 }

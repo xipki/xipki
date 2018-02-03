@@ -74,6 +74,7 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.server.impl.store.db.CrlInfo;
+import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
@@ -99,24 +100,16 @@ public class ImportCrl {
             = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
     private static final String SQL_UPDATE_CERT
-            = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,PN=? WHERE ID=?";
+            = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,PN=?,HASH=? WHERE ID=?";
 
     private static final String SQL_INSERT_CERT
-            = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,PN) "
-              + "VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-
-    private static final String SQL_INSERT_CERTHASH
-            = "INSERT INTO CHASH (CID,S1,S256,S3_256) VALUES(?,?,?,?)";
+            = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,PN,HASH) "
+              + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String CORE_SQL_SELECT_ID_CERT
             = "ID FROM CERT WHERE IID=? AND SN=?";
 
-    private static final String CORESQL_SELECT_CID_CERTHASH
-            = "1 FROM CHASH WHERE CID=?";
-
     private final String sqlSelectIdCert;
-
-    private final String sqlSelectCidCertHash;
 
     private final X509CRL crl;
 
@@ -143,19 +136,21 @@ public class ImportCrl {
 
     private final CertRevocationInfo caRevInfo;
 
+    private final HashAlgoType certhashAlgo;
+
     private PreparedStatement psDeleteCert;
     private PreparedStatement psInsertCert;
     private PreparedStatement psInsertCertRev;
-    private PreparedStatement psInsertCertHash;
-    private PreparedStatement psSelectCidCertHash;
     private PreparedStatement psSelectIdCert;
     private PreparedStatement psUpdateCert;
     private PreparedStatement psUpdateCertRev;
 
     public ImportCrl(DataSourceWrapper datasource, boolean useCrlUpdates, X509CRL crl,
             String crlUrl, X509Certificate caCert, X509Certificate issuerCert,
-            CertRevocationInfo caRevInfo, String certsDirName) throws ImportCrlException {
+            CertRevocationInfo caRevInfo, String certsDirName)
+            throws ImportCrlException, DataAccessException {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+        this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
         this.useCrlUpdates = useCrlUpdates;
         this.crl = ParamUtil.requireNonNull("crl", crl);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
@@ -221,7 +216,6 @@ public class ImportCrl {
         vec.add(new DERTaggedObject(true, 2, new DERGeneralizedTime(crl.getThisUpdate())));
         this.crlId = CrlID.getInstance(new DERSequence(vec));
 
-        this.sqlSelectCidCertHash = datasource.buildSelectFirstSql(1, CORESQL_SELECT_CID_CERTHASH);
         this.sqlSelectIdCert = datasource.buildSelectFirstSql(1, CORE_SQL_SELECT_ID_CERT);
     }
 
@@ -238,8 +232,6 @@ public class ImportCrl {
             psDeleteCert = datasource.prepareStatement(conn, SQL_DELETE_CERT);
             psInsertCert = datasource.prepareStatement(conn, SQL_INSERT_CERT);
             psInsertCertRev = datasource.prepareStatement(conn, SQL_INSERT_CERT_REV);
-            psInsertCertHash = datasource.prepareStatement(conn, SQL_INSERT_CERTHASH);
-            psSelectCidCertHash = datasource.prepareStatement(conn, sqlSelectCidCertHash);
             psSelectIdCert = datasource.prepareStatement(conn, sqlSelectIdCert);
             psUpdateCert = datasource.prepareStatement(conn, SQL_UPDATE_CERT);
             psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
@@ -253,8 +245,6 @@ public class ImportCrl {
             releaseResources(psDeleteCert, null);
             releaseResources(psInsertCert, null);
             releaseResources(psInsertCertRev, null);
-            releaseResources(psInsertCertHash, null);
-            releaseResources(psSelectCidCertHash, null);
             releaseResources(psSelectIdCert, null);
             releaseResources(psUpdateCert, null);
             releaseResources(psUpdateCertRev, null);
@@ -630,6 +620,7 @@ public class ImportCrl {
         } catch (IOException ex) {
             throw new ImportCrlException("could not encode certificate {}" + certLogId, ex);
         }
+        String b64CertHash = certhashAlgo.base64Hash(encodedCert);
 
         if (caSpki != null) {
             byte[] aki = null;
@@ -695,6 +686,7 @@ public class ImportCrl {
             } else {
                 ps.setString(offset++, profileName);
             }
+            ps.setString(offset++, b64CertHash);
 
             if (sql == SQL_UPDATE_CERT) {
                 ps.setLong(offset++, id);
@@ -703,40 +695,6 @@ public class ImportCrl {
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
-        }
-
-        boolean insertCertHash = true;
-        // then add entry to the table CHASH
-        if (tblCertIdExists) {
-            sql = sqlSelectCidCertHash;
-            ps = psSelectCidCertHash;
-            ResultSet rs = null;
-            try {
-                ps.setLong(1, id);
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    insertCertHash = false;
-                }
-            } catch (SQLException ex) {
-                throw datasource.translate(sql, ex);
-            } finally {
-                releaseResources(null, rs);
-            }
-        }
-
-        if (insertCertHash) {
-            sql = SQL_INSERT_CERTHASH;
-            ps = psInsertCertHash;
-            try {
-                int offset = 1;
-                ps.setLong(offset++, id);
-                ps.setString(offset++, HashAlgoType.SHA1.base64Hash(encodedCert));
-                ps.setString(offset++, HashAlgoType.SHA256.base64Hash(encodedCert));
-                ps.setString(offset++, HashAlgoType.SHA3_256.base64Hash(encodedCert));
-                ps.executeUpdate();
-            } catch (SQLException ex) {
-                throw datasource.translate(sql, ex);
-            }
         }
 
         // it is not required to add entry to table CRAW

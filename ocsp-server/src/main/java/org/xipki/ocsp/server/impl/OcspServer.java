@@ -462,25 +462,6 @@ public class OcspServer {
             }
 
             // required HashAlgorithms for certificate
-            ResponseOption respOpt = responseOptions.get(respOptName);
-            Set<HashAlgoType> certHashAlgos = new HashSet<>(3);
-            if (respOpt.isIncludeCerthash()) {
-                if (respOpt.certHashAlgo() != null) {
-                    certHashAlgos.add(respOpt.certHashAlgo());
-                } else {
-                    Set<HashAlgoType> algs = requestOptions.get(reqOptName).hashAlgos();
-                    if (CollectionUtil.isNonEmpty(algs)) {
-                        for (HashAlgoType h : algs) {
-                            if (ResponseOption.SUPPORTED_CERTHASH_ALGORITHMS.contains(h)) {
-                                certHashAlgos.add(h);
-                            }
-                        }
-                    } else {
-                        certHashAlgos.addAll(ResponseOption.SUPPORTED_CERTHASH_ALGORITHMS);
-                    }
-                }
-            }
-
             List<StoreType> storeDefs = conf.getStores().getStore();
             Set<String> storeNames = new HashSet<>(storeDefs.size());
             for (StoreType storeDef : storeDefs) {
@@ -685,7 +666,6 @@ public class OcspServer {
             }
 
             AlgorithmCode cacheDbSigAlgCode = null;
-            AlgorithmCode cacheDbCertHashAlgCode = null;
             BigInteger cacheDbSerialNumber = null;
             Integer cacheDbIssuerId = null;
 
@@ -696,20 +676,10 @@ public class OcspServer {
                 CertID certId = requestList.get(0);
                 HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
                 if(!reqOpt.allows(reqHashAlgo)) {
-                    if (reqHashAlgo != null) {
-                        LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
-                    } else {
-                        LOG.warn("CertID.hashAlgorithm {} not allowed",
-                                certId.issuer().hashAlgorithmOID());
-                    }
+                    LOG.warn("CertID.hashAlgorithm {} not allowed",
+                            reqHashAlgo != null ? reqHashAlgo : certId.issuer().hashAlgorithmOID());
                     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
                 }
-
-                HashAlgoType certHashAlgo = repOpt.certHashAlgo();
-                if (certHashAlgo == null) {
-                    certHashAlgo = reqHashAlgo;
-                }
-                cacheDbCertHashAlgCode = certHashAlgo.algorithmCode();
 
                 cacheDbSigAlgCode = concurrentSigner.algorithmCode();
 
@@ -718,8 +688,7 @@ public class OcspServer {
 
                 if (cacheDbIssuerId != null) {
                     OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
-                            cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlgCode,
-                            cacheDbCertHashAlgCode);
+                            cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlgCode);
                     if (cachedResp != null) {
                         return cachedResp;
                     }
@@ -791,8 +760,7 @@ public class OcspServer {
                 // of storage
                 responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
                         cacheDbSerialNumber, repControl.cacheThisUpdate,
-                        repControl.cacheNextUpdate, cacheDbSigAlgCode,
-                        cacheDbCertHashAlgCode, encodeOCSPResponse);
+                        repControl.cacheNextUpdate, cacheDbSigAlgCode, encodeOCSPResponse);
             }
 
             if (viaGet && repControl.canCacheInfo) {
@@ -829,8 +797,7 @@ public class OcspServer {
             try {
                 certStatusInfo = store.getCertStatus(now, certId.issuer(), serial,
                         repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
-                        responder.responderOption().inheritCaRevocation(),
-                        repOpt.certHashAlgo());
+                        responder.responderOption().inheritCaRevocation());
                 if (certStatusInfo != null) {
                     break;
                 }

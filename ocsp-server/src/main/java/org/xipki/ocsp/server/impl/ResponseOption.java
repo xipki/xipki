@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.server.impl.jaxb.CacheType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;
@@ -53,8 +52,6 @@ public class ResponseOption {
 
     private final boolean includeCerthash;
 
-    private final HashAlgoType certHashAlgo;
-
     private final Long cacheMaxAge;
 
     ResponseOption(ResponseOptionType conf) throws InvalidConfException {
@@ -70,29 +67,6 @@ public class ResponseOption {
             this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
         } else {
             this.cacheMaxAge = null;
-        }
-
-        String str = conf.getCerthashAlgorithm();
-        if (str == null) {
-            this.certHashAlgo = null;
-        } else {
-            String token = str.trim();
-
-            HashAlgoType tmpCertHashAlgo = null;
-            if (StringUtil.isNotBlank(token)) {
-                tmpCertHashAlgo = HashAlgoType.getHashAlgoType(token);
-            }
-
-            if (tmpCertHashAlgo == null) {
-                throw new InvalidConfException("Invalid hash algorithm '" + str + "'");
-            }
-
-            if (!SUPPORTED_CERTHASH_ALGORITHMS.contains(tmpCertHashAlgo)) {
-                throw new InvalidConfException("Only hash algorithm "
-                        + SUPPORTED_CERTHASH_ALGORITHMS + " is unsupported for CertHash");
-            }
-
-            this.certHashAlgo = tmpCertHashAlgo;
         }
     }
 
@@ -118,10 +92,6 @@ public class ResponseOption {
 
     public EmbedCertsMode embedCertsMode() {
         return embedCertsMode;
-    }
-
-    public HashAlgoType certHashAlgo() {
-        return certHashAlgo;
     }
 
     private static boolean getBoolean(Boolean bo, boolean dflt) {
