@@ -76,14 +76,20 @@ public class OcspCertsReader extends DbiXmlReader {
                 case OcspCertType.TAG_ROOT:
                     ret.validate();
                     return ret;
-                case OcspCertType.TAG_FILE:
-                    ret.setFile(tagContent);
-                    break;
                 case OcspCertType.TAG_ID:
                     ret.setId(Long.parseLong(tagContent));
                     break;
+                case OcspCertType.TAG_HASH:
+                    ret.setHash(tagContent);
+                    break;
                 case OcspCertType.TAG_IID:
                     ret.setIid(Integer.parseInt(tagContent));
+                    break;
+                case OcspCertType.TAG_NAFTER:
+                    ret.setNafter(Long.parseLong(tagContent));
+                    break;
+                case OcspCertType.TAG_NBEFORE:
+                    ret.setNbefore(Long.parseLong(tagContent));
                     break;
                 case OcspCertType.TAG_PROFILE:
                     ret.setProfile(tagContent);
@@ -102,6 +108,9 @@ public class OcspCertsReader extends DbiXmlReader {
                     break;
                 case OcspCertType.TAG_SN:
                     ret.setSn(tagContent);
+                    break;
+                case OcspCertType.TAG_SUBJECT:
+                    ret.setSubject(tagContent);
                     break;
                 case OcspCertType.TAG_UPDATE:
                     ret.setUpdate(Long.parseLong(tagContent));

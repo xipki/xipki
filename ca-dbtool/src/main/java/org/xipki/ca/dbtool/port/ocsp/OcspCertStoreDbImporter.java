@@ -32,7 +32,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType;
@@ -109,6 +108,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         try {
             if (!resume) {
                 dropIndexes();
+                importCertHashAlgo(certstore.getCerthashAlgo());
                 importIssuer(certstore.getIssuers());
             }
             importCert(certstore, processLogFile);
@@ -120,6 +120,21 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         }
         System.out.println(" imported OCSP certstore to database");
     } // method importToDB
+
+    private void importCertHashAlgo(String certHashAlgo) throws DataAccessException {
+        String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME='CERTHASH_ALGO'";
+        PreparedStatement ps = prepareStatement(sql);
+        try {
+            ps.setString(1, certHashAlgo);
+            ps.executeUpdate();
+            dbSchemaInfo.setVariable("CERTHASH_ALGO", certHashAlgo);
+        } catch (SQLException ex) {
+            System.err.println("could not import DBSCHEMA");
+            throw translate(sql, ex);
+        } finally {
+            releaseResources(ps, null);
+        }
+    }
 
     private void importIssuer(Issuers issuers)
             throws DataAccessException, CertificateException, IOException {
@@ -206,8 +221,6 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         processLog.printHeader();
 
         PreparedStatement psCert = prepareStatement(SQL_ADD_CERT);
-        PreparedStatement psCerthash = prepareStatement(SQL_ADD_CHASH);
-        PreparedStatement psRawcert = prepareStatement(SQL_ADD_CRAW);
 
         OcspDbEntryType type = OcspDbEntryType.CERT;
 
@@ -236,7 +249,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 try {
-                    long lastId = importCert0(psCert, psCerthash, psRawcert, certsFile, minId,
+                    long lastId = importCert0(psCert, certsFile, minId,
                             processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception ex) {
@@ -248,8 +261,6 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             } // end for
         } finally {
             releaseResources(psCert, null);
-            releaseResources(psCerthash, null);
-            releaseResources(psRawcert, null);
             certsFileIterator.close();
         }
 
@@ -258,9 +269,9 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(importedText() + processLog.numProcessed() + " certificates");
     } // method importCert
 
-    private long importCert0(PreparedStatement psCert, PreparedStatement psCerthash,
-            PreparedStatement psRawcert, String certsZipFile, long minId, File processLogFile,
-            ProcessLog processLog, int numProcessedInLastProcess) throws Exception {
+    private long importCert0(PreparedStatement psCert, String certsZipFile, long minId,
+            File processLogFile, ProcessLog processLog, int numProcessedInLastProcess)
+            throws Exception {
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
@@ -296,65 +307,26 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 numEntriesInBatch++;
-                String filename = cert.file();
-
-                // rawcert
-                ZipEntry certZipEnty = zipFile.getEntry(filename);
-                // rawcert
-                byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
-
-                TBSCertificate tbsCert;
-                try {
-                    Certificate cc = Certificate.getInstance(encodedCert);
-                    tbsCert = cc.getTBSCertificate();
-                } catch (RuntimeException ex) {
-                    LOG.error("could not parse certificate in file {}", filename);
-                    LOG.debug("could not parse certificate in file " + filename, ex);
-                    throw new CertificateException(ex.getMessage(), ex);
-                }
 
                 // cert
                 try {
                     int idx = 1;
                     psCert.setLong(idx++, id);
                     psCert.setInt(idx++, cert.iid());
-                    psCert.setString(idx++,
-                            tbsCert.getSerialNumber().getPositiveValue().toString(16));
+                    psCert.setString(idx++, cert.sn());
                     psCert.setLong(idx++, cert.update());
-                    psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
-                    psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
+                    psCert.setLong(idx++, cert.nbefore());
+                    psCert.setLong(idx++, cert.nafter());
                     setBoolean(psCert, idx++, cert.rev().booleanValue());
                     setInt(psCert, idx++, cert.rr());
                     setLong(psCert, idx++, cert.rt());
                     setLong(psCert, idx++, cert.rit());
                     psCert.setString(idx++, cert.profile());
+                    psCert.setString(idx++, cert.hash());
+                    psCert.setString(idx++, cert.subject());
                     psCert.addBatch();
                 } catch (SQLException ex) {
                     throw translate(SQL_ADD_CERT, ex);
-                }
-
-                // certhash
-                try {
-                    int idx = 1;
-                    psCerthash.setLong(idx++, cert.id());
-                    psCerthash.setString(idx++, sha1(encodedCert));
-                    psCerthash.setString(idx++, sha256(encodedCert));
-                    psCerthash.setString(idx++, sha3_256(encodedCert));
-                    psCerthash.addBatch();
-                } catch (SQLException ex) {
-                    throw translate(SQL_ADD_CHASH, ex);
-                }
-
-                // rawcert
-                try {
-                    int idx = 1;
-                    psRawcert.setLong(idx++, cert.id());
-                    psRawcert.setString(idx++,
-                            X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen));
-                    psRawcert.setString(idx++, Base64.encodeToString(encodedCert));
-                    psRawcert.addBatch();
-                } catch (SQLException ex) {
-                    throw translate(SQL_ADD_CRAW, ex);
                 }
 
                 boolean isLastBlock = !certs.hasNext();
@@ -363,27 +335,15 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                         && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
                     if (evaulateOnly) {
                         psCert.clearBatch();
-                        psCerthash.clearBatch();
-                        psRawcert.clearBatch();
                     } else {
-                        String sql = null;
                         try {
-                            sql = SQL_ADD_CERT;
                             psCert.executeBatch();
-
-                            sql = SQL_ADD_CHASH;
-                            psCerthash.executeBatch();
-
-                            sql = SQL_ADD_CRAW;
-                            psRawcert.executeBatch();
-
-                            sql = null;
                             commit("(commit import cert to OCSP)");
                         } catch (Throwable th) {
                             rollback();
                             deleteCertGreatherThan(lastSuccessfulCertId, LOG);
                             if (th instanceof SQLException) {
-                                throw translate(sql, (SQLException) th);
+                                throw translate(SQL_ADD_CERT, (SQLException) th);
                             } else if (th instanceof Exception) {
                                 throw (Exception) th;
                             } else {

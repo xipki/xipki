@@ -40,23 +40,10 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
     protected static final String SQL_ADD_CERT =
-        "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN)"
-        + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN,HASH,SUBJECT)"
+        + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    protected static final String SQL_DEL_CERT =
-        "DELETE FROM CERT WHERE ID>?";
-
-    protected static final String SQL_ADD_CHASH =
-        "INSERT INTO CHASH (CID,S1,S256,S3_256) VALUES (?,?,?,?)";
-
-    protected static final String SQL_DEL_CHASH =
-        "DELETE FROM CHASH WHERE ID>?";
-
-    protected static final String SQL_ADD_CRAW =
-        "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
-
-    protected static final String SQL_DEL_CRAW =
-        "DELETE FROM CRAW WHERE ID>?";
+    protected static final String SQL_DEL_CERT = "DELETE FROM CERT WHERE ID>?";
 
     AbstractOcspCertStoreDbImporter(DataSourceWrapper datasource, String srcDir,
             AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
@@ -76,8 +63,6 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
     }
 
     protected void deleteCertGreatherThan(long id, Logger log) {
-        deleteFromTableWithLargerId("CRAW", "CID", id, log);
-        deleteFromTableWithLargerId("CHASH", "CID", id, log);
         deleteFromTableWithLargerId("CERT", "ID", id, log);
     }
 
@@ -88,12 +73,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         datasource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
         datasource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
 
-        datasource.dropForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH");
-        datasource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
-
         datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
-        datasource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
-        datasource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
@@ -104,17 +84,10 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         long start = System.currentTimeMillis();
 
         datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
-        datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
-        datasource.addPrimaryKey(null, "PK_CHASH", "CHASH", "CID");
 
         datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
                 "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
         datasource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
-
-        datasource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW", "CID", "CERT", "ID",
-                "CASCADE", "NO ACTION");
-        datasource.addForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH", "CID", "CERT", "ID",
-                "CASCADE", "NO ACTION");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));

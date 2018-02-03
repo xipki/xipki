@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -490,7 +489,7 @@ public class DbCertStatusStore extends OcspStore {
             this.certHashAlgo = getCertHashAlgo(datasource);
         } catch (DataAccessException ex) {
             throw new OcspStoreException(
-                    "Could not retrieve the CERTHASH.ALGO from the database", ex);
+                    "Could not retrieve the certhash's algorithm from the database", ex);
         }
 
         StoreConf storeConf = new StoreConf(conf);
@@ -583,34 +582,13 @@ public class DbCertStatusStore extends OcspStore {
 
     public static HashAlgoType getCertHashAlgo(DataSourceWrapper datasource)
             throws DataAccessException {
-        // analyse the database
-        final String sql = "SELECT VALUE2 FROM DBSCHEMA WHERE NAME='CERTHASH.ALGO'";
-        Connection conn = datasource.getConnection();
-        if (conn == null) {
-            throw new DataAccessException("could not get connection");
-        }
+        // analyze the database
+        String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
+                "NAME='CERTHASH_ALGO'", String.class);
 
-        String certHashAlgoStr = null;
-
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = datasource.createStatement(conn);
-            if (stmt == null) {
-                throw new DataAccessException("could not create statement");
-            }
-
-            rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                certHashAlgoStr = rs.getString("VALUE2");
-            } else {
-                throw new DataAccessException(
-                        "Column with NAME='CERTHASH.ALGO' is not defined in table DBSCHEMA");
-            }
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(stmt, rs);
+        if (certHashAlgoStr == null) {
+            throw new DataAccessException(
+                    "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
         }
 
         return HashAlgoType.getNonNullHashAlgoType(certHashAlgoStr);

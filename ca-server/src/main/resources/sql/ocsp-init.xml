@@ -28,7 +28,7 @@
       <column name="VALUE2" value="350"/>
     </insert>
     <insert tableName="DBSCHEMA">
-      <column name="NAME" value="CERTHASH.ALGO"/>
+      <column name="NAME" value="CERTHASH_ALGO"/>
       <column name="VALUE2" value="SHA256"/>
     </insert>
     <!-- table ISSUER -->
@@ -103,7 +103,7 @@
           remarks="certificate profile name"/>
       <!-- For maximal 512 bit hash value -->
       <column name="HASH" type="CHAR(86)"
-          remarks="base64 enoded hash value of the DER encoded certificate. Algorithm is defined by CERTHASH.ALGO in table DBSchema">
+          remarks="base64 enoded hash value of the DER encoded certificate. Algorithm is defined by CERTHASH_ALGO in table DBSchema">
       </column>
       <column name="SUBJECT" type="${x500name.type}"
           remarks="subject of the certificate">

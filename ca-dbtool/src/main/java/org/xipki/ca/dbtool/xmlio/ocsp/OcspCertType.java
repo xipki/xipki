@@ -36,21 +36,39 @@ public class OcspCertType extends IdentifidDbObjectType {
     public static final String TAG_ROOT = "cert";
 
     /**
+     * base64 encoded hash
+     */
+    public static final String TAG_HASH = "hash";
+
+    /**
      * issuer id.
      */
     public static final String TAG_IID = "iid";
 
     /**
-     * certificate serial number.
+     * not after
      */
-    public static final String TAG_SN = "sn";
+    public static final String TAG_NAFTER = "nafter";
 
-    public static final String TAG_UPDATE = "update";
+    /**
+     * not before
+     */
+    public static final String TAG_NBEFORE = "nbefore";
+
+    /**
+     * certificate profile name.
+     */
+    public static final String TAG_PROFILE = "profile";
 
     /**
      * whether revoked.
      */
     public static final String TAG_REV = "rev";
+
+    /**
+     * revocation invalidity time.
+     */
+    public static final String TAG_RIT = "rit";
 
     /**
      * revocation reason.
@@ -63,32 +81,51 @@ public class OcspCertType extends IdentifidDbObjectType {
     public static final String TAG_RT = "rt";
 
     /**
-     * revocation invalidity time.
+     * certificate serial number.
      */
-    public static final String TAG_RIT = "rit";
+    public static final String TAG_SN = "sn";
 
     /**
-     * certificate profile name.
+     * subject
      */
-    public static final String TAG_PROFILE = "profile";
+    public static final String TAG_SUBJECT = "subject";
 
-    private String file;
+    /**
+     * last update
+     */
+    public static final String TAG_UPDATE = "update";
 
-    private String profile;
+    private String hash;
 
     private Integer iid;
 
-    private String sn;
+    private Long nafter;
 
-    private Long update;
+    private Long nbefore;
+
+    private String profile;
 
     private Boolean rev;
+
+    private Long rit;
 
     private Integer rr;
 
     private Long rt;
 
-    private Long rit;
+    private String sn;
+
+    private String subject;
+
+    private Long update;
+
+    public String hash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
 
     public Integer iid() {
         return iid;
@@ -98,12 +135,20 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.iid = iid;
     }
 
-    public String sn() {
-        return sn;
+    public Long nafter() {
+        return nafter;
     }
 
-    public void setSn(String sn) {
-        this.sn = sn;
+    public void setNafter(Long nafter) {
+        this.nafter = nafter;
+    }
+
+    public Long nbefore() {
+        return nbefore;
+    }
+
+    public void setNbefore(Long nbefore) {
+        this.nbefore = nbefore;
     }
 
     public String profile() {
@@ -114,20 +159,20 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.profile = profile;
     }
 
-    public Long update() {
-        return update;
-    }
-
-    public void setUpdate(Long update) {
-        this.update = update;
-    }
-
     public Boolean rev() {
         return rev;
     }
 
     public void setRev(Boolean rev) {
         this.rev = rev;
+    }
+
+    public Long rit() {
+        return rit;
+    }
+
+    public void setRit(Long rit) {
+        this.rit = rit;
     }
 
     public Integer rr() {
@@ -146,35 +191,43 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.rt = rt;
     }
 
-    public Long rit() {
-        return rit;
+    public String sn() {
+        return sn;
     }
 
-    public void setRit(Long rit) {
-        this.rit = rit;
+    public void setSn(String sn) {
+        this.sn = sn;
     }
 
-    public String file() {
-        return file;
+    public String subject() {
+        return subject;
     }
 
-    public void setFile(String file) {
-        this.file = file;
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public Long update() {
+        return update;
+    }
+
+    public void setUpdate(Long update) {
+        this.update = update;
     }
 
     @Override
     public void validate() throws InvalidDataObjectException {
         super.validate();
+
         assertNotNull(TAG_IID, iid);
+
         assertNotBlank(TAG_SN, sn);
-        assertNotNull(TAG_UPDATE, update);
         assertNotNull(TAG_REV, rev);
         if (rev) {
             assertNotNull(TAG_RR, rr);
             assertNotNull(TAG_RT, rt);
         }
-
-        assertNotBlank(TAG_FILE, file);
+        assertNotNull(TAG_UPDATE, update);
     }
 
     @Override
@@ -193,7 +246,12 @@ public class OcspCertType extends IdentifidDbObjectType {
         writeIfNotNull(writer, TAG_RT, rt);
         writeIfNotNull(writer, TAG_RIT, rit);
         writeIfNotNull(writer, TAG_PROFILE, profile);
-        writeIfNotNull(writer, TAG_FILE, file);
+
+        writeIfNotNull(writer, TAG_NBEFORE, nbefore);
+        writeIfNotNull(writer, TAG_NAFTER, nafter);
+        writeIfNotNull(writer, TAG_SUBJECT, subject);
+        writeIfNotNull(writer, TAG_HASH, hash);
+
         writer.writeEndElement();
         writer.writeNewline();
     }

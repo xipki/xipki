@@ -45,13 +45,11 @@ import org.xipki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.ca.dbtool.xmlio.ocsp.OcspCertType;
 import org.xipki.ca.dbtool.xmlio.ocsp.OcspCertsWriter;
 import org.xipki.common.ProcessLog;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -115,6 +113,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         System.out.println("exporting OCSP certstore from database");
 
         if (!resume) {
+            exportHashAlgo(certstore);
             exportIssuer(certstore);
         }
 
@@ -134,6 +133,16 @@ class OcspCertStoreDbExporter extends DbPorter {
             throw exception;
         }
     } // method export
+
+    private void exportHashAlgo(CertStoreType certstore) throws DataAccessException {
+        String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
+        if (certHashAlgoStr == null) {
+            throw new DataAccessException(
+                    "CERTHASH_ALGO is not defined in table DBSCHEMA");
+        }
+
+        certstore.setCerthashAlgo(certHashAlgoStr);
+    }
 
     private void exportIssuer(CertStoreType certstore) throws DataAccessException, IOException {
         System.out.println("exporting table ISSUER");
@@ -200,7 +209,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
-            System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
+            System.err.println("\nexporting table CERT has been cancelled due to error,\n"
                     + "please continue with the option '--resume'");
             LOG.error("Exception", ex);
             return ex;
@@ -225,10 +234,10 @@ class OcspCertStoreDbExporter extends DbPorter {
             minId = min("CERT", "ID");
         }
 
-        System.out.println(exportingText() + "tables CERT, CHASH and CRAW from ID " + minId);
+        System.out.println(exportingText() + "table CERT from ID " + minId);
 
-        final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
-                + "FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID=CRAW.CID";
+        final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,NAFTER,NBEFORE,HASH,SUBJECT "
+                + "FROM CERT WHERE ID>=?";
         final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
 
         final long maxId = max("CERT", "ID");
@@ -294,21 +303,6 @@ class OcspCertStoreDbExporter extends DbPorter {
                         maxCertIdOfCurrentFile = id;
                     }
 
-                    String b64Cert = rs.getString("CERT");
-                    byte[] certBytes = Base64.decodeFast(b64Cert);
-
-                    String sha1Cert = HashAlgoType.SHA1.hexHash(certBytes);
-
-                    if (!evaulateOnly) {
-                        ZipEntry certZipEntry = new ZipEntry(sha1Cert + ".der");
-                        currentCertsZip.putNextEntry(certZipEntry);
-                        try {
-                            currentCertsZip.write(certBytes);
-                        } finally {
-                            currentCertsZip.closeEntry();
-                        }
-                    }
-
                     OcspCertType cert = new OcspCertType();
 
                     cert.setId(id);
@@ -335,10 +329,29 @@ class OcspCertStoreDbExporter extends DbPorter {
                             cert.setRit(revInvalidityTime);
                         }
                     }
-                    cert.setFile(sha1Cert + ".der");
 
                     String profile = rs.getString("PN");
                     cert.setProfile(profile);
+
+                    String hash = rs.getString("HASH");
+                    if (hash != null) {
+                        cert.setHash(hash);
+                    }
+
+                    String subject = rs.getString("SUBJECT");
+                    if (subject != null) {
+                        cert.setSubject(subject);
+                    }
+
+                    long nafter = rs.getLong("NAFTER");
+                    if (nafter != 0) {
+                        cert.setNafter(nafter);
+                    }
+
+                    long nbefore = rs.getLong("NBEFORE");
+                    if (nbefore != 0) {
+                        cert.setNbefore(nbefore);
+                    }
 
                     certsInCurrentFile.add(cert);
                     numCertInCurrentFile++;
@@ -406,7 +419,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         processLogFile.delete();
 
         System.out.println(exportedText() + processLog.numProcessed()
-                + " certificates from tables CERT, CHASH and CRAW");
+                + " certificates from tables CERT");
     } // method exportCert0
 
     private void finalizeZip(ZipOutputStream zipOutStream, DbiXmlWriter certsType)

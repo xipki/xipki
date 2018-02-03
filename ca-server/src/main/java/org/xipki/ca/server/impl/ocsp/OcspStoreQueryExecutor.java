@@ -120,7 +120,7 @@ class OcspStoreQueryExecutor {
         str = variables.get("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
 
-        str = variables.get("CERTHASH.ALGO");
+        str = variables.get("CERTHASH_ALGO");
         this.certhashAlgo = HashAlgoType.getNonNullHashAlgoType(str);
     } // constructor
 
@@ -195,7 +195,8 @@ class OcspStoreQueryExecutor {
 
         try {
             // CERT
-            int idx = 2;
+            int idx = 1;
+            ps.setLong(idx++, certId);
             ps.setLong(idx++, currentTimeSeconds);
             ps.setString(idx++, serialNumber.toString(16));
             ps.setLong(idx++, notBeforeSeconds);

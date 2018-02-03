@@ -79,4 +79,8 @@ public class DbSchemaInfo {
         return variables.get(variableName);
     }
 
+    public void setVariable(String name, String value) {
+        variables.put(name, value);
+    }
+
 }
