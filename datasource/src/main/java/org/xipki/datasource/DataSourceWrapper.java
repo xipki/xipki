@@ -655,6 +655,30 @@ public abstract class DataSourceWrapper {
 
     public abstract String buildSelectFirstSql(int rows, String orderBy, String coreSql);
 
+    public <T> T getFirstValue(Connection conn, String table, String column, String criteria,
+            Class<T> type) throws DataAccessException {
+        final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                return rs.getObject(column, type);
+            } else {
+                return null;
+            }
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
+        } finally {
+            if (conn == null) {
+                releaseResources(stmt, rs);
+            } else {
+                releaseStatementAndResultSet(stmt, rs);
+            }
+        }
+    }
+
     public long getMin(Connection conn, String table, String column) throws DataAccessException {
         return getMin(conn, table, column, null);
     }
