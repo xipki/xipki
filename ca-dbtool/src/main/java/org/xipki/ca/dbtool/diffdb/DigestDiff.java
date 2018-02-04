@@ -36,15 +36,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.StopMe;
-import org.xipki.ca.dbtool.diffdb.io.DbSchemaType;
-import org.xipki.ca.dbtool.diffdb.io.TargetDigestRetriever;
-import org.xipki.ca.dbtool.diffdb.io.XipkiDbControl;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.HashAlgoType;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -52,11 +49,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class DbDigestDiff {
+class DigestDiff {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiff.class);
-
-    private final String refDirname;
+    private static final Logger LOG = LoggerFactory.getLogger(DigestDiff.class);
 
     private final DataSourceWrapper refDatasource;
 
@@ -64,7 +59,11 @@ public class DbDigestDiff {
 
     private final DataSourceWrapper targetDatasource;
 
-    private final XipkiDbControl targetDbControl;
+    private final DbControl refDbControl;
+
+    private final DbControl targetDbControl;
+
+    private final HashAlgoType certhashAlgo;
 
     private Set<byte[]> includeCaCerts;
 
@@ -76,27 +75,43 @@ public class DbDigestDiff {
 
     private final int numTargetThreads;
 
-    private DbDigestDiff(String refDir, DataSourceWrapper refDatasource,
+    public DigestDiff(DataSourceWrapper refDatasource,
             DataSourceWrapper targetDatasource, String reportDirName,
             boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
             int numThreads) throws IOException, DataAccessException {
-        if (refDir == null && refDatasource == null) {
-            throw new IllegalArgumentException("refDir and refDatasource must not be both null");
-        } else if (refDir != null && refDatasource != null) {
-            throw new IllegalArgumentException(
-                    "refDir and refDatasource must not be both non-null");
-        }
-
+        this.refDatasource = ParamUtil.requireNonNull("refDatasource", refDatasource);
         this.revokedOnly = revokedOnly;
-        this.refDirname = (refDir == null) ? null : IoUtil.expandFilepath(refDir);
-        this.refDatasource = refDatasource;
         this.targetDatasource = ParamUtil.requireNonNull("targetDatasource", targetDatasource);
         this.reportDirName = ParamUtil.requireNonNull("reportDirName", reportDirName);
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
         this.numPerSelect = ParamUtil.requireMin("numPerSelect", numPerSelect, 1);
 
-        DbSchemaType dbSchemaType = DbDigestExportWorker.detectDbSchemaType(targetDatasource);
-        this.targetDbControl = new XipkiDbControl(dbSchemaType);
+        this.refDbControl = detectDbControl(refDatasource);
+        this.targetDbControl = detectDbControl(targetDatasource);
+
+        if (refDbControl == DbControl.XIPKI_OCSP_v3) {
+            if (targetDbControl != DbControl.XIPKI_OCSP_v3) {
+                throw new IllegalArgumentException(
+                        "Could not compare refDataSource (CA) and targetDataSource (OCSP)");
+            }
+
+            HashAlgoType refAlgo = detectOcspDbCerthashAlgo(refDatasource);
+            HashAlgoType targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
+            if (refAlgo != targetAlgo) {
+                throw new IllegalArgumentException("Could not compare OCSP datasources with"
+                        + " different CERTHASH_ALGO: refDataSource (" + refAlgo
+                        + ") and targetDataSource (" + targetAlgo + ")");
+            }
+            this.certhashAlgo = refAlgo;
+        } else if (refDbControl == DbControl.XIPKI_CA_v3) {
+            if (targetDbControl == DbControl.XIPKI_OCSP_v3) {
+                this.certhashAlgo = detectOcspDbCerthashAlgo(targetDatasource);
+            } else{
+                this.certhashAlgo = HashAlgoType.SHA1;
+            }
+        } else {
+            throw new RuntimeException("should not reach here, unknown dbContro " + refDbControl);
+        }
 
         // number of threads
         this.numTargetThreads = Math.min(numThreads, targetDatasource.maximumPoolSize() - 1);
@@ -118,57 +133,46 @@ public class DbDigestDiff {
     public void diff() throws Exception {
         Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbControl);
 
-        if (refDirname != null) {
-            File refDir = new File(this.refDirname);
-            File[] childFiles = refDir.listFiles();
-            if (childFiles != null) {
-                for (File caDir : childFiles) {
-                    if (!caDir.isDirectory() || !caDir.getName().startsWith("ca-")) {
-                        continue;
-                    }
+        List<Integer> refCaIds = new LinkedList<>();
 
-                    String caDirPath = caDir.getPath();
-                    DigestReader refReader = new FileDigestReader(caDirPath, numPerSelect);
-                    diffSingleCa(refReader, caIdCertMap);
-                }
-            }
+        String refSql;
+        if (refDbControl == DbControl.XIPKI_OCSP_v3) {
+            refSql = "SELECT ID FROM ISSUER";
+        } else if (refDbControl == DbControl.XIPKI_CA_v3) {
+            refSql = "SELECT ID FROM CA";
         } else {
-            DbSchemaType refDbSchemaType = DbDigestExportWorker.detectDbSchemaType(refDatasource);
-            List<Integer> refCaIds = new LinkedList<>();
+            throw new RuntimeException("invalid refDbControl " + refDbControl);
+        }
 
-            XipkiDbControl refDbControl = new XipkiDbControl(refDbSchemaType);
-            String refSql = "SELECT ID FROM " + refDbControl.tblCa();
-
-            Statement refStmt = null;
+        Statement refStmt = null;
+        try {
+            refStmt = refDatasource.createStatement(refDatasource.getConnection());
+            ResultSet refRs = null;
             try {
-                refStmt = refDatasource.createStatement(refDatasource.getConnection());
-                ResultSet refRs = null;
-                try {
-                    refRs = refStmt.executeQuery(refSql);
-                    while (refRs.next()) {
-                        int id = refRs.getInt(1);
-                        refCaIds.add(id);
-                    }
-                } catch (SQLException ex) {
-                    throw refDatasource.translate(refSql, ex);
-                } finally {
-                    refDatasource.releaseResources(refStmt, refRs);
+                refRs = refStmt.executeQuery(refSql);
+                while (refRs.next()) {
+                    int id = refRs.getInt(1);
+                    refCaIds.add(id);
                 }
+            } catch (SQLException ex) {
+                throw refDatasource.translate(refSql, ex);
             } finally {
-                refDatasource.releaseResources(refStmt, null);
+                refDatasource.releaseResources(refStmt, refRs);
             }
+        } finally {
+            refDatasource.releaseResources(refStmt, null);
+        }
 
-            final int numBlocksToRead = (numTargetThreads * 3 / 2);
-            for (Integer refCaId : refCaIds) {
-                DigestReader refReader = XipkiDbDigestReader.getInstance(refDatasource,
-                        refDbSchemaType, refCaId, numBlocksToRead, numPerSelect,
-                        new StopMe(stopMe));
-                diffSingleCa(refReader, caIdCertMap);
-            }
+        final int numBlocksToRead = numTargetThreads * 3 / 2;
+        for (Integer refCaId : refCaIds) {
+            RefDigestReader refReader = RefDigestReader.getInstance(refDatasource,
+                    refDbControl, certhashAlgo, refCaId, numBlocksToRead, numPerSelect,
+                    new StopMe(stopMe));
+            diffSingleCa(refReader, caIdCertMap);
         }
     } // method diff
 
-    private void diffSingleCa(DigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
+    private void diffSingleCa(RefDigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
             throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.caCert();
         byte[] caCertBytes = caCert.getEncoded();
@@ -194,7 +198,7 @@ public class DbDigestDiff {
             caReportDir = new File(reportDirName, "ca-" + commonName + "-" + (idx++));
         }
 
-        DbDigestReporter reporter = new DbDigestReporter(caReportDir.getPath(), caCertBytes);
+        DigestDiffReporter reporter = new DigestDiffReporter(caReportDir.getPath(), caCertBytes);
 
         Integer caId = null;
         for (Integer i : caIdCertBytesMap.keySet()) {
@@ -220,8 +224,8 @@ public class DbDigestDiff {
             processLog.printHeader();
 
             target = new TargetDigestRetriever(revokedOnly, processLog, refReader, reporter,
-                    targetDatasource, targetDbControl, caId, numPerSelect, numTargetThreads,
-                    new StopMe(stopMe));
+                    targetDatasource, targetDbControl, certhashAlgo, caId, numPerSelect,
+                    numTargetThreads, new StopMe(stopMe));
 
             target.awaitTerminiation();
             processLog.printTrailer();
@@ -240,26 +244,18 @@ public class DbDigestDiff {
         }
     } // method diffSingleCa
 
-    public static DbDigestDiff getInstanceForDirRef(String refDirname,
-            DataSourceWrapper targetDatasource, String reportDirName, boolean revokedOnly,
-            AtomicBoolean stopMe, int numPerSelect, int numThreads)
-            throws IOException, DataAccessException {
-        return new DbDigestDiff(refDirname, null, targetDatasource, reportDirName, revokedOnly,
-                stopMe, numPerSelect, numThreads);
-    }
-
-    public static DbDigestDiff getInstanceForDbRef(DataSourceWrapper refDatasource,
-            DataSourceWrapper targetDatasource, String reportDirName,
-            boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
-            int numThreads) throws IOException, DataAccessException {
-        return new DbDigestDiff(null, refDatasource, targetDatasource, reportDirName, revokedOnly,
-                stopMe, numPerSelect, numThreads);
-    }
-
     private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource,
-            XipkiDbControl dbControl) throws DataAccessException {
+            DbControl dbControl) throws DataAccessException {
         // get a list of available CAs in the target database
-        String sql = "SELECT ID,CERT FROM " + dbControl.tblCa();
+        String sql = "SELECT ID,CERT FROM ";
+        if (dbControl == DbControl.XIPKI_CA_v3) {
+            sql += "CA";
+        } else if (dbControl == DbControl.XIPKI_OCSP_v3) {
+            sql += "ISSUER";
+        } else {
+            throw new IllegalArgumentException("unknown dbControl " + dbControl);
+        }
+
         Connection conn = datasource.getConnection();
         Statement stmt = datasource.createStatement(conn);
         Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
@@ -278,6 +274,30 @@ public class DbDigestDiff {
         }
 
         return caIdCertMap;
+    }
+
+    public static DbControl detectDbControl(DataSourceWrapper datasource)
+            throws DataAccessException {
+        Connection conn = datasource.getConnection();
+        try {
+            if (datasource.tableExists(conn, "CA")
+                    && datasource.tableExists(conn, "CRAW")) {
+                return DbControl.XIPKI_CA_v3;
+            } else if (datasource.tableExists(conn, "ISSUER")) {
+                return DbControl.XIPKI_OCSP_v3;
+            } else {
+                throw new IllegalArgumentException("unknown database schema");
+            }
+        } finally {
+            datasource.returnConnection(conn);
+        }
+    }
+
+    public static HashAlgoType detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
+            throws DataAccessException {
+        String str = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'",
+                String.class);
+        return HashAlgoType.getNonNullHashAlgoType(str);
     }
 
 }

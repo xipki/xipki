@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -39,9 +38,9 @@ import org.xipki.common.util.StringUtil;
  * @since 2.0.0
  */
 
-public class DbDigestReporter {
+class DigestDiffReporter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbDigestReporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DigestDiffReporter.class);
 
     private final String reportDirname;
 
@@ -67,7 +66,7 @@ public class DbDigestReporter {
 
     private AtomicInteger numError = new AtomicInteger(0);
 
-    public DbDigestReporter(String reportDirname, byte[] caCertBytes) throws IOException {
+    public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
         this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
         File dir = new File(reportDirname);
         dir.mkdirs();
@@ -110,7 +109,7 @@ public class DbDigestReporter {
         writeSerialNumberLine(unexpectedWriter, serialNumber);
     }
 
-    public void addDiff(DbDigestEntry refCert, DbDigestEntry targetCert) throws IOException {
+    public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
         ParamUtil.requireNonNull("refCert", refCert);
         ParamUtil.requireNonNull("targetCert", targetCert);
 

@@ -17,25 +17,34 @@
 
 package org.xipki.ca.dbtool.diffdb;
 
-import java.security.cert.X509Certificate;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 
-import org.xipki.ca.dbtool.diffdb.io.CertsBundle;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface DigestReader {
+class CertsBundle {
 
-    X509Certificate caCert();
+    private Map<BigInteger, DigestEntry> certs;
 
-    String caSubjectName();
+    private List<BigInteger> serialNumbers;
 
-    int totalAccount();
+    public CertsBundle(Map<BigInteger, DigestEntry> certs, List<BigInteger> serialNumbers) {
+        this.certs = ParamUtil.requireNonEmpty("certs", certs);
+        this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
+    }
 
-    CertsBundle nextCerts() throws Exception;
+    public Map<BigInteger, DigestEntry> certs() {
+        return certs;
+    }
 
-    void close();
+    public List<BigInteger> serialNumbers() {
+        return serialNumbers;
+    }
 
 }

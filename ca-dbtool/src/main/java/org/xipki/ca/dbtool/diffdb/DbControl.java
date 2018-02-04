@@ -15,17 +15,14 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.diffdb.io;
+package org.xipki.ca.dbtool.diffdb;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public enum DbSchemaType {
-
-    XIPKI_CA_v2,
-    XIPKI_OCSP_v2,
-    EJBCA_CA_v3;
-
+enum DbControl {
+    XIPKI_CA_v3,
+    XIPKI_OCSP_v3;
 }

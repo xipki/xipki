@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.diffdb.io;
+package org.xipki.ca.dbtool.diffdb;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,15 +27,15 @@ import org.xipki.common.QueueEntry;
  * @since 2.0.0
  */
 
-public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet> {
+class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
 
     private final long startId;
 
     private Exception exception;
 
-    private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
+    private List<IdentifiedDigestEntry> entries = new LinkedList<>();
 
-    public DigestDbEntrySet(long startId) {
+    public DigestEntrySet(long startId) {
         this.startId = startId;
     }
 
@@ -47,7 +47,7 @@ public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet
         return exception;
     }
 
-    public void addEntry(IdentifiedDbDigestEntry entry) {
+    public void addEntry(IdentifiedDigestEntry entry) {
         entries.add(entry);
     }
 
@@ -55,12 +55,12 @@ public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet
         return startId;
     }
 
-    public List<IdentifiedDbDigestEntry> entries() {
+    public List<IdentifiedDigestEntry> entries() {
         return entries;
     }
 
     @Override
-    public int compareTo(DigestDbEntrySet obj) {
+    public int compareTo(DigestEntrySet obj) {
         if (startId < obj.startId) {
             return -1;
         } else if (startId == obj.startId) {

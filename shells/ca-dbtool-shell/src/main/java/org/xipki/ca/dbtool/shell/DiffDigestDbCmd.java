@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.dbtool.diffdb.DbDigestDiffWorker;
+import org.xipki.ca.dbtool.diffdb.DigestDiffWorker;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.DirPathCompleter;
@@ -41,17 +41,10 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class DiffDigestDbCmd extends DbPortAction {
 
-    @Option(name = "--ref-db",
-            description = "database configuration file of the reference system\n"
-                    + "(one of --ref-db and--ref-dir must be specified)")
+    @Option(name = "--ref-db", required = true,
+            description = "database configuration file of the reference system\n(required)")
     @Completion(FilePathCompleter.class)
     private String refDbConf;
-
-    @Option(name = "--ref-dir",
-            description = "directory of exported digest files of the reference system\n"
-                    + "(one of --ref-db and--ref-dir must be specified)")
-    @Completion(DirPathCompleter.class)
-    private String refDir;
 
     @Option(name = "--target", required = true,
             description = "configuration file of the target database to be evaluated")
@@ -88,7 +81,7 @@ public class DiffDigestDbCmd extends DbPortAction {
             }
         }
 
-        return new DbDigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly, refDir,
+        return new DigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly,
                 refDbConf, dbconfFile, reportDir, numCertsPerSelect, numTargetThreads, caCerts);
     }
 

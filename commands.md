@@ -55,11 +55,7 @@ Feature xipki-database-tool (not started by default)
 
    * `ca:diff-digest-db`
 
-     diff digest XiPKI/EJBCA databas
-
-   * `ca:digest-db`
-
-     digest XiPKI/EJBCA database
+     diff digest XiPKI databases
 
    * `ca:export-ca`
 

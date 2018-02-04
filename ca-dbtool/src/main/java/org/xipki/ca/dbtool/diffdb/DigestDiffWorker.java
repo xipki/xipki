@@ -41,19 +41,17 @@ import org.xipki.password.PasswordResolverException;
  * @since 2.0.0
  */
 
-public class DbDigestDiffWorker extends DbPortWorker {
+public class DigestDiffWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DigestDiffWorker.class);
 
     private final boolean revokedOnly;
-
-    private final String refDirname;
 
     private final DataSourceWrapper refDatasource;
 
     private final Set<byte[]> includeCaCerts;
 
-    private final DataSourceWrapper datasource;
+    private final DataSourceWrapper targetDatasource;
 
     private final String reportDir;
 
@@ -61,23 +59,16 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
     private final int numThreads;
 
-    public DbDigestDiffWorker(DataSourceFactory datasourceFactory,
-            PasswordResolver passwordResolver, boolean revokedOnly, String refDirname,
-            String refDbConfFile, String dbConfFile, String reportDirName, int numCertsPerSelect,
-            int numThreads, Set<byte[]> includeCaCerts)
+    public DigestDiffWorker(DataSourceFactory datasourceFactory,
+            PasswordResolver passwordResolver, boolean revokedOnly,
+            String refDbConfFile, String targetDbConfFile, String reportDirName,
+            int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
             throws DataAccessException, PasswordResolverException, IOException {
-        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
-        this.reportDir = ParamUtil.requireNonBlank("reportDirName", reportDirName);
+        this.reportDir = reportDirName;
         this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
         this.numCertsPerSelect = numCertsPerSelect;
-        boolean validRef = (refDirname == null) ? (refDbConfFile != null) : (refDbConfFile == null);
-
-        if (!validRef) {
-            throw new IllegalArgumentException(
-                    "Exactly one of refDirname and refDbConffile must be not null");
-        }
-
         this.includeCaCerts = includeCaCerts;
+        this.revokedOnly = revokedOnly;
 
         File file = new File(reportDirName);
         if (!file.exists()) {
@@ -98,46 +89,34 @@ public class DbDigestDiffWorker extends DbPortWorker {
         }
 
         Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
-                passwordResolver);
+                new FileInputStream(IoUtil.expandFilepath(targetDbConfFile)));
+        this.targetDatasource = datasourceFactory.createDataSource(
+                "ds-" + targetDbConfFile, props, passwordResolver);
 
-        this.revokedOnly = revokedOnly;
-        if (refDirname != null) {
-            this.refDirname = refDirname;
-            this.refDatasource = null;
-        } else {
-            this.refDirname = null;
-            Properties refProps = DbPorter.getDbConfProperties(
-                    new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
-            this.refDatasource = datasourceFactory.createDataSource(
-                    "ds-" + refDbConfFile, refProps, passwordResolver);
-        }
-    } // constructor DbDigestDiffWorker
+        Properties refProps = DbPorter.getDbConfProperties(
+                new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
+        this.refDatasource = datasourceFactory.createDataSource(
+                "ds-" + refDbConfFile, refProps, passwordResolver);
+    } // constructor
 
     @Override
     protected void run0() throws Exception {
         long start = System.currentTimeMillis();
 
         try {
-            DbDigestDiff diff = (refDirname != null)
-                ? DbDigestDiff.getInstanceForDirRef(refDirname, datasource, reportDir,
-                        revokedOnly, stopMe, numCertsPerSelect, numThreads)
-                : DbDigestDiff.getInstanceForDbRef(refDatasource, datasource, reportDir,
-                        revokedOnly, stopMe, numCertsPerSelect, numThreads);
+            DigestDiff diff = new DigestDiff(refDatasource, targetDatasource,
+                    reportDir, revokedOnly, stopMe, numCertsPerSelect, numThreads);
             diff.setIncludeCaCerts(includeCaCerts);
             diff.diff();
         } finally {
-            if (refDatasource != null) {
-                try {
-                    refDatasource.close();
-                } catch (Throwable th) {
-                    LOG.error("refDatasource.close()", th);
-                }
+            try {
+                refDatasource.close();
+            } catch (Throwable th) {
+                LOG.error("refDatasource.close()", th);
             }
 
             try {
-                datasource.close();
+                targetDatasource.close();
             } catch (Throwable th) {
                 LOG.error("datasource.close()", th);
             }

@@ -15,11 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.diffdb.io;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
+package org.xipki.ca.dbtool.diffdb;
 
 import org.xipki.common.util.ParamUtil;
 
@@ -28,23 +24,33 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CertsBundle {
+class IdentifiedDigestEntry {
 
-    private Map<BigInteger, DbDigestEntry> certs;
+    private final DigestEntry content;
 
-    private List<BigInteger> serialNumbers;
+    private Integer caId;
 
-    public CertsBundle(Map<BigInteger, DbDigestEntry> certs, List<BigInteger> serialNumbers) {
-        this.certs = ParamUtil.requireNonEmpty("certs", certs);
-        this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
+    private final long id;
+
+    public IdentifiedDigestEntry(DigestEntry content, long id) {
+        this.content = ParamUtil.requireNonNull("content", content);
+        this.id = id;
     }
 
-    public Map<BigInteger, DbDigestEntry> certs() {
-        return certs;
+    public long id() {
+        return id;
     }
 
-    public List<BigInteger> serialNumbers() {
-        return serialNumbers;
+    public DigestEntry content() {
+        return content;
+    }
+
+    public void setCaId(Integer caId) {
+        this.caId = caId;
+    }
+
+    public Integer caId() {
+        return caId;
     }
 
 }

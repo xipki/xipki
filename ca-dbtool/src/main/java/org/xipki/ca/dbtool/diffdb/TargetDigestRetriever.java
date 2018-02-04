@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.diffdb.io;
+package org.xipki.ca.dbtool.diffdb;
 
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -34,20 +34,20 @@ import java.util.concurrent.TimeUnit;
 
 import org.xipki.ca.dbtool.DbToolBase;
 import org.xipki.ca.dbtool.StopMe;
-import org.xipki.ca.dbtool.diffdb.DbDigestReporter;
-import org.xipki.ca.dbtool.diffdb.DigestReader;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class TargetDigestRetriever {
+class TargetDigestRetriever {
 
     private class Retriever implements Runnable {
 
@@ -90,15 +90,15 @@ public class TargetDigestRetriever {
                 }
 
                 try {
-                    Map<BigInteger, DbDigestEntry> refCerts = bundle.certs();
-                    Map<BigInteger, DbDigestEntry> resp = query(bundle);
+                    Map<BigInteger, DigestEntry> refCerts = bundle.certs();
+                    Map<BigInteger, DigestEntry> resp = query(bundle);
 
                     List<BigInteger> serialNumbers = bundle.serialNumbers();
                     int size = serialNumbers.size();
 
                     for (BigInteger serialNumber : serialNumbers) {
-                        DbDigestEntry refCert = refCerts.get(serialNumber);
-                        DbDigestEntry targetCert = resp.get(serialNumber);
+                        DigestEntry refCert = refCerts.get(serialNumber);
+                        DigestEntry targetCert = resp.get(serialNumber);
 
                         if (revokedOnly) {
                             if (!refCert.isRevoked() && targetCert != null) {
@@ -130,7 +130,7 @@ public class TargetDigestRetriever {
             datasource.returnConnection(conn);
         } // method run
 
-        private Map<BigInteger, DbDigestEntry> query(CertsBundle bundle)
+        private Map<BigInteger, DigestEntry> query(CertsBundle bundle)
                 throws DataAccessException {
             List<BigInteger> serialNumbers = bundle.serialNumbers();
             int size = serialNumbers.size();
@@ -143,7 +143,9 @@ public class TargetDigestRetriever {
 
     } // class Retriever
 
-    private final XipkiDbControl dbControl;
+    private final DbControl dbControl;
+
+    private final HashAlgoType certhashAlgo;
 
     private final DataSourceWrapper datasource;
 
@@ -159,47 +161,78 @@ public class TargetDigestRetriever {
 
     private ExecutorService executor;
 
-    private final DigestReader reader;
+    private final RefDigestReader reader;
 
-    private final DbDigestReporter reporter;
+    private final DigestDiffReporter reporter;
 
     private final ProcessLog processLog;
 
     private final List<Retriever> retrievers;
 
-    public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog, DigestReader reader,
-            DbDigestReporter reporter, DataSourceWrapper datasource, XipkiDbControl dbControl,
+    public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog,
+            RefDigestReader reader, DigestDiffReporter reporter,
+            DataSourceWrapper datasource, DbControl dbControl, HashAlgoType certHashAlgo,
             int caId, int numPerSelect, int numThreads, StopMe stopMe) throws DataAccessException {
         this.processLog = ParamUtil.requireNonNull("processLog", processLog);
         this.numPerSelect = numPerSelect;
-        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
         this.reader = ParamUtil.requireNonNull("reader", reader);
         this.reporter = ParamUtil.requireNonNull("reporter", reporter);
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+        this.certhashAlgo = ParamUtil.requireNonNull("certhashAlgo", certHashAlgo);
 
-        StringBuilder buffer = new StringBuilder(200);
-        buffer.append("REV,RR,RT,RIT,");
-        buffer.append(dbControl.colCerthash());
-        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.tblCerthash());
-        buffer.append(" ON CERT.").append(dbControl.colCaId()).append('=').append(caId);
-        buffer.append(" AND CERT.SN=?");
-        buffer.append(" AND CERT.ID=").append(dbControl.tblCerthash()).append(".CID");
-
-        singleCertSql = datasource.buildSelectFirstSql(1, buffer.toString());
-
-        buffer = new StringBuilder(200);
-        buffer.append("SN,REV,RR,RT,RIT,");
-        buffer.append(dbControl.colCerthash());
-        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.tblCerthash());
-        buffer.append(" ON CERT.").append(dbControl.colCaId()).append('=').append(caId);
-        buffer.append(" AND CERT.SN IN (?");
-        for (int i = 1; i < numPerSelect; i++) {
-            buffer.append(",?");
+        if (dbControl == DbControl.XIPKI_OCSP_v3) {
+            String certHashAlgoInDb = datasource.getFirstValue(
+                    null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
+            if (certHashAlgo != HashAlgoType.getHashAlgoType(certHashAlgoInDb)) {
+                throw new IllegalArgumentException(
+                        "certHashAlgo in parameter (" + certHashAlgo + ") != in DB ("
+                        + certHashAlgoInDb + ")");
+            }
         }
-        buffer.append(") AND CERT.ID=").append(dbControl.tblCerthash());
-        buffer.append(".CID");
-        inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, buffer.toString());
+
+        StringBuilder singleBuffer = new StringBuilder(200);
+        StringBuilder arrayBuffer = new StringBuilder(200);
+
+        if (dbControl == DbControl.XIPKI_OCSP_v3) {
+            singleBuffer.append("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=")
+                .append(caId).append(" AND SN=?");
+
+            arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=")
+                .append(caId).append(" AND SN IN (?");
+            for (int i = 1; i < numPerSelect; i++) {
+                arrayBuffer.append(",?");
+            }
+            arrayBuffer.append(")");
+        } else if (dbControl == DbControl.XIPKI_CA_v3) {
+            String hashOrCertColumn;
+            if (certHashAlgo == HashAlgoType.SHA1) {
+                hashOrCertColumn = "SHA1";
+            } else {
+                hashOrCertColumn = "CERT";
+            }
+
+            singleBuffer.append("REV,RR,RT,RIT,")
+                .append(hashOrCertColumn)
+                .append(" FROM CERT INNER JOIN CRAW ON CERT.CA_ID=").append(caId)
+                .append(" AND CERT.SN=? AND CERT.ID=CRAW.CID");
+
+            arrayBuffer.append("SN,REV,RR,RT,RIT,")
+                .append(hashOrCertColumn)
+                .append(" FROM CERT INNER JOIN CRAW ON CERT.CA_ID=").append(caId)
+                .append(" AND CERT.SN IN (?");
+
+            for (int i = 1; i < numPerSelect; i++) {
+                arrayBuffer.append(",?");
+            }
+            arrayBuffer.append(") AND CERT.ID=CRAW.CID");
+        } else {
+            throw new IllegalArgumentException("unknown dbControl " + dbControl);
+        }
+
+        singleCertSql = datasource.buildSelectFirstSql(1, singleBuffer.toString());
+        inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, arrayBuffer.toString());
 
         retrievers = new ArrayList<>(numThreads);
 
@@ -225,13 +258,13 @@ public class TargetDigestRetriever {
         }
     }
 
-    private Map<BigInteger, DbDigestEntry> getCertsViaSingleSelectInB(
+    private Map<BigInteger, DigestEntry> getCertsViaSingleSelectInB(
             PreparedStatement singleSelectStmt, List<BigInteger> serialNumbers)
             throws DataAccessException {
-        Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
+        Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
         for (BigInteger serialNumber : serialNumbers) {
-            DbDigestEntry certB = getSingleCert(singleSelectStmt, serialNumber);
+            DigestEntry certB = getSingleCert(singleSelectStmt, serialNumber);
             if (certB != null) {
                 ret.put(serialNumber, certB);
             }
@@ -240,7 +273,7 @@ public class TargetDigestRetriever {
         return ret;
     }
 
-    private Map<BigInteger, DbDigestEntry> getCertsViaInArraySelectInB(
+    private Map<BigInteger, DigestEntry> getCertsViaInArraySelectInB(
             PreparedStatement batchSelectStmt, List<BigInteger> serialNumbers)
             throws DataAccessException {
         final int n = serialNumbers.size();
@@ -266,9 +299,9 @@ public class TargetDigestRetriever {
         }
     }
 
-    private Map<BigInteger, DbDigestEntry> buildResult(ResultSet rs, List<BigInteger> serialNumbers)
+    private Map<BigInteger, DigestEntry> buildResult(ResultSet rs, List<BigInteger> serialNumbers)
             throws SQLException {
-        Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
+        Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
         while (rs.next()) {
             BigInteger serialNumber = new BigInteger(rs.getString("SN"),
@@ -289,16 +322,17 @@ public class TargetDigestRetriever {
                     revInvTime = null;
                 }
             }
-            String sha1Fp = rs.getString(dbControl.colCerthash());
-            DbDigestEntry certB = new DbDigestEntry(serialNumber, revoked, revReason, revTime,
-                    revInvTime, sha1Fp);
+
+            String base64Certhash = getBase64HashValue(rs);
+            DigestEntry certB = new DigestEntry(serialNumber, revoked, revReason, revTime,
+                    revInvTime, base64Certhash);
             ret.put(serialNumber, certB);
         }
 
         return ret;
     }
 
-    private DbDigestEntry getSingleCert(PreparedStatement singleSelectStmt,
+    private DigestEntry getSingleCert(PreparedStatement singleSelectStmt,
             BigInteger serialNumber) throws DataAccessException {
         ResultSet rs = null;
         try {
@@ -319,8 +353,9 @@ public class TargetDigestRetriever {
                     revInvTime = null;
                 }
             }
-            String sha1Fp = rs.getString(dbControl.colCerthash());
-            return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
+            String base64CertHash = getBase64HashValue(rs);
+            return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime,
+                    base64CertHash);
         } catch (SQLException ex) {
             throw datasource.translate(singleCertSql, ex);
         } finally {
@@ -346,4 +381,17 @@ public class TargetDigestRetriever {
         }
     }
 
+    private String getBase64HashValue(ResultSet rs) throws SQLException {
+        if (dbControl == DbControl.XIPKI_OCSP_v3) {
+            return rs.getString("HASH");
+        } else { // if (dbControl == DbControl.XIPKI_CA_v3) {
+            if (certhashAlgo == HashAlgoType.SHA1) {
+                return rs.getString("SHA1");
+            } else {
+                String b64Cert = rs.getString("CERT");
+                byte[] encodedCert = Base64.decodeFast(b64Cert);
+                return certhashAlgo.base64Hash(encodedCert);
+            }
+        }
+    }
 }

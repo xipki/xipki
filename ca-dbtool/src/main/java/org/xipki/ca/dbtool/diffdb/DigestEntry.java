@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.diffdb.io;
+package org.xipki.ca.dbtool.diffdb;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -30,7 +28,7 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class DbDigestEntry {
+class DigestEntry {
 
     private final BigInteger serialNumber;
 
@@ -42,23 +40,16 @@ public class DbDigestEntry {
 
     private final Long revInvTime;
 
-    private final String base64Sha1;
+    private final String base64HashValue;
 
-    public DbDigestEntry(BigInteger serialNumber, boolean revoked, Integer revReason, Long revTime,
-            Long revInvTime, String sha1Fp) {
-        ParamUtil.requireNonNull("sha1Fp", sha1Fp);
+    public DigestEntry(BigInteger serialNumber, boolean revoked, Integer revReason, Long revTime,
+            Long revInvTime, String base64HashValue) {
+        ParamUtil.requireNonNull("base64HashValue", base64HashValue);
         if (revoked) {
             ParamUtil.requireNonNull("revReason", revReason);
             ParamUtil.requireNonNull("revTime", revTime);
         }
-
-        if (sha1Fp.length() == 28) {
-            this.base64Sha1 = sha1Fp;
-        } else if (sha1Fp.length() == 40) {
-            this.base64Sha1 = Base64.encodeToString(Hex.decode(sha1Fp));
-        } else {
-            throw new IllegalArgumentException("invalid sha1Fp '" + sha1Fp + "'");
-        }
+        this.base64HashValue = base64HashValue;
 
         this.serialNumber = serialNumber;
         this.revoked = revoked;
@@ -87,8 +78,8 @@ public class DbDigestEntry {
         return revInvTime;
     }
 
-    public String base64Sha1() {
-        return base64Sha1;
+    public String base64HashValue() {
+        return base64HashValue;
     }
 
     @Override
@@ -109,7 +100,7 @@ public class DbDigestEntry {
         if (withSerialNumber) {
             sb.append(serialNumber.toString(16)).append(";");
         }
-        sb.append(base64Sha1).append(";");
+        sb.append(base64HashValue).append(";");
         sb.append(revoked ? "1" : "0").append(";");
 
         if (revReason != null) {
@@ -129,7 +120,7 @@ public class DbDigestEntry {
         return sb.toString();
     }
 
-    public boolean contentEquals(DbDigestEntry obj) {
+    public boolean contentEquals(DigestEntry obj) {
         if (obj == null) {
             return false;
         }
@@ -154,14 +145,14 @@ public class DbDigestEntry {
             return false;
         }
 
-        if (!equals(base64Sha1, obj.base64Sha1)) {
+        if (!equals(base64HashValue, obj.base64HashValue)) {
             return false;
         }
 
         return true;
     } // method contentEquals
 
-    public static DbDigestEntry decode(String encoded) {
+    public static DigestEntry decode(String encoded) {
         ParamUtil.requireNonNull("encoded", encoded);
 
         List<Integer> indexes = getIndexes(encoded);
@@ -197,7 +188,7 @@ public class DbDigestEntry {
             }
         }
 
-        return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
+        return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
     } // method decode
 
     private static List<Integer> getIndexes(String encoded) {
