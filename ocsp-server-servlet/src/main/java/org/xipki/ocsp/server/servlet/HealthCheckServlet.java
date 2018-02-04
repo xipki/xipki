@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.ocsp.server.impl.OcspServer;
-import org.xipki.ocsp.server.impl.Responder;
+import org.xipki.ocsp.api.OcspServer;
+import org.xipki.ocsp.api.ResponderAndPath;
 
 /**
  * @author Lijun Liao
@@ -70,14 +70,14 @@ public class HealthCheckServlet extends HttpServlet {
             String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
                     req.getRequestURI());
 
-            Responder responder = server.getResponderForPath(path);
-            if (responder == null) {
+            ResponderAndPath responderAndPath = server.getResponderForPath(path);
+            if (responderAndPath == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 resp.setContentLength(0);
                 return;
             }
 
-            HealthCheckResult healthResult = server.healthCheck(responder);
+            HealthCheckResult healthResult = server.healthCheck(responderAndPath.responder());
             int status = healthResult.isHealthy()
                     ? HttpServletResponse.SC_OK
                     : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;

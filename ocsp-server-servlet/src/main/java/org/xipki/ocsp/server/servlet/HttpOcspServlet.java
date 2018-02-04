@@ -32,9 +32,10 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo;
-import org.xipki.ocsp.server.impl.OcspServer;
-import org.xipki.ocsp.server.impl.Responder;
+import org.xipki.ocsp.api.OcspRespWithCacheInfo;
+import org.xipki.ocsp.api.OcspServer;
+import org.xipki.ocsp.api.Responder;
+import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgoType;
 
 /**
@@ -45,6 +46,8 @@ import org.xipki.security.HashAlgoType;
 public class HttpOcspServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
+
+    private static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
     private static final long serialVersionUID = 1L;
 
@@ -67,8 +70,8 @@ public class HttpOcspServlet extends HttpServlet {
         try {
             String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
                     req.getRequestURI());
-            Responder responder = server.getResponderForPath(path);
-            if (responder == null) {
+            ResponderAndPath responderAndPath = server.getResponderForPath(path);
+            if (responderAndPath == null) {
                 sendError(resp, HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -80,9 +83,10 @@ public class HttpOcspServlet extends HttpServlet {
                 return;
             }
 
+            Responder responder = responderAndPath.responder();
             byte[] reqContent = IoUtil.read(req.getInputStream());
             // request too long
-            if (reqContent.length > responder.requestOption().maxRequestSize()) {
+            if (reqContent.length > responder.maxRequestSize()) {
                 sendError(resp, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
                 return;
             }
@@ -116,16 +120,16 @@ public class HttpOcspServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
-        Object[] objs = server.getServletPathAndResponderForPath(path);
-        if (objs == null) {
+        ResponderAndPath responderAndPath = server.getResponderForPath(path);
+        if (responderAndPath == null) {
             sendError(resp, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        String servletPath = (String) objs[0];
-        Responder responder = (Responder) objs[1];
+        String servletPath = responderAndPath.servletPath();
+        Responder responder = responderAndPath.responder();
 
-        if (!responder.requestOption().supportsHttpGet()) {
+        if (!responder.supportsHttpGet()) {
             sendError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
@@ -147,7 +151,7 @@ public class HttpOcspServlet extends HttpServlet {
         try {
             // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
             // POST, we support GET for longer requests anyway.
-            if (b64OcspReq.length() > responder.requestOption().maxRequestSize()) {
+            if (b64OcspReq.length() > responder.maxRequestSize()) {
                 sendError(resp, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
                 return;
             }
@@ -189,10 +193,10 @@ public class HttpOcspServlet extends HttpServlet {
 
                 // Max age must be in seconds in the cache-control header
                 long maxAge;
-                if (responder.responseOption().cacheMaxAge() != null) {
-                    maxAge = responder.responseOption().cacheMaxAge().longValue();
+                if (responder.cacheMaxAge() != null) {
+                    maxAge = responder.cacheMaxAge().longValue();
                 } else {
-                    maxAge = OcspServer.DFLT_CACHE_MAX_AGE;
+                    maxAge = DFLT_CACHE_MAX_AGE;
                 }
 
                 if (cacheInfo.nextUpdate() != null) {

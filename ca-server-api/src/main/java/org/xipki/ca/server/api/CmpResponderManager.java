@@ -15,21 +15,33 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.server.api;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 3.0.1
  */
 
-public interface ScepManager {
+public interface CmpResponderManager {
 
     /**
-     *
-     * @param name
-     *          Name of the SCEP. Must not be {@code null}.
-     * @return the SCEP with the given name.
+     * Returns the CA name for the alias {@code caAlias}.
+     * @param caAlias
+     *          CA alias. Must not be {@code null}.
+     * @return CA name for the given alias.
      */
-    ScepImpl getScepImpl(String name);
+    String getCaNameForAlias(String caAlias);
+
+    /**
+     * Returns the CMP responder for the CA {@code caName}.
+     * @param caName
+     *          CA name. Must not be {@code null}.
+     * @return the CMP responder for the given CA name.
+     */
+    X509CaCmpResponder getX509CaResponder(String caName);
+
+    Scep getScep(String name);
+
+    Rest getRest();
 
 }

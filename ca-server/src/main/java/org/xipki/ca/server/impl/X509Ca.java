@@ -98,6 +98,7 @@ import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
+import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.ca.server.impl.store.CertificateStore;

@@ -28,8 +28,8 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
 import org.xipki.http.servlet.SslReverseProxyMode;
-import org.xipki.ocsp.server.impl.OcspServer;
-import org.xipki.ocsp.server.impl.Responder;
+import org.xipki.ocsp.api.OcspServer;
+import org.xipki.ocsp.api.ResponderAndPath;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -80,12 +80,12 @@ public class HealthCheckServlet extends AbstractHttpServlet {
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }
 
-            Responder responder = server.getResponderForPath(servletUri.path());
-            if (responder == null) {
+            ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.path());
+            if (responderAndPath == null) {
                 return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
             }
 
-            HealthCheckResult healthResult = server.healthCheck(responder);
+            HealthCheckResult healthResult = server.healthCheck(responderAndPath.responder());
             HttpResponseStatus status = healthResult.isHealthy()
                     ? HttpResponseStatus.OK
                     : HttpResponseStatus.INTERNAL_SERVER_ERROR;

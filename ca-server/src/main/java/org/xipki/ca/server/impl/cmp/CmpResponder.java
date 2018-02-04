@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.server.impl.CaAuditConstants;
+import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.cmp.CmpUtil;

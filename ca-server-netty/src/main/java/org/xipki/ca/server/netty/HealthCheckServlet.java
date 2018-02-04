@@ -23,8 +23,8 @@ import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.impl.cmp.CmpResponderManager;
-import org.xipki.ca.server.impl.cmp.X509CaCmpResponder;
+import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.X509CaCmpResponder;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;

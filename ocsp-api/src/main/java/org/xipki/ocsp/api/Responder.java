@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ocsp.api;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface ScepManager {
+public interface Responder {
 
-    /**
-     *
-     * @param name
-     *          Name of the SCEP. Must not be {@code null}.
-     * @return the SCEP with the given name.
-     */
-    ScepImpl getScepImpl(String name);
+    int maxRequestSize();
 
+    boolean supportsHttpGet();
+
+    Long cacheMaxAge();
 }

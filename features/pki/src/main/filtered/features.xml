@@ -70,6 +70,7 @@
     <bundle start-level="80">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-server-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-server-netty/${project.version}</bundle>
   </feature>
@@ -100,11 +101,11 @@
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${xitk.version}" description="Audit">
-    <bundle start-level="80">mvn:org.xipki.tk/audit/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/audit/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${xitk.version}" description="Syslog audit">
     <feature>xipki-audit</feature>
-    <bundle start-level="80"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
-    <bundle start-level="80">mvn:org.xipki.tk/audit-syslog/${xitk.version}</bundle>
+    <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/audit-syslog/${xitk.version}</bundle>
   </feature>
 </features>

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl;
+package org.xipki.ocsp.api;
 
 /**
  * @author Lijun Liao
@@ -30,7 +30,7 @@ public class OcspRespWithCacheInfo {
 
         private Long nextUpdate;
 
-        ResponseCacheInfo(long thisUpdate) {
+        public ResponseCacheInfo(long thisUpdate) {
             this.thisUpdate = thisUpdate;
         }
 
@@ -52,7 +52,7 @@ public class OcspRespWithCacheInfo {
 
     private ResponseCacheInfo cacheInfo;
 
-    OcspRespWithCacheInfo(byte[] response, ResponseCacheInfo cacheInfo) {
+    public OcspRespWithCacheInfo(byte[] response, ResponseCacheInfo cacheInfo) {
         this.response = response;
         this.cacheInfo = cacheInfo;
     }

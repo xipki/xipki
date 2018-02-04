@@ -32,10 +32,15 @@ import org.xipki.common.util.ParamUtil;
 public class CertTemplateData {
 
     private final X500Name subject;
+
     private final SubjectPublicKeyInfo publicKeyInfo;
+
     private final Date notBefore;
+
     private final Date notAfter;
+
     private final String certprofileName;
+
     private final Extensions extensions;
 
     public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,

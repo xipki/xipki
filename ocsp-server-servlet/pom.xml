@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-server</artifactId>
+      <artifactId>ocsp-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -47,7 +47,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.CmpResponderEntryWrapper;
-import org.xipki.ca.server.impl.scep.Scep;
+import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
@@ -1798,7 +1798,7 @@ class CaManagerQueryExecutor {
         }
     } // method changeCrlSigner
 
-    Scep changeScep(String name, NameId caIdent, Boolean active, String responderType,
+    ScepImpl changeScep(String name, NameId caIdent, Boolean active, String responderType,
             String responderConf, String responderBase64Cert, Set<String> certProfiles,
             String control, CaManagerImpl caManager, final SecurityFactory securityFactory)
             throws CaMgmtException {
@@ -1873,7 +1873,7 @@ class CaManagerQueryExecutor {
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
-        Scep scep = new Scep(newDbEntry, caManager);
+        ScepImpl scep = new ScepImpl(newDbEntry, caManager);
         final String sql = sqlBuilder.toString();
         StringBuilder sb = new StringBuilder();
         PreparedStatement ps = null;

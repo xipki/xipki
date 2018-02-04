@@ -103,7 +103,8 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.X509CertWithDbId;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
-import org.xipki.ca.server.impl.CaAuditConstants;
+import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.X509CaCmpResponder;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.X509Ca;
@@ -136,7 +137,7 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-public class X509CaCmpResponder extends CmpResponder {
+public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpResponder {
 
     private class PendingPoolCleaner implements Runnable {
 
@@ -169,7 +170,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
     private static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
 
-    private static final Logger LOG = LoggerFactory.getLogger(X509CaCmpResponder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(X509CaCmpResponderImpl.class);
 
     private final PendingCertificatePool pendingCertPool;
 
@@ -183,7 +184,7 @@ public class X509CaCmpResponder extends CmpResponder {
         KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cacerts.getId());
     }
 
-    public X509CaCmpResponder(CaManagerImpl caManager, String caName) {
+    public X509CaCmpResponderImpl(CaManagerImpl caManager, String caName) {
         super(caManager.securityFactory());
 
         this.caManager = caManager;
@@ -231,6 +232,11 @@ public class X509CaCmpResponder extends CmpResponder {
 
         result.setHealthy(healthy);
         return result;
+    }
+
+    @Override
+    public String getCaName() {
+        return caName;
     }
 
     public String getResponderName() {

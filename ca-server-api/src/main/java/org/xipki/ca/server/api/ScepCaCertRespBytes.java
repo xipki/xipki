@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.server.api;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -35,11 +35,11 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CaCertRespBytes {
+public class ScepCaCertRespBytes {
 
     private final byte[] bytes;
 
-    CaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
+    public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
             throws CMSException, CertificateException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("responderCert", responderCert);

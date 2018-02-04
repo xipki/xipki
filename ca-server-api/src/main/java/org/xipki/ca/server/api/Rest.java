@@ -15,21 +15,17 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.server.api;
+
+import org.xipki.audit.AuditEvent;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 3.0.1
  */
 
-public interface ScepManager {
+public interface Rest {
 
-    /**
-     *
-     * @param name
-     *          Name of the SCEP. Must not be {@code null}.
-     * @return the SCEP with the given name.
-     */
-    ScepImpl getScepImpl(String name);
-
+    RestResponse service(String path, AuditEvent event, byte[] request,
+            HttpRequestMetadataRetriever httpRetriever);
 }

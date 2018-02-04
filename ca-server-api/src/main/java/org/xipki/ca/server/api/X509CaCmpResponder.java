@@ -15,21 +15,28 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.server.api;
+
+import java.security.cert.X509Certificate;
+
+import org.bouncycastle.asn1.cmp.PKIMessage;
+import org.xipki.audit.AuditEvent;
+import org.xipki.common.HealthCheckResult;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 3.0.1
  */
 
-public interface ScepManager {
+public interface X509CaCmpResponder {
 
-    /**
-     *
-     * @param name
-     *          Name of the SCEP. Must not be {@code null}.
-     * @return the SCEP with the given name.
-     */
-    ScepImpl getScepImpl(String name);
+    boolean isOnService();
+
+    HealthCheckResult healthCheck();
+
+    PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
+            AuditEvent event);
+
+    String getCaName();
 
 }

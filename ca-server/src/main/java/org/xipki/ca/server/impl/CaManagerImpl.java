@@ -82,13 +82,17 @@ import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.x509.X509CertPublisher;
 import org.xipki.ca.api.publisher.x509.X509CertPublisherFactoryRegister;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
+import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.Rest;
+import org.xipki.ca.server.api.Scep;
 import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.CmpResponderEntryWrapper;
-import org.xipki.ca.server.impl.cmp.CmpResponderManager;
-import org.xipki.ca.server.impl.cmp.X509CaCmpResponder;
+import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
 import org.xipki.ca.server.impl.ocsp.OcspCertPublisher;
-import org.xipki.ca.server.impl.scep.Scep;
+import org.xipki.ca.server.impl.rest.RestImpl;
+import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.scep.ScepManager;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
@@ -304,7 +308,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private final Map<String, X509CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
-    private final Map<String, Scep> sceps = new ConcurrentHashMap<>();
+    private final Map<String, ScepImpl> sceps = new ConcurrentHashMap<>();
 
     private final Map<String, ScepEntry> scepDbEntries = new ConcurrentHashMap<>();
 
@@ -323,11 +327,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    private final Map<String, X509CaCmpResponder> x509Responders = new ConcurrentHashMap<>();
+    private final Map<String, X509CaCmpResponderImpl> x509Responders = new ConcurrentHashMap<>();
 
     private final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
 
     private final DataSourceFactory datasourceFactory;
+
+    private final RestImpl rest;
 
     private String caConfFile;
 
@@ -400,6 +406,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         this.lockInstanceId = (hostAddress == null) ? calockId : hostAddress + "/" + calockId;
+        this.rest = new RestImpl(this);
     } // constructor
 
     public SecurityFactory securityFactory() {
@@ -847,7 +854,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         x509cas.put(caName, ca);
-        X509CaCmpResponder caResponder = new X509CaCmpResponder(this, caName);
+        X509CaCmpResponderImpl caResponder = new X509CaCmpResponderImpl(this, caName);
         x509Responders.put(caName, caResponder);
 
         return true;
@@ -901,7 +908,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method shutdown
 
     @Override
-    public X509CaCmpResponder getX509CaResponder(String name) {
+    public X509CaCmpResponderImpl getX509CaResponder(String name) {
         ParamUtil.requireNonBlank("name", name);
         return x509Responders.get(name.toUpperCase());
     }
@@ -1211,7 +1218,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             scepDbEntries.put(name, scepDb);
 
             try {
-                Scep scep = new Scep(scepDb, this);
+                ScepImpl scep = new ScepImpl(scepDb, this);
                 scepDb.setConfFaulty(false);
                 sceps.put(name, scep);
             } catch (CaMgmtException ex) {
@@ -2905,7 +2912,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         dbEntry.caIdent().setId(caIdent.id());
 
-        Scep scep = new Scep(dbEntry, this);
+        ScepImpl scep = new ScepImpl(dbEntry, this);
         boolean bo = queryExecutor.addScep(dbEntry);
         if (bo) {
             final String name = dbEntry.name();
@@ -2952,7 +2959,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         }
 
-        Scep scep = queryExecutor.changeScep(name, caId, active, type, conf, base64Cert,
+        ScepImpl scep = queryExecutor.changeScep(name, caId, active, type, conf, base64Cert,
                 scepEntry.certProfiles(), control, this, securityFactory);
         if (scep == null) {
             return false;
@@ -2973,6 +2980,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public Scep getScep(String name) {
+        ParamUtil.requireNonBlank("name", name);
+        return (sceps == null) ? null : sceps.get(name.toUpperCase());
+    }
+
+    @Override
+    public ScepImpl getScepImpl(String name) {
         ParamUtil.requireNonBlank("name", name);
         return (sceps == null) ? null : sceps.get(name.toUpperCase());
     }
@@ -3889,6 +3902,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             ret.getStr().add(str);
         }
         return ret;
+    }
+
+    @Override
+    public Rest getRest() {
+        return rest;
     }
 
 }

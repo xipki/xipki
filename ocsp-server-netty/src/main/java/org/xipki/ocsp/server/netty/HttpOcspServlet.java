@@ -30,9 +30,10 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
 import org.xipki.http.servlet.SslReverseProxyMode;
-import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo;
-import org.xipki.ocsp.server.impl.OcspServer;
-import org.xipki.ocsp.server.impl.Responder;
+import org.xipki.ocsp.api.OcspRespWithCacheInfo;
+import org.xipki.ocsp.api.OcspServer;
+import org.xipki.ocsp.api.Responder;
+import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgoType;
 
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -50,6 +51,8 @@ import io.netty.handler.codec.http.HttpVersion;
 public class HttpOcspServlet extends AbstractHttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
+
+    private static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
     private static final String CT_REQUEST = "application/ocsp-request";
 
@@ -90,8 +93,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
         HttpVersion version = request.protocolVersion();
 
-        Responder responder = server.getResponderForPath(servletUri.path());
-        if (responder == null) {
+        ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.path());
+        if (responderAndPath == null) {
             return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
         }
 
@@ -102,9 +105,11 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
             }
 
+            Responder responder = responderAndPath.responder();
+
             int contentLen = request.content().readableBytes();
             // request too long
-            if (contentLen > responder.requestOption().maxRequestSize()) {
+            if (contentLen > responder.maxRequestSize()) {
                 return createErrorResponse(version,
                         HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
             }
@@ -132,16 +137,16 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
         HttpVersion version = request.protocolVersion();
 
-        Object[] objs = server.getServletPathAndResponderForPath(servletUri.path());
-        if (objs == null) {
+        ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.path());
+        if (responderAndPath == null) {
             return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
         }
 
         String path = servletUri.path();
-        String servletPath = (String) objs[0];
-        Responder responder = (Responder) objs[1];
+        String servletPath = responderAndPath.servletPath();
+        Responder responder = responderAndPath.responder();
 
-        if (!responder.requestOption().supportsHttpGet()) {
+        if (!responder.supportsHttpGet()) {
             return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
         }
 
@@ -161,7 +166,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         try {
             // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
             // POST, we support GET for longer requests anyway.
-            if (b64OcspReq.length() > responder.requestOption().maxRequestSize()) {
+            if (b64OcspReq.length() > responder.maxRequestSize()) {
                 return createErrorResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
             }
 
@@ -201,11 +206,12 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                         .toString());
 
                 // Max age must be in seconds in the cache-control header
+
                 long maxAge;
-                if (responder.responseOption().cacheMaxAge() != null) {
-                    maxAge = responder.responseOption().cacheMaxAge().longValue();
+                if (responder.cacheMaxAge() != null) {
+                    maxAge = responder.cacheMaxAge().longValue();
                 } else {
-                    maxAge = OcspServer.DFLT_CACHE_MAX_AGE;
+                    maxAge = DFLT_CACHE_MAX_AGE;
                 }
 
                 if (cacheInfo.nextUpdate() != null) {

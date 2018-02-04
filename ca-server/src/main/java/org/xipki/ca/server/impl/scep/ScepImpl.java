@@ -58,8 +58,10 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
+import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.Scep;
+import org.xipki.ca.server.api.ScepCaCertRespBytes;
 import org.xipki.ca.server.impl.ByUserRequestorInfo;
-import org.xipki.ca.server.impl.CaAuditConstants;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.KnowCertResult;
@@ -104,9 +106,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  *
  */
-public class Scep {
+public class ScepImpl implements Scep {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Scep.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScepImpl.class);
 
     private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
@@ -134,7 +136,7 @@ public class Scep {
 
     private X509Cert caCert;
 
-    private CaCertRespBytes caCertRespBytes;
+    private ScepCaCertRespBytes caCertRespBytes;
 
     private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
@@ -150,7 +152,7 @@ public class Scep {
         AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
     }
 
-    public Scep(ScepEntry dbEntry, CaManagerImpl caManager) throws CaMgmtException {
+    public ScepImpl(ScepEntry dbEntry, CaManagerImpl caManager) throws CaMgmtException {
         this.caManager = ParamUtil.requireNonNull("caManager", caManager);
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         this.name = dbEntry.name();
@@ -231,17 +233,29 @@ public class Scep {
         return caCaps;
     }
 
-    public CaCertRespBytes caCertResp() throws OperationException {
+    public ScepCaCertRespBytes caCertResp() throws OperationException {
         refreshCa();
         return caCertRespBytes;
     }
 
-    public boolean supportsCertProfile(String profileName) throws CaMgmtException {
+    public boolean supportsCertProfile(String profileName) {
         if (certProfiles.contains("ALL") || certProfiles.contains(profileName.toUpperCase())) {
-            return caManager.x509Ca(caIdent).supportsCertProfile(profileName);
+            X509Ca ca;
+            try {
+                ca = caManager.x509Ca(caIdent);
+            } catch (CaMgmtException ex) {
+                LogUtil.warn(LOG, ex);
+                return false;
+            }
+            return ca.supportsCertProfile(profileName);
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isOnService() {
+        return status() == CaStatus.ACTIVE;
     }
 
     public CaStatus status() {
@@ -770,7 +784,7 @@ public class Scep {
             }
 
             caCert = currentCaCert;
-            caCertRespBytes = new CaCertRespBytes(currentCaCert.cert(), responderCert);
+            caCertRespBytes = new ScepCaCertRespBytes(currentCaCert.cert(), responderCert);
         } catch (CaMgmtException | CertificateException | CMSException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }

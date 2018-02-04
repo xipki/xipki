@@ -52,6 +52,7 @@
     <module>ca-qa</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
+    <module>ca-server-api</module>
     <module>ca-server</module>
     <module>ca-server-netty</module>
     <module>ca-server-servlet</module>

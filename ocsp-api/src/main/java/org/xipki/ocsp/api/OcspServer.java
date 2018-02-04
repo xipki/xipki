@@ -15,29 +15,22 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.cmp;
+package org.xipki.ocsp.api;
+
+import java.io.UnsupportedEncodingException;
+
+import org.xipki.common.HealthCheckResult;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface CmpResponderManager {
+public interface OcspServer {
 
-    /**
-     * Returns the CA name for the alias {@code caAlias}.
-     * @param caAlias
-     *          CA alias. Must not be {@code null}.
-     * @return CA name for the given alias.
-     */
-    String getCaNameForAlias(String caAlias);
+    ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException;
 
-    /**
-     * Returns the CMP responder for the CA {@code caName}.
-     * @param caName
-     *          CA name. Must not be {@code null}.
-     * @return the CMP responder for the given CA name.
-     */
-    X509CaCmpResponder getX509CaResponder(String caName);
+    OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet);
 
+    HealthCheckResult healthCheck(Responder responder);
 }

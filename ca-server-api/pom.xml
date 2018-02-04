@@ -8,19 +8,29 @@
     <artifactId>xipki-parent</artifactId>
     <version>3.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-server-netty</artifactId>
+  <artifactId>ca-server-api</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ca-server-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xipki.tk</groupId>
+      <artifactId>security</artifactId>
+      <version>${xitk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.tk</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>audit</artifactId>
       <version>${xitk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-api</artifactId>
+      <version>${xitk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.scep</groupId>
+      <artifactId>scep-common</artifactId>
+      <version>${xiscep.version}</version>
     </dependency>
   </dependencies>
 </project>

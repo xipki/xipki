@@ -38,10 +38,9 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.server.impl.CaAuditConstants;
-import org.xipki.ca.server.impl.CaManagerImpl;
-import org.xipki.ca.server.impl.scep.Scep;
-import org.xipki.ca.server.mgmt.api.CaStatus;
+import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.Scep;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.RandomUtil;
@@ -77,7 +76,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
 
     private AuditServiceRegister auditServiceRegister;
 
-    private CaManagerImpl responderManager;
+    private CmpResponderManager responderManager;
 
     public HttpScepServlet() {
     }
@@ -145,7 +144,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
             }
 
             Scep responder = responderManager.getScep(scepName);
-            if (responder == null || responder.status() != CaStatus.ACTIVE
+            if (responder == null || !responder.isOnService()
                     || !responder.supportsCertProfile(certProfileName)) {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
                 LOG.warn(auditMessage);
@@ -280,7 +279,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
         }
     } // method generatePKIMessage
 
-    public void setResponderManager(CaManagerImpl responderManager) {
+    public void setResponderManager(CmpResponderManager responderManager) {
         this.responderManager = responderManager;
     }
 

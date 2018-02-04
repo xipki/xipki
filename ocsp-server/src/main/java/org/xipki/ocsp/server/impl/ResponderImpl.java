@@ -21,13 +21,14 @@ import java.util.List;
 
 import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.OcspStore;
+import org.xipki.ocsp.api.Responder;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Responder {
+public class ResponderImpl implements Responder {
 
     private final ResponderOption responderOption;
 
@@ -39,7 +40,7 @@ public class Responder {
 
     private final List<OcspStore> stores;
 
-    Responder(ResponderOption responderOption, RequestOption requestOption,
+    ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
             ResponseOption responseOption, ResponderSigner signer, List<OcspStore> stores) {
         this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
         this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
@@ -66,6 +67,21 @@ public class Responder {
 
     public List<OcspStore> stores() {
         return stores;
+    }
+
+    @Override
+    public int maxRequestSize() {
+        return requestOption.maxRequestSize();
+    }
+
+    @Override
+    public boolean supportsHttpGet() {
+        return requestOption.supportsHttpGet();
+    }
+
+    @Override
+    public Long cacheMaxAge() {
+        return responseOption.cacheMaxAge();
     }
 
 }

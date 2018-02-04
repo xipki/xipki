@@ -75,10 +75,14 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.OcspMode;
+import org.xipki.ocsp.api.OcspRespWithCacheInfo;
+import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
+import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
-import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
+import org.xipki.ocsp.api.Responder;
+import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.impl.jaxb.DatasourceType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.FileOrPlainValueType;
@@ -120,7 +124,7 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-public class OcspServer {
+public class OcspServerImpl implements OcspServer {
 
     private static class SizeComparableString implements Comparable<SizeComparableString> {
 
@@ -183,7 +187,7 @@ public class OcspServer {
 
     private OcspStoreFactoryRegister ocspStoreFactoryRegister;
 
-    private Map<String, Responder> responders = new HashMap<>();
+    private Map<String, ResponderImpl> responders = new HashMap<>();
 
     private Map<String, ResponderSigner> signers = new HashMap<>();
 
@@ -195,7 +199,7 @@ public class OcspServer {
 
     private List<String> servletPaths = new ArrayList<>();
 
-    private Map<String, Responder> path2responderMap = new HashMap<>();
+    private Map<String, ResponderImpl> path2responderMap = new HashMap<>();
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -224,7 +228,7 @@ public class OcspServer {
         extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
     }
 
-    public OcspServer() {
+    public OcspServerImpl() {
         this.datasourceFactory = new DataSourceFactory();
     }
 
@@ -236,26 +240,17 @@ public class OcspServer {
         this.confFile = confFile;
     }
 
-    public Responder getResponderForPath(String path) throws UnsupportedEncodingException {
+    @Override
+    public ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException {
         for (String servletPath : servletPaths) {
             if (path.startsWith(servletPath)) {
-                return path2responderMap.get(servletPath);
+                return new ResponderAndPath(servletPath, path2responderMap.get(servletPath));
             }
         }
         return null;
     }
 
-    public Object[] getServletPathAndResponderForPath(String path)
-            throws UnsupportedEncodingException {
-        for (String servletPath : servletPaths) {
-            if (path.startsWith(servletPath)) {
-                return new Object[]{servletPath, path2responderMap.get(servletPath)};
-            }
-        }
-        return null;
-    }
-
-    public Responder getResponder(String name) {
+    public ResponderImpl getResponder(String name) {
         ParamUtil.requireNonBlank("name", name);
         return responders.get(name);
     }
@@ -502,7 +497,7 @@ public class OcspServer {
                 }
             }
 
-            Responder responder = new Responder(option,
+            ResponderImpl responder = new ResponderImpl(option,
                     requestOptions.get(option.requestOptionName()),
                     responseOption, signer, statusStores);
             responders.put(name, responder);
@@ -511,7 +506,7 @@ public class OcspServer {
         // servlet paths
         List<SizeComparableString> tmpList = new LinkedList<>();
         for (String name : responderOptions.keySet()) {
-            Responder responder = responders.get(name);
+            ResponderImpl responder = responders.get(name);
             ResponderOption option = responderOptions.get(name);
             List<String> strs = option.servletPaths();
             for (String path : strs) {
@@ -545,7 +540,9 @@ public class OcspServer {
         }
     }
 
-    public OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet) {
+    @Override
+    public OcspRespWithCacheInfo answer(Responder responder2, byte[] request, boolean viaGet) {
+        ResponderImpl responder = (ResponderImpl) responder2;
         RequestOption reqOpt = responder.requestOption();
 
         int version;
@@ -779,7 +776,7 @@ public class OcspServer {
     } // method ask
 
     private OcspRespWithCacheInfo processCertReq(CertID certId,
-            OCSPRespBuilder builder, Responder responder, RequestOption reqOpt,
+            OCSPRespBuilder builder, ResponderImpl responder, RequestOption reqOpt,
             ResponseOption repOpt, OcspRespControl repControl) throws IOException {
         HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
         if (!reqOpt.allows(reqHashAlgo)) {
@@ -911,7 +908,9 @@ public class OcspServer {
         return null;
     }
 
-    public HealthCheckResult healthCheck(Responder responder) {
+    @Override
+    public HealthCheckResult healthCheck(Responder responder2) {
+        ResponderImpl responder = (ResponderImpl) responder2;
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
         boolean healthy = true;
 
@@ -1207,7 +1206,7 @@ public class OcspServer {
             SchemaFactory schemaFact = SchemaFactory.newInstance(
                     javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFact.newSchema(
-                    OcspServer.class.getResource("/xsd/ocsp-conf.xsd"));
+                    OcspServerImpl.class.getResource("/xsd/ocsp-conf.xsd"));
             unmarshaller.setSchema(schema);
             return (OCSPServer) unmarshaller.unmarshal(
                     new File(IoUtil.expandFilepath(confFilename)));

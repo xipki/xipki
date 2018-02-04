@@ -32,9 +32,9 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.server.impl.CaAuditConstants;
-import org.xipki.ca.server.impl.cmp.CmpResponderManager;
-import org.xipki.ca.server.impl.cmp.X509CaCmpResponder;
+import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.X509CaCmpResponder;
 import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
@@ -131,7 +131,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_ca, responder.getCa().caIdent().name());
+            event.addEventData(CaAuditConstants.NAME_ca, responder.getCaName());
 
             byte[] reqContent = readContent(request);
             PKIMessage pkiReq;

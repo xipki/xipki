@@ -33,7 +33,7 @@ import org.xipki.ca.api.X509CertWithDbId;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.x509.X509CertPublisher;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
-import org.xipki.ca.server.impl.CaAuditConstants;
+import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;

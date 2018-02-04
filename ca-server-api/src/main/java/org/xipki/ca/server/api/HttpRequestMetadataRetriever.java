@@ -15,21 +15,22 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.server.api;
+
+import java.io.IOException;
+import java.security.cert.X509Certificate;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 3.0.1
  */
 
-public interface ScepManager {
+public interface HttpRequestMetadataRetriever {
 
-    /**
-     *
-     * @param name
-     *          Name of the SCEP. Must not be {@code null}.
-     * @return the SCEP with the given name.
-     */
-    ScepImpl getScepImpl(String name);
+    String getHeader(String headerName);
+
+    String getParameter(String paramName);
+
+    X509Certificate getTlsClientCert() throws IOException;
 
 }

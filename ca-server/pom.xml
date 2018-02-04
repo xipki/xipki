@@ -11,10 +11,12 @@
   <artifactId>ca-server</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <Export-Package>org.xipki.ca.server.impl,org.xipki.ca.server.impl.*</Export-Package>
-  </properties>
   <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-server-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ca-mgmt-api</artifactId>

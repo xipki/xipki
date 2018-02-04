@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+  <cm:property-placeholder persistent-id="org.xipki.ca.server" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
+
+  <reference id="auditServiceRegister"
+      interface="org.xipki.audit.AuditServiceRegister"/>
+
+  <reference id="x509CertProfileFactoryRegister"
+      interface="org.xipki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
+
+  <reference id="x509CertPublisherFactoryRegister"
+      interface="org.xipki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
+
+  <bean id="caManager" class="org.xipki.ca.server.impl.CaManagerImpl"
+      init-method="startCaSystem" destroy-method="shutdown">
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="caConfFile" value="${caConfFile}"/>
+    <property name="auditServiceRegister" ref="auditServiceRegister"/>
+    <property name="x509CertProfileFactoryRegister" ref="x509CertProfileFactoryRegister"/>
+    <property name="x509CertPublisherFactoryRegister" ref="x509CertPublisherFactoryRegister"/>
+  </bean>
+
+  <service ref="caManager">
+    <interfaces>
+      <value>org.xipki.ca.server.mgmt.api.CaManager</value>
+      <value>org.xipki.ca.server.api.CmpResponderManager</value>
+    </interfaces>
+  </service>
+</blueprint>
