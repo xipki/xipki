@@ -36,7 +36,7 @@ import io.netty.util.CharsetUtil;
  * @since 2.1.0
  */
 
-class ClientCertCache {
+public class ClientCertCache {
     private static CertificateFactory cf;
 
     static {
