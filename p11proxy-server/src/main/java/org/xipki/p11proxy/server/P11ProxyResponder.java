@@ -33,9 +33,9 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.security.exception.BadAsn1ObjectException;
@@ -391,7 +391,7 @@ class P11ProxyResponder {
             }
         } catch (BadAsn1ObjectException ex) {
             LogUtil.error(LOG, ex, "could not process decode requested content (tid="
-                    + Hex.toHexString(transactionId) + ")");
+                    + Hex.encodeToString(transactionId) + ")");
             return getResp(version, transactionId, action, P11ProxyConstants.RC_BAD_REQUEST);
         } catch (P11TokenException ex) {
             LogUtil.error(LOG, ex, buildErrorMsg(action, transactionId));
@@ -418,7 +418,7 @@ class P11ProxyResponder {
 
     private static String buildErrorMsg(short action, byte[] transactionId) {
         return "could not process action " + P11ProxyConstants.getActionName(action)
-                + " (tid=" + Hex.toHexString(transactionId) + ")";
+                + " (tid=" + Hex.encodeToString(transactionId) + ")";
     }
 
     private P11Slot getSlot(P11CryptService p11Service, Asn1P11EntityIdentifier entityId)
