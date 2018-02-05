@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.db;
+package org.xipki.ocsp.api;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;

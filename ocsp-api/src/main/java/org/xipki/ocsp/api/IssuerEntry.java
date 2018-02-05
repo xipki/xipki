@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.db;
+package org.xipki.ocsp.api;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
@@ -28,7 +28,6 @@ import java.util.Map;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
