@@ -87,7 +87,6 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -149,6 +148,7 @@ import org.xipki.ca.qa.internal.QaTlsFeature;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ExtensionExistence;
@@ -2483,7 +2483,7 @@ public class ExtensionsChecker {
     }
 
     private static String hex(byte[] bytes) {
-        return Hex.toHexString(bytes);
+        return Hex.encodeToString(bytes);
     }
 
     private static Set<String> strInBnotInA(Collection<String> collectionA,

@@ -57,7 +57,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.HealthCheckResult;
@@ -65,6 +64,7 @@ import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.TripleState;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -888,7 +888,7 @@ public class OcspServerImpl implements OcspServer {
             sb.append("thisUpdate: ").append(thisUpdate).append(", ");
             sb.append("nextUpdate: ").append(nextUpdate);
             if (certHash != null) {
-                sb.append(", certHash: ").append(Hex.toHexString(certHash).toUpperCase());
+                sb.append(", certHash: ").append(Hex.encodeUpperToString(certHash));
             }
             LOG.debug(sb.toString());
         }

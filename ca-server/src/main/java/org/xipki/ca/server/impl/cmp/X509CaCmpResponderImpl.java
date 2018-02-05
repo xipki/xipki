@@ -92,7 +92,6 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -122,6 +121,7 @@ import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.DateUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -1045,7 +1045,8 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             if (certInfo == null) {
                 if (LOG.isWarnEnabled()) {
                     LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
-                            transactionId, certReqId.getPositiveValue(), Hex.toHexString(certHash));
+                            transactionId, certReqId.getPositiveValue(),
+                            Hex.encodeToString(certHash));
                 }
                 continue;
             }

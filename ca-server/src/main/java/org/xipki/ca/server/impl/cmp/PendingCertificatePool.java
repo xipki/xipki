@@ -24,9 +24,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
 
@@ -84,7 +84,7 @@ class PendingCertificatePool {
             return;
         }
 
-        String hexTid = Hex.toHexString(transactionId);
+        String hexTid = Hex.encodeToString(transactionId);
         MyEntry myEntry = new MyEntry(certReqId, waitForConfirmTill, certInfo);
         synchronized (map) {
             Set<MyEntry> entries = map.get(hexTid);
@@ -102,7 +102,7 @@ class PendingCertificatePool {
         ParamUtil.requireNonNull("certReqId", certReqId);
         ParamUtil.requireNonNull("certHash", certHash);
 
-        String hexTid = Hex.toHexString(transactionId);
+        String hexTid = Hex.encodeToString(transactionId);
         MyEntry retEntry = null;
 
         synchronized (map) {
@@ -135,7 +135,7 @@ class PendingCertificatePool {
     Set<X509CertificateInfo> removeCertificates(byte[] transactionId) {
         ParamUtil.requireNonNull("transactionId", transactionId);
 
-        String hexId = Hex.toHexString(transactionId);
+        String hexId = Hex.encodeToString(transactionId);
         Set<MyEntry> entries;
         synchronized  (map) {
             entries = map.remove(hexId);
