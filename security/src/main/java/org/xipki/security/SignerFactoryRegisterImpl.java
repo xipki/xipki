@@ -29,11 +29,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Base64;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -285,7 +285,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                 ? slot.getObjectIdForId(keyId)
                 : slot.getObjectIdForLabel(keyLabel);
         if (p11ObjId == null) {
-            String str2 = (keyId != null) ? "id " + Hex.toHexString(keyId) : "label " + keyLabel;
+            String str2 = (keyId != null) ? "id " + Hex.encodeToString(keyId) : "label " + keyLabel;
             throw new ObjectCreationException("cound not find identity with " + str2);
         }
         P11EntityIdentifier entityId = new P11EntityIdentifier(slot.slotId(), p11ObjId);

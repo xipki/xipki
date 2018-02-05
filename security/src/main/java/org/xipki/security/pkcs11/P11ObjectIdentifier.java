@@ -20,7 +20,7 @@ package org.xipki.security.pkcs11;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -45,7 +45,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     public P11ObjectIdentifier(byte[] id, String label) {
         this.id = ParamUtil.requireNonNull("id", id);
         this.label = ParamUtil.requireNonNull("label", label);
-        this.idHex = Hex.toHexString(id).toUpperCase();
+        this.idHex = Hex.encodeToString(id);
     }
 
     public byte[] id() {

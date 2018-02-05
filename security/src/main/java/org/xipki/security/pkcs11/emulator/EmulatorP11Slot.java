@@ -62,7 +62,6 @@ import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
@@ -294,7 +293,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         if (secKeyInfoFiles != null && secKeyInfoFiles.length != 0) {
             for (File secKeyInfoFile : secKeyInfoFiles) {
                 byte[] id = getKeyIdFromInfoFilename(secKeyInfoFile.getName());
-                String hexId = Hex.toHexString(id);
+                String hexId = hex(id);
 
                 try {
                     Properties props = loadProperties(secKeyInfoFile);
@@ -356,7 +355,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         if (privKeyInfoFiles != null && privKeyInfoFiles.length != 0) {
             for (File privKeyInfoFile : privKeyInfoFiles) {
                 byte[] id = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
-                String hexId = Hex.toHexString(id);
+                String hexId = hex(id);
 
                 try {
                     Properties props = loadProperties(privKeyInfoFile);
@@ -409,15 +408,15 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     private PublicKey readPublicKey(byte[] keyId) throws P11TokenException {
-        String hexKeyId = Hex.toHexString(keyId);
+        String hexKeyId = hex(keyId);
         File pubKeyFile = new File(pubKeyDir, hexKeyId + INFO_FILE_SUFFIX);
         Properties props = loadProperties(pubKeyFile);
 
         String algorithm = props.getProperty(PROP_ALGORITHM);
         if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(algorithm)) {
             BigInteger exp = new BigInteger(1,
-                    Hex.decode(props.getProperty(PROP_RSA_PUBLIC_EXPONENT)));
-            BigInteger mod = new BigInteger(1, Hex.decode(props.getProperty(PROP_RSA_MODUS)));
+                    decodeHex(props.getProperty(PROP_RSA_PUBLIC_EXPONENT)));
+            BigInteger mod = new BigInteger(1, decodeHex(props.getProperty(PROP_RSA_MODUS)));
 
             RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
             try {
@@ -427,13 +426,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
             }
         } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
             BigInteger prime = new BigInteger(1,
-                    Hex.decode(props.getProperty(PROP_DSA_PRIME))); // p
+                    decodeHex(props.getProperty(PROP_DSA_PRIME))); // p
             BigInteger subPrime = new BigInteger(1,
-                    Hex.decode(props.getProperty(PROP_DSA_SUBPRIME))); // q
+                    decodeHex(props.getProperty(PROP_DSA_SUBPRIME))); // q
             BigInteger base = new BigInteger(1,
-                    Hex.decode(props.getProperty(PROP_DSA_BASE))); // g
+                    decodeHex(props.getProperty(PROP_DSA_BASE))); // g
             BigInteger value = new BigInteger(1,
-                    Hex.decode(props.getProperty(PROP_DSA_VALUE))); // y
+                    decodeHex(props.getProperty(PROP_DSA_VALUE))); // y
 
             DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
             try {
@@ -442,8 +441,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
                 throw new P11TokenException(ex.getMessage(), ex);
             }
         } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
-            byte[] ecdsaParams = Hex.decode(props.getProperty(PROP_EC_ECDSA_PARAMS));
-            byte[] asn1EncodedPoint = Hex.decode(props.getProperty(PROP_EC_EC_POINT));
+            byte[] ecdsaParams = decodeHex(props.getProperty(PROP_EC_ECDSA_PARAMS));
+            byte[] asn1EncodedPoint = decodeHex(props.getProperty(PROP_EC_EC_POINT));
             byte[] ecPoint = DEROctetString.getInstance(asn1EncodedPoint).getOctets();
             try {
                 return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
@@ -456,7 +455,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
-        byte[] encoded = IoUtil.read(new File(certDir, Hex.toHexString(keyId) + VALUE_FILE_SUFFIX));
+        byte[] encoded = IoUtil.read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
         X509Certificate cert = X509Util.parseCert(encoded);
         return new X509Cert(cert, encoded);
     }
@@ -475,7 +474,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     private static byte[] getKeyIdFromInfoFilename(String fileName) {
-        return Hex.decode(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
+        return decodeHex(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
     }
 
     @Override
@@ -492,7 +491,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         byte[] id = objectId.id();
         String label = objectId.label();
         if (id != null) {
-            String hextId = Hex.toHexString(id);
+            String hextId = hex(id);
             File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
             if (!infoFile.exists()) {
                 return false;
@@ -530,7 +529,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
-        String hextId = Hex.toHexString(objectId);
+        String hextId = hex(objectId);
         File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
         boolean b1 = true;
         if (infoFile.exists()) {
@@ -552,7 +551,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
 
         if (id != null && id.length > 0) {
-            String hextId = Hex.toHexString(id);
+            String hextId = hex(id);
             File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
             if (!infoFile.exists()) {
                 return 0;
@@ -624,7 +623,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     private void savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
             throws P11TokenException {
-        String hexId = Hex.toHexString(id).toLowerCase();
+        String hexId = hex(id);
 
         StringBuilder sb = new StringBuilder(100);
         sb.append(PROP_ID).append('=').append(hexId).append('\n');
@@ -638,11 +637,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
             sb.append(PROP_RSA_MODUS).append('=');
 
             RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
-            sb.append(Hex.toHexString(rsaKey.getModulus().toByteArray()));
+            sb.append(hex(rsaKey.getModulus().toByteArray()));
             sb.append('\n');
 
             sb.append(PROP_RSA_PUBLIC_EXPONENT).append('=');
-            sb.append(Hex.toHexString(rsaKey.getPublicExponent().toByteArray()));
+            sb.append(hex(rsaKey.getPublicExponent().toByteArray()));
             sb.append('\n');
         } else if (publicKey instanceof DSAPublicKey) {
             sb.append(PROP_ALGORITHM).append('=');
@@ -651,19 +650,19 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
             sb.append(PROP_DSA_PRIME).append('=');
             DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
-            sb.append(Hex.toHexString(dsaKey.getParams().getP().toByteArray()));
+            sb.append(hex(dsaKey.getParams().getP().toByteArray()));
             sb.append('\n');
 
             sb.append(PROP_DSA_SUBPRIME).append('=');
-            sb.append(Hex.toHexString(dsaKey.getParams().getQ().toByteArray()));
+            sb.append(hex(dsaKey.getParams().getQ().toByteArray()));
             sb.append('\n');
 
             sb.append(PROP_DSA_BASE).append('=');
-            sb.append(Hex.toHexString(dsaKey.getParams().getG().toByteArray()));
+            sb.append(hex(dsaKey.getParams().getG().toByteArray()));
             sb.append('\n');
 
             sb.append(PROP_DSA_VALUE).append('=');
-            sb.append(Hex.toHexString(dsaKey.getY().toByteArray()));
+            sb.append(hex(dsaKey.getY().toByteArray()));
             sb.append('\n');
         } else if (publicKey instanceof ECPublicKey) {
             sb.append(PROP_ALGORITHM).append('=');
@@ -693,7 +692,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
             }
 
             sb.append(PROP_EC_ECDSA_PARAMS).append('=');
-            sb.append(Hex.toHexString(encodedParams));
+            sb.append(hex(encodedParams));
             sb.append('\n');
 
             // EC point
@@ -711,7 +710,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
                 throw new P11TokenException("could not ASN.1 encode the ECPoint");
             }
             sb.append(PROP_EC_EC_POINT).append('=');
-            sb.append(Hex.toHexString(encodedEcPoint));
+            sb.append(hex(encodedEcPoint));
             sb.append('\n');
         } else {
             throw new IllegalArgumentException(
@@ -752,7 +751,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         ParamUtil.requireNonBlank("label", label);
         ParamUtil.requireNonNull("value", value);
 
-        String hexId = Hex.toHexString(id).toLowerCase();
+        String hexId = hex(id);
 
         StringBuilder sb = new StringBuilder(200);
         sb.append(PROP_ID).append('=').append(hexId).append('\n');

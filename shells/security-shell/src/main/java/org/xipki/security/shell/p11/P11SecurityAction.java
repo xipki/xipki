@@ -19,7 +19,7 @@ package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;

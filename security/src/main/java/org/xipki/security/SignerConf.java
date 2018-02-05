@@ -20,9 +20,9 @@ package org.xipki.security;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.Base64;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -194,7 +194,7 @@ public class SignerConf {
         }
 
         if (keyId != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId));
+            conf.putPair("key-id", Hex.encodeToString(keyId));
         }
 
         if (keyLabel != null) {
@@ -234,7 +234,7 @@ public class SignerConf {
         }
 
         if (keyId != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId));
+            conf.putPair("key-id", Hex.encodeToString(keyId));
         }
 
         if (keyLabel != null) {

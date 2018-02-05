@@ -35,9 +35,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
@@ -97,19 +97,30 @@ public abstract class AbstractP11Slot implements P11Slot {
      * @return the hex representation of the bytes.
      */
     protected static String hex(byte[] bytes) {
-        return Hex.toHexString(bytes).toUpperCase();
+        return Hex.encodeToString(bytes);
+    }
+
+    /**
+     * Returns the hex representation of the bytes.
+     *
+     * @param bytes
+     *          Data to be encoded. Must not be {@code null}.
+     * @return the hex representation of the bytes.
+     */
+    protected static byte[] decodeHex(String hex) {
+        return Hex.decode(hex);
     }
 
     protected static String getDescription(byte[] keyId, char[] keyLabel) {
         StringBuilder sb = new StringBuilder();
-        sb.append("id ").append((keyId == null) ? "null" : Hex.toHexString(keyId));
+        sb.append("id ").append((keyId == null) ? "null" : hex(keyId));
         sb.append(" and label ").append((keyLabel == null) ? "null" : new String(keyLabel));
         return sb.toString();
     }
 
     protected static String getDescription(byte[] keyId, String keyLabel) {
         StringBuilder sb = new StringBuilder();
-        sb.append("id ").append((keyId == null) ? "null" : Hex.toHexString(keyId));
+        sb.append("id ").append((keyId == null) ? "null" : hex(keyId));
         sb.append(" and label ").append(keyLabel);
         return sb.toString();
     }

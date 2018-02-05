@@ -74,12 +74,12 @@ import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.FpIdCalculator;
@@ -389,22 +389,12 @@ public class X509Util {
             return ((ASN1String) value).getString();
         } else {
             try {
-                return "#" + bytesToString(
-                        Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
+                return "#" + Hex.encodeToString(
+                        value.toASN1Primitive().getEncoded(ASN1Encoding.DER));
             } catch (IOException ex) {
                 throw new IllegalArgumentException("other value has no encoded form");
             }
         }
-    }
-
-    private static String bytesToString(byte[] data) {
-        char[] cs = new char[data.length];
-
-        for (int i = 0; i != cs.length; i++) {
-            cs[i] = (char) (data[i] & 0xff);
-        }
-
-        return new String(cs);
     }
 
     public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> usages) {

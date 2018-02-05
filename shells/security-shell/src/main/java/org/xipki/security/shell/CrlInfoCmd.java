@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
@@ -95,7 +95,7 @@ public class CrlInfoCmd extends SecurityAction {
         }
 
         if (no instanceof Byte) {
-            return "0X" + Hex.toHexString(new byte[]{(byte) no});
+            return "0X" + Hex.encodeToString(new byte[]{(byte) no});
         } else if (no instanceof Short) {
             return "0X" + Integer.toHexString(Integer.valueOf((short) no));
         } else if (no instanceof Integer) {

@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -84,7 +84,7 @@ class HashCalculator {
 
     public static String hexHash(HashAlgoType hashAlgoType, byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
-        return (bytes == null) ? null : Hex.toHexString(bytes).toUpperCase();
+        return (bytes == null) ? null : Hex.encodeUpperToString(bytes);
     }
 
     public static String base64Hash(HashAlgoType hashAlgoType, byte[] data) {

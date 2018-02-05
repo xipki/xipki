@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;

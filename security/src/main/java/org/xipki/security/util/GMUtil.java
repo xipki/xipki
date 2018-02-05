@@ -28,7 +28,7 @@ import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.util.BigIntegers;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 
 /**
  * @author Lijun Liao

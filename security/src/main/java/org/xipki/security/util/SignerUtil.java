@@ -40,7 +40,7 @@ import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.exception.XiSecurityException;

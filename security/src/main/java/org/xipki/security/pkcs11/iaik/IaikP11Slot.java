@@ -36,7 +36,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.concurrent.ConcurrentBag;
@@ -292,7 +291,7 @@ class IaikP11Slot extends AbstractP11Slot {
         } else {
             PublicKey p11PublicKey = getPublicKeyObject(id, null);
             if (p11PublicKey == null) {
-                LOG.info("neither certificate nor public key for the key (" + Hex.toHexString(id)
+                LOG.info("neither certificate nor public key for the key (" + hex(id)
                         + " is available");
                 return;
             }
@@ -445,7 +444,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("signature:\n{}", Hex.toHexString(signature));
+            LOG.debug("signature:\n{}", hex(signature));
         }
         return signature;
     }
