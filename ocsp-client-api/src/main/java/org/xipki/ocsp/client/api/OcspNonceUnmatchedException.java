@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.client.api;
 
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 
 /**
  * @author Lijun Liao
@@ -37,13 +37,13 @@ public class OcspNonceUnmatchedException extends OcspResponseException {
         if (is == null || is.length == 0) {
             sb.append("none");
         } else {
-            sb.append(Hex.toHexString(is));
+            sb.append(Hex.encodeToString(is));
         }
         sb.append(", but expected ");
         if (expected == null || expected.length == 0) {
             sb.append("nonce");
         } else {
-            sb.append(Hex.toHexString(expected));
+            sb.append(Hex.encodeToString(expected));
         }
         sb.append(")");
         return sb.toString();

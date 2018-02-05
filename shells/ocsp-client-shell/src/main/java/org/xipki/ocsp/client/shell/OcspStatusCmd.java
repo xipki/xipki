@@ -49,7 +49,7 @@ import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -262,7 +262,7 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
                     byte[] hashValue = certHash.getCertificateHash();
 
                     msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
-                    msg.append("\tHash value: ").append(Hex.toHexString(hashValue)).append("\n");
+                    msg.append("\tHash value: ").append(Hex.encodeToString(hashValue)).append("\n");
 
                     if (encodedCerts != null) {
                         byte[] encodedCert = encodedCerts.get(serialNumber);

@@ -53,7 +53,6 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.PkiErrorException;
@@ -65,6 +64,7 @@ import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.ObjectIdentifiers;
@@ -189,7 +189,7 @@ abstract class CmpRequestor {
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException ex) {
             LOG.error("could not decode the received PKI message: {}",
-                    Hex.toHexString(encodedResponse));
+                    Hex.encodeToString(encodedResponse));
             throw new CmpRequestorException(ex.getMessage(), ex);
         }
 
@@ -220,7 +220,7 @@ abstract class CmpRequestor {
         if (response.hasProtection()) {
             try {
                 ProtectionVerificationResult verifyProtection = verifyProtection(
-                        Hex.toHexString(tid.getOctets()), response);
+                        Hex.encodeToString(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException | OperatorCreationException | CMPException ex) {
                 throw new CmpRequestorException(ex.getMessage(), ex);
