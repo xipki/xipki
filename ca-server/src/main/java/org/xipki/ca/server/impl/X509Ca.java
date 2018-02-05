@@ -49,12 +49,14 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -133,6 +135,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -2040,6 +2043,28 @@ public class X509Ca {
             grantedPublicKeyInfo = certprofile.checkPublicKey(grantedPublicKeyInfo);
         } catch (BadCertTemplateException ex) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
+        }
+
+        // CHECK weak public key, like RSA key (ROCA)
+        if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
+                PKCSObjectIdentifiers.rsaEncryption)) {
+            try {
+                ASN1Sequence seq = ASN1Sequence.getInstance(
+                        grantedPublicKeyInfo.getPublicKeyData().getOctets());
+                if (seq.size() != 2) {
+                    throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                            "invalid format of RSA public key");
+                }
+
+                BigInteger modulus = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+                if (RSABrokenKey.isAffected(modulus)) {
+                    throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                            "RSA public key is too weak");
+                }
+            } catch (IllegalArgumentException ex) {
+                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                        "invalid format of RSA public key");
+            }
         }
 
         Date gsmckFirstNotBefore = null;
