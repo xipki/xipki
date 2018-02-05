@@ -122,6 +122,10 @@ public class CertStatusInfo {
         return ret;
     }
 
+    public static CertStatusInfo getGoodCertStatusInfo(Date thisUpdate, Date nextUpdate) {
+        return new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, null);
+    }
+
     public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
             HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
             String certprofile) {
@@ -133,6 +137,16 @@ public class CertStatusInfo {
         ret.revocationInfo = revocationInfo;
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
+        return ret;
+    }
+
+    public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
+            Date thisUpdate, Date nextUpdate) {
+        if (revocationInfo == null) {
+            throw new IllegalArgumentException("revocationInfo must not be null");
+        }
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
+        ret.revocationInfo = revocationInfo;
         return ret;
     }
 
