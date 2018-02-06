@@ -84,7 +84,7 @@ class PendingCertificatePool {
             return;
         }
 
-        String hexTid = Hex.encodeToString(transactionId);
+        String hexTid = Hex.encode(transactionId);
         MyEntry myEntry = new MyEntry(certReqId, waitForConfirmTill, certInfo);
         synchronized (map) {
             Set<MyEntry> entries = map.get(hexTid);
@@ -102,7 +102,7 @@ class PendingCertificatePool {
         ParamUtil.requireNonNull("certReqId", certReqId);
         ParamUtil.requireNonNull("certHash", certHash);
 
-        String hexTid = Hex.encodeToString(transactionId);
+        String hexTid = Hex.encode(transactionId);
         MyEntry retEntry = null;
 
         synchronized (map) {
@@ -135,7 +135,7 @@ class PendingCertificatePool {
     Set<X509CertificateInfo> removeCertificates(byte[] transactionId) {
         ParamUtil.requireNonNull("transactionId", transactionId);
 
-        String hexId = Hex.encodeToString(transactionId);
+        String hexId = Hex.encode(transactionId);
         Set<MyEntry> entries;
         synchronized  (map) {
             entries = map.remove(hexId);

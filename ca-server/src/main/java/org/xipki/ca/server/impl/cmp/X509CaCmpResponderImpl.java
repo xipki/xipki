@@ -1046,7 +1046,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
                 if (LOG.isWarnEnabled()) {
                     LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
                             transactionId, certReqId.getPositiveValue(),
-                            Hex.encodeToString(certHash));
+                            Hex.encode(certHash));
                 }
                 continue;
             }

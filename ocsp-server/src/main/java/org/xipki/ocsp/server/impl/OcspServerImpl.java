@@ -888,7 +888,7 @@ public class OcspServerImpl implements OcspServer {
             sb.append("thisUpdate: ").append(thisUpdate).append(", ");
             sb.append("nextUpdate: ").append(nextUpdate);
             if (certHash != null) {
-                sb.append(", certHash: ").append(Hex.encodeUpperToString(certHash));
+                sb.append(", certHash: ").append(Hex.encode(certHash));
             }
             LOG.debug(sb.toString());
         }

@@ -129,7 +129,7 @@ public class RequestIssuer {
 
     @Override
     public String toString() {
-        return Hex.encodeToString(data, from, len);
+        return Hex.encode(Arrays.copyOfRange(data, from, from + len));
     }
 
 }

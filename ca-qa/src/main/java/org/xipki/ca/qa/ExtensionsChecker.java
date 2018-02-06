@@ -2483,7 +2483,7 @@ public class ExtensionsChecker {
     }
 
     private static String hex(byte[] bytes) {
-        return Hex.encodeToString(bytes);
+        return Hex.encode(bytes);
     }
 
     private static Set<String> strInBnotInA(Collection<String> collectionA,
