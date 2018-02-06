@@ -391,7 +391,7 @@ class P11ProxyResponder {
             }
         } catch (BadAsn1ObjectException ex) {
             LogUtil.error(LOG, ex, "could not process decode requested content (tid="
-                    + Hex.encodeToString(transactionId) + ")");
+                    + Hex.encode(transactionId) + ")");
             return getResp(version, transactionId, action, P11ProxyConstants.RC_BAD_REQUEST);
         } catch (P11TokenException ex) {
             LogUtil.error(LOG, ex, buildErrorMsg(action, transactionId));
@@ -418,7 +418,7 @@ class P11ProxyResponder {
 
     private static String buildErrorMsg(short action, byte[] transactionId) {
         return "could not process action " + P11ProxyConstants.getActionName(action)
-                + " (tid=" + Hex.encodeToString(transactionId) + ")";
+                + " (tid=" + Hex.encode(transactionId) + ")";
     }
 
     private P11Slot getSlot(P11CryptService p11Service, Asn1P11EntityIdentifier entityId)
