@@ -259,21 +259,29 @@ public class OcspServerImpl implements OcspServer {
         return initialized.get();
     }
 
-    public boolean init() {
+    public void init() throws InvalidConfException, DataAccessException, PasswordResolverException {
         LOG.info("starting OCSPResponder server ...");
         if (initialized.get()) {
             LOG.info("already started, skipping ...");
-            return true;
+            return;
         }
 
         try {
             init0();
             initialized.set(true);
             LOG.info("started OCSPResponder server");
-            return true;
+        } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
+            LOG.error("could not start OCSP responder", ex);
+            throw ex;
         } catch (Throwable th) {
           LOG.error("could not start OCSP responder", th);
-          return false;
+          if (th instanceof RuntimeException) {
+              throw (RuntimeException) th;
+          } else if (th instanceof Error) {
+              throw (Error) th;
+          } else {
+              throw new RuntimeException(th);
+          }
         }
     }
 
