@@ -17,8 +17,6 @@
 
 package org.xipki.common.util;
 
-import java.util.Arrays;
-
 /**
  * @author Lijun Liao
  * @since 2.1.0
