@@ -97,7 +97,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      * @return the hex representation of the bytes.
      */
     protected static String hex(byte[] bytes) {
-        return Hex.encodeToString(bytes);
+        return Hex.encode(bytes);
     }
 
     /**

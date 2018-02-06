@@ -17,6 +17,8 @@
 
 package org.xipki.common.util;
 
+import java.util.Arrays;
+
 /**
  * @author Lijun Liao
  * @since 2.1.0
@@ -35,46 +37,27 @@ public class Hex {
     };
 
     private static final int[] LINTS = new int['f' + 1];
-    private static final int[] HINTS = new int['f' + 1];
+    private static final int[] HINTS = new int[LINTS.length];
 
     static {
-        LINTS['0'] = 0;
-        LINTS['1'] = 1;
-        LINTS['2'] = 2;
-        LINTS['3'] = 3;
-        LINTS['4'] = 4;
-        LINTS['5'] = 5;
-        LINTS['6'] = 6;
-        LINTS['7'] = 7;
-        LINTS['8'] = 8;
-        LINTS['9'] = 9;
-        LINTS['A'] = 10;
-        LINTS['a'] = 10;
-        LINTS['B'] = 11;
-        LINTS['b'] = 11;
-        LINTS['C'] = 12;
-        LINTS['c'] = 12;
-        LINTS['D'] = 13;
-        LINTS['d'] = 13;
-        LINTS['E'] = 14;
-        LINTS['e'] = 14;
-        LINTS['F'] = 15;
-        LINTS['f'] = 15;
+        for (int i = 0; i < DIGITS.length; i++) {
+            LINTS[DIGITS[i]] = i;
+        }
+
+        for (int i = 10; i < UPPER_DIGITS.length; i++) {
+            LINTS[UPPER_DIGITS[i]] = i;
+        }
 
         for (int i = 0; i < LINTS.length; i++) {
             HINTS[i] = LINTS[i] << 4;
         }
     }
 
-    public static String encodeToString(byte[] bytes) {
-        return new String(encode(bytes));
+    public static String encode(byte[] bytes) {
+        return new String(encodeToChars(bytes));
     }
 
-    public static String encodeToString(byte[] bytes, int from, int len) {
-        return new String(encode(bytes, from, len));
-    }
-
-    public static char[] encode(byte[] data) {
+    public static char[] encodeToChars(byte[] data) {
         int l = data.length;
 
         char[] out = new char[l << 1];
@@ -88,27 +71,11 @@ public class Hex {
         return out;
     }
 
-    public static char[] encode(byte[] data, int from, int len) {
-        if (from + len > data.length) {
-            throw new IndexOutOfBoundsException("data is too short");
-        }
-
-        char[] out = new char[len << 1];
-
-        // two characters form the hex value.
-        for (int i = from, j = 0; i < from + len; i++) {
-            out[j++] = DIGITS[(0xF0 & data[i]) >>> 4];
-            out[j++] = DIGITS[0x0F & data[i]];
-        }
-
-        return out;
+    public static String encodeUpper(byte[] bytes) {
+        return new String(encodeToUpperChars(bytes));
     }
 
-    public static String encodeUpperToString(byte[] bytes) {
-        return new String(encodeUpper(bytes));
-    }
-
-    public static char[] encodeUpper(byte[] data) {
+    public static char[] encodeToUpperChars(byte[] data) {
         int l = data.length;
 
         char[] out = new char[l << 1];

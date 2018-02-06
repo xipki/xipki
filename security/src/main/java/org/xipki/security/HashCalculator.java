@@ -84,7 +84,7 @@ class HashCalculator {
 
     public static String hexHash(HashAlgoType hashAlgoType, byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
-        return (bytes == null) ? null : Hex.encodeUpperToString(bytes);
+        return (bytes == null) ? null : Hex.encode(bytes);
     }
 
     public static String base64Hash(HashAlgoType hashAlgoType, byte[] data) {

@@ -389,7 +389,7 @@ public class X509Util {
             return ((ASN1String) value).getString();
         } else {
             try {
-                return "#" + Hex.encodeToString(
+                return "#" + Hex.encode(
                         value.toASN1Primitive().getEncoded(ASN1Encoding.DER));
             } catch (IOException ex) {
                 throw new IllegalArgumentException("other value has no encoded form");

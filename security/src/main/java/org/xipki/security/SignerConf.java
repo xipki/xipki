@@ -194,7 +194,7 @@ public class SignerConf {
         }
 
         if (keyId != null) {
-            conf.putPair("key-id", Hex.encodeToString(keyId));
+            conf.putPair("key-id", Hex.encode(keyId));
         }
 
         if (keyLabel != null) {
@@ -234,7 +234,7 @@ public class SignerConf {
         }
 
         if (keyId != null) {
-            conf.putPair("key-id", Hex.encodeToString(keyId));
+            conf.putPair("key-id", Hex.encode(keyId));
         }
 
         if (keyLabel != null) {

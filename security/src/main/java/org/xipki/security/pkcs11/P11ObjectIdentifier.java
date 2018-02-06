@@ -45,7 +45,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     public P11ObjectIdentifier(byte[] id, String label) {
         this.id = ParamUtil.requireNonNull("id", id);
         this.label = ParamUtil.requireNonNull("label", label);
-        this.idHex = Hex.encodeToString(id);
+        this.idHex = Hex.encode(id);
     }
 
     public byte[] id() {

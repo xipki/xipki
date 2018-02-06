@@ -63,7 +63,7 @@ public class CertRevocationInfo {
     }
 
     public void setRevocationTime(Date revocationTime) {
-        this.revocationTime = revocationTime;
+        this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
     }
 
     /**

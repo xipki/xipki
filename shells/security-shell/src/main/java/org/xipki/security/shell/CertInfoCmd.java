@@ -106,7 +106,7 @@ public class CertInfoCmd extends SecurityAction {
         }
 
         if (no instanceof Byte) {
-            return "0X" + Hex.encodeToString(new byte[]{(byte) no});
+            return "0X" + Hex.encode(new byte[]{(byte) no});
         } else if (no instanceof Short) {
             return "0X" + Integer.toHexString(Integer.valueOf((short) no));
         } else if (no instanceof Integer) {

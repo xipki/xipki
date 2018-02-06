@@ -285,7 +285,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                 ? slot.getObjectIdForId(keyId)
                 : slot.getObjectIdForLabel(keyLabel);
         if (p11ObjId == null) {
-            String str2 = (keyId != null) ? "id " + Hex.encodeToString(keyId) : "label " + keyLabel;
+            String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
             throw new ObjectCreationException("cound not find identity with " + str2);
         }
         P11EntityIdentifier entityId = new P11EntityIdentifier(slot.slotId(), p11ObjId);
