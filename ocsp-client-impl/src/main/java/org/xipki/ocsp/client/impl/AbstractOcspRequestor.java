@@ -463,7 +463,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     public void setSignerType(String signerType) {
         this.signer = null;
-        this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
+        this.signerType = signerType;
     }
 
     public SecurityFactory securityFactory() {

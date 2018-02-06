@@ -22,8 +22,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
+import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
@@ -73,9 +76,38 @@ public class OcspQa {
     }
 
     public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
+            BigInteger serialNumber, byte[] encodedCert, OcspError expectedOcspError,
+            OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption,
+            Date exptectedRevTime) {
+        List<BigInteger> serialNumbers = new ArrayList<>(1);
+        serialNumbers.add(serialNumber);
+
+        Map<BigInteger, byte[]> encodedCerts = null;
+        if (encodedCert != null) {
+            encodedCerts = new HashMap<>();
+            encodedCerts.put(serialNumber, encodedCert);
+        }
+
+        Map<BigInteger, OcspCertStatus> expectedOcspStatuses = null;
+        if (expectedOcspStatus != null) {
+            expectedOcspStatuses = new HashMap<>();
+            expectedOcspStatuses.put(serialNumber, expectedOcspStatus);
+        }
+
+        Map<BigInteger, Date> exptectedRevTimes = null;
+        if (exptectedRevTime != null) {
+            exptectedRevTimes = new HashMap<>();
+            exptectedRevTimes.put(serialNumber, exptectedRevTime);
+        }
+
+        return checkOcsp(response, issuerHash, serialNumbers, encodedCerts, expectedOcspError,
+                expectedOcspStatuses, exptectedRevTimes, responseOption);
+    }
+
+    public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
             List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
             OcspError expectedOcspError, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            OcspResponseOption responseOption) {
+            Map<BigInteger, Date> exptectedRevTimes, OcspResponseOption responseOption) {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
         ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
@@ -262,6 +294,7 @@ public class OcspQa {
             SingleResp singleResp = singleResponses[i];
             BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
             OcspCertStatus expectedStatus = expectedOcspStatuses.get(serialNumber);
+            Date expectedRevTime = exptectedRevTimes.get(serialNumber);
 
             byte[] encodedCert = null;
             if (encodedCerts != null) {
@@ -269,7 +302,7 @@ public class OcspQa {
             }
 
             List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash,
-                    expectedStatus, encodedCert, extendedRevoke,
+                    expectedStatus, encodedCert, expectedRevTime, extendedRevoke,
                     responseOption.nextUpdateOccurrence(),
                     responseOption.certhashOccurrence(), responseOption.certhashAlgId());
             resultIssues.addAll(issues);
@@ -280,7 +313,8 @@ public class OcspQa {
 
     private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
             IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
-            boolean extendedRevoke, Occurrence nextupdateOccurrence, Occurrence certhashOccurrence,
+            Date expectedRevTime, boolean extendedRevoke,
+            Occurrence nextupdateOccurrence, Occurrence certhashOccurrence,
             ASN1ObjectIdentifier certhashAlg) {
         if (expectedStatus == OcspCertStatus.unknown
                 || expectedStatus == OcspCertStatus.issuerUnknown) {
@@ -314,17 +348,18 @@ public class OcspQa {
         CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
         OcspCertStatus status = null;
+        Long revTime = null;
         if (singleCertStatus == null) {
             status = OcspCertStatus.good;
         } else if (singleCertStatus instanceof RevokedStatus) {
             RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
-            Date revTime = revStatus.getRevocationTime();
+            revTime = revStatus.getRevocationTime().getTime() / 1000;
 
             if (revStatus.hasRevocationReason()) {
                 int reason = revStatus.getRevocationReason();
-                if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code()
-                        && revTime.getTime() == 0) {
+                if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code() && revTime == 0) {
                     status = OcspCertStatus.unknown;
+                    revTime = null;
                 } else {
                     CrlReason revocationReason = CrlReason.forReasonCode(reason);
                     switch (revocationReason) {
@@ -372,6 +407,13 @@ public class OcspQa {
 
         if (!issue.isFailed() && expectedStatus != status) {
             issue.setFailureMessage("is='" + status + "', but expected='" + expectedStatus + "'");
+        }
+
+        // revocation time
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".REVTIME", "certificate time");
+        issues.add(issue);
+        if (!CompareUtil.equalsObject(expectedRevTime, revTime)) {
+            issue.setFailureMessage("is='" + revTime + "', but expected='" + expectedRevTime + "'");
         }
 
         // nextUpdate

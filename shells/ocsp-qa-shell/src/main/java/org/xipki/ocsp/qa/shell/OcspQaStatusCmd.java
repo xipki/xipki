@@ -169,7 +169,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         }
 
         ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
-                encodedCerts, expectedOcspError, expectedStatuses, responseOption);
+                encodedCerts, expectedOcspError, expectedStatuses, null, responseOption);
 
         StringBuilder sb = new StringBuilder(50);
         sb.append("OCSP response is ");
