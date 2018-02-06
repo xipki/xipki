@@ -37,13 +37,13 @@ public class OcspNonceUnmatchedException extends OcspResponseException {
         if (is == null || is.length == 0) {
             sb.append("none");
         } else {
-            sb.append(Hex.encodeToString(is));
+            sb.append(Hex.encode(is));
         }
         sb.append(", but expected ");
         if (expected == null || expected.length == 0) {
             sb.append("nonce");
         } else {
-            sb.append(Hex.encodeToString(expected));
+            sb.append(Hex.encode(expected));
         }
         sb.append(")");
         return sb.toString();

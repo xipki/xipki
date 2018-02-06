@@ -262,7 +262,7 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
                     byte[] hashValue = certHash.getCertificateHash();
 
                     msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
-                    msg.append("\tHash value: ").append(Hex.encodeToString(hashValue)).append("\n");
+                    msg.append("\tHash value: ").append(Hex.encode(hashValue)).append("\n");
 
                     if (encodedCerts != null) {
                         byte[] encodedCert = encodedCerts.get(serialNumber);

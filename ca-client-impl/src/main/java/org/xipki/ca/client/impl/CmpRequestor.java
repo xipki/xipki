@@ -189,7 +189,7 @@ abstract class CmpRequestor {
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException ex) {
             LOG.error("could not decode the received PKI message: {}",
-                    Hex.encodeToString(encodedResponse));
+                    Hex.encode(encodedResponse));
             throw new CmpRequestorException(ex.getMessage(), ex);
         }
 
@@ -220,7 +220,7 @@ abstract class CmpRequestor {
         if (response.hasProtection()) {
             try {
                 ProtectionVerificationResult verifyProtection = verifyProtection(
-                        Hex.encodeToString(tid.getOctets()), response);
+                        Hex.encode(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException | OperatorCreationException | CMPException ex) {
                 throw new CmpRequestorException(ex.getMessage(), ex);
