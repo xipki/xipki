@@ -198,6 +198,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
                 println(resultText);
                 resultOut.write(resultText.getBytes());
+                resultOut.write(NEWLINE);
             }
 
             // unknown serial number
@@ -208,7 +209,8 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             bytes[0] = (byte) (0x7F & bytes[0]);
             BigInteger serialNumber = new BigInteger(bytes);
 
-            String resultText = StringUtil.formatAccount(lineNo, 6) + ": " + line + ": ";
+            String resultText = StringUtil.formatAccount(lineNo, 6)
+                    + ": " + serialNumber.toString(16) + ",unknown: ";
             try {
                 ValidationResult result = processOcspQuery(ocspQa, serialNumber,
                         OcspCertStatus.unknown, null, outDir, serverUrl,
@@ -220,6 +222,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
             println(resultText);
             resultOut.write(resultText.getBytes());
+            resultOut.write(NEWLINE);
         } finally {
             snReader.close();
             resultOut.close();
