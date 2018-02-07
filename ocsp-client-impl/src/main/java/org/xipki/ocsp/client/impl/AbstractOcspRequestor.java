@@ -189,7 +189,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         if (debug != null) {
             msgPair = new RequestResponsePair();
             debug.add(msgPair);
-            msgPair.setRequest(encodedReq);
+            if (debug.saveRequest()) {
+                msgPair.setRequest(encodedReq);
+            }
         }
 
         byte[] encodedResp;
@@ -199,7 +201,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             throw new ResponderUnreachableException("IOException: " + ex.getMessage(), ex);
         }
 
-        if (msgPair != null) {
+        if (msgPair != null && debug.saveResponse()) {
             msgPair.setResponse(encodedResp);
         }
 

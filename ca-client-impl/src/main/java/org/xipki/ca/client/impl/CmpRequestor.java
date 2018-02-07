@@ -169,7 +169,9 @@ abstract class CmpRequestor {
         if (debug != null) {
             reqResp = new RequestResponsePair();
             debug.add(reqResp);
-            reqResp.setRequest(encodedRequest);
+            if (debug.saveRequest()) {
+                reqResp.setRequest(encodedRequest);
+            }
         }
 
         byte[] encodedResponse;
@@ -180,7 +182,7 @@ abstract class CmpRequestor {
             throw new CmpRequestorException("TRANSPORT_ERROR", ex);
         }
 
-        if (reqResp != null) {
+        if (reqResp != null && debug.saveResponse()) {
             reqResp.setResponse(encodedResponse);
         }
 

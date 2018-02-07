@@ -53,7 +53,7 @@ public abstract class ClientAction extends XiAction {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
         if (saveReq || saveResp) {
-            return new RequestResponseDebug();
+            return new RequestResponseDebug(saveReq, saveResp);
         }
         return null;
     }

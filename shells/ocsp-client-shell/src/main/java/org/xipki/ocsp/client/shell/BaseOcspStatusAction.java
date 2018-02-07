@@ -266,7 +266,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
         boolean saveResp = isNotBlank(respout);
         RequestResponseDebug debug = null;
         if (saveReq || saveResp) {
-            debug = new RequestResponseDebug();
+            debug = new RequestResponseDebug(saveReq, saveResp);
         }
 
         IssuerHash issuerHash = new IssuerHash(
