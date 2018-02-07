@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URL;
@@ -70,11 +71,17 @@ import org.xipki.security.util.X509Util;
  */
 
 @Command(scope = "xiqa", name = "batch-ocsp-status",
-        description = "request status of certificates (QA)")
+        description = "batch request status of certificates (QA)")
 @Service
 public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchOcspQaStatusCmd.class);
+
+    private static final String FILE_SEP = File.separator;
+
+    @Option(name = "--noout",
+            description = "do not print the detailed message")
+    private Boolean noout = Boolean.FALSE;
 
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
@@ -155,11 +162,49 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         expectedNextUpdateOccurrence = Occurrence.forName(nextUpdateOccurrenceText);
         expectedNonceOccurrence = Occurrence.forName(nonceOccurrenceText);
 
+        File outDir = new File(outDirStr);
+        File messageDir = new File(outDir, "messages");
+        messageDir.mkdirs();
+
+        File detailsDir = new File(outDir, "details");
+        detailsDir.mkdirs();
+
+        println("The result is saved in the folder " + outDir.getPath());
+
+        StringBuilder sb = new StringBuilder();
+        if (saveReq || saveResp) {
+            sb.append("Commands\n");
+            sb.append("  1. Verify and print the text form of request and response:\n");
+            sb.append("    openssl ocsp -text ");
+            if (respIssuerFile != null) {
+                sb.append("-CAfile responder_issuer.pem");
+            } else {
+                sb.append("-no_cert_verify");
+            }
+            sb.append(" -reqin <request file> -respin <response file>\n");
+
+            sb.append("  2. Print the text form of request:\n");
+            sb.append("    openssl ocsp -text -reqin <request file>\n");
+
+            sb.append("  3. Verify and print the text form of response:\n");
+            sb.append("    openssl ocsp -text ");
+            if (respIssuerFile != null) {
+                sb.append("-CAfile responder_issuer.pem");
+            } else {
+                sb.append("-no_cert_verify");
+            }
+            sb.append(" -respin <response file>");
+
+            IoUtil.save(new File(outDir, "README.txt"), sb.toString().getBytes());
+        }
+
         X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
 
         X509Certificate respIssuer = null;
         if (respIssuerFile != null) {
             respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
+            IoUtil.save(new File(outDir, "responder-issuer.pem"),
+                    X509Util.toPemCert(respIssuer).getBytes());
         }
 
         RequestOptions requestOptions = getRequestOptions();
@@ -168,15 +213,11 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 HashAlgoType.getNonNullHashAlgoType(requestOptions.hashAlgorithmId()),
                 Certificate.getInstance(issuerCert.getEncoded()));
 
-        File outDir = new File(outDirStr);
-        File messageDir = new File(outDir, "messages");
-        messageDir.mkdirs();
-
-        File detailsDir = new File(outDir, "details");
-        detailsDir.mkdirs();
-
         OutputStream resultOut = new FileOutputStream(new File(outDir, "overview.txt"));
         BufferedReader snReader = new BufferedReader(new FileReader(snFile));
+
+        int numSucc = 0;
+        int numFail = 0;
 
         try {
             URL serverUrl = new URL(serverUrlStr);
@@ -188,15 +229,13 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             int lineNo = 0;
             String line;
 
-            byte[] NEWLINE = new byte[]{'\n'};
-
             while ((line = snReader.readLine()) != null) {
                 lineNo++;
                 line = line.trim();
 
                 if (line.startsWith("#") || line.isEmpty()) {
                     resultOut.write(line.getBytes());
-                    resultOut.write(NEWLINE);
+                    resultOut.write('\n');
                     continue;
                 }
 
@@ -205,15 +244,23 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                     ValidationResult result = processOcspQuery(ocspQa, line, messageDir,
                             detailsDir,  serverUrl, respIssuer, issuerCert, issuerHash,
                             requestOptions);
-                    resultText += result.isAllSuccessful() ? "valid" : "invalid";
+                    if (result.isAllSuccessful()) {
+                        numSucc++;
+                        resultText += "valid";
+                    } else {
+                        numFail++;
+                        resultText += "invalid";
+                    }
                 } catch (Throwable th) {
                     LogUtil.error(LOG, th);
+                    numFail++;
                     resultText += "error - " + th.getMessage();
                 }
 
-                println(resultText);
-                resultOut.write(resultText.getBytes());
-                resultOut.write(NEWLINE);
+                if (!noout) {
+                    println(resultText);
+                }
+                println(resultText, resultOut);
             }
 
             // unknown serial number
@@ -229,15 +276,34 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 ValidationResult result = processOcspQuery(ocspQa, serialNumber,
                         OcspCertStatus.unknown, null, messageDir, detailsDir, serverUrl,
                         respIssuer, issuerCert, issuerHash, requestOptions);
-                resultText += result.isAllSuccessful() ? "valid" : "invalid";
+                if (result.isAllSuccessful()) {
+                    numSucc++;
+                    resultText += "valid";
+                } else {
+                    numFail++;
+                    resultText += "invalid";
+                }
             } catch (Throwable th) {
                 LogUtil.error(LOG, th);
+                numFail++;
                 resultText += "error - " + th.getMessage();
             }
 
-            println(resultText);
-            resultOut.write(resultText.getBytes());
-            resultOut.write(NEWLINE);
+            if (!noout) {
+                println(resultText);
+            }
+            println(resultText, resultOut);
+
+            sb = new StringBuilder(200);
+            sb.append("=====BEGIN SUMMARY=====")
+                .append("\n       url: ").append(serverUrlStr)
+                .append("\n       sum: ").append(numFail + numSucc)
+                .append("\nsuccessful: ").append(numSucc)
+                .append("\n    failed: ").append(numFail)
+                .append("\n=====END SUMMARY=====");
+            String message = sb.toString();
+            println(message);
+            println(message, resultOut);
         } finally {
             snReader.close();
             resultOut.close();
@@ -320,7 +386,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
         RequestResponseDebug debug = null;
         if (saveReq || saveResp) {
-            debug = new RequestResponseDebug();
+            debug = new RequestResponseDebug(saveReq, saveResp);
         }
 
         OCSPResp response;
@@ -334,14 +400,16 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 if (saveReq) {
                     byte[] bytes = reqResp.request();
                     if (bytes != null) {
-                        IoUtil.save(new File(messageDir, filename + ".req"), bytes);
+                        IoUtil.save(
+                                new File(messageDir, filename + FILE_SEP + "request.der"), bytes);
                     }
                 }
 
                 if (saveResp) {
                     byte[] bytes = reqResp.response();
                     if (bytes != null) {
-                        IoUtil.save(new File(messageDir, filename + ".resp"), bytes);
+                        IoUtil.save(
+                                new File(messageDir, filename + FILE_SEP + "response.der"), bytes);
                     }
                 }
             } // end if
@@ -377,6 +445,11 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         IoUtil.save(new File(detailsDir, hexSerial + "." + validity), sb.toString().getBytes());
 
         return ret;
+    }
+
+    private void println(String message, OutputStream out) throws IOException {
+        out.write(message.getBytes());
+        out.write('\n');
     }
 
 }
