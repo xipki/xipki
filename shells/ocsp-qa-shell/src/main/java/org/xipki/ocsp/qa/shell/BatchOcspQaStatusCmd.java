@@ -265,7 +265,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 } else if ("good".equalsIgnoreCase(token)) {
                     status = OcspCertStatus.good;
                 } else {
-                    CrlReason reason = CrlReason.forReasonCode(Integer.parseInt(token));
+                    CrlReason reason = CrlReason.forNameOrText(token);
                     switch (reason) {
                         case AA_COMPROMISE:
                             status = OcspCertStatus.aACompromise;
