@@ -196,6 +196,17 @@ public class X509Util {
         return parseBase64EncodedCert(b64);
     }
 
+    public static String toPemCert(X509Certificate cert)
+            throws CertificateException {
+        ParamUtil.requireNonNull("cert", cert);
+        byte[] encoded = cert.getEncoded();
+        StringBuilder sb = new StringBuilder(encoded.length * 4 / 3 + 80);
+        sb.append("-----BEGIN CERTIFICATE-----\n");
+        sb.append(Base64.encodeToString(encoded, true));
+        sb.append("\n-----END CERTIFICATE-----");
+        return sb.toString();
+    }
+
     public static X509Certificate toX509Cert(org.bouncycastle.asn1.x509.Certificate asn1Cert)
             throws CertificateException {
         byte[] encodedCert;
