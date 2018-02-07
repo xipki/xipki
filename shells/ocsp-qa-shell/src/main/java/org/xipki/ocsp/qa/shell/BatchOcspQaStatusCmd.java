@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
+import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
@@ -85,10 +86,15 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
     private String serverUrlStr;
 
     @Option(name = "--sn-file", required = true,
-            description =
-                "file containing the serial number and revocation information\n(required)")
+            description = "file containing the serial number and revocation information"
+                    + "\n(required)\nEach line starts with # for comment or is of following format"
+                    + "\nserial-number[,status[,revocation-time]]")
     @Completion(FilePathCompleter.class)
     private String snFile;
+
+    @Option(name = "--hex",
+            description = "serial number without prefix is hex number")
+    private Boolean hex = Boolean.FALSE;
 
     @Option(name = "--out-dir", required = true,
             description = "folder to save the request and response")
@@ -166,6 +172,9 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         File messageDir = new File(outDir, "messages");
         messageDir.mkdirs();
 
+        File detailsDir = new File(outDir, "details");
+        detailsDir.mkdirs();
+
         OutputStream resultOut = new FileOutputStream(new File(outDir, "overview.txt"));
         BufferedReader snReader = new BufferedReader(new FileReader(snFile));
 
@@ -193,8 +202,9 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
                 String resultText = lineNo + ": " + line + ": ";
                 try {
-                    ValidationResult result = processOcspQuery(ocspQa, line, messageDir, serverUrl,
-                            respIssuer, issuerCert, issuerHash, requestOptions);
+                    ValidationResult result = processOcspQuery(ocspQa, line, messageDir,
+                            detailsDir,  serverUrl, respIssuer, issuerCert, issuerHash,
+                            requestOptions);
                     resultText += result.isAllSuccessful() ? "valid" : "invalid";
                 } catch (Throwable th) {
                     LogUtil.error(LOG, th);
@@ -217,7 +227,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             String resultText = lineNo + ": " + serialNumber.toString(16) + ",unknown: ";
             try {
                 ValidationResult result = processOcspQuery(ocspQa, serialNumber,
-                        OcspCertStatus.unknown, null, messageDir, serverUrl,
+                        OcspCertStatus.unknown, null, messageDir, detailsDir, serverUrl,
                         respIssuer, issuerCert, issuerHash, requestOptions);
                 resultText += result.isAllSuccessful() ? "valid" : "invalid";
             } catch (Throwable th) {
@@ -236,8 +246,8 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         return null;
     } // method execute0
 
-    private ValidationResult processOcspQuery(OcspQa ocspQa, String line,
-            File messageDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
+    private ValidationResult processOcspQuery(OcspQa ocspQa, String line, File messageDir,
+            File detailsDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
             IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
         StringTokenizer tokens = new StringTokenizer(line, ",;:");
 
@@ -246,7 +256,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         OcspCertStatus status = null;
         Date revTime = null;
         try {
-            serialNumber = new BigInteger(tokens.nextToken(), 16);
+            serialNumber = toBigInt(tokens.nextToken(), hex);
 
             if (count > 1) {
                 String token = tokens.nextToken();
@@ -296,17 +306,17 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(tokens.nextToken());
             }
         } catch (Exception ex) {
-            LOG.warn("Could not parse line '{}'", line);
+            LogUtil.warn(LOG, ex, "Could not parse line '" + line + "'");
             throw new IllegalArgumentException("illegal line");
         }
 
-        return processOcspQuery(ocspQa, serialNumber, status, revTime, messageDir, serverUrl,
-                respIssuer, issuerCert, issuerHash, requestOptions);
+        return processOcspQuery(ocspQa, serialNumber, status, revTime, messageDir, detailsDir,
+                serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
     }
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, BigInteger serialNumber,
-            OcspCertStatus status, Date revTime,
-            File messageDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
+            OcspCertStatus status, Date revTime, File messageDir, File detailsDir,
+            URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
             IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
         RequestResponseDebug debug = null;
         if (saveReq || saveResp) {
@@ -348,8 +358,25 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
         }
 
-        return ocspQa.checkOcsp(response, issuerHash, serialNumber, null, null, status,
-                responseOption, revTime);
+        ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null, null,
+                status, responseOption, revTime);
+
+        String validity = ret.isAllSuccessful() ? "valid" : "invalid";
+        String hexSerial = serialNumber.toString(16);
+        StringBuilder sb = new StringBuilder(50);
+        sb.append("OCSP response for ")
+            .append(serialNumber.toString())
+            .append(" (0x").append(hexSerial)
+            .append(") is ").append(validity);
+
+        for (ValidationIssue issue : ret.validationIssues()) {
+            sb.append("\n");
+            OcspQaStatusCmd.format(issue, "    ", sb);
+        }
+
+        IoUtil.save(new File(detailsDir, hexSerial + "." + validity), sb.toString().getBytes());
+
+        return ret;
     }
 
 }

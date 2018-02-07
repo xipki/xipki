@@ -212,7 +212,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         return null;
     } // method processResponse
 
-    private static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
+    static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
         sb.append(prefix);
         sb.append(issue.code());
         sb.append(", ").append(issue.description());
