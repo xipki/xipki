@@ -10,19 +10,30 @@
 
 ################## MySQL/MariaDB via MySQL Connector #################
 
-dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+# Deprecated. Use jdbcUrl instead
+#dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+#dataSource.serverName = 127.0.0.1
+#dataSource.port = 3306
+#dataSource.databaseName = ocspcrl
 
-dataSource.serverName = 127.0.0.1
-dataSource.port = 3306
-dataSource.databaseName = ocspcrl
+jdbcUrl = jdbc:mysql://127.0.0.1:3306/ocspcrl;useSSL=false
+
 dataSource.user = root
 # encrypted password 123456
 #dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
 dataSource.password = 123456
-dataSource.cachePrepStmts = true
-dataSource.prepStmtCacheSize = 250
-dataSource.prepStmtCacheSqlLimit = 2048
-dataSource.useServerPrepStmts = true
+
+dataSource.cachePrepStmts=true
+dataSource.prepStmtCacheSize=250
+dataSource.prepStmtCacheSqlLimit=2048
+dataSource.useServerPrepStmts=true
+dataSource.useLocalSessionState=true
+dataSource.useLocalTransactionState=true
+dataSource.rewriteBatchedStatements=true
+dataSource.cacheResultSetMetadata=true
+dataSource.cacheServerConfiguration=true
+dataSource.elideSetAutoCommits=true
+dataSource.maintainTimeStats=false
 
 autoCommit = true
 readOnly = false
