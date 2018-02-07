@@ -394,6 +394,9 @@ public class OcspQa {
                     case AA_COMPROMISE:
                         status = OcspCertStatus.aACompromise;
                         break;
+                    case CESSATION_OF_OPERATION:
+                        status = OcspCertStatus.cessationOfOperation;
+                        break;
                     default:
                         issue.setFailureMessage(
                                 "should not reach here, unknown CRLReason " + revocationReason);
