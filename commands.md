@@ -381,3 +381,32 @@ Feature xipki-ocspclient (started by default)
 
 	 request certificate status
 
+Feature xipki-caclient-benchmark
+-----
+
+   * `xiqa:cmp-benchmark-enroll`
+
+     CA client enroll load test
+
+   * `xiqa:cmp-benchmark-revoke`
+
+     CA client revoke load test
+
+   * `xiqa:cmp-benchmark-template-enroll`
+
+     CA client template enroll load test
+
+Feature xipki-ocspqa
+-----
+
+   * `xiqa:qa-ocsp-status`
+
+     request certificate status (QA)
+
+   * `xiqa:batch-ocsp-status`
+
+     batch request status of certificates (QA)
+
+   * `xiqa:benchmark-ocsp-status`
+
+     OCSP benchmark
