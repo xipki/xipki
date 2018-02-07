@@ -74,7 +74,17 @@ public class DataSourceFactory {
             databaseType = DatabaseType.forDataSourceClass(className);
         } else {
             className = conf.getProperty("driverClassName");
-            databaseType = DatabaseType.forDriver(className);
+            if (className != null) {
+                databaseType = DatabaseType.forDriver(className);
+            } else {
+                String jdbcUrl = conf.getProperty("jdbcUrl");
+                if (jdbcUrl == null) {
+                    throw new IllegalArgumentException("none of the properties dataSourceClassName"
+                            + ", driverClassName and jdbcUrl is configured");
+                }
+
+                databaseType = DatabaseType.forJdbcUrl(jdbcUrl);
+            }
         }
 
         String password = conf.getProperty("password");

@@ -45,11 +45,34 @@ public enum DatabaseType {
         return getDatabaseType(datasourceClass);
     }
 
+    public static DatabaseType forJdbcUrl(String url) {
+        ParamUtil.requireNonNull("url", url);
+        url = url.toLowerCase();
+        if (url.startsWith("jdbc:db2")) {
+            return DB2;
+        } else if (url.startsWith("jdbc:h2")) {
+            return H2;
+        } else if (url.startsWith("jdbc:hsqldb")) {
+            return HSQL;
+        } else if (url.startsWith("jdbc:mysql")) {
+            return MYSQL;
+        } else if (url.startsWith("jdbc:mariadb")) {
+            return MARIADB;
+        } else if (url.startsWith("jdbc:oracle")) {
+            return ORACLE;
+        } else if (url.startsWith("jdbc:pgsql")
+                || url.startsWith("jdbc:postgres")
+                || url.startsWith("jdbc:postgresql")) {
+            return POSTGRES;
+        } else {
+            return UNKNOWN;
+        }
+    }
+
     private static DatabaseType getDatabaseType(String className) {
         if (className.contains("db2.")) {
             return DatabaseType.DB2;
-        }
-        if (className.contains("h2.")) {
+        } else if (className.contains("h2.")) {
             return DatabaseType.H2;
         } else if (className.contains("hsqldb.")) {
             return DatabaseType.HSQL;

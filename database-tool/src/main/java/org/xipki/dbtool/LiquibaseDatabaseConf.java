@@ -44,7 +44,7 @@ public class LiquibaseDatabaseConf {
 
     private LiquibaseDatabaseConf(String driver, String username, String password,
             String url, String schema) {
-        this.driver = Objects.requireNonNull(driver, "driver must not be null");
+        this.driver = driver;
         this.username = Objects.requireNonNull(username, "username must not be null");
         this.password = password;
         this.url = Objects.requireNonNull(url, "url must not be null");
@@ -83,6 +83,26 @@ public class LiquibaseDatabaseConf {
             }
         }
 
+        String user = dbProps.getProperty("dataSource.user");
+        if (user == null) {
+            user = dbProps.getProperty("username");
+        }
+
+        String password = dbProps.getProperty("dataSource.password");
+        if (password == null) {
+            password = dbProps.getProperty("password");
+        }
+
+        if (passwordResolver != null && (password != null && !password.isEmpty())) {
+            password = new String(passwordResolver.resolvePassword(password));
+        }
+
+        String url = dbProps.getProperty("jdbcUrl");
+        if (url != null) {
+            String driverClassName = dbProps.getProperty("driverClassName");
+            return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
+        }
+
         String datasourceClassName = dbProps.getProperty("dataSourceClassName");
         if (datasourceClassName == null) {
             throw new IllegalArgumentException("unsupported configuration");
@@ -92,7 +112,6 @@ public class LiquibaseDatabaseConf {
 
         datasourceClassName = datasourceClassName.toLowerCase();
         String driverClassName;
-        String url;
 
         if (datasourceClassName.contains("org.h2.")) {
             driverClassName = "org.h2.Driver";
@@ -161,13 +180,6 @@ public class LiquibaseDatabaseConf {
         }
 
         url = urlBuilder.toString();
-
-        String user = dbProps.getProperty("dataSource.user");
-        String password = dbProps.getProperty("dataSource.password");
-
-        if (passwordResolver != null && (password != null && !password.isEmpty())) {
-            password = new String(passwordResolver.resolvePassword(password));
-        }
 
         return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
     } // method getInstance
