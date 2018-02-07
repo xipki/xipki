@@ -39,4 +39,16 @@
     <bundle>mvn:org.xipki.sdk/ocsp-client-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki.sdk/ocsp-client-shell/${project.version}</bundle>
   </feature>
+  <feature name="xipki-ocspqa" version="${project.version}" description="OCSP QA shell">
+    <feature prerequisite="true">xipki-ocspclient</feature>
+    <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-qa-shell/${project.version}</bundle>
+  </feature>
 </features>
