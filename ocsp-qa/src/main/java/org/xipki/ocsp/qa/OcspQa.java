@@ -51,7 +51,7 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.CompareUtil;
+import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
@@ -107,7 +107,7 @@ public class OcspQa {
     public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
             List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
             OcspError expectedOcspError, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            Map<BigInteger, Date> exptectedRevTimes, OcspResponseOption responseOption) {
+            Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption) {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
         ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
@@ -294,7 +294,10 @@ public class OcspQa {
             SingleResp singleResp = singleResponses[i];
             BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
             OcspCertStatus expectedStatus = expectedOcspStatuses.get(serialNumber);
-            Date expectedRevTime = exptectedRevTimes.get(serialNumber);
+            Date expectedRevTime = null;
+            if (expectedRevTimes != null) {
+                expectedRevTime = expectedRevTimes.get(serialNumber);
+            }
 
             byte[] encodedCert = null;
             if (encodedCerts != null) {
@@ -348,18 +351,19 @@ public class OcspQa {
         CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
         OcspCertStatus status = null;
-        Long revTime = null;
+        Long revTimeSec = null;
         if (singleCertStatus == null) {
             status = OcspCertStatus.good;
         } else if (singleCertStatus instanceof RevokedStatus) {
             RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
-            revTime = revStatus.getRevocationTime().getTime() / 1000;
+            revTimeSec = revStatus.getRevocationTime().getTime() / 1000;
 
             if (revStatus.hasRevocationReason()) {
                 int reason = revStatus.getRevocationReason();
-                if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code() && revTime == 0) {
+                if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code()
+                        && revTimeSec == 0) {
                     status = OcspCertStatus.unknown;
-                    revTime = null;
+                    revTimeSec = null;
                 } else {
                     CrlReason revocationReason = CrlReason.forReasonCode(reason);
                     switch (revocationReason) {
@@ -412,8 +416,14 @@ public class OcspQa {
         // revocation time
         issue = new ValidationIssue("OCSP.RESPONSE." + index + ".REVTIME", "certificate time");
         issues.add(issue);
-        if (!CompareUtil.equalsObject(expectedRevTime, revTime)) {
-            issue.setFailureMessage("is='" + revTime + "', but expected='" + expectedRevTime + "'");
+        if (expectedRevTime != null) {
+            if (revTimeSec == null) {
+                issue.setFailureMessage("is='null', but expected='" +
+                        formatTime(expectedRevTime) + "'");
+            } else if (revTimeSec != expectedRevTime.getTime() / 1000) {
+                issue.setFailureMessage("is='" +  formatTime(new Date(revTimeSec * 1000)) +
+                        "', but expected='" + formatTime(expectedRevTime) + "'");
+            }
         }
 
         // nextUpdate
@@ -482,4 +492,7 @@ public class OcspQa {
         return issue;
     }
 
+    private static final String formatTime(Date date) {
+        return DateUtil.toUtcTimeyyyyMMddhhmmss(date);
+    }
 }

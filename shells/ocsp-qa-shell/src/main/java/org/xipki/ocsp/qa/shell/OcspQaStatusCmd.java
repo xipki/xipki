@@ -19,6 +19,7 @@ package org.xipki.ocsp.qa.shell;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
+import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
@@ -68,6 +70,10 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     @Completion(CertStatusCompleter.class)
     private List<String> statusTexts;
 
+    @Option(name = "--rev-time", multiValued = true,
+            description = "revocation time, UTC time of format yyyyMMddHHmmss\n(multi-valued)")
+    private List<String> revTimeTexts;
+
     @Option(name = "--exp-sig-alg",
             description = "expected signature algorithm")
     @Completion(SigAlgCompleter.class)
@@ -103,6 +109,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
 
     private Map<BigInteger, OcspCertStatus> expectedStatuses;
 
+    private Map<BigInteger, Date> expecteRevTimes;
+
     private Occurrence expectedNextUpdateOccurrence;
 
     private Occurrence expectedCerthashOccurrence;
@@ -131,8 +139,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         if (isNotEmpty(statusTexts)) {
             if (statusTexts.size() != serialNumbers.size()) {
                 throw new IllegalArgumentException("number of expStatus is invalid: "
-                        + (statusTexts.size())
-                        + ", it should be " + serialNumbers.size());
+                        + (statusTexts.size()) + ", it should be " + serialNumbers.size());
             }
 
             expectedStatuses = new HashMap<>();
@@ -142,6 +149,21 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
                 String expectedStatusText = statusTexts.get(i);
                 OcspCertStatus certStatus = OcspCertStatus.forName(expectedStatusText);
                 expectedStatuses.put(serialNumbers.get(i), certStatus);
+            }
+        }
+
+        if (isNotEmpty(revTimeTexts)) {
+            if (revTimeTexts.size() != serialNumbers.size()) {
+                throw new IllegalArgumentException("number of revTimes is invalid: "
+                        + (revTimeTexts.size()) + ", it should be " + serialNumbers.size());
+            }
+
+            expecteRevTimes = new HashMap<>();
+            final int n = serialNumbers.size();
+
+            for (int i = 0; i < n; i++) {
+                Date revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(revTimeTexts.get(i));
+                expecteRevTimes.put(serialNumbers.get(i), revTime);
             }
         }
 
@@ -169,7 +191,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         }
 
         ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
-                encodedCerts, expectedOcspError, expectedStatuses, null, responseOption);
+                encodedCerts, expectedOcspError, expectedStatuses, expecteRevTimes, responseOption);
 
         StringBuilder sb = new StringBuilder(50);
         sb.append("OCSP response is ");

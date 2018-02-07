@@ -36,11 +36,14 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.qa.ValidationResult;
+import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.LogUtil;
 import org.xipki.console.karaf.completer.DirPathCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
@@ -69,6 +72,8 @@ import org.xipki.security.util.X509Util;
         description = "request status of certificates (QA)")
 @Service
 public class BatchOcspQaStatusCmd extends OcspStatusAction {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BatchOcspQaStatusCmd.class);
 
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
@@ -158,9 +163,8 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 Certificate.getInstance(issuerCert.getEncoded()));
 
         File outDir = new File(outDirStr);
-        if (outDir.getParentFile() != null) {
-            outDir.getParentFile().mkdirs();
-        }
+        File messageDir = new File(outDir, "messages");
+        messageDir.mkdirs();
 
         OutputStream resultOut = new FileOutputStream(new File(outDir, "overview.txt"));
         BufferedReader snReader = new BufferedReader(new FileReader(snFile));
@@ -187,12 +191,13 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                     continue;
                 }
 
-                String resultText = StringUtil.formatAccount(lineNo, 6) + ": " + line + ": ";
+                String resultText = lineNo + ": " + line + ": ";
                 try {
-                    ValidationResult result = processOcspQuery(ocspQa, line, outDir, serverUrl,
+                    ValidationResult result = processOcspQuery(ocspQa, line, messageDir, serverUrl,
                             respIssuer, issuerCert, issuerHash, requestOptions);
                     resultText += result.isAllSuccessful() ? "valid" : "invalid";
                 } catch (Throwable th) {
+                    LogUtil.error(LOG, th);
                     resultText += "error - " + th.getMessage();
                 }
 
@@ -209,14 +214,14 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             bytes[0] = (byte) (0x7F & bytes[0]);
             BigInteger serialNumber = new BigInteger(bytes);
 
-            String resultText = StringUtil.formatAccount(lineNo, 6)
-                    + ": " + serialNumber.toString(16) + ",unknown: ";
+            String resultText = lineNo + ": " + serialNumber.toString(16) + ",unknown: ";
             try {
                 ValidationResult result = processOcspQuery(ocspQa, serialNumber,
-                        OcspCertStatus.unknown, null, outDir, serverUrl,
+                        OcspCertStatus.unknown, null, messageDir, serverUrl,
                         respIssuer, issuerCert, issuerHash, requestOptions);
                 resultText += result.isAllSuccessful() ? "valid" : "invalid";
             } catch (Throwable th) {
+                LogUtil.error(LOG, th);
                 resultText += "error - " + th.getMessage();
             }
 
@@ -232,7 +237,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
     } // method execute0
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, String line,
-            File outDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
+            File messageDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
             IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
         StringTokenizer tokens = new StringTokenizer(line, ",;:");
 
@@ -241,16 +246,16 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         OcspCertStatus status = null;
         Date revTime = null;
         try {
-            if (count == 1) {
-                serialNumber = new BigInteger(tokens.nextToken(), 16);
-            } else if (count == 3){
-                serialNumber = new BigInteger(tokens.nextToken(), 16);
-                CrlReason reason = CrlReason.forReasonCode(Integer.parseInt(tokens.nextToken()));
-                revTime = new Date(Long.parseLong(tokens.nextToken()) * 1000);
+            serialNumber = new BigInteger(tokens.nextToken(), 16);
 
-                if (reason == null) {
+            if (count > 1) {
+                String token = tokens.nextToken();
+                if ("unknown".equalsIgnoreCase(token)) {
+                    status = OcspCertStatus.unknown;
+                } else if ("good".equalsIgnoreCase(token)) {
                     status = OcspCertStatus.good;
                 } else {
+                    CrlReason reason = CrlReason.forReasonCode(Integer.parseInt(token));
                     switch (reason) {
                         case AA_COMPROMISE:
                             status = OcspCertStatus.aACompromise;
@@ -284,19 +289,24 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                     }
                 }
             } else {
-               throw new IllegalArgumentException("illegal line");
+                status = OcspCertStatus.good;
+            }
+
+            if (count > 2 && status != OcspCertStatus.good && status != OcspCertStatus.unknown) {
+                revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(tokens.nextToken());
             }
         } catch (Exception ex) {
+            LOG.warn("Could not parse line '{}'", line);
             throw new IllegalArgumentException("illegal line");
         }
 
-        return processOcspQuery(ocspQa, serialNumber, status, revTime, outDir, serverUrl,
+        return processOcspQuery(ocspQa, serialNumber, status, revTime, messageDir, serverUrl,
                 respIssuer, issuerCert, issuerHash, requestOptions);
     }
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, BigInteger serialNumber,
             OcspCertStatus status, Date revTime,
-            File outDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
+            File messageDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
             IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
         RequestResponseDebug debug = null;
         if (saveReq || saveResp) {
@@ -314,14 +324,14 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 if (saveReq) {
                     byte[] bytes = reqResp.request();
                     if (bytes != null) {
-                        IoUtil.save(new File(outDir, filename + ".req"), bytes);
+                        IoUtil.save(new File(messageDir, filename + ".req"), bytes);
                     }
                 }
 
                 if (saveResp) {
                     byte[] bytes = reqResp.response();
                     if (bytes != null) {
-                        IoUtil.save(new File(outDir, filename + ".resp"), bytes);
+                        IoUtil.save(new File(messageDir, filename + ".resp"), bytes);
                     }
                 }
             } // end if
