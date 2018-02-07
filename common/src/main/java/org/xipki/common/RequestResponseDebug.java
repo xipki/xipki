@@ -29,6 +29,27 @@ public class RequestResponseDebug {
 
     private final List<RequestResponsePair> pairs = new LinkedList<>();
 
+    private final boolean saveRequest;
+
+    private final boolean saveResponse;
+
+    public RequestResponseDebug(boolean saveRequest, boolean saveResponse) {
+        if (!(saveRequest || saveResponse)) {
+            throw new IllegalArgumentException(
+                    "saveRequest and saveResponse must not be both false");
+        }
+        this.saveRequest = saveRequest;
+        this.saveResponse = saveResponse;
+    }
+
+    public boolean saveRequest() {
+        return saveRequest;
+    }
+
+    public boolean saveResponse() {
+        return saveResponse;
+    }
+
     public void add(RequestResponsePair pair) {
         pairs.add(pair);
     }
