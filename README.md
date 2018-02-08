@@ -73,7 +73,7 @@ follows.
   `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt
   them.
 
-  The database users must have both the read and right permissions.
+  The database users must have both the read and write permissions.
 
 3. Configure PKCS#11 device (optional)
 
