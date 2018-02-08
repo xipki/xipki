@@ -180,7 +180,7 @@ class OcspBenchRequestor {
         if (canCache) {
             byte[] request = requests.get(serialNumbers[0]);
             if (request != null) {
-               return request;
+                return request;
             }
         }
 

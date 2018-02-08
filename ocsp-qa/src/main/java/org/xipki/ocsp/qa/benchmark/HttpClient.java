@@ -166,7 +166,6 @@ final class HttpClient {
             return;
         }
 
-        String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
         int port = uri.getPort();
         if (port == -1) {
             port = 80;
@@ -227,6 +226,7 @@ final class HttpClient {
             .channel(channelClass)
             .handler(new HttpClientInitializer());
 
+        String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
         // Make the connection attempt.
         this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
     }
@@ -255,7 +255,7 @@ final class HttpClient {
 
     private void incrementPendingRequests() {
         synchronized (latch) {
-            if (++pendingRequests >= queueSize){
+            if (++pendingRequests >= queueSize) {
                 if (latch.getCount() == 0) {
                     latch.countUp();
                 }
@@ -265,7 +265,7 @@ final class HttpClient {
 
     private void decrementPendingRequests() {
         synchronized (latch) {
-            if (--pendingRequests < queueSize){
+            if (--pendingRequests < queueSize) {
                 final int count = (int) latch.getCount();
                 if (count > 0) {
                     while (latch.getCount() != 0) {

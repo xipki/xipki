@@ -167,13 +167,13 @@ public class CmpCaClient {
         this.requestorSigner = buildSigner(requestorKey);
 
         ASN1ObjectIdentifier[] oids = {
-                PKCSObjectIdentifiers.sha256WithRSAEncryption,
-                PKCSObjectIdentifiers.sha384WithRSAEncryption,
-                PKCSObjectIdentifiers.sha512WithRSAEncryption,
-                X9ObjectIdentifiers.ecdsa_with_SHA256,  X9ObjectIdentifiers.ecdsa_with_SHA384,
-                X9ObjectIdentifiers.ecdsa_with_SHA512,
-                NISTObjectIdentifiers.dsa_with_sha256, NISTObjectIdentifiers.dsa_with_sha384,
-                NISTObjectIdentifiers.dsa_with_sha512};
+            PKCSObjectIdentifiers.sha256WithRSAEncryption,
+            PKCSObjectIdentifiers.sha384WithRSAEncryption,
+            PKCSObjectIdentifiers.sha512WithRSAEncryption,
+            X9ObjectIdentifiers.ecdsa_with_SHA256,  X9ObjectIdentifiers.ecdsa_with_SHA384,
+            X9ObjectIdentifiers.ecdsa_with_SHA512,
+            NISTObjectIdentifiers.dsa_with_sha256, NISTObjectIdentifiers.dsa_with_sha384,
+            NISTObjectIdentifiers.dsa_with_sha512};
         for (ASN1ObjectIdentifier oid : oids) {
             trustedProtectionAlgOids.add(oid.getId());
         }
@@ -430,7 +430,7 @@ public class CmpCaClient {
         throw new Exception("Server did not return any certificate");
     } // method parseEnrollCertResult
 
-    public X509Certificate requestCertViaCSR(String certProfile, CertificationRequest csr)
+    public X509Certificate requestCertViaCsr(String certProfile, CertificationRequest csr)
             throws Exception {
         ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
                 PKIHeader.CMP_2000, requestorSubject, responderSubject);
@@ -491,7 +491,7 @@ public class CmpCaClient {
                 && serialNumber.equals(revCert.getSerialNumber().getValue());
     }
 
-    public X509Certificate requestCertViaCRMF(String certProfile, PrivateKey privateKey,
+    public X509Certificate requestCertViaCrmf(String certProfile, PrivateKey privateKey,
             SubjectPublicKeyInfo publicKeyInfo, String subject) throws Exception {
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
@@ -631,14 +631,14 @@ public class CmpCaClient {
     private static String buildText(PKIStatusInfo pkiStatusInfo) {
         final int status = pkiStatusInfo.getStatus().intValue();
         switch (status) {
-            case 0: return "accepted (0)";
-            case 1: return "grantedWithMods (1)";
-            case 2: return "rejection (2)";
-            case 3: return "waiting (3)";
-            case 4: return "revocationWarning (4)";
-            case 5: return "revocationNotification (5)";
-            case 6: return "keyUpdateWarning (6)";
-            default: return Integer.toString(status);
+        case 0: return "accepted (0)";
+        case 1: return "grantedWithMods (1)";
+        case 2: return "rejection (2)";
+        case 3: return "waiting (3)";
+        case 4: return "revocationWarning (4)";
+        case 5: return "revocationNotification (5)";
+        case 6: return "keyUpdateWarning (6)";
+        default: return Integer.toString(status);
         }
     }
 }

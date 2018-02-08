@@ -379,6 +379,7 @@ public interface CaClient {
     /**
      * Returns the CA certificate.
      * @param caName
+     *          the CA name
      * @return the CA certificate
      * @throws CaClientException
      *          if client error occurs.

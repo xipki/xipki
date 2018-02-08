@@ -421,11 +421,11 @@ public class OcspQa {
         issues.add(issue);
         if (expectedRevTime != null) {
             if (revTimeSec == null) {
-                issue.setFailureMessage("is='null', but expected='" +
-                        formatTime(expectedRevTime) + "'");
+                issue.setFailureMessage("is='null', but expected='"
+                        + formatTime(expectedRevTime) + "'");
             } else if (revTimeSec != expectedRevTime.getTime() / 1000) {
-                issue.setFailureMessage("is='" +  formatTime(new Date(revTimeSec * 1000)) +
-                        "', but expected='" + formatTime(expectedRevTime) + "'");
+                issue.setFailureMessage("is='" +  formatTime(new Date(revTimeSec * 1000))
+                        + "', but expected='" + formatTime(expectedRevTime) + "'");
             }
         }
 

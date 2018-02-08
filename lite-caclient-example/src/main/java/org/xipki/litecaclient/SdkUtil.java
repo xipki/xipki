@@ -110,6 +110,7 @@ public class SdkUtil {
             try {
                 in.close();
             } catch (IOException ex) {
+                // CHECKSTYLE:SKIP
             }
         }
     }

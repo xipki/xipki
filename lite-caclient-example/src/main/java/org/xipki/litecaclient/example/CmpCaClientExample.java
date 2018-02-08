@@ -65,9 +65,6 @@ public class CmpCaClientExample extends CaClientExample {
         //System.setProperty("javax.net.debug", "all");
 
         try {
-            X509Certificate responderCert = SdkUtil.parseCert(
-                    new File(expandPath(RESPONDER_CERT_FILE)));
-
             KeyStore ks = KeyStore.getInstance("PKCS12");
 
             char[] password = REQUESTOR_KEYSTORE_PASSWORD.toCharArray();
@@ -78,7 +75,7 @@ public class CmpCaClientExample extends CaClientExample {
             Enumeration<String> aliases = ks.aliases();
 
             String alias = null;
-            while(aliases.hasMoreElements()) {
+            while (aliases.hasMoreElements()) {
                 String tmp = aliases.nextElement();
                 if (ks.isKeyEntry(tmp)) {
                     alias = tmp;
@@ -90,6 +87,9 @@ public class CmpCaClientExample extends CaClientExample {
             X509Certificate requestorCert = (X509Certificate) ks.getCertificate(alias);
 
             X509Certificate caCert = SdkUtil.parseCert(new File(expandPath(CA_CERT_FILE)));
+
+            X509Certificate responderCert = SdkUtil.parseCert(
+                    new File(expandPath(RESPONDER_CERT_FILE)));
             CmpCaClient client = new CmpCaClient(CA_URL, caCert, requestorKey, requestorCert,
                     responderCert, HASH_ALGO);
 
@@ -107,36 +107,36 @@ public class CmpCaClientExample extends CaClientExample {
             // Enroll certificate via CSR - RSA
             MyKeypair kp = generateRsaKeypair();
             CertificationRequest csr = genCsr(kp, getSubject());
-            X509Certificate cert = client.requestCertViaCSR(CERT_PROFILE, csr);
+            X509Certificate cert = client.requestCertViaCsr(CERT_PROFILE, csr);
             printCert("===== RSA via CSR (CMP) =====", cert);
 
             // Enroll certificate via CSR - EC
             kp = generateEcKeypair();
             csr = genCsr(kp, getSubject());
-            cert = client.requestCertViaCSR(CERT_PROFILE, csr);
+            cert = client.requestCertViaCsr(CERT_PROFILE, csr);
             printCert("===== EC via CSR (CMP) =====", cert);
 
             // Enroll certificate via CSR - DSA
             kp = generateDsaKeypair();
             csr = genCsr(kp, getSubject());
-            cert = client.requestCertViaCSR(CERT_PROFILE, csr);
+            cert = client.requestCertViaCsr(CERT_PROFILE, csr);
             printCert("===== DSA via CSR (CMP) =====", cert);
 
             // Enroll certificate via CRMF - RSA
             kp = generateRsaKeypair();
-            cert = client.requestCertViaCRMF(
+            cert = client.requestCertViaCrmf(
                     CERT_PROFILE, kp.getPrivate(),  kp.getPublic(), getSubject());
             printCert("===== RSA via CRMF (CMP) =====", cert);
 
             // Enroll certificate via CRMF - EC
             kp = generateEcKeypair();
-            cert = client.requestCertViaCRMF(
+            cert = client.requestCertViaCrmf(
                     CERT_PROFILE, kp.getPrivate(),  kp.getPublic(), getSubject());
             printCert("===== EC via CRMF (CMP) =====", cert);
 
             // Enroll certificate via CRMF - DSA
             kp = generateDsaKeypair();
-            cert = client.requestCertViaCRMF(
+            cert = client.requestCertViaCrmf(
                     CERT_PROFILE, kp.getPrivate(),  kp.getPublic(), getSubject());
             printCert("===== DSA via CRMF (CMP) =====", cert);
 

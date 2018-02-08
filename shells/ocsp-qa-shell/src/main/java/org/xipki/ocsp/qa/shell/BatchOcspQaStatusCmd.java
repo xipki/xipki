@@ -333,35 +333,35 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
                 } else {
                     CrlReason reason = CrlReason.forNameOrText(token);
                     switch (reason) {
-                        case AA_COMPROMISE:
-                            status = OcspCertStatus.aACompromise;
-                            break;
-                        case CA_COMPROMISE:
-                            status = OcspCertStatus.cACompromise;
-                            break;
-                        case AFFILIATION_CHANGED:
-                            status = OcspCertStatus.affiliationChanged;
-                            break;
-                        case CERTIFICATE_HOLD:
-                            status = OcspCertStatus.certificateHold;
-                            break;
-                        case CESSATION_OF_OPERATION:
-                            status = OcspCertStatus.cessationOfOperation;
-                            break;
-                        case KEY_COMPROMISE:
-                            status = OcspCertStatus.keyCompromise;
-                            break;
-                        case PRIVILEGE_WITHDRAWN:
-                            status = OcspCertStatus.privilegeWithdrawn;
-                            break;
-                        case SUPERSEDED:
-                            status = OcspCertStatus.superseded;
-                            break;
-                        case UNSPECIFIED:
-                            status = OcspCertStatus.unspecified;
-                            break;
-                        default:
-                            throw new Exception("invalid reason");
+                    case AA_COMPROMISE:
+                        status = OcspCertStatus.aACompromise;
+                        break;
+                    case CA_COMPROMISE:
+                        status = OcspCertStatus.cACompromise;
+                        break;
+                    case AFFILIATION_CHANGED:
+                        status = OcspCertStatus.affiliationChanged;
+                        break;
+                    case CERTIFICATE_HOLD:
+                        status = OcspCertStatus.certificateHold;
+                        break;
+                    case CESSATION_OF_OPERATION:
+                        status = OcspCertStatus.cessationOfOperation;
+                        break;
+                    case KEY_COMPROMISE:
+                        status = OcspCertStatus.keyCompromise;
+                        break;
+                    case PRIVILEGE_WITHDRAWN:
+                        status = OcspCertStatus.privilegeWithdrawn;
+                        break;
+                    case SUPERSEDED:
+                        status = OcspCertStatus.superseded;
+                        break;
+                    case UNSPECIFIED:
+                        status = OcspCertStatus.unspecified;
+                        break;
+                    default:
+                        throw new Exception("invalid reason");
                     }
                 }
             } else {
