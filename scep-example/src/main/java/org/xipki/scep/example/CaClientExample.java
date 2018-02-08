@@ -32,7 +32,6 @@ import java.security.spec.ECGenParameterSpec;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -120,21 +119,19 @@ public class CaClientExample {
 
     protected static MyKeypair generateEcKeypair()
             throws GeneralSecurityException {
-        ASN1ObjectIdentifier curveOid = SECObjectIdentifiers.secp256r1;
-
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("EC");
         ECGenParameterSpec spec = new ECGenParameterSpec("secp256r1");
         kpGen.initialize(spec);
         KeyPair kp = kpGen.generateKeyPair();
-
-        AlgorithmIdentifier algId = new AlgorithmIdentifier(
-                X9ObjectIdentifiers.id_ecPublicKey, curveOid);
 
         ECPublicKey pub = (ECPublicKey) kp.getPublic();
         byte[] keyData = new byte[65];
         keyData[0] = 4;
         copyArray(pub.getW().getAffineX().toByteArray(), keyData, 1, 32);
         copyArray(pub.getW().getAffineY().toByteArray(), keyData, 33, 32);
+
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(
+                X9ObjectIdentifiers.id_ecPublicKey, SECObjectIdentifiers.secp256r1);
         SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
         return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
     }

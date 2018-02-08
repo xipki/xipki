@@ -104,8 +104,9 @@ public abstract class Client {
      *          Content type of the HTTP request. Must not be {@code null}.
      * @param request
      *          HTTP request. Must not be {@code null}.
-     * @return
+     * @return the SCEP response
      * @throws ScepClientException
+     *          If error happens
      */
     protected abstract ScepHttpResponse httpPost(String url, String requestContentType,
             byte[] request) throws ScepClientException;

@@ -27,6 +27,7 @@ import org.xipki.scep.transaction.TransactionException;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * CA identifier.
  * @author Lijun Liao
  */
 

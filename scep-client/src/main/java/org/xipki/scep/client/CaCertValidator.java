@@ -20,7 +20,9 @@ package org.xipki.scep.client;
 import java.security.cert.X509Certificate;
 
 /**
+ * CA Certificate validator.
  * @author Lijun Liao
+ *
  */
 
 public interface CaCertValidator {

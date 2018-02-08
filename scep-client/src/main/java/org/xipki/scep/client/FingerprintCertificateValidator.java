@@ -59,7 +59,7 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
      *          Hash algorithm. Must not be {@code null}.
      * @param hashValue
      *          Hash value of the certificate to be checked. Must not be {@code null}.
-     * @return
+     * @return whether the given certificate is trusted.
      */
     protected abstract boolean isCertTrusted(ScepHashAlgoType hashAlgo,
             byte[] hashValue);

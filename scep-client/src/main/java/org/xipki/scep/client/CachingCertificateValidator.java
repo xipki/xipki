@@ -25,6 +25,7 @@ import org.xipki.scep.crypto.ScepHashAlgoType;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * CA certificate validator with caching certificates.
  * @author Lijun Liao
  */
 
