@@ -552,7 +552,7 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public boolean canResolveIssuer(RequestIssuer reqIssuer) {
+    public boolean knowsIssuer(RequestIssuer reqIssuer) {
         return null != issuerStore.getIssuerForFp(reqIssuer);
     }
 

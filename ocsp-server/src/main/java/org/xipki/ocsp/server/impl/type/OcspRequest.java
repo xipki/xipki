@@ -165,7 +165,6 @@ public class OcspRequest {
 
     public static OcspRequest getInstance(OCSPRequest req) throws EncodingException {
         TBSRequest tbsReq0 = req.getTbsRequest();
-        int version = tbsReq0.getVersion().getValue().intValue();
 
         org.bouncycastle.asn1.x509.Extensions extensions0 = tbsReq0.getRequestExtensions();
         Set<String> criticalExtensionOids = new HashSet<>();
@@ -212,7 +211,7 @@ public class OcspRequest {
             }
         }
 
-        return new OcspRequest(version, requestList, extensions);
+        return new OcspRequest(tbsReq0.getVersion().getValue().intValue(), requestList, extensions);
     }
 
     public static int readRequestVersion(byte[] request) throws EncodingException {

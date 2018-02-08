@@ -51,7 +51,7 @@ public class ClientCertCache {
 
         if (mode == null || "NO".equals(mode)) {
             reverseProxyMode = null;
-        } else if ("APACHE".equals(mode)){
+        } else if ("APACHE".equals(mode)) {
             reverseProxyMode = "APACHE";
         } else {
             LOG.error("invalid value of property {}: {} is not one of [NO, APACHE]",

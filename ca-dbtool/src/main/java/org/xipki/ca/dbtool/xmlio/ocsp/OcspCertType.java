@@ -36,7 +36,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     public static final String TAG_ROOT = "cert";
 
     /**
-     * base64 encoded hash
+     * base64 encoded hash.
      */
     public static final String TAG_HASH = "hash";
 
@@ -46,12 +46,12 @@ public class OcspCertType extends IdentifidDbObjectType {
     public static final String TAG_IID = "iid";
 
     /**
-     * not after
+     * not after.
      */
     public static final String TAG_NAFTER = "nafter";
 
     /**
-     * not before
+     * not before.
      */
     public static final String TAG_NBEFORE = "nbefore";
 
@@ -86,12 +86,12 @@ public class OcspCertType extends IdentifidDbObjectType {
     public static final String TAG_SN = "sn";
 
     /**
-     * subject
+     * subject.
      */
     public static final String TAG_SUBJECT = "subject";
 
     /**
-     * last update
+     * last update.
      */
     public static final String TAG_UPDATE = "update";
 

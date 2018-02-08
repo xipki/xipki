@@ -29,7 +29,7 @@ public interface QaSystemManager {
     Set<String> issuerNames();
 
     /**
-     *
+     * Returns the issuer information.
      * @param issuerName
      *          Name of the issuer
      * @return the issuer

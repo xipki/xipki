@@ -32,13 +32,14 @@ import org.xipki.security.ObjectIdentifiers;
  * @since 2.2.0
  */
 
+// CHECKSTYLE:SKIP
 public enum OID {
-    ID_PKIX_OCSP_NONCE (OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
-    ID_PKIX_OCSP_PREFSIGALGS (ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs),
-    ID_PKIX_OCSP_EXTENDEDREVOKE (ObjectIdentifiers.id_pkix_ocsp_extendedRevoke),
-    ID_ISISMTT_AT_CERTHASH (ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
+    ID_PKIX_OCSP_NONCE(OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
+    ID_PKIX_OCSP_PREFSIGALGS(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs),
+    ID_PKIX_OCSP_EXTENDEDREVOKE(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke),
+    ID_ISISMTT_AT_CERTHASH(ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
     ID_INVALIDITY_DATE(Extension.invalidityDate),
-    ID_PKIX_OCSP_ARCHIVE_CUTOFF (OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
+    ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
 
     private String id;
 

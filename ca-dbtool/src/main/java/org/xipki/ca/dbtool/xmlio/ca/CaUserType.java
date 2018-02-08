@@ -51,7 +51,7 @@ public class CaUserType extends IdentifidDbObjectType {
 
     private String profiles;
 
-    public Integer aId() {
+    public Integer caId() {
         return caId;
     }
 

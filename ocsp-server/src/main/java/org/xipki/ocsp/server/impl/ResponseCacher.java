@@ -66,7 +66,7 @@ class ResponseCacher {
 
     private static final String SQL_SELECT_ISSUER_ID = "SELECT ID FROM ISSUER";
 
-    private static final String SQL_DELETE_ISSUER= "DELETE FROM ISSUER WHERE ID=?";
+    private static final String SQL_DELETE_ISSUER = "DELETE FROM ISSUER WHERE ID=?";
 
     private static final String SQL_SELECT_ISSUER = "SELECT ID,CERT FROM ISSUER";
 
@@ -588,14 +588,14 @@ class ResponseCacher {
             }
         }
 
-        return  (0x7FL & hash[0]) << 56 | // ignore the first bit
-                (0xFFL & hash[1]) << 48 |
-                (0xFFL & hash[2]) << 40 |
-                (0xFFL & hash[3]) << 32 |
-                (0xFFL & hash[4]) << 24 |
-                (0xFFL & hash[5]) << 16 |
-                (0xFFL & hash[6]) << 8 |
-                (0xFFL & hash[7]);
+        return    (0x7FL & hash[0]) << 56 // ignore the first bit
+                | (0xFFL & hash[1]) << 48
+                | (0xFFL & hash[2]) << 40
+                | (0xFFL & hash[3]) << 32
+                | (0xFFL & hash[4]) << 24
+                | (0xFFL & hash[5]) << 16
+                | (0xFFL & hash[6]) << 8
+                | (0xFFL & hash[7]);
     }
 
     private static byte[] int2Bytes(int value) {

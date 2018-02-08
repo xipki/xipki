@@ -106,7 +106,7 @@ class DigestDiff {
         } else if (refDbControl == DbControl.XIPKI_CA_v3) {
             if (targetDbControl == DbControl.XIPKI_OCSP_v3) {
                 this.certhashAlgo = detectOcspDbCerthashAlgo(targetDatasource);
-            } else{
+            } else {
                 this.certhashAlgo = HashAlgoType.SHA1;
             }
         } else {

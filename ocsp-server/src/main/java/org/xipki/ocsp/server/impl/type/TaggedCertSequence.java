@@ -40,7 +40,7 @@ public class TaggedCertSequence extends ASN1Type {
             seqBodyLen += encodedCerts[i].length;
         }
 
-        int seqLen= getLen(seqBodyLen);
+        int seqLen = getLen(seqBodyLen);
         encodedLen = getLen(seqLen);
 
         this.encoded = new byte[encodedLen];

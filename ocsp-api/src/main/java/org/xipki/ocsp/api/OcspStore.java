@@ -55,9 +55,8 @@ public abstract class OcspStore {
      * @param reqIssuer
      *          Requested issuer
      * @return whether this OCSP store knows the given issuer.
-     * FIXME: rename it to knowsIssuer.
      */
-    public abstract boolean canResolveIssuer(RequestIssuer reqIssuer);
+    public abstract boolean knowsIssuer(RequestIssuer reqIssuer);
 
     /**
      *

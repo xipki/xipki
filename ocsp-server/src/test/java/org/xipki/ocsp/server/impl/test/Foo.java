@@ -111,6 +111,7 @@ public class Foo {
         Request request2 = new Request(certId2,
                 new Extensions(new Extension(ObjectIdentifiers.id_ad_timeStamping,
                         false, newBytes(30, (byte) 0x33))));
+        // CHECKSTYLE:SKIP
         ASN1Sequence requestList = new DERSequence(new ASN1Encodable[]{request1, request2});
 
         Extensions requestExtensions = null;
@@ -144,24 +145,24 @@ public class Foo {
             requestExtensions = new Extensions(arrays);
         }
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
 
         if (control.version != 0) {
-            v.add(new DERTaggedObject(true, 0,
+            vec.add(new DERTaggedObject(true, 0,
                     new ASN1Integer(BigInteger.valueOf(control.version))));
         }
 
         if (requestorName != null) {
-            v.add(new DERTaggedObject(true, 1, requestorName));
+            vec.add(new DERTaggedObject(true, 1, requestorName));
         }
 
-        v.add(requestList);
+        vec.add(requestList);
 
         if (requestExtensions != null) {
-            v.add(new DERTaggedObject(true, 2, requestExtensions));
+            vec.add(new DERTaggedObject(true, 2, requestExtensions));
         }
 
-        TBSRequest tbsRequest = TBSRequest.getInstance(new DERSequence(v));
+        TBSRequest tbsRequest = TBSRequest.getInstance(new DERSequence(vec));
 
         Signature sig = null;
         if (control.withSignature) {

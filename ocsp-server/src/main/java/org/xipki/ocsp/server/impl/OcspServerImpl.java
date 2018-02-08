@@ -274,14 +274,14 @@ public class OcspServerImpl implements OcspServer {
             LOG.error("could not start OCSP responder", ex);
             throw ex;
         } catch (Throwable th) {
-          LOG.error("could not start OCSP responder", th);
-          if (th instanceof RuntimeException) {
-              throw (RuntimeException) th;
-          } else if (th instanceof Error) {
-              throw (Error) th;
-          } else {
-              throw new RuntimeException(th);
-          }
+            LOG.error("could not start OCSP responder", th);
+            if (th instanceof RuntimeException) {
+                throw (RuntimeException) th;
+            } else if (th instanceof Error) {
+                throw (Error) th;
+            } else {
+                throw new RuntimeException(th);
+            }
         }
     }
 
@@ -590,7 +590,6 @@ public class OcspServerImpl implements OcspServer {
             OcspRespControl repControl = new OcspRespControl();
             repControl.canCacheInfo = true;
 
-            ResponderID responderId = signer.getResponderId(repOpt.isResponderIdByName());
             List<ExtendedExtension> reqExtensions = req.extensions();
             List<Extension> respExtensions = new LinkedList<>();
 
@@ -679,7 +678,7 @@ public class OcspServerImpl implements OcspServer {
                 // try to find the cached response
                 CertID certId = requestList.get(0);
                 HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
-                if(!reqOpt.allows(reqHashAlgo)) {
+                if (!reqOpt.allows(reqHashAlgo)) {
                     LOG.warn("CertID.hashAlgorithm {} not allowed",
                             reqHashAlgo != null ? reqHashAlgo : certId.issuer().hashAlgorithmOID());
                     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
@@ -716,6 +715,7 @@ public class OcspServerImpl implements OcspServer {
                 }
             }
 
+            ResponderID responderId = signer.getResponderId(repOpt.isResponderIdByName());
             OCSPRespBuilder builder = new OCSPRespBuilder(responderId);
 
             for (int i = 0; i < requestsSize; i++) {
@@ -747,9 +747,9 @@ public class OcspServerImpl implements OcspServer {
                 certsInResp = signer.sequenceOfCertificateChain();
             }
 
-            byte[] encodeOCSPResponse;
+            byte[] encodeOcspResponse;
             try {
-                encodeOCSPResponse = builder.buildOCSPResponse(concurrentSigner,
+                encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner,
                         certsInResp, new Date());
             } catch (NoIdleSignerException ex) {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
@@ -764,7 +764,7 @@ public class OcspServerImpl implements OcspServer {
                 // of storage
                 responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
                         cacheDbSerialNumber, repControl.cacheThisUpdate,
-                        repControl.cacheNextUpdate, cacheDbSigAlgCode, encodeOCSPResponse);
+                        repControl.cacheNextUpdate, cacheDbSigAlgCode, encodeOcspResponse);
             }
 
             if (viaGet && repControl.canCacheInfo) {
@@ -772,9 +772,9 @@ public class OcspServerImpl implements OcspServer {
                 if (repControl.cacheNextUpdate != Long.MAX_VALUE) {
                     cacheInfo.setNextUpdate(repControl.cacheNextUpdate);
                 }
-                return new OcspRespWithCacheInfo(encodeOCSPResponse, cacheInfo);
+                return new OcspRespWithCacheInfo(encodeOcspResponse, cacheInfo);
             } else {
-                return new OcspRespWithCacheInfo(encodeOCSPResponse, null);
+                return new OcspRespWithCacheInfo(encodeOcspResponse, null);
             }
         } catch (Throwable th) {
             LogUtil.error(LOG, th);
@@ -902,7 +902,7 @@ public class OcspServerImpl implements OcspServer {
 
         if (CollectionUtil.isEmpty(extensions)) {
             builder.addResponse(certId, certStatus, thisUpdate, nextUpdate, null);
-        } else{
+        } else {
             builder.addResponse(certId, certStatus, thisUpdate, nextUpdate,
                     new Extensions(extensions));
         }

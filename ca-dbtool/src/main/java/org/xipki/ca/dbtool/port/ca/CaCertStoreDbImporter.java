@@ -665,7 +665,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     try {
                         int idx = 1;
                         psAddCaUser.setLong(idx++, causer.id());
-                        psAddCaUser.setInt(idx++, causer.aId());
+                        psAddCaUser.setInt(idx++, causer.caId());
                         psAddCaUser.setInt(idx++, causer.uid());
                         psAddCaUser.setInt(idx++, causer.permission());
                         psAddCaUser.setString(idx++, causer.profiles());

@@ -94,7 +94,6 @@ class ResponderSigner {
             this.certificate = certificateChain[0];
 
             byte[] encodedCertificate = this.certificate.getEncoded();
-            Certificate bcCertificate = Certificate.getInstance(encodedCertificate);
             this.sequenceOfCertificate = new TaggedCertSequence(encodedCertificate);
 
             byte[][] encodedCertificateChain = new byte[this.certificateChain.length][];
@@ -104,6 +103,7 @@ class ResponderSigner {
             }
             this.sequenceOfCertificateChain = new TaggedCertSequence(encodedCertificateChain);
 
+            Certificate bcCertificate = Certificate.getInstance(encodedCertificate);
             this.responderIdByName = new ResponderID(bcCertificate.getSubject());
             byte[] keySha1 = HashAlgoType.SHA1.hash(
                     bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());

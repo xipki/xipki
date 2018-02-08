@@ -78,6 +78,7 @@ public class RequestIssuer {
         return hashAlgo;
     }
 
+    // CHECKSTYLE:SKIP
     public String hashAlgorithmOID() {
         if (hashAlgo != null) {
             return hashAlgo.oid().getId();
