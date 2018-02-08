@@ -148,6 +148,7 @@ public class P11ContentSignerBuilder {
                 }
 
                 if (isSm2p256v1) {
+                    // CHECKSTYLE:SKIP
                     java.security.spec.ECPoint w = ecKey.getW();
                     signer = createSM2ContentSigner(signatureAlgId, GMObjectIdentifiers.sm2p256v1,
                             w.getAffineX(), w.getAffineY());

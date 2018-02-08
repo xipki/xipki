@@ -53,6 +53,7 @@ public abstract class AbstractHttpServlet implements HttpServlet {
         return bytes;
     }
 
+    // CHECKSTYLE:SKIP
     protected static FullHttpResponse createOKResponse(HttpVersion version,
             String contentType, byte[] content) {
         return createResponse(version, HttpResponseStatus.OK, contentType, content);

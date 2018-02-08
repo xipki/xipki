@@ -68,6 +68,7 @@ class P11SM2ContentSigner implements XiContentSigner {
 
     private final OutputStream outputStream;
 
+    // CHECKSTYLE:SKIP
     private final byte[] z;
 
     static {

@@ -31,23 +31,23 @@ public class DataAccessException extends Exception {
 
     public static enum Reason {
         /**
-         * Root reason
+         * Root reason.
          */
-        Root (null),
+        Root(null),
 
         /**
          * Root of the hierarchy of data access exceptions that are considered non-transient -
          * where a retry of the same operation would fail unless the cause of the Exception
          * is corrected.
          */
-        NonTransientDataAccess (Root),
+        NonTransientDataAccess(Root),
 
         /**
          *  Exception thrown when an attempt to insert or update data results in violation of an
          *  integrity constraint. Note that this is not purely a relational concept; unique primary
          *  keys are required by most database types.
          */
-        DataIntegrityViolation (NonTransientDataAccess),
+        DataIntegrityViolation(NonTransientDataAccess),
 
         /**
          * Exception thrown when an attempt to insert or update data results in violation of a
@@ -55,7 +55,7 @@ public class DataAccessException extends Exception {
          * Note that this is not necessarily a purely relational concept; unique primary keys are
          * required by most database types.
          */
-        DuplicateKey (DataIntegrityViolation),
+        DuplicateKey(DataIntegrityViolation),
 
         /**
          * Root for exceptions thrown when we use a data access resource incorrectly.
@@ -72,7 +72,7 @@ public class DataAccessException extends Exception {
          * A custom SQLExceptionTranslator could create such more specific exceptions,
          * without affecting code using this class.
          */
-        BadSqlGrammar (InvalidDataAccessResourceUsage),
+        BadSqlGrammar(InvalidDataAccessResourceUsage),
 
         /**
          * Exception thrown when a ResultSet has been accessed in an invalid fashion. Such
@@ -81,73 +81,73 @@ public class DataAccessException extends Exception {
          * <p>This typically happens when an invalid ResultSet column index or name has been
          * specified. Also thrown by disconnected SqlRowSets.
          */
-        InvalidResultSetAccess (InvalidDataAccessResourceUsage),
+        InvalidResultSetAccess(InvalidDataAccessResourceUsage),
 
         /**
          * Data access exception thrown when a resource fails completely and the failure is
          * permanent.
          */
-        NonTransientDataAccessResource (NonTransientDataAccess),
+        NonTransientDataAccessResource(NonTransientDataAccess),
 
         /**
          * Data access exception thrown when a resource fails completely: for example, if we can't
          * connect to a database using JDBC.
          */
-        DataAccessResourceFailure (NonTransientDataAccessResource),
+        DataAccessResourceFailure(NonTransientDataAccessResource),
 
         /**
          * Exception thrown when the underlying resource denied a permission to access a specific
          * element, such as a specific database table.
          */
-        PermissionDeniedDataAccess (NonTransientDataAccess),
+        PermissionDeniedDataAccess(NonTransientDataAccess),
 
         /**
          * Normal superclass when we can't distinguish anything more specific than "something went
          * wrong with the underlying resource": for example, a SQLException from JDBC we cannot
          * pinpoint more precisely.
          */
-        UncategorizedDataAccess (NonTransientDataAccess),
+        UncategorizedDataAccess(NonTransientDataAccess),
 
         /**
          * Exception thrown when we can't classify a SQLException into one of our generic data
          * access exceptions.
          */
-        UncategorizedSql (UncategorizedDataAccess),
+        UncategorizedSql(UncategorizedDataAccess),
 
         /**
          * Root of the hierarchy of data access exceptions that are considered transient - where a
          * previously failed operation might be able to succeed when the operation is retried
          * without any intervention by application-level functionality.
          */
-        TransientDataAcces (Root),
+        TransientDataAcces(Root),
 
         /**
          * Indicate the type of failure: optimistic locking, failure to acquire lock, etc.
          */
-        ConcurrencyFailure (TransientDataAcces),
+        ConcurrencyFailure(TransientDataAcces),
 
         /**
          * Exception thrown on a pessimistic locking violation.
          *
         */
-        PessimisticLockingFailure (ConcurrencyFailure),
+        PessimisticLockingFailure(ConcurrencyFailure),
 
         /**
          * Failure to acquire a lock during an update, for example during a "select for update"
          * statement.
          */
-        CannotAcquireLock (PessimisticLockingFailure),
+        CannotAcquireLock(PessimisticLockingFailure),
 
         /**
          * Failure to complete a transaction in serialized mode due to update conflicts.
          */
-        CannotSerializeTransaction (PessimisticLockingFailure),
+        CannotSerializeTransaction(PessimisticLockingFailure),
 
         /**
          * Generic exception thrown when the current process was a deadlock loser, and its
          * transaction rolled back.
          */
-        DeadlockLoserDataAccess (PessimisticLockingFailure),
+        DeadlockLoserDataAccess(PessimisticLockingFailure),
 
         /**
          * Exception to be thrown on a query timeout. This could have different causes depending on
@@ -157,13 +157,13 @@ public class DataAccessException extends Exception {
          * <p>This exception can be thrown by user code trapping the native database exception or
          * by exception translation.
          */
-        QueryTimeout (TransientDataAcces),
+        QueryTimeout(TransientDataAcces),
 
         /**
          * Exception thrown when the underlying resource denied a permission to access a specific
          * element, such as a specific database table.
          */
-        TransientDataAccessResource (TransientDataAcces);
+        TransientDataAccessResource(TransientDataAcces);
 
         private final Reason parent;
 
@@ -179,7 +179,7 @@ public class DataAccessException extends Exception {
                 } else if (parent == this) {
                     return true;
                 } else {
-                    reason =parent;
+                    reason = parent;
                 }
             }
         }

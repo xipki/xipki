@@ -167,7 +167,7 @@ public final class HttpServers {
                 }
             } else {
                 Enumeration<String> aliases = ks.aliases();
-                while(aliases.hasMoreElements()) {
+                while (aliases.hasMoreElements()) {
                     String al = aliases.nextElement();
                     if (ks.isKeyEntry(al)) {
                         alias = al;
@@ -223,20 +223,19 @@ public final class HttpServers {
         List<String> availableProtocols;
         List<String> availableCiphersuits;
         switch (sslProvider) {
-            case JDK:
-                SSLParameters sslParams = SSLContext.getDefault().getSupportedSSLParameters();
-                availableProtocols = Arrays.asList(sslParams.getProtocols());
-                availableCiphersuits = Arrays.asList(sslParams.getCipherSuites());
-                break;
-            case OPENSSL:
-            case OPENSSL_REFCNT:
-                // any way to get the supported protocols of OpenSSL?
-                availableProtocols = Arrays.asList("TLSv1.1", "TLSv1.2");
-                availableCiphersuits = new ArrayList<>(OpenSsl.availableJavaCipherSuites());
-                break;
-            default:
-                throw new RuntimeException(
-                        "should not reach here, unknown SssProvider " + sslProvider);
+        case JDK:
+            SSLParameters sslParams = SSLContext.getDefault().getSupportedSSLParameters();
+            availableProtocols = Arrays.asList(sslParams.getProtocols());
+            availableCiphersuits = Arrays.asList(sslParams.getCipherSuites());
+            break;
+        case OPENSSL:
+        case OPENSSL_REFCNT:
+            // any way to get the supported protocols of OpenSSL?
+            availableProtocols = Arrays.asList("TLSv1.1", "TLSv1.2");
+            availableCiphersuits = new ArrayList<>(OpenSsl.availableJavaCipherSuites());
+            break;
+        default:
+            throw new RuntimeException("should not reach here, unknown SssProvider " + sslProvider);
         }
 
         // protocols
@@ -272,7 +271,7 @@ public final class HttpServers {
         builder.protocols(usedProtocols.toArray(strArray));
 
         // canonicalize the cipher suites
-        boolean cipherWithTLS = availableCiphersuits.get(0).startsWith("TLS_");
+        boolean cipherWithTls = availableCiphersuits.get(0).startsWith("TLS_");
 
         // cipher suites
         Set<String> usedCipherSuites = new HashSet<>();
@@ -284,10 +283,10 @@ public final class HttpServers {
                 }
 
                 String adaptedCipher;
-                if (cipherWithTLS == cipherSuite.startsWith("TLS_")) {
+                if (cipherWithTls == cipherSuite.startsWith("TLS_")) {
                     adaptedCipher = cipherSuite;
                 } else {
-                    if (cipherWithTLS) {
+                    if (cipherWithTls) {
                         adaptedCipher  = "TLS_" + cipherSuite.substring(4);
                     } else {
                         adaptedCipher = "SSL_" + cipherSuite.substring(4);
@@ -381,8 +380,7 @@ public final class HttpServers {
     }
 
     private KeyStore loadKeyStore(String storeType, FileOrValueType store, char[] password)
-            throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
-             {
+            throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         InputStream stream;
         if (store.getValue() != null) {
             stream = new ByteArrayInputStream(store.getValue());

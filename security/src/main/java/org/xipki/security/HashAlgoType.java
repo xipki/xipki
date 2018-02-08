@@ -166,7 +166,7 @@ public enum HashAlgoType {
             return HashAlgoType.SHA3_512;
         } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
             return HashAlgoType.SHA3_512;
-        } else if (hashMech == PKCS11VendorConstants.CKM_VENDOR_SM3){
+        } else if (hashMech == PKCS11VendorConstants.CKM_VENDOR_SM3) {
             return HashAlgoType.SM3;
         } else {
             return null;

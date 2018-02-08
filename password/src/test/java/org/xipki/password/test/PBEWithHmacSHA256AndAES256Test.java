@@ -51,8 +51,8 @@ public class PBEWithHmacSHA256AndAES256Test {
         char[] password = "qwert".toCharArray();
         int iterationCount = 1000;
         byte[] encrypted = new byte[]{16, // length of IV
-                -15, -2, 113, -42, -46, 43, -65, -8, -51, 48, 6, 26, -73, -38, -111, -1, // IV
-                75, 76, -36, -17, -96, -123, 2, -107, 92, -27, -114, -74, -80, 105, 46, 91};
+            -15, -2, 113, -42, -46, 43, -65, -8, -51, 48, 6, 26, -73, -38, -111, -1, // IV
+            75, 76, -36, -17, -96, -123, 2, -107, 92, -27, -114, -74, -80, 105, 46, 91};
         byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password,
                 iterationCount, salt);
 

@@ -780,8 +780,8 @@ public class AlgorithmUtil {
                 sigAlgOid = GMObjectIdentifiers.sm2sign_with_sm3;
                 break;
             default:
-                throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo +
-                        " for SM2 EC key");
+                throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo
+                        + " for SM2 EC key");
             }
         } else if (plainSignature) {
             sigAlgOid = digestToECPlainSigAlgMap.get(hashAlgo);
@@ -936,15 +936,15 @@ public class AlgorithmUtil {
 
         StringBuilder sb = new StringBuilder(algoText.length());
         for (int i = 0; i < algoText.length(); i++) {
-            char c = algoText.charAt(i);
-            if (c == '-') {
+            char cc = algoText.charAt(i);
+            if (cc == '-') {
                 if (i > 3 && !(algoText.charAt(i - 4) == 'S' && algoText.charAt(i - 3) == 'H'
                         && algoText.charAt(i - 2) == 'A' && algoText.charAt(i - 1) == '3')) {
                     continue;
                 }
             }
 
-            sb.append(c);
+            sb.append(cc);
         }
 
         return sb.toString();

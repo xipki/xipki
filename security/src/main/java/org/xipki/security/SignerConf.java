@@ -205,8 +205,8 @@ public class SignerConf {
     }
 
     public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-            Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm
-            , int parallelism) {
+            Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm,
+            int parallelism) {
         ParamUtil.requireMin("parallelism", parallelism, 1);
         ParamUtil.requireNonNull("algo", signatureAlgorithm);
         if (slotIndex == null && slotId == null) {

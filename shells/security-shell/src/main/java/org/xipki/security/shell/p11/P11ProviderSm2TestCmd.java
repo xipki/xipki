@@ -19,7 +19,6 @@ package org.xipki.security.shell.p11;
 
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
 import java.util.Enumeration;
@@ -76,7 +75,6 @@ public class P11ProviderSm2TestCmd extends P11SecurityAction {
             println("could not find certificate to verify signature");
             return null;
         }
-        PublicKey pubKey = cert.getPublicKey();
 
         String sigAlgo = "SM3withSM2";
         println("signature algorithm: " + sigAlgo);
@@ -98,7 +96,7 @@ public class P11ProviderSm2TestCmd extends P11SecurityAction {
             ver.setParameter(new SM2ParameterSpec(ida.getBytes()));
         }
 
-        ver.initVerify(pubKey);
+        ver.initVerify(cert.getPublicKey());
         ver.update(data);
         boolean valid = ver.verify(signature);
         println("signature valid: " + valid);

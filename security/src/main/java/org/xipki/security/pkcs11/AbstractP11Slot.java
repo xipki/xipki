@@ -675,8 +675,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateSecretKey");
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
 
         P11Identity identity = generateSecretKey0(keyType, keysize, label, control);
@@ -694,8 +694,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("createSecretKey");
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
 
         P11Identity identity = createSecretKey0(keyType, keyValue, label, control);
@@ -717,8 +717,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         assertWritable("generateRSAKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
 
         BigInteger tmpPublicExponent = publicExponent;
@@ -743,8 +743,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         assertWritable("generateDSAKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
 
         DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength,
@@ -769,8 +769,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         assertWritable("generateDSAKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
 
         P11Identity identity = generateDSAKeypair0(p, q, g, label, control);
@@ -788,8 +788,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         assertWritable("generateECKeypair");
         assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
 
         ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
@@ -811,8 +811,8 @@ public abstract class AbstractP11Slot implements P11Slot {
 
         assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
         if (getObjectIdForLabel(label) != null) {
-            throw new P11DuplicateEntityException("identity with label " + label +
-                    " already exists");
+            throw new P11DuplicateEntityException("identity with label " + label
+                    + " already exists");
         }
         P11Identity identity = generateSM2Keypair0(label, control);
         addIdentity(identity);

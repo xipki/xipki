@@ -43,6 +43,7 @@ public class ServletURIPool {
     private ServletURIPool() {
     }
 
+    // CHECKSTYLE:SKIP
     public static ServletURI getServletURI(String uri) throws URISyntaxException {
         if (uri == null || uri.isEmpty() || uri.equals("/")) {
             return SLASH_URI;

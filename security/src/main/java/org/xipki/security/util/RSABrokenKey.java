@@ -24,13 +24,14 @@ package org.xipki.security.util;
  * This detector port is unmaintained. Please refer to the original Python
  * implementation for more details.
  */
+
 import java.math.BigInteger;
 
 /**
  * @author Lijun Liao
  * @since 2.1.0
  */
-
+// CHECKSTYLE:SKIP
 public class RSABrokenKey {
 
     private static final BigInteger ONE = BigInteger.ONE;

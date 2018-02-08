@@ -18,6 +18,7 @@
 package org.xipki.security.pkcs11;
 
 /**
+ * PKCS#11 byte array parameters.
  * @author Lijun Liao
  */
 

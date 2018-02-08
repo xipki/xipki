@@ -125,7 +125,7 @@ public class EmulatorP11Identity extends P11Identity {
             if (this.publicKey instanceof ECPublicKey) {
                 boolean sm2curve = GMUtil.isSm2primev2Curve(
                         ((ECPublicKey) this.publicKey).getParams().getCurve());
-                algorithm = sm2curve ? null: "NONEwithECDSA";
+                algorithm = sm2curve ? null : "NONEwithECDSA";
             } else if (this.publicKey instanceof DSAPublicKey) {
                 algorithm = "NONEwithDSA";
             } else {

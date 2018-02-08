@@ -49,10 +49,12 @@ import org.xipki.security.util.GMUtil;
  *
  */
 class SM2Signer {
+    // CHECKSTYLE:SKIP
     private final DSAKCalculator kCalculator = new RandomDSAKCalculator();
 
     private final Digest digest;
 
+    // CHECKSTYLE:SKIP
     private final byte[] z;
 
     private final ECDomainParameters ecParams;
@@ -60,11 +62,11 @@ class SM2Signer {
 
     public SM2Signer(CipherParameters param) {
         if (param instanceof ParametersWithRandom) {
-            ParametersWithRandom rParam = (ParametersWithRandom) param;
+            ParametersWithRandom rdmParam = (ParametersWithRandom) param;
 
-            ecKey = (ECKeyParameters)rParam.getParameters();
+            ecKey = (ECKeyParameters)rdmParam.getParameters();
             ecParams = ecKey.getParameters();
-            kCalculator.init(ecParams.getN(), rParam.getRandom());
+            kCalculator.init(ecParams.getN(), rdmParam.getRandom());
         } else {
             ecKey = (ECKeyParameters) param;
             ecParams = ecKey.getParameters();
@@ -93,17 +95,19 @@ class SM2Signer {
         return generateSignatureForHash(hash);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
         BigInteger n = ecParams.getN();
         BigInteger e = new BigInteger(1, eHash);
         BigInteger d = ((ECPrivateKeyParameters)ecKey).getD();
 
-        BigInteger r, s;
+        BigInteger r;
+        BigInteger s;
 
         ECMultiplier basePointMultiplier = new FixedPointCombMultiplier();
 
         // 5.2.1 Draft RFC:  SM2 Public Key Algorithms
-        do {// generate s
+        do { // generate s
             BigInteger k;
             do { // generate r
                 // A3
@@ -114,14 +118,16 @@ class SM2Signer {
 
                 // A5
                 r = e.add(p.getAffineXCoord().toBigInteger()).mod(n);
-            } while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
+            }
+            while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
 
             // A6
             BigInteger dPlus1ModN = d.add(ECConstants.ONE).modInverse(n);
 
             s = k.subtract(r.multiply(d)).mod(n);
             s = dPlus1ModN.multiply(s).mod(n);
-        } while (s.equals(ECConstants.ZERO));
+        }
+        while (s.equals(ECConstants.ZERO));
 
         // A7
         try {
@@ -133,5 +139,6 @@ class SM2Signer {
             throw new CryptoException("unable to encode signature: " + ex.getMessage(), ex);
         }
     }
+    // CHECKSTYLE:ON
 
 }

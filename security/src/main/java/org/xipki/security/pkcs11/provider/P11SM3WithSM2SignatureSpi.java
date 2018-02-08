@@ -78,7 +78,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
 
         this.signingKey = (P11PrivateKey) privateKey;
         if (!(signingKey.publicKey() instanceof ECPublicKey)) {
-           throw new InvalidKeyException("only EC key is allowed");
+            throw new InvalidKeyException("only EC key is allowed");
         }
 
         ECPublicKey pubKey = (ECPublicKey) signingKey.publicKey();
@@ -98,6 +98,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
             outputStream = new DigestOutputStream(HashAlgoType.SM3.createDigest());
             p11Params = null;
 
+            // CHECKSTYLE:SKIP
             ECPoint w = pubKey.getW();
 
             sm2Z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,

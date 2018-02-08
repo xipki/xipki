@@ -31,10 +31,11 @@ import org.bouncycastle.util.BigIntegers;
 import org.xipki.common.util.Hex;
 
 /**
+ * Chinese GM/SM Util class.
  * @author Lijun Liao
  *
  */
-
+// CHECKSTYLE:SKIP
 public class GMUtil {
 
     private static final byte[] defaultIDA =
@@ -52,15 +53,17 @@ public class GMUtil {
         return getSM2Z(defaultIDA, curveOid, pubPointX, pubPointY);
     }
 
+    // CHECKSTYLE:SKIP
     public static byte[] getDefaultIDA() {
         return defaultIDA.clone();
     }
 
+    // CHECKSTYLE:SKIP
     public static byte[] getSM2Z(byte[] userID, ASN1ObjectIdentifier curveOid,
             BigInteger pubPointX, BigInteger pubPointY) {
         SM3Digest digest = new SM3Digest();
 
-        addUserID(digest, userID);
+        addUserId(digest, userID);
 
         X9ECParameters ecParams = GMNamedCurves.getByOID(curveOid);
         addFieldElement(digest, ecParams.getCurve().getA());
@@ -80,18 +83,16 @@ public class GMUtil {
         return result;
     }
 
-    private static void addUserID(Digest digest, byte[] userID)
-    {
-        int len = userID.length * 8;
+    private static void addUserId(Digest digest, byte[] userId) {
+        int len = userId.length * 8;
         digest.update((byte)(len >> 8 & 0xFF));
         digest.update((byte)(len & 0xFF));
-        digest.update(userID, 0, userID.length);
+        digest.update(userId, 0, userId.length);
     }
 
-    private static void addFieldElement(Digest digest, ECFieldElement v)
-    {
-        byte[] p = v.getEncoded();
-        digest.update(p, 0, p.length);
+    private static void addFieldElement(Digest digest, ECFieldElement element) {
+        byte[] encoded = element.getEncoded();
+        digest.update(encoded, 0, encoded.length);
     }
 
     public static boolean isSm2primev2Curve(EllipticCurve curve) {

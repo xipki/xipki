@@ -97,7 +97,7 @@ public final class HttpServer {
             }
 
             Object[] objs = servletListener.getServlet(request.uri());
-            if (objs== null) {
+            if (objs == null) {
                 sendError(ctx, HttpResponseStatus.NOT_FOUND);
                 return;
             }
@@ -237,7 +237,7 @@ public final class HttpServer {
     public void start() {
         int numProcessors = Runtime.getRuntime().availableProcessors();
         Class<? extends ServerSocketChannel> channelClass = null;
-        int bossGroupThreads = numProcessors == 1 ? 1  : (numProcessors + 1)/ 2;
+        int bossGroupThreads = numProcessors == 1 ? 1  : (numProcessors + 1) / 2;
 
         ClassLoader loader = getClass().getClassLoader();
         if (epollAvailable != null && epollAvailable.booleanValue()) {

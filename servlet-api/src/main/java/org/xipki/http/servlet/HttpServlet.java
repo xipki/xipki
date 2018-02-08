@@ -40,8 +40,9 @@ public interface HttpServlet {
      *          SSLSession associated with this connection. Could be {@code null}.
      * @param sslReverseProxyMode
      *          Mode of the SSL reverse proxy. Must not be {@code null}.
-     * @return
+     * @return the HTTP response
      * @throws Exception
+     *          If error occurs
      */
     FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
             SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception;

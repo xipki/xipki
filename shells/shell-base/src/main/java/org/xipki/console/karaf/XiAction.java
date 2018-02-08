@@ -105,7 +105,7 @@ public abstract class XiAction implements Action {
         } // end if(saveTo.exists())
 
         int retries = 2;
-        while(true) {
+        while (true) {
             try {
                 save(saveTo, encoded);
                 break;

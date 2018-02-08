@@ -71,7 +71,7 @@ public class LruCache<K, V> {
      * be created.
      *
      * @param key: the key the value for {@code key} if it exists in the cache or can be
-     * created by {@code #create}.
+     *      created by {@code #create}.
      * @return the
      */
     public final V get(K key) {
@@ -269,7 +269,7 @@ public class LruCache<K, V> {
      * @param key the key
      * @param value the value
      * @return he size of the entry for {@code key} and {@code value} in
-     *   user-defined units
+     *      user-defined units
      */
     protected int sizeOf(K key, V value) {
         return 1;
@@ -322,6 +322,7 @@ public class LruCache<K, V> {
     }
 
     /**
+     * Returns the number of times {@link #create(Object)} returned a value.
      * @return the number of times {@link #create(Object)} returned a value.
      */
     public final synchronized int createCount() {
@@ -329,6 +330,7 @@ public class LruCache<K, V> {
     }
 
     /**
+     * Returns the number of times {@link #put} was called.
      * @return the number of times {@link #put} was called.
      */
     public final synchronized int putCount() {
@@ -336,6 +338,7 @@ public class LruCache<K, V> {
     }
 
     /**
+     * Returns the number of values that have been evicted.
      * @return the number of values that have been evicted.
      */
     public final synchronized int evictionCount() {
@@ -344,7 +347,7 @@ public class LruCache<K, V> {
 
     /**
      * @return a copy of the current contents of the cache, ordered from least
-     * recently accessed to most recently accessed.
+     *      recently accessed to most recently accessed.
      */
     public final synchronized Map<K, V> snapshot() {
         return new LinkedHashMap<>(map);

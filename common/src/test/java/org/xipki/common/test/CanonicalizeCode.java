@@ -53,7 +53,7 @@ public class CanonicalizeCode {
             BufferedReader reader = new BufferedReader(
                     new FileReader("src/test/resources/HEADER.txt"));
             String line;
-            while((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 headerLines.add(line.getBytes("utf-8"));
             }
             reader.close();

@@ -25,13 +25,11 @@ package org.xipki.common.util;
 public class Hex {
 
     private static final char[] DIGITS = {
-            '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
 
     private static final char[] UPPER_DIGITS = {
-            '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
     };
 
     private static final int[] LINTS = new int['f' + 1];
@@ -56,12 +54,12 @@ public class Hex {
     }
 
     public static char[] encodeToChars(byte[] data) {
-        int l = data.length;
+        int len = data.length;
 
-        char[] out = new char[l << 1];
+        char[] out = new char[len << 1];
 
         // two characters form the hex value.
-        for (int i = 0, j = 0; i < l; i++) {
+        for (int i = 0, j = 0; i < len; i++) {
             out[j++] = DIGITS[(0xF0 & data[i]) >>> 4];
             out[j++] = DIGITS[0x0F & data[i]];
         }
@@ -74,12 +72,12 @@ public class Hex {
     }
 
     public static char[] encodeToUpperChars(byte[] data) {
-        int l = data.length;
+        int len = data.length;
 
-        char[] out = new char[l << 1];
+        char[] out = new char[len << 1];
 
         // two characters form the hex value.
-        for (int i = 0, j = 0; i < l; i++) {
+        for (int i = 0, j = 0; i < len; i++) {
             out[j++] = UPPER_DIGITS[(0xF0 & data[i]) >>> 4];
             out[j++] = UPPER_DIGITS[0x0F & data[i]];
         }

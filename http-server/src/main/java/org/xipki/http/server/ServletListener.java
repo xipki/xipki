@@ -153,17 +153,17 @@ public class ServletListener {
 
             if (rawPath.startsWith(m)) {
                 int len = rawPath.length();
-                int mLen = m.length();
-                if (len == mLen) {
+                int mlen = m.length();
+                if (len == mlen) {
                     uriText = "/";
                     alias = m;
                 } else {
-                    char ch = rawPath.charAt(mLen);
+                    char ch = rawPath.charAt(mlen);
                     if (ch == '/') {
-                        uriText = (len == mLen + 1) ? "/" : rawPath.substring(mLen);
+                        uriText = (len == mlen + 1) ? "/" : rawPath.substring(mlen);
                         alias = m;
                     } else if (ch == '?') {
-                        uriText = rawPath.substring(mLen);
+                        uriText = rawPath.substring(mlen);
                         alias = m;
                     }
                 }

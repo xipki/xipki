@@ -22,7 +22,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.bouncycastle.util.Arrays;
 
 /**
- * Parameter spec for SM2 ID parameter
+ * Parameter spec for SM2 ID parameter.
  *
  * @author Lijun Liao
  *
@@ -48,6 +48,7 @@ public class XiSM2ParameterSpec implements AlgorithmParameterSpec {
      *
      * @return the ID string.
      */
+    // CHECKSTYLE:SKIP
     public byte[] getID() {
         return Arrays.clone(id);
     }

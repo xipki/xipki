@@ -143,6 +143,7 @@ public interface ClockSource {
     long plusMillis0(long time, long millis);
 
     /**
+     * Return the TimeUnit the ClockSource is denominated in.
      * @return the TimeUnit the ClockSource is denominated in.
      */
     static TimeUnit getSourceTimeUnit() {

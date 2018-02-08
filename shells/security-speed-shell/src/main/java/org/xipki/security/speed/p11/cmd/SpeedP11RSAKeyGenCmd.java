@@ -38,7 +38,7 @@ public class SpeedP11RSAKeyGenCmd extends SpeedP11Action {
             description = "keysize in bit")
     private Integer keysize = 2048;
 
-    @Option(name = "--exponent", aliases="-e",
+    @Option(name = "--exponent", aliases = "-e",
             description = "public exponent")
     private String publicExponent = "0x10001";
 
