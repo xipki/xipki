@@ -17,7 +17,6 @@
 
 package org.xipki.datasource;
 
-import java.io.Console;
 import java.io.PrintWriter;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
