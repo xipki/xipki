@@ -30,6 +30,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.SignatureAlgoControl;
@@ -117,14 +118,13 @@ public class P11ProviderTestCmd extends P11SecurityAction {
     }
 
     private String getAlias() {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append(moduleName).append("#slotindex-").append(slotIndex);
         if (label != null) {
-            sb.append("#keylabel-").append(label);
+            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+                    "#keylabel-", label);
         } else {
-            sb.append("#keyid-").append(id.toUpperCase());
+            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+                    "#keyid-", id.toUpperCase());
         }
-        return sb.toString();
     }
 
     private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {

@@ -104,14 +104,13 @@ public class P11ProviderSm2TestCmd extends P11SecurityAction {
     }
 
     private String getAlias() {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append(moduleName).append("#slotindex-").append(slotIndex);
         if (label != null) {
-            sb.append("#keylabel-").append(label);
+            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+                    "#keylabel-", label);
         } else {
-            sb.append("#keyid-").append(id.toUpperCase());
+            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+                    "#keyid-", id.toUpperCase());
         }
-        return sb.toString();
     }
 
 }

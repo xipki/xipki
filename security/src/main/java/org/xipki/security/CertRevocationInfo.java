@@ -20,6 +20,7 @@ package org.xipki.security;
 import java.util.Date;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -91,11 +92,8 @@ public class CertRevocationInfo {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("reason: ").append(reason).append("\n");
-        sb.append("revocationTime: ").append(revocationTime).append("\n");
-        sb.append("invalidityTime: ").append(invalidityTime);
-        return sb.toString();
+        return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime,
+                "\ninvalidityTime: ", invalidityTime);
     }
 
 }

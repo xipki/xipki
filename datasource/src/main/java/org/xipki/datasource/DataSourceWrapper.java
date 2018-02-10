@@ -17,6 +17,7 @@
 
 package org.xipki.datasource;
 
+import java.io.Console;
 import java.io.PrintWriter;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
@@ -58,41 +59,27 @@ public abstract class DataSourceWrapper {
 
         @Override
         public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
-            // 'SELECT ': 7
-            // ' LIMIT ': 7
-            // rows (till 9999): 4
-            int size = coreSql.length() + 18;
-            if (StringUtil.isNotBlank(orderBy)) {
-                // ' ORDER BY ': 10
-                size += 10 + orderBy.length();
-            }
-            StringBuilder sql = new StringBuilder(size);
-            sql.append("SELECT ").append(coreSql);
-            if (StringUtil.isNotBlank(orderBy)) {
-                sql.append(" ORDER BY ").append(orderBy);
-            }
-            return sql.append(" LIMIT ").append(rows).toString();
+            return StringUtil.concat("SELECT ", coreSql,
+                    (StringUtil.isBlank(orderBy) ? "" : " ORDER BY " + orderBy),
+                    " LIMIT ", Integer.toString(rows));
         }
 
         @Override
         protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 75);
-            sql.append("INSERT INTO SEQ_TBL (SEQ_NAME,SEQ_VALUE) VALUES('");
-            return sql.append(sequenceName).append("', ").append(startValue).append(")").toString();
+            return StringUtil.concat("INSERT INTO SEQ_TBL (SEQ_NAME,SEQ_VALUE) VALUES('",
+                    sequenceName, "', ", Long.toString(startValue), ")");
         }
 
         @Override
         protected String buildDropSequenceSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 40);
-            sql.append("DELETE FROM SEQ_TBL WHERE SEQ_NAME='").append(sequenceName).append("'");
-            return sql.toString();
+            return StringUtil.concat("DELETE FROM SEQ_TBL WHERE SEQ_NAME='", sequenceName, "'");
         }
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 75);
-            sql.append("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME='");
-            return sql.append(sequenceName).append("'").toString();
+            return StringUtil.concat(
+                    "UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME='",
+                    sequenceName, "'");
         }
 
         @Override
@@ -138,23 +125,18 @@ public abstract class DataSourceWrapper {
         @Override
         protected String getSqlToDropForeignKeyConstraint(String constraintName,
                 String baseTable) throws DataAccessException {
-            StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
-            return sb.append("ALTER TABLE ").append(baseTable).append(" DROP FOREIGN KEY ")
-                    .append(constraintName).toString();
+            return StringUtil.concat("ALTER TABLE ", baseTable, " DROP FOREIGN KEY ",
+                    constraintName);
         }
 
         @Override
         protected String getSqlToDropIndex(String table, String indexName) {
-            StringBuilder sb = new StringBuilder(indexName.length() + table.length() + 15);
-            return sb.append("DROP INDEX ").append(indexName).append(" ON ").append(table)
-                    .toString();
+            return StringUtil.concat("DROP INDEX ", indexName, " ON ", table);
         }
 
         @Override
         protected String getSqlToDropUniqueConstraint(String constraintName, String table) {
-            StringBuilder sb = new StringBuilder(constraintName.length() + table.length() + 22);
-            return sb.append("ALTER TABLE ").append(table).append(" DROP KEY ")
-                    .append(constraintName).toString();
+            return StringUtil.concat("ALTER TABLE ", table, " DROP KEY ", constraintName);
         }
 
     } // class MySQL
@@ -177,45 +159,26 @@ public abstract class DataSourceWrapper {
 
         @Override
         public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
-            // 'SELECT ': 7
-            // ' FETCH FIRST ': 15
-            // ' ROWS ONLY' : 10
-            // rows (till 9999): 4
-            int size = coreSql.length() + 36;
-            if (StringUtil.isNotBlank(orderBy)) {
-                // ' ORDER BY ': 10
-                size += 10 + orderBy.length();
-            }
-            StringBuilder sql = new StringBuilder(size);
-
-            sql.append("SELECT ").append(coreSql);
-
-            if (StringUtil.isNotBlank(orderBy)) {
-                sql.append(" ORDER BY ").append(orderBy);
-            }
-
-            return sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY").toString();
+            return StringUtil.concat("SELECT ", coreSql,
+                    (StringUtil.isBlank(orderBy) ? "" : " ORDER BY " + orderBy),
+                    " FETCH FIRST ", Integer.toString(rows), " ROWS ONLY");
         }
 
         @Override
         protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
-            sql.append("CREATE SEQUENCE ").append(sequenceName).append(" AS BIGINT START WITH ");
-            return sql.append(startValue).append(" INCREMENT BY 1 NO CYCLE NO CACHE").toString();
+            return StringUtil.concat("CREATE SEQUENCE ", sequenceName, " AS BIGINT START WITH ",
+                    Long.toString(startValue), " INCREMENT BY 1 NO CYCLE NO CACHE");
         }
 
         @Override
         protected String buildDropSequenceSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
+            return StringUtil.concat("DROP SEQUENCE ", sequenceName);
         }
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 44);
-            sql.append("SELECT NEXT VALUE FOR ").append(sequenceName)
-                .append(" FROM sysibm.sysdummy1");
-            return sql.toString();
+            return StringUtil.concat("SELECT NEXT VALUE FOR ", sequenceName,
+                    " FROM sysibm.sysdummy1");
         }
 
     } // class DB2
@@ -229,43 +192,25 @@ public abstract class DataSourceWrapper {
 
         @Override
         public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
-            // 'SELECT ': 7
-            // ' FETCH FIRST ': 13
-            // ' ROWS ONLY': 10
-            // rows (till 9999): 4
-            int size = coreSql.length() + 34;
-            if (StringUtil.isNotBlank(orderBy)) {
-                // ' ORDER BY ': 10
-                size += 10 + orderBy.length();
-            }
-            StringBuilder sql = new StringBuilder(size);
-
-            sql.append("SELECT ").append(coreSql);
-
-            if (StringUtil.isNotBlank(orderBy)) {
-                sql.append(" ORDER BY ").append(orderBy);
-            }
-
-            return sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY").toString();
+            return StringUtil.concat("SELECT ", coreSql,
+                    (StringUtil.isBlank(orderBy) ? "" : " ORDER BY " + orderBy),
+                    " FETCH FIRST ", Integer.toString(rows), " ROWS ONLY");
         }
 
         @Override
         protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 70);
-            sql.append("CREATE SEQUENCE ").append(sequenceName).append(" START WITH ");
-            return sql.append(startValue).append(" INCREMENT BY 1 NO CYCLE").toString();
+            return StringUtil.concat("CREATE SEQUENCE ", sequenceName, " START WITH ",
+                    Long.toString(startValue), " INCREMENT BY 1 NO CYCLE");
         }
 
         @Override
         protected String buildDropSequenceSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
+            return StringUtil.concat("DROP SEQUENCE ", sequenceName);
         }
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
-            return sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')").toString();
+            return StringUtil.concat("SELECT NEXTVAL ('", sequenceName, "')");
         }
 
         @Override
@@ -275,18 +220,16 @@ public abstract class DataSourceWrapper {
 
         @Override
         protected String getSqlToDropPrimaryKey(String primaryKeyName, String table) {
-            StringBuilder sb = new StringBuilder(500);
-            sb.append("DO $$ DECLARE constraint_name varchar;\n");
-            sb.append("BEGIN\n");
-            sb.append("  SELECT tc.CONSTRAINT_NAME into strict constraint_name\n");
-            sb.append("  FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc\n");
-            sb.append("  WHERE CONSTRAINT_TYPE='PRIMARY KEY'\n");
-            sb.append("  AND TABLE_NAME='").append(table.toLowerCase())
-                    .append("' AND TABLE_SCHEMA='public';\n");
-            sb.append("  EXECUTE 'alter table public.").append(table.toLowerCase())
-                    .append(" drop constraint ' || constraint_name;\n");
-            sb.append("END $$;");
-            return sb.toString();
+            return StringUtil.concat("DO $$ DECLARE constraint_name varchar;\n",
+                "BEGIN\n",
+                "  SELECT tc.CONSTRAINT_NAME into strict constraint_name\n",
+                "  FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc\n",
+                "  WHERE CONSTRAINT_TYPE='PRIMARY KEY'\n",
+                "  AND TABLE_NAME='", table.toLowerCase(),
+                    "' AND TABLE_SCHEMA='public';\n",
+                    "  EXECUTE 'alter table public.", table.toLowerCase(),
+                    " drop constraint ' || constraint_name;\n",
+                "END $$;");
         }
 
     } // class PostgreSQL
@@ -303,44 +246,30 @@ public abstract class DataSourceWrapper {
          */
         @Override
         public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
-            int size = coreSql.length() + 18;
-            size += StringUtil.isBlank(orderBy) ? 14 : orderBy.length() + 40;
-
-            // ' ROWNUM < ': 10
-            // rows (till 9999): 4
-            size += 14;
-            StringBuilder sql = new StringBuilder(size);
-
             if (StringUtil.isBlank(orderBy)) {
-                sql.append("SELECT ").append(coreSql);
-                sql.append(coreSql.contains(" WHERE") ? " AND" : " WHERE");
+                return StringUtil.concat("SELECT ", coreSql,
+                    (coreSql.contains(" WHERE") ? " AND" : " WHERE"),
+                    " ROWNUM<", Integer.toString(rows + 1));
             } else {
-                sql.append("SELECT * FROM (SELECT ").append(coreSql);
-                sql.append(" ORDER BY ").append(orderBy).append(" ) WHERE");
+                return StringUtil.concat("SELECT * FROM (SELECT ", coreSql,
+                    " ORDER BY ", orderBy, " ) WHERE ROWNUM<", Integer.toString(rows + 1));
             }
-
-            return sql.append(" ROWNUM<").append(rows + 1).toString();
         }
 
         @Override
         protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 59);
-            sql.append("CREATE SEQUENCE ").append(sequenceName);
-            sql.append(" START WITH ").append(startValue);
-            return sql.append(" INCREMENT BY 1 NOCYCLE NOCACHE").toString();
+            return StringUtil.concat("CREATE SEQUENCE ", sequenceName, " START WITH ",
+                    Long.toString(startValue), " INCREMENT BY 1 NOCYCLE NOCACHE");
         }
 
         @Override
         protected String buildDropSequenceSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
+            return StringUtil.concat("DROP SEQUENCE ", sequenceName);
         }
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 21);
-            sql.append("SELECT ").append(sequenceName).append(".NEXTVAL FROM DUAL");
-            return sql.toString();
+            return StringUtil.concat("SELECT ", sequenceName, ".NEXTVAL FROM DUAL");
         }
 
         @Override
@@ -350,23 +279,17 @@ public abstract class DataSourceWrapper {
 
         @Override
         protected String getSqlToDropUniqueConstraint(String contraintName, String table) {
-            StringBuilder sql = new StringBuilder(table.length() + contraintName.length() + 40);
-            return sql.append("ALTER TABLE ").append(table)
-                    .append(" DROP CONSTRAINT ").append(contraintName)
-                    .append(" DROP INDEX").toString();
+            return StringUtil.concat("ALTER TABLE ", table, " DROP CONSTRAINT ", contraintName,
+                    " DROP INDEX");
         }
 
         @Override
         protected String getSqlToAddForeignKeyConstraint(String constraintName,
                 String baseTable, String baseColumn, String referencedTable,
                 String referencedColumn, String onDeleteAction, String onUpdateAction) {
-            final StringBuilder sb = new StringBuilder(100);
-            sb.append("ALTER TABLE ").append(baseTable);
-            sb.append(" ADD CONSTRAINT ").append(constraintName);
-            sb.append(" FOREIGN KEY (").append(baseColumn).append(")");
-            sb.append(" REFERENCES ").append(referencedTable);
-            sb.append(" (").append(referencedColumn).append(")");
-            return sb.append(" ON DELETE ").append(onDeleteAction).toString();
+            return StringUtil.concat("ALTER TABLE ", baseTable, " ADD CONSTRAINT ", constraintName,
+                    " FOREIGN KEY (", baseColumn, ")", " REFERENCES ", referencedTable,
+                    " (", referencedColumn, ")", " ON DELETE ", onDeleteAction);
         }
 
         @Override
@@ -397,44 +320,25 @@ public abstract class DataSourceWrapper {
 
         @Override
         public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
-            // 'SELECT ': 7
-            // ' LIMIT ': 7
-            // rows (till 9999): 4
-            int size = coreSql.length() + 18;
-            if (StringUtil.isNotBlank(orderBy)) {
-                // ' ORDER BY ': 10
-                size += 10 + orderBy.length();
-            }
-            StringBuilder sql = new StringBuilder(size);
-
-            sql.append("SELECT ").append(coreSql);
-
-            if (StringUtil.isNotBlank(orderBy)) {
-                sql.append(" ORDER BY ").append(orderBy);
-            }
-
-            sql.append(" LIMIT ").append(rows);
-            return sql.toString();
+            return StringUtil.concat("SELECT ", coreSql,
+                    (StringUtil.isBlank(orderBy) ? "" : " ORDER BY " + orderBy),
+                    " LIMIT ", Integer.toString(rows));
         }
 
         @Override
         protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
-            sql.append("CREATE SEQUENCE ").append(sequenceName);
-            sql.append(" START WITH ").append(startValue);
-            return sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE").toString();
+            return StringUtil.concat("CREATE SEQUENCE ", sequenceName, " START WITH ",
+                    Long.toString(startValue), " INCREMENT BY 1 NO CYCLE NO CACHE");
         }
 
         @Override
         protected String buildDropSequenceSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
+            return StringUtil.concat("DROP SEQUENCE ", sequenceName);
         }
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
-            return sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')").toString();
+            return StringUtil.concat("SELECT NEXTVAL ('", sequenceName, "')");
         }
 
     } // class H2
@@ -448,43 +352,25 @@ public abstract class DataSourceWrapper {
 
         @Override
         public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
-            // 'SELECT ': 7
-            // ' LIMIT ': 7
-            // rows (till 9999): 4
-            int size = coreSql.length() + 18;
-            if (StringUtil.isNotBlank(orderBy)) {
-                // ' ORDER BY ': 10
-                size += 10 + orderBy.length();
-            }
-            StringBuilder sql = new StringBuilder(size);
-
-            sql.append("SELECT ").append(coreSql);
-
-            if (StringUtil.isNotBlank(orderBy)) {
-                sql.append(" ORDER BY ").append(orderBy);
-            }
-
-            return sql.append(" LIMIT ").append(rows).toString();
+            return StringUtil.concat("SELECT ", coreSql,
+                    (StringUtil.isBlank(orderBy) ? "" : " ORDER BY " + orderBy), " LIMIT ",
+                    Integer.toString(rows));
         }
 
         @Override
         protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 70);
-            sql.append("CREATE SEQUENCE ").append(sequenceName);
-            sql.append(" AS BIGINT START WITH ").append(startValue);
-            return sql.append(" INCREMENT BY 1").toString();
+            return StringUtil.concat("CREATE SEQUENCE ", sequenceName, " AS BIGINT START WITH ",
+                    Long.toString(startValue), " INCREMENT BY 1");
         }
 
         @Override
         protected String buildDropSequenceSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
+            return StringUtil.concat("DROP SEQUENCE ", sequenceName);
         }
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
-            return sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')").toString();
+            return StringUtil.concat("SELECT NEXTVAL ('", sequenceName, "')");
         }
 
     } // class HSQL
@@ -688,18 +574,8 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
-        int size = column.length() + table.length() + 20;
-        if (StringUtil.isNotBlank(condition)) {
-            size += 7 + condition.length();
-        }
-
-        StringBuilder sqlBuilder = new StringBuilder(size);
-        sqlBuilder.append("SELECT MIN(").append(column).append(") FROM ").append(table);
-        if (StringUtil.isNotBlank(condition)) {
-            sqlBuilder.append(" WHERE ").append(condition);
-        }
-
-        final String sql = sqlBuilder.toString();
+        String sql = StringUtil.concat("SELECT MIN(", column, ") FROM ", table,
+                (StringUtil.isBlank(condition) ? "" : " WHERE " + condition));
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -722,9 +598,7 @@ public abstract class DataSourceWrapper {
     public int getCount(Connection conn, String table) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
-        StringBuilder sqlBuilder = new StringBuilder(table.length() + 21);
-        sqlBuilder.append("SELECT COUNT(*) FROM ").append(table);
-        final String sql = sqlBuilder.toString();
+        final String sql = StringUtil.concat("SELECT COUNT(*) FROM ", table);
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -752,17 +626,9 @@ public abstract class DataSourceWrapper {
             throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
-        int size = column.length() + table.length() + 20;
-        if (StringUtil.isNotBlank(condition)) {
-            size += 7 + condition.length();
-        }
 
-        StringBuilder sqlBuilder = new StringBuilder(size);
-        sqlBuilder.append("SELECT MAX(").append(column).append(") FROM ").append(table);
-        if (StringUtil.isNotBlank(condition)) {
-            sqlBuilder.append(" WHERE ").append(condition);
-        }
-        final String sql = sqlBuilder.toString();
+        final String sql = StringUtil.concat("SELECT MAX(", column, ") FROM ", table,
+                (StringUtil.isBlank(condition) ? "" : " WHERE " + condition));
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -785,10 +651,8 @@ public abstract class DataSourceWrapper {
     public boolean deleteFromTable(Connection conn, String table, String idColumn, long id) {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("idColumn", idColumn);
-        final StringBuilder sb = new StringBuilder(table.length() + idColumn.length() + 35);
-        sb.append("DELETE FROM ").append(table).append(" WHERE ")
-            .append(idColumn).append("=").append(id);
-        final String sql = sb.toString();
+        final String sql = StringUtil.concat("DELETE FROM ", table, " WHERE ", idColumn,
+                "=", Long.toString(id));
 
         Connection tmpConn;
         if (conn != null) {
@@ -831,10 +695,8 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("column", column);
         ParamUtil.requireNonNull("value", value);
 
-        StringBuilder sb = new StringBuilder(2 * column.length() + 15);
-        sb.append(column).append(" FROM ").append(table);
-        sb.append(" WHERE ").append(column).append("=?");
-        String sql = buildSelectFirstSql(1, sb.toString());
+        String coreSql = StringUtil.concat(column, " FROM ", table, " WHERE ", column, "=?");
+        String sql = buildSelectFirstSql(1, coreSql);
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -875,9 +737,8 @@ public abstract class DataSourceWrapper {
             throw translate(null, ex);
         }
 
-        StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
-        sqlBuilder.append(column).append(" FROM ").append(table);
-        final String sql = buildSelectFirstSql(1, sqlBuilder.toString());
+        String coreSql = StringUtil.concat(column, " FROM ", table);
+        final String sql = buildSelectFirstSql(1, coreSql);
 
         try {
             stmt.execute(sql);
@@ -903,9 +764,7 @@ public abstract class DataSourceWrapper {
             throw translate(null, ex);
         }
 
-        StringBuilder sqlBuilder = new StringBuilder(table.length() + 10);
-        sqlBuilder.append("1 FROM ").append(table);
-        final String sql = buildSelectFirstSql(1, sqlBuilder.toString());
+        final String sql = buildSelectFirstSql(1, StringUtil.concat("1 FROM ", table));
 
         try {
             stmt.execute(sql);
@@ -1037,8 +896,7 @@ public abstract class DataSourceWrapper {
     protected String getSqlToDropPrimaryKey(String primaryKeyName, String table) {
         ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
         ParamUtil.requireNonBlank("table", table);
-        StringBuilder sql = new StringBuilder(table.length() + 30);
-        return sql.append("ALTER TABLE ").append(table).append(" DROP PRIMARY KEY ").toString();
+        return StringUtil.concat("ALTER TABLE ", table, " DROP PRIMARY KEY ");
     }
 
     public void dropPrimaryKey(Connection conn, String primaryKeyName, String table)
@@ -1076,9 +934,7 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("constraintName", constraintName);
         ParamUtil.requireNonBlank("baseTable", baseTable);
 
-        StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
-        return sb.append("ALTER TABLE ").append(baseTable).append(" DROP CONSTRAINT ")
-                .append(constraintName).toString();
+        return StringUtil.concat("ALTER TABLE ", baseTable, " DROP CONSTRAINT ", constraintName);
     }
 
     public void dropForeignKeyConstraint(Connection conn, String constraintName,
@@ -1097,15 +953,10 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("onDeleteAction", onDeleteAction);
         ParamUtil.requireNonBlank("onUpdateAction", onUpdateAction);
 
-        final StringBuilder sb = new StringBuilder(100);
-        sb.append("ALTER TABLE ").append(baseTable);
-        sb.append(" ADD CONSTRAINT ").append(constraintName);
-        sb.append(" FOREIGN KEY (").append(baseColumn).append(")");
-        sb.append(" REFERENCES ").append(referencedTable);
-        sb.append(" (").append(referencedColumn).append(")");
-        sb.append(" ON DELETE ").append(onDeleteAction);
-        sb.append(" ON UPDATE ").append(onUpdateAction);
-        return sb.toString();
+        return StringUtil.concat("ALTER TABLE ", baseTable, " ADD CONSTRAINT ", constraintName,
+            " FOREIGN KEY (", baseColumn, ")", " REFERENCES ", referencedTable,
+            " (", referencedColumn, ")", " ON DELETE ", onDeleteAction,
+            " ON UPDATE ", onUpdateAction);
     }
 
     public void addForeignKeyConstraint(Connection conn, String constraintName,
@@ -1155,9 +1006,7 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("constraintName", constraintName);
 
-        StringBuilder sb = new StringBuilder(table.length() + constraintName.length() + 30);
-        return sb.append("ALTER TABLE ").append(table).append(" DROP CONSTRAINT ")
-                .append(constraintName).toString();
+        return StringUtil.concat("ALTER TABLE ", table, " DROP CONSTRAINT ", constraintName);
     }
 
     public void dropUniqueConstrain(Connection conn, String constraintName, String table)
@@ -1171,9 +1020,9 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("table", table);
 
         final StringBuilder sb = new StringBuilder(100);
-        sb.append("ALTER TABLE ").append(table);
-        sb.append(" ADD CONSTRAINT ").append(constraintName);
-        sb.append(" UNIQUE (");
+        sb.append("ALTER TABLE ").append(table)
+            .append(" ADD CONSTRAINT ").append(constraintName)
+            .append(" UNIQUE (");
         final int n = columns.length;
         for (int i = 0; i < n; i++) {
             if (i != 0) {
@@ -1181,8 +1030,7 @@ public abstract class DataSourceWrapper {
             }
             sb.append(columns[i]);
         }
-        sb.append(")");
-        return sb.toString();
+        return sb.append(")").toString();
     }
 
     public void addUniqueConstrain(Connection conn, String constraintName,
@@ -1300,10 +1148,11 @@ public abstract class DataSourceWrapper {
         if (LOG.isDebugEnabled()) {
             String codes;
             if (sqlErrorCodes.useSqlStateForTranslation) {
-                codes = new StringBuilder(60).append("SQL state '").append(sqlEx.getSQLState())
-                        .append("', error code '").append(sqlEx.getErrorCode()).toString();
+                codes = StringUtil.concatObjectsCap(60, "SQL state '", sqlEx.getSQLState(),
+                        "', error code '", sqlEx.getErrorCode());
             } else {
-                codes = "Error code '" + sqlEx.getErrorCode() + "'";
+                codes = StringUtil.concat("Error code '",
+                        Integer.toString(sqlEx.getErrorCode()), "'");
             }
             LOG.debug("Unable to translate SQLException with " + codes);
         }
@@ -1323,8 +1172,7 @@ public abstract class DataSourceWrapper {
 
     private String buildMessage(String sql, SQLException ex) {
         String msg = ex.getMessage();
-        StringBuilder sb = new StringBuilder(msg.length() + sql.length() + 8);
-        return sb.append("SQL [").append(sql).append("]; ").append(ex.getMessage()).toString();
+        return msg.contains(sql) ? msg : StringUtil.concat("SQL [", sql, "]; ", msg);
     }
 
     private void executeUpdate(Connection conn, String sql) throws DataAccessException {

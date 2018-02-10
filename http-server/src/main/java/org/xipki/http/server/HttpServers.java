@@ -399,11 +399,10 @@ public final class HttpServers {
 
     private static void logOpenSslWarning() {
         if (LOG.isWarnEnabled()) {
-            StringBuilder sb = new StringBuilder(120);
-            sb.append("To use the OpenSSL as SSL provider, both libapr-1 and OpenSSL must be ")
-                .append("installed and configured. Note that OpenSSL cannot be applied in ")
-                .append("Fedora distribution");
-            LOG.warn(sb.toString());
+            String msg = "To use the OpenSSL as SSL provider, both libapr-1 and "
+                    + "OpenSSL must be installed and configured. Note that OpenSSL cannot be "
+                    + "applied in Fedora distribution";
+            LOG.warn(msg);
         }
     }
 

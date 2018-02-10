@@ -202,29 +202,17 @@ public abstract class LoadExecutor {
     protected void printSummary() {
         processLog.printTrailer();
 
-        final long account = processLog.numProcessed();
-        StringBuilder sb = new StringBuilder(400);
+        String averageText = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
 
-        String text = new Date(processLog.startTimeMs()).toString();
-        sb.append(" started at: ").append(text).append("\n");
+        String msg = StringUtil.concatObjectsCap(400,
+            " started at: ", new Date(processLog.startTimeMs()),
+            "\nfinished at: ", new Date(processLog.endTimeMs()),
+            "\n   duration: ", StringUtil.formatTime(processLog.totalElapsedTime() / 1000, false),
+            "\n    account: ", StringUtil.formatAccount(processLog.numProcessed(), 1), " ", unit,
+            "\n     failed: ", StringUtil.formatAccount(errorAccount.get(), 1), " ", unit,
+            "\n    average: ", averageText, " ", unit, "/s\n");
 
-        text = new Date(processLog.endTimeMs()).toString();
-        sb.append("finished at: ").append(text).append("\n");
-
-        long elapsedTimeMs = processLog.totalElapsedTime();
-        text = StringUtil.formatTime(elapsedTimeMs / 1000, false);
-        sb.append("   duration: ").append(text).append("\n");
-
-        text = StringUtil.formatAccount(account, 1);
-        sb.append("    account: ").append(text).append(" ").append(unit).append("\n");
-
-        text = StringUtil.formatAccount(errorAccount.get(), 1);
-        sb.append("     failed: ").append(text).append(" ").append(unit).append("\n");
-
-        text = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
-        sb.append("    average: ").append(text).append(" ").append(unit).append("/s\n");
-
-        System.out.println(sb.toString());
+        System.out.println(msg);
     }
 
     protected static long getSecureIndex() {

@@ -82,6 +82,7 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -200,11 +201,8 @@ public class X509Util {
             throws CertificateException {
         ParamUtil.requireNonNull("cert", cert);
         byte[] encoded = cert.getEncoded();
-        StringBuilder sb = new StringBuilder(encoded.length * 4 / 3 + 80);
-        sb.append("-----BEGIN CERTIFICATE-----\n");
-        sb.append(Base64.encodeToString(encoded, true));
-        sb.append("\n-----END CERTIFICATE-----");
-        return sb.toString();
+        return StringUtil.concat("-----BEGIN CERTIFICATE-----\n",
+                Base64.encodeToString(encoded, true), "\n-----END CERTIFICATE-----");
     }
 
     public static X509Certificate toX509Cert(org.bouncycastle.asn1.x509.Certificate asn1Cert)
@@ -688,10 +686,7 @@ public class X509Util {
         if (text.length() <= maxLen) {
             return text;
         }
-        StringBuilder sb = new StringBuilder(maxLen);
-        sb.append(text.substring(0, maxLen - 13));
-        sb.append("...skipped...");
-        return sb.toString();
+        return StringUtil.concat(text.substring(0, maxLen - 13), "...skipped...");
     }
 
     public static String cutX500Name(X500Name name, int maxLen) {

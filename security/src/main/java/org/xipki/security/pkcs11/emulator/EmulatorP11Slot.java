@@ -753,13 +753,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
         String hexId = hex(id);
 
-        StringBuilder sb = new StringBuilder(200);
-        sb.append(PROP_ID).append('=').append(hexId).append('\n');
-        sb.append(PROP_LABEL).append('=').append(label).append('\n');
-        sb.append(PROP_SHA1SUM).append('=').append(HashAlgoType.SHA1.hexHash(value)).append('\n');
+        String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n",
+                PROP_SHA1SUM, "=", HashAlgoType.SHA1.hexHash(value), "\n");
 
         try {
-            IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
+            IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), str.getBytes());
             IoUtil.save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
         } catch (IOException ex) {
             throw new P11TokenException("could not save certificate");

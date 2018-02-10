@@ -24,6 +24,7 @@ import java.util.Map;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -78,13 +79,10 @@ public class CmpFailureUtil {
     }
 
     public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("PKIStatusInfo {status = ").append(status);
-        sb.append(" (").append(STATUS_TEXT_MAP.get(status)).append("), ");
-        sb.append("failureInfo = ").append(failureInfo);
-        sb.append(" (").append(getFailureInfoText(failureInfo)).append("), ");
-        sb.append("statusMessage = ").append(statusMessage).append("}");
-        return sb.toString();
+        return StringUtil.concatObjectsCap(200, "PKIStatusInfo {status = ", status,
+                " (", STATUS_TEXT_MAP.get(status), "), ", "failureInfo = ", failureInfo,
+                " (", getFailureInfoText(failureInfo), "), ", "statusMessage = ", statusMessage,
+                "}");
     }
 
     public static String getFailureInfoText(int failureInfo) {

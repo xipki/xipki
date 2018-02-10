@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.P11DuplicateEntityException;
@@ -112,17 +113,13 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     protected static String getDescription(byte[] keyId, char[] keyLabel) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("id ").append((keyId == null) ? "null" : hex(keyId));
-        sb.append(" and label ").append((keyLabel == null) ? "null" : new String(keyLabel));
-        return sb.toString();
+        return StringUtil.concat("id ", (keyId == null ? "null" : hex(keyId)),
+                " and label ", (keyLabel == null ? "null" : new String(keyLabel)));
     }
 
     protected static String getDescription(byte[] keyId, String keyLabel) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("id ").append((keyId == null) ? "null" : hex(keyId));
-        sb.append(" and label ").append(keyLabel);
-        return sb.toString();
+        return StringUtil.concat("id ", (keyId == null ? "null" : hex(keyId)),
+                " and label ", keyLabel);
     }
 
     /**

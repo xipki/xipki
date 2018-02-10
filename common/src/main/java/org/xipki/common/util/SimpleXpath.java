@@ -82,11 +82,8 @@ public class SimpleXpath {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(isElement ? "Element" : "Attribute");
-            sb.append(" localPart='").append(localPart).append("'");
-            sb.append(" namespace='").append(namespaceUri).append("'");
-            return sb.toString();
+            return StringUtil.concat((isElement ? "Element" : "Attribute"),
+                    " localPart='", localPart, "' namespace='", namespaceUri, "'");
         }
 
     } // class SimpleXPathStep

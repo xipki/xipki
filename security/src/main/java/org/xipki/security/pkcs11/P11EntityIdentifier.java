@@ -18,6 +18,7 @@
 package org.xipki.security.pkcs11;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -77,10 +78,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("slot ").append(slotId);
-        sb.append(", object ").append(objectId);
-        return sb.toString();
+        return StringUtil.concatObjects("slot ", slotId, ", object ", objectId);
     }
 
     @Override

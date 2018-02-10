@@ -119,8 +119,7 @@ public class SignerConf {
         if (verbose || tmpSignerConf.length() < 101) {
             return tmpSignerConf;
         } else {
-            return new StringBuilder().append(tmpSignerConf.substring(0, 97)).append("...")
-                    .toString();
+            return StringUtil.concat(tmpSignerConf.substring(0, 97), "...");
         }
     }
 

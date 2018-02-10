@@ -18,6 +18,7 @@
 package org.xipki.security.pkcs11;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -59,9 +60,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(30);
-        sb.append("(index = ").append(index).append(", id = ").append(id).append(")");
-        return sb.toString();
+        return StringUtil.concatObjects(30, "(index = ", index, ", id = ", id, ")");
     }
 
     @Override
