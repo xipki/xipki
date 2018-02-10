@@ -18,6 +18,7 @@
 package org.xipki.ca.api;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -78,8 +79,7 @@ public class NameId {
 
     @Override
     public String toString() {
-        return new StringBuilder(20)
-                .append("(id=").append(id).append(", name=").append(name).append(")").toString();
+        return StringUtil.concat("(id=", Integer.toString(id), ", name=", name, ")");
 
     }
 

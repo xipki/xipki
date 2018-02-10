@@ -58,6 +58,7 @@ import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -172,10 +173,7 @@ class CaConfigurationDbExporter extends DbPorter {
             throws DataAccessException, IOException {
         System.out.println("exporting table CRLSIGNER");
         Crlsigners crlsigners = new Crlsigners();
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT NAME,SIGNER_TYPE,SIGNER_CONF,SIGNER_CERT,CRL_CONTROL");
-        sqlBuilder.append(" FROM CRLSIGNER");
-        final String sql = sqlBuilder.toString();
+        String sql = "SELECT NAME,SIGNER_TYPE,SIGNER_CONF,SIGNER_CERT,CRL_CONTROL FROM CRLSIGNER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -390,15 +388,13 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCa(CAConfigurationType caconf) throws DataAccessException, IOException {
         System.out.println("exporting table CA");
         Cas cas = new Cas();
-        StringBuilder sqlBuilder = new StringBuilder(400);
-        sqlBuilder.append("SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,");
-        sqlBuilder.append("SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,");
-        sqlBuilder.append("EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,");
-        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,");
-        sqlBuilder.append("VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,");
-        sqlBuilder.append("CMPCONTROL_NAME,EXTRA_CONTROL FROM CA");
-
-        final String sql = sqlBuilder.toString();
+        String sql = StringUtil.concat(
+            "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,",
+            "SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,",
+            "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,",
+            "DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,",
+            "VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,",
+            "CMPCONTROL_NAME,EXTRA_CONTROL FROM CA");
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -604,9 +600,7 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCaHasProfile(CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_PROFILE");
         CaHasProfiles caHasProfiles = new CaHasProfiles();
-        StringBuilder sqlBuilder = new StringBuilder(100);
-        sqlBuilder.append("SELECT CA_ID,PROFILE_ID FROM CA_HAS_PROFILE");
-        final String sql = sqlBuilder.toString();
+        final String sql = "SELECT CA_ID,PROFILE_ID FROM CA_HAS_PROFILE";
 
         Statement stmt = null;
         ResultSet rs = null;

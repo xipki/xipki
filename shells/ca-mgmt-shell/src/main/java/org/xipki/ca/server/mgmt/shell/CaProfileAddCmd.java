@@ -23,6 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -46,12 +47,9 @@ public class CaProfileAddCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        sb.append(" to CA ").append(caName);
-
+        String msg = StringUtil.concat("certificate profile ", profileName, " to CA ", caName);
         boolean bo = caManager.addCertprofileToCa(profileName, caName);
-        output(bo, "associated", "could not associate", sb.toString());
+        output(bo, "associated", "could not associate", msg);
         return null;
     }
 

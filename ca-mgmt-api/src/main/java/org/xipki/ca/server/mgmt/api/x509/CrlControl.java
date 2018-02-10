@@ -142,17 +142,8 @@ public class CrlControl {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder(100);
-            if (hour < 10) {
-                sb.append("0");
-            }
-            sb.append(hour);
-            sb.append(":");
-            if (minute < 10) {
-                sb.append("0");
-            }
-            sb.append(minute);
-            return sb.toString();
+            return StringUtil.concatObjectsCap(100, (hour < 10 ? "0" : ""), hour, ":",
+                    (minute < 10 ? "0" : ""), minute);
         }
 
         @Override

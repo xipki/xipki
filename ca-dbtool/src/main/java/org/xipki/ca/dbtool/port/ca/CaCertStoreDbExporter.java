@@ -589,9 +589,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private void exportPublishQueue(CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table PUBLISHQUEUE");
 
-        StringBuilder sqlBuilder = new StringBuilder("SELECT CID,PID,CA_ID");
-        sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC");
-        final String sql = sqlBuilder.toString();
+        String sql = StringUtil.concat("SELECT CID,PID,CA_ID",
+                " FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC");
         final int minId = (int) min("PUBLISHQUEUE", "CID");
         final int maxId = (int) max("PUBLISHQUEUE", "CID");
 

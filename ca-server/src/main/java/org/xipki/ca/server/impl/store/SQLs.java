@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.xipki.common.LruCache;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataSourceWrapper;
 
 /**
@@ -270,17 +271,10 @@ class SQLs {
     }
 
     String getSqlSerials(int numEntries, Date notExpiredAt, boolean onlyRevoked, boolean withEe) {
-        StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CS=?");
-        if (notExpiredAt != null) {
-            sb.append(" AND NAFTER>?");
-        }
-        if (onlyRevoked) {
-            sb.append(" AND REV=1");
-        }
-        if (withEe) {
-            sb.append(" AND EE=?");
-        }
-        return datasource.buildSelectFirstSql(numEntries, "ID ASC", sb.toString());
+        String sql = StringUtil.concat("ID,SN FROM CERT WHERE ID>? AND CS=?",
+                (notExpiredAt != null ? " AND NAFTER>?" : ""),
+                (onlyRevoked ? " AND REV=1" : ""), (withEe ? " AND EE=?" : ""));
+        return datasource.buildSelectFirstSql(numEntries, "ID ASC", sql);
     }
 
 }

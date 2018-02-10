@@ -238,24 +238,20 @@ public class CmpControl {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(500);
-        sb.append("name: ").append(dbEntry.name()).append('\n');
-        sb.append("confirmCert: ").append(getYesNo(confirmCert)).append('\n');
-        sb.append("sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");
-        sb.append("sendResponderCert: ").append(getYesNo(sendResponderCert)).append("\n");
-        sb.append("messageTimeRequired: ").append(getYesNo(messageTimeRequired)).append("\n");
-        sb.append("groupEnroll: ").append(getYesNo(groupEnroll)).append("\n");
-        sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
-        sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
-        sb.append("protection algos: ")
-            .append(StringUtil.collectionAsString(sigAlgoValidator.algoNames(), ALGO_DELIMITER))
-            .append('\n');
-        sb.append("popo algos: ")
-            .append(StringUtil.collectionAsString(popoAlgoValidator.algoNames(), ALGO_DELIMITER))
-            .append('\n');
-        sb.append("conf: ").append(dbEntry.conf());
-
-        return sb.toString();
+        String protAlgos = StringUtil.collectionAsString(
+                sigAlgoValidator.algoNames(), ALGO_DELIMITER);
+        String popoAlgos = StringUtil.collectionAsString(
+                popoAlgoValidator.algoNames(), ALGO_DELIMITER);
+        return StringUtil.concatObjectsCap(500, "name: ", dbEntry.name(),
+                "\nconfirmCert: ", getYesNo(confirmCert),
+                "\nsendCaCert: ", getYesNo(sendCaCert),
+                "\nsendResponderCert: ", getYesNo(sendResponderCert),
+                "\nmessageTimeRequired: ", getYesNo(messageTimeRequired),
+                "\ngroupEnroll: ", getYesNo(groupEnroll),
+                "\nmessageTimeBias: ", messageTimeBias, " s",
+                "\nconfirmWaitTime: ", confirmWaitTime, " s",
+                "\nprotection algos: ", protAlgos,
+                "\npopo algos: ",  popoAlgos, "conf: ", dbEntry.conf());
     }
 
     private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {

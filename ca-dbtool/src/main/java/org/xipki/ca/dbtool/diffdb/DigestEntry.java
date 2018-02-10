@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -96,28 +97,13 @@ class DigestEntry {
     }
 
     private String encoded(boolean withSerialNumber) {
-        StringBuilder sb = new StringBuilder();
-        if (withSerialNumber) {
-            sb.append(serialNumber.toString(16)).append(";");
-        }
-        sb.append(base64HashValue).append(";");
-        sb.append(revoked ? "1" : "0").append(";");
-
-        if (revReason != null) {
-            sb.append(revReason);
-        }
-        sb.append(";");
-
-        if (revTime != null) {
-            sb.append(revTime);
-        }
-        sb.append(";");
-
-        if (revInvTime != null) {
-            sb.append(revInvTime);
-        }
-
-        return sb.toString();
+        return StringUtil.concatObjects(
+                (withSerialNumber ? serialNumber.toString(16) + ";" : ""),
+                base64HashValue, ";",
+                (revoked ? "1" : "0"), ";",
+                (revReason != null ? revReason : ""), ";",
+                (revTime != null ? revTime : ""), ";",
+                (revInvTime != null ? revInvTime : ""));
     }
 
     public boolean contentEquals(DigestEntry obj) {

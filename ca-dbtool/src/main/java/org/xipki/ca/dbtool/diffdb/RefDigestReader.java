@@ -43,6 +43,7 @@ import org.xipki.common.EndOfQueue;
 import org.xipki.common.QueueEntry;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgoType;
@@ -212,18 +213,13 @@ class RefDigestReader {
                         + certHashAlgoInDb + ")");
             }
 
-            coreSql = "ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=" + caId + " AND ID>=?";
+            coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
+                    Integer.toString(caId), " AND ID>=?");
         } else { // if (dbControl == DbControl.XIPKI_CA_v2) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("ID,SN,REV,RR,RT,RIT,");
-            if (certhashAlgo == HashAlgoType.SHA1) {
-                sb.append("SHA1");
-            } else {
-                sb.append("CERT");
-            }
-            sb.append(" FROM CERT INNER JOIN CRAW ON CERT.CA_ID=")
-                .append(caId).append(" AND CERT.ID>=? AND CERT.ID=CRAW.CID");
-            coreSql = sb.toString();
+            coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
+                    (certhashAlgo == HashAlgoType.SHA1 ? "SHA1" : "CERT"),
+                    " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=",
+                    Integer.toString(caId), " AND CERT.ID>=? AND CERT.ID=CRAW.CID");
         }
         this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 

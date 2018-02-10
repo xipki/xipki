@@ -290,8 +290,7 @@ class CaManagerQueryExecutor {
     }
 
     List<String> namesFromTable(String table, String nameColumn) throws CaMgmtException {
-        final String sql = new StringBuilder("SELECT ")
-                .append(nameColumn).append(" FROM ").append(table).toString();
+        final String sql = StringUtil.concat("SELECT ", nameColumn, " FROM ", table);
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -697,8 +696,7 @@ class CaManagerQueryExecutor {
             }
         }
 
-        final String sql = new StringBuilder("DELETE FROM ").append(table)
-                .append(" WHERE NAME=?").toString();
+        final String sql = StringUtil.concat("DELETE FROM ", table, " WHERE NAME=?");
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -739,14 +737,12 @@ class CaManagerQueryExecutor {
 
         X509CaEntry entry = (X509CaEntry) caEntry;
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
-        sqlBuilder.append(",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE");
-        sqlBuilder.append(",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY");
-        sqlBuilder.append(",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD");
-        sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        final String sql = sqlBuilder.toString();
+        final String sql = "INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS"
+                + ",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE"
+                + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
+                + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD"
+                + ",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
+                + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         // insert to table ca
         PreparedStatement ps = null;
@@ -989,10 +985,8 @@ class CaManagerQueryExecutor {
         }
 
         String name = dbEntry.name();
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,");
-        sqlBuilder.append("SIGNER_CONF) VALUES (?,?,?,?,?)");
-        final String sql = sqlBuilder.toString();
+        String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,"
+                + "CRL_CONTROL,SIGNER_CONF) VALUES (?,?,?,?,?)";
 
         PreparedStatement ps = null;
         try {

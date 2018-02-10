@@ -33,6 +33,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.dbtool.shell.completer.LogLevelCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
@@ -119,11 +120,14 @@ public abstract class LiquibaseAction extends XiAction {
 
     }
 
-    private static Properties getDbConfPoperties(String dbconfFile)
-            throws FileNotFoundException, IOException {
-        Properties props = new Properties();
-        props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
-        return props;
+    static void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile) {
+        String msg = StringUtil.concat("\n--------------------------------------------",
+                "\n     driver: ", dbParams.driver(),  "\n       user: ", dbParams.username(),
+                "\n        URL: ", dbParams.url(),
+                (dbParams.schema() != null ? "     schema: " + dbParams.schema() + "\n" : ""),
+                "schema file: ", schemaFile, "\n");
+
+        System.out.println(msg);
     }
 
     protected Map<String, LiquibaseDatabaseConf> getDatabaseConfs()
@@ -145,25 +149,18 @@ public abstract class LiquibaseAction extends XiAction {
         return ret;
     }
 
+    private static Properties getDbConfPoperties(String dbconfFile)
+            throws FileNotFoundException, IOException {
+        Properties props = new Properties();
+        props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
+        return props;
+    }
+
     private static Properties getPropertiesFromFile(String propFile)
             throws FileNotFoundException, IOException {
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
         return props;
-    }
-
-    private void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("\n--------------------------------------------\n");
-        msg.append("     driver: ").append(dbParams.driver()).append("\n");
-        msg.append("       user: ").append(dbParams.username()).append("\n");
-        msg.append("        URL: ").append(dbParams.url()).append("\n");
-        if (dbParams.schema() != null) {
-            msg.append("     schema: ").append(dbParams.schema()).append("\n");
-        }
-        msg.append("schema file: ").append(schemaFile).append("\n");
-
-        System.out.println(msg);
     }
 
     private boolean confirm(String command) throws IOException {

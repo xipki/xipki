@@ -17,6 +17,8 @@
 
 package org.xipki.ca.api.profile;
 
+import org.xipki.common.util.StringUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -65,17 +67,8 @@ public class Range {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append("[");
-        if (min != null) {
-            sb.append(min);
-        }
-        sb.append(", ");
-        if (max != null) {
-            sb.append(max);
-        }
-        sb.append("]");
-        return sb.toString();
+        return StringUtil.concatObjects("[", (min == null ? "" : min), ",",
+                (max == null ? "" : max), "]");
     }
 
 }

@@ -111,13 +111,10 @@ public class ListCertCmd extends CaAction {
     }
 
     private String format(int index, CertListInfo info) {
-        StringBuilder sb = new StringBuilder(300);
-        sb.append(StringUtil.formatAccount(index, 4)).append(" | ");
-        sb.append(StringUtil.formatText(info.serialNumber().toString(16), 20)).append(" | ");
-        sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.notBefore())).append(" | ");
-        sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.notAfter())).append(" | ");
-        sb.append(info.subject());
-        return sb.toString();
+        return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
+                StringUtil.formatText(info.serialNumber().toString(16), 20), " | ",
+                DateUtil.toUtcTimeyyyyMMddhhmmss(info.notBefore()), " | ",
+                DateUtil.toUtcTimeyyyyMMddhhmmss(info.notAfter()), " | ", info.subject());
     }
 
     private Date getDate(String str) throws IllegalCmdParamException {

@@ -37,6 +37,7 @@ import org.xipki.ca.dbtool.StopMe;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
@@ -192,12 +193,12 @@ class TargetDigestRetriever {
             }
         }
 
-        StringBuilder singleBuffer = new StringBuilder(200);
+        String singleSql;
         StringBuilder arrayBuffer = new StringBuilder(200);
 
         if (dbControl == DbControl.XIPKI_OCSP_v3) {
-            singleBuffer.append("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=")
-                .append(caId).append(" AND SN=?");
+            singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
+                    Integer.toString(caId), " AND SN=?");
 
             arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=")
                 .append(caId).append(" AND SN IN (?");
@@ -213,10 +214,9 @@ class TargetDigestRetriever {
                 hashOrCertColumn = "CERT";
             }
 
-            singleBuffer.append("REV,RR,RT,RIT,")
-                .append(hashOrCertColumn)
-                .append(" FROM CERT INNER JOIN CRAW ON CERT.CA_ID=").append(caId)
-                .append(" AND CERT.SN=? AND CERT.ID=CRAW.CID");
+            singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
+                " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=", Integer.toString(caId),
+                " AND CERT.SN=? AND CERT.ID=CRAW.CID");
 
             arrayBuffer.append("SN,REV,RR,RT,RIT,")
                 .append(hashOrCertColumn)
@@ -231,7 +231,7 @@ class TargetDigestRetriever {
             throw new IllegalArgumentException("unknown dbControl " + dbControl);
         }
 
-        singleCertSql = datasource.buildSelectFirstSql(1, singleBuffer.toString());
+        singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
         inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, arrayBuffer.toString());
 
         retrievers = new ArrayList<>(numThreads);

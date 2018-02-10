@@ -19,6 +19,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -53,12 +54,8 @@ public class UserEntry {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("id: ").append(ident.id()).append('\n');
-        sb.append("name: ").append(ident.name()).append('\n');
-        sb.append("active: ").append(active).append('\n');
-        sb.append("password: *****\n");
-        return sb.toString();
+        return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+                "\nactive: ", active, "\npassword: *****\n");
     }
 
 }

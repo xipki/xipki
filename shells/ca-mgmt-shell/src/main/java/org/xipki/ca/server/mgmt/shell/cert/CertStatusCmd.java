@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.x509.CertWithStatusInfo;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -52,16 +53,11 @@ public class CertStatusCmd extends UnRevRmCertAction {
             return null;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile: ").append(certInfo.certprofile()).append("\n");
-        sb.append("status: ");
-        if (certInfo.revocationInfo() == null) {
-            sb.append("good");
-        } else {
-            sb.append("revoked with ").append(certInfo.revocationInfo());
-        }
-        println(sb.toString());
-
+        String msg = StringUtil.concat(
+                "certificate profile: ", certInfo.certprofile(),
+                "\nstatus: ", (certInfo.revocationInfo() == null ? "good"
+                        : "revoked with " + certInfo.revocationInfo()));
+        println(msg);
         if (outputFile != null) {
             saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
         }

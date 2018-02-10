@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -43,12 +44,12 @@ public class EnvInfoCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
 
         if (name == null) {
             Set<String> paramNames = caManager.getEnvParamNames();
             int size = paramNames.size();
 
+            StringBuilder sb = new StringBuilder();
             if (size == 0 || size == 1) {
                 sb.append((size == 0) ? "no" : "1");
                 sb.append(" environment parameter is configured\n");
@@ -62,16 +63,16 @@ public class EnvInfoCmd extends CaAction {
             for (String paramName : sorted) {
                 sb.append("\t").append(paramName).append("\n");
             }
+            println(sb.toString());
         } else {
             String paramValue = caManager.getEnvParam(name);
             if (paramValue == null) {
                 throw new CmdFailure("\tno environment named '" + name + " is configured");
             } else {
-                sb.append(name).append("\n\t").append(paramValue);
+                println(StringUtil.concat(name, "\n\t", paramValue));
             }
         }
 
-        println(sb.toString());
         return null;
     } // method execute0
 

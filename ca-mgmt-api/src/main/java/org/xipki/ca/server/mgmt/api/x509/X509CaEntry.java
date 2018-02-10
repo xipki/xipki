@@ -25,10 +25,9 @@ import java.util.List;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.KeyUsage;
@@ -170,50 +169,23 @@ public class X509CaEntry extends CaEntry {
     }
 
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder(1000);
-        sb.append(super.toString(verbose, ignoreSensitiveInfo));
-        if (sb.charAt(sb.length() - 1) != '\n') {
-            sb.append('\n');
-        }
-        sb.append("serialNoBitLen: ").append(serialNoBitLen).append('\n');
-        sb.append("nextCrlNumber: ").append(nextCrlNumber).append('\n');
-        sb.append("deltaCrlUris: ").append(deltaCrlUrisAsString()).append('\n');
-        sb.append("crlUris: ").append(crlUrisAsString()).append('\n');
-        sb.append("ocspUris: ").append(ocspUrisAsString()).append('\n');
-        sb.append("caCertUris: ").append(cacertUrisAsString()).append('\n');
-        sb.append("cert: ").append("\n");
-        if (cert == null) {
-            sb.append("\tnull").append("\n");
-        } else {
-            sb.append("\tissuer: ").append(
-                    X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append("\n");
-            sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
-                    .append("\n");
-            sb.append("\tsubject: ").append(subject).append("\n");
-            sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
-            sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
-            if (verbose) {
-                String b64EncodedCert = null;
-                try {
-                    b64EncodedCert = Base64.encodeToString(cert.getEncoded());
-                } catch (CertificateEncodingException ex) {
-                    b64EncodedCert = "ERROR, could not encode the certificate";
-                }
-                sb.append("\tencoded: ").append(b64EncodedCert).append("\n");
-            }
+        String superToStr = super.toString(verbose, ignoreSensitiveInfo);
+        String str = StringUtil.concatObjectsCap(1000, superToStr,
+                (superToStr.charAt(superToStr.length() - 1) == '\n' ? "\n" : ""),
+                "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
+                "\ndeltaCrlUris: ", deltaCrlUrisAsString(), "\ncrlUris: ", crlUrisAsString(),
+                "\nocspUris: ", ocspUrisAsString(), "\ncaCertUris: ", cacertUrisAsString(),
+                "\ncert: \n", InternUtil.formatCert(cert, verbose),
+                "\ncrlSignerName: ", crlSignerName,
+                "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), "\n");
+
+        if (revocationInfo == null) {
+            return str;
         }
 
-        sb.append("crlSignerName: ").append(crlSignerName).append('\n');
-        sb.append("revocation: ");
-        sb.append(revocationInfo == null ? "not revoked" : "revoked");
-        sb.append("\n");
-        if (revocationInfo != null) {
-            sb.append("\treason: ").append(revocationInfo.reason().description())
-                .append("\n");
-            sb.append("\trevoked at ").append(revocationInfo.revocationTime()).append("\n");
-        }
-
-        return sb.toString();
+        return StringUtil.concatObjectsCap(str.length() + 30,  str,
+                "\treason: ", revocationInfo.reason().description(),
+                "\n\trevoked at ", revocationInfo.revocationTime(), "\n");
     } // method toString
 
     public CertRevocationInfo revocationInfo() {

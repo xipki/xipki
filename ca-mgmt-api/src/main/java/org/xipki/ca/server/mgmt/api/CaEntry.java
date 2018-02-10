@@ -223,37 +223,23 @@ public class CaEntry {
     }
 
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder(500);
-        sb.append("id: ").append(ident.id()).append('\n');
-        sb.append("name: ").append(ident.name()).append('\n');
-        sb.append("status: ").append((status == null) ? "null" : status.status()).append('\n');
-        sb.append("maxValidity: ").append(maxValidity).append("\n");
-        sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
-        sb.append("signerType: ").append(signerType).append('\n');
-        sb.append("signerConf: ");
-        if (signerConf == null) {
-            sb.append("null");
-        } else {
-            sb.append(SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo));
-        }
-        sb.append('\n');
-        sb.append("cmpcontrolName: ").append(cmpControlName).append('\n');
-        sb.append("responderName: ").append(responderName).append('\n');
-        sb.append("duplicateKey: ").append(duplicateKeyPermitted).append('\n');
-        sb.append("duplicateSubject: ").append(duplicateSubjectPermitted).append('\n');
-        sb.append("saveRequest: ").append(saveRequest).append('\n');
-        sb.append("validityMode: ").append(validityMode).append('\n');
-        sb.append("permission: ").append(permission).append('\n');
-        sb.append("keepExpiredCerts: ");
-        if (keepExpiredCertInDays < 0) {
-            sb.append("forever");
-        } else {
-            sb.append(keepExpiredCertInDays).append(" days");
-        }
-        sb.append("\n");
-        sb.append("extraControl: ").append(extraControl).append('\n');
-
-        return sb.toString();
+        return StringUtil.concatObjectsCap(500, "id: ", ident.id(), "\nname: ", ident.name(),
+                "\nstatus: ", (status == null ? "null" : status.status()),
+                "\nmaxValidity: ", maxValidity,
+                "\nexpirationPeriod: ", expirationPeriod, " days",
+                "\nsignerType: ", signerType,
+                "\nsignerConf: ", (signerConf == null ? "null" :
+                    SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo)),
+                "\ncmpcontrolName: ", cmpControlName,
+                "\nresponderName: ", responderName,
+                "\nduplicateKey: ", duplicateKeyPermitted,
+                "\nduplicateSubject: ", duplicateSubjectPermitted,
+                "\nsaveRequest: ", saveRequest,
+                "\nvalidityMode: ", validityMode,
+                "\npermission: ", permission,
+                "\nkeepExpiredCerts: ",
+                    (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
+                "\nextraControl: ", extraControl, "\n");
     } // method toString
 
     protected static String toString(Collection<? extends Object> tokens) {

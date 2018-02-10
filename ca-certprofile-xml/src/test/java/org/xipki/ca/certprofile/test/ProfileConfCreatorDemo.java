@@ -1838,14 +1838,14 @@ public class ProfileConfCreatorDemo {
     }
 
     private static AnyType createDescription(String details) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<my:myDescription xmlns:my=\"http://example.org\">\n");
-        sb.append("      <my:category>cat A</my:category>\n");
-        sb.append("      <my:details>").append(details).append("</my:details>\n");
-        sb.append("    </my:myDescription>\n");
+        String str = StringUtil.concat(
+                "<my:myDescription xmlns:my=\"http://example.org\">\n",
+                "  <my:category>cat A</my:category>\n",
+                "  <my:details>", details, "</my:details>\n",
+                "</my:myDescription>\n");
         Element element;
         try {
-            element = XmlUtil.getDocumentElment(sb.toString().getBytes());
+            element = XmlUtil.getDocumentElment(str.getBytes());
         } catch (IOException | SAXException ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }

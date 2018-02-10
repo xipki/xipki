@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.api.x509;
 
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
@@ -25,11 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
 
@@ -153,41 +151,12 @@ public class ScepEntry {
     }
 
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("ca: ").append(caIdent).append('\n');
-        sb.append("active: ").append(active).append('\n');
-        sb.append("faulty: ").append(faulty()).append('\n');
-        sb.append("responderType: ").append(responderType).append('\n');
-        sb.append("responderConf: ");
-        if (responderConf == null) {
-            sb.append("null");
-        } else {
-            sb.append(SignerConf.toString(responderConf, verbose, ignoreSensitiveInfo));
-        }
-        sb.append('\n');
-        sb.append("control: ").append(control).append("\n");
-        if (certificate != null) {
-            sb.append("cert: ").append("\n");
-            sb.append("\tissuer: ").append(
-                    X509Util.getRfc4519Name(certificate.getIssuerX500Principal())).append('\n');
-            sb.append("\tserialNumber: ").append(LogUtil.formatCsn(certificate.getSerialNumber()))
-                    .append('\n');
-            sb.append("\tsubject: ").append(
-                    X509Util.getRfc4519Name(certificate.getSubjectX500Principal())).append('\n');
-
-            if (verbose) {
-                sb.append("\tencoded: ");
-                try {
-                    sb.append(Base64.encodeToString(certificate.getEncoded()));
-                } catch (CertificateEncodingException ex) {
-                    sb.append("ERROR");
-                }
-            }
-        } else {
-            sb.append("cert: null\n");
-        }
-
-        return sb.toString();
+        return StringUtil.concatObjects("ca: ", caIdent, "\nactive: ", active,
+                "\nfaulty: ", faulty(), "\nresponderType: ", responderType,
+                "\nresponderConf: ", (responderConf == null ? "null"
+                        : SignerConf.toString(responderConf, verbose, ignoreSensitiveInfo)),
+                "\ncontrol: ", control,
+                "\ncert\n", InternUtil.formatCert(certificate, verbose));
     } // method toString
 
     @Override

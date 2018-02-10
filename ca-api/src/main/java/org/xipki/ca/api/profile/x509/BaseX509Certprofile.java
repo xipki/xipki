@@ -60,6 +60,7 @@ import org.xipki.common.LruCache;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -526,15 +527,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
-            if (prefix != null) {
-                sb.append(prefix);
-            }
-            sb.append(tmpText);
-            if (suffix != null) {
-                sb.append(suffix);
-            }
-            tmpText = sb.toString();
+            tmpText = StringUtil.concat((prefix != null ? prefix : ""), tmpText,
+                    (suffix != null ? suffix : ""));
 
             int len = tmpText.length();
             Range range = option.stringLengthRange();

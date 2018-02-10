@@ -119,11 +119,9 @@ class DigestDiffReporter {
         }
 
         numDiff.incrementAndGet();
-        StringBuilder sb = new StringBuilder(140);
-        sb.append(refCert.serialNumber().toString(16)).append('\t');
-        sb.append(refCert.encodedOmitSeriaNumber()).append('\t');
-        sb.append(targetCert.encodedOmitSeriaNumber()).append('\n');
-        String msg = sb.toString();
+        String msg = StringUtil.concat(refCert.serialNumber().toString(16),
+                "\t", refCert.encodedOmitSeriaNumber(),
+                "\t", targetCert.encodedOmitSeriaNumber(), "\n");
         synchronized (diffWriter) {
             diffWriter.write(msg);
         }
@@ -133,9 +131,7 @@ class DigestDiffReporter {
         ParamUtil.requireNonNull("errorMessage", errorMessage);
 
         numError.incrementAndGet();
-        StringBuilder sb = new StringBuilder(errorMessage);
-        sb.append('\n');
-        String msg = sb.toString();
+        String msg = StringUtil.concat(errorMessage, "\n");
         synchronized (errorWriter) {
             errorWriter.write(msg);
         }
@@ -159,44 +155,31 @@ class DigestDiffReporter {
         Date now = new Date();
         int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("      sum : ")
-            .append(StringUtil.formatAccount(sum, false)).append("\n");
-        sb.append("      good: ")
-            .append(StringUtil.formatAccount(numGood.get(), false)).append("\n");
-        sb.append("      diff: ")
-            .append(StringUtil.formatAccount(numDiff.get(), false)).append("\n");
-        sb.append("   missing: ")
-            .append(StringUtil.formatAccount(numMissing.get(), false)).append("\n");
-        sb.append("unexpected: ")
-        .append(StringUtil.formatAccount(numUnexpected.get(), false)).append("\n");
-        sb.append("     error: ")
-            .append(StringUtil.formatAccount(numError.get(), false)).append("\n");
-        sb.append("  duration: ")
-            .append(StringUtil.formatTime(durationSec, false)).append("\n");
-        sb.append("start time: ").append(startTime).append("\n");
-        sb.append("  end time: ").append(now).append("\n");
-        sb.append("     speed: ");
-        if (durationSec > 0) {
-            sb.append(StringUtil.formatAccount(sum / durationSec, false)).append(" /s");
-        } else {
-            sb.append("--");
-        }
-        sb.append("\n");
+        String speedStr = (durationSec > 0)
+                ? StringUtil.formatAccount(sum / durationSec, false) + " /s" : "--";
+
+        String str = StringUtil.concatObjectsCap(200,
+                "      sum : ", StringUtil.formatAccount(sum, false),
+                "\n      good: ", StringUtil.formatAccount(numGood.get(), false),
+                "\n      diff: ", StringUtil.formatAccount(numDiff.get(), false),
+                "\n   missing: ", StringUtil.formatAccount(numMissing.get(), false),
+                "\nunexpected: ", StringUtil.formatAccount(numUnexpected.get(), false),
+                "\n     error: ", StringUtil.formatAccount(numError.get(), false),
+                "\n  duration: ", StringUtil.formatTime(durationSec, false),
+                "\nstart time: ", startTime,
+                "\n  end time: ", now,
+                "\n     speed: ", speedStr, "\n");
 
         try {
-            IoUtil.save(reportDirname + File.separator + "overview.txt", sb.toString().getBytes());
+            IoUtil.save(reportDirname + File.separator + "overview.txt", str.getBytes());
         } catch (IOException ex) {
-            System.out.println("Could not write overview.txt with following content\n"
-                    + sb.toString());
+            System.out.println("Could not write overview.txt with following content\n" + str);
         }
     } // method close
 
     private static void writeSerialNumberLine(BufferedWriter writer, BigInteger serialNumber)
             throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append(serialNumber.toString(16)).append('\n');
-        String msg = sb.toString();
+        String msg = StringUtil.concat(serialNumber.toString(16), "\n");
         synchronized (writer) {
             writer.write(msg);
         }

@@ -60,6 +60,7 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -332,15 +333,13 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importCa(Cas cas) throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
-        StringBuilder sqlBuilder = new StringBuilder(500);
-        sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
-        sqlBuilder.append("CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,");
-        sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
-        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,");
-        sqlBuilder.append("NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,");
-        sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        final String sql = sqlBuilder.toString();
+        String sql = StringUtil.concat(
+                "INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,",
+                "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,",
+                "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,",
+                "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,",
+                "REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)",
+                " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
         PreparedStatement ps = null;
         try {

@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -47,17 +48,14 @@ public class ScepInfoCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
         if (name == null) {
-            sb.append("SCEPs: ");
-            sb.append(caManager.getScepNames());
-            println(sb.toString());
+            println(StringUtil.concatObjects("SCEPs: ", caManager.getScepNames()));
         } else {
             ScepEntry scep = caManager.getScepEntry(name);
             if (scep == null) {
                 throw new CmdFailure("could not find SCEP '" + name + "'");
             }
-            System.out.println(scep.toString(verbose.booleanValue()));
+            println(scep.toString(verbose.booleanValue()));
         }
 
         return null;

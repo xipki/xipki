@@ -47,12 +47,11 @@ public class PublisherInfoCmd extends CaAction {
 
     @Override
     protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
-
         if (name == null) {
             Set<String> names = caManager.getPublisherNames();
             int size = names.size();
 
+            StringBuilder sb = new StringBuilder();
             if (size == 0 || size == 1) {
                 sb.append((size == 0) ? "no" : "1");
                 sb.append(" publisher is configured\n");
@@ -66,16 +65,16 @@ public class PublisherInfoCmd extends CaAction {
             for (String entry : sorted) {
                 sb.append("\t").append(entry).append("\n");
             }
+            println(sb.toString());
         } else {
             PublisherEntry entry = caManager.getPublisher(name);
             if (entry == null) {
                 throw new CmdFailure("\tno publisher named '" + name + " is configured");
             } else {
-                sb.append(entry.toString());
+                println(entry.toString());
             }
         }
 
-        println(sb.toString());
         return null;
     } // method execute0
 

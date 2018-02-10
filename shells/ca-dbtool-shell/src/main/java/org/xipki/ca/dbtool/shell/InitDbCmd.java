@@ -90,7 +90,7 @@ public class InitDbCmd extends XiAction {
         ParamUtil.requireNonNull("dbConf", dbConf);
         ParamUtil.requireNonNull("schemaFile", schemaFile);
 
-        printDatabaseInfo(dbConf, schemaFile);
+        LiquibaseAction.printDatabaseInfo(dbConf, schemaFile);
         if (!force) {
             if (!confirm("reset and initialize")) {
                 println("cancelled");
@@ -115,20 +115,6 @@ public class InitDbCmd extends XiAction {
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
-    }
-
-    private void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("\n--------------------------------------------\n");
-        msg.append("     driver: ").append(dbParams.driver()).append("\n");
-        msg.append("       user: ").append(dbParams.username()).append("\n");
-        msg.append("        URL: ").append(dbParams.url()).append("\n");
-        if (dbParams.schema() != null) {
-            msg.append("     schema: ").append(dbParams.schema()).append("\n");
-        }
-        msg.append("schema file: ").append(schemaFile).append("\n");
-
-        System.out.println(msg);
     }
 
     private boolean confirm(String command) throws IOException {

@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt.api;
 import org.xipki.ca.api.NameId;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -64,13 +65,8 @@ public class PublisherEntry {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("id: ").append(ident.id()).append('\n');
-        sb.append("name: ").append(ident.name()).append('\n');
-        sb.append("faulty: ").append(faulty).append('\n');
-        sb.append("type: ").append(type).append('\n');
-        sb.append("conf: ").append(conf);
-        return sb.toString();
+        return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+                "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ", conf);
     }
 
     @Override

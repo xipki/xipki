@@ -17,16 +17,14 @@
 
 package org.xipki.ca.server.mgmt.api.x509;
 
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
 
@@ -127,40 +125,12 @@ public class X509CrlSignerEntry {
     }
 
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder(1000);
-        sb.append("name: ").append(name).append('\n');
-        sb.append("faulty: ").append(isFaulty()).append('\n');
-        sb.append("signerType: ").append(signerType).append('\n');
-        sb.append("signerConf: ");
-        if (signerConf == null) {
-            sb.append("null");
-        } else {
-            sb.append(SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo));
-        }
-        sb.append('\n');
-        sb.append("crlControl: ").append(crlControl).append("\n");
-        if (cert != null) {
-            sb.append("cert: ").append("\n");
-            sb.append("\tissuer: ").append(
-                    X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
-            sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
-                    .append('\n');
-            sb.append("\tsubject: ").append(
-                    X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
-
-            if (verbose) {
-                sb.append("\tencoded: ");
-                try {
-                    sb.append(Base64.encodeToString(cert.getEncoded()));
-                } catch (CertificateEncodingException ex) {
-                    sb.append("ERROR");
-                }
-            }
-        } else {
-            sb.append("cert: null\n");
-        }
-
-        return sb.toString();
+        return StringUtil.concatObjectsCap(1000, "name: ", name, "\nfaulty: ", isFaulty(),
+                "\nsignerType: ", signerType,
+                "\nsignerConf: ", (signerConf == null ? "null"
+                        : SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo)),
+                "\ncrlControl: ", crlControl,
+                "\ncert:\n", InternUtil.formatCert(cert, verbose));
     } // method toString
 
     @Override

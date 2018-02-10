@@ -186,10 +186,7 @@ public class HttpOcspServlet extends HttpServlet {
                 // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
                 // HEX representation of the SHA1 hash of the OCSPResponse structure.
                 resp.addHeader("ETag",
-                        new StringBuilder(42).append('\\')
-                            .append(HashAlgoType.SHA1.hexHash(encodedOcspResp))
-                            .append('\\')
-                        .toString());
+                        StringUtil.concat("\\", HashAlgoType.SHA1.hexHash(encodedOcspResp), "\\"));
 
                 // Max age must be in seconds in the cache-control header
                 long maxAge;
@@ -205,8 +202,8 @@ public class HttpOcspServlet extends HttpServlet {
                 }
 
                 resp.addHeader("Cache-Control",
-                        new StringBuilder(55).append("max-age=").append(maxAge)
-                            .append(",public,no-transform,must-revalidate").toString());
+                        StringUtil.concat("max-age=", Long.toString(maxAge),
+                            ",public,no-transform,must-revalidate"));
             } // end if (ocspRespWithCacheInfo)
 
             resp.setContentLength(encodedOcspResp.length);

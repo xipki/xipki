@@ -886,14 +886,13 @@ public class OcspServerImpl implements OcspServer {
                 certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
             }
 
-            StringBuilder sb = new StringBuilder(250);
-            sb.append("issuer: ").append(certId.issuer()).append(", ");
-            sb.append("serialNumber: ")
-                .append(LogUtil.formatCsn(certId.serialNumber()))
-                .append(", ");
-            sb.append("certStatus: ").append(certStatusText).append(", ");
-            sb.append("thisUpdate: ").append(thisUpdate).append(", ");
-            sb.append("nextUpdate: ").append(nextUpdate);
+            String msg = StringUtil.concatObjectsCap(250, "issuer: ", certId.issuer(),
+                    ", serialNumber: ", LogUtil.formatCsn(certId.serialNumber()),
+                    ", certStatus: ", certStatusText, ", thisUpdate: ", thisUpdate,
+                    ", nextUpdate: ", nextUpdate);
+
+            StringBuilder sb = new StringBuilder(msg.length() + 80);
+            sb.append(msg);
             if (certHash != null) {
                 sb.append(", certHash: ").append(Hex.encode(certHash));
             }

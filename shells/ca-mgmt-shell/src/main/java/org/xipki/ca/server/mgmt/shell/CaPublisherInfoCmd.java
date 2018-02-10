@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -48,19 +49,18 @@ public class CaPublisherInfoCmd extends CaAction {
             throw new CmdFailure("could not find CA '" + caName + "'");
         }
 
-        StringBuilder sb = new StringBuilder();
-
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
         if (isNotEmpty(entries)) {
-            sb.append("publishers for CA " + caName).append("\n");
+            StringBuilder sb = new StringBuilder();
+            sb.append("publishers for CA ").append(caName).append("\n");
             for (PublisherEntry entry : entries) {
                 sb.append("\t").append(entry.ident().name()).append("\n");
             }
+            println(sb.toString());
         } else {
-            sb.append("\tno publisher for CA " + caName + " is configured");
+            println(StringUtil.concat("no publisher for CA ", caName," is configured"));
         }
 
-        println(sb.toString());
         return null;
     }
 

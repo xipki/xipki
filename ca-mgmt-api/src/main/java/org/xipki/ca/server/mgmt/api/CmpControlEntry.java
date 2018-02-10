@@ -18,6 +18,7 @@
 package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -55,12 +56,8 @@ public class CmpControlEntry {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("name: ").append(name).append('\n');
-        sb.append("faulty: ").append(faulty).append('\n');
-        sb.append("conf: ").append(conf);
-
-        return sb.toString();
+        return StringUtil.concatObjectsCap(200, "name: ", name, "\nfaulty: ", faulty,
+                "\nconf: ", conf);
     }
 
     @Override

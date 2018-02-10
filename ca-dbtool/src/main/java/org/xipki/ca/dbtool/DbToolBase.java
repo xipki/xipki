@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 
@@ -103,9 +104,8 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("tableName", tableName);
         ParamUtil.requireNonBlank("idColumn", idColumn);
 
-        StringBuilder sb = new StringBuilder(50);
-        sb.append("DELETE FROM ").append(tableName).append(" WHERE ");
-        sb.append(idColumn).append(">").append(id);
+        String sql = StringUtil.concatObjects("DELETE FROM ", tableName, " WHERE ", idColumn, ">",
+                id);
 
         Statement stmt;
         try {
@@ -115,7 +115,7 @@ public class DbToolBase {
             return false;
         }
         try {
-            stmt.execute(sb.toString());
+            stmt.execute(sql);
         } catch (Throwable th) {
             String msg = String.format("could not delete columns from table %s with %s > %s",
                     tableName, idColumn, id);
