@@ -18,6 +18,7 @@
 package org.xipki.dbtool;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.dbtool.internal.MyLoggerFactory;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
@@ -64,6 +65,8 @@ public class LiquibaseMain {
     public void changeLogLevel(String logLevel, String logFile) throws CommandLineParsingException {
         ParamUtil.requireNonNull("logLevel", logLevel);
         try {
+            LogFactory.setInstance(new MyLoggerFactory());
+
             Logger log = LogFactory.getInstance().getLog();
             if (logFile != null && logFile.length() > 0) {
                 log.setLogLevel(logLevel, logFile);
