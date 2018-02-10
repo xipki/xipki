@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.HealthCheckResult;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
@@ -69,15 +70,12 @@ public class HealthCmd extends ClientAction {
         }
 
         HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
-        StringBuilder sb = new StringBuilder(40);
-        sb.append("healthy status for CA ");
-        sb.append(caName);
-        sb.append(": ");
-        sb.append(healthResult.isHealthy() ? "healthy" : "not healthy");
-        if (verbose.booleanValue()) {
-            sb.append("\n").append(healthResult.toJsonMessage(true));
+        String str = StringUtil.concat("healthy status for CA ", caName, ": ",
+                (healthResult.isHealthy() ? "healthy" : "not healthy"));
+        if (verbose) {
+            str = StringUtil.concat(str, "\n", healthResult.toJsonMessage(true));
         }
-        System.out.println(sb.toString());
+        System.out.println(str);
         return null;
     } // method execute0
 

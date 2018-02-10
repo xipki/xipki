@@ -46,6 +46,7 @@ import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.DirPathCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
@@ -171,31 +172,20 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
         println("The result is saved in the folder " + outDir.getPath());
 
-        StringBuilder sb = new StringBuilder();
         if (saveReq || saveResp) {
-            sb.append("Commands\n");
-            sb.append("  1. Verify and print the text form of request and response:\n");
-            sb.append("    openssl ocsp -text ");
-            if (respIssuerFile != null) {
-                sb.append("-CAfile responder_issuer.pem");
-            } else {
-                sb.append("-no_cert_verify");
-            }
-            sb.append(" -reqin <request file> -respin <response file>\n");
+            String msg = StringUtil.concat("Commands\n",
+                "  1. Verify and print the text form of request and response:\n",
+                "    openssl ocsp -text ",
+                    (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify"),
+                    " -reqin <request file> -respin <response file>\n",
+                "  2. Print the text form of request:\n",
+                "    openssl ocsp -text -reqin <request file>\n",
+                "  3. Verify and print the text form of response:\n",
+                "    openssl ocsp -text ",
+                    (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify"),
+                    " -respin <response file>");
 
-            sb.append("  2. Print the text form of request:\n");
-            sb.append("    openssl ocsp -text -reqin <request file>\n");
-
-            sb.append("  3. Verify and print the text form of response:\n");
-            sb.append("    openssl ocsp -text ");
-            if (respIssuerFile != null) {
-                sb.append("-CAfile responder_issuer.pem");
-            } else {
-                sb.append("-no_cert_verify");
-            }
-            sb.append(" -respin <response file>");
-
-            IoUtil.save(new File(outDir, "README.txt"), sb.toString().getBytes());
+            IoUtil.save(new File(outDir, "README.txt"), msg.getBytes());
         }
 
         X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
@@ -294,14 +284,11 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             }
             println(resultText, resultOut);
 
-            sb = new StringBuilder(200);
-            sb.append("=====BEGIN SUMMARY=====")
-                .append("\n       url: ").append(serverUrlStr)
-                .append("\n       sum: ").append(numFail + numSucc)
-                .append("\nsuccessful: ").append(numSucc)
-                .append("\n    failed: ").append(numFail)
-                .append("\n=====END SUMMARY=====");
-            String message = sb.toString();
+            String message = StringUtil.concatObjectsCap(200,
+                "=====BEGIN SUMMARY=====",
+                "\n       url: ", serverUrlStr, "\n       sum: ", numFail + numSucc,
+                "\nsuccessful: ", numSucc,      "\n    failed: ", numFail,
+                "\n=====END SUMMARY=====");
             println(message);
             println(message, resultOut);
         } finally {

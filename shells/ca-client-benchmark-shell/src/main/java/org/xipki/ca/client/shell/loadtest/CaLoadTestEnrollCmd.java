@@ -93,15 +93,10 @@ public class CaLoadTestEnrollCmd extends CaLoadTestAction {
             throw new IllegalCmdParamException("curveName is not specified");
         }
 
-        StringBuilder description = new StringBuilder(200);
-        description.append("subjectTemplate: ").append(subjectTemplate).append("\n");
-        description.append("profile: ").append(certprofile).append("\n");
-        description.append("keyType: ").append(keyType).append("\n");
-        description.append("maxRequests: ").append(maxRequests).append("\n");
-        description.append("unit: ").append(num).append(" certificate");
-        if (num > 1) {
-            description.append("s");
-        }
+        String description = StringUtil.concatObjectsCap(200,
+                "subjectTemplate: ", subjectTemplate, "\nprofile: ", certprofile,
+                "\nkeyType: ", keyType, "\nmaxRequests: ", maxRequests,
+                "\nunit: ", num, " certificate", (num > 1 ? "s" : ""));
 
         RandomDn randomDn = null;
         if (randomDnStr != null) {
@@ -125,7 +120,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestAction {
         LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry,
                 subjectTemplate, randomDn);
         CaLoadTestEnroll loadTest = new CaLoadTestEnroll(caClient, loadtestEntry, maxRequests,
-                num, description.toString());
+                num, description);
 
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);

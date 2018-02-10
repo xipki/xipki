@@ -18,6 +18,7 @@
 package org.xipki.ocsp.client.api;
 
 import org.xipki.common.util.Hex;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -32,21 +33,9 @@ public class OcspNonceUnmatchedException extends OcspResponseException {
     }
 
     private static String buildMessage(byte[] expected, byte[] is) {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("nonce unmatch (received ");
-        if (is == null || is.length == 0) {
-            sb.append("none");
-        } else {
-            sb.append(Hex.encode(is));
-        }
-        sb.append(", but expected ");
-        if (expected == null || expected.length == 0) {
-            sb.append("nonce");
-        } else {
-            sb.append(Hex.encode(expected));
-        }
-        sb.append(")");
-        return sb.toString();
+        return StringUtil.concat("nonce unmatch (received ",
+                (is == null || is.length == 0 ? "none" : Hex.encode(is)), ", but expected ",
+                (expected == null || expected.length == 0 ? "none" : Hex.encode(expected)), ")");
     }
 
 }

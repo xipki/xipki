@@ -52,6 +52,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
@@ -219,13 +220,10 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
                             && revTime.getTime() == 0) {
                         status = "unknown (RFC6960)";
                     } else {
-                        StringBuilder sb = new StringBuilder("revoked, reason = ");
-                        sb.append(CrlReason.forReasonCode(reason).description());
-                        sb.append(", revocationTime = ").append(revTime);
-                        if (invTime != null) {
-                            sb.append(", invalidityTime = ").append(invTime);
-                        }
-                        status = sb.toString();
+                        status = StringUtil.concatObjects("revoked, reason = ",
+                                CrlReason.forReasonCode(reason).description(),
+                                ", revocationTime = ", revTime,
+                                (invTime == null ? "" : ", invalidityTime = " + invTime));
                     }
                 } else {
                     status = "revoked, no reason, revocationTime = " + revTime;

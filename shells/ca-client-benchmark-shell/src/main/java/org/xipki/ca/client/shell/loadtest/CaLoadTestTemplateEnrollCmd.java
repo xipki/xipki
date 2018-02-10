@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.shell.loadtest.jaxb.EnrollTemplateType;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
@@ -65,17 +66,12 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestAction {
                 new FileInputStream(templateFile));
         int size = template.getEnrollCert().size();
 
-        StringBuilder description = new StringBuilder(200);
-        description.append("template: ").append(templateFile).append("\n");
-        description.append("maxRequests: ").append(maxRequests).append("\n");
-        description.append("unit: ").append(size).append(" certificate");
-        if (size > 1) {
-            description.append("s");
-        }
-        description.append("\n");
+        String description = StringUtil.concatObjectsCap(200,
+                "template: ", templateFile, "\nmaxRequests: ", maxRequests,
+                "\nunit: ", size, " certificate", (size > 1 ? "s" : ""), "\n");
 
         CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient, template,
-                maxRequests, description.toString());
+                maxRequests, description);
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();

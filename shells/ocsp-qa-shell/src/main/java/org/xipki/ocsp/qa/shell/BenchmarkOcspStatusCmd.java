@@ -34,6 +34,7 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.FileBigIntegerIterator;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.RangeBigIntegerIterator;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -152,11 +153,9 @@ public class BenchmarkOcspStatusCmd extends OcspStatusAction {
         }
 
         try {
-            StringBuilder description = new StringBuilder();
-            description.append("issuer cert: ").append(issuerCertFile).append("\n");
-            description.append("server URL: ").append(serverUrl.toString()).append("\n");
-            description.append("maxRequest: ").append(maxRequests).append("\n");
-            description.append("hash: ").append(hashAlgo);
+            String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
+                    "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests,
+                    "\nhash: ", hashAlgo);
 
             Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
 

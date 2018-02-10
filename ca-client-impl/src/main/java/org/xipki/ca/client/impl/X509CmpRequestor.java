@@ -737,14 +737,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
                     CertprofileInfo profile = new CertprofileInfo(name, type, conf);
                     profiles.add(profile);
                     profileNames.add(name);
-                    if (LOG.isDebugEnabled()) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("configured for CA ").append(caName).append(" certprofile (");
-                        sb.append("name=").append(name).append(", ");
-                        sb.append("type=").append(type).append(", ");
-                        sb.append("conf=").append(conf).append(")");
-                        LOG.debug(sb.toString());
-                    }
+                    LOG.debug("configured for CA {} certprofile (name={}, type={}, conf={})",
+                            caName, name, type, conf);
                 }
             }
 

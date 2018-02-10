@@ -30,6 +30,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.FileBigIntegerIterator;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.datasource.DataSourceFactory;
@@ -99,17 +100,10 @@ public class CaLoadTestRevokeCmd extends CaLoadTestAction {
                     "exactly one of ca-db and serial-file must be specified");
         }
 
-        StringBuilder description = new StringBuilder(200);
-        description.append("issuer: ").append(issuerCertFile).append("\n");
-        description.append("cadb: ").append(caDbConfFile).append("\n");
-        description.append("serialNumberFile: ").append(serialNumberFile).append("\n");
-        description.append("maxCerts: ").append(maxCerts).append("\n");
-        description.append("#certs/req: ").append(num).append("\n");
-        description.append("unit: ").append(num).append(" certificate");
-        if (num > 1) {
-            description.append("s");
-        }
-        description.append("\n");
+        String description = StringUtil.concatObjectsCap(200,
+                "issuer: ", issuerCertFile, "\ncadb: ", caDbConfFile,
+                "\nserialNumberFile: ", serialNumberFile, "\nmaxCerts: ", maxCerts,
+                "\n#certs/req: ", num, "\nunit: ", num, " certificate", (num > 1 ? "s" : ""), "\n");
 
         Certificate caCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
         Properties props = new Properties();
@@ -131,7 +125,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestAction {
 
         try {
             CaLoadTestRevoke loadTest = new CaLoadTestRevoke(
-                    caClient, caCert, serialNumberIterator, maxCerts, num, description.toString());
+                    caClient, caCert, serialNumberIterator, maxCerts, num, description);
 
             loadTest.setDuration(duration);
             loadTest.setThreads(numThreads);

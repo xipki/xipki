@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.RequestOptions;
 
 /**
@@ -58,15 +59,11 @@ public class DfltHttpOcspRequestor extends AbstractOcspRequestor {
         if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
             String b64Request = Base64.encodeToString(request);
             String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
-            StringBuilder urlBuilder = new StringBuilder();
             String baseUrl = responderUrl.toString();
-            urlBuilder.append(baseUrl);
-            if (!baseUrl.endsWith("/")) {
-                urlBuilder.append('/');
-            }
-            urlBuilder.append(urlEncodedReq);
+            String url = StringUtil.concat(baseUrl, (baseUrl.endsWith("/") ? "" : "/"),
+                    urlEncodedReq);
 
-            URL newUrl = new URL(urlBuilder.toString());
+            URL newUrl = new URL(url);
             httpUrlConnection = IoUtil.openHttpConn(newUrl);
             httpUrlConnection.setRequestMethod("GET");
         } else {

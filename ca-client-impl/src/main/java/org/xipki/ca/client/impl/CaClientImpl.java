@@ -143,10 +143,7 @@ public final class CaClientImpl implements CaClient {
                     return;
                 }
 
-                StringBuilder sb = new StringBuilder("scheduled configuring CAs ");
-                sb.append(autoConfCaNames);
-
-                LOG.info(sb.toString());
+                LOG.info("scheduled configuring CAs {}", autoConfCaNames);
                 Set<String> failedCaNames = autoConfCas(autoConfCaNames);
 
                 if (CollectionUtil.isNonEmpty(failedCaNames)) {

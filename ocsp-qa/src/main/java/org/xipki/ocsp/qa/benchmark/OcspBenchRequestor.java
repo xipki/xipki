@@ -44,6 +44,7 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgoType;
@@ -157,11 +158,7 @@ class OcspBenchRequestor {
             } catch (UnsupportedEncodingException ex) {
                 throw new OcspRequestorException(ex.getMessage());
             }
-            StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(responderRawPathGet);
-            urlBuilder.append(urlEncodedReq);
-            String newRawpath = urlBuilder.toString();
-
+            String newRawpath = StringUtil.concat(responderRawPathGet, urlEncodedReq);
             request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
                     HttpMethod.GET, newRawpath);
         } else {

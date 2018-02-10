@@ -243,22 +243,19 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
         SingleResp[] singleResponses = basicOcspResp.getResponses();
         if (singleResponses == null || singleResponses.length == 0) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("response with no singleResponse is returned, expected is ");
-            sb.append(serialNumbers.length);
-            throw new OcspTargetUnmatchedException(sb.toString());
+            String msg = StringUtil.concat(
+                    "response with no singleResponse is returned, expected is ",
+                    Integer.toString(serialNumbers.length));
+            throw new OcspTargetUnmatchedException(msg);
         }
 
         final int countSingleResponses = singleResponses.length;
 
         if (countSingleResponses != serialNumbers.length) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("response with ").append(countSingleResponses).append(" singleResponse");
-            if (countSingleResponses > 1) {
-                sb.append("s");
-            }
-            sb.append(" is returned, expected is ").append(serialNumbers.length);
-            throw new OcspTargetUnmatchedException(sb.toString());
+            String msg = StringUtil.concat("response with ", Integer.toString(countSingleResponses),
+                    " singleResponse", (countSingleResponses > 1 ? "s" : ""),
+                    " is returned, expected is ", Integer.toString(serialNumbers.length));
+            throw new OcspTargetUnmatchedException(msg);
         }
 
         Request reqAt0 =
