@@ -119,7 +119,7 @@ public class RestImpl implements Rest {
 
                 caName = responderManager.getCaNameForAlias(caAlias);
                 if (caName == null) {
-                    caName = caAlias.toUpperCase();
+                    caName = caAlias.toLowerCase();
                 }
                 ca = responderManager.getX509CaResponder(caName).getCa();
             }
@@ -203,7 +203,7 @@ public class RestImpl implements Rest {
                             "required parameter " + RestAPIConstants.PARAM_profile
                             + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
                 }
-                profile = profile.toUpperCase();
+                profile = profile.toLowerCase();
 
                 try {
                     requestor.assertPermitted(PermissionConstants.ENROLL_CERT);

@@ -61,7 +61,7 @@ public class CrlSignerUpdateCmd extends CaAction {
     private String signerConf;
 
     @Option(name = "--cert",
-            description = "CRL signer's certificate file or 'NULL'")
+            description = "CRL signer's certificate file or 'null'")
     @Completion(FilePathCompleter.class)
     private String signerCert;
 

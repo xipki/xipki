@@ -68,7 +68,7 @@ public class CaHasRequestorEntry {
         if (CollectionUtil.isEmpty(profiles)) {
             this.profiles = Collections.emptySet();
         } else {
-            this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
+            this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toLowerCaseSet(profiles));
         }
     }
 
@@ -81,7 +81,7 @@ public class CaHasRequestorEntry {
             return false;
         }
 
-        return profiles.contains("ALL") || profiles.contains(certprofile.toUpperCase());
+        return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
     }
 
     public boolean isPermitted(int permission) {

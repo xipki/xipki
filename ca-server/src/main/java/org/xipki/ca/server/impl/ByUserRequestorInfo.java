@@ -68,7 +68,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
             return false;
         }
 
-        return profiles.contains("ALL") || profiles.contains(certprofile.toUpperCase());
+        return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
     }
 
     @Override

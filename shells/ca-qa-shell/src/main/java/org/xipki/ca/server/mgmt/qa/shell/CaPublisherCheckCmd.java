@@ -59,7 +59,7 @@ public class CaPublisherCheckCmd extends CaAction {
 
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
 
-        String upPublisherName = publisherName.toUpperCase();
+        String upPublisherName = publisherName.toLowerCase();
         for (PublisherEntry m : entries) {
             if (m.ident().name().equals(upPublisherName)) {
                 println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName

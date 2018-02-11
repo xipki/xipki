@@ -46,7 +46,7 @@ public class ProfileUpdateCmd extends CaAction {
     protected String type;
 
     @Option(name = "--conf",
-            description = "certificate profile configuration or 'NULL'")
+            description = "certificate profile configuration or 'null'")
     protected String conf;
 
     @Option(name = "--conf-file",

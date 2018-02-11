@@ -38,7 +38,7 @@ public class X509ChangeCrlSignerEntry {
     private String crlControl;
 
     public X509ChangeCrlSignerEntry(String name) throws InvalidConfException {
-        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     }
 
     public String name() {

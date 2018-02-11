@@ -111,7 +111,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
                 String[] tokens = path.split("/");
                 if (tokens.length == 2) {
                     scepName = tokens[0];
-                    certProfileName = tokens[1].toUpperCase();
+                    certProfileName = tokens[1].toLowerCase();
                 }
             } // end if
         } // end if

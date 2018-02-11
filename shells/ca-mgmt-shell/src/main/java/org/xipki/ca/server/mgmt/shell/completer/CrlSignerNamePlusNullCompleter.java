@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaManager;
 
 /**
  * @author Lijun Liao
@@ -34,7 +35,7 @@ public class CrlSignerNamePlusNullCompleter extends MgmtNameCompleter {
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>();
         ret.addAll(caManager.getCrlSignerNames());
-        ret.add("NULL");
+        ret.add(CaManager.NULL);
         return ret;
     }
 

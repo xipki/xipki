@@ -54,7 +54,7 @@ public class CaHasUserEntry {
     }
 
     public void setProfiles(Set<String> profiles) {
-        this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
+        this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toLowerCaseSet(profiles));
     }
 
     public Set<String> profiles() {

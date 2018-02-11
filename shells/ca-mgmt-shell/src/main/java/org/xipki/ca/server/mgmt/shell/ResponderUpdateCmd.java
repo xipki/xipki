@@ -59,12 +59,12 @@ public class ResponderUpdateCmd extends CaAction {
     protected String signerType;
 
     @Option(name = "--cert",
-            description = "requestor certificate file or 'NULL'")
+            description = "requestor certificate file or 'null'")
     @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "--signer-conf",
-            description = "conf of the responder signer or 'NULL'")
+            description = "conf of the responder signer or 'null'")
     private String signerConf;
 
     protected String getSignerConf() throws Exception {

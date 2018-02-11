@@ -112,7 +112,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
                 String caAlias = servletUri.path().substring(1);
                 caName = responderManager.getCaNameForAlias(caAlias);
                 if (caName == null) {
-                    caName = caAlias.toUpperCase();
+                    caName = caAlias.toLowerCase();
                 }
                 responder = responderManager.getX509CaResponder(caName);
             }

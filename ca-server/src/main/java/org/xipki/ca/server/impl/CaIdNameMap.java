@@ -70,7 +70,7 @@ public class CaIdNameMap {
     }
 
     public NameId certprofile(String name) {
-        return nameCertprofileMap.get(name.toUpperCase());
+        return nameCertprofileMap.get(name.toLowerCase());
     }
 
     public NameId publisher(int id) {
@@ -78,7 +78,7 @@ public class CaIdNameMap {
     }
 
     public NameId publisher(String name) {
-        return namePublisherMap.get(name.toUpperCase());
+        return namePublisherMap.get(name.toLowerCase());
     }
 
     public NameId requestor(int id) {
@@ -86,7 +86,7 @@ public class CaIdNameMap {
     }
 
     public NameId requestor(String name) {
-        return nameRequestorMap.get(name.toUpperCase());
+        return nameRequestorMap.get(name.toLowerCase());
     }
 
     public NameId ca(int id) {
@@ -94,7 +94,7 @@ public class CaIdNameMap {
     }
 
     public NameId ca(String name) {
-        return nameCaMap.get(name.toUpperCase());
+        return nameCaMap.get(name.toLowerCase());
     }
 
     public String certprofileName(int id) {
@@ -146,7 +146,7 @@ public class CaIdNameMap {
     }
 
     public NameId removeCertprofile(String name) {
-        NameId ident = nameCertprofileMap.remove(name.toUpperCase());
+        NameId ident = nameCertprofileMap.remove(name.toLowerCase());
         if (ident != null) {
             idCertprofileMap.remove(ident.id());
         }
@@ -162,7 +162,7 @@ public class CaIdNameMap {
     }
 
     public NameId removePublisher(String name) {
-        NameId ident = namePublisherMap.remove(name.toUpperCase());
+        NameId ident = namePublisherMap.remove(name.toLowerCase());
         if (ident != null) {
             idPublisherMap.remove(ident.id());
         }
@@ -178,7 +178,7 @@ public class CaIdNameMap {
     }
 
     public NameId removeRequestor(String name) {
-        NameId ident = nameRequestorMap.remove(name.toUpperCase());
+        NameId ident = nameRequestorMap.remove(name.toLowerCase());
         if (ident != null) {
             idRequestorMap.remove(ident.id());
         }
@@ -194,7 +194,7 @@ public class CaIdNameMap {
     }
 
     public NameId removeCa(String name) {
-        NameId ident = nameCaMap.remove(name.toUpperCase());
+        NameId ident = nameCaMap.remove(name.toLowerCase());
         if (ident != null) {
             idCaMap.remove(ident.id());
         }

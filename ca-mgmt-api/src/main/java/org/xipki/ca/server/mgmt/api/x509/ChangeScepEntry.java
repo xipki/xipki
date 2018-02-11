@@ -47,7 +47,7 @@ public class ChangeScepEntry {
     private String control;
 
     public ChangeScepEntry(String name) {
-        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     }
 
     public String name() {
@@ -103,7 +103,7 @@ public class ChangeScepEntry {
             this.certProfiles = null;
         } else {
             this.certProfiles = CollectionUtil.unmodifiableSet(
-                    CollectionUtil.toUpperCaseSet(certProfiles));
+                    CollectionUtil.toLowerCaseSet(certProfiles));
         }
     }
 

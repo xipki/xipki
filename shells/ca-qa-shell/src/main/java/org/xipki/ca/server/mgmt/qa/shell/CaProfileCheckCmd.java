@@ -57,7 +57,7 @@ public class CaProfileCheckCmd extends CaAction {
         }
 
         Set<String> entries = caManager.getCertprofilesForCa(caName);
-        if (!entries.contains(profileName.toUpperCase())) {
+        if (!entries.contains(profileName.toLowerCase())) {
             throw new CmdFailure("CA is not associated with profile '" + profileName + "'");
         }
 

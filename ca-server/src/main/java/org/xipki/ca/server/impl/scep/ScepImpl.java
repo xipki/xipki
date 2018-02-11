@@ -239,7 +239,7 @@ public class ScepImpl implements Scep {
     }
 
     public boolean supportsCertProfile(String profileName) {
-        if (certProfiles.contains("ALL") || certProfiles.contains(profileName.toUpperCase())) {
+        if (certProfiles.contains("all") || certProfiles.contains(profileName.toLowerCase())) {
             X509Ca ca;
             try {
                 ca = caManager.x509Ca(caIdent);

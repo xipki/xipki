@@ -552,7 +552,7 @@ public class X509Ca {
     }
 
     public NameId authenticateUser(String user, byte[] password) throws OperationException {
-        return certstore.authenticateUser(user.toUpperCase(), password);
+        return certstore.authenticateUser(user.toLowerCase(), password);
     }
 
     public NameId getUserIdent(int userId) throws OperationException {
@@ -2246,7 +2246,7 @@ public class X509Ca {
     public boolean supportsCertProfile(String certprofileName) {
         ParamUtil.requireNonNull("certprofileLocalName", certprofileName);
         Set<String> profileNames = caManager.getCertprofilesForCa(caIdent.name());
-        return profileNames.contains(certprofileName.toUpperCase());
+        return profileNames.contains(certprofileName.toLowerCase());
     }
 
     public CmpRequestorInfo getRequestor(X500Name requestorSender) {

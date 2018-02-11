@@ -108,7 +108,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
     }
 
     public void setCrlSignerName(String crlSignerName) {
-        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toUpperCase();
+        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
     }
 
     public Integer numCrls() {

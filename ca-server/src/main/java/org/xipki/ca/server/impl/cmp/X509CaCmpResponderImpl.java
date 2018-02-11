@@ -430,7 +430,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
                         PKIFailureInfo.badCertTemplate, msg));
                 continue;
             }
-            certprofileName = certprofileName.toUpperCase();
+            certprofileName = certprofileName.toLowerCase();
 
             if (!tmpRequestor.isCertProfilePermitted(certprofileName)) {
                 String msg = "certprofile " + certprofileName + " is not allowed";
@@ -588,7 +588,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
                 certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
                         "badCertTemplate", null);
             } else {
-                certprofileName = certprofileName.toUpperCase();
+                certprofileName = certprofileName.toLowerCase();
                 if (!requestor.isCertProfilePermitted(certprofileName)) {
                     String msg = "certprofile " + certprofileName + " is not allowed";
                     certResp = buildErrorCertResponse(certReqId,
@@ -1221,7 +1221,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             Set<String> caProfileNames = ca.caManager().getCertprofilesForCa(
                     ca.caInfo().ident().name());
             for (String caProfileName : caProfileNames) {
-                if (requestorProfiles.contains("ALL")
+                if (requestorProfiles.contains("all")
                         || requestorProfiles.contains(caProfileName)) {
                     supportedProfileNames.add(caProfileName);
                 }

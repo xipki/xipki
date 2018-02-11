@@ -103,7 +103,7 @@ public class ChangeCaEntry {
     }
 
     public void setCmpControlName(String cmpControlName) {
-        this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toUpperCase();
+        this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
     }
 
     public String responderName() {
@@ -111,7 +111,7 @@ public class ChangeCaEntry {
     }
 
     public void setResponderName(String responderName) {
-        this.responderName = (responderName == null) ? null : responderName.toUpperCase();
+        this.responderName = (responderName == null) ? null : responderName.toLowerCase();
     }
 
     public Boolean duplicateKeyPermitted() {

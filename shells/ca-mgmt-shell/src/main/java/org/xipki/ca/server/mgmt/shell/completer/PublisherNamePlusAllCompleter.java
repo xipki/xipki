@@ -33,7 +33,7 @@ public class PublisherNamePlusAllCompleter extends MgmtNameCompleter {
     @Override
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>(caManager.getPublisherNames());
-        ret.add("ALL");
+        ret.add("all");
         return ret;
     }
 }

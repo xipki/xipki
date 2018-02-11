@@ -42,15 +42,15 @@ public class PermissionConstants {
             | KEY_UPDATE | GEN_CRL | GET_CRL | ENROLL_CROSS;
 
     static {
-        codeTextMap.put(ENROLL_CERT, "ENROLL_CERT");
-        codeTextMap.put(REVOKE_CERT, "REVOKE_CERT");
-        codeTextMap.put(UNREVOKE_CERT, "UNREVOKE_CERT");
-        codeTextMap.put(REMOVE_CERT, "REMOVE_CERT");
-        codeTextMap.put(KEY_UPDATE, "KEY_UPDATE");
-        codeTextMap.put(GEN_CRL, "GEN_CRL");
-        codeTextMap.put(GET_CRL, "GET_CRL");
-        codeTextMap.put(ENROLL_CROSS, "ENROLL_CROSS");
-        codeTextMap.put(ALL, "ALL");
+        codeTextMap.put(ENROLL_CERT, "enroll_cert");
+        codeTextMap.put(REVOKE_CERT, "revoke_cert");
+        codeTextMap.put(UNREVOKE_CERT, "unrevoke_cert");
+        codeTextMap.put(REMOVE_CERT, "remove_cert");
+        codeTextMap.put(KEY_UPDATE, "key_update");
+        codeTextMap.put(GEN_CRL, "gen_crl");
+        codeTextMap.put(GET_CRL, "get_crl");
+        codeTextMap.put(ENROLL_CROSS, "enroll_cross");
+        codeTextMap.put(ALL, "all");
 
         for (Integer code : codeTextMap.keySet()) {
             textCodeMap.put(codeTextMap.get(code), code);
@@ -65,7 +65,7 @@ public class PermissionConstants {
     }
 
     public static Integer getPermissionForText(String text) {
-        return (text == null) ? null : textCodeMap.get(text.toUpperCase());
+        return (text == null) ? null : textCodeMap.get(text.toLowerCase());
     }
 
     public static String getTextForCode(int code) {

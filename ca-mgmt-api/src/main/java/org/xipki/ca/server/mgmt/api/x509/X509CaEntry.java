@@ -165,7 +165,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     public void setCrlSignerName(String crlSignerName) {
-        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toUpperCase();
+        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
     }
 
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {

@@ -62,7 +62,7 @@ public class CaRequestorAddCmd extends CaAction {
     private Set<String> permissions;
 
     @Option(name = "--profile", multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n(multi-valued)")
+            description = "profile name or 'all' for all profiles\n(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

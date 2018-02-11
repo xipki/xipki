@@ -37,12 +37,12 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 public class ClearPublishQueueCmd extends CaAction {
 
     @Option(name = "--ca", required = true,
-            description = "CA name or 'ALL' for all CAs\n(required)")
+            description = "CA name or 'all' for all CAs\n(required)")
     @Completion(CaNamePlusAllCompleter.class)
     private String caName;
 
     @Option(name = "--publisher", required = true, multiValued = true,
-            description = "publisher name or 'ALL' for all publishers\n(required, multi-valued)")
+            description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
     @Completion(PublisherNamePlusAllCompleter.class)
     private List<String> publisherNames;
 
@@ -53,7 +53,7 @@ public class ClearPublishQueueCmd extends CaAction {
         }
         boolean allPublishers = false;
         for (String publisherName : publisherNames) {
-            if ("ALL".equalsIgnoreCase(publisherName)) {
+            if ("all".equalsIgnoreCase(publisherName)) {
                 allPublishers = true;
                 break;
             }
@@ -63,7 +63,7 @@ public class ClearPublishQueueCmd extends CaAction {
             publisherNames = null;
         }
 
-        if ("ALL".equalsIgnoreCase(caName)) {
+        if ("all".equalsIgnoreCase(caName)) {
             caName = null;
         }
 

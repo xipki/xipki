@@ -79,17 +79,17 @@ public class ScepUpdateCmd extends CaAction {
     private String responderConf;
 
     @Option(name = "--resp-cert",
-            description = "responder certificate file or 'NULL'")
+            description = "responder certificate file or 'null'")
     @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--profile", multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n(multi-valued)")
+            description = "profile name or 'all' for all profiles\n(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 
     @Option(name = "--control",
-            description = "SCEP control or 'NULL'")
+            description = "SCEP control or 'null'")
     private String control;
 
     @Reference

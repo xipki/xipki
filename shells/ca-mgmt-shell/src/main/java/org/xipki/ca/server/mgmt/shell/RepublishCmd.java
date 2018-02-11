@@ -46,7 +46,7 @@ public class RepublishCmd extends CaAction {
     private String caName;
 
     @Option(name = "--publisher", required = true, multiValued = true,
-            description = "publisher name or 'ALL' for all publishers\n(required, multi-valued)")
+            description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
     @Completion(PublisherNamePlusAllCompleter.class)
     private List<String> publisherNames;
 
@@ -57,7 +57,7 @@ public class RepublishCmd extends CaAction {
         }
         boolean allPublishers = false;
         for (String publisherName : publisherNames) {
-            if ("ALL".equalsIgnoreCase(publisherName)) {
+            if ("all".equalsIgnoreCase(publisherName)) {
                 allPublishers = true;
                 break;
             }
@@ -67,7 +67,7 @@ public class RepublishCmd extends CaAction {
             publisherNames = null;
         }
 
-        if ("ALL".equalsIgnoreCase(caName)) {
+        if ("all".equalsIgnoreCase(caName)) {
             caName = null;
         }
 

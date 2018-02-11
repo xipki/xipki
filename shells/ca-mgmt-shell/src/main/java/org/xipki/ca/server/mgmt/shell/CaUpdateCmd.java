@@ -79,15 +79,15 @@ public class CaUpdateCmd extends CaAction {
     private List<String> caCertUris;
 
     @Option(name = "--ocsp-uri", multiValued = true,
-            description = "OCSP URI or 'NULL'\n(multi-valued)")
+            description = "OCSP URI or 'null'\n(multi-valued)")
     private List<String> ocspUris;
 
     @Option(name = "--crl-uri", multiValued = true,
-            description = "CRL distribution point URI or 'NULL'\n(multi-valued)")
+            description = "CRL distribution point URI or 'null'\n(multi-valued)")
     private List<String> crlUris;
 
     @Option(name = "--deltacrl-uri", multiValued = true,
-            description = "delta CRL distribution point URI or 'NULL'\n(multi-valued)")
+            description = "delta CRL distribution point URI or 'null'\n(multi-valued)")
     private List<String> deltaCrlUris;
 
     @Option(name = "--permission", multiValued = true,
@@ -108,17 +108,17 @@ public class CaUpdateCmd extends CaAction {
     private Integer keepExpiredCertInDays;
 
     @Option(name = "--crl-signer",
-            description = "CRL signer name or 'NULL'")
+            description = "CRL signer name or 'null'")
     @Completion(CrlSignerNamePlusNullCompleter.class)
     private String crlSignerName;
 
     @Option(name = "--responder",
-            description = "responder name or 'NULL'")
+            description = "responder name or 'null'")
     @Completion(ResponderNamePlusNullCompleter.class)
     private String responderName;
 
     @Option(name = "--cmp-control",
-            description = "CMP control name or 'NULL'")
+            description = "CMP control name or 'null'")
     @Completion(CmpControlNamePlusNullCompleter.class)
     private String cmpControlName;
 
@@ -137,7 +137,7 @@ public class CaUpdateCmd extends CaAction {
     private String signerType;
 
     @Option(name = "--signer-conf",
-            description = "CA signer configuration or 'NULL'")
+            description = "CA signer configuration or 'null'")
     private String signerConf;
 
     @Option(name = "--duplicate-key",

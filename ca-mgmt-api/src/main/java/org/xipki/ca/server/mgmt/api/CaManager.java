@@ -44,7 +44,7 @@ import org.xipki.security.CrlReason;
 
 public interface CaManager {
 
-    String NULL = "NULL";
+    String NULL = "null";
 
     CaSystemStatus getCaSystemStatus();
 

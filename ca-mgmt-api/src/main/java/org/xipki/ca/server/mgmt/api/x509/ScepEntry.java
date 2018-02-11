@@ -65,12 +65,12 @@ public class ScepEntry {
     public ScepEntry(String name, NameId caIdent, boolean active, String responderType,
             String responderConf, String base64Cert, Set<String> certProfiles, String control)
             throws InvalidConfException {
-        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         this.caIdent = ParamUtil.requireNonNull("caIdent", caIdent);
         this.active = active;
         this.responderType = ParamUtil.requireNonBlank("responderType", responderType);
         this.certProfiles = CollectionUtil.unmodifiableSet(
-                CollectionUtil.toUpperCaseSet(certProfiles));
+                CollectionUtil.toLowerCaseSet(certProfiles));
         this.base64Cert = base64Cert;
         this.responderConf = responderConf;
         this.control = control;

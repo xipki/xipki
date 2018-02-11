@@ -89,7 +89,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
         ParamUtil.requireNonBlank("publisherName", publisherName);
-        this.publisherName = publisherName.toUpperCase();
+        this.publisherName = publisherName.toLowerCase();
         this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);

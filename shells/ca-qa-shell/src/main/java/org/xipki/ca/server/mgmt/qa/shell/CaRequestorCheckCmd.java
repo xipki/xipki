@@ -67,7 +67,7 @@ public class CaRequestorCheckCmd extends CaAction {
     private Set<String> permissions;
 
     @Option(name = "--profile", multiValued = true,
-            description = "profile name or 'ALL' for all profiles, and 'NULL' for no profiles\n"
+            description = "profile name or 'all' for all profiles, and 'null' for no profiles\n"
                     + "(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
@@ -82,7 +82,7 @@ public class CaRequestorCheckCmd extends CaAction {
 
         Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
         CaHasRequestorEntry entry = null;
-        String upRequestorName = requestorName.toUpperCase();
+        String upRequestorName = requestorName.toLowerCase();
         for (CaHasRequestorEntry m : entries) {
             if (m.requestorIdent().name().equals(upRequestorName)) {
                 entry = m;

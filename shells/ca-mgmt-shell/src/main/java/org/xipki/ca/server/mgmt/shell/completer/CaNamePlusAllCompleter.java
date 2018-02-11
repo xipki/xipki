@@ -33,7 +33,7 @@ public class CaNamePlusAllCompleter extends MgmtNameCompleter {
     @Override
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>(caManager.getCaNames());
-        ret.add("ALL");
+        ret.add("all");
         return ret;
     }
 

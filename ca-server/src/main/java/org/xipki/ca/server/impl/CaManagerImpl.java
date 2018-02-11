@@ -909,8 +909,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509CaCmpResponderImpl getX509CaResponder(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return x509Responders.get(name.toUpperCase());
+        return x509Responders.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
     }
 
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
@@ -1357,8 +1356,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509CaEntry getCa(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        X509CaInfo caInfo = caInfos.get(name.toUpperCase());
+        X509CaInfo caInfo = caInfos.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
         return (caInfo == null) ? null : caInfo.caEntry();
     }
 
@@ -1400,12 +1398,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean removeCertprofileFromCa(String profileName, String caName)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("profileName", profileName);
-        ParamUtil.requireNonBlank("caName", caName);
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        profileName = profileName.toUpperCase();
-        caName = caName.toUpperCase();
         boolean bo = queryExecutor.removeCertprofileFromCa(profileName, caName);
         if (!bo) {
             return false;
@@ -1422,12 +1418,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("profileName", profileName);
-        ParamUtil.requireNonBlank("caName", caName);
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        profileName = profileName.toUpperCase();
-        caName = caName.toUpperCase();
         NameId ident = idNameMap.certprofile(profileName);
         if (ident == null) {
             LOG.warn("CertProfile {} does not exist", profileName);
@@ -1457,12 +1451,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean removePublisherFromCa(String publisherName, String caName)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("publisherName", publisherName);
-        ParamUtil.requireNonBlank("caName", caName);
+        publisherName = ParamUtil.requireNonBlank("publisherName", publisherName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
-
-        publisherName = publisherName.toUpperCase();
-        caName = caName.toUpperCase();
 
         if (!queryExecutor.removePublisherFromCa(publisherName, caName)) {
             return false;
@@ -1478,12 +1469,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean addPublisherToCa(String publisherName, String caName)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("publisherName", publisherName);
-        ParamUtil.requireNonBlank("caName", caName);
+        publisherName = ParamUtil.requireNonBlank("publisherName", publisherName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        publisherName = publisherName.toUpperCase();
-        caName = caName.toUpperCase();
         NameId ident = idNameMap.publisher(publisherName);
         if (ident == null) {
             LOG.warn("Publisher {} does not exist", publisherName);
@@ -1517,25 +1506,21 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public Set<String> getCertprofilesForCa(String caName) {
-        ParamUtil.requireNonBlank("caName", caName);
-        return caHasProfiles.get(caName.toUpperCase());
+        return caHasProfiles.get(ParamUtil.requireNonBlank("caName", caName).toLowerCase());
     }
 
     @Override
     public Set<CaHasRequestorEntry> getRequestorsForCa(String caName) {
-        ParamUtil.requireNonBlank("caName", caName);
-        return caHasRequestors.get(caName.toUpperCase());
+        return caHasRequestors.get(ParamUtil.requireNonBlank("caName", caName).toLowerCase());
     }
 
     @Override
     public CmpRequestorEntry getRequestor(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return requestorDbEntries.get(name.toUpperCase());
+        return requestorDbEntries.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
     }
 
     public CmpRequestorEntryWrapper cmpRequestorWrapper(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return requestors.get(name.toUpperCase());
+        return requestors.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
     }
 
     @Override
@@ -1560,10 +1545,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeRequestor(String requestorName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("requestorName", requestorName);
+        requestorName = ParamUtil.requireNonBlank("requestorName", requestorName).toLowerCase();
         asssertMasterMode();
 
-        requestorName = requestorName.toUpperCase();
         for (String caName : caHasRequestors.keySet()) {
             removeRequestorFromCa(requestorName, caName);
         }
@@ -1582,10 +1566,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changeRequestor(String name, String base64Cert) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
 
-        name = name.toUpperCase();
         if (base64Cert == null) {
             return false;
         }
@@ -1611,12 +1594,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean removeRequestorFromCa(String requestorName, String caName)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("requestorName", requestorName);
-        ParamUtil.requireNonBlank("caName", caName);
+        requestorName = ParamUtil.requireNonBlank("requestorName", requestorName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        requestorName = requestorName.toUpperCase();
-        caName = caName.toUpperCase();
         if (requestorName.equals(RequestorInfo.NAME_BY_CA)
                 || requestorName.equals(RequestorInfo.NAME_BY_USER)) {
             throw new CaMgmtException("removing requestor " + requestorName + " is not permitted");
@@ -1640,9 +1621,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public boolean addRequestorToCa(CaHasRequestorEntry requestor, String caName)
             throws CaMgmtException {
         ParamUtil.requireNonNull("requestor", requestor);
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
-        caName = caName.toUpperCase();
 
         NameId requestorIdent = requestor.requestorIdent();
         NameId ident = idNameMap.requestor(requestorIdent.name());
@@ -1676,19 +1656,19 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeUserFromCa(String userName, String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("userName", userName);
-        ParamUtil.requireNonBlank("caName", caName);
+        userName = ParamUtil.requireNonBlank("userName", userName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        return queryExecutor.removeUserFromCa(userName.toUpperCase(), caName.toUpperCase());
+        return queryExecutor.removeUserFromCa(userName, caName);
     }
 
     @Override
     public boolean addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        X509Ca ca = x509Ca(caName.toUpperCase());
+        X509Ca ca = x509Ca(caName);
         return queryExecutor.addUserToCa(user, ca.caIdent());
     }
 
@@ -1700,16 +1680,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public CertprofileEntry getCertprofile(String profileName) {
-        ParamUtil.requireNonBlank("profileName", profileName);
-        return certprofileDbEntries.get(profileName.toUpperCase());
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
+        return certprofileDbEntries.get(profileName);
     }
 
     @Override
     public boolean removeCertprofile(String profileName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("profileName", profileName);
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
         asssertMasterMode();
 
-        profileName = profileName.toUpperCase();
         for (String caName : caHasProfiles.keySet()) {
             removeCertprofileFromCa(profileName, caName);
         }
@@ -1729,7 +1708,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changeCertprofile(String name, String type, String conf) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         if (type == null && conf == null) {
             return false;
         }
@@ -1739,7 +1718,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         asssertMasterMode();
-        name = name.toUpperCase();
 
         IdentifiedX509Certprofile profile = queryExecutor.changeCertprofile(
                 ident, type, conf, this);
@@ -1811,9 +1789,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeResponder(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         boolean bo = queryExecutor.deleteRowWithName(name, "RESPONDER");
         if (!bo) {
             return false;
@@ -1834,9 +1811,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean changeResponder(String name, String type, String conf, String base64Cert)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         if (type == null && conf == null && base64Cert == null) {
             return false;
         }
@@ -1857,12 +1833,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public CmpResponderEntry getResponder(String name) {
         ParamUtil.requireNonBlank("name", name);
-        return responderDbEntries.get(name.toUpperCase());
+        return responderDbEntries.get(name.toLowerCase());
     }
 
     public CmpResponderEntryWrapper cmpResponderWrapper(String name) {
         ParamUtil.requireNonBlank("name", name);
-        return responders.get(name.toUpperCase());
+        return responders.get(name.toLowerCase());
     }
 
     @Override
@@ -1892,9 +1868,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCrlSigner(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         boolean bo = queryExecutor.deleteRowWithName(name, "CRLSIGNER");
         if (!bo) {
             return false;
@@ -1938,13 +1913,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509CrlSignerEntry getCrlSigner(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return crlSignerDbEntries.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return crlSignerDbEntries.get(name);
     }
 
     public X509CrlSignerEntryWrapper crlSignerWrapper(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return crlSigners.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return crlSigners.get(name);
     }
 
     @Override
@@ -1975,8 +1950,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public List<PublisherEntry> getPublishersForCa(String caName) {
-        ParamUtil.requireNonBlank("caName", caName);
-        caName = caName.toUpperCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         Set<String> publisherNames = caHasPublishers.get(caName);
         if (publisherNames == null) {
             return Collections.emptyList();
@@ -1992,15 +1966,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public PublisherEntry getPublisher(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return publisherDbEntries.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return publisherDbEntries.get(name);
     }
 
     @Override
     public boolean removePublisher(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         for (String caName : caHasPublishers.keySet()) {
             removePublisherFromCa(name, caName);
         }
@@ -2019,9 +1992,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changePublisher(String name, String type, String conf) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         if (type == null && conf == null) {
             return false;
         }
@@ -2043,13 +2015,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public CmpControlEntry getCmpControl(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return cmpControlDbEntries.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return cmpControlDbEntries.get(name);
     }
 
     public CmpControl cmpControlObject(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return cmpControls.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return cmpControls.get(name);
     }
 
     @Override
@@ -2078,9 +2050,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCmpControl(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         boolean bo = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
         if (!bo) {
             return false;
@@ -2101,10 +2072,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changeCmpControl(String name, String conf) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         ParamUtil.requireNonBlank("conf", conf);
         asssertMasterMode();
-        name = name.toUpperCase();
         CmpControl newCmpControl = queryExecutor.changeCmpControl(name, conf);
         if (newCmpControl == null) {
             return false;
@@ -2187,32 +2157,28 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean addCaAlias(String aliasName, String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("aliasName", aliasName);
-        ParamUtil.requireNonBlank("caName", caName);
+        aliasName = ParamUtil.requireNonBlank("aliasName", aliasName).toLowerCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
-        aliasName = aliasName.toUpperCase();
-        caName = caName.toUpperCase();
 
         X509Ca ca = x509cas.get(caName);
         if (ca == null) {
             return false;
         }
 
-        String tmpAlias = aliasName.toUpperCase();
-        if (caAliases.get(tmpAlias) != null) {
+        if (caAliases.get(aliasName) != null) {
             return false;
         }
 
-        queryExecutor.addCaAlias(tmpAlias, ca.caIdent());
-        caAliases.put(tmpAlias, ca.caIdent().id());
+        queryExecutor.addCaAlias(aliasName, ca.caIdent());
+        caAliases.put(aliasName, ca.caIdent().id());
         return true;
     } // method addCaAlias
 
     @Override
     public boolean removeCaAlias(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         boolean bo = queryExecutor.removeCaAlias(name);
         if (!bo) {
             return false;
@@ -2224,8 +2190,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public String getCaNameForAlias(String aliasName) {
-        ParamUtil.requireNonBlank("aliasName", aliasName);
-        aliasName = aliasName.toUpperCase();
+        aliasName = ParamUtil.requireNonBlank("aliasName", aliasName).toLowerCase();
         Integer caId = caAliases.get(aliasName);
         for (String name : x509cas.keySet()) {
             X509Ca ca = x509cas.get(name);
@@ -2238,8 +2203,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public Set<String> getAliasesForCa(String caName) {
-        ParamUtil.requireNonBlank("caName", caName);
-        caName = caName.toUpperCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         Set<String> aliases = new HashSet<>();
         X509Ca ca = x509cas.get(caName);
         if (ca == null) {
@@ -2265,9 +2229,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCa(String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
-        caName = caName.toUpperCase();
 
         boolean bo = queryExecutor.removeCa(caName);
         if (!bo) {
@@ -2292,16 +2255,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean republishCertificates(String caName, List<String> publisherNames, int numThreads)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireMin("numThreads", numThreads, 1);
         asssertMasterMode();
-        caName = caName.toUpperCase();
         X509Ca ca = x509cas.get(caName);
         if (ca == null) {
             throw new CaMgmtException("could not find CA named " + caName);
         }
 
-        List<String> upperPublisherNames = CollectionUtil.toUpperCaseList(publisherNames);
+        List<String> upperPublisherNames = CollectionUtil.toLowerCaseList(publisherNames);
         boolean successful = ca.republishCertificates(upperPublisherNames, numThreads);
         if (!successful) {
             throw new CaMgmtException("republishing certificates of CA " + caName + " failed");
@@ -2313,11 +2275,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         asssertMasterMode();
 
-        caName = caName.toUpperCase();
         if (!x509cas.containsKey(caName)) {
             return false;
         }
@@ -2351,10 +2312,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean unrevokeCa(String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         asssertMasterMode();
 
-        caName = caName.toUpperCase();
         if (!x509cas.containsKey(caName)) {
             throw new CaMgmtException("could not find CA named " + caName);
         }
@@ -2422,7 +2382,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throws CaMgmtException {
         asssertMasterMode();
 
-        List<String> upperPublisherNames = CollectionUtil.toUpperCaseList(publisherNames);
+        List<String> upperPublisherNames = CollectionUtil.toLowerCaseList(publisherNames);
 
         if (caName == null) {
             if (CollectionUtil.isNonEmpty(upperPublisherNames)) {
@@ -2435,9 +2395,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             } catch (OperationException ex) {
                 throw new CaMgmtException(ex.getMessage(), ex);
             }
+        } else {
+            caName = caName.toLowerCase();
         }
 
-        caName = caName.toUpperCase();
         X509Ca ca = x509cas.get(caName);
         if (ca == null) {
             throw new CaMgmtException("could not find CA named " + caName);
@@ -2464,10 +2425,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean revokeCertificate(String caName, BigInteger serialNumber,
             CrlReason reason, Date invalidityTime) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         asssertMasterMode();
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         try {
             return ca.revokeCertificate(serialNumber, reason, invalidityTime,
@@ -2480,9 +2440,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean unrevokeCertificate(String caName, BigInteger serialNumber)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("serialNumber", serialNumber);
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         try {
             return ca.unrevokeCertificate(serialNumber, CaAuditConstants.MSGID_ca_mgmt) != null;
@@ -2494,10 +2453,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean removeCertificate(String caName, BigInteger serialNumber)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         asssertMasterMode();
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         if (ca == null) {
             return false;
@@ -2513,12 +2471,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public X509Certificate generateCertificate(String caName, String profileName,
             byte[] encodedCsr, Date notBefore, Date notAfter) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
-        ParamUtil.requireNonBlank("profileName", profileName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
-
-        caName = caName.toUpperCase();
-        profileName = profileName.toUpperCase();
 
         AuditEvent event = new AuditEvent(new Date());
         event.setApplicationName(CaAuditConstants.APPNAME);
@@ -2575,8 +2530,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method generateCertificate
 
     public X509Ca x509Ca(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
-        name = name.toUpperCase();
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         X509Ca ca = x509cas.get(name);
         if (ca == null) {
             throw new CaMgmtException("unknown CA " + name);
@@ -2594,13 +2548,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     public IdentifiedX509Certprofile identifiedCertprofile(String profileName) {
-        ParamUtil.requireNonBlank("profileName", profileName);
-        return certprofiles.get(profileName.toUpperCase());
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
+        return certprofiles.get(profileName);
     }
 
     public List<IdentifiedX509CertPublisher> identifiedPublishersForCa(String caName) {
-        ParamUtil.requireNonBlank("caName", caName);
-        caName = caName.toUpperCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
         Set<String> publisherNames = caHasPublishers.get(caName);
         if (publisherNames == null) {
@@ -2615,12 +2568,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method getIdentifiedPublishersForCa
 
     @Override
-    public X509Certificate generateRootCa(X509CaEntry caEntry, String certprofileName,
+    public X509Certificate generateRootCa(X509CaEntry caEntry, String profileName,
             byte[] encodedCsr, BigInteger serialNumber) throws CaMgmtException {
         ParamUtil.requireNonNull("caEntry", caEntry);
-        ParamUtil.requireNonBlank("certprofileName", certprofileName);
+        profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
-        certprofileName = certprofileName.toUpperCase();
 
         int numCrls = caEntry.numCrls();
         List<String> crlUris = caEntry.crlUris();
@@ -2650,9 +2602,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return null;
         }
 
-        IdentifiedX509Certprofile certprofile = identifiedCertprofile(certprofileName);
+        IdentifiedX509Certprofile certprofile = identifiedCertprofile(profileName);
         if (certprofile == null) {
-            throw new CaMgmtException("unknown certprofile " + certprofileName);
+            throw new CaMgmtException("unknown certprofile " + profileName);
         }
 
         BigInteger serialOfThisCert = (serialNumber != null) ? serialNumber
@@ -2830,15 +2782,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeUser(String username) throws CaMgmtException {
-        ParamUtil.requireNonBlank("username", username);
+        username = ParamUtil.requireNonBlank("username", username).toLowerCase();
         asssertMasterMode();
-        return queryExecutor.removeUser(username.toUpperCase());
+        return queryExecutor.removeUser(username);
     }
 
     @Override
     public UserEntry getUser(String username) throws CaMgmtException {
-        ParamUtil.requireNonBlank("username", username);
-        return queryExecutor.getUser(username.toUpperCase());
+        username = ParamUtil.requireNonBlank("username", username).toLowerCase();
+        return queryExecutor.getUser(username);
     }
 
     CaIdNameMap idNameMap() {
@@ -2847,8 +2799,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509CRL generateCrlOnDemand(String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
-        caName = caName.toUpperCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
 
         X509Ca ca = x509Ca(caName);
         try {
@@ -2860,9 +2811,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509CRL getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("crlNumber", crlNumber);
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         try {
             X509CRL crl = ca.getCrl(crlNumber);
@@ -2877,8 +2827,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509CRL getCurrentCrl(String caName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
-        caName = caName.toUpperCase();
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         X509Ca ca = x509Ca(caName);
         try {
             X509CRL crl = ca.getCurrentCrl();
@@ -2924,9 +2873,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeScep(String name) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         asssertMasterMode();
-        name = name.toUpperCase();
         boolean bo = queryExecutor.removeScep(name);
         if (bo) {
             scepDbEntries.remove(name);
@@ -2974,20 +2922,20 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public ScepEntry getScepEntry(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return (scepDbEntries == null) ? null : scepDbEntries.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return (scepDbEntries == null) ? null : scepDbEntries.get(name);
     }
 
     @Override
     public Scep getScep(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return (sceps == null) ? null : sceps.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return (sceps == null) ? null : sceps.get(name);
     }
 
     @Override
     public ScepImpl getScepImpl(String name) {
-        ParamUtil.requireNonBlank("name", name);
-        return (sceps == null) ? null : sceps.get(name.toUpperCase());
+        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        return (sceps == null) ? null : sceps.get(name);
     }
 
     @Override
@@ -3042,9 +2990,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public CertWithStatusInfo getCert(String caName, BigInteger serialNumber)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("serialNumber", serialNumber);
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         X509CertWithRevocationInfo certInfo;
         try {
@@ -3057,9 +3004,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireNonNull("serialNumber", serialNumber);
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         try {
             return ca.getCertRequest(serialNumber);
@@ -3072,9 +3018,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern,
             Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
         ParamUtil.requireRange("numEntries", numEntries, 1, 1000);
-        caName = caName.toUpperCase();
         X509Ca ca = x509Ca(caName);
         try {
             return ca.listCertificates(subjectPattern, validFrom, validTo, orderBy, numEntries);

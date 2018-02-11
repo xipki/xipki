@@ -38,7 +38,7 @@ public class CaSystemStatusCmd extends CaAction {
         if (status != null) {
             println(status.toString());
         } else {
-            throw new CmdFailure("status is NULL");
+            throw new CmdFailure("status is null");
         }
         return null;
     }

@@ -28,8 +28,8 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 @Service
 public class PermissionCompleter extends AbstractEnumCompleter {
 
-    private static final String tokens = "ENROLL_CERT,REVOKE_CERT,UNREVOKE_CERT,REMOVE_CERT,"
-            + "KEY_UPDATE,GEN_CRL,GET_CRL,ENROLL_CROSS,ALL";
+    private static final String tokens = "enroll_cert,revoke_cert,unrevoke_cert,remove_cert,"
+            + "key_update,gen_crl,get_crl,enroll_cross,all";
 
     public PermissionCompleter() {
         setTokens(tokens);

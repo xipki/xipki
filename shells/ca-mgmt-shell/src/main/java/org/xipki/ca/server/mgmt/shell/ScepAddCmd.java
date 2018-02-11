@@ -76,7 +76,7 @@ public class ScepAddCmd extends CaAction {
     private String scepControl;
 
     @Option(name = "--profile", required = true, multiValued = true,
-            description = "profile name or 'ALL' for all profiles\n(required, multi-valued)")
+            description = "profile name or 'all' for all profiles\n(required, multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 

@@ -46,7 +46,7 @@ public class PublisherUpdateCmd extends CaAction {
     protected String type;
 
     @Option(name = "--conf",
-            description = "publisher configuration or 'NULL'")
+            description = "publisher configuration or 'null'")
     protected String conf;
 
     @Option(name = "--conf-file",

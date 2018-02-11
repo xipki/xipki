@@ -314,8 +314,7 @@ public class CaConf {
                         BigInteger serialNumber = null;
                         String str = ci.getGenSelfIssued().getSerialNumber();
                         if (str != null) {
-                            str = str.toUpperCase();
-                            if (str.startsWith("0X")) {
+                            if (str.startsWith("0x") || str.startsWith("0X") ) {
                                 serialNumber = new BigInteger(str.substring(2), 16);
                             } else {
                                 serialNumber = new BigInteger(str);
