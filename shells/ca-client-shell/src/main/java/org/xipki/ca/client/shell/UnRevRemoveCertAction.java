@@ -68,6 +68,10 @@ public abstract class UnRevRemoveCertAction extends ClientAction {
 
     protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
             throws CertificateEncodingException {
+        if (caName != null) {
+            caName = caName.toLowerCase();
+        }
+
         ParamUtil.requireNonNull("cert", cert);
         ParamUtil.requireNonNull("caCert", caCert);
 

@@ -75,6 +75,10 @@ public class CsrEnrollCertCmd extends ClientAction {
 
     @Override
     protected Object execute0() throws Exception {
+        if (caName != null) {
+            caName = caName.toLowerCase();
+        }
+
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
         Date notBefore = StringUtil.isNotBlank(notBeforeS)

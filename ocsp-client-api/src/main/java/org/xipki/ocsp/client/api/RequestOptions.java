@@ -45,42 +45,14 @@ public class RequestOptions {
     private static final Map<String, AlgorithmIdentifier> SIGALGS_MAP = new HashMap<>();
 
     static {
-        String algoName = "SHA1withRSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
+        String[] algoNames = {"SHA1WITHRSA", "SHA256WITHRSA", "SHA384WITHRSA", "SHA512WITHRSA",
+            "SHA1WITHECDSA", "SHA256WITHECDSA", "SHA384WITHECDSA", "SHA512WITHECDSA",
+            "SHA1WITHRSAANDMGF1", "SHA256WITHRSAANDMGF1", "SHA384WITHRSAANDMGF1",
+            "SHA512WITHRSAANDMGF1"};
 
-        algoName = "SHA256withRSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA384withRSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA512withRSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA1withECDSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA256withECDSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA384withECDSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA512withECDSA";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA1withRSAandMGF1";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA256withRSAandMGF1";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA384withRSAandMGF1";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
-        algoName = "SHA512withRSAandMGF1";
-        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
-
+        for (String algoName : algoNames) {
+            SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
+        }
     }
 
     private boolean signRequest;
@@ -169,27 +141,28 @@ public class RequestOptions {
     }
 
     private static AlgorithmIdentifier createAlgId(String algoName) {
+        algoName = algoName.toUpperCase();
         ASN1ObjectIdentifier algOid = null;
-        if ("SHA1withRSA".equalsIgnoreCase(algoName)) {
+        if ("SHA1WITHRSA".equals(algoName)) {
             algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-        } else if ("SHA256withRSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA256WITHRSA".equals(algoName)) {
             algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-        } else if ("SHA384withRSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA384WITHRSA".equals(algoName)) {
             algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-        } else if ("SHA512withRSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA512WITHRSA".equals(algoName)) {
             algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-        } else if ("SHA1withECDSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA1WITHECDSA".equals(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-        } else if ("SHA256withECDSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA256WITHECDSA".equals(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-        } else if ("SHA384withECDSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA384WITHECDSA".equals(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-        } else if ("SHA512withECDSA".equalsIgnoreCase(algoName)) {
+        } else if ("SHA512WITHECDSA".equals(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-        } else if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)
-                || "SHA256withRSAandMGF1".equalsIgnoreCase(algoName)
-                || "SHA384withRSAandMGF1".equalsIgnoreCase(algoName)
-                || "SHA512withRSAandMGF1".equalsIgnoreCase(algoName)) {
+        } else if ("SHA1WITHRSAANDMGF1".equals(algoName)
+                || "SHA256WITHRSAANDMGF1".equals(algoName)
+                || "SHA384WITHRSAANDMGF1".equals(algoName)
+                || "SHA512WITHRSAANDMGF1".equals(algoName)) {
             algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
         } else {
             throw new RuntimeException("Unsupported algorithm " + algoName); // should not happen
@@ -198,13 +171,13 @@ public class RequestOptions {
         ASN1Encodable params;
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
             ASN1ObjectIdentifier digestAlgOid = null;
-            if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)) {
+            if ("SHA1WITHRSAANDMGF1".equals(algoName)) {
                 digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-            } else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoName)) {
+            } else if ("SHA256WITHRSAANDMGF1".equals(algoName)) {
                 digestAlgOid = NISTObjectIdentifiers.id_sha256;
-            } else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoName)) {
+            } else if ("SHA384WITHRSAANDMGF1".equals(algoName)) {
                 digestAlgOid = NISTObjectIdentifiers.id_sha384;
-            } else { // if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
+            } else { // if ("SHA512WITHRSAANDMGF1".equals(algoName))
                 digestAlgOid = NISTObjectIdentifiers.id_sha512;
             }
             params = createPSSRSAParams(digestAlgOid);

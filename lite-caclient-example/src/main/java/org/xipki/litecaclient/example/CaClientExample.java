@@ -187,7 +187,7 @@ public class CaClientExample {
         System.out.print(" Issuer: ");
         System.out.println(cert.getIssuerX500Principal());
         System.out.print(" Serial: 0X");
-        System.out.println(cert.getSerialNumber().toString(16).toUpperCase());
+        System.out.println(cert.getSerialNumber().toString(16));
         System.out.println("NotBefore: " + cert.getNotBefore());
         System.out.println(" NotAfter: " + cert.getNotAfter());
         System.out.println("-----BEGIN CERTIFICATE-----");

@@ -497,18 +497,19 @@ public final class CaClientImpl implements CaClient {
             throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("csr", csr);
 
-        String tmpCaName = caName;
-        if (tmpCaName == null) {
-            tmpCaName = getCaNameForProfile(profile);
+        if (caName == null) {
+            caName = getCaNameForProfile(profile);
+        } else {
+            caName = caName.toLowerCase();
         }
 
-        if (tmpCaName == null) {
+        if (caName == null) {
             throw new CaClientException("certprofile " + profile + " is not supported by any CA");
         }
 
-        CaConf ca = casMap.get(tmpCaName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
-            throw new CaClientException("could not find CA named " + tmpCaName);
+            throw new CaClientException("could not find CA named " + caName);
         }
 
         final String id = "cert-1";
@@ -520,7 +521,7 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return parseEnrollCertResult(result, tmpCaName);
+        return parseEnrollCertResult(result);
     } // method requestCert
 
     @Override
@@ -533,29 +534,30 @@ public final class CaClientImpl implements CaClient {
             return null;
         }
 
-        String tmpCaName = caName;
-        boolean bo = (tmpCaName != null);
-        if (tmpCaName == null) {
+        boolean bo = (caName != null);
+        if (caName == null) {
             // detect the CA name
             String profile = requestEntries.get(0).certprofile();
-            tmpCaName = getCaNameForProfile(profile);
-            if (tmpCaName == null) {
+            caName = getCaNameForProfile(profile);
+            if (caName == null) {
                 throw new CaClientException("certprofile " + profile
                         + " is not supported by any CA");
             }
+        } else {
+            caName = caName.toLowerCase();
         }
 
         if (bo || request.requestEntries().size() > 1) {
             // make sure that all requests are targeted on the same CA
             for (EnrollCertRequestEntry entry : request.requestEntries()) {
                 String profile = entry.certprofile();
-                checkCertprofileSupportInCa(profile, tmpCaName);
+                checkCertprofileSupportInCa(profile, caName);
             }
         }
 
-        CaConf ca = casMap.get(tmpCaName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
-            throw new CaClientException("could not find CA named " + tmpCaName);
+            throw new CaClientException("could not find CA named " + caName);
         }
 
         EnrollCertResultResp result;
@@ -565,21 +567,21 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return parseEnrollCertResult(result, tmpCaName);
+        return parseEnrollCertResult(result);
     } // method requestCerts
 
     private void checkCertprofileSupportInCa(String certprofile, String caName)
             throws CaClientException {
-        String tmpCaName = caName;
-        if (tmpCaName != null) {
-            CaConf ca = casMap.get(tmpCaName.trim());
+        if (caName != null) {
+            caName = caName.toLowerCase();
+            CaConf ca = casMap.get(caName);
             if (ca == null) {
-                throw new CaClientException("unknown ca: " + tmpCaName);
+                throw new CaClientException("unknown ca: " + caName);
             }
 
             if (!ca.supportsProfile(certprofile)) {
                 throw new CaClientException("certprofile " + certprofile
-                        + " is not supported by the CA " + tmpCaName);
+                        + " is not supported by the CA " + caName);
             }
             return;
         }
@@ -592,15 +594,15 @@ public final class CaClientImpl implements CaClient {
                 continue;
             }
 
-            if (tmpCaName == null) {
-                tmpCaName = ca.name();
+            if (caName == null) {
+                caName = ca.name();
             } else {
                 throw new CaClientException("certprofile " + certprofile
                         + " supported by more than one CA, please specify the CA name.");
             }
         }
 
-        if (tmpCaName == null) {
+        if (caName == null) {
             throw new CaClientException("unsupported certprofile " + certprofile);
         }
     }
@@ -708,17 +710,17 @@ public final class CaClientImpl implements CaClient {
     @Override
     public X509CRL downloadCrl(String caName, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException {
-        ParamUtil.requireNonNull("caName", caName);
+        caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
         return downloadCrl(caName, (BigInteger) null, debug);
     }
 
     @Override
     public X509CRL downloadCrl(String caName, BigInteger crlNumber, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException {
-        ParamUtil.requireNonNull("caName", caName);
+        caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
         init0(false);
 
-        CaConf ca = casMap.get(caName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
             throw new IllegalArgumentException("unknown CA " + caName);
         }
@@ -738,9 +740,9 @@ public final class CaClientImpl implements CaClient {
     @Override
     public X509CRL generateCrl(String caName, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException {
-        ParamUtil.requireNonNull("caName", caName);
+        caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
 
-        CaConf ca = casMap.get(caName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
             throw new IllegalArgumentException("unknown CA " + caName);
         }
@@ -817,24 +819,24 @@ public final class CaClientImpl implements CaClient {
             String profileName, String caName) throws CaClientException {
         ParamUtil.requireNonNull("certRequest", certRequest);
         ParamUtil.requireNonNull("pop", pop);
-        ParamUtil.requireNonNull("profileName", profileName);
+        profileName = ParamUtil.requireNonNull("profileName", profileName).toLowerCase();
 
         init0(false);
-        String tmpCaName = caName;
-        if (tmpCaName == null) {
+        if (caName == null) {
             // detect the CA name
-            tmpCaName = getCaNameForProfile(profileName);
-            if (tmpCaName == null) {
+            caName = getCaNameForProfile(profileName);
+            if (caName == null) {
                 throw new CaClientException("certprofile " + profileName
                         + " is not supported by any CA");
             }
         } else {
-            checkCertprofileSupportInCa(profileName, tmpCaName);
+            caName = caName.toLowerCase();
+            checkCertprofileSupportInCa(profileName, caName);
         }
 
-        CaConf ca = casMap.get(tmpCaName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
-            throw new CaClientException("could not find CA named " + tmpCaName);
+            throw new CaClientException("could not find CA named " + caName);
         }
 
         PKIMessage pkiMessage;
@@ -1040,10 +1042,10 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public Set<CertprofileInfo> getCertprofiles(String caName) throws CaClientException {
-        ParamUtil.requireNonNull("caName", caName);
+        caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
 
         init0(false);
-        CaConf ca = casMap.get(caName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
             return Collections.emptySet();
         }
@@ -1062,7 +1064,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public HealthCheckResult getHealthCheckResult(String caName) throws CaClientException {
-        ParamUtil.requireNonNull("caName", caName);
+        caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
 
         String name = "X509CA";
         HealthCheckResult healthCheckResult = new HealthCheckResult(name);
@@ -1075,7 +1077,7 @@ public final class CaClientImpl implements CaClient {
             return healthCheckResult;
         }
 
-        CaConf ca = casMap.get(caName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
             throw new IllegalArgumentException("unknown CA " + caName);
         }
@@ -1138,7 +1140,7 @@ public final class CaClientImpl implements CaClient {
         return healthCheckResult;
     } // method getHealthCheckResult
 
-    private EnrollCertResult parseEnrollCertResult(EnrollCertResultResp result, String caName)
+    private EnrollCertResult parseEnrollCertResult(EnrollCertResultResp result)
             throws CaClientException {
         Map<String, CertOrError> certOrErrors = new HashMap<>();
         for (ResultEntry resultEntry : result.resultEntries()) {
@@ -1246,11 +1248,27 @@ public final class CaClientImpl implements CaClient {
             LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
         }
 
-        if (root instanceof JAXBElement) {
-            return (CAClientType) ((JAXBElement<?>) root).getValue();
-        } else {
+        if (!(root instanceof JAXBElement)) {
             throw new CaClientException("invalid root element type");
         }
+
+        CAClientType conf = (CAClientType) ((JAXBElement<?>) root).getValue();
+        // canonicalize the names
+        for (RequestorType m : conf.getRequestors().getRequestor()) {
+            m.setName(m.getName().toLowerCase());
+        }
+
+        for (ResponderType m : conf.getResponders().getResponder()) {
+            m.setName(m.getName().toLowerCase());
+        }
+
+        for (CAType ca : conf.getCAs().getCA()) {
+            ca.setName(ca.getName().toLowerCase());
+            ca.setRequestor(ca.getRequestor().toLowerCase());
+            ca.setResponder(ca.getResponder().toLowerCase());
+        }
+
+        return conf;
     } // method parse
 
     private static byte[] readData(FileOrValueType fileOrValue) throws IOException {
@@ -1262,18 +1280,19 @@ public final class CaClientImpl implements CaClient {
     }
 
     private CaConf getCa(String caName) throws CaClientException {
-        String tmpCaName = caName;
-        if (tmpCaName == null) {
+        if (caName == null) {
             Iterator<String> names = casMap.keySet().iterator();
             if (!names.hasNext()) {
                 throw new CaClientException("no CA is configured");
             }
-            tmpCaName = names.next();
+            caName = names.next();
+        } else {
+            caName = caName.toLowerCase();
         }
 
-        CaConf ca = casMap.get(tmpCaName.trim());
+        CaConf ca = casMap.get(caName);
         if (ca == null) {
-            throw new CaClientException("could not find CA named " + tmpCaName);
+            throw new CaClientException("could not find CA named " + caName);
         }
         return ca;
     }
@@ -1293,7 +1312,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public java.security.cert.Certificate getCaCert(String caName) throws CaClientException {
-        CaConf ca = casMap.get(caName.toUpperCase());
+        CaConf ca = casMap.get(caName.toLowerCase());
         return ca == null ? null : ca.cert();
     }
 }

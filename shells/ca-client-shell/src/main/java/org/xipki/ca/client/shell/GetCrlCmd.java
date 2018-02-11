@@ -67,6 +67,10 @@ public class GetCrlCmd extends CrlAction {
 
     @Override
     protected Object execute0() throws Exception {
+        if (caName != null) {
+            caName = caName.toLowerCase();
+        }
+
         Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");

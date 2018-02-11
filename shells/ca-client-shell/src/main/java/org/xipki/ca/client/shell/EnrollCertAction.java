@@ -200,6 +200,10 @@ public abstract class EnrollCertAction extends ClientAction {
 
     @Override
     protected Object execute0() throws Exception {
+        if (caName != null) {
+            caName = caName.toLowerCase();
+        }
+
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
         ConcurrentContentSigner signer = getSigner(

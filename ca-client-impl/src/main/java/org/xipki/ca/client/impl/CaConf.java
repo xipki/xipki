@@ -68,7 +68,7 @@ class CaConf {
 
     CaConf(String name, String url, String healthUrl, String requestorName,
             CmpResponder responder) {
-        this.name = ParamUtil.requireNonBlank("name", name);
+        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         this.url = ParamUtil.requireNonBlank("url", url);
         this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
         this.responder = ParamUtil.requireNonNull("responder", responder);
@@ -119,12 +119,12 @@ class CaConf {
 
     public boolean supportsProfile(String profileName) {
         ParamUtil.requireNonNull("profileName", profileName);
-        return profiles.containsKey(profileName.toUpperCase());
+        return profiles.containsKey(profileName.toLowerCase());
     }
 
     public CertprofileInfo profile(String profileName) {
         ParamUtil.requireNonNull("profileName", profileName);
-        return profiles.get(profileName);
+        return profiles.get(profileName.toLowerCase());
     }
 
     public boolean isCaInfoConfigured() {

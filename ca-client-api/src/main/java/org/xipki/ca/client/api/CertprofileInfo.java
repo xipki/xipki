@@ -34,7 +34,7 @@ public class CertprofileInfo {
     private final String conf;
 
     public CertprofileInfo(String name, String type, String conf) {
-        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         this.type = StringUtil.isBlank(type) ? null : type;
         this.conf = StringUtil.isBlank(conf) ? null : conf;
     }
