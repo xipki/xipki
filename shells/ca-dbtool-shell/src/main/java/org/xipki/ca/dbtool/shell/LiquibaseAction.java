@@ -124,8 +124,8 @@ public abstract class LiquibaseAction extends XiAction {
         String msg = StringUtil.concat("\n--------------------------------------------",
                 "\n     driver: ", dbParams.driver(),  "\n       user: ", dbParams.username(),
                 "\n        URL: ", dbParams.url(),
-                (dbParams.schema() != null ? "     schema: " + dbParams.schema() + "\n" : ""),
-                "schema file: ", schemaFile, "\n");
+                (dbParams.schema() != null ? "     schema: " + dbParams.schema() : ""),
+                "\nschema file: ", schemaFile, "\n");
 
         System.out.println(msg);
     }
