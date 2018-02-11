@@ -109,7 +109,7 @@ public class P11ProviderSm2TestCmd extends P11SecurityAction {
                     "#keylabel-", label);
         } else {
             return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-                    "#keyid-", id.toUpperCase());
+                    "#keyid-", id.toLowerCase());
         }
     }
 

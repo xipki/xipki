@@ -67,26 +67,26 @@ public class CollectionUtil {
         return Collections.unmodifiableMap(map);
     }
 
-    public static List<String> toUpperCaseList(List<String> list) {
+    public static List<String> toLowerCaseList(List<String> list) {
         if (list == null) {
             return list;
         }
 
         List<String> upperList = new ArrayList<>(list.size());
         for (String s : list) {
-            upperList.add(s.toUpperCase());
+            upperList.add(s.toLowerCase());
         }
         return upperList;
     }
 
-    public static Set<String> toUpperCaseSet(Set<String> set) {
+    public static Set<String> toLowerCaseSet(Set<String> set) {
         if (set == null) {
             return set;
         }
 
         Set<String> upperSet = new HashSet<>();
         for (String s : set) {
-            upperSet.add(s.toUpperCase());
+            upperSet.add(s.toLowerCase());
         }
         return upperSet;
     }
