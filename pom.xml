@@ -40,7 +40,7 @@
     <jscep.version>2.4.0</jscep.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.1-SNAPSHOT</pkcs11-wrapper.version>
-    <hikaricp.version>2.7.4</hikaricp.version>
+    <hikaricp.version>2.7.7</hikaricp.version>
   </properties>
   <modules>
     <module>lite-caclient-example</module>
