@@ -62,7 +62,7 @@ public enum ScepHashAlgoType {
 
     public String hexDigest(byte[] content) {
         byte[] dgst = digest(content);
-        return (dgst == null) ? null : Hex.toHexString(dgst).toUpperCase();
+        return (dgst == null) ? null : Hex.toHexString(dgst);
     }
 
     public byte[] digest(byte[] content) {
