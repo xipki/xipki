@@ -17,6 +17,8 @@
 
 package org.xipki.dbtool.internal;
 
+import org.xipki.common.util.ParamUtil;
+
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
 import liquibase.logging.LogLevel;
@@ -35,6 +37,7 @@ public class MyLogger implements Logger {
     private Logger underlying;
 
     public MyLogger(Logger underlying) {
+        this.underlying = ParamUtil.requireNonNull("underlying", underlying);
     }
 
     @Override

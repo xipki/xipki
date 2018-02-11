@@ -253,7 +253,7 @@ public class StringUtil {
     }
 
     public static String concatObjects(Object o1, Object... objs) {
-        return concatObjects(16, o1, objs);
+        return concatObjectsCap(16, o1, objs);
     }
 
     public static String concatObjectsCap(int cap, Object o1, Object... objs) {
