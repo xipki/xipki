@@ -42,9 +42,9 @@
     <jscep.version>2.4.0</jscep.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.1-SNAPSHOT</pkcs11-wrapper.version>
-    <liquibase.version>3.5.3</liquibase.version>
+    <liquibase.version>3.5.4</liquibase.version>
     <snakeyaml.version>1.17</snakeyaml.version>
-    <hikaricp.version>2.7.4</hikaricp.version>
+    <hikaricp.version>2.7.7</hikaricp.version>
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
   <modules>
