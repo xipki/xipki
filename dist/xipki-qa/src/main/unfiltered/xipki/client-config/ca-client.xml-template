@@ -32,8 +32,8 @@
       disables the interval update -->
     <CAInfoUpdateInterval>10</CAInfoUpdateInterval>
     <CA enabled="true">
-      <name>RCA1</name>
-      <url>https://localhost:8443/cmp/RCA</url>
+      <name>rca1</name>
+      <url>https://localhost:8443/cmp/rca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpControl>
@@ -47,8 +47,8 @@
       </certprofiles>
     </CA>
     <CA enabled="true">
-      <name>SubCA1</name>
-      <url>https://localhost:8443/cmp/SubCA</url>
+      <name>subca1</name>
+      <url>https://localhost:8443/cmp/subca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpControl>
@@ -62,8 +62,8 @@
       </certprofiles>
     </CA>
     <CA enabled="true">
-      <name>SubCAwithCRL1</name>
-      <url>https://localhost:8443/cmp/SubCAwithCRL</url>
+      <name>subcawithcrl1</name>
+      <url>https://localhost:8443/cmp/subcawithcrl</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpControl>

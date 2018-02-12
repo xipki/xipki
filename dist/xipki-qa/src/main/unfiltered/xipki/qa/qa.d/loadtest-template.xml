@@ -11,19 +11,19 @@
   </enrollCert>
   -->
   <enrollCert>
-    <certprofile>TLS</certprofile>
+    <certprofile>tls</certprofile>
     <subject>CN=xipki.org,O=example PKI TLS RSA,C=DE</subject>
     <randomDN>O</randomDN>
     <rsaKey modulusLength="2048"/>
   </enrollCert>
   <enrollCert>
-    <certprofile>TLS</certprofile>
+    <certprofile>tls</certprofile>
     <subject>CN=xipki.org,O=example PKI TLS DSA,C=DE</subject>
     <randomDN>O</randomDN>
     <dsaKey pLength="2048"/>
   </enrollCert>
   <enrollCert>
-    <certprofile>TLS</certprofile>
+    <certprofile>tls</certprofile>
     <subject>CN=xipki.org,O=example PKI EC,C=DE</subject>
     <randomDN>O</randomDN>
     <ecKey curve="secp256r1"/>

@@ -5,7 +5,7 @@
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
   </properties>
   <cas>
-    <ca name="SubCA1.complex-Name">
+    <ca name="subca1-complex-name">
       <caInfo>
         <x509Ca>
           <cmpcontrolName>cmpcontrol1</cmpcontrolName>
@@ -22,9 +22,9 @@
             <value>${ca.signerConf}</value>
           </signerConf>
           <status>active</status>
-          <validityMode>STRICT</validityMode>
+          <validityMode>strict</validityMode>
           <cacertUris>
-            <str>http://example.org/SubCA1.der</str>
+            <str>http://example.org/subca1.der</str>
           </cacertUris>
           <nextCrlNo>2</nextCrlNo>
           <ocspUris>
@@ -37,15 +37,15 @@
         </x509Ca>
       </caInfo>
       <aliases>
-        <str>SubCA</str>
+        <str>subca</str>
       </aliases>
       <profiles>
-        <str>QC</str>
-        <str>EE.Complex</str>
-        <str>TLS</str>
-        <str>TLS_C</str>
-        <str>TLSwithIncSN</str>
-        <str>gSMC_K</str>
+        <str>qc</str>
+        <str>ee-complex</str>
+        <str>tls</str>
+        <str>tls-c</str>
+        <str>tls-inc-sn</str>
+        <str>gsmc-k</str>
       </profiles>
       <requestors>
         <requestor>
@@ -53,12 +53,12 @@
           <ra>true</ra>
           <permission>255</permission>
           <profiles>
-            <str>ALL</str>
+            <str>all</str>
           </profiles>
         </requestor>
       </requestors>
       <publishers>
-        <str>OCSP.PUBLISHER</str>
+        <str>ocsp-publisher</str>
       </publishers>
     </ca>
   </cas>

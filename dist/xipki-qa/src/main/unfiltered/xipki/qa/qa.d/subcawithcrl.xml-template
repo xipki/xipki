@@ -5,11 +5,11 @@
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
   </properties>
   <cas>
-    <ca name="SubCAwithCRL1">
+    <ca name="subcawithcrl1">
       <caInfo>
         <x509Ca>
           <cmpcontrolName>cmpcontrol1</cmpcontrolName>
-          <crlsignerName>CASIGN.CRLSIGNER</crlsignerName>
+          <crlsignerName>casign-crlsigner</crlsignerName>
           <crlUris>
             <str>http://subcawithcrl.example.org/crl</str>
           </crlUris>
@@ -29,9 +29,9 @@
             <value>${ca.signerConf}</value>
           </signerConf>
           <status>active</status>
-          <validityMode>LAX</validityMode>
+          <validityMode>lax</validityMode>
           <cacertUris>
-            <str>http://example.org/SubCAwithCRL1.der</str>
+            <str>http://example.org/subcawithcrl1.der</str>
           </cacertUris>
           <nextCrlNo>2</nextCrlNo>
           <ocspUris>
@@ -41,15 +41,15 @@
         </x509Ca>
       </caInfo>
       <aliases>
-        <str>SubCAwithCRL</str>
+        <str>subcawithcrl</str>
       </aliases>
       <profiles>
-        <str>OCSP</str>
-        <str>SCEP</str>
-        <str>multipleOUs</str>
-        <str>multiValuedRDN</str>
-        <str>MaxTime</str>
-        <str>TLSA</str>
+        <str>ocsp</str>
+        <str>scep</str>
+        <str>multiple-ous</str>
+        <str>multi-valued-rdn</str>
+        <str>max-time</str>
+        <str>tlsa</str>
       </profiles>
       <requestors>
         <requestor>
@@ -57,7 +57,7 @@
           <ra>true</ra>
           <permission>255</permission>
           <profiles>
-            <str>ALL</str>
+            <str>all</str>
           </profiles>
         </requestor>
       </requestors>

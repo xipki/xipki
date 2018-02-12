@@ -255,41 +255,41 @@ if { $printUsage equals "true" } {
   echo "#################################################################"
   echo "#                    Add certificate profile                    #"
   echo "#################################################################"
-  caqa:profile-check --name SubCA --type XML \
-    --conf-file xipki/qa/profile/Certprofile_SubCA.xml
+  caqa:profile-check --name subca --type XML \
+    --conf-file xipki/qa/certprofile/certprofile-subca.xml
 
-  ca:profile-add --name qa-SubCA --type XML \
-    --conf-file xipki/qa/profile/Certprofile_SubCA_Complex.xml
+  ca:profile-add --name qa-subca --type XML \
+    --conf-file xipki/qa/certprofile/certprofile-subca-complex.xml
 
   # name already exists
-  caqa:neg-profile-add --name qa-SubCA --type XML \
-    --conf-file xipki/qa/profile/Certprofile_SubCA_Complex.xml
+  caqa:neg-profile-add --name qa-subca --type XML \
+    --conf-file xipki/qa/certprofile/certprofile-subca-complex.xml
 
   # unknown type
-  caqa:neg-profile-add --name qa-SubCA2 --type java:packagename.classname
+  caqa:neg-profile-add --name qa-subca2 --type java:packagename.classname
 
   # invalid conf for the given type
-  caqa:neg-profile-add --name qa-SubCA --type XML \
+  caqa:neg-profile-add --name qa-subca --type XML \
     --conf invalid-profile-conf
 
   # invalid type
-  caqa:neg-profile-up --name qa-SubCA --type invalid-type
+  caqa:neg-profile-up --name qa-subca --type invalid-type
 
   # invalid conf
-  caqa:neg-profile-up --name qa-SubCA --conf invalid-profile-conf
+  caqa:neg-profile-up --name qa-subca --conf invalid-profile-conf
 
-  caqa:profile-check --name qa-SubCA --type XML \
-    --conf-file xipki/qa/profile/Certprofile_SubCA_Complex.xml
+  caqa:profile-check --name qa-subca --type XML \
+    --conf-file xipki/qa/certprofile/certprofile-subca-complex.xml
 
-  ca:profile-rm qa-SubCA
+  ca:profile-rm qa-subca
 
   # name does not exist
-  caqa:neg-profile-rm qa-SubCA
+  caqa:neg-profile-rm qa-subca
 
   echo "#################################################################"
   echo "#                         Add CRL signer                        #"
   echo "#################################################################"
-  caqa:crlsigner-check --name CASIGN.CRLSIGNER --signer-type CA \
+  caqa:crlsigner-check --name casign-crlsigner --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
   echo "direct CRL signer (signed by CA)"
@@ -354,261 +354,261 @@ if { $printUsage equals "true" } {
   echo "#                              CA                               #"
   echo "#################################################################"
 
-  caqa:ca-check --name SUBCA1.COMPLEX-NAME \
---permission ALL \
+  caqa:ca-check --name subca1-complex-name \
+--permission all \
     --max-validity 5y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/SubCA1.der \
+    --ca-cert-uri http://example.org/subca1.der \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes
 
-  caqa:ca-check --name RCA1 \
-    --permission ALL \
+  caqa:ca-check --name rca1 \
+    --permission all \
     --max-validity 10y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
-    --cert output/RCA1.der \
+    --cert output/rca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
   # change the CA configuration
 
-  ca:ca-up --name RCA1 \
-    --permission ENROLL_CERT \
-    --permission REVOKE_CERT \
+  ca:ca-up --name rca1 \
+    --permission enroll_cert \
+    --permission revoke_cert \
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
-    --ca-cert-uri http://example.org/RCA1-2.der \
+    --ca-cert-uri http://example.org/rca1-2.der \
     --duplicate-subject no \
     --duplicate-key no \
-    --validity-mode STRICT
+    --validity-mode strict
 
-  caqa:ca-check --name RCA1 \
-    --permission ENROLL_CERT \
-    --permission REVOKE_CERT \
+  caqa:ca-check --name rca1 \
+    --permission enroll_cert \
+    --permission revoke_cert \
     --max-validity 8y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
-    --cert output/RCA1.der \
+    --cert output/rca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
-    --ca-cert-uri http://example.org/RCA1-2.der \
+    --ca-cert-uri http://example.org/rca1-2.der \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
     --duplicate-subject no \
     --duplicate-key no \
-    --validity-mode STRICT
+    --validity-mode strict
 
   # for commands neg-gen-rca
-  ca:profile-add --name RCA --type XML --conf-file xipki/qa/profile/Certprofile_RootCA.xml
+  ca:profile-add --name rca --type XML --conf-file xipki/qa/certprofile/certprofile-rootca.xml
 
-  # The CA named RCA2 exists. No new CA with the same name is allowed
+  # The CA named rca2 exists. No new CA with the same name is allowed
 
   if { $TOKEN_TYPE equals "PKCS11" } {
-    CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=RCA1"
+    CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=rca1"
   }
 
   if { $TOKEN_TYPE equals "PKCS12" } {
-    CA_SIGNER_CONF_RCA = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
+    CA_SIGNER_CONF_RCA = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/rca1.p12,algo=$CA_SIGNER_ALGO"
   }
 
-  echo "neg-gen-rca: CA named RCA1 already exists"
+  echo "neg-gen-rca: CA named rca1 already exists"
 
   caqa:neg-gen-rca \
-    --name RCA1 \
-    --csr output/RCA1.csr \
-    --profile RCA \
-    --out output/RCA1-2.der \
-    --permission ALL \
+    --name rca1 \
+    --csr output/rca1.csr \
+    --profile rca \
+    --out output/rca1-2.der \
+    --permission all \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
-  ca:profile-rm RCA
+  ca:profile-rm rca
 
   echo "neg-ca-add: certificate and key do not match"
 
   caqa:neg-ca-add \
-    --name RCA2 \
-    --permission ALL \
+    --name rca2 \
+    --permission all \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/SubCA1.der \
+    --cert output/subca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
   echo "neg-ca-add: CMP control name does not exist"
 
   caqa:neg-ca-add \
-    --name RCA2 \
-    --permission ALL \
+    --name rca2 \
+    --permission all \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/RCA1.der \
+    --cert output/rca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --cmp-control cmpcontrol2 \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
   echo "neg-ca-add: CRL signer name does not exist"
 
   caqa:neg-ca-add \
-    --name RCA2 \
-    --permission ALL \
+    --name rca2 \
+    --permission all \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/RCA1.der \
+    --cert output/rca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --crl-signer crlsigner2 \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
   echo "neg-ca-add: responder name does not exist"
 
   caqa:neg-ca-add \
-    --name RCA2 \
-    --permission ALL \
+    --name rca2 \
+    --permission all \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/RCA1.der \
+    --cert output/rca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --cmp-control cmpcontrol1 \
     --responder responder2 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
   echo "#################################################################"
   echo "#                            CA alias                           #"
   echo "#################################################################"
-  caqa:caalias-check --ca RCA1 --alias RCA
+  caqa:caalias-check --ca rca1 --alias rca
 
-  caqa:caalias-check --ca SUBCA1.COMPLEX-NAME --alias SubCA
+  caqa:caalias-check --ca subca1-complex-name --alias subca
 
-  caqa:caalias-check --ca SUBCAWITHCRL1 --alias SubCAwithCRL
+  caqa:caalias-check --ca subcawithcrl1 --alias subcawithcrl
 
-  ca:caalias-add --ca RCA1 --alias RCA-1
+  ca:caalias-add --ca rca1 --alias rca-1
 
-  caqa:caalias-check --ca RCA1 --alias RCA-1
+  caqa:caalias-check --ca rca1 --alias rca-1
 
-  ca:caalias-rm RCA-1
+  ca:caalias-rm rca-1
 
   echo "#################################################################"
   echo "#                          CA-has-profile                       #"
   echo "#################################################################"
 
-  caqa:caprofile-check --ca RCA1 --profile Cross
+  caqa:caprofile-check --ca rca1 --profile cross
 
-  caqa:caprofile-check --ca RCA1 --profile SubCA
+  caqa:caprofile-check --ca rca1 --profile subca
 
-  caqa:caprofile-check --ca RCA1 --profile SubCA.Complex
+  caqa:caprofile-check --ca rca1 --profile subca-complex
 
-  ca:caprofile-add --ca RCA1 --profile TLS
+  ca:caprofile-add --ca rca1 --profile tls
 
-  caqa:caprofile-check --ca RCA1 --profile TLS
+  caqa:caprofile-check --ca rca1 --profile tls
 
   # CA name does not exist
 
-  caqa:neg-caprofile-add --ca RCA10 --profile PROFILE-DUMMY
+  caqa:neg-caprofile-add --ca rca10 --profile profile-dummy
 
   # profile name does not exist
 
-  caqa:neg-caprofile-add --ca RCA1 --profile PROFILE-DUMMY
+  caqa:neg-caprofile-add --ca rca1 --profile profile-dummy
 
   # invalid permission
 
-  caqa:neg-caprofile-rm --ca RCA1 --profile PROFILE-DUMMY
+  caqa:neg-caprofile-rm --ca rca1 --profile profile-dummy
 
   echo "#################################################################"
   echo "#                         CA-has-publisher                      #"
   echo "#################################################################"
-  caqa:capub-check --ca RCA1 --publisher OCSP.PUBLISHER
+  caqa:capub-check --ca rca1 --publisher ocsp-publisher
 
   # CA name does not exist
-  caqa:neg-capub-add --ca RCA10 --publisher PUBLISHER-DUMMY
+  caqa:neg-capub-add --ca rca10 --publisher publisher-dummy
 
   # CA name does not exist
-  caqa:neg-capub-rm --ca RCA10 --publisher PUBLISHER-DUMMY
+  caqa:neg-capub-rm --ca rca10 --publisher publisher-dummy
 
   # Publisher name does not exist
-  caqa:neg-capub-add --ca RCA1 --publisher PUBLISHER-DUMMY
+  caqa:neg-capub-add --ca rca1 --publisher publisher-dummy
 
   # Publisher name does not exist
-  caqa:neg-capub-rm --ca RCA1 --publisher PUBLISHER-DUMMY
+  caqa:neg-capub-rm --ca rca1 --publisher publisher-dummy
 
   echo "#################################################################"
   echo "#                         CA-has-requestor                      #"
   echo "#################################################################"
-  caqa:careq-check --ca RCA1 --requestor requestor1 --ra yes \
-    --permission ALL --profile ALL
+  caqa:careq-check --ca rca1 --requestor requestor1 --ra yes \
+    --permission all --profile all
 
-  ca:careq-rm --ca RCA1 --requestor requestor1 \
+  ca:careq-rm --ca rca1 --requestor requestor1 \
 
-  ca:careq-add --ca RCA1 --requestor requestor1 --ra yes \
-    --permission ENROLL_CERT --permission REVOKE_CERT
+  ca:careq-add --ca rca1 --requestor requestor1 --ra yes \
+    --permission enroll_cert --permission revoke_cert
 
-  caqa:careq-check --ca RCA1 --ra yes --requestor requestor1 \
-    --permission ENROLL_CERT --permission REVOKE_CERT --profile NULL
-
-  # CA name does not exist
-  caqa:neg-careq-add --ca RCA10 --requestor REQUESTOR-DUMMY \
-    --permission ALL --profile ALL
+  caqa:careq-check --ca rca1 --ra yes --requestor requestor1 \
+    --permission enroll_cert --permission revoke_cert --profile null
 
   # CA name does not exist
-  caqa:neg-careq-rm --ca RCA10 --requestor REQUESTOR-DUMMY
+  caqa:neg-careq-add --ca rca10 --requestor requestor-dummy \
+    --permission all --profile all
+
+  # CA name does not exist
+  caqa:neg-careq-rm --ca rca10 --requestor requestor-dummy
 
   # Requestor name does not exist
-  caqa:neg-careq-add --ca RCA1 --requestor REQUESTOR-DUMMY \
-    --permission ALL --profile ALL
+  caqa:neg-careq-add --ca rca1 --requestor requestor-dummy \
+    --permission all --profile all
 
   # Requestor name does not exist
-  caqa:neg-careq-rm --ca RCA1 --requestor REQUESTOR-DUMMY
+  caqa:neg-careq-rm --ca rca1 --requestor requestor-dummy
 
   # Requestor name does not exist
-  caqa:neg-careq-add --ca RCA1 --requestor REQUESTOR-DUMMY \
-    --permission ALL --profile ALL
+  caqa:neg-careq-add --ca rca1 --requestor requestor-dummy \
+    --permission all --profile all
 
   ## Positive CA qa script
 
@@ -616,42 +616,42 @@ if { $printUsage equals "true" } {
 
   ca:caalias-info
 
-  ca:caalias-info RCA
+  ca:caalias-info rca
 
-  ca:caalias-rm RCA
+  ca:caalias-rm rca
 
-  ca:caalias-add --alias RCA --ca RCA1
+  ca:caalias-add --alias rca --ca rca1
 
   ##### caprofile #####
 
-  ca:caprofile-info --ca RCA1
+  ca:caprofile-info --ca rca1
 
-  ca:caprofile-rm --profile SubCA --ca RCA1
+  ca:caprofile-rm --profile subca --ca rca1
 
-  ca:caprofile-add --profile SubCA --ca RCA1
+  ca:caprofile-add --profile subca --ca rca1
 
   ##### capub #####
 
-  ca:capub-info --ca RCA1
+  ca:capub-info --ca rca1
 
-  ca:capub-rm --publisher OCSP.PUBLISHER --ca RCA1
+  ca:capub-rm --publisher ocsp-publisher --ca rca1
 
-  ca:capub-add --ca RCA1 --publisher OCSP.PUBLISHER
+  ca:capub-add --ca rca1 --publisher ocsp-publisher
 
   ##### careq #####
 
-  ca:careq-info --ca RCA1
+  ca:careq-info --ca rca1
 
-  ca:careq-rm --requestor requestor1 --ca RCA1
+  ca:careq-rm --requestor requestor1 --ca rca1
 
-  ca:careq-add --requestor requestor1 --ca RCA1 --profile ALL \
-    --ra yes --permission ALL
+  ca:careq-add --requestor requestor1 --ca rca1 --profile all \
+    --ra yes --permission all
 
   ##### clear-publishqueue #####
 
-  ca:clear-publishqueue --ca RCA1 --publisher OCSP.PUBLISHER
+  ca:clear-publishqueue --ca rca1 --publisher ocsp-publisher
 
-  ca:clear-publishqueue --ca ALL --publisher ALL
+  ca:clear-publishqueue --ca all --publisher all
 
   ##### cmpcontrol #####
 
@@ -669,54 +669,54 @@ if { $printUsage equals "true" } {
 
   ##### crlsigner #####
 
-  ca:crlsigner-add --name CASIGN.CRLSIGNER2 --signer-type CA \
+  ca:crlsigner-add --name casign-crlsigner2 --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
   ca:crlsigner-info
 
-  ca:crlsigner-info CASIGN.CRLSIGNER2
+  ca:crlsigner-info casign-crlsigner2
 
-  ca:crlsigner-up --name CASIGN.CRLSIGNER2 --signer-type CA \
+  ca:crlsigner-up --name casign-crlsigner2 --signer-type CA \
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:30
 
-  ca:crlsigner-rm CASIGN.CRLSIGNER2
+  ca:crlsigner-rm casign-crlsigner2
 
   ##### env #####
 
-  env-add --name ENV2 --value VALUE2
+  env-add --name env2 --value value2
 
   ca:env-info
 
-  ca:env-info ENV2
+  ca:env-info env2
 
-  ca:env-up --name ENV2 --value VALUE2-2
+  ca:env-up --name env2 --value value2-2
 
-  ca:env-rm ENV2
+  ca:env-rm env2
 
   ##### profile #####
 
   ca:profile-info
 
-  ca:profile-info OCSP
+  ca:profile-info ocsp
 
-  ca:profile-export --name SubCA --out output/Certprofile_SubCA.export
+  ca:profile-export --name subca --out output/certprofile-subca.export
 
-  ca:profile-up --name SubCA --conf-file output/Certprofile_SubCA.export
+  ca:profile-up --name subca --conf-file output/certprofile-subca.export
 
   ##### publisher #####
 
   ca:publisher-info
 
-  ca:publisher-info OCSP.PUBLISHER
+  ca:publisher-info ocsp-publisher
 
-  ca:publisher-export --name OCSP.PUBLISHER --out output/publisher.export
+  ca:publisher-export --name ocsp-publisher --out output/publisher.export
 
-  ca:publisher-up --name OCSP.PUBLISHER --conf-file output/publisher.export
+  ca:publisher-up --name ocsp-publisher --conf-file output/publisher.export
 
-  ca:publisher-add --name OCSP.PUBLISHER2 --type OCSP \
+  ca:publisher-add --name ocsp-publisher2 --type ocsp \
     --conf-file output/publisher.export
 
-  ca:publisher-rm OCSP.PUBLISHER2
+  ca:publisher-rm ocsp-publisher2
 
   ##### requestor #####
 
@@ -746,27 +746,27 @@ if { $printUsage equals "true" } {
 
   ##### cert #####
 
-  ca:revoke-cert --ca RCA1 --reason certificateHold --cert output/SubCAwithCRL1.der
+  ca:revoke-cert --ca rca1 --reason certificateHold --cert output/subcawithcrl1.der
 
-  ca:unrevoke-cert --ca RCA1 --cert output/SubCAwithCRL1.der
+  ca:unrevoke-cert --ca rca1 --cert output/subcawithcrl1.der
 
-  ca:revoke-cert --ca RCA1 --reason certificateHold --cert output/SubCAwithCRL1.der
+  ca:revoke-cert --ca rca1 --reason certificateHold --cert output/subcawithcrl1.der
 
-  ca:unrevoke-cert --ca RCA1 --cert output/SubCAwithCRL1.der
+  ca:unrevoke-cert --ca rca1 --cert output/subcawithcrl1.der
 
-  ca:revoke-cert --ca RCA1 --reason keyCompromise --cert output/SubCAwithCRL1.der
+  ca:revoke-cert --ca rca1 --reason keyCompromise --cert output/subcawithcrl1.der
 
-  ca:revoke-cert --ca RCA1 --reason keyCompromise --cert output/SubCA1.der
+  ca:revoke-cert --ca rca1 --reason keyCompromise --cert output/subca1.der
 
-  ca:remove-cert --ca RCA1 --cert output/SubCAwithCRL1.der
+  ca:remove-cert --ca rca1 --cert output/subcawithcrl1.der
 
-  ca:remove-cert --ca RCA1 --cert output/SubCA1.der
+  ca:remove-cert --ca rca1 --cert output/subca1.der
 
   ##### CA #####
 
-  ca:ca-revoke --reason keyCompromise RCA1
+  ca:ca-revoke --reason keyCompromise rca1
 
-  ca:ca-unrevoke RCA1
+  ca:ca-unrevoke rca1
 
   ca:notify-change
 
@@ -776,26 +776,26 @@ if { $printUsage equals "true" } {
 
   ca:ca-info
 
-  ca:ca-info RCA1
+  ca:ca-info rca1
 
-  ca:ca-up --name RCA1 \
-    --permission ENROLL_CERT \
-    --permission REVOKE_CERT \
+  ca:ca-up --name rca1 \
+    --permission enroll_cert \
+    --permission revoke_cert \
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
-    --ca-cert-uri http://example.org/RCA1-2.der \
+    --ca-cert-uri http://example.org/rca1-2.der \
     --duplicate-subject no \
     --duplicate-key no \
-    --validity-mode STRICT
+    --validity-mode strict
 
-  ca:ca-up --name RCA1 \
-    --permission ALL \
+  ca:ca-up --name rca1 \
+    --permission all \
     --max-validity 10y \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/RCA1.der \
+    --ca-cert-uri http://example.org/rca1.der \
     --duplicate-subject yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode cutoff
 
   feature:uninstall xipki-caqa-shell
 }

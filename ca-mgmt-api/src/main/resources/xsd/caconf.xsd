@@ -202,7 +202,7 @@
       <xs:element name="status" type="xs:string"/>
       <xs:element name="validityMode" type="xs:string" minOccurs="0">
         <xs:annotation>
-          <xs:documentation>Valid values are STRICT, CUTOFF, LAX. Default is STRICT</xs:documentation>
+          <xs:documentation>Valid values are strict, cutoff and lax. Default is strict</xs:documentation>
         </xs:annotation>
       </xs:element>
       <!-- X.509 specific CA configuration -->

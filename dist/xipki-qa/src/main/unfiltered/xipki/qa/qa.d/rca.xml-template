@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CAConf xmlns="http://xipki.org/ca/conf/v2" version="1">
   <properties>
-    <property name="profiles.dir">xipki/qa/profile</property>
+    <property name="profiles.dir">xipki/qa/certprofile</property>
     <property name="security.dir">xipki/security</property>
     <property name="output.dir">output</property>
     <property name="token.type">REPLACEME-TOKEN_TYPE</property>
@@ -25,7 +25,7 @@
     </responder>
   </responders>
   <crlsigners>
-    <crlsigner name="CASIGN.CRLSIGNER">
+    <crlsigner name="casign-crlsigner">
       <signerType>CA</signerType>
       <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
     </crlsigner>
@@ -38,7 +38,7 @@
     </requestor>
   </requestors>
   <publishers>
-    <publisher name="OCSP.PUBLISHER">
+    <publisher name="ocsp-publisher">
       <type>OCSP</type>
       <conf>
         <value>datasource=ocsp,publish.goodcerts=true</value>
@@ -46,117 +46,117 @@
     </publisher>
   </publishers>
   <profiles>
-    <profile name="RCA">
+    <profile name="rca">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_RootCA.xml</file>
+        <file>${profiles.dir}/certprofile-rootca.xml</file>
       </conf>
     </profile>
-    <profile name="Cross">
+    <profile name="cross">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_Cross.xml</file>
+        <file>${profiles.dir}/certprofile-cross.xml</file>
       </conf>
     </profile>
-    <profile name="SubCA">
+    <profile name="subca">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_SubCA.xml</file>
+        <file>${profiles.dir}/certprofile-subca.xml</file>
       </conf>
     </profile>
-    <profile name="SubCA.Complex">
+    <profile name="subca-complex">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_SubCA_Complex.xml</file>
+        <file>${profiles.dir}/certprofile-subca-complex.xml</file>
       </conf>
     </profile>
-    <profile name="OCSP">
+    <profile name="ocsp">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_OCSP.xml</file>
+        <file>${profiles.dir}/certprofile-ocsp.xml</file>
       </conf>
     </profile>
-    <profile name="SCEP">
+    <profile name="scep">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_SCEP.xml</file>
+        <file>${profiles.dir}/certprofile-scep.xml</file>
       </conf>
     </profile>
-    <profile name="multipleOUs">
+    <profile name="multiple-ous">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_multipleOUs.xml</file>
+        <file>${profiles.dir}/certprofile-multiple-ous.xml</file>
       </conf>
     </profile>
-    <profile name="multiValuedRDN">
+    <profile name="multi-valued-rdn">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_multiValuedRDN.xml</file>
+        <file>${profiles.dir}/certprofile-multi-valued-rdn.xml</file>
       </conf>
     </profile>
-    <profile name="QC">
+    <profile name="qc">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_QC.xml</file>
+        <file>${profiles.dir}/certprofile-qc.xml</file>
       </conf>
     </profile>
-    <profile name="EE.Complex">
+    <profile name="ee-complex">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_EE_Complex.xml</file>
+        <file>${profiles.dir}/certprofile-ee-complex.xml</file>
       </conf>
     </profile>
-    <profile name="TLS">
+    <profile name="tls">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_TLS.xml</file>
+        <file>${profiles.dir}/certprofile-tls.xml</file>
       </conf>
     </profile>
-    <profile name="TLSA">
+    <profile name="tlsa">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_TLS.xml</file>
+        <file>${profiles.dir}/certprofile-tls.xml</file>
       </conf>
     </profile>
-    <profile name="TLS_C">
+    <profile name="tls-c">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_TLS_C.xml</file>
+        <file>${profiles.dir}/certprofile-tls-c.xml</file>
       </conf>
     </profile>
-    <profile name="TLSwithIncSN">
+    <profile name="tls-inc-sn">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_TLSwithIncSN.xml</file>
+        <file>${profiles.dir}/certprofile-tls-inc-sn.xml</file>
       </conf>
     </profile>
-    <profile name="gSMC_K">
+    <profile name="gsmc-k">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_gSMC_K.xml</file>
+        <file>${profiles.dir}/certprofile-gsmc-k.xml</file>
       </conf>
     </profile>
-    <profile name="MaxTime">
+    <profile name="max-time">
       <type>XML</type>
       <conf>
-        <file>${profiles.dir}/Certprofile_MaxTime.xml</file>
+        <file>${profiles.dir}/certprofile-max-time.xml</file>
       </conf>
     </profile>
   </profiles>
   <cas>
-    <ca name="RCA1">
+    <ca name="rca1">
       <caInfo>
         <x509Ca>
           <genSelfIssued>
             <csr>
-              <file>${output.dir}/RCA1.csr</file>
+              <file>${output.dir}/rca1.csr</file>
             </csr>
-            <profile>RCA</profile>
+            <profile>rca</profile>
             <serialNumber>1</serialNumber>
           </genSelfIssued>
           <cmpcontrolName>cmpcontrol1</cmpcontrolName>
           <cert>
-            <file>${output.dir}/RCA1.der</file>
+            <file>${output.dir}/rca1.der</file>
           </cert>
           <duplicateKey>true</duplicateKey>
           <duplicateSubject>true</duplicateSubject>
@@ -171,9 +171,9 @@
             <value>${ca.signerConf}</value>
           </signerConf>
           <status>active</status>
-          <validityMode>CUTOFF</validityMode>
+          <validityMode>cutoff</validityMode>
           <cacertUris>
-            <str>http://example.org/RCA1.der</str>
+            <str>http://example.org/rca1.der</str>
           </cacertUris>
           <nextCrlNo>2</nextCrlNo>
           <ocspUris>
@@ -183,13 +183,13 @@
         </x509Ca>
       </caInfo>
       <aliases>
-        <str>RCA</str>
+        <str>rca</str>
       </aliases>
       <profiles>
-        <str>Cross</str>
-        <str>SubCA</str>
-        <str>SubCA.Complex</str>
-        <str>OCSP</str>
+        <str>cross</str>
+        <str>subca</str>
+        <str>subca-complex</str>
+        <str>ocsp</str>
       </profiles>
       <requestors>
         <requestor>
@@ -197,12 +197,12 @@
           <ra>true</ra>
           <permission>255</permission>
           <profiles>
-            <str>ALL</str>
+            <str>all</str>
           </profiles>
         </requestor>
       </requestors>
       <publishers>
-        <str>OCSP.PUBLISHER</str>
+        <str>ocsp-publisher</str>
       </publishers>
     </ca>
   </cas>

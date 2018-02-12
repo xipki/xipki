@@ -4,25 +4,25 @@ echo "#################################################################"
 echo "#             Manage certificate via REST interface             #"
 echo "#################################################################"
 
-CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/subcawithcrl1.der)
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --p12 output/REST-TLS1.p12 --password 1234 \
-  --subject "CN=REST-TLS1.example.org,O=xipki,C=DE" \
-  --out output/rest/REST-TLS1.csr
+  --p12 output/rest-tls1.p12 --password 1234 \
+  --subject "CN=rest-tls1.example.org,O=xipki,C=DE" \
+  --out output/rest/rest-tls1.csr
 
 echo "REST cacert"
 
-xi:curl --out output/rest/cacert-SubCAwithCRL.der $BASE_URL/cacert
+xi:curl --out output/rest/cacert-subcawithcrl1.der $BASE_URL/cacert
 
 echo "REST enroll"
 
-xi:curl --out output/rest/REST-TLS1.der \
-  --data-file output/rest/REST-TLS1.csr \
+xi:curl --out output/rest/rest-tls1.der \
+  --data-file output/rest/rest-tls1.csr \
   --header "Content-Type: application/pkcs10" \
-  "$BASE_URL/enroll-cert?profile=TLSA"
+  "$BASE_URL/enroll-cert?profile=tlsa"
 
-SERIAL = $(xi:cert-info --serial --hex --in output/rest/REST-TLS1.der)
+SERIAL = $(xi:cert-info --serial --hex --in output/rest/rest-tls1.der)
 
 echo "REST revoke (suspend) "
 

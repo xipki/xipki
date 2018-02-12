@@ -1,15 +1,15 @@
-## Add SCEP support to SubCAwithCRL1
+## Add SCEP support to subcawith
 
-xi:csr-p12 --hash $STDHASH --p12 output/SCEP1.p12 --password 1234 \
-  --subject "CN=SCEP Responder1,O=xipki,C=DE" --out output/SCEP1.csr
+xi:csr-p12 --hash $STDHASH --p12 output/scep1.p12 --password 1234 \
+  --subject "CN=scep responder1,O=xipki,C=DE" --out output/scep1.csr
 
-ca:enroll-cert --ca SubCAwithCRL1 --csr output/SCEP1.csr --out output/SCEP1.der \
-  --profile SCEP
+ca:enroll-cert --ca subcawithcrl1 --csr output/scep1.csr --out output/scep1.der \
+  --profile scep
 
-xi:update-cert-p12 --p12 output/SCEP1.p12 --password 1234 --cert output/SCEP1.der
+xi:update-cert-p12 --p12 output/scep1.p12 --password 1234 --cert output/scep1.der
 
 # with encrypted password 1234
-ca:scep-add --name SCEP1 --ca SubCAwithCRL1 --profile ALL --resp-type PKCS12 \
-  --resp-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/SCEP1.p12 \
+ca:scep-add --name scep1 --ca subcawithcrl1 --profile all --resp-type PKCS12 \
+  --resp-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/scep1.p12 \
   --control caCert.included=false,signerCert.included=true,support.getcrl=true
  

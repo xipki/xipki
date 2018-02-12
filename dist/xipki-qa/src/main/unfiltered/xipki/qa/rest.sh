@@ -2,7 +2,7 @@
 
 # Please adapt the URL
 BASE_URL="https://localhost:8443/rest/subcawithcrl"
-CACERT="output/SubCAwithCRL1.der"
+CACERT="output/subcawithcrl1.der"
 
 echo "base url: ${BASE_URL}"
 
@@ -42,10 +42,10 @@ curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${filename}.csr" \
     --output ${filename}.der -v \
-    "${BASE_URL}/enroll-cert?profile=TLSA"
+    "${BASE_URL}/enroll-cert?profile=tlsa"
 
 # get the serial number
-SERIAL=0X`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '=' -f 2`
+SERIAL=0x`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '=' -f 2`
 
 echo "suspend certificate"
 

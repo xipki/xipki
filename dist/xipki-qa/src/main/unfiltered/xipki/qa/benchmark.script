@@ -77,7 +77,7 @@ if { $printUsage equals "true" } {
 
     echo "Revoke benchmark"
     xiqa:cmp-benchmark-revoke --duration $duration --thread $threads \
-      --issuer output/SubCA1.der \
+      --issuer output/subca1.der \
       --ca-db xipki/ca-config/ca-db.properties
 
     feature:uninstall xipki-caclient-shell
@@ -91,12 +91,12 @@ if { $printUsage equals "true" } {
     sleep 1
     echo "OCSP status benchmark"
     xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
-      --issuer output/SubCA1.der --cert output/TLS_C2.der --url $URL \
+      --issuer output/subca1.der --cert output/tls-c2.der --url $URL \
       --queue-size $OCSP_QUEUE_SIZE
 
     echo "Loadtest OCSP status"
     xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
-      --issuer output/SubCAwithCRL1.der --cert output/OCSP2.der --url $URL_CRL \
+      --issuer output/subcawithcrl1.der --cert output/ocsp2.der --url $URL_CRL \
       --queue-size $OCSP_QUEUE_SIZE
   }
 }

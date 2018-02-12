@@ -12,110 +12,110 @@ sleep 1
 
 xi:csr-p12 \
   --hash $STDHASH \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
   --challenge-password user1:password1 \
-  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE" \
-  --out output/JSCEP-OCSP1.csr
+  --subject "CN=jscep-ocsp1,O=xipki,C=DE" \
+  --out output/jscep-ocsp1.csr
 
 ## Enroll certificate via PKCSReq
 xi:jscep-enroll \
   --url $JSCEP_URL \
-  --ca-cert output/SubCAwithCRL1.der \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --ca-cert output/subcawithcrl1.der \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --csr output/JSCEP-OCSP1.csr \
-  --out output/JSCEP-OCSP1.der
+  --csr output/jscep-ocsp1.csr \
+  --out output/jscep-ocsp1.der
 
 ## Poll Cert
 xi:jscep-certpoll \
   --url $JSCEP_URL \
-  --ca-cert output/SubCAwithCRL1.der \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --ca-cert output/subcawithcrl1.der \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --csr output/JSCEP-OCSP1.csr \
-  --out output/JSCEP-OCSP1-certpoll.der
+  --csr output/jscep-ocsp1.csr \
+  --out output/jscep-ocsp1-certpoll.der
   
 ## Get Cert
 
-SERIAL = $(xi:cert-info --serial --hex --in output/JSCEP-OCSP1.der)
+SERIAL = $(xi:cert-info --serial --hex --in output/jscep-ocsp1.der)
 
 xi:jscep-getcert \
   --url $JSCEP_URL \
-  --ca-cert output/SubCAwithCRL1.der \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --ca-cert output/subcawithcrl1.der \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --out output/JSCEP-OCSP1-getcert.der \
+  --out output/jscep-ocsp1-getcert.der \
   --serial $SERIAL
 
 ## Update the certificate in PKCS#12 file
 xi:update-cert-p12 \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --cert output/JSCEP-OCSP1.der \
-  --ca-cert output/SubCAwithCRL1.der \
-  --ca-cert output/RCA1.der
+  --cert output/jscep-ocsp1.der \
+  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/rca1.der
 
 ## Get CRL
 xi:jscep-getcrl \
   --url $JSCEP_URL \
-  --ca-cert output/SubCAwithCRL1.der \
-  --cert output/JSCEP-OCSP1.der \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --ca-cert output/subcawithcrl1.der \
+  --cert output/jscep-ocsp1.der \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --out output/SubCAwithCRL1-jscep.crl
+  --out output/subcawithcrl1-jscep.crl
  
 ## Renewal with same CommonName 
 
 xi:csr-p12 \
   --hash $STDHASH \
-  --p12 output/JSCEP-OCSP1-2.p12 \
+  --p12 output/jscep-ocsp1-2.p12 \
   --password 1234 \
-  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE" \
-  --out output/JSCEP-OCSP1-2.csr
+  --subject "CN=jscep-ocsp1,O=xipki,C=DE" \
+  --out output/jscep-ocsp1-2.csr
 
-## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
+## Enroll certificate via Renewal, hence signed by the old key jscep-ocsp1.p12
 xi:jscep-enroll \
   --url $JSCEP_URL \
-  --ca-cert output/SubCAwithCRL1.der \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --ca-cert output/subcawithcrl1.der \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --csr output/JSCEP-OCSP1-2.csr \
-  --out output/JSCEP-OCSP1-2.der \
+  --csr output/jscep-ocsp1-2.csr \
+  --out output/jscep-ocsp1-2.der \
 
 ## Update the certificate in PKCS#12 file
 xi:update-cert-p12 \
-  --p12 output/JSCEP-OCSP1-2.p12 \
+  --p12 output/jscep-ocsp1-2.p12 \
   --password 1234 \
-  --cert output/JSCEP-OCSP1-2.der \
-  --ca-cert output/SubCAwithCRL1.der \
-  --ca-cert output/RCA1.der
+  --cert output/jscep-ocsp1-2.der \
+  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/rca1.der
 
 ## Renewal with different CommonName 
 
 xi:csr-p12 \
   --hash $STDHASH \
-  --p12 output/JSCEP-OCSP2.p12 \
+  --p12 output/jscep-ocsp2.p12 \
   --password 1234 \
-  --subject "CN=JSCEP-OCSP2,O=xipki,C=DE" \
-  --out output/JSCEP-OCSP2.csr
+  --subject "CN=jscep-ocsp2,O=xipki,C=DE" \
+  --out output/jscep-ocsp2.csr
 
-## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
+## Enroll certificate via Renewal, hence signed by the old key jscep-ocsp1.p12
 xi:jscep-enroll \
   --url $JSCEP_URL \
-  --ca-cert output/SubCAwithCRL1.der \
-  --p12 output/JSCEP-OCSP1.p12 \
+  --ca-cert output/subcawithcrl1.der \
+  --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
-  --csr output/JSCEP-OCSP2.csr \
-  --out output/JSCEP-OCSP2.der \
+  --csr output/jscep-ocsp2.csr \
+  --out output/jscep-ocsp2.der \
 
 ## Update the certificate in PKCS#12 file
 xi:update-cert-p12 \
-  --p12 output/JSCEP-OCSP2.p12 \
+  --p12 output/jscep-ocsp2.p12 \
   --password 1234 \
-  --cert output/JSCEP-OCSP2.der \
-  --ca-cert output/SubCAwithCRL1.der \
-  --ca-cert output/RCA1.der
+  --cert output/jscep-ocsp2.der \
+  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/rca1.der
 
 feature:uninstall xipki-jscepclient-shell
 

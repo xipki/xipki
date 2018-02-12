@@ -28,7 +28,7 @@
   <signers>
     <signer name="signer1">
       <type>PKCS12</type>
-      <key>password=1234,keystore=file:xipki/setup/keycerts/OCSP1.p12</key>
+      <key>password=1234,keystore=file:xipki/setup/keycerts/ocsp1.p12</key>
       <algorithms>
         <!-- In case of RSA key -->
         <algorithm>SHA256withRSA</algorithm>

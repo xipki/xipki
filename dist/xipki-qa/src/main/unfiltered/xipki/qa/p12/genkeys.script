@@ -1,234 +1,234 @@
 echo " ----- generate SCEP keys (RSA only) -----"
 
 ## SCEP responder
-xi:rsa-p12 --password 1234 \--out p12/shared/SCEP1.p12
+xi:rsa-p12 --password 1234 --out p12/shared/scep1.p12
 
 ## SCEP
 
-xi:rsa-p12 --password 1234 --out p12/shared/SCEP-OCSP1.p12 \
+xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp1.p12 \
   --subject "CN=SCEP-OCSP1,O=xipki,C=DE"
 
-xi:rsa-p12 --password 1234 --out p12/shared/SCEP-OCSP1-2.p12
+xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp1-2.p12
 
-xi:rsa-p12 --password 1234 --out p12/shared/SCEP-OCSP2.p12
+xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp2.p12
 
 ## JSCEP
 
-xi:rsa-p12 --password 1234 --out p12/shared/JSCEP-OCSP1.p12 \
+xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp1.p12 \
   --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
 
-xi:rsa-p12 --password 1234 --out p12/shared/JSCEP-OCSP1-2.p12 \
+xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp1-2.p12 \
   --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
 
-xi:rsa-p12 --password 1234 --out p12/shared/JSCEP-OCSP2.p12 \
+xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp2.p12 \
   --subject "CN=JSCEP-OCSP2,O=xipki,C=DE"
 
-echo " ----- generate keys for Cross1 -----"
+echo " ----- generate keys for cross1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/Cross1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/cross1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/Cross1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/cross1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/Cross1.p12
+xi:ec-p12  --password 1234 --out p12/ec/cross1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/Cross1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/cross1.p12
 
-echo " ----- generate keys for OCSP1 -----"
+echo " ----- generate keys for ocsp1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/OCSP1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/ocsp1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/OCSP1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/ocsp1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/OCSP1.p12
+xi:ec-p12  --password 1234 --out p12/ec/ocsp1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/OCSP1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/ocsp1.p12
 
-echo " ----- generate keys for OCSP2 -----"
+echo " ----- generate keys for ocsp2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/OCSP2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/ocsp2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/OCSP2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/ocsp2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/OCSP2.p12
+xi:ec-p12  --password 1234 --out p12/ec/ocsp2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/OCSP2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/ocsp2.p12
 
-echo " ----- generate keys for multipleOUs1 -----"
+echo " ----- generate keys for multiple-ous -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/multipleOUs1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/multiple-ous1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/multipleOUs1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/multiple-ous1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/multipleOUs1.p12
+xi:ec-p12  --password 1234 --out p12/ec/multiple-ous1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/multipleOUs1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/multiple-ous1.p12
 
-echo " ----- generate keys for multipleOUs2 -----"
+echo " ----- generate keys for multiple-ous2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/multipleOUs2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/multiple-ous2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/multipleOUs2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/multiple-ous2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/multipleOUs2.p12
+xi:ec-p12  --password 1234 --out p12/ec/multiple-ous2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/multipleOUs2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/multiple-ous2.p12
 
-echo " ----- generate keys for multiValuedRDN1 -----"
+echo " ----- generate keys for multi-valued-rdn1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/multiValuedRDN1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/multi-valued-rdn1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/multiValuedRDN1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/multi-valued-rdn1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/multiValuedRDN1.p12
+xi:ec-p12  --password 1234 --out p12/ec/multi-valued-rdn1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/multiValuedRDN1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/multi-valued-rdn1.p12
 
-echo " ----- generate keys for QC1 -----"
+echo " ----- generate keys for qc1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/QC1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/qc1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/QC1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/qc1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/QC1.p12
+xi:ec-p12  --password 1234 --out p12/ec/qc1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/QC1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/qc1.p12
 
-echo " ----- generate keys for EE.Complex1 -----"
+echo " ----- generate keys for ee-complex1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/EE.Complex1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/ee-complex1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/EE.Complex1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/ee-complex1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/EE.Complex1.p12
+xi:ec-p12  --password 1234 --out p12/ec/ee-complex1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/EE.Complex1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/ee-complex1.p12
 
-echo " ----- generate keys for EE.Complex2 -----"
+echo " ----- generate keys for ee-complex2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/EE.Complex2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/ee-complex2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/EE.Complex2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/ee-complex2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/EE.Complex2.p12
+xi:ec-p12  --password 1234 --out p12/ec/ee-complex2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/EE.Complex2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/ee-complex2.p12
 
-echo " ----- generate keys for TLS1 -----"
+echo " ----- generate keys for tls1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLS1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLS1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLS1.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLS1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls1.p12
 
 echo " ----- generate keys for TLS-neg -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLS-neg.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/TLS-neg.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLS-neg.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/TLS-neg.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLS-neg.p12
+xi:ec-p12  --password 1234 --out p12/ec/TLS-neg.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLS-neg.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/TLS-neg.p12
 
-echo " ----- generate keys for TLSwithIncSN1 -----"
+echo " ----- generate keys for tls-inc-sn1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLSwithIncSN1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls-inc-sn1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLSwithIncSN1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls-inc-sn1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLSwithIncSN1.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls-inc-sn1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLSwithIncSN1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls-inc-sn1.p12
 
-echo " ----- generate keys for TLSwithIncSN1-1 -----"
+echo " ----- generate keys for tls-inc-sn1-1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLSwithIncSN1-1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls-inc-sn1-1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLSwithIncSN1-1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls-inc-sn1-1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLSwithIncSN1-1.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls-inc-sn1-1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLSwithIncSN1-1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls-inc-sn1-1.p12
 
-echo " ----- generate keys for TLSwithIncSN1-2 -----"
+echo " ----- generate keys for tls-inc-sn1-2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLSwithIncSN1-2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls-inc-sn1-2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLSwithIncSN1-2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls-inc-sn1-2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLSwithIncSN1-2.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls-inc-sn1-2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLSwithIncSN1-2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls-inc-sn1-2.p12
 
-echo " ----- generate keys for TLS2 -----"
+echo " ----- generate keys for tls2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLS2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLS2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLS2.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLS2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls2.p12
 
-echo " ----- generate keys for REST-TLS1 -----"
+echo " ----- generate keys for rest-tls1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/REST-TLS1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/rest-tls1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/REST-TLS1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/rest-tls1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/REST-TLS1.p12
+xi:ec-p12  --password 1234 --out p12/ec/rest-tls1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/REST-TLS1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/rest-tls1.p12
 
-echo " ----- generate keys for TLS_C1 -----"
+echo " ----- generate keys for tls-c1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLS_C1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls-c1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLS_C1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls-c1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLS_C1.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls-c1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLS_C1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls-c1.p12
 
-echo " ----- generate keys for TLS_C2 -----"
+echo " ----- generate keys for tls-c2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/TLS_C2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls-c2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/TLS_C2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls-c2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/TLS_C2.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls-c2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/TLS_C2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls-c2.p12
 
-echo " ----- generate keys for gSMC_K1 -----"
+echo " ----- generate keys for gsmc-k1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/gSMC_K1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/gsmc-k1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/gSMC_K1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/gsmc-k1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/gSMC_K1.p12
+xi:ec-p12  --password 1234 --out p12/ec/gsmc-k1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/gSMC_K1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/gsmc-k1.p12
 
-echo " ----- generate keys for gSMC_K2 -----"
+echo " ----- generate keys for gsmc-k2 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/gSMC_K2.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/gsmc-k2.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/gSMC_K2.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/gsmc-k2.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/gSMC_K2.p12
+xi:ec-p12  --password 1234 --out p12/ec/gsmc-k2.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/gSMC_K2.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/gsmc-k2.p12
 
-echo " ----- generate keys for MaxTime1 -----"
+echo " ----- generate keys for max-time1 -----"
 
-xi:rsa-p12 --password 1234 --out p12/RSA/MaxTime1.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/max-time1.p12
 
-xi:dsa-p12 --password 1234 --out p12/DSA/MaxTime1.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/max-time1.p12
 
-xi:ec-p12  --password 1234 --out p12/EC/MaxTime1.p12
+xi:ec-p12  --password 1234 --out p12/ec/max-time1.p12
 
-xi:sm2-p12 --password 1234 --out p12/SM2/MaxTime1.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/max-time1.p12
