@@ -423,7 +423,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
             CmpUtf8Pairs keyvalues = CmpUtil.extract(reqMsg.getRegInfo());
             String certprofileName = (keyvalues == null) ? null
-                    : keyvalues.value(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                    : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
             if (certprofileName == null) {
                 String msg = "no certificate profile";
                 certResponses.put(i, buildErrorCertResponse(certReqId,
@@ -571,14 +571,14 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             Date notAfter = null;
 
             if (keyvalues != null) {
-                certprofileName = keyvalues.value(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                certprofileName = keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
 
-                String str = keyvalues.value(CmpUtf8Pairs.KEY_NOT_BEFORE);
+                String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
                 if (str != null) {
                     notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
                 }
 
-                str = keyvalues.value(CmpUtf8Pairs.KEY_NOT_AFTER);
+                str = keyvalues.value(CmpUtf8Pairs.KEY_NOTAFTER);
                 if (str != null) {
                     notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
                 }
