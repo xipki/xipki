@@ -58,7 +58,7 @@ curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${OUT_DIR}/${CN}.csr" \
     --output ${OUT_DIR}/${CN}.der \
-    "${CA_URL}/enroll-cert?profile=TLS"
+    "${CA_URL}/enroll-cert?profile=tls"
 
 # get the serial number
 SERIAL=0X`openssl x509 -inform der -serial -noout -in ${OUT_DIR}/${CN}.der | cut -d '=' -f 2`

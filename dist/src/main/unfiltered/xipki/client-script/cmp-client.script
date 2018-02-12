@@ -20,26 +20,26 @@ xi:cmp-cacert \
 
 echo "=====CMP: Enroll via CRMF====="
 
-CN = CMPCRMF-TLS-${CUR_TIME}
+CN = cmp-crmf-tls-${CUR_TIME}
 
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" --subject "CN=${CN}"
 
 xi:cmp-enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
-  --out ${OUT_DIR}/${CN}.der --profile TLS --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+  --out ${OUT_DIR}/${CN}.der --profile tls --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Enroll via CSR====="
 
-CN = CMPCSR-TLS-${CUR_TIME}
+CN = cmp-csr-tls-${CUR_TIME}
 
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
 xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
 
-xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile TLS
+xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile tls
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
@@ -49,29 +49,29 @@ xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Suspend certificate====="
 
-xi:cmp-revoke --ca MYCA --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
 
 echo "Current OCSP Status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Unsuspend certificate====="
 
-xi:cmp-unrevoke --ca MYCA --cert ${OUT_DIR}/${CN}.der
+xi:cmp-unrevoke --ca myca --cert ${OUT_DIR}/${CN}.der
 
 echo "Current OCSP Status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Revocate certificate====="
 
-xi:cmp-revoke --ca MYCA --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
+xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
 
 echo "Current OCSP Status"
 xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Generate CRL====="
 
-xi:cmp-gencrl --ca MYCA --out ${OUT_DIR}/CMP-MYCA-GEN.crl
+xi:cmp-gencrl --ca myca --out ${OUT_DIR}/cmp-myca-gen.crl
 
 echo "=====CMP: Get CRL===="
-xi:cmp-getcrl --ca MYCA --out ${OUT_DIR}/CMP-MYCA-GET.crl
+xi:cmp-getcrl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
 

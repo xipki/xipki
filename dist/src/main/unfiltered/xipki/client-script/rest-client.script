@@ -19,7 +19,7 @@ CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
 
 echo "=====REST: Enroll====="
 
-CN = REST-TLS-${CUR_TIME}
+CN = rest-tls-${CUR_TIME}
 
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
@@ -29,7 +29,7 @@ xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
 
 xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
   --header "Content-Type: application/pkcs10" \
-  "$BASE_URL/enroll-cert?profile=TLS"
+  "$BASE_URL/enroll-cert?profile=tls"
 
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 
@@ -59,7 +59,7 @@ xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====CMP: Generate CRL====="
 
-xi:curl --out ${OUT_DIR}/REST-MYCA-GEN.crl $BASE_URL/new-crl
+xi:curl --out ${OUT_DIR}/rest-myca-gen.crl $BASE_URL/new-crl
 
-xi:curl --out ${OUT_DIR}/REST-MYCA-GET.crl $BASE_URL/crl
+xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
 

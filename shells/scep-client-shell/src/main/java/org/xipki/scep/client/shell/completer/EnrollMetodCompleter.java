@@ -28,7 +28,7 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 public class EnrollMetodCompleter extends AbstractEnumCompleter {
 
     public EnrollMetodCompleter() {
-        setTokens("PKCS,RENEWAL,UPDATE");
+        setTokens("pkcs,renewal,update");
     }
 
 }

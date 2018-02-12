@@ -68,11 +68,11 @@ public class EnrollCertCmd extends ClientAction {
         X509Certificate cert0 = getIdentityCert();
         if (StringUtil.isBlank(method)) {
             resp = client.scepEnrol(csr, key0, cert0);
-        } else if ("PKCS".equalsIgnoreCase(method)) {
+        } else if ("pkcs".equalsIgnoreCase(method)) {
             resp = client.scepPkcsReq(csr, key0, cert0);
-        } else if ("RENEWAL".equalsIgnoreCase(method)) {
+        } else if ("renewal".equalsIgnoreCase(method)) {
             resp = client.scepRenewalReq(csr, key0, cert0);
-        } else if ("UPDATE".equalsIgnoreCase(method)) {
+        } else if ("update".equalsIgnoreCase(method)) {
             resp = client.scepUpdateReq(csr, key0, cert0);
         } else {
             throw new CmdFailure("invalid enroll method");
