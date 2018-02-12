@@ -588,15 +588,15 @@ abstract class X509CmpRequestor extends CmpRequestor {
     } // method buildUnrevokeOrRemoveCertRequest
 
     private PKIMessage buildPkiMessage(CsrEnrollCertRequest csr, Date notBefore, Date notAfter) {
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE,
                 csr.certprofile());
 
         if (notBefore != null) {
-            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOT_BEFORE,
+            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOTBEFORE,
                     DateUtil.toUtcTimeyyyyMMddhhmmss(notBefore));
         }
         if (notAfter != null) {
-            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOT_AFTER,
+            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOTAFTER,
                     DateUtil.toUtcTimeyyyyMMddhhmmss(notAfter));
         }
 
@@ -614,7 +614,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         for (int i = 0; i < reqEntries.size(); i++) {
             EnrollCertRequestEntry reqEntry = reqEntries.get(i);
-            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
+            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE,
                     reqEntry.certprofile());
             AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 
@@ -642,7 +642,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     private PKIMessage buildPkiMessage(CertRequest req, ProofOfPossession pop, String profileName) {
         PKIHeader header = buildPkiHeader(implicitConfirm, null);
 
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE, profileName);
         AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
         CertReqMsg[] certReqMsgs = new CertReqMsg[1];
         certReqMsgs[0] = new CertReqMsg(req, pop, new AttributeTypeAndValue[]{certprofileInfo});
