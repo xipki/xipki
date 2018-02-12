@@ -50,11 +50,11 @@ public abstract class Pkcs12RSATest {
     protected abstract AlgorithmIdentifier getSignatureAlgorithm();
 
     protected String getPkcs12File() {
-        return "src/test/resources/C.TSL.SIG1.p12";
+        return "src/test/resources/test1.p12";
     }
 
     protected String getCertificateFile() {
-        return "src/test/resources/C.TSL.SIG1.der";
+        return "src/test/resources/test1.der";
     }
 
     protected String getPassword() {
