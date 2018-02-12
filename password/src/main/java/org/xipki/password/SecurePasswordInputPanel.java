@@ -21,8 +21,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Panel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,37 +41,6 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 
 public class SecurePasswordInputPanel extends Panel {
-
-    public class MyActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            JButton btn = (JButton) event.getSource();
-            String pressedKey = (String) btn.getClientProperty("key");
-
-            if (CAPS.equals(pressedKey)) {
-                for (JButton button : buttons) {
-                    String text = button.getText();
-                    text = caps ? text.toLowerCase() : text.toUpperCase();
-                    button.setText(text);
-                }
-                caps = !caps;
-                return;
-            }
-
-            if (BACKSPACE.equals(pressedKey)) {
-                if (password.length() > 0) {
-                    password = password.substring(0, password.length() - 1);
-                }
-            } else if (CLEAR.equals(pressedKey)) {
-                password = "";
-            } else {
-                password += btn.getText();
-            }
-            passwordField.setText(password);
-        } // method actionPerformed
-
-    } // class MyActionListener
 
     private static final long serialVersionUID = 1L;
 
@@ -143,7 +110,31 @@ public class SecurePasswordInputPanel extends Panel {
                 }
 
                 button.putClientProperty("key", text);
-                button.addActionListener(new MyActionListener());
+                button.addActionListener(e -> {
+                    JButton btn = (JButton) e.getSource();
+                    String pressedKey = (String) btn.getClientProperty("key");
+
+                    if (CAPS.equals(pressedKey)) {
+                        for (JButton m : buttons) {
+                            String txt = m.getText();
+                            m.setText(caps ? txt.toLowerCase() : txt.toUpperCase());
+                        }
+                        caps = !caps;
+                        return;
+                    }
+
+                    if (BACKSPACE.equals(pressedKey)) {
+                        if (password.length() > 0) {
+                            password = password.substring(0, password.length() - 1);
+                        }
+                    } else if (CLEAR.equals(pressedKey)) {
+                        password = "";
+                    } else {
+                        password += btn.getText();
+                    }
+                    passwordField.setText(password);
+
+                });
                 panel.add(button);
             } // end for
             add(panel);
