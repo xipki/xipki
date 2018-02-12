@@ -56,7 +56,7 @@ ca:profile-add \
 ca:profile-add \
   --name ocsp \
   --type XML \
-  --conf-file xipki/qa/certprofile/Certprofile-ocsp.xml
+  --conf-file xipki/qa/certprofile/certprofile-ocsp.xml
 
 ca:profile-add \
   --name scep \

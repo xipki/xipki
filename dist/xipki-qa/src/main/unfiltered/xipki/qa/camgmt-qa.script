@@ -22,6 +22,12 @@ if { "$1" equals "" } {
       KEYSPEC =$4
     }
 
+    if { "$HASH" equals "SM3" } {
+      STDHASH = SHA256
+    } {
+      STDHASH = "$HASH"
+    }
+
    list = [PKCS11 PKCS12]; each ($list) {
      if { "$TOKEN_TYPE" equals $it } {
        argsValid = "true"
@@ -107,6 +113,12 @@ if { $printUsage equals "true" } {
 
   dsaPlain = ""
 
+  gm = ""
+
+  if { "$SIG_TYPE" equals "SM2" } {
+    gm = "--gm"
+  }
+
   if { "$SIG_TYPE" equals "PLAINEC" } {
     dsaPlain = "--dsa-plain"
   }
@@ -126,6 +138,12 @@ if { $printUsage equals "true" } {
     xipki/qa/qa.d/ca-load.script
 
   xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/qa.d/ca.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
+    xipki/qa/qa.d/ca-load.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
     xipki/qa/qa.d/ca.script
 
   if { "$1" equals "-l" } {
@@ -437,7 +455,7 @@ if { $printUsage equals "true" } {
     --ca-cert-uri http://example.org/rca1.der \
     --cmp-control cmpcontrol1 \
     --responder responder1 \
-    --duplicate-subject  yes \
+    --duplicate-subject yes \
     --duplicate-key yes \
     --validity-mode cutoff
 
