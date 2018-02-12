@@ -79,6 +79,10 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     @Completion(SigAlgCompleter.class)
     private String sigAlg;
 
+    @Option(name = "--no-sig-verify",
+            description = "where to verify the signature")
+    private Boolean noSigVerify = Boolean.FALSE;
+
     @Option(name = "--exp-nextupdate",
             description = "occurrence of nextUpdate")
     @Completion(OccurrenceCompleter.class)
@@ -191,7 +195,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         }
 
         ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
-                encodedCerts, expectedOcspError, expectedStatuses, expecteRevTimes, responseOption);
+                encodedCerts, expectedOcspError, expectedStatuses, expecteRevTimes,
+                responseOption, noSigVerify.booleanValue());
 
         StringBuilder sb = new StringBuilder(50);
         sb.append("OCSP response is ");

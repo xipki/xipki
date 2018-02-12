@@ -111,13 +111,19 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
     @Option(name = "--save-req",
             description = "where to save the request")
-    @Completion(FilePathCompleter.class)
     private Boolean saveReq = Boolean.FALSE;
 
     @Option(name = "--save-resp",
             description = "where to save the request")
-    @Completion(FilePathCompleter.class)
     private Boolean saveResp = Boolean.FALSE;
+
+    @Option(name = "--unknown-as-good",
+            description = "where to expect the status good for unknown certificate")
+    private Boolean unknownAsGood = Boolean.FALSE;
+
+    @Option(name = "--no-sig-verify",
+            description = "where to verify the signature")
+    private Boolean noSigVerify = Boolean.FALSE;
 
     @Option(name = "--exp-sig-alg",
             description = "expected signature algorithm")
@@ -371,6 +377,10 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
             OcspCertStatus status, Date revTime, File messageDir, File detailsDir,
             URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
             IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
+        if (unknownAsGood && status == OcspCertStatus.unknown) {
+            status = OcspCertStatus.good;
+        }
+
         RequestResponseDebug debug = null;
         if (saveReq || saveResp) {
             debug = new RequestResponseDebug(saveReq, saveResp);
@@ -414,7 +424,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         }
 
         ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null, null,
-                status, responseOption, revTime);
+                status, responseOption, revTime, noSigVerify.booleanValue());
 
         String validity = ret.isAllSuccessful() ? "valid" : "invalid";
         String hexSerial = serialNumber.toString(16);

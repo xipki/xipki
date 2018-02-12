@@ -78,7 +78,7 @@ public class OcspQa {
     public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
             BigInteger serialNumber, byte[] encodedCert, OcspError expectedOcspError,
             OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption,
-            Date exptectedRevTime) {
+            Date exptectedRevTime, boolean noSigVerify) {
         List<BigInteger> serialNumbers = new ArrayList<>(1);
         serialNumbers.add(serialNumber);
 
@@ -101,13 +101,14 @@ public class OcspQa {
         }
 
         return checkOcsp(response, issuerHash, serialNumbers, encodedCerts, expectedOcspError,
-                expectedOcspStatuses, exptectedRevTimes, responseOption);
+                expectedOcspStatuses, exptectedRevTimes, responseOption, noSigVerify);
     }
 
     public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
             List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
             OcspError expectedOcspError, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption) {
+            Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption,
+            boolean noSigVerify) {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
         ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
@@ -165,13 +166,19 @@ public class OcspQa {
         boolean hasSignature = basicResp.getSignature() != null;
 
         // check the signature if available
-        issue = new ValidationIssue("OCSP.SIG", "signature presence");
+        if (noSigVerify) {
+            issue = new ValidationIssue("OCSP.SIG", hasSignature
+                    ? "signature presence (Ignore)" : "signature presence");
+        } else {
+            issue = new ValidationIssue("OCSP.SIG", "signature presence");
+        }
         resultIssues.add(issue);
+
         if (!hasSignature) {
             issue.setFailureMessage("response is not signed");
         }
 
-        if (hasSignature) {
+        if (hasSignature & !noSigVerify) {
             // signature algorithm
             issue = new ValidationIssue("OCSP.SIG.ALG", "signature algorithm");
             resultIssues.add(issue);
