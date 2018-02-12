@@ -33,11 +33,11 @@ import org.xipki.common.util.ParamUtil;
 
 public class CmpUtf8Pairs {
 
-    public static final String KEY_CERT_PROFILE = "CERT-PROFILE";
+    public static final String KEY_CERTPROFILE = "certprofile";
 
-    public static final String KEY_NOT_BEFORE = "NOT-BEFORE";
+    public static final String KEY_NOTBEFORE = "notbefore";
 
-    public static final String KEY_NOT_AFTER = "NOT-AFTER";
+    public static final String KEY_NOTAFTER = "notafter";
 
     private static final char NAME_TERM = '?';
 
