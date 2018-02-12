@@ -22,6 +22,10 @@ echo '+++++source xipki/qa/camgmt-qa.script    SHA256 PKCS12 EC secp256r1+++++'
            source xipki/qa/camgmt-qa.script    SHA256 PKCS12 EC secp256r1
 
 sleep 2
+echo '+++++source xipki/qa/camgmt-qa.script    SM3 PKCS12 SM2 secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    SM3 PKCS12 SN2 secp256r1
+
+sleep 2
 echo '+++++source xipki/qa/camgmt-qa.script -l SHA256 PKCS11 RSA 2048+++++'
            source xipki/qa/camgmt-qa.script -l SHA256 PKCS11 RSA 2048
 
@@ -44,3 +48,7 @@ echo '+++++source xipki/qa/camgmt-qa.script -l SHA256 PKCS11 EC secp256r1+++++'
 sleep 2
 echo '+++++source xipki/qa/camgmt-qa.script -l SHA256 PKCS12 EC secp256r1+++++'
            source xipki/qa/camgmt-qa.script -l SHA256 PKCS12 EC secp256r1
+
+sleep 2
+echo '+++++source xipki/qa/camgmt-qa.script -l SM3 PKCS12 SM2+++++'
+           source xipki/qa/camgmt-qa.script -l SM3 PKCS12 SM2

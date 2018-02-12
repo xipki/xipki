@@ -6,7 +6,7 @@ xi:rsa-p12 --password 1234 --out p12/shared/scep1.p12
 ## SCEP
 
 xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp1.p12 \
-  --subject "CN=SCEP-OCSP1,O=xipki,C=DE"
+  --subject "CN=scep-ocsp1,O=xipki,C=DE"
 
 xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp1-2.p12
 
@@ -15,13 +15,13 @@ xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp2.p12
 ## JSCEP
 
 xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp1.p12 \
-  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
+  --subject "CN=jscep-ocsp1,O=xipki,C=DE"
 
 xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp1-2.p12 \
-  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
+  --subject "CN=jscep-ocsp1,O=xipki,C=DE"
 
 xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp2.p12 \
-  --subject "CN=JSCEP-OCSP2,O=xipki,C=DE"
+  --subject "CN=jscep-ocsp2,O=xipki,C=DE"
 
 echo " ----- generate keys for cross1 -----"
 
@@ -123,15 +123,15 @@ xi:ec-p12  --password 1234 --out p12/ec/tls1.p12
 
 xi:sm2-p12 --password 1234 --out p12/sm2/tls1.p12
 
-echo " ----- generate keys for TLS-neg -----"
+echo " ----- generate keys for tls-neg -----"
 
-xi:rsa-p12 --password 1234 --out p12/rsa/TLS-neg.p12
+xi:rsa-p12 --password 1234 --out p12/rsa/tls-neg.p12
 
-xi:dsa-p12 --password 1234 --out p12/dsa/TLS-neg.p12
+xi:dsa-p12 --password 1234 --out p12/dsa/tls-neg.p12
 
-xi:ec-p12  --password 1234 --out p12/ec/TLS-neg.p12
+xi:ec-p12  --password 1234 --out p12/ec/tls-neg.p12
 
-xi:sm2-p12 --password 1234 --out p12/sm2/TLS-neg.p12
+xi:sm2-p12 --password 1234 --out p12/sm2/tls-neg.p12
 
 echo " ----- generate keys for tls-inc-sn1 -----"
 
