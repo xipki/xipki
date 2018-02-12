@@ -37,7 +37,7 @@
     <bc.version>1.59</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <junit.version>4.8.2</junit.version>
-    <pkcs11-wrapper.version>1.4.0</pkcs11-wrapper.version>
+    <pkcs11-wrapper.version>1.4.1-SNAPSHOT</pkcs11-wrapper.version>
   </properties>
   <modules>
     <module>p11proxy-server</module>
