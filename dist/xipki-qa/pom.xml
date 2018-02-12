@@ -91,7 +91,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <stripVersion>true</stripVersion>
+              <stripVersion>false</stripVersion>
               <artifactItems>
                 <artifactItem>
                   <groupId>com.h2database</groupId>
