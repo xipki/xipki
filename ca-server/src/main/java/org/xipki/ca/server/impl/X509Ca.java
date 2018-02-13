@@ -33,7 +33,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -757,9 +759,6 @@ public class X509Ca {
 
             final int numEntries = 100;
 
-            List<CertRevInfoWithSerial> revInfos;
-            boolean isFirstCrlEntry = true;
-
             Date notExpireAt;
             if (control.includeExpiredCerts()) {
                 notExpireAt = new Date(0);
@@ -769,6 +768,12 @@ public class X509Ca {
             }
 
             long startId = 1;
+
+            // we have to cache the serial entries to sort them
+            List<CertRevInfoWithSerial> allRevInfos = new LinkedList<>();
+
+            List<CertRevInfoWithSerial> revInfos;
+
             do {
                 if (deltaCrl) {
                     revInfos = certstore.getCertsForDeltaCrl(caIdent, startId, numEntries,
@@ -778,74 +783,85 @@ public class X509Ca {
                             numEntries, control.onlyContainsCaCerts(),
                             control.onlyContainsUserCerts());
                 }
+                allRevInfos.addAll(revInfos);
 
                 long maxId = 1;
-
                 for (CertRevInfoWithSerial revInfo : revInfos) {
                     if (revInfo.id() > maxId) {
                         maxId = revInfo.id();
                     }
-
-                    CrlReason reason = revInfo.reason();
-                    if (crlControl.excludeReason() && reason != CrlReason.REMOVE_FROM_CRL) {
-                        reason = CrlReason.UNSPECIFIED;
-                    }
-
-                    Date revocationTime = revInfo.revocationTime();
-                    Date invalidityTime = revInfo.invalidityTime();
-
-                    switch (crlControl.invalidityDateMode()) {
-                    case FORBIDDEN:
-                        invalidityTime = null;
-                        break;
-                    case OPTIONAL:
-                        break;
-                    case REQUIRED:
-                        if (invalidityTime == null) {
-                            invalidityTime = revocationTime;
-                        }
-                        break;
-                    default:
-                        throw new RuntimeException("unknown TripleState: "
-                                + crlControl.invalidityDateMode());
-                    }
-
-                    BigInteger serial = revInfo.serial();
-                    LOG.debug("added cert ca={} serial={} to CRL", caIdent, serial);
-
-                    if (directCrl || !isFirstCrlEntry) {
-                        if (invalidityTime != null) {
-                            crlBuilder.addCRLEntry(serial, revocationTime, reason.code(),
-                                    invalidityTime);
-                        } else {
-                            crlBuilder.addCRLEntry(serial, revocationTime, reason.code());
-                        }
-                        continue;
-                    }
-
-                    List<Extension> extensions = new ArrayList<>(3);
-                    if (reason != CrlReason.UNSPECIFIED) {
-                        Extension ext = createReasonExtension(reason.code());
-                        extensions.add(ext);
-                    }
-                    if (invalidityTime != null) {
-                        Extension ext = createInvalidityDateExtension(invalidityTime);
-                        extensions.add(ext);
-                    }
-
-                    Extension ext = createCertificateIssuerExtension(
-                            caInfo.publicCaInfo().x500Subject());
-                    extensions.add(ext);
-
-                    crlBuilder.addCRLEntry(serial, revocationTime,
-                            new Extensions(extensions.toArray(new Extension[0])));
-                    isFirstCrlEntry = false;
                 } // end for
-
                 startId = maxId + 1;
             }
-            while (revInfos.size() >= numEntries);
-            // end do
+            while (revInfos.size() >= numEntries); // end do
+            
+            if (revInfos != null) { // free the memory
+                revInfos.clear();
+            }
+
+            // sort the list by SerialNumber ASC
+            Collections.sort(allRevInfos);
+
+            boolean isFirstCrlEntry = true;
+
+            for (CertRevInfoWithSerial revInfo : allRevInfos) {
+                CrlReason reason = revInfo.reason();
+                if (crlControl.excludeReason() && reason != CrlReason.REMOVE_FROM_CRL) {
+                    reason = CrlReason.UNSPECIFIED;
+                }
+
+                Date revocationTime = revInfo.revocationTime();
+                Date invalidityTime = revInfo.invalidityTime();
+
+                switch (crlControl.invalidityDateMode()) {
+                case FORBIDDEN:
+                    invalidityTime = null;
+                    break;
+                case OPTIONAL:
+                    break;
+                case REQUIRED:
+                    if (invalidityTime == null) {
+                        invalidityTime = revocationTime;
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("unknown TripleState: "
+                            + crlControl.invalidityDateMode());
+                }
+
+                BigInteger serial = revInfo.serial();
+                LOG.debug("added cert ca={} serial={} to CRL", caIdent, serial);
+
+                if (directCrl || !isFirstCrlEntry) {
+                    if (invalidityTime != null) {
+                        crlBuilder.addCRLEntry(serial, revocationTime, reason.code(),
+                                invalidityTime);
+                    } else {
+                        crlBuilder.addCRLEntry(serial, revocationTime, reason.code());
+                    }
+                    continue;
+                }
+
+                List<Extension> extensions = new ArrayList<>(3);
+                if (reason != CrlReason.UNSPECIFIED) {
+                    Extension ext = createReasonExtension(reason.code());
+                    extensions.add(ext);
+                }
+                if (invalidityTime != null) {
+                    Extension ext = createInvalidityDateExtension(invalidityTime);
+                    extensions.add(ext);
+                }
+
+                Extension ext = createCertificateIssuerExtension(
+                        caInfo.publicCaInfo().x500Subject());
+                extensions.add(ext);
+
+                crlBuilder.addCRLEntry(serial, revocationTime,
+                        new Extensions(extensions.toArray(new Extension[0])));
+                isFirstCrlEntry = false;
+            }
+            
+            allRevInfos.clear(); // free the memory
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
             event.addEventData(CaAuditConstants.NAME_crlNumber, crlNumber);

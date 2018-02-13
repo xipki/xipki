@@ -29,7 +29,8 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
-public class CertRevInfoWithSerial extends CertRevocationInfo {
+public class CertRevInfoWithSerial extends CertRevocationInfo
+    implements Comparable<CertRevInfoWithSerial> {
 
     private final long id;
 
@@ -39,7 +40,7 @@ public class CertRevInfoWithSerial extends CertRevocationInfo {
             Date revocationTime, Date invalidityTime) {
         super(reason, revocationTime, invalidityTime);
         this.id = id;
-        this.serial = serial;
+        this.serial = ParamUtil.requireNonNull("serial", serial);
     }
 
     public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
@@ -55,6 +56,11 @@ public class CertRevInfoWithSerial extends CertRevocationInfo {
 
     public long id() {
         return id;
+    }
+
+    @Override
+    public int compareTo(CertRevInfoWithSerial other) {
+        return serial.compareTo(other.serial);
     }
 
 }
