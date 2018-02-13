@@ -317,7 +317,7 @@ public class OcspServerImpl implements OcspServer {
             for (int i = 0; i < name.length(); i++) {
                 char ch = name.charAt(i);
                 if (!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z')
-                        || (ch >= 'a' && ch <= 'z'))) {
+                        || (ch >= 'a' && ch <= 'z') || ch == '-') || ch == '_' || ch == '.') {
                     throw new InvalidConfException("invalid OCSP responder name '" + name + "'");
                 }
             } // end for
