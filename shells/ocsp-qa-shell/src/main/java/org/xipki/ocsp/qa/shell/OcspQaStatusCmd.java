@@ -222,7 +222,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
         sb.append(issue.code());
         sb.append(", ").append(issue.description());
         sb.append(", ");
-        sb.append( issue.isFailed() ? "failed" : "successful");
+        sb.append(issue.isFailed() ? "failed" : "successful");
         if (issue.failureMessage() != null) {
             sb.append(", ").append(issue.failureMessage());
         }
