@@ -808,7 +808,7 @@ public class AlgorithmUtil {
         return hashAlgo;
     }
 
-    public static AlgorithmIdentifier extractDigesetAlgFromSigAlg( AlgorithmIdentifier sigAlgId)
+    public static AlgorithmIdentifier extractDigesetAlgFromSigAlg(AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 

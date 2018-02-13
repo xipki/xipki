@@ -54,11 +54,11 @@ class SM2Signer {
 
     private final Digest digest;
 
-    // CHECKSTYLE:SKIP
-    private final byte[] z;
-
     private final ECDomainParameters ecParams;
+
     private final ECKeyParameters ecKey;
+
+    private final ECPoint pubPoint;
 
     public SM2Signer(CipherParameters param) {
         if (param instanceof ParametersWithRandom) {
@@ -77,16 +77,26 @@ class SM2Signer {
             throw new IllegalArgumentException("Given EC key is not of the curve sm2primev2");
         }
 
-        ECPoint pubPoint = new FixedPointCombMultiplier().multiply(ecParams.getG(),
+        this.pubPoint = new FixedPointCombMultiplier().multiply(ecParams.getG(),
                 ((ECPrivateKeyParameters)ecKey).getD()).normalize();
 
         this.digest = HashAlgoType.SM3.createDigest();
-        this.z = GMUtil.getSM2Z(GMObjectIdentifiers.sm2p256v1,
-                pubPoint.getAffineXCoord().toBigInteger(),
-                pubPoint.getAffineYCoord().toBigInteger());
     }
 
-    public byte[] generateSignatureForMessage(byte[] message) throws CryptoException {
+    public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
+            throws CryptoException {
+        // CHECKSTYLE:SKIP
+        byte[] z;
+        if (userId == null) {
+            // use default userId
+            z = GMUtil.getSM2Z(GMObjectIdentifiers.sm2p256v1,
+                    pubPoint.getAffineXCoord().toBigInteger(),
+                    pubPoint.getAffineYCoord().toBigInteger());
+        } else {
+            z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
+                pubPoint.getAffineXCoord().toBigInteger(),
+                pubPoint.getAffineYCoord().toBigInteger());
+        }
         digest.reset();
         digest.update(z, 0, z.length);
         digest.update(message, 0, message.length);

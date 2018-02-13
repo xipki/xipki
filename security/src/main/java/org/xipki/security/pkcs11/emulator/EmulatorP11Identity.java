@@ -49,6 +49,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
@@ -189,9 +190,9 @@ public class EmulatorP11Identity extends P11Identity {
         } else if (PKCS11Constants.CKM_ECDSA_SHA3_512 == mechanism) {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA3_512);
         } else if (PKCS11VendorConstants.CKM_VENDOR_SM2 == mechanism) {
-            return sm2Sign(content, null);
+            return sm2SignHash(content);
         } else if (PKCS11VendorConstants.CKM_VENDOR_SM2_SM3 == mechanism) {
-            return sm2Sign(content, HashAlgoType.SM3);
+            return sm2Sign(parameters, content, HashAlgoType.SM3);
         } else if (PKCS11Constants.CKM_DSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
         } else if (PKCS11Constants.CKM_DSA_SHA1 == mechanism) {
@@ -391,7 +392,45 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    private byte[] sm2Sign(byte[] dataToSign, HashAlgoType hash) throws P11TokenException {
+    private byte[] sm2SignHash(byte[] hash) throws P11TokenException {
+        ConcurrentBagEntry<SM2Signer> sig0;
+        try {
+            sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            throw new P11TokenException(
+                    "InterruptedException occurs while retrieving idle signature");
+        }
+
+        if (sig0 == null) {
+            throw new P11TokenException("no idle SM2 Signer available");
+        }
+
+        try {
+            SM2Signer sig = sig0.value();
+            byte[] x962Signature = sig.generateSignatureForHash(hash);
+            return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
+        } catch (CryptoException ex) {
+            throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
+        } catch (XiSecurityException ex) {
+            throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
+        } finally {
+            sm2Signers.requite(sig0);
+        }
+    }
+
+    private byte[] sm2Sign(P11Params params, byte[] dataToSign, HashAlgoType hash)
+            throws P11TokenException {
+        if (params == null) {
+            throw new P11TokenException("userId must not be null");
+        }
+
+        byte[] userId;
+        if (params instanceof P11ByteArrayParams) {
+            userId = ((P11ByteArrayParams) params).getBytes();
+        } else {
+            throw new P11TokenException("params must be instanceof P11ByteArrayParams");
+        }
+
         ConcurrentBagEntry<SM2Signer> sig0;
         try {
             sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
@@ -407,9 +446,7 @@ public class EmulatorP11Identity extends P11Identity {
         try {
             SM2Signer sig = sig0.value();
 
-            byte[] x962Signature = (hash == null)
-                ? sig.generateSignatureForHash(dataToSign)
-                : sig.generateSignatureForMessage(dataToSign);
+            byte[] x962Signature = sig.generateSignatureForMessage(userId, dataToSign);
             return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
         } catch (CryptoException ex) {
             throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);

@@ -65,7 +65,7 @@ public class P11Conf {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             SchemaFactory schemaFact = SchemaFactory.newInstance(
                     javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFact.newSchema(getClass().getResource( "/xsd/pkcs11-conf.xsd"));
+            Schema schema = schemaFact.newSchema(getClass().getResource("/xsd/pkcs11-conf.xsd"));
             unmarshaller.setSchema(schema);
             @SuppressWarnings("unchecked")
             JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)

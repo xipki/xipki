@@ -184,7 +184,7 @@ public class IoUtil {
     }
 
     public static short parseShort(byte[] bytes, int offset) {
-        return (short) ( (0xFF & bytes[offset++]) << 8
+        return (short)  ((0xFF & bytes[offset++]) << 8
                         | 0xFF & bytes[offset]);
     }
 

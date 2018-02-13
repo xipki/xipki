@@ -123,7 +123,7 @@ public class P12ComplexCsrGenCmd extends CsrGenAction {
         }
         SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, new String(pwd), 1,
                 HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
-        return securityFactory.createSigner( "PKCS12", signerConf, (X509Certificate[]) null);
+        return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
     }
 
     @Override
