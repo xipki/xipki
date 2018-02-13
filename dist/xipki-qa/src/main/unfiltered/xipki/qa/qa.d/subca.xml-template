@@ -5,7 +5,7 @@
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
   </properties>
   <cas>
-    <ca name="subca1-complex-name">
+    <ca name="subca1">
       <caInfo>
         <x509Ca>
           <cmpcontrolName>cmpcontrol1</cmpcontrolName>

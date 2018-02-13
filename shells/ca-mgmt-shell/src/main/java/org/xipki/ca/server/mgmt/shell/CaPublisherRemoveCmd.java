@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -39,18 +41,18 @@ public class CaPublisherRemoveCmd extends CaAction {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--publisher",
-            required = true,
-            description = "publisher name\n"
-                    + "(required)")
+    @Option(name = "--publisher", required = true, multiValued = true,
+            description = "publisher name\n(required, multi-valued)")
     @Completion(PublisherNameCompleter.class)
-    private String publisherName;
+    private List<String> publisherNames;
 
     @Override
     protected Object execute0() throws Exception {
-        boolean bo = caManager.removePublisherFromCa(publisherName, caName);
-        output(bo, "removed", "could not remove",
-                "publisher " + publisherName + " from CA " + caName);
+        for (String publisherName : publisherNames) {
+            boolean bo = caManager.removePublisherFromCa(publisherName, caName);
+            output(bo, "removed", "could not remove",
+                    "publisher " + publisherName + " from CA " + caName);
+        }
         return null;
     }
 

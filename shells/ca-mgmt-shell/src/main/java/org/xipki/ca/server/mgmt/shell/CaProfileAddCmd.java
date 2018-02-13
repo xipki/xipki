@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -40,16 +42,18 @@ public class CaProfileAddCmd extends CaAction {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile", required = true,
-            description = "profile name\n(required)")
+    @Option(name = "--profile", required = true, multiValued = true,
+            description = "profile name\n(required, multi-valued)")
     @Completion(ProfileNameCompleter.class)
-    private String profileName;
+    private List<String> profileNames;
 
     @Override
     protected Object execute0() throws Exception {
-        String msg = StringUtil.concat("certificate profile ", profileName, " to CA ", caName);
-        boolean bo = caManager.addCertprofileToCa(profileName, caName);
-        output(bo, "associated", "could not associate", msg);
+        for (String profileName : profileNames) {
+            boolean bo = caManager.addCertprofileToCa(profileName, caName);
+            output(bo, "associated", "could not associate",
+                    StringUtil.concat("certificate profiles ", profileName, " to CA ", caName));
+        }
         return null;
     }
 

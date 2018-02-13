@@ -384,7 +384,7 @@ if { $printUsage equals "true" } {
   echo "#                              CA                               #"
   echo "#################################################################"
 
-  caqa:ca-check --name subca1-complex-name \
+  caqa:ca-check --name subca1 \
 --permission all \
     --max-validity 5y \
     --sn-bitlen 63  \
@@ -555,7 +555,7 @@ if { $printUsage equals "true" } {
   echo "#################################################################"
   caqa:caalias-check --ca rca1 --alias rca
 
-  caqa:caalias-check --ca subca1-complex-name --alias subca
+  caqa:caalias-check --ca subca1 --alias subca
 
   caqa:caalias-check --ca subcawithcrl1 --alias subcawithcrl
 

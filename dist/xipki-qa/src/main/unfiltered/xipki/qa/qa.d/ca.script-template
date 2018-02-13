@@ -223,18 +223,9 @@ ca:caalias-add \
 ## Add Profiles
 ca:caprofile-add \
   --ca rca1 \
-  --profile cross
-
-ca:caprofile-add \
-  --ca rca1 \
-  --profile subca
-
-ca:caprofile-add \
-  --ca rca1 \
-  --profile subca-complex
-
-ca:caprofile-add \
-  --ca rca1 \
+  --profile cross \
+  --profile subca \
+  --profile subca-complex \
   --profile ocsp
 
 ## Add publisher
@@ -393,7 +384,7 @@ if { $TOKEN_TYPE equals "PKCS12" } {
 }
 
 ca:ca-add \
-  --name subca1-complex-Name \
+  --name subca1 \
   --permission all \
   --sn-bitlen 63 \
   --next-crl-no 2 \
@@ -410,37 +401,22 @@ ca:ca-add \
   --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d
 
 ca:caalias-add \
-  --ca subca1-complex-name \
+  --ca subca1 \
   --alias subca
 
 ## Add cert profile to CA
 ca:caprofile-add \
-  --ca subca1-complex-name \
-  --profile qc
-
-ca:caprofile-add \
-  --ca subca1-complex-name \
-  --profile ee-complex
-
-ca:caprofile-add \
-  --ca subca1-complex-name \
-  --profile tls
-
-ca:caprofile-add \
-  --ca subca1-complex-name \
-  --profile tls-c
-
-ca:caprofile-add \
-  --ca subca1-complex-name \
-  --profile tls-inc-sn
-
-ca:caprofile-add \
-  --ca subca1-complex-name \
-  --profile gsmc-k
+  --ca subca1 \
+  --profile qc \
+  --profile ee-complex \
+  --profile tls \
+  --profile tls-c \
+  --profile tls-inc-sn \
+  --profile gsmc-k \
 
 ## Add publisher
 ca:capub-add \
-  --ca subca1-complex-name \
+  --ca subca1 \
   --publisher ocsp-publisher
 
 # Add requestor to CA
@@ -449,7 +425,7 @@ ca:careq-add \
   --permission all \
   --ra yes \
   --profile all \
-  --ca subca1-complex-name
+  --ca subca1
 
 ## Restart the CA
 #ca:restart
@@ -495,26 +471,11 @@ ca:caalias-add \
 ## Add cert profile to CA
 ca:caprofile-add \
   --ca subcawithcrl1 \
-  --profile ocsp
-
-ca:caprofile-add \
-  --ca subcawithcrl1 \
-  --profile tlsa
-
-ca:caprofile-add \
-  --ca subcawithcrl1 \
-  --profile scep
-
-ca:caprofile-add \
-  --ca subcawithcrl1 \
-  --profile multiple-ous
-
-ca:caprofile-add \
-  --ca subcawithcrl1 \
-  --profile multi-valued-rdn
-
-ca:caprofile-add \
-  --ca subcawithcrl1 \
+  --profile ocsp \
+  --profile tlsa \
+  --profile scep \
+  --profile multiple-ous \
+  --profile multi-valued-rdn \
   --profile max-time
 
 ## Add CMP requestor to CA

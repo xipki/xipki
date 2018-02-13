@@ -17,11 +17,14 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -38,15 +41,17 @@ public class CaProfileRemoveCmd extends CaAction {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile", required = true,
-            description = "certificate profile name\n(required)")
-    private String profileName;
+    @Option(name = "--profile", required = true, multiValued = true,
+            description = "certificate profile name\n(required, multi-valued)")
+    private List<String> profileNames;
 
     @Override
     protected Object execute0() throws Exception {
-        boolean bo = caManager.removeCertprofileFromCa(profileName, caName);
-        output(bo, "removed", "could not remove",
-                "certificate profile " + profileName + " from CA " + caName);
+        for (String profileName : profileNames) {
+            boolean bo = caManager.removeCertprofileFromCa(profileName, caName);
+            output(bo, "removed", "could not remove",
+                    StringUtil.concat("certificate profile ", profileName, " from CA ", caName));
+        }
         return null;
     }
 
