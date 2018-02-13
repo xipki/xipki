@@ -187,7 +187,7 @@ public class ScepUtil {
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
                 BigInteger.ONE, notBefore, notAfter, subjectDn, pubKeyInfo);
 
-        X509KeyUsage ku = new X509KeyUsage( X509KeyUsage.digitalSignature
+        X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature
                     | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement
                     | X509KeyUsage.keyEncipherment);
         try {
