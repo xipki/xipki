@@ -60,7 +60,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;

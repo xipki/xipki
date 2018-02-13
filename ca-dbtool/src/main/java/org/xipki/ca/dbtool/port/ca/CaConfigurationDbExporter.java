@@ -58,7 +58,6 @@ import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -394,7 +393,7 @@ class CaConfigurationDbExporter extends DbPorter {
             + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,"
             + "DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,"
             + "VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,"
-            + "CMPCONTROL_NAME,EXTRA_CONTROL FROM CA");
+            + "CMPCONTROL_NAME,EXTRA_CONTROL FROM CA";
 
         Statement stmt = null;
         ResultSet rs = null;
