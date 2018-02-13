@@ -50,6 +50,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.AbstractP11Slot;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11NewKeyControl;
@@ -89,6 +90,7 @@ import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.ValuedSecretKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
+import iaik.pkcs.pkcs11.params.IVParams;
 import iaik.pkcs.pkcs11.params.OpaqueParams;
 import iaik.pkcs.pkcs11.params.Params;
 import iaik.pkcs.pkcs11.params.RSAPkcsPssParams;
@@ -464,6 +466,8 @@ class IaikP11Slot extends AbstractP11Slot {
                     param.saltLength());
         } else if (parameters instanceof P11ByteArrayParams) {
             paramObj = new OpaqueParams(((P11ByteArrayParams) parameters).getBytes());
+        } else if (parameters instanceof P11IVParams) {
+            paramObj = new IVParams(((P11IVParams) parameters).getIV());
         } else {
             throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
         }

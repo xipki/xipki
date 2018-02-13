@@ -303,7 +303,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
         final int n = seq.size();
 
         List<Long> mechs = new ArrayList<>(n);
-        for ( int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             long mech = ASN1Integer.getInstance(seq.getObjectAt(i)).getValue().longValue();
             mechs.add(mech);
         }

@@ -21,19 +21,19 @@ import java.io.IOException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.BadAsn1ObjectException;
 
 /**
  *
  * <pre>
  * ASN1P11Params ::= CHOICE {
- *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters
- *     opaqueParams       [1]  OCTET-STRING }
+ *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters,
+ *     opaqueParams       [1]  OCTET-STRING,
+ *     iv                 [2]  IV }
  * </pre>
  *
  * @author Lijun Liao
@@ -42,29 +42,23 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 
 public class Asn1P11Params extends ASN1Object {
 
+    public static final int TAG_RSA_PKCS_PSS = 0;
+
+    public static final int TAG_OPAQUE = 1;
+
+    public static final int TAG_IV = 2;
+
     private final int tagNo;
     private final ASN1Encodable p11Params;
 
-    public Asn1P11Params(ASN1Encodable p11Params) {
-        if (p11Params instanceof Asn1RSAPkcsPssParams) {
-            this.tagNo = 0;
-        } else if (p11Params instanceof ASN1OctetString) {
-            this.tagNo = 1;
-        } else {
-            throw new IllegalArgumentException("Illegal p11Params");
-        }
-        this.p11Params = p11Params;
+    public Asn1P11Params(int tagNo, ASN1Encodable p11Params) {
+        this.tagNo = tagNo;
+        this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
     }
 
     private Asn1P11Params(ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
         this.tagNo = taggedObject.getTagNo();
-        if (tagNo == 0) {
-            this.p11Params = Asn1RSAPkcsPssParams.getInstance(taggedObject.getObject());
-        } else if (tagNo == 1) {
-            this.p11Params = DEROctetString.getInstance(taggedObject.getObject());
-        } else {
-            throw new BadAsn1ObjectException("invalid tag " + tagNo);
-        }
+        this.p11Params = taggedObject.getObject();
     }
 
     public static Asn1P11Params getInstance(Object obj) throws BadAsn1ObjectException {
@@ -89,6 +83,10 @@ public class Asn1P11Params extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         return new DERTaggedObject(tagNo, p11Params);
+    }
+
+    public int tagNo() {
+        return tagNo;
     }
 
     public ASN1Encodable p11Params() {

@@ -25,6 +25,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
@@ -57,11 +58,17 @@ class ProxyP11Identity extends P11Identity {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1P11Params p11Param = null;
         if (parameters instanceof P11RSAPkcsPssParams) {
-            p11Param = new Asn1P11Params(
+            p11Param = new Asn1P11Params(Asn1P11Params.TAG_RSA_PKCS_PSS,
                     new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
         } else if (parameters instanceof P11ByteArrayParams) {
             byte[] bytes = ((P11ByteArrayParams) parameters).getBytes();
-            p11Param = new Asn1P11Params(new DEROctetString(bytes));
+            p11Param = new Asn1P11Params(Asn1P11Params.TAG_OPAQUE,
+                    new DEROctetString(bytes));
+        } else if (parameters instanceof P11IVParams) {
+            p11Param = new Asn1P11Params(Asn1P11Params.TAG_IV,
+                    new DEROctetString(((P11IVParams) parameters).getIV()));
+        } else {
+            throw new IllegalArgumentException("unkown parameter 'parameters'");
         }
 
         Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
