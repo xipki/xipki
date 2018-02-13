@@ -1411,7 +1411,7 @@ public class ExtensionsChecker {
         for (int i = 0; i < n; i++) {
             Attribute attr = Attribute.getInstance(subDirAttrs.get(i));
             ASN1ObjectIdentifier attrType = attr.getAttrType();
-            if ( !attrTypes.contains(attrType)) {
+            if (!attrTypes.contains(attrType)) {
                 failureMsg.append("attribute of type " + attrType.getId()
                     + " is present but not expected; ");
                 continue;

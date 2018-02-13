@@ -240,7 +240,7 @@ public class CaConf {
 
         // Responders
         if (jaxb.getResponders() != null) {
-            for ( ResponderType m : jaxb.getResponders().getResponder()) {
+            for (ResponderType m : jaxb.getResponders().getResponder()) {
                 CmpResponderEntry en = new CmpResponderEntry(m.getName(), expandConf(m.getType()),
                         getValue(m.getConf(), zipFile), getBase64Binary(m.getCert(), zipFile));
                 addResponder(en);
