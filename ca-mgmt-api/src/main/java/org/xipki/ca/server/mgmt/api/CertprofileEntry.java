@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt.api;
 import org.xipki.ca.api.NameId;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -72,18 +73,10 @@ public class CertprofileEntry {
     }
 
     public String toString(boolean verbose) {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("id: ").append(ident.id()).append('\n');
-        sb.append("name: ").append(ident.name()).append('\n');
-        sb.append("faulty: ").append(faulty).append('\n');
-        sb.append("type: ").append(type).append('\n');
-        sb.append("conf: ");
-        if (verbose || conf == null || conf.length() < 301) {
-            sb.append(conf);
-        } else {
-            sb.append(conf.substring(0, 297)).append("...");
-        }
-        return sb.toString();
+        boolean bo = (verbose || conf == null || conf.length() < 301);
+        return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+                "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ",
+                (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
     }
 
     @Override

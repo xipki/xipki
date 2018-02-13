@@ -23,6 +23,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -63,11 +64,8 @@ public class CaHasUserEntry {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("user: ").append(userIdent).append("\n");
-        sb.append("profiles: ").append(profiles).append("\n");
-        sb.append("permission: ").append(permission);
-        return sb.toString();
+        return StringUtil.concatObjectsCap(200, "user: ", userIdent,
+                "\nprofiles: ", profiles, "\npermission: ", permission);
     }
 
     @Override

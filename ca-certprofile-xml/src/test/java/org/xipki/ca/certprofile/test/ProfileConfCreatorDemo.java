@@ -1839,10 +1839,10 @@ public class ProfileConfCreatorDemo {
 
     private static AnyType createDescription(String details) {
         String str = StringUtil.concat(
-                "<my:myDescription xmlns:my=\"http://example.org\">\n",
-                "  <my:category>cat A</my:category>\n",
-                "  <my:details>", details, "</my:details>\n",
-                "</my:myDescription>\n");
+                "<my:myDescription xmlns:my=\"http://example.org\">\n"
+                + "  <my:category>cat A</my:category>\n"
+                + "  <my:details>", details, "</my:details>\n"
+                + "</my:myDescription>\n");
         Element element;
         try {
             element = XmlUtil.getDocumentElment(str.getBytes());

@@ -388,13 +388,13 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCa(CAConfigurationType caconf) throws DataAccessException, IOException {
         System.out.println("exporting table CA");
         Cas cas = new Cas();
-        String sql = StringUtil.concat(
-            "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,",
-            "SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,",
-            "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,",
-            "DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,",
-            "VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,",
-            "CMPCONTROL_NAME,EXTRA_CONTROL FROM CA");
+        String sql =
+            "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,"
+            + "SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,"
+            + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,"
+            + "DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,"
+            + "VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,"
+            + "CMPCONTROL_NAME,EXTRA_CONTROL FROM CA");
 
         Statement stmt = null;
         ResultSet rs = null;
