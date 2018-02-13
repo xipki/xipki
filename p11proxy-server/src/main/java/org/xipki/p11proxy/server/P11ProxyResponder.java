@@ -27,10 +27,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.slf4j.Logger;
@@ -44,8 +44,10 @@ import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.P11UnknownEntityException;
 import org.xipki.security.exception.P11UnsupportedMechanismException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
@@ -336,16 +338,24 @@ class P11ProxyResponder {
             {
                 Asn1SignTemplate signTemplate = Asn1SignTemplate.getInstance(content);
                 long mechanism = signTemplate.mechanism().mechanism();
-                Asn1P11Params tmpParams = signTemplate.mechanism().params();
-                ASN1Encodable asn1Params = null;
-                if (tmpParams != null) {
-                    asn1Params = tmpParams.p11Params();
-                }
+                Asn1P11Params asn1Params = signTemplate.mechanism().params();
+
                 P11Params params = null;
-                if (asn1Params instanceof Asn1RSAPkcsPssParams) {
+
+                switch (asn1Params.tagNo()) {
+                case Asn1P11Params.TAG_RSA_PKCS_PSS:
                     params = Asn1RSAPkcsPssParams.getInstance(asn1Params).pkcsPssParams();
-                } else if (asn1Params != null) {
-                    throw new BadAsn1ObjectException("unknown SignTemplate.params");
+                    break;
+                case Asn1P11Params.TAG_OPAQUE:
+                    params = new P11ByteArrayParams(
+                            ASN1OctetString.getInstance(asn1Params).getOctets());
+                    break;
+                case Asn1P11Params.TAG_IV:
+                    params = new P11IVParams(ASN1OctetString.getInstance(asn1Params).getOctets());
+                    break;
+                default:
+                    throw new BadAsn1ObjectException(
+                            "unknown SignTemplate.params: unknown tag " + asn1Params.tagNo());
                 }
 
                 byte[] message = signTemplate.message();
