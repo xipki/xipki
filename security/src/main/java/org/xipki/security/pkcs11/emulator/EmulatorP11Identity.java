@@ -39,7 +39,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.macs.GMac;
 import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.modes.GCMBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +56,7 @@ import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
@@ -273,16 +279,43 @@ public class EmulatorP11Identity extends P11Identity {
             return hmac(content, HashAlgoType.SHA3_384);
         } else if (PKCS11Constants.CKM_SHA3_512_HMAC == mechanism) {
             return hmac(content, HashAlgoType.SHA3_512);
+        } else if (PKCS11Constants.CKM_AES_GMAC == mechanism) {
+            return aesGmac(parameters, content);
         } else {
             throw new P11TokenException("unsupported mechanism " + mechanism);
         }
     }
 
+    // TODO: check the correctness
     private byte[] hmac(byte[] contentToSign, HashAlgoType hashAlgo) {
         HMac hmac = new HMac(hashAlgo.createDigest());
+        hmac.init(new KeyParameter(signingKey.getEncoded()));
         hmac.update(contentToSign, 0, contentToSign.length);
         byte[] signature = new byte[hmac.getMacSize()];
         hmac.doFinal(signature, 0);
+        return signature;
+    }
+
+    // TODO: check the correctness
+    private byte[] aesGmac(P11Params params, byte[] contentToSign) throws P11TokenException {
+        if (params == null) {
+            throw new P11TokenException("iv must not be null");
+        }
+
+        byte[] iv;
+        if (params instanceof P11IVParams) {
+            iv = ((P11IVParams) params).getIV();
+        } else {
+            throw new P11TokenException("params must be instanceof P11IVParams");
+        }
+
+        GMac gmac = new GMac(new GCMBlockCipher(new AESEngine()));
+        ParametersWithIV paramsWithIv =
+                new ParametersWithIV(new KeyParameter(signingKey.getEncoded()), iv);
+        gmac.init(paramsWithIv);
+        gmac.update(contentToSign, 0, contentToSign.length);
+        byte[] signature = new byte[gmac.getMacSize()];
+        gmac.doFinal(signature, 0);
         return signature;
     }
 
