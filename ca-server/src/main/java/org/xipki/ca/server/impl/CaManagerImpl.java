@@ -1428,6 +1428,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return false;
         }
 
+        NameId caIdent = idNameMap.ca(caName);
+        if (caIdent == null) {
+            LOG.warn("CA {} does not exist", caName);
+            return false;
+        }
+
         Set<String> set = caHasProfiles.get(caName);
         if (set == null) {
             set = new HashSet<>();
@@ -1443,7 +1449,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("certprofile '" + profileName + "' is faulty");
         }
 
-        queryExecutor.addCertprofileToCa(ident, idNameMap.ca(caName));
+        queryExecutor.addCertprofileToCa(ident, caIdent);
         set.add(profileName);
         return true;
     } // method addCertprofileToCa
@@ -1478,6 +1484,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.warn("Publisher {} does not exist", publisherName);
             return false;
         }
+        
+        NameId caIdent = idNameMap.ca(caName);
+        if (caIdent == null) {
+            LOG.warn("CA {} does not exist", caName);
+            return false;
+        }
 
         Set<String> publisherNames = caHasPublishers.get(caName);
         if (publisherNames == null) {
@@ -1495,8 +1507,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("publisher '" + publisherName + "' is faulty");
         }
 
-        queryExecutor.addPublisherToCa(idNameMap.publisher(publisherName),
-                idNameMap.ca(caName));
+        queryExecutor.addPublisherToCa(idNameMap.publisher(publisherName), caIdent);
         publisherNames.add(publisherName);
         caHasPublishers.get(caName).add(publisherName);
 
@@ -1630,6 +1641,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.warn("Requestor {} does not exist", requestorIdent.name());
             return false;
         }
+        
+        NameId caIdent = idNameMap.ca(caName);
+        if (caIdent == null) {
+            LOG.warn("CA {} does not exist", caName);
+            return false;
+        }
+
         // Set the ID of requestor
         requestorIdent.setId(ident.id());
 
@@ -1649,7 +1667,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         cmpRequestors.add(requestor);
-        queryExecutor.addRequestorToCa(requestor, idNameMap.ca(caName));
+        queryExecutor.addRequestorToCa(requestor, caIdent);
         caHasRequestors.get(caName).add(requestor);
         return true;
     } // method addRequestorToCa
@@ -1669,6 +1687,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
 
         X509Ca ca = x509Ca(caName);
+        if (ca == null) {
+            LOG.warn("CA {} does not exist", caName);
+            return false;
+        }
+        
         return queryExecutor.addUserToCa(user, ca.caIdent());
     }
 

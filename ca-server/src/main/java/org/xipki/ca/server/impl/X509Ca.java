@@ -794,7 +794,7 @@ public class X509Ca {
                 startId = maxId + 1;
             }
             while (revInfos.size() >= numEntries); // end do
-            
+
             if (revInfos != null) { // free the memory
                 revInfos.clear();
             }
@@ -860,7 +860,7 @@ public class X509Ca {
                         new Extensions(extensions.toArray(new Extension[0])));
                 isFirstCrlEntry = false;
             }
-            
+
             allRevInfos.clear(); // free the memory
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
