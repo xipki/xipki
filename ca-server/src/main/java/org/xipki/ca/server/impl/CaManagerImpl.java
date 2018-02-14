@@ -1484,7 +1484,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.warn("Publisher {} does not exist", publisherName);
             return false;
         }
-        
+
         NameId caIdent = idNameMap.ca(caName);
         if (caIdent == null) {
             LOG.warn("CA {} does not exist", caName);
@@ -1641,7 +1641,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.warn("Requestor {} does not exist", requestorIdent.name());
             return false;
         }
-        
+
         NameId caIdent = idNameMap.ca(caName);
         if (caIdent == null) {
             LOG.warn("CA {} does not exist", caName);
@@ -1691,7 +1691,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.warn("CA {} does not exist", caName);
             return false;
         }
-        
+
         return queryExecutor.addUserToCa(user, ca.caIdent());
     }
 
