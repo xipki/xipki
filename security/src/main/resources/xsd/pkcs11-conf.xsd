@@ -11,7 +11,21 @@
   <xs:complexType name="PKCS11ConfType">
     <xs:all>
       <xs:element name="modules" type="modulesType"/>
+      <xs:element name="mechanismSets" type="mechnanismSetsType"/>
     </xs:all>
+  </xs:complexType>
+  <xs:complexType name="mechnanismSetsType">
+    <xs:sequence>
+      <xs:element name="mechanismSet" type="mechanismSetType"
+         maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mechanismSetType">
+    <xs:sequence>
+      <!-- set mechanism to ALL to accept all available mechanisms -->
+      <xs:element name="mechanism" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="modulesType">
     <xs:sequence>
@@ -63,7 +77,7 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="passwordSets" type="passwordSetsType" minOccurs="0"/>
-      <xs:element name="mechanismSets" type="mechanismSetsType" minOccurs="0"/>
+      <xs:element name="mechanismFilters" type="mechanismFiltersType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -102,12 +116,12 @@
       <xs:element name="password" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="mechanismSetsType">
+  <xs:complexType name="mechanismFiltersType">
     <xs:sequence>
-      <xs:element name="mechanisms" type="mechanismsType" maxOccurs="unbounded"/>
+      <xs:element name="mechanismFilter" type="mechanismFilterType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="mechanismsType">
+  <xs:complexType name="mechanismFilterType">
     <xs:sequence>
       <xs:element name="slots" type="slotsType" minOccurs="0">
         <xs:annotation>
@@ -117,7 +131,8 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="mechanism" type="xs:string" maxOccurs="unbounded"/>
+      <!-- name of the mechanismSet -->
+      <xs:element name="mechanismSet" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

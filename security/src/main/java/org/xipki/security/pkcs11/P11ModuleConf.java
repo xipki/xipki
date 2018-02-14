@@ -18,8 +18,10 @@
 package org.xipki.security.pkcs11;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -29,8 +31,10 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.pkcs11.jaxb.MechanismSetsType;
-import org.xipki.security.pkcs11.jaxb.MechanismsType;
+import org.xipki.security.pkcs11.jaxb.MechanismFilterType;
+import org.xipki.security.pkcs11.jaxb.MechanismFiltersType;
+import org.xipki.security.pkcs11.jaxb.MechanismSetType;
+import org.xipki.security.pkcs11.jaxb.MechnanismSetsType;
 import org.xipki.security.pkcs11.jaxb.ModuleType;
 import org.xipki.security.pkcs11.jaxb.NativeLibraryType;
 import org.xipki.security.pkcs11.jaxb.PasswordSetsType;
@@ -65,9 +69,10 @@ public class P11ModuleConf {
 
     private final long userType;
 
-    public P11ModuleConf(ModuleType moduleType, PasswordResolver passwordResolver)
-            throws InvalidConfException {
+    public P11ModuleConf(ModuleType moduleType, MechnanismSetsType mechanismSetsType,
+            PasswordResolver passwordResolver) throws InvalidConfException {
         ParamUtil.requireNonNull("moduleType", moduleType);
+        ParamUtil.requireNonNull("mechanismSetsType", mechanismSetsType);
         this.name = moduleType.getName();
         this.readOnly = moduleType.isReadonly();
         this.userType = moduleType.getUser().longValue();
@@ -76,44 +81,72 @@ public class P11ModuleConf {
             throw new InvalidConfException("invalid maxMessageSize (< 128): " + maxMessageSize);
         }
 
-        // Mechanism filter
-        mechanismFilter = new P11MechanismFilter();
-        MechanismSetsType mechsList = moduleType.getMechanismSets();
-        if (mechsList != null && CollectionUtil.isNonEmpty(mechsList.getMechanisms())) {
-            for (MechanismsType mechType : mechsList.getMechanisms()) {
-                Set<P11SlotIdFilter> slots = getSlotIdFilters(mechType.getSlots());
-                Set<Long> mechanisms = new HashSet<>();
-                for (String mechStr : mechType.getMechanism()) {
-                    Long mech = null;
-                    if (mechStr.startsWith("CKM_")) {
-                        mech = Pkcs11Functions.mechanismStringToCode(mechStr);
-                    } else {
-                        int radix = 10;
-                        String value = mechStr.toLowerCase();
-                        if (value.startsWith("0x")) {
-                            radix = 16;
-                            value = value.substring(2);
-                        }
+        // parse mechanismSets
+        List<MechanismSetType> list = mechanismSetsType.getMechanismSet();
+        Map<String, Set<Long>> mechanismSetsMap = new HashMap<>(list.size() * 3 / 2);
+        for (MechanismSetType m : list) {
+            String name = m.getName();
+            if (mechanismSetsMap.containsKey(name)) {
+                throw new InvalidConfException("Duplication mechanismSets named " + name);
+            }
+            Set<Long> mechanisms = new HashSet<>();
+            for (String mechStr : m.getMechanism()) {
+                mechStr = mechStr.trim().toUpperCase();
+                if (mechStr.equals("ALL")) {
+                    mechanisms = null; // accept all mechanisms
+                    break;
+                }
 
-                        if (value.endsWith("ul")) {
-                            value = value.substring(0, value.length() - 2);
-                        } else if (value.endsWith("l")) {
-                            value = value.substring(0, value.length() - 1);
-                        }
-
-                        try {
-                            mech = Long.parseLong(value, radix);
-                        } catch (NumberFormatException ex) {// CHECKSTYLE:SKIP
-                        }
+                Long mech = null;
+                if (mechStr.startsWith("CKM_")) {
+                    mech = Pkcs11Functions.mechanismStringToCode(mechStr);
+                } else {
+                    int radix = 10;
+                    if (mechStr.startsWith("0X")) {
+                        radix = 16;
+                        mechStr = mechStr.substring(2);
                     }
 
-                    if (mech == null) {
-                        LOG.warn("skipped unknown mechanism '" + mechStr + "'");
-                    } else {
-                        mechanisms.add(mech);
+                    if (mechStr.endsWith("UL")) {
+                        mechStr = mechStr.substring(0, mechStr.length() - 2);
+                    } else if (mechStr.endsWith("L")) {
+                        mechStr = mechStr.substring(0, mechStr.length() - 1);
+                    }
+
+                    try {
+                        mech = Long.parseLong(mechStr, radix);
+                    } catch (NumberFormatException ex) {// CHECKSTYLE:SKIP
                     }
                 }
-                mechanismFilter.addEntry(slots, mechanisms);
+
+                if (mech == null) {
+                    LOG.warn("skipped unknown mechanism '" + mechStr + "'");
+                } else {
+                    mechanisms.add(mech);
+                }
+            }
+
+            mechanismSetsMap.put(name, mechanisms);
+        }
+
+        // Mechanism filter
+        mechanismFilter = new P11MechanismFilter();
+
+        MechanismFiltersType mechFilters = moduleType.getMechanismFilters();
+        if (mechFilters != null && CollectionUtil.isNonEmpty(mechFilters.getMechanismFilter())) {
+            for (MechanismFilterType filterType : mechFilters.getMechanismFilter()) {
+                Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
+                String mechanismSetName = filterType.getMechanismSet();
+                if (!mechanismSetsMap.containsKey(mechanismSetName)) {
+                    throw new InvalidConfException(
+                            "MechanismSet '" +  mechanismSetName + "' is not defined");
+                }
+                Set<Long> mechanisms = mechanismSetsMap.get(mechanismSetName);
+                if (mechanisms == null) {
+                    mechanismFilter.addAcceptAllEntry(slots);
+                } else {
+                    mechanismFilter.addEntry(slots, mechanisms);
+                }
             }
         }
 

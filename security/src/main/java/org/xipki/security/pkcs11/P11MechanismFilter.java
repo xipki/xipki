@@ -73,7 +73,12 @@ public class P11MechanismFilter {
     }
 
     void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
+        ParamUtil.requireNonNull("mechanismis", mechanisms);
         singleFilters.add(new SingleFilter(slots, mechanisms));
+    }
+
+    void addAcceptAllEntry(Set<P11SlotIdFilter> slots) {
+        singleFilters.add(new SingleFilter(slots, null));
     }
 
     public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
