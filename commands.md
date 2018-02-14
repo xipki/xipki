@@ -165,9 +165,9 @@ Feature xipki-security (started by default)
 
      refresh PKCS#11 module
      
-   * `xi:create-secretkey-p11`
+   * `xi:import-secretkey-p11`
      
-     create secret key with given value in PKCS#11 device
+     import secret key with given value in PKCS#11 device
 
    * `xi:secretkey-p11`
      
