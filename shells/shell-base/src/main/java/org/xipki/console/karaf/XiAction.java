@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.SecurePasswordInputPanel;
 
@@ -100,6 +101,7 @@ public abstract class XiAction implements Action {
                     }
                 } // end while
             } catch (IOException ex) {
+                LogUtil.error(LOG, ex, "could not save file");
                 saveTo = new File("tmp-" + randomHex(6));
             }
         } // end if(saveTo.exists())
@@ -110,6 +112,7 @@ public abstract class XiAction implements Action {
                 save(saveTo, encoded);
                 break;
             } catch (IOException ex) {
+                println("ERROR: " + ex.getMessage());
                 if (retries > 0) {
                     String newFn;
                     while (true) {
@@ -123,7 +126,8 @@ public abstract class XiAction implements Action {
                     // save it to tmp file
                     saveTo = new File("tmp-" + randomHex(6));
                 } else {
-                    throw new IOException("could not save to file");
+                    LogUtil.error(LOG, ex, "could not save to file");
+                    throw new IOException("could not save to file", ex);
                 }
             }
         }
