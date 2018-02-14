@@ -216,7 +216,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         }
     }
 
-    public ConcurrentContentSigner newPkcs11Signer(SecurityFactory securityFactory,
+    private ConcurrentContentSigner newPkcs11Signer(SecurityFactory securityFactory,
             String type, SignerConf conf, X509Certificate[] certificateChain)
             throws ObjectCreationException {
         if (p11CryptServiceFactory == null) {

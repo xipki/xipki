@@ -83,6 +83,7 @@ import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
+import iaik.pkcs.pkcs11.Util;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
@@ -805,6 +806,30 @@ class EmulatorP11Slot extends AbstractP11Slot {
         if (keysize % 8 != 0) {
             throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
         }
+
+        long mech;
+        if (PKCS11Constants.CKK_AES == keyType) {
+            mech = PKCS11Constants.CKM_AES_KEY_GEN;
+        } else if (PKCS11Constants.CKK_DES3 == keyType) {
+            mech = PKCS11Constants.CKM_DES3_KEY_GEN;
+        } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
+            mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+        } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
+                || PKCS11Constants.CKK_SHA224_HMAC == keyType
+                || PKCS11Constants.CKK_SHA256_HMAC == keyType
+                || PKCS11Constants.CKK_SHA384_HMAC == keyType
+                || PKCS11Constants.CKK_SHA512_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_224_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_384_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
+            mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+        } else {
+            throw new IllegalArgumentException("unsupported key type 0x"
+                    + Util.toFullHex((int)keyType));
+        }
+        assertMechanismSupported(mech);
+
         byte[] keyBytes = new byte[keysize / 8];
         random.nextBytes(keyBytes);
         SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
@@ -851,6 +876,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
     @Override
     protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
             String label, P11NewKeyControl control) throws P11TokenException {
+        assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
@@ -866,6 +893,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
             String label, P11NewKeyControl control) throws P11TokenException {
     // CHECKSTYLE:ON
+        assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
         DSAParameters dsaParams = new DSAParameters(p, q, g);
         KeyPair keypair;
         try {
@@ -880,12 +908,15 @@ class EmulatorP11Slot extends AbstractP11Slot {
     @Override
     protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
             throws P11TokenException {
+        assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
         return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
     }
 
     @Override
     protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
             String label, P11NewKeyControl control) throws P11TokenException {
+        assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
+
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(), random);

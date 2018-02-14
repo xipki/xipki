@@ -932,24 +932,13 @@ class IaikP11Slot extends AbstractP11Slot {
             throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
         }
 
-        // The SecretKey class does not support the specification of valueLen
-        // So we use GenericSecretKey and set the KeyType manual.
-        ValuedSecretKey template = new ValuedSecretKey(keyType);
-
-        template.getToken().setBooleanValue(true);
-        template.getLabel().setCharArrayValue(label.toCharArray());
-        template.getSign().setBooleanValue(true);
-        template.getSensitive().setBooleanValue(true);
-        template.getExtractable().setBooleanValue(control.isExtractable());
-        template.getValueLen().setLongValue((long) (keysize / 8));
-
-        long mechanism;
+        long mech;
         if (PKCS11Constants.CKK_AES == keyType) {
-            mechanism = PKCS11Constants.CKM_AES_KEY_GEN;
+            mech = PKCS11Constants.CKM_AES_KEY_GEN;
         } else if (PKCS11Constants.CKK_DES3 == keyType) {
-            mechanism = PKCS11Constants.CKM_DES3_KEY_GEN;
+            mech = PKCS11Constants.CKM_DES3_KEY_GEN;
         } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
-            mechanism = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+            mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
         } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
                 || PKCS11Constants.CKK_SHA224_HMAC == keyType
                 || PKCS11Constants.CKK_SHA256_HMAC == keyType
@@ -959,13 +948,24 @@ class IaikP11Slot extends AbstractP11Slot {
                 || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
                 || PKCS11Constants.CKK_SHA3_384_HMAC == keyType
                 || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
-            mechanism = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+            mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
         } else {
             throw new IllegalArgumentException("unsupported key type 0x"
                     + Util.toFullHex((int)keyType));
         }
 
-        Mechanism mech = Mechanism.get(mechanism);
+        assertMechanismSupported(mech);
+
+        ValuedSecretKey template = new ValuedSecretKey(keyType);
+
+        template.getToken().setBooleanValue(true);
+        template.getLabel().setCharArrayValue(label.toCharArray());
+        template.getSign().setBooleanValue(true);
+        template.getSensitive().setBooleanValue(true);
+        template.getExtractable().setBooleanValue(control.isExtractable());
+        template.getValueLen().setLongValue((long) (keysize / 8));
+
+        Mechanism mechanism = Mechanism.get(mech);
         SecretKey key;
         Session session = borrowWritableSession();
         try {
@@ -977,10 +977,10 @@ class IaikP11Slot extends AbstractP11Slot {
             byte[] id = generateKeyId(session);
             template.getId().setByteArrayValue(id);
             try {
-                key = (SecretKey) session.generateKey(mech, template);
+                key = (SecretKey) session.generateKey(mechanism, template);
             } catch (TokenException ex) {
                 throw new P11TokenException("could not generate generic secret key using "
-                        + mech.getName(), ex);
+                        + mechanism.getName(), ex);
             }
 
             P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
@@ -995,8 +995,6 @@ class IaikP11Slot extends AbstractP11Slot {
     @Override
     protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control) throws P11TokenException {
-        // The SecretKey class does not support the specification of valueLen
-        // So we use GenericSecretKey and set the KeyType manual.
         ValuedSecretKey template = new ValuedSecretKey(keyType);
         template.getToken().setBooleanValue(true);
         template.getLabel().setCharArrayValue(label.toCharArray());
@@ -1004,7 +1002,6 @@ class IaikP11Slot extends AbstractP11Slot {
         template.getSensitive().setBooleanValue(true);
         template.getExtractable().setBooleanValue(control.isExtractable());
         template.getValue().setByteArrayValue(keyValue);
-        template.getValueLen().setLongValue((long) keyValue.length);
 
         SecretKey key;
         Session session = borrowWritableSession();
@@ -1034,6 +1031,9 @@ class IaikP11Slot extends AbstractP11Slot {
     @Override
     protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
             String label, P11NewKeyControl control) throws P11TokenException {
+        long mech = PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN;
+        assertMechanismSupported(mech);
+
         RSAPrivateKey privateKey = new RSAPrivateKey();
         RSAPublicKey publicKey = new RSAPublicKey();
         setKeyAttributes(label, PKCS11Constants.CKK_RSA, control, publicKey, privateKey);
@@ -1043,7 +1043,7 @@ class IaikP11Slot extends AbstractP11Slot {
             publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
         }
 
-        return generateKeyPair(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, privateKey, publicKey);
+        return generateKeyPair(mech, privateKey, publicKey);
     }
 
     @Override
@@ -1051,6 +1051,9 @@ class IaikP11Slot extends AbstractP11Slot {
     protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
             String label, P11NewKeyControl control) throws P11TokenException {
     // CHECKSTYLE:ON
+        long mech = PKCS11Constants.CKM_DSA_KEY_PAIR_GEN;
+        assertMechanismSupported(mech);
+
         DSAPrivateKey privateKey = new DSAPrivateKey();
         DSAPublicKey publicKey = new DSAPublicKey();
         setKeyAttributes(label, PKCS11Constants.CKK_DSA, control, publicKey, privateKey);
@@ -1058,12 +1061,15 @@ class IaikP11Slot extends AbstractP11Slot {
         publicKey.getPrime().setByteArrayValue(p.toByteArray());
         publicKey.getSubprime().setByteArrayValue(q.toByteArray());
         publicKey.getBase().setByteArrayValue(g.toByteArray());
-        return generateKeyPair(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, privateKey, publicKey);
+        return generateKeyPair(mech, privateKey, publicKey);
     }
 
     @Override
     protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, String label,
             P11NewKeyControl control) throws P11TokenException {
+        long mech = PKCS11Constants.CKM_EC_KEY_PAIR_GEN;
+        assertMechanismSupported(mech);
+
         ECPrivateKey privateKey = new ECPrivateKey();
         ECPublicKey publicKey = new ECPublicKey();
         setKeyAttributes(label, PKCS11Constants.CKK_EC, control, publicKey, privateKey);
@@ -1075,7 +1081,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
         try {
             publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
-            return generateKeyPair(PKCS11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
+            return generateKeyPair(mech, privateKey, publicKey);
         } catch (P11TokenException ex) {
             X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
             if (ecParams == null) {
@@ -1088,19 +1094,21 @@ class IaikP11Slot extends AbstractP11Slot {
             } catch (IOException ex2) {
                 throw new P11TokenException(ex.getMessage(), ex);
             }
-            return generateKeyPair(PKCS11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
+            return generateKeyPair(mech, privateKey, publicKey);
         }
     }
 
     @Override
     protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
             throws P11TokenException {
+        long mech = PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
+        assertMechanismSupported(mech);
+
         SM2PrivateKey privateKey = new SM2PrivateKey();
         SM2PublicKey publicKey = new SM2PublicKey();
         setKeyAttributes(label, PKCS11VendorConstants.CKK_VENDOR_SM2,
                 control, publicKey, privateKey);
-        return generateKeyPair(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
-                privateKey, publicKey);
+        return generateKeyPair(mech, privateKey, publicKey);
     }
 
     private P11Identity generateKeyPair(long mech, PrivateKey privateKey, PublicKey publicKey)
