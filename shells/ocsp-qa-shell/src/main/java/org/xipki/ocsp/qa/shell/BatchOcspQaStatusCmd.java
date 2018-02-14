@@ -179,17 +179,17 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         println("The result is saved in the folder " + outDir.getPath());
 
         if (saveReq || saveResp) {
-            String msg = StringUtil.concat("Commands\n",
-                "  1. Verify and print the text form of request and response:\n",
-                "    openssl ocsp -text ",
-                    (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify"),
-                    " -reqin <request file> -respin <response file>\n",
-                "  2. Print the text form of request:\n",
-                "    openssl ocsp -text -reqin <request file>\n",
-                "  3. Verify and print the text form of response:\n",
-                "    openssl ocsp -text ",
-                    (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify"),
-                    " -respin <response file>");
+            String msg = "Commands\n"
+                + "  1. Verify and print the text form of request and response:\n"
+                + "    openssl ocsp -text "
+                +     (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify")
+                +     " -reqin <request file> -respin <response file>\n"
+                + "  2. Print the text form of request:\n"
+                + "    openssl ocsp -text -reqin <request file>\n"
+                + "  3. Verify and print the text form of response:\n"
+                + "    openssl ocsp -text "
+                +     (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify"
+                +     " -respin <response file>");
 
             IoUtil.save(new File(outDir, "README.txt"), msg.getBytes());
         }
