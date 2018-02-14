@@ -54,7 +54,7 @@ xi:update-cert-p12 \
   --password 1234 \
   --cert output/jscep-ocsp1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Get CRL
 xi:jscep-getcrl \
@@ -89,7 +89,7 @@ xi:update-cert-p12 \
   --password 1234 \
   --cert output/jscep-ocsp1-2.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Renewal with different CommonName 
 
@@ -115,7 +115,7 @@ xi:update-cert-p12 \
   --password 1234 \
   --cert output/jscep-ocsp2.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 feature:uninstall xipki-jscepclient-shell
 

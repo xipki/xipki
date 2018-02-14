@@ -34,7 +34,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "gen-rca",
+@Command(scope = "ca", name = "gen-rootca",
         description = "generate selfsigned CA")
 @Service
 public class CaGenRcaCmd extends CaAddOrGenAction {
@@ -46,7 +46,7 @@ public class CaGenRcaCmd extends CaAddOrGenAction {
 
     @Option(name = "--profile", required = true,
             description = "profile of the Root CA\n(required)")
-    private String rcaProfile;
+    private String rootcaProfile;
 
     @Option(name = "--serial",
             description = "profile of the Root CA")
@@ -55,7 +55,7 @@ public class CaGenRcaCmd extends CaAddOrGenAction {
     @Option(name = "--out", aliases = "-o",
             description = "where to save the generated CA certificate")
     @Completion(FilePathCompleter.class)
-    private String rcaCertOutFile;
+    private String rootcaCertOutFile;
 
     @Override
     protected Object execute0() throws Exception {
@@ -66,10 +66,11 @@ public class CaGenRcaCmd extends CaAddOrGenAction {
             serialNumber = toBigInt(serialS);
         }
 
-        X509Certificate rcaCert = caManager.generateRootCa(caEntry, rcaProfile, csr, serialNumber);
-        if (rcaCertOutFile != null) {
-            saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
-                    rcaCert.getEncoded());
+        X509Certificate rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr,
+                serialNumber);
+        if (rootcaCertOutFile != null) {
+            saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
+                    rootcaCert.getEncoded());
         }
         println("generated root CA " + caEntry.ident().name());
         return null;

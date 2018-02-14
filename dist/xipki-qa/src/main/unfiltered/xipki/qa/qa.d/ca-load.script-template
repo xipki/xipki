@@ -25,53 +25,53 @@ ca:restart
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:csr-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-    --slot $SLOT --label rca1 --out output/rca1.csr \
-    --subject "CN=rca1,O=xipki,C=DE" --keyusage cRLSign
+    --slot $SLOT --label rootca1 --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE" --keyusage cRLSign
 } {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-    --p12 output/rca1.p12 --password 1234 \
-    --out output/rca1.csr \
-    --subject "CN=rca1,O=xipki,C=DE" \
+    --p12 output/rootca1.p12 --password 1234 \
+    --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE" \
     --keyusage cRLSign
 }
 
 echo "#################################################################"
-echo "#                           Load rca.xml                        #"
+echo "#                           Load rootca.xml                        #"
 echo "#################################################################"
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rca1"
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 }
 
 if { $TOKEN_TYPE equals "PKCS12" } {
-  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/rca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/rca.xml-template xipki/qa/qa.d/rca.xml
+xi:copy-file -f xipki/qa/qa.d/rootca.xml-template xipki/qa/qa.d/rootca.xml
 
 xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-  xipki/qa/qa.d/rca.xml
+  xipki/qa/qa.d/rootca.xml
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  xipki/qa/qa.d/rca.xml
+  xipki/qa/qa.d/rootca.xml
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  xipki/qa/qa.d/rca.xml
+  xipki/qa/qa.d/rootca.xml
 
 xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-  xipki/qa/qa.d/rca.xml
+  xipki/qa/qa.d/rootca.xml
 
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
-  xipki/qa/qa.d/rca.xml
+  xipki/qa/qa.d/rootca.xml
 
-ca:load-conf --conf-file xipki/qa/qa.d/rca.xml
+ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } {
-  xi:update-cert-p11 --slot $SLOT --label rca1 --cert output/rca1.der
+  xi:update-cert-p11 --slot $SLOT --label rootca1 --cert output/rootca1.der
 } {
-  xi:update-cert-p12 --p12 output/rca1.p12 --password 1234 --cert output/rca1.der
+  xi:update-cert-p12 --p12 output/rootca1.p12 --password 1234 --cert output/rootca1.der
 }
 
 ## Generate keys and CSR for subca1
@@ -85,7 +85,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --out output/subca1.csr --subject "CN=subca1,O=xipki,C=DE"
 }
 
-ca:enroll-cert --ca rca1 --csr output/subca1.csr \
+ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
   --out output/subca1.der --profile subca
 
 if { $TOKEN_TYPE equals "PKCS11" } {
@@ -93,7 +93,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --cert output/subca1.der \
 } {
   xi:update-cert-p12 --p12 output/subca1.p12 --password 1234 \
-    --cert output/subca1.der --ca-cert output/rca1.der
+    --cert output/subca1.der --ca-cert output/rootca1.der
 }
 
 ## Generate keys and CSR for subcawithcrl
@@ -129,7 +129,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 }
 
-ca:enroll-cert --ca rca1 --csr output/subcawithcrl1.csr \
+ca:enroll-cert --ca rootca1 --csr output/subcawithcrl1.csr \
   --out output/subcawithcrl1.der --profile subca-Complex
 
 if { $TOKEN_TYPE equals "PKCS11" } {
@@ -137,7 +137,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --cert output/subcawithcrl1.der \
 } {
   xi:update-cert-p12 --p12 output/subcawithcrl1.p12 --password 1234 \
-    --cert output/subcawithcrl1.der --ca-cert output/rca1.der
+    --cert output/subcawithcrl1.der --ca-cert output/rootca1.der
 }
 
 ## Generate keys and CSR for OCSPResponder
@@ -151,17 +151,17 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 }
 
-ca:enroll-cert --ca rca1 --csr output/ocsp99.csr --out output/ocsp99.der \
+ca:enroll-cert --ca rootca1 --csr output/ocsp99.csr --out output/ocsp99.der \
   --profile ocsp
 
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:update-cert-p11 --slot $SLOT --label ocsp99 --cert output/ocsp99.der \
 } {
   xi:update-cert-p12 --p12 output/ocsp99.p12 --password 1234 \
-    --cert output/ocsp99.der --ca-cert output/rca1.der
+    --cert output/ocsp99.der --ca-cert output/rootca1.der
 }
 
-ca:caprofile-rm --ca rca1 --profile ocsp
+ca:caprofile-rm --ca rootca1 --profile ocsp
 
 echo "#################################################################"
 echo "#                        Add subca with OCSP                    #"
@@ -185,9 +185,9 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
 
 ca:load-conf --conf-file xipki/qa/qa.d/subca.xml
 
-# Remove CertProfile rca
+# Remove CertProfile rootca
 
-ca:profile-rm rca
+ca:profile-rm rootca
 
 ## Restart the CA
 #ca:restart

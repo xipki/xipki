@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <QAConf xmlns="http://xipki.org/ca/qa/qa/conf/v2">
   <X509Issuers>
-    <X509Issuer name="rca">
+    <X509Issuer name="rootca">
       <cert>
-        <file>output/rca1.der</file>
+        <file>output/rootca1.der</file>
       </cert>
       <validityMode>cutoff</validityMode>
-      <caIssuerUrl>http://example.org/rca1.der</caIssuerUrl>
+      <caIssuerUrl>http://example.org/rootca1.der</caIssuerUrl>
       <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
     </X509Issuer>
     <X509Issuer name="subca">
@@ -29,7 +29,7 @@
     </X509Issuer>
   </X509Issuers>
   <X509Certprofiles>
-    <X509Certprofile name="rca">
+    <X509Certprofile name="rootca">
       <file>xipki/qa/certprofile/certprofile-rootca.xml</file>
     </X509Certprofile>
     <X509Certprofile name="cross">

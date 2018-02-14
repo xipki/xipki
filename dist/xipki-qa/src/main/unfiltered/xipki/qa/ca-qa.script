@@ -10,18 +10,18 @@ echo "#################################################################"
 echo "#                       Check certificate                       #"
 echo "#################################################################"
 
-## rca
+## rootca
 
-caqa:check-cert --issuer rca --profile rca \
-  --csr output/rca1.csr --cert output/rca1.der
+caqa:check-cert --issuer rootca --profile rootca \
+  --csr output/rootca1.csr --cert output/rootca1.der
 
-caqa:check-cert --issuer rca --profile cross \
+caqa:check-cert --issuer rootca --profile cross \
   --csr output/cross1.csr --cert output/cross1.der
 
-caqa:check-cert --issuer rca --profile subca \
+caqa:check-cert --issuer rootca --profile subca \
   --csr output/subca1.csr --cert output/subca1.der
 
-caqa:check-cert --issuer rca --profile subca-complex \
+caqa:check-cert --issuer rootca --profile subca-complex \
   --csr output/subcawithcrl1.csr --cert output/subcawithcrl1.der
 
 ## subcawithcrl

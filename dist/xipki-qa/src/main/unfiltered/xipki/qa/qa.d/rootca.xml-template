@@ -46,7 +46,7 @@
     </publisher>
   </publishers>
   <profiles>
-    <profile name="rca">
+    <profile name="rootca">
       <type>XML</type>
       <conf>
         <file>${profiles.dir}/certprofile-rootca.xml</file>
@@ -144,19 +144,19 @@
     </profile>
   </profiles>
   <cas>
-    <ca name="rca1">
+    <ca name="rootca1">
       <caInfo>
         <x509Ca>
           <genSelfIssued>
             <csr>
-              <file>${output.dir}/rca1.csr</file>
+              <file>${output.dir}/rootca1.csr</file>
             </csr>
-            <profile>rca</profile>
+            <profile>rootca</profile>
             <serialNumber>1</serialNumber>
           </genSelfIssued>
           <cmpcontrolName>cmpcontrol1</cmpcontrolName>
           <cert>
-            <file>${output.dir}/rca1.der</file>
+            <file>${output.dir}/rootca1.der</file>
           </cert>
           <duplicateKey>true</duplicateKey>
           <duplicateSubject>true</duplicateSubject>
@@ -173,7 +173,7 @@
           <status>active</status>
           <validityMode>cutoff</validityMode>
           <cacertUris>
-            <str>http://example.org/rca1.der</str>
+            <str>http://example.org/rootca1.der</str>
           </cacertUris>
           <nextCrlNo>2</nextCrlNo>
           <ocspUris>
@@ -183,7 +183,7 @@
         </x509Ca>
       </caInfo>
       <aliases>
-        <str>rca</str>
+        <str>rootca</str>
       </aliases>
       <profiles>
         <str>cross</str>

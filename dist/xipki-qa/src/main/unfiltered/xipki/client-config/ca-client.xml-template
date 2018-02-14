@@ -32,8 +32,8 @@
       disables the interval update -->
     <CAInfoUpdateInterval>10</CAInfoUpdateInterval>
     <CA enabled="true">
-      <name>rca1</name>
-      <url>https://localhost:8443/cmp/rca</url>
+      <name>rootca1</name>
+      <url>https://localhost:8443/cmp/rootca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpControl>

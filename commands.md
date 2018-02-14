@@ -368,7 +368,7 @@ Feature xipki-camgmt-shell (started by default)
 
      remove CA alias
 
-   * `ca:gen-rca`
+   * `ca:gen-rootca`
 
      generate selfsigned CA
 

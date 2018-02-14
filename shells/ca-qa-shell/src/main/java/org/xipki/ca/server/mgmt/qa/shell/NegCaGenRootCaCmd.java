@@ -27,14 +27,14 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-gen-rca",
+@Command(scope = "caqa", name = "neg-gen-rootca",
         description = "generate selfsigned CA (negative, QA)")
 @Service
 public class NegCaGenRootCaCmd extends CaGenRcaCmd {
 
     @Override
     protected Object execute0() throws Exception {
-        println("neg-gen-rca");
+        println("neg-gen-rootca");
 
         try {
             super.execute0();

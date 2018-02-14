@@ -38,80 +38,19 @@ ca:cmpcontrol-add \
   --conf send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA
 
 ## Certificate Profiles
-ca:profile-add \
-  --name cross \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-cross.xml
 
-ca:profile-add \
-  --name subca \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-subca.xml
+list = [ cross subca subca-complex ocsp scep multiple-ous \
+  multi-valued-rdn qc ee-complex tls tls-c tls-inc-sn gsmc-k max-time ]
 
-ca:profile-add \
-  --name subca-complex \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-subca-complex.xml
-
-ca:profile-add \
-  --name ocsp \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-ocsp.xml
-
-ca:profile-add \
-  --name scep \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-scep.xml
-
-ca:profile-add \
-  --name multiple-ous \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-multiple-ous.xml
-
-ca:profile-add \
-  --name multi-valued-rdn \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-multi-valued-rdn.xml
-
-ca:profile-add \
-  --name qc \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-qc.xml
-
-ca:profile-add \
-  --name ee-complex \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-ee-complex.xml
-
-ca:profile-add \
-  --name tls \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-tls.xml
+each ($list) {
+  ca:profile-add --type XML --name ${it} \
+    --conf-file xipki/qa/certprofile/certprofile-${it}.xml
+}
 
 ca:profile-add \
   --name tlsa \
   --type XML \
   --conf-file xipki/qa/certprofile/certprofile-tls.xml
-
-ca:profile-add \
-  --name tls-c \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-tls-c.xml
-
-ca:profile-add \
-  --name tls-inc-sn \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-tls-inc-sn.xml
-
-ca:profile-add \
-  --name gsmc-k \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-gsmc-k.xml
-
-ca:profile-add \
-  --name max-time \
-  --type XML \
-  --conf-file xipki/qa/certprofile/certprofile-max-time.xml
 
 ## Publishers
 ca:publisher-add \
@@ -142,11 +81,11 @@ echo "Sleeping 1 second"
 sleep 1
 
 echo "#################################################################"
-echo "#                          Generate rca                         #"
+echo "#                        Generate rootca                        #"
 echo "#################################################################"
-## Add the profile rca
+## Add the profile rootca
 ca:profile-add \
-  --name rca \
+  --name rootca \
   --type XML \
   --conf-file xipki/qa/certprofile/certprofile-rootca.xml
 
@@ -155,36 +94,36 @@ if { $TOKEN_TYPE equals "PKCS11" } {
   xi:csr-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT \
-    --label rca1 \
-    --out output/rca1.csr \
-    --subject "CN=rca1,O=xipki,C=DE" \
+    --label rootca1 \
+    --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE" \
     --keyusage cRLSign
 } {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-    --p12 output/rca1.p12 \
+    --p12 output/rootca1.p12 \
     --password 1234 \
-    --out output/rca1.csr \
-    --subject "CN=rca1,O=xipki,C=DE" \
+    --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE" \
     --keyusage cRLSign
 }
 
-## Generate selfsigned rca
+## Generate selfsigned rootca
 
 if { $TOKEN_TYPE equals "PKCS11" } {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rca1"
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 }
 
 if { $TOKEN_TYPE equals "PKCS12" } {
-  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rca1.p12,password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg=="
+  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg=="
 }
 
-ca:gen-rca \
-  --name rca1 \
-  --csr output/rca1.csr \
-  --profile rca \
+ca:gen-rootca \
+  --name rootca1 \
+  --csr output/rootca1.csr \
+  --profile rootca \
   --serial 1 \
-  --out output/rca1.der \
+  --out output/rootca1.der \
   --permission all \
   --sn-bitlen 63 \
   --next-crl-no 2 \
@@ -192,7 +131,7 @@ ca:gen-rca \
   --signer-type $TOKEN_TYPE \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
-  --ca-cert-uri http://example.org/rca1.der \
+  --ca-cert-uri http://example.org/rootca1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
   --duplicate-subject yes \
@@ -200,29 +139,29 @@ ca:gen-rca \
   --validity-mode cutoff \
   --save-req yes
 
-## Remove the profile rca
-ca:profile-rm rca
+## Remove the profile rootca
+ca:profile-rm rootca
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } {
   xi:update-cert-p11 \
     --slot $SLOT \
-    --label rca1 \
-    --cert output/rca1.der
+    --label rootca1 \
+    --cert output/rootca1.der
 } {
   xi:update-cert-p12 \
-    --p12 output/rca1.p12 \
+    --p12 output/rootca1.p12 \
     --password 1234 \
-    --cert output/rca1.der
+    --cert output/rootca1.der
 }
 
 ca:caalias-add \
-  --ca rca1 \
-  --alias rca
+  --ca rootca1 \
+  --alias rootca
 
 ## Add Profiles
 ca:caprofile-add \
-  --ca rca1 \
+  --ca rootca1 \
   --profile cross \
   --profile subca \
   --profile subca-complex \
@@ -230,7 +169,7 @@ ca:caprofile-add \
 
 ## Add publisher
 ca:capub-add \
-  --ca rca1 \
+  --ca rootca1 \
   --publisher ocsp-publisher
 
 # Add requestor to CA
@@ -239,7 +178,7 @@ ca:careq-add \
   --permission all \
   --ra yes \
   --profile all \
-  --ca rca1
+  --ca rootca1
 
 ## Generate keys and CSR for subca1
 if { $TOKEN_TYPE equals "PKCS11" } {
@@ -259,7 +198,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 }
 
 ca:enroll-cert \
-  --ca rca1 \
+  --ca rootca1 \
   --csr output/subca1.csr \
   --out output/subca1.der \
   --profile subca
@@ -274,7 +213,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --p12 output/subca1.p12 \
     --password 1234 \
     --cert output/subca1.der \
-    --ca-cert output/rca1.der
+    --ca-cert output/rootca1.der
 }
 
 ## Generate keys and CSR for subcawithcrl1
@@ -312,7 +251,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 }
 
 ca:enroll-cert \
-  --ca rca1 \
+  --ca rootca1 \
   --csr output/subcawithcrl1.csr \
   --out output/subcawithcrl1.der \
   --profile subca-complex
@@ -327,7 +266,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --p12 output/subcawithcrl1.p12 \
     --password 1234 \
     --cert output/subcawithcrl1.der \
-    --ca-cert output/rca1.der
+    --ca-cert output/rootca1.der
 }
 
 ## Generate keys and CSR for OCSPResponder
@@ -348,7 +287,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 }
 
 ca:enroll-cert \
-  --ca rca1 \
+  --ca rootca1 \
   --csr output/ocsp99.csr \
   --out output/ocsp99.der \
   --profile ocsp
@@ -363,11 +302,11 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --p12 output/ocsp99.p12 \
     --password 1234 \
     --cert output/ocsp99.der \
-    --ca-cert output/rca1.der
+    --ca-cert output/rootca1.der
 }
 
 ca:caprofile-rm \
-  --ca rca1 \
+  --ca rootca1 \
   --profile ocsp
 
 echo "#################################################################"

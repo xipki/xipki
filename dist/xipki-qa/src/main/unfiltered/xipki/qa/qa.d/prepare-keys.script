@@ -77,7 +77,7 @@ if { $KEY_TYPE equals "DSA" } {
   }
 }
 
-list = [ rca1 subca1 subcawithcrl1 ocsp99 ]
+list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
 
 if { $TOKEN_TYPE equals "PKCS11" } {
   SLOT = "0"

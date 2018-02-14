@@ -44,7 +44,7 @@
     </publisher>
   </publishers>
   <profiles>
-    <profile name="rca">
+    <profile name="rootca">
       <type>XML</type>
       <conf>
         <file>${profiles.dir}/certprofile-rootca.xml</file>
@@ -89,7 +89,7 @@
             <csr>
               <file>xipki/setup/keycerts/myca1.csr</file>
             </csr>
-            <profile>rca</profile>
+            <profile>rootca</profile>
             <serialNumber>1</serialNumber>
           </genSelfIssued>
           <cert>

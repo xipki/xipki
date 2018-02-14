@@ -9,7 +9,7 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --subject "CN=cross1,O=xipki,C=DE" \
   --out output/cross1.csr
 
-ca:enroll-cert --ca rca1 --profile cross \
+ca:enroll-cert --ca rootca1 --profile cross \
   --csr output/cross1.csr --out output/cross1.der
 
 echo "#################################################################"
@@ -22,7 +22,7 @@ sleep 1
 
 ## Check the healthy status
 
-xi:cmp-health --ca rca1
+xi:cmp-health --ca rootca1
 
 xi:cmp-health --ca subca1
 
@@ -47,7 +47,7 @@ xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1
 xi:update-cert-p12 --p12 output/ocsp1.p12 --password 1234 \
   --cert output/ocsp1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate ocsp2
 
@@ -66,7 +66,7 @@ xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1
 
 xi:update-cert-p12 --p12 output/ocsp2.p12 --password 1234 \
   --cert output/ocsp2.der --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Revocate certificates
 xi:cmp-revoke --ca subcawithcrl1 --cert output/ocsp2.der --reason keyCompromise
@@ -87,7 +87,7 @@ xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1
 xi:update-cert-p12 --p12 output/multiple-ous1.p12 --password 1234 \
   --cert output/multiple-ous1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Create the CSR for the command caqa:check-cert in QA 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
@@ -103,7 +103,7 @@ xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1
 xi:update-cert-p12 --p12 output/multiple-ous2.p12 --password 1234 \
   --cert output/multiple-ous2.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate multi-valued-rdn
 
@@ -121,7 +121,7 @@ xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1
 xi:update-cert-p12 --p12 output/multi-valued-rdn1.p12 --password 1234 \
   --cert output/multi-valued-rdn1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate qc
 
@@ -140,7 +140,7 @@ xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1
 xi:update-cert-p12 --p12 output/qc1.p12 --password 1234 \
   --cert output/qc1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate ee-complex1 with complex subject (parsable in openssl)
 
@@ -161,7 +161,7 @@ xi:cmp-csr-enroll --csr output/ee-complex1.csr \
 xi:update-cert-p12 --p12 output/ee-complex1.p12 --password 1234 \
   --cert output/ee-complex1.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate ee-complex1 with complex subject (not parsable in openssl due to complex subject)
 
@@ -182,7 +182,7 @@ xi:cmp-csr-enroll --csr output/ee-complex2.csr --out output/ee-complex2.der \
 xi:update-cert-p12 --p12 output/ee-complex2.p12 --password 1234 \
   --cert output/ee-complex2.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate tls1
 
@@ -196,7 +196,7 @@ xi:cmp-csr-enroll --csr output/tls1.csr --out output/tls1.der --profile tls
 xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
   --cert output/tls1.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
  
 # Certificate tls-inc-sn1 (all with same subject and profile but different key) 
 # 1.
@@ -241,7 +241,7 @@ xi:cmp-csr-enroll --csr output/tls2.csr --out output/tls2.der --profile tls
 xi:update-cert-p12 --p12 output/tls2.p12 --password 1234 \
   --cert output/tls2.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Suspend certificates
 xi:cmp-revoke --ca subca1 --cert output/tls2.der --reason certificateHold
@@ -265,7 +265,7 @@ xi:cmp-csr-enroll --csr output/tls-c1.csr --out output/tls-c1.der --profile tls-
 xi:update-cert-p12 --p12 output/tls-c1.p12 --password 1234 \
   --cert output/tls-c1.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate tls-c2
 
@@ -280,7 +280,7 @@ xi:cmp-csr-enroll --csr output/tls-c2.csr --out output/tls-c2.der \
 xi:update-cert-p12 --p12 output/tls-c2.p12 --password 1234 \
   --cert output/tls-c2.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Revocate certificates
 xi:cmp-revoke --ca subca1 --cert output/tls-c2.der --reason affiliationChanged
@@ -297,7 +297,7 @@ xi:cmp-csr-enroll --csr output/gsmc-k1.csr --out output/gsmc-k1.der --profile gs
 xi:update-cert-p12 --p12 output/gsmc-k1.p12 --password 1234 \
   --cert output/gsmc-k1.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Sleep 2 seconds to ensure different notBefore in certificate
 echo "Sleeping 2 seconds"
@@ -315,7 +315,7 @@ xi:cmp-csr-enroll --csr output/gsmc-k2.csr --out output/gsmc-k2.der --profile gs
 xi:update-cert-p12 --p12 output/gsmc-k2.p12 --password 1234 \
   --cert output/gsmc-k2.der \
   --ca-cert output/subca1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 # Certificate max-time1
 
@@ -329,7 +329,7 @@ xi:cmp-csr-enroll --csr output/max-time1.csr --out output/max-time1.der --profil
 xi:update-cert-p12 --p12 output/max-time1.p12 --password 1234 \
   --cert output/max-time1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
   
 ## Get CRL
 xi:cmp-getcrl --ca subcawithcrl1 --out output/subcawithcrl1-1-get.crl

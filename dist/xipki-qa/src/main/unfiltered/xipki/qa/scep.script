@@ -44,7 +44,7 @@ xi:update-cert-p12 \
   --password 1234 \
   --cert output/scep-ocsp1.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Get CRL
 xi:scep-getcrl \
@@ -78,7 +78,7 @@ xi:update-cert-p12 \
   --p12 output/scep-ocsp1-2.p12 --password 1234 \
   --cert output/scep-ocsp1-2.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 ## Renewal with different CommonName 
 
@@ -99,6 +99,6 @@ xi:update-cert-p12 \
   --p12 output/scep-ocsp2.p12 --password 1234 \
   --cert output/scep-ocsp2.der \
   --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rca1.der
+  --ca-cert output/rootca1.der
 
 feature:uninstall xipki-scepclient-shell
