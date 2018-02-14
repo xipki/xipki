@@ -77,59 +77,39 @@ if { $KEY_TYPE equals "DSA" } {
   }
 }
 
+list = [ rca1 subca1 subcawithcrl1 ocsp99 ]
+
 if { $TOKEN_TYPE equals "PKCS11" } {
   SLOT = "0"
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=ocsp99"
 
-  xi:delete-key-p11 --force --slot $SLOT --label rca1
-
-  xi:delete-key-p11 --force --slot $SLOT --label subca1
-
-  xi:delete-key-p11 --force --slot $SLOT --label subcawithcrl1
-
-  xi:delete-key-p11 --force --slot $SLOT --label ocsp99
+  each ($list) {
+    xi:delete-key-p11 --force --slot $SLOT --label ${it}
+  }
 
   if { $KEY_TYPE equals "RSA" } {
-    xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label rca1
-
-    xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label subca1
-
-    xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label subcawithcrl1
-
-    xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label ocsp99
-
+    each ($list) {
+      xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label ${it}
+    }
   }
 
   if { $KEY_TYPE equals "EC" } {
-    xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label rca1
-
-    xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label subca1
-
-    xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label subcawithcrl1
-
-    xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label ocsp99
+    each ($list) {
+      xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label ${it}
+    }
   }
 
   if { $KEY_TYPE equals "DSA" } {
-    xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label rca1
-
-    xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label subca1
-
-    xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label subcawithcrl1
-
-    xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label ocsp99
-
+    each ($list) {
+      xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label ${it}
+    }
   }
 
   if { $KEY_TYPE equals "SM2" } {
-    xi:sm2-p11 --slot $SLOT --label rca1
-
-    xi:sm2-p11 --slot $SLOT --label subca1
-
-    xi:sm2-p11 --slot $SLOT --label subcawithcrl1
-
-    xi:sm2-p11 --slot $SLOT --label ocsp99
+    each ($list) {
+      xi:sm2-p11 --slot $SLOT --label ${it}
+    }
   }
 
 }
@@ -139,44 +119,27 @@ if { $TOKEN_TYPE equals "PKCS12" } {
   OCSP_KEYCONF = "password=1234,keystore=file:output/ocsp99.p12"
 
   if { $KEY_TYPE equals "RSA" } {
-    xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/rca1.p12
-
-    xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/subca1.p12
-
-    xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/subcawithcrl1.p12
-  
-    xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/ocsp99.p12
+    each ($list) {
+      xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/${it}.p12
+    }
   }
   
   if { $KEY_TYPE equals "DSA" } {
-    xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/rca1.p12
-
-    xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/subca1.p12
-
-    xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/subcawithcrl1.p12
-
-    xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/ocsp99.p12
-
+    each ($list) {
+      xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/${it}.p12
+    }
   }
     
   if { $KEY_TYPE equals "EC" } {
-    xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/rca1.p12
-
-    xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/subca1.p12
-
-    xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/subcawithcrl1.p12
-
-    xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/ocsp99.p12
+    each ($list) {
+      xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/${it}.p12
+    }
   }
 
   if { $KEY_TYPE equals "SM2" } {
-    xi:sm2-p12 --password 1234 --out output/rca1.p12
-
-    xi:sm2-p12 --password 1234 --out output/subca1.p12
-
-    xi:sm2-p12 --password 1234 --out output/subcawithcrl1.p12
-
-    xi:sm2-p12 --password 1234 --out output/ocsp99.p12
+    each ($list) {
+      xi:sm2-p12 --password 1234 --out output/${it}.p12
+    }
   }
 
 }
