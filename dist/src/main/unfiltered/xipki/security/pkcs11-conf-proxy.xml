@@ -16,13 +16,23 @@
         </slot>
       </includeSlots>
       <readonly>false</readonly>
-      <mechanismSets>
-        <mechanisms>
+      <mechanismFilters>
+        <mechanismFilter>
           <slots>
             <slot>
               <index>0</index>
             </slot>
           </slots>
+          <mechanismSet>standardMechanisms</mechanismSet>
+        </mechanismFilter>
+      </mechanismFilters>
+    </module>
+  </modules>
+  <mechanismSets>
+    <mechanismSet name="allMechanisms">
+      <mechanism>ALL</mechanism>
+    </mechanismSet>
+    <mechanismSet name="standardMechanisms">
           <mechanism>CKM_RSA_PKCS_KEY_PAIR_GEN</mechanism>
           <mechanism>CKM_DSA_KEY_PAIR_GEN</mechanism>
           <mechanism>CKM_EC_KEY_PAIR_GEN</mechanism>
@@ -48,6 +58,8 @@
           <mechanism>CKM_SHA3_256_HMAC</mechanism>
           <mechanism>CKM_SHA3_384_HMAC</mechanism>
           <mechanism>CKM_SHA3_512_HMAC</mechanism>
+
+          <mechanism>CKM_AES_GMAC</mechanism>
 
           <mechanism>CKM_RSA_9796</mechanism>
           <mechanism>CKM_RSA_X_509</mechanism>
@@ -99,8 +111,6 @@
           <mechanism>CKM_VENDOR_SM2</mechanism>
           <mechanism>CKM_VENDOR_SM2_SM3</mechanism>
           <mechanism>CKM_VENDOR_SM2_KEY_PAIR_GEN</mechanism>
-        </mechanisms>
-      </mechanismSets>
-    </module>
-  </modules>
+    </mechanismSet>
+  </mechanismSets>
 </PKCS11Conf>
