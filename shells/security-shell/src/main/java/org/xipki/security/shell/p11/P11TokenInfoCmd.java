@@ -56,6 +56,7 @@ public class P11TokenInfoCmd extends SecurityAction {
     protected Object execute0() throws Exception {
         P11Module module = getP11Module(moduleName);
         println("module: " + moduleName);
+        println(module.getDescription());
         List<P11SlotIdentifier> slots = module.slotIdentifiers();
         if (slotIndex == null) {
             output(slots);
@@ -63,6 +64,7 @@ public class P11TokenInfoCmd extends SecurityAction {
         }
 
         P11Slot slot = getSlot(moduleName, slotIndex);
+        println("Details of slot");
         slot.showDetails(System.out, verbose);
         System.out.println();
         System.out.flush();

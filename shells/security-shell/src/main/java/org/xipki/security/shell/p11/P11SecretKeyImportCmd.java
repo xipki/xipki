@@ -44,11 +44,11 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @since 2.2.0
  */
 
-@Command(scope = "xi", name = "create-secretkey-p11",
-        description = "create secret key with given value in PKCS#11 device")
+@Command(scope = "xi", name = "import-secretkey-p11",
+        description = "import secret key with given value in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
-public class P11SecretKeyCreateCmd extends P11KeyGenAction {
+public class P11SecretKeyImportCmd extends P11KeyGenAction {
 
     @Option(name = "--key-type", required = true,
             description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
@@ -107,9 +107,8 @@ public class P11SecretKeyCreateCmd extends P11KeyGenAction {
         }
 
         P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.createSecretKey(p11KeyType, keyValue, label,
-                getControl());
-        finalize("Create Secret Key", objId);
+        P11ObjectIdentifier objId = slot.createSecretKey(p11KeyType, keyValue, label, getControl());
+        println("imported " + keyType + " key " + objId);
         return null;
     }
 

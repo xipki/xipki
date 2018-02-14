@@ -67,6 +67,8 @@ public class ProxyP11Module extends AbstractP11Module {
 
     private final short version = P11ProxyConstants.VERSION_V1_0;
 
+    private final String description;
+
     private URL serverUrl;
 
     private short moduleId;
@@ -81,6 +83,8 @@ public class ProxyP11Module extends AbstractP11Module {
             throw new IllegalArgumentException("the module path does not starts with " + PREFIX
                     + ": " + modulePath);
         }
+
+        this.description = StringUtil.concat("PKCS#11 proxy", "\nPath: ", modulePath);
 
         ConfPairs confPairs = new ConfPairs(modulePath.substring(PREFIX.length()));
         String urlStr = confPairs.value("url");
@@ -171,6 +175,11 @@ public class ProxyP11Module extends AbstractP11Module {
             slots.add(slot);
         }
         setSlots(slots);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

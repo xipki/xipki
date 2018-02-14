@@ -21,7 +21,12 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.bouncycastle.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.exception.P11UnsupportedMechanismException;
+import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
@@ -39,17 +44,28 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11SecretKeyGenCmd extends P11KeyGenAction {
 
+    private static final Logger LOG = LoggerFactory.getLogger(P11SecretKeyGenCmd.class);
+
     @Option(name = "--key-type", required = true,
             description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
     @Completion(SecretKeyTypeCompleter.class)
     private String keyType;
 
     @Option(name = "--key-size", required = true,
-            description = "keysize in bit.")
+            description = "keysize in bit\n(required)")
     private Integer keysize;
+
+    @Option(name = "--extern-if-gen-unsupported",
+            description = "If set, if the generation mechanism is not supported by the PKCS#11 "
+                    + "device, create in memory and then import it to the device")
+    private Boolean createExternIfGenUnsupported = Boolean.FALSE;
 
     @Override
     protected Object execute0() throws Exception {
+        if (keysize % 8 != 0) {
+            throw new IllegalCmdParamException("keysize is not multiple of 8: " + keysize);
+        }
+
         long p11KeyType;
         if ("AES".equalsIgnoreCase(keyType)) {
             p11KeyType = PKCS11Constants.CKK_AES;
@@ -63,9 +79,33 @@ public class P11SecretKeyGenCmd extends P11KeyGenAction {
         }
 
         P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.generateSecretKey(p11KeyType, keysize, label,
-                getControl());
-        finalize("Generate Secret Key", objId);
+        P11NewKeyControl control = getControl();
+
+        P11ObjectIdentifier objId = null;
+        try {
+            objId = slot.generateSecretKey(p11KeyType, keysize, label, control);
+            finalize(keyType, objId);
+        } catch (P11UnsupportedMechanismException ex) {
+            if (!createExternIfGenUnsupported) {
+                throw ex;
+            }
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info("could not generate secret key {}: ", label, ex.getMessage());
+            }
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("could not generate secret key " + label, ex);
+            }
+
+            byte[] keyValue = new byte[keysize / 8];
+            securityFactory.getRandom4Key().nextBytes(keyValue);
+
+            objId = slot.createSecretKey(p11KeyType, keyValue, label, control);
+            Arrays.fill(keyValue, (byte) 0); // clear the memory
+            println("generated in memory and imported " + keyType + " key " + objId);
+        }
+
         return null;
     }
 

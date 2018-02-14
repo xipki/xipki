@@ -31,6 +31,8 @@ public interface P11Module {
 
     String getName();
 
+    String getDescription();
+
     P11ModuleConf getConf();
 
     boolean isReadOnly();

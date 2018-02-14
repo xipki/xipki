@@ -41,7 +41,7 @@ public class JceksSecretKeyGenCmd extends P12KeyGenAction {
    private String keyType;
 
     @Option(name = "--key-size", required = true,
-            description = "keysize in bit.")
+            description = "keysize in bit\n(required)")
     private Integer keysize;
 
     @Override

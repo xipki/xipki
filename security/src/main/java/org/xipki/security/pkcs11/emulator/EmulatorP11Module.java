@@ -48,8 +48,11 @@ public class EmulatorP11Module extends AbstractP11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Module.class);
 
+    private final String description;
+
     private EmulatorP11Module(P11ModuleConf moduleConf) throws P11TokenException {
         super(moduleConf);
+
         final String modulePath = moduleConf.nativeLibrary();
         if (!StringUtil.startsWithIgnoreCase(modulePath, PREFIX)) {
             throw new IllegalArgumentException("the module path does not starts with " + PREFIX
@@ -57,6 +60,9 @@ public class EmulatorP11Module extends AbstractP11Module {
         }
 
         File baseDir = new File(IoUtil.expandFilepath(modulePath.substring(PREFIX.length())));
+
+        this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ", modulePath);
+
         File[] children = baseDir.listFiles();
 
         if (children == null || children.length == 0) {
@@ -152,6 +158,11 @@ public class EmulatorP11Module extends AbstractP11Module {
     public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         return new EmulatorP11Module(moduleConf);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

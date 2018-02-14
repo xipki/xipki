@@ -60,7 +60,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
     @Override
     public String toString() {
-        return StringUtil.concatObjects(30, "(index = ", index, ", id = ", id, ")");
+        return StringUtil.concatObjectsCap(30, "(index = ", index, ", id = ", id, ")");
     }
 
     @Override

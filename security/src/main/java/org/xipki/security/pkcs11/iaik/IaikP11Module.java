@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.AbstractP11Module;
@@ -35,6 +36,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 import iaik.pkcs.pkcs11.DefaultInitializeArgs;
+import iaik.pkcs.pkcs11.Info;
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.SlotInfo;
@@ -53,9 +55,26 @@ public class IaikP11Module extends AbstractP11Module {
 
     private Module module;
 
-    private IaikP11Module(Module module, P11ModuleConf moduleConf) throws P11TokenException {
+    private String description;
+
+    private IaikP11Module(Module module, P11ModuleConf moduleConf)
+            throws P11TokenException {
         super(moduleConf);
         this.module = ParamUtil.requireNonNull("module", module);
+
+        try {
+            Info info = module.getInfo();
+            this.description = StringUtil.concatObjects("PKCS#11 IAIK",
+                    "\n\tPath", moduleConf.nativeLibrary(),
+                    "\n\tCryptokiVersion: ", info.getCryptokiVersion(),
+                    "\n\tManufacturerID: ", info.getManufacturerID(),
+                    "\n\tLibraryDescription: ", info.getLibraryDescription(),
+                    "\n\tLibraryVersion: ", info.getLibraryVersion());
+
+        } catch (TokenException ex) {
+            this.description = StringUtil.concatObjects("PKCS#11 IAIK",
+                    "\n\tPath", moduleConf.nativeLibrary());
+        }
 
         Slot[] slotList;
         try {
@@ -170,6 +189,11 @@ public class IaikP11Module extends AbstractP11Module {
         }
 
         return new IaikP11Module(module, moduleConf);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

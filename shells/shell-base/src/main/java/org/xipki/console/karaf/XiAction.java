@@ -55,7 +55,7 @@ public abstract class XiAction implements Action {
         try {
             return execute0();
         } catch (Exception ex) {
-            LOG.debug("Exception caught while executing command", ex);
+            LogUtil.error(LOG, ex, "Command ERROR");
             throw new Exception(ex.getClass().getName() + ": " + ex.getMessage());
         }
     }
