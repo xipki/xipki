@@ -45,10 +45,10 @@ public class SecurePasswordInputPanel extends Panel {
     private static final long serialVersionUID = 1L;
 
     // CHECKSTYLE:SKIP
-    private static final String BACKSPACE = "\u21E6";
+    private static final String BACKSPACE = "\u21E6"; // ⇦
 
     // CHECKSTYLE:SKIP
-    private static final String CAPS = "\u21E7";
+    private static final String CAPS = "\u21E7"; // ⇧
 
     private static final String CLEAR = "Clear";
 
