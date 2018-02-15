@@ -138,8 +138,8 @@ public class SyslogAuditServiceImpl extends AuditService {
 
         final int n = sb.size();
         if (n > maxMessageLength) {
-            LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it",
-                    n, maxMessageLength);
+            LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it", n,
+                    maxMessageLength);
             return;
         }
 
@@ -177,8 +177,8 @@ public class SyslogAuditServiceImpl extends AuditService {
         CharArrayWriter msg = event.toCharArrayWriter(prefix);
         final int n = msg.size();
         if (n > maxMessageLength) {
-            LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it",
-                    n, maxMessageLength);
+            LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it", n,
+                    maxMessageLength);
             return;
         }
 

@@ -20,7 +20,6 @@ package org.xipki.common.util;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
@@ -53,6 +52,7 @@ public class DateUtil {
         if (coreUtcTime == null || coreUtcTime.length() != 14) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
+
         try {
             LocalDateTime localDate = LocalDateTime.parse(coreUtcTime, SDF1);
             Instant instant = localDate.atZone(ZONE_UTC).toInstant();
@@ -75,6 +75,7 @@ public class DateUtil {
         if (coreUtcTime == null || coreUtcTime.length() != 8) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
+
         try {
             LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
             Instant instant = localDate.atZone(ZONE_UTC).toInstant();
@@ -86,13 +87,11 @@ public class DateUtil {
     }
 
     public static String toUtcTimeyyyyMMddhhmmss(Date utcTime) {
-        ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
-        return SDF1.format(zd);
+        return SDF1.format(utcTime.toInstant().atZone(ZONE_UTC));
     }
 
     public static String toUtcTimeyyyyMMdd(Date utcTime) {
-        ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
-        return SDF2.format(zd);
+        return SDF2.format(utcTime.toInstant().atZone(ZONE_UTC));
     }
 
 }

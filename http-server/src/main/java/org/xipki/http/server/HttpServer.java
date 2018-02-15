@@ -187,11 +187,8 @@ public final class HttpServer {
     public HttpServer(SslContext sslContext, int port, int numThreads) {
         this.sslContext = sslContext;
         this.port = port;
-        if (numThreads > 0) {
-            this.numThreads = numThreads;
-        } else {
-            this.numThreads = 4 * Runtime.getRuntime().availableProcessors();
-        }
+        this.numThreads = (numThreads > 0)
+                ? numThreads : Runtime.getRuntime().availableProcessors();
     }
 
     public void setServletListener(ServletListener servletListener) {

@@ -62,15 +62,14 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
         BigInteger nextNumber = currentNumber.add(BigInteger.ONE);
         BigIntegerRange range = ranges.get(currentIndex);
         if (range.isInRange(nextNumber)) {
-            this.currentNumber = nextNumber;
+            currentNumber = nextNumber;
         } else {
-            this.currentIndex++;
-            if (loop && this.currentIndex >= sizeRanges) {
-                this.currentIndex = 0;
+            currentIndex++;
+            if (loop && currentIndex >= sizeRanges) {
+                currentIndex = 0;
             }
 
-            this.currentNumber = (this.currentIndex < sizeRanges)
-                    ? ranges.get(this.currentIndex).from() : null;
+            currentNumber = (currentIndex < sizeRanges) ? ranges.get(currentIndex).from() : null;
         }
 
         return ret;

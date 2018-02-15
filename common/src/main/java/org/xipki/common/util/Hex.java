@@ -19,7 +19,7 @@ package org.xipki.common.util;
 
 /**
  * @author Lijun Liao
- * @since 2.1.0
+ * @since 3.0.1
  */
 
 public class Hex {

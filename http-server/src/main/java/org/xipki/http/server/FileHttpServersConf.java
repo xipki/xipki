@@ -20,6 +20,7 @@ package org.xipki.http.server;
 import java.io.File;
 import java.net.URL;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -47,7 +48,7 @@ public class FileHttpServersConf implements HttpServersConf {
             JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
             Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
             final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                    javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    XMLConstants.W3C_XML_SCHEMA_NS_URI);
             URL url = ObjectFactory.class.getResource("/xsd/httpserver.xsd");
             jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 

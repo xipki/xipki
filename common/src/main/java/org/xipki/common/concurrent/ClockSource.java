@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @author Brett Wooldridge
  */
 public interface ClockSource {
+
     static ClockSource CLOCK = Factory.create();
 
     /**
@@ -212,43 +213,36 @@ public interface ClockSource {
             return System.currentTimeMillis() - startTime;
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedMillis0(long startTime, long endTime) {
             return endTime - startTime;
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedNanos0(long startTime) {
             return MILLISECONDS.toNanos(System.currentTimeMillis() - startTime);
         }
 
-        /** {@inheritDoc} */
         @Override
         public long elapsedNanos0(long startTime, long endTime) {
             return MILLISECONDS.toNanos(endTime - startTime);
         }
 
-        /** {@inheritDoc} */
         @Override
         public long toMillis0(long time) {
             return time;
         }
 
-        /** {@inheritDoc} */
         @Override
         public long toNanos0(long time) {
             return MILLISECONDS.toNanos(time);
         }
 
-        /** {@inheritDoc} */
         @Override
         public long plusMillis0(long time, long millis) {
             return time + millis;
         }
 
-        /** {@inheritDoc} */
         @Override
         public TimeUnit getSourceTimeUnit0() {
             return MILLISECONDS;

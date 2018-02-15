@@ -80,9 +80,8 @@ public class CmpFailureUtil {
 
     public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {
         return StringUtil.concatObjectsCap(200, "PKIStatusInfo {status = ", status,
-                " (", STATUS_TEXT_MAP.get(status), "), ", "failureInfo = ", failureInfo,
-                " (", getFailureInfoText(failureInfo), "), ", "statusMessage = ", statusMessage,
-                "}");
+            " (", STATUS_TEXT_MAP.get(status), "), ", "failureInfo = ", failureInfo,
+            " (", getFailureInfoText(failureInfo), "), ", "statusMessage = ", statusMessage, "}");
     }
 
     public static String getFailureInfoText(int failureInfo) {

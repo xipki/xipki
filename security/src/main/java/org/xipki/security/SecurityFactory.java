@@ -53,8 +53,8 @@ public interface SecurityFactory {
      * @throws ObjectCreationException
      *         if could not create the object
      */
-    KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf,
-            X509Certificate cert) throws ObjectCreationException;
+    KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Certificate cert)
+            throws ObjectCreationException;
 
     /**
      * Creates signer.
@@ -186,8 +186,7 @@ public interface SecurityFactory {
      *          If case 3 occurs.
      */
     byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-            char[] password, X509Certificate[] newCertChain)
-            throws KeyStoreException;
+            char[] password, X509Certificate[] newCertChain) throws KeyStoreException;
 
     SecureRandom getRandom4Sign();
 

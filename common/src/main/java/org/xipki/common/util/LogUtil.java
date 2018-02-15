@@ -107,7 +107,7 @@ public class LogUtil {
      * @return formatted certificate serial number
      */
     public static String formatCsn(BigInteger serialNumber) {
-        return "0x" + serialNumber.toString(16);
+        return "0x" + Hex.encode(serialNumber.toByteArray());
     }
 
     private static String getMessage(Throwable th) {

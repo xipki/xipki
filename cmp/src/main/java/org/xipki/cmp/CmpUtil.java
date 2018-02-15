@@ -131,15 +131,14 @@ public class CmpUtil {
         ParamUtil.requireNonNull("header", header);
 
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
-        if (regInfos == null) {
-            return false;
-        }
-
-        for (InfoTypeAndValue regInfo : regInfos) {
-            if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
-                return true;
+        if (regInfos != null) {
+            for (InfoTypeAndValue regInfo : regInfos) {
+                if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -148,14 +147,12 @@ public class CmpUtil {
     }
 
     public static CmpUtf8Pairs extract(InfoTypeAndValue[] regInfos) {
-        if (regInfos == null) {
-            return null;
-        }
-
-        for (InfoTypeAndValue regInfo : regInfos) {
-            if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
-                String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
-                return new CmpUtf8Pairs(regInfoValue);
+        if (regInfos != null) {
+            for (InfoTypeAndValue regInfo : regInfos) {
+                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
+                    String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
+                    return new CmpUtf8Pairs(regInfoValue);
+                }
             }
         }
 
@@ -163,14 +160,12 @@ public class CmpUtil {
     }
 
     public static CmpUtf8Pairs extract(AttributeTypeAndValue[] atvs) {
-        if (atvs == null) {
-            return null;
-        }
-
-        for (AttributeTypeAndValue atv : atvs) {
-            if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType())) {
-                String regInfoValue = ((ASN1String) atv.getValue()).getString();
-                return new CmpUtf8Pairs(regInfoValue);
+        if (atvs != null) {
+            for (AttributeTypeAndValue atv : atvs) {
+                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType())) {
+                    String regInfoValue = ((ASN1String) atv.getValue()).getString();
+                    return new CmpUtf8Pairs(regInfoValue);
+                }
             }
         }
 

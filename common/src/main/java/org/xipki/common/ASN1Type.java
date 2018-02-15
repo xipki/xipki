@@ -67,13 +67,13 @@ public abstract class ASN1Type {
             out[idx++] = (byte) 0x83;
             out[idx++] = (byte) (0xFF & (bodyLen >> 16));
             out[idx++] = (byte) (0xFF & (bodyLen >> 8));
-            out[idx++] = (byte) (0xFF & bodyLen);
+            out[idx++] = (byte) (0xFF &  bodyLen);
         } else {
             out[idx++] = (byte) 0x84;
             out[idx++] = (byte) (0xFF & (bodyLen >> 24));
             out[idx++] = (byte) (0xFF & (bodyLen >> 16));
             out[idx++] = (byte) (0xFF & (bodyLen >> 8));
-            out[idx++] = (byte) (0xFF & bodyLen);
+            out[idx++] = (byte) (0xFF &  bodyLen);
         }
         return idx - offset;
     }

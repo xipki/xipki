@@ -29,6 +29,7 @@ public enum TripleState {
     REQUIRED("required"),
     OPTIONAL("optional"),
     FORBIDDEN("forbidden");
+
     private final String value;
 
     TripleState(String value) {

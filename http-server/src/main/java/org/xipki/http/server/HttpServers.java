@@ -399,10 +399,9 @@ public final class HttpServers {
 
     private static void logOpenSslWarning() {
         if (LOG.isWarnEnabled()) {
-            String msg = "To use the OpenSSL as SSL provider, both libapr-1 and "
+            LOG.warn("To use the OpenSSL as SSL provider, both libapr-1 and "
                     + "OpenSSL must be installed and configured. Note that OpenSSL cannot be "
-                    + "applied in Fedora distribution";
-            LOG.warn(msg);
+                    + "applied in Fedora distribution");
         }
     }
 

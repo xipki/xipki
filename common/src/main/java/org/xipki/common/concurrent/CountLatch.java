@@ -59,8 +59,7 @@ public class CountLatch {
         sync.acquireSharedInterruptibly(1);
     }
 
-    public boolean await(long timeout, TimeUnit unit)
-            throws InterruptedException {
+    public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
         return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
     }
 

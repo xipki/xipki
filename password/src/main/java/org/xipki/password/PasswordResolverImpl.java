@@ -103,9 +103,8 @@ public class PasswordResolverImpl implements PasswordResolver {
             }
         }
 
-        throw new PasswordResolverException(
-                "could not find password resolver to resolve password of protocol '"
-                + protocol + "'");
+        throw new PasswordResolverException("could not find password resolver to resolve password "
+                + "of protocol '" + protocol + "'");
     }
 
     public void setMasterPasswordCallback(String masterPasswordCallback) {

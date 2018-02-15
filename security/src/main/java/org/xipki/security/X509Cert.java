@@ -106,8 +106,8 @@ public class X509Cert {
             try {
                 certHolder = new X509CertificateHolder(encodedCert);
             } catch (IOException ex) {
-                throw new RuntimeException(
-                        "should not happen, could not decode certificate: " + ex.getMessage());
+                throw new RuntimeException("should not happen, could not decode certificate: "
+                        + ex.getMessage());
             }
             return certHolder;
         }

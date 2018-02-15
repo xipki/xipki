@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -124,7 +125,7 @@ public class PBEPasswordService {
 
         // cipher text
         System.arraycopy(encrypted, 0, encryptedText, offset, encrypted.length);
-        return "PBE:" + Base64.getEncoder().encodeToString(encryptedText);
+        return StringUtil.concat("PBE:", Base64.getEncoder().encodeToString(encryptedText));
     }
 
 }

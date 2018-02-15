@@ -110,11 +110,7 @@ public class PciAuditEvent {
     }
 
     public String userId() {
-        if (isBlank(this.userId)) {
-            return UNDEFINED;
-        }
-
-        return this.userId;
+        return isBlank(userId) ? UNDEFINED : userId;
     }
 
     public void setUserId(String userId) {
@@ -122,11 +118,7 @@ public class PciAuditEvent {
     }
 
     public String eventType() {
-        if (isBlank(this.eventType)) {
-            return UNDEFINED;
-        }
-
-        return this.eventType;
+        return isBlank(eventType) ? UNDEFINED : eventType;
     }
 
     public void setEventType(String eventType) {
@@ -142,11 +134,7 @@ public class PciAuditEvent {
     }
 
     public String status() {
-        if (isBlank(this.status)) {
-            return UNDEFINED;
-        }
-
-        return this.status;
+        return isBlank(status) ? UNDEFINED : status;
     }
 
     public void setStatus(String status) {
@@ -166,11 +154,7 @@ public class PciAuditEvent {
     }
 
     public String affectedResource() {
-        if (isBlank(this.affectedResource)) {
-            return UNDEFINED;
-        }
-
-        return this.affectedResource;
+        return isBlank(affectedResource) ? UNDEFINED : affectedResource;
     }
 
     public void setAffectedResource(String affectedResource) {
@@ -188,13 +172,12 @@ public class PciAuditEvent {
         }
 
         buffer.append(replaceDelimiter(userId(), delimiter, replaceDelimiter)).append(delimiter);
-        buffer.append(replaceDelimiter(eventType(), delimiter, replaceDelimiter))
-                .append(delimiter);
+        buffer.append(replaceDelimiter(eventType(), delimiter, replaceDelimiter)).append(delimiter);
         buffer.append(replaceDelimiter(date(), delimiter, replaceDelimiter)).append(delimiter);
         buffer.append(replaceDelimiter(time(), delimiter, replaceDelimiter)).append(delimiter);
         buffer.append(replaceDelimiter(status(), delimiter, replaceDelimiter)).append(delimiter);
         buffer.append(replaceDelimiter(origination(), delimiter, replaceDelimiter))
-                .append(delimiter);
+            .append(delimiter);
         buffer.append(replaceDelimiter(affectedResource(), delimiter, replaceDelimiter));
 
         return buffer;
@@ -237,6 +220,7 @@ public class PciAuditEvent {
         } catch (SocketException ex) {
             return "UNKNOWN";
         }
+
         while (interfaces.hasMoreElements()) {
             NetworkInterface ni = interfaces.nextElement();
             Enumeration<InetAddress> ee = ni.getInetAddresses();

@@ -189,10 +189,10 @@ public class IoUtil {
     }
 
     public static void writeInt(int value, byte[] dest, int destOffset) {
-        dest[destOffset++] = (byte) (value >> 24);
+        dest[destOffset++] = (byte) (        value >> 24);
         dest[destOffset++] = (byte) (0xFF & (value >> 16));
         dest[destOffset++] = (byte) (0xFF & (value >> 8));
-        dest[destOffset] = (byte) (0xFF & value);
+        dest[destOffset]   = (byte) (0xFF &  value);
     }
 
     public static int parseInt(byte[] bytes, int offset) {

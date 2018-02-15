@@ -55,11 +55,8 @@ public class LiquibaseMain {
     private Liquibase liquibase;
 
     public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile) {
-        ParamUtil.requireNonNull("dbConf", dbConf);
-        ParamUtil.requireNonBlank("changeLogFile", changeLogFile);
-
-        this.dbConf = dbConf;
-        this.changeLogFile = changeLogFile;
+        this.dbConf = ParamUtil.requireNonNull("dbConf", dbConf);
+        this.changeLogFile = ParamUtil.requireNonBlank("changeLogFile", changeLogFile);
     }
 
     public void changeLogLevel(String logLevel, String logFile) throws CommandLineParsingException {
@@ -124,8 +121,8 @@ public class LiquibaseMain {
             try {
                 database.rollback();
                 database.close();
-            } catch (Exception e2) {
-                LogFactory.getInstance().getLog().warning("problem closing connection", ex);
+            } catch (Exception ex2) {
+                LogFactory.getInstance().getLog().warning("problem closing connection", ex2);
             }
             throw ex;
         }

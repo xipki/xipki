@@ -41,8 +41,7 @@ public class DataSourceFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
     public DataSourceWrapper createDataSourceForFile(String name, String confFile,
-            PasswordResolver passwordResolver)
-            throws PasswordResolverException, IOException {
+            PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);
         FileInputStream fileIn = new FileInputStream(IoUtil.expandFilepath(confFile));
         return createDataSource(name, fileIn, passwordResolver);

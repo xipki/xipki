@@ -76,9 +76,8 @@ public abstract class DataSourceWrapper {
 
         @Override
         protected String buildNextSeqValueSql(String sequenceName) {
-            return StringUtil.concat(
-                    "UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME='",
-                    sequenceName, "'");
+            return StringUtil.concat("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 "
+                    + "WHERE SEQ_NAME='", sequenceName, "'");
         }
 
         @Override
@@ -122,8 +121,8 @@ public abstract class DataSourceWrapper {
         } // method nextSeqValue
 
         @Override
-        protected String getSqlToDropForeignKeyConstraint(String constraintName,
-                String baseTable) throws DataAccessException {
+        protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable)
+                throws DataAccessException {
             return StringUtil.concat("ALTER TABLE ", baseTable, " DROP FOREIGN KEY ",
                     constraintName);
         }
@@ -250,8 +249,8 @@ public abstract class DataSourceWrapper {
                     (coreSql.contains(" WHERE") ? " AND" : " WHERE"),
                     " ROWNUM<", Integer.toString(rows + 1));
             } else {
-                return StringUtil.concat("SELECT * FROM (SELECT ", coreSql,
-                    " ORDER BY ", orderBy, " ) WHERE ROWNUM<", Integer.toString(rows + 1));
+                return StringUtil.concat("SELECT * FROM (SELECT ", coreSql, " ORDER BY ", orderBy,
+                        " ) WHERE ROWNUM<", Integer.toString(rows + 1));
             }
         }
 
@@ -823,7 +822,6 @@ public abstract class DataSourceWrapper {
         } finally {
             releaseResources(stmt, null);
         }
-
     }
 
     public void dropSequence(String sequenceName) throws DataAccessException {
@@ -1164,9 +1162,8 @@ public abstract class DataSourceWrapper {
             return;
         }
 
-        LOG.debug(
-            "Translating SQLException: SQL state '{}', error code '{}', message [{}]; SQL was [{}]",
-            sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
+        LOG.debug("Translating SQLException: SQL state '{}', error code '{}', message [{}]; SQL "
+                + "was [{}]", sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
     }
 
     private String buildMessage(String sql, SQLException ex) {

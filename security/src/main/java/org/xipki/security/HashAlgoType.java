@@ -75,7 +75,7 @@ public enum HashAlgoType {
             map.put(type.name, type);
         }
 
-        map.put("SHA-1", SHA1);
+        map.put("SHA-1",   SHA1);
         map.put("SHA-224", SHA224);
         map.put("SHA-256", SHA256);
         map.put("SHA-384", SHA384);
