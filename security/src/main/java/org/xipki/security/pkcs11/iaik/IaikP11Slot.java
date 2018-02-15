@@ -201,52 +201,57 @@ class IaikP11Slot extends AbstractP11Slot {
             }
         }
 
-        // secret keys
-        List<SecretKey> secretKeys = getAllSecretKeyObjects();
-        for (SecretKey secKey : secretKeys) {
-            byte[] keyId = secKey.getId().getByteArrayValue();
-            if (keyId == null || keyId.length == 0) {
-                continue;
-            }
+        ConcurrentBagEntry<Session> session = borrowSession();
 
-            analyseSingleKey(secKey, ret);
-        }
-
-        // first get the list of all CA certificates
-        List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects();
-        for (X509PublicKeyCertificate p11Cert : p11Certs) {
-            P11ObjectIdentifier objId = new P11ObjectIdentifier(p11Cert.getId().getByteArrayValue(),
-                    toString(p11Cert.getLabel()));
-            ret.addCertificate(objId, parseCert(p11Cert));
-        }
-
-        List<PrivateKey> privKeys = getAllPrivateObjects();
-
-        for (PrivateKey privKey : privKeys) {
-            byte[] keyId = privKey.getId().getByteArrayValue();
-            if (keyId == null || keyId.length == 0) {
-                break;
-            }
-
-            try {
-                analyseSingleKey(privKey, ret);
-            } catch (XiSecurityException ex) {
-                LogUtil.error(LOG, ex,
-                        "XiSecurityException while initializing private key with id " + hex(keyId));
-                continue;
-            } catch (Throwable th) {
-                String label = "";
-                if (privKey.getLabel() != null) {
-                    label = new String(privKey.getLabel().getCharArrayValue());
+        try {
+            // secret keys
+            List<SecretKey> secretKeys = getAllSecretKeyObjects(session.value());
+            for (SecretKey secKey : secretKeys) {
+                byte[] keyId = secKey.getId().getByteArrayValue();
+                if (keyId == null || keyId.length == 0) {
+                    continue;
                 }
-                LOG.error(
-                        "unexpected exception while initializing private key with id " + hex(keyId)
-                        + " and label " + label, th);
-                continue;
-            }
-        }
 
-        return ret;
+                analyseSingleKey(secKey, ret);
+            }
+
+            // first get the list of all CA certificates
+            List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects(session.value());
+            for (X509PublicKeyCertificate p11Cert : p11Certs) {
+                P11ObjectIdentifier objId = new P11ObjectIdentifier(
+                        p11Cert.getId().getByteArrayValue(), toString(p11Cert.getLabel()));
+                ret.addCertificate(objId, parseCert(p11Cert));
+            }
+
+            List<PrivateKey> privKeys = getAllPrivateObjects(session.value());
+
+            for (PrivateKey privKey : privKeys) {
+                byte[] keyId = privKey.getId().getByteArrayValue();
+                if (keyId == null || keyId.length == 0) {
+                    break;
+                }
+
+                try {
+                    analyseSingleKey(session.value(), privKey, ret);
+                } catch (XiSecurityException ex) {
+                    LogUtil.error(LOG, ex, "XiSecurityException while initializing private key "
+                            + "with id " + hex(keyId));
+                    continue;
+                } catch (Throwable th) {
+                    String label = "";
+                    if (privKey.getLabel() != null) {
+                        label = new String(privKey.getLabel().getCharArrayValue());
+                    }
+                    LOG.error("unexpected exception while initializing private key with id "
+                            + hex(keyId) + " and label " + label, th);
+                    continue;
+                }
+            }
+
+            return ret;
+        } finally {
+            sessions.requite(session);
+        }
     } // method refresh
 
     @Override
@@ -283,15 +288,15 @@ class IaikP11Slot extends AbstractP11Slot {
         refreshResult.addIdentity(identity);
     }
 
-    private void analyseSingleKey(PrivateKey privKey, P11SlotRefreshResult refreshResult)
-            throws P11TokenException, XiSecurityException {
+    private void analyseSingleKey(Session session, PrivateKey privKey,
+            P11SlotRefreshResult refreshResult) throws P11TokenException, XiSecurityException {
         byte[] id = privKey.getId().getByteArrayValue();
         java.security.PublicKey pubKey = null;
         X509Cert cert = refreshResult.getCertForId(id);
         if (cert != null) {
             pubKey = cert.cert().getPublicKey();
         } else {
-            PublicKey p11PublicKey = getPublicKeyObject(id, null);
+            PublicKey p11PublicKey = getPublicKeyObject(session, id, null);
             if (p11PublicKey == null) {
                 LOG.info("neither certificate nor public key for the key (" + hex(id)
                         + " is available");
@@ -321,11 +326,6 @@ class IaikP11Slot extends AbstractP11Slot {
             LOG.debug("digest (init, digestKey, then finish)\n{}", signingKey);
         }
 
-        ConcurrentBagEntry<Session> session0 = borrowSession();
-        if (session0 == null) {
-            throw new P11TokenException("no idle session available");
-        }
-
         int digestLen;
         if (PKCS11Constants.CKM_SHA_1 == mechanism) {
             digestLen = 20;
@@ -344,6 +344,8 @@ class IaikP11Slot extends AbstractP11Slot {
         } else {
             throw new P11TokenException("unsupported mechnism " + mechanism);
         }
+
+        ConcurrentBagEntry<Session> session0 = borrowSession();
 
         try {
             Session session = session0.value();
@@ -365,23 +367,42 @@ class IaikP11Slot extends AbstractP11Slot {
         assertMechanismSupported(mechanism);
 
         int len = content.length;
-        if (len <= maxMessageSize) {
-            return singleSign(mechanism, parameters, content, identity);
-        }
-
-        Key signingKey = identity.signingKey();
-        Mechanism mechanismObj = getMechanism(mechanism, parameters);
-        if (LOG.isTraceEnabled()) {
-            LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
+        int expectedSignatureLen;
+        if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC) {
+            expectedSignatureLen = 20;
+        } else if (mechanism == PKCS11Constants.CKM_SHA224_HMAC
+                || mechanism == PKCS11Constants.CKM_SHA3_224) {
+            expectedSignatureLen = 28;
+        } else if (mechanism == PKCS11Constants.CKM_SHA256_HMAC
+                || mechanism == PKCS11Constants.CKM_SHA3_256) {
+            expectedSignatureLen = 32;
+        } else if (mechanism == PKCS11Constants.CKM_SHA384_HMAC
+                || mechanism == PKCS11Constants.CKM_SHA3_384) {
+            expectedSignatureLen = 48;
+        } else if (mechanism == PKCS11Constants.CKM_SHA512_HMAC
+                || mechanism == PKCS11Constants.CKM_SHA3_512) {
+            expectedSignatureLen = 64;
+        } else if (mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2
+                || mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2_SM3) {
+            expectedSignatureLen = 32;
+        } else {
+            expectedSignatureLen = identity.expectedSignatureLen();
         }
 
         ConcurrentBagEntry<Session> session0 = borrowSession();
-        if (session0 == null) {
-            throw new P11TokenException("no idle session available");
-        }
 
         try {
             Session session = session0.value();
+            if (len <= maxMessageSize) {
+                return singleSign(session, mechanism, parameters, content, identity);
+            }
+
+            Key signingKey = identity.signingKey();
+            Mechanism mechanismObj = getMechanism(mechanism, parameters);
+            if (LOG.isTraceEnabled()) {
+                LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
+            }
+
             session.signInit(mechanismObj, signingKey);
             for (int i = 0; i < len; i += maxMessageSize) {
                 int blockLen = Math.min(maxMessageSize, len - i);
@@ -390,27 +411,6 @@ class IaikP11Slot extends AbstractP11Slot {
                 session.signUpdate(content, i, blockLen);
             }
 
-            int expectedSignatureLen;
-            if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC) {
-                expectedSignatureLen = 20;
-            } else if (mechanism == PKCS11Constants.CKM_SHA224_HMAC
-                    || mechanism == PKCS11Constants.CKM_SHA3_224) {
-                expectedSignatureLen = 28;
-            } else if (mechanism == PKCS11Constants.CKM_SHA256_HMAC
-                    || mechanism == PKCS11Constants.CKM_SHA3_256) {
-                expectedSignatureLen = 32;
-            } else if (mechanism == PKCS11Constants.CKM_SHA384_HMAC
-                    || mechanism == PKCS11Constants.CKM_SHA3_384) {
-                expectedSignatureLen = 48;
-            } else if (mechanism == PKCS11Constants.CKM_SHA512_HMAC
-                    || mechanism == PKCS11Constants.CKM_SHA3_512) {
-                expectedSignatureLen = 64;
-            } else if (mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2
-                    || mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2_SM3) {
-                expectedSignatureLen = 32;
-            } else {
-                expectedSignatureLen = identity.expectedSignatureLen();
-            }
             return session.signFinal(expectedSignatureLen);
         } catch (TokenException ex) {
             throw new P11TokenException(ex);
@@ -419,7 +419,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private byte[] singleSign(long mechanism, P11Params parameters, byte[] content,
+    private byte[] singleSign(Session session, long mechanism, P11Params parameters, byte[] content,
             IaikP11Identity identity) throws P11TokenException {
         Key signingKey = identity.signingKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
@@ -427,22 +427,12 @@ class IaikP11Slot extends AbstractP11Slot {
             LOG.debug("sign with signing key:\n{}", signingKey);
         }
 
-        ConcurrentBagEntry<Session> session0 = borrowSession();
-        if (session0 == null) {
-            throw new P11TokenException("no idle session available");
-        }
-
         byte[] signature;
         try {
-            Session session = session0.value();
-            synchronized (session) {
-                session.signInit(mechanismObj, signingKey);
-                signature = session.sign(content);
-            }
+            session.signInit(mechanismObj, signingKey);
+            signature = session.sign(content);
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
-        } finally {
-            sessions.requite(session0);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -587,71 +577,61 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private List<PrivateKey> getAllPrivateObjects() throws P11TokenException {
-        ConcurrentBagEntry<Session> session0 = borrowSession();
-
-        try {
-            Session session = session0.value();
-            PrivateKey template = new PrivateKey();
-            List<Storage> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                return Collections.emptyList();
-            }
-
-            final int n = tmpObjects.size();
-            LOG.info("found {} private keys", n);
-
-            List<PrivateKey> privateKeys = new ArrayList<>(n);
-            for (Storage tmpObject : tmpObjects) {
-                PrivateKey privateKey = (PrivateKey) tmpObject;
-                privateKeys.add(privateKey);
-            }
-
-            return privateKeys;
-        } finally {
-            sessions.requite(session0);
+    private List<PrivateKey> getAllPrivateObjects(Session session) throws P11TokenException {
+        PrivateKey template = new PrivateKey();
+        List<Storage> tmpObjects = getObjects(session, template);
+        if (CollectionUtil.isEmpty(tmpObjects)) {
+            return Collections.emptyList();
         }
-    }
 
-    private List<SecretKey> getAllSecretKeyObjects() throws P11TokenException {
-        ConcurrentBagEntry<Session> session0 = borrowSession();
+        final int n = tmpObjects.size();
+        LOG.info("found {} private keys", n);
 
-        try {
-            Session session = session0.value();
-            SecretKey template = new SecretKey();
-            List<Storage> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                return Collections.emptyList();
-            }
-
-            final int n = tmpObjects.size();
-            LOG.info("found {} private keys", n);
-
-            List<SecretKey> keys = new ArrayList<>(n);
-            for (Storage tmpObject : tmpObjects) {
-                SecretKey key = (SecretKey) tmpObject;
-                keys.add(key);
-            }
-
-            return keys;
-        } finally {
-            sessions.requite(session0);
+        List<PrivateKey> privateKeys = new ArrayList<>(n);
+        for (Storage tmpObject : tmpObjects) {
+            PrivateKey privateKey = (PrivateKey) tmpObject;
+            privateKeys.add(privateKey);
         }
+
+        return privateKeys;
     }
 
-    private SecretKey getSecretKeyObject(byte[] keyId, char[] keyLabel) throws P11TokenException {
-        return (SecretKey) getKeyObject(new SecretKey(), keyId, keyLabel);
+    private List<SecretKey> getAllSecretKeyObjects(Session session) throws P11TokenException {
+        SecretKey template = new SecretKey();
+        List<Storage> tmpObjects = getObjects(session, template);
+        if (CollectionUtil.isEmpty(tmpObjects)) {
+            return Collections.emptyList();
+        }
+
+        final int n = tmpObjects.size();
+        LOG.info("found {} private keys", n);
+
+        List<SecretKey> keys = new ArrayList<>(n);
+        for (Storage tmpObject : tmpObjects) {
+            SecretKey key = (SecretKey) tmpObject;
+            keys.add(key);
+        }
+
+        return keys;
     }
 
-    private PrivateKey getPrivateKeyObject(byte[] keyId, char[] keyLabel) throws P11TokenException {
-        return (PrivateKey) getKeyObject(new PrivateKey(), keyId, keyLabel);
+    private SecretKey getSecretKeyObject(Session session, byte[] keyId, char[] keyLabel)
+            throws P11TokenException {
+        return (SecretKey) getKeyObject(session, new SecretKey(), keyId, keyLabel);
     }
 
-    private PublicKey getPublicKeyObject(byte[] keyId, char[] keyLabel) throws P11TokenException {
-        return (PublicKey) getKeyObject(new PublicKey(), keyId, keyLabel);
+    private PrivateKey getPrivateKeyObject(Session session, byte[] keyId, char[] keyLabel)
+            throws P11TokenException {
+        return (PrivateKey) getKeyObject(session, new PrivateKey(), keyId, keyLabel);
     }
 
-    private Key getKeyObject(Key template, byte[] keyId, char[] keyLabel) throws P11TokenException {
+    private PublicKey getPublicKeyObject(Session session, byte[] keyId, char[] keyLabel)
+            throws P11TokenException {
+        return (PublicKey) getKeyObject(session, new PublicKey(), keyId, keyLabel);
+    }
+
+    private Key getKeyObject(Session session, Key template, byte[] keyId, char[] keyLabel)
+            throws P11TokenException {
         if (keyId != null) {
             template.getId().setByteArrayValue(keyId);
         }
@@ -659,24 +639,17 @@ class IaikP11Slot extends AbstractP11Slot {
             template.getLabel().setCharArrayValue(keyLabel);
         }
 
-        ConcurrentBagEntry<Session> session0 = borrowSession();
-
-        try {
-            Session session = session0.value();
-            List<Storage> tmpObjects = getObjects(session, template, 2);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                return null;
-            }
-            int size = tmpObjects.size();
-            if (size > 1) {
-                LOG.warn("found {} public key identified by {}, use the first one", size,
-                        getDescription(keyId, keyLabel));
-            }
-
-            return (Key) tmpObjects.get(0);
-        } finally {
-            sessions.requite(session0);
+        List<Storage> tmpObjects = getObjects(session, template, 2);
+        if (CollectionUtil.isEmpty(tmpObjects)) {
+            return null;
         }
+        int size = tmpObjects.size();
+        if (size > 1) {
+            LOG.warn("found {} public key identified by {}, use the first one", size,
+                    getDescription(keyId, keyLabel));
+        }
+
+        return (Key) tmpObjects.get(0);
     }
 
     private static boolean checkSessionLoggedIn(Session session) throws P11TokenException {
@@ -826,15 +799,10 @@ class IaikP11Slot extends AbstractP11Slot {
         this.writableSessionInUse = false;
     }
 
-    private List<X509PublicKeyCertificate> getAllCertificateObjects() throws P11TokenException {
+    private List<X509PublicKeyCertificate> getAllCertificateObjects(Session session)
+            throws P11TokenException {
         X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-        ConcurrentBagEntry<Session> session = borrowSession();
-        List<Storage> tmpObjects;
-        try {
-            tmpObjects = getObjects(session.value(), template);
-        } finally {
-            sessions.requite(session);
-        }
+        List<Storage> tmpObjects = getObjects(session, template);
 
         List<X509PublicKeyCertificate> certs = new ArrayList<>(tmpObjects.size());
         for (PKCS11Object tmpObject : tmpObjects) {
@@ -891,15 +859,16 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
-        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(objectId.id(),
-                objectId.labelChars());
-        if (existingCerts == null || existingCerts.length == 0) {
-            LOG.warn("could not find certificates " + objectId);
-            return;
-        }
-
         Session session = borrowWritableSession();
+
         try {
+            X509PublicKeyCertificate[] existingCerts = getCertificateObjects(session, objectId.id(),
+                    objectId.labelChars());
+            if (existingCerts == null || existingCerts.length == 0) {
+                LOG.warn("could not find certificates " + objectId);
+                return;
+            }
+
             for (X509PublicKeyCertificate cert : existingCerts) {
                 session.destroyObject(cert);
             }
@@ -993,7 +962,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
+    protected P11Identity importSecretKey0(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control) throws P11TokenException {
         ValuedSecretKey template = new ValuedSecretKey(keyType);
         template.getToken().setBooleanValue(true);
@@ -1134,24 +1103,24 @@ class IaikP11Slot extends AbstractP11Slot {
                     throw new P11TokenException("could not generate keypair "
                             + Pkcs11Functions.mechanismCodeToString(mech), ex);
                 }
+
+                P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+                P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
+                java.security.PublicKey jcePublicKey;
+                try {
+                    jcePublicKey = generatePublicKey(keypair.getPublicKey());
+                } catch (XiSecurityException ex) {
+                    throw new P11TokenException("could not generate public key " + objId, ex);
+                }
+
+                PrivateKey privateKey2 = getPrivateKeyObject(session, id, label.toCharArray());
+                if (privateKey2 == null) {
+                    throw new P11TokenException("could not read the generated private key");
+                }
+                return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
             } finally {
                 returnWritableSession(session);
             }
-
-            P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
-            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
-            java.security.PublicKey jcePublicKey;
-            try {
-                jcePublicKey = generatePublicKey(keypair.getPublicKey());
-            } catch (XiSecurityException ex) {
-                throw new P11TokenException("could not generate public key " + objId, ex);
-            }
-
-            PrivateKey privateKey2 = getPrivateKeyObject(id, label.toCharArray());
-            if (privateKey2 == null) {
-                throw new P11TokenException("could not read the generated private key");
-            }
-            return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
         } catch (P11TokenException | RuntimeException ex) {
             try {
                 removeObjects(id, label);
@@ -1227,8 +1196,8 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private X509PublicKeyCertificate[] getCertificateObjects(byte[] keyId, char[] keyLabel)
-            throws P11TokenException {
+    private X509PublicKeyCertificate[] getCertificateObjects(Session session, byte[] keyId,
+            char[] keyLabel) throws P11TokenException {
         X509PublicKeyCertificate template = new X509PublicKeyCertificate();
         if (keyId != null) {
             template.getId().setByteArrayValue(keyId);
@@ -1237,13 +1206,7 @@ class IaikP11Slot extends AbstractP11Slot {
             template.getLabel().setCharArrayValue(keyLabel);
         }
 
-        List<Storage> tmpObjects;
-        ConcurrentBagEntry<Session> session = borrowSession();
-        try {
-            tmpObjects = getObjects(session.value(), template);
-        } finally {
-            sessions.requite(session);
-        }
+        List<Storage> tmpObjects = getObjects(session, template);
 
         if (CollectionUtil.isEmpty(tmpObjects)) {
             LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
@@ -1264,7 +1227,7 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             byte[] id = objectId.id();
             char[] label = objectId.labelChars();
-            SecretKey secretKey = getSecretKeyObject(id, label);
+            SecretKey secretKey = getSecretKeyObject(session, id, label);
             if (secretKey != null) {
                 try {
                     session.destroyObject(secretKey);
@@ -1275,7 +1238,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 }
             }
 
-            PrivateKey privKey = getPrivateKeyObject(id, label);
+            PrivateKey privKey = getPrivateKeyObject(session, id, label);
             if (privKey != null) {
                 try {
                     session.destroyObject(privKey);
@@ -1286,7 +1249,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 }
             }
 
-            PublicKey pubKey = getPublicKeyObject(id, label);
+            PublicKey pubKey = getPublicKeyObject(session, id, label);
             if (pubKey != null) {
                 try {
                     session.destroyObject(pubKey);
@@ -1297,7 +1260,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 }
             }
 
-            X509PublicKeyCertificate[] certs = getCertificateObjects(id, label);
+            X509PublicKeyCertificate[] certs = getCertificateObjects(session, id, label);
             if (certs != null && certs.length > 0) {
                 for (int i = 0; i < certs.length; i++) {
                     try {
