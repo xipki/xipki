@@ -707,7 +707,8 @@ class IaikP11Slot extends AbstractP11Slot {
         } finally {
             try {
                 session.findObjectsFinal();
-            } catch (Exception ex) { // CHECKSTYLE:SKIP
+            } catch (Exception ex) {
+                LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
             }
         }
 
@@ -1297,19 +1298,33 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             session.findObjectsInit(key);
             objects = session.findObjects(1);
-            session.findObjectsFinal();
             if (objects.length > 0) {
                 return true;
             }
-
-            X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
-            cert.getId().setByteArrayValue(keyId);
-
-            session.findObjectsInit(cert);
-            objects = session.findObjects(1);
-            session.findObjectsFinal();
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
+        } finally {
+            try {
+                session.findObjectsFinal();
+            } catch (TokenException ex) {
+                LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
+            }
+        }
+
+        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+        cert.getId().setByteArrayValue(keyId);
+
+        try {
+            session.findObjectsInit(cert);
+            objects = session.findObjects(1);
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+        } finally {
+            try {
+                session.findObjectsFinal();
+            } catch (TokenException ex) {
+                LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
+            }
         }
 
         return objects.length > 0;
@@ -1324,19 +1339,33 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             session.findObjectsInit(key);
             objects = session.findObjects(1);
-            session.findObjectsFinal();
             if (objects.length > 0) {
                 return true;
             }
-
-            X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
-            cert.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-            session.findObjectsInit(cert);
-            objects = session.findObjects(1);
-            session.findObjectsFinal();
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
+        } finally {
+            try {
+                session.findObjectsFinal();
+            } catch (TokenException ex) {
+                LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
+            }
+        }
+
+        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+        cert.getLabel().setCharArrayValue(keyLabel.toCharArray());
+
+        try {
+            session.findObjectsInit(cert);
+            objects = session.findObjects(1);
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+        } finally {
+            try {
+                session.findObjectsFinal();
+            } catch (TokenException ex) {
+                LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
+            }
         }
 
         return objects.length > 0;
