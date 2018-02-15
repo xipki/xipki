@@ -5,8 +5,8 @@
     <module name="default">
       <nativeLibraries>
         <nativeLibrary>
-          <path>/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so</path>
-          <!--path>/usr/local/lib/softhsm/libsofthsm2.so</path-->
+          <!--path>/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so</path-->
+          <path>/usr/local/lib/softhsm/libsofthsm2.so</path>
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>
