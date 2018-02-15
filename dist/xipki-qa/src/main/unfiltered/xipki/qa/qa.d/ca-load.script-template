@@ -37,7 +37,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 }
 
 echo "#################################################################"
-echo "#                           Load rootca.xml                        #"
+echo "#                         Load rootca.xml                       #"
 echo "#################################################################"
 
 if { $TOKEN_TYPE equals "PKCS11" } {
