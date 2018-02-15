@@ -352,8 +352,8 @@ class IaikP11Slot extends AbstractP11Slot {
             byte[] digest = new byte[digestLen];
             session.digestFinal(digest, 0, digestLen);
             return digest;
-        } catch (TokenException e) {
-            throw new P11TokenException(e);
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex);
         } finally {
             sessions.requite(session0);
         }
@@ -412,8 +412,8 @@ class IaikP11Slot extends AbstractP11Slot {
                 expectedSignatureLen = identity.expectedSignatureLen();
             }
             return session.signFinal(expectedSignatureLen);
-        } catch (TokenException e) {
-            throw new P11TokenException(e);
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex);
         } finally {
             sessions.requite(session0);
         }
@@ -652,16 +652,16 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private Key getKeyObject(Key template, byte[] keyId, char[] keyLabel) throws P11TokenException {
+        if (keyId != null) {
+            template.getId().setByteArrayValue(keyId);
+        }
+        if (keyLabel != null) {
+            template.getLabel().setCharArrayValue(keyLabel);
+        }
+
         ConcurrentBagEntry<Session> session0 = borrowSession();
 
         try {
-            if (keyId != null) {
-                template.getId().setByteArrayValue(keyId);
-            }
-            if (keyLabel != null) {
-                template.getLabel().setCharArrayValue(keyLabel);
-            }
-
             Session session = session0.value();
             List<Storage> tmpObjects = getObjects(session, template, 2);
             if (CollectionUtil.isEmpty(tmpObjects)) {
