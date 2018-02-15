@@ -43,7 +43,7 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
-import org.xipki.security.pkcs11.proxy.msg.Asn1CreateSecretKeyParams;
+import org.xipki.security.pkcs11.proxy.msg.Asn1ImportSecretKeyParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1EntityIdAndCert;
 import org.xipki.security.pkcs11.proxy.msg.Asn1GenDSAKeypairParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1GenECKeypairParams;
@@ -207,11 +207,11 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
+    protected P11Identity importSecretKey0(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control) throws P11TokenException {
-        Asn1CreateSecretKeyParams asn1 = new Asn1CreateSecretKeyParams(
+        Asn1ImportSecretKeyParams asn1 = new Asn1ImportSecretKeyParams(
                 slotId, label, control, keyType, keyValue);
-        byte[] resp = module.send(P11ProxyConstants.ACTION_CREATE_SECRET_KEY, asn1);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_IMPORT_SECRET_KEY, asn1);
         return parseGenerateSecretKeyResult(resp);
     }
 

@@ -253,7 +253,7 @@ public interface P11Slot {
             P11NewKeyControl control) throws P11TokenException;
 
     /**
-     * Creates secret key object in the PKCS#11 token. The key itself will not be generated
+     * Imports secret key object in the PKCS#11 token. The key itself will not be generated
      * within the PKCS#11 token.
      *
      * @param keyType
@@ -268,7 +268,7 @@ public interface P11Slot {
      * @throws P11TokenException
      *         if PKCS#11 token exception occurs.
      */
-    P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, String label,
+    P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control) throws P11TokenException;
 
     /**

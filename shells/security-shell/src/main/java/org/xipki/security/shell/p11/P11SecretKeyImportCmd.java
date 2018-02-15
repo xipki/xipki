@@ -107,7 +107,7 @@ public class P11SecretKeyImportCmd extends P11KeyGenAction {
         }
 
         P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.createSecretKey(p11KeyType, keyValue, label, getControl());
+        P11ObjectIdentifier objId = slot.importSecretKey(p11KeyType, keyValue, label, getControl());
         println("imported " + keyType + " key " + objId);
         return null;
     }

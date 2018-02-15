@@ -82,7 +82,7 @@ public class P11ProxyConstants {
 
     public static final short ACTION_GEN_SECRET_KEY    = 0x0135;
 
-    public static final short ACTION_CREATE_SECRET_KEY = 0x0136;
+    public static final short ACTION_IMPORT_SECRET_KEY = 0x0136;
 
     public static final short ACTION_ADD_CERT          = 0x0140;
 
@@ -116,23 +116,28 @@ public class P11ProxyConstants {
 
         // action
         actionMap = new HashMap<>();
-        actionMap.put(ACTION_ADD_CERT,         "ACTION_ADD_CERT");
-        actionMap.put(ACTION_GEN_KEYPAIR_DSA,  "ACTION_GEN_KEYPAIR_DSA");
-        actionMap.put(ACTION_GEN_KEYPAIR_EC,   "ACTION_GEN_KEYPAIR_EC");
-        actionMap.put(ACTION_GEN_KEYPAIR_RSA,  "ACTION_GEN_KEYPAIR_RSA");
-        actionMap.put(ACTION_GET_CERT,         "ACTION_GET_CERT");
-        actionMap.put(ACTION_GET_CERT_IDS,     "ACTION_GET_CERT_IDS");
-        actionMap.put(ACTION_GET_IDENTITY_IDS, "ACTION_GET_IDENTITY_IDS");
-        actionMap.put(ACTION_GET_MECHANISMS,   "ACTION_GET_MECHANISMS");
-        actionMap.put(ACTION_GET_PUBLICKEY,    "ACTION_GET_PUBLICKEY");
-        actionMap.put(ACTION_GET_SERVER_CAPS,  "ACTION_GET_SERVER_CAPS");
-        actionMap.put(ACTION_GET_SLOT_IDS,     "ACTION_GET_SLOT_IDS");
-        actionMap.put(ACTION_NOPE,             "ACTION_NOPE");
-        actionMap.put(ACTION_REMOVE_CERTS,     "ACTION_REMOVE_CERTS");
-        actionMap.put(ACTION_REMOVE_IDENTITY,  "ACTION_REMOVE_IDENTITY");
-        actionMap.put(ACTION_REMOVE_OBJECTS,   "ACTION_REMOVE_OBJECTS");
-        actionMap.put(ACTION_SIGN,             "ACTION_SIGN");
-        actionMap.put(ACTION_UPDATE_CERT,      "ACTION_UPDATE_CERT");
+        actionMap.put(ACTION_NOPE,              "ACTION_NOPE");
+        actionMap.put(ACTION_GET_SERVER_CAPS,   "ACTION_GET_SERVER_CAPS");
+        actionMap.put(ACTION_GET_PUBLICKEY,     "ACTION_GET_PUBLICKEY");
+        actionMap.put(ACTION_GET_CERT,          "ACTION_GET_CERT");
+        actionMap.put(ACTION_GET_SLOT_IDS,      "ACTION_GET_SLOT_IDS");
+        actionMap.put(ACTION_GET_IDENTITY_IDS,  "ACTION_GET_IDENTITY_IDS");
+        actionMap.put(ACTION_GET_CERT_IDS,      "ACTION_GET_CERT_IDS");
+        actionMap.put(ACTION_GET_MECHANISMS,    "ACTION_GET_MECHANISMS");
+        actionMap.put(ACTION_SIGN,              "ACTION_SIGN");
+        actionMap.put(ACTION_GEN_KEYPAIR_RSA,   "ACTION_GEN_KEYPAIR_RSA");
+        actionMap.put(ACTION_GEN_KEYPAIR_DSA,   "ACTION_GEN_KEYPAIR_DSA");
+        actionMap.put(ACTION_GEN_KEYPAIR_EC,    "ACTION_GEN_KEYPAIR_EC");
+        actionMap.put(ACTION_DIGEST_SECRETKEY,  "ACTION_DIGEST_SECRETKEY");
+        actionMap.put(ACTION_GEN_SECRET_KEY,    "ACTION_GEN_SECRET_KEY");
+        actionMap.put(ACTION_IMPORT_SECRET_KEY, "ACTION_IMPORT_SECRET_KEY");
+        actionMap.put(ACTION_ADD_CERT,          "ACTION_ADD_CERT");
+        actionMap.put(ACTION_REMOVE_IDENTITY,   "ACTION_REMOVE_IDENTITY");
+        actionMap.put(ACTION_REMOVE_CERTS,      "ACTION_REMOVE_CERTS");
+        actionMap.put(ACTION_UPDATE_CERT,       "ACTION_UPDATE_CERT");
+        actionMap.put(ACTION_REMOVE_OBJECTS,    "ACTION_REMOVE_OBJECTS");
+        actionMap.put(ACTION_GEN_KEYPAIR_SM2,   "ACTION_GEN_KEYPAIR_SM2");
+
     }
 
     private P11ProxyConstants() {

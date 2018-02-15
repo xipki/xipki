@@ -47,7 +47,7 @@ public class P11HMACSignLoadTest extends P11SignLoadTest {
         int keysize = P12HMACSignLoadTest.getKeysize(signatureAlgorithm);
         byte[] keyBytes = new byte[keysize / 8];
         new SecureRandom().nextBytes(keyBytes);
-        return slot.createSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
+        return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
                 "loadtest-" + System.currentTimeMillis(),
                 getNewKeyControl());
     }

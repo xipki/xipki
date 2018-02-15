@@ -37,7 +37,7 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 /**
  *
  * <pre>
- * CreateSecretKeyParams ::= SEQUENCE {
+ * ImportSecretKeyParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
  *     label                UTF8STRING,
  *     control              NewKeyControl,
@@ -50,7 +50,7 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
  */
 
 // CHECKSTYLE:SKIP
-public class Asn1CreateSecretKeyParams extends ASN1Object {
+public class Asn1ImportSecretKeyParams extends ASN1Object {
 
     private final P11SlotIdentifier slotId;
 
@@ -62,7 +62,7 @@ public class Asn1CreateSecretKeyParams extends ASN1Object {
 
     private final byte[] keyValue;
 
-    public Asn1CreateSecretKeyParams(P11SlotIdentifier slotId, String label,
+    public Asn1ImportSecretKeyParams(P11SlotIdentifier slotId, String label,
             P11NewKeyControl control, long keyType, byte[] keyValue) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
@@ -71,7 +71,7 @@ public class Asn1CreateSecretKeyParams extends ASN1Object {
         this.keyValue = ParamUtil.requireNonNull("keyValue", keyValue);
     }
 
-    private Asn1CreateSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Asn1ImportSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
@@ -81,14 +81,14 @@ public class Asn1CreateSecretKeyParams extends ASN1Object {
         keyValue = ASN1OctetString.getInstance(seq.getObjectAt(idx++)).getOctets();
     }
 
-    public static Asn1CreateSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1CreateSecretKeyParams) {
-            return (Asn1CreateSecretKeyParams) obj;
+    public static Asn1ImportSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1ImportSecretKeyParams) {
+            return (Asn1ImportSecretKeyParams) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1CreateSecretKeyParams((ASN1Sequence) obj);
+                return new Asn1ImportSecretKeyParams((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {

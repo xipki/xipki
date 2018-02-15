@@ -183,7 +183,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             String label, P11NewKeyControl control) throws P11TokenException;
 
     /**
-     * Creates secret key object in the PKCS#11 token. The key itself will not be generated
+     * Imports secret key object in the PKCS#11 token. The key itself will not be generated
      * within the PKCS#11 token.
      *
      * @param keyType
@@ -198,7 +198,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      * @throws P11TokenException
      *         if PKCS#11 token exception occurs.
      */
-    protected abstract P11Identity createSecretKey0(long keyType, byte[] keyValue,
+    protected abstract P11Identity importSecretKey0(long keyType, byte[] keyValue,
             String label, P11NewKeyControl control) throws P11TokenException;
 
     /**
@@ -685,9 +685,8 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
-    public P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, String label,
-            P11NewKeyControl control)
-            throws P11TokenException {
+    public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue, String label,
+            P11NewKeyControl control) throws P11TokenException {
         ParamUtil.requireNonBlank("label", label);
         assertWritable("createSecretKey");
         if (getObjectIdForLabel(label) != null) {
@@ -695,7 +694,7 @@ public abstract class AbstractP11Slot implements P11Slot {
                     + " already exists");
         }
 
-        P11Identity identity = createSecretKey0(keyType, keyValue, label, control);
+        P11Identity identity = importSecretKey0(keyType, keyValue, label, control);
         addIdentity(identity);
 
         P11ObjectIdentifier objId = identity.identityId().objectId();

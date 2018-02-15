@@ -837,7 +837,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
+    protected P11Identity importSecretKey0(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control) throws P11TokenException {
         SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
         return saveP11Entity(key, label);

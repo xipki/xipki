@@ -101,7 +101,7 @@ public class P11SecretKeyGenCmd extends P11KeyGenAction {
             byte[] keyValue = new byte[keysize / 8];
             securityFactory.getRandom4Key().nextBytes(keyValue);
 
-            objId = slot.createSecretKey(p11KeyType, keyValue, label, control);
+            objId = slot.importSecretKey(p11KeyType, keyValue, label, control);
             Arrays.fill(keyValue, (byte) 0); // clear the memory
             println("generated in memory and imported " + keyType + " key " + objId);
         }
