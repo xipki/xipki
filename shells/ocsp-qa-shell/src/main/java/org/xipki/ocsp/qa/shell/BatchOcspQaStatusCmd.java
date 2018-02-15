@@ -178,20 +178,37 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
         println("The result is saved in the folder " + outDir.getPath());
 
-        if (saveReq || saveResp) {
-            String msg = "Commands\n"
-                + "  1. Verify and print the text form of request and response:\n"
-                + "    openssl ocsp -text "
-                +     (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify")
-                +     " -reqin <request file> -respin <response file>\n"
-                + "  2. Print the text form of request:\n"
-                + "    openssl ocsp -text -reqin <request file>\n"
-                + "  3. Verify and print the text form of response:\n"
-                + "    openssl ocsp -text "
-                +     (respIssuerFile != null ? "-CAfile responder_issuer.pem" : "-no_cert_verify"
-                +     " -respin <response file>");
+        String linuxIssuer = (respIssuerFile != null)
+                ? "-CAfile ../../responder_issuer.pem" : "-no_cert_verify";
 
-            IoUtil.save(new File(outDir, "README.txt"), msg.getBytes());
+        String winIssuer = (respIssuerFile != null)
+                ? "-CAfile ..\\..\\responder_issuer.pem" : "-no_cert_verify";
+
+        String linuxMsg = "openssl ocsp -text ";
+
+        String winMsg = "openssl ocsp -text ";
+
+        String shellFilePath = null;
+
+        if (saveReq && saveResp) {
+            linuxMsg += linuxIssuer + " -reqin request.der -respin response.der";
+            winMsg += winIssuer + " -reqin request.der -respin response.der";
+            shellFilePath = new File(outDir, "verify-req-resp").getPath();
+        } else if (saveReq) {
+            linuxMsg += "-reqin request.der\n";
+            winMsg += "-reqin request.der\n";
+            shellFilePath = new File(outDir, "verify-req").getPath();
+        } else if (saveResp) {
+            linuxMsg += linuxIssuer + " -respin response.der\n";
+            winMsg += winIssuer + " -respin response.der\n";
+            shellFilePath = new File(outDir, "verify-resp").getPath();
+        }
+
+        if (shellFilePath != null) {
+            File linuxShellFile = new File(shellFilePath + ".sh");
+            IoUtil.save(linuxShellFile, ("#!/bin/sh\n" + linuxMsg).getBytes());
+            IoUtil.save(shellFilePath + ".bat", ("@echo off\r\n" + winMsg).getBytes());
+            linuxShellFile.setExecutable(true);
         }
 
         X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
