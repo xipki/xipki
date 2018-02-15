@@ -52,12 +52,7 @@ public abstract class XiAction implements Action {
 
     @Override
     public Object execute() throws Exception {
-        try {
-            return execute0();
-        } catch (Exception ex) {
-            LogUtil.error(LOG, ex, "Command ERROR");
-            throw new Exception(ex.getClass().getName() + ": " + ex.getMessage());
-        }
+        return execute0();
     }
 
     protected boolean isTrue(Boolean bo) {
