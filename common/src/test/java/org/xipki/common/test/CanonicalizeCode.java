@@ -27,8 +27,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
@@ -42,6 +44,11 @@ public class CanonicalizeCode {
 
     private static final List<byte[]> headerLines = new ArrayList<>(20);
 
+    private static final Set<String> textFileExtensions =
+            new HashSet<>(Arrays.asList("txt", "xml", "xsd", "cfg", "properties",
+                    "script", "xml-template", "script-template", "jxb", "info",
+                    "properties-db2", "properties-h2", "properties-hsqldb", "properties-mariadb",
+                    "properties-mysql", "properties-pgsql", "properties-oracle"));
     private static Throwable initializationError;
 
     private final String baseDir;
@@ -116,6 +123,8 @@ public class CanonicalizeCode {
 
                 if ("java".equals(extension)) {
                     canonicalizeFile(file);
+                } else if (textFileExtensions.contains(extension)) {
+                    canonicalizeTextFile(file);
                 }
             }
         }
@@ -187,6 +196,32 @@ public class CanonicalizeCode {
             System.out.println(file.getPath().substring(baseDirLen));
         }
     } // method canonicalizeFile
+
+    private void canonicalizeTextFile(File file) throws Exception {
+        byte[] newLine = detectNewline(file);
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String canonicalizedLine = canonicalizeTextLine(line);
+                writeLine(writer, newLine, canonicalizedLine);
+            } // end while
+        } finally {
+            writer.close();
+            reader.close();
+        }
+
+        byte[] oldBytes = IoUtil.read(file);
+        byte[] newBytes = writer.toByteArray();
+        if (!Arrays.equals(oldBytes, newBytes)) {
+            File newFile = new File(file.getPath() + "-new");
+            IoUtil.save(file, newBytes);
+            newFile.renameTo(file);
+            System.out.println(file.getPath().substring(baseDirLen));
+        }
+    } // method canonicalizeNonJavaFile
 
     private void checkWarnings() throws Exception {
         checkWarningsInDir(new File(baseDir), true);
@@ -314,6 +349,51 @@ public class CanonicalizeCode {
 
         return ret;
     } // end canonicalizeLine
+
+    /**
+     * replace tab by 4 spaces, delete white spaces at the end.
+     */
+    private static String canonicalizeTextLine(String line) {
+        if (line.trim().startsWith("//")) {
+            // comments
+            String nline = line.replace("\t", "    ");
+            return removeTrailingSpaces(nline);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int len = line.length();
+
+        int lastNonSpaceCharIndex = 0;
+        int index = 0;
+        for (int i = 0; i < len; i++) {
+            char ch = line.charAt(i);
+            if (ch == '\t') {
+                sb.append("    ");
+                index += 4;
+            } else if (ch == ' ') {
+                sb.append(ch);
+                index++;
+            } else {
+                sb.append(ch);
+                index++;
+                lastNonSpaceCharIndex = index;
+            }
+        }
+
+        int numSpacesAtEnd = sb.length() - lastNonSpaceCharIndex;
+        if (numSpacesAtEnd > 0) {
+            sb.delete(lastNonSpaceCharIndex, sb.length());
+        }
+
+        String ret = sb.toString();
+        if (ret.startsWith("    throws ")) {
+            ret = "        " + ret;
+        } else if (ret.startsWith("        throws ")) {
+            ret = "    " + ret;
+        }
+
+        return ret;
+    } // end canonicalizeNonJavaLine
 
     private static String removeTrailingSpaces(String line) {
         final int n = line.length();
