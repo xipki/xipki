@@ -253,7 +253,12 @@ public class StringUtil {
     }
 
     public static String concatObjects(Object o1, Object... objs) {
-        return concatObjectsCap(16, o1, objs);
+        StringBuilder sb = new StringBuilder();
+        sb.append(o1);
+        for (Object obj : objs) {
+            sb.append(obj);
+        }
+        return sb.toString();
     }
 
     public static String concatObjectsCap(int cap, Object o1, Object... objs) {

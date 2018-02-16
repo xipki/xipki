@@ -65,11 +65,11 @@ public class IaikP11Module extends AbstractP11Module {
         try {
             Info info = module.getInfo();
             this.description = StringUtil.concatObjects("PKCS#11 IAIK",
-                    "\n\tPath", moduleConf.nativeLibrary(),
-                    "\n\tCryptokiVersion: ", info.getCryptokiVersion(),
+                    "\n\tPath: ", moduleConf.nativeLibrary(),
+                    "\n\tCryptoki Version: ", info.getCryptokiVersion(),
                     "\n\tManufacturerID: ", info.getManufacturerID(),
-                    "\n\tLibraryDescription: ", info.getLibraryDescription(),
-                    "\n\tLibraryVersion: ", info.getLibraryVersion());
+                    "\n\tLibrary Description: ", info.getLibraryDescription(),
+                    "\n\tLibrary Version: ", info.getLibraryVersion());
 
         } catch (TokenException ex) {
             this.description = StringUtil.concatObjects("PKCS#11 IAIK",
