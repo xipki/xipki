@@ -146,7 +146,7 @@
               <repository>${output.directory}/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.p11proxy/features/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>              
+                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>aries-blueprint</feature>
