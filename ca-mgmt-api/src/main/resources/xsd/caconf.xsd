@@ -18,7 +18,7 @@
                 <xs:documentation>The element name specifies the property name, the the element
                 value specifies the property value. The property propname can be referenced by
                 ${propname}.
-                
+
                 Property baseDir is reserved which points to the parent directory
                 of the configuration file</xs:documentation>
                 </xs:annotation>
@@ -178,7 +178,7 @@
       <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0">
         <xs:annotation>
-          <xs:documentation>If genSelfIssued is preset, only choice file is allowed and 
+          <xs:documentation>If genSelfIssued is preset, only choice file is allowed and
           it specifies the location to save the new self-issued CA certificate. Otherwise it
           specifies the CA certificate</xs:documentation>
         </xs:annotation>

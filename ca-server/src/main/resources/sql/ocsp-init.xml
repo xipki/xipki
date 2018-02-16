@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- 
+<!--
  Maximal column size: 4k
   - DB2: PAGESIZE 4 k
 -->
@@ -57,7 +57,7 @@
           remarks="revocation reason"/>
       <column name="RT"  type="BIGINT"
           remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="RIT" type="BIGINT" 
+      <column name="RIT" type="BIGINT"
           remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>

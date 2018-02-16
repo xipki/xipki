@@ -15,5 +15,5 @@
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
   </bean>
-  <service ref="qaSystemManager" interface="org.xipki.ca.qa.QaSystemManager"/>  
+  <service ref="qaSystemManager" interface="org.xipki.ca.qa.QaSystemManager"/>
 </blueprint>

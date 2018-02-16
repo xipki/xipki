@@ -35,7 +35,7 @@ xi:jscep-certpoll \
   --password 1234 \
   --csr output/jscep-ocsp1.csr \
   --out output/jscep-ocsp1-certpoll.der
-  
+
 ## Get Cert
 
 SERIAL = $(xi:cert-info --serial --hex --in output/jscep-ocsp1.der)
@@ -64,8 +64,8 @@ xi:jscep-getcrl \
   --p12 output/jscep-ocsp1.p12 \
   --password 1234 \
   --out output/subcawithcrl1-jscep.crl
- 
-## Renewal with same CommonName 
+
+## Renewal with same CommonName
 
 xi:csr-p12 \
   --hash $STDHASH \
@@ -91,7 +91,7 @@ xi:update-cert-p12 \
   --ca-cert output/subcawithcrl1.der \
   --ca-cert output/rootca1.der
 
-## Renewal with different CommonName 
+## Renewal with different CommonName
 
 xi:csr-p12 \
   --hash $STDHASH \

@@ -199,7 +199,7 @@ xiqa:qa-ocsp-status \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.der
- 
+
 ## POST, SIGNED
 echo "QA: Good (POST, SIGNED, DB)"
 xiqa:qa-ocsp-status \
@@ -254,7 +254,7 @@ xiqa:qa-ocsp-status \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/rootca1.der
- 
+
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
 xiqa:qa-ocsp-status \
   --issuer output/subcawithcrl1.der \
@@ -264,7 +264,7 @@ xiqa:qa-ocsp-status \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/rootca1.der
- 
+
 echo "QA: Good (POST, SIGNED, CRL)"
 xiqa:qa-ocsp-status \
   --issuer output/subcawithcrl1.der \

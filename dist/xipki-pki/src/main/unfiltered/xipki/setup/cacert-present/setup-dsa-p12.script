@@ -31,7 +31,7 @@ ca:load-conf --conf-file xipki/setup/cacert-present/ca-conf.xml
 
 echo "# add user"
 ca:user-add --name user1 --password password1
-  
+
 ca:causer-add --user user1 --ca myca1 --profile all --permission all
 
 echo "create initial CRL"

@@ -48,7 +48,7 @@
           <xs:documentation>
             Format of the notBefore field.
               current: current time
-              midnight: mid night, namely 00:00:00 UTC 
+              midnight: mid night, namely 00:00:00 UTC
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -57,7 +57,7 @@
       <xs:element name="specialBehavior" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            some certificate profiles must be processed specially. Currently 
+            some certificate profiles must be processed specially. Currently
             defined special behavior is gematik_gSMC_K.
           </xs:documentation>
         </xs:annotation>
@@ -159,7 +159,7 @@
       <xs:enumeration value="bmpString"/>
       <xs:enumeration value="ia5String"/>
     </xs:restriction>
-  </xs:simpleType>  
+  </xs:simpleType>
   <xs:complexType name="extensionsType">
     <xs:sequence>
       <xs:element name="subjectToSubjectAltNames" type="subjectToSubjectAltNamesType" minOccurs="0">
@@ -313,7 +313,7 @@
     <xs:complexContent>
       <xs:extension base="anyType"/>
     </xs:complexContent>
-  </xs:complexType>  
+  </xs:complexType>
   <xs:element name="basicConstraints">
     <xs:complexType>
       <xs:all>
@@ -524,7 +524,7 @@
   <xs:complexType name="qcStatementType">
     <xs:sequence>
       <xs:element name="statementId" type="oidWithDescType"/>
-      <xs:element name="statementValue" type="qcStatementValueType" minOccurs="0"/> 
+      <xs:element name="statementValue" type="qcStatementValueType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="qcStatementValueType">
@@ -612,7 +612,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:complexType name="base64BinaryWithDescType">
     <xs:simpleContent>
       <xs:extension base="xs:base64Binary">
@@ -624,7 +624,7 @@
   <xs:complexType name="range2Type">
     <xs:attribute name="min" type="xs:int" use="required"/>
     <xs:attribute name="max" type="xs:int" use="required"/>
-  </xs:complexType>  
+  </xs:complexType>
   <xs:complexType name="constantValueType">
     <xs:simpleContent>
       <xs:extension base="xs:base64Binary">

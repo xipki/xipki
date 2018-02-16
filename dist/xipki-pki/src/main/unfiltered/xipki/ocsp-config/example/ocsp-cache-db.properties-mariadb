@@ -11,10 +11,10 @@
 
 ################## MySQL/MariaDB via MariaDB Connector #################
 
-dataSourceClassName = org.mariadb.jdbc.MariaDbDataSource 
+dataSourceClassName = org.mariadb.jdbc.MariaDbDataSource
 
 # :capital_abcd:jdbcUrl
-jdbcUrl = 
+jdbcUrl =
 
 # choice 1
 dataSource.serverName = 127.0.0.1

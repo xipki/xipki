@@ -96,7 +96,7 @@
 # The optional file ${crl.file}.revocation contains the revocation information of the CA itself.
 #
 # Just create the file ${crl.file}.UPDATEME to tell responder to update the CRL.
-# 
+#
 # required
 crl.file = output/subcawithcrl1.crl
 
@@ -128,7 +128,7 @@ certs.dir = output
       <includeArchiveCutoff>false</includeArchiveCutoff>
       <includeCrlID>true</includeCrlID>
     </store>
-  </stores>  
+  </stores>
   <!-- requestOptions -->
   <requestOptions>
     <requestOption name="request1">

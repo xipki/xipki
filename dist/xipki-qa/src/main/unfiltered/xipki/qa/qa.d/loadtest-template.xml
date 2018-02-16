@@ -5,7 +5,7 @@
   <enrollCert>
     <certprofile>certificate profile name</certprofile>
     <subject>subject DN</subject>
-    <randomDN>RDN name to be attended with random number, valid values are 
+    <randomDN>RDN name to be attended with random number, valid values are
        NONE, GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN</randomDN>
     <rsaKey modulusLength="2048"/>
   </enrollCert>

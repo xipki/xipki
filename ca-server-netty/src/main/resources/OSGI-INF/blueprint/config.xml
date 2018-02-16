@@ -39,7 +39,7 @@
       <entry key="alias" value="/scep"/>
     </service-properties>
   </service>
-  
+
   <!-- Health servlet -->
   <bean id="healthServlet" class="org.xipki.ca.server.netty.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>

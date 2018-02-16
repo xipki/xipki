@@ -10,7 +10,7 @@
   <reference-list id="certprofileFactories"
        interface="org.xipki.ca.api.profile.x509.X509CertprofileFactory"
        availability="optional">
-    <reference-listener ref="certprofileFactoryRegister" bind-method="bindService" 
+    <reference-listener ref="certprofileFactoryRegister" bind-method="bindService"
          unbind-method="unbindService"/>
   </reference-list>
 

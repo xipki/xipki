@@ -41,7 +41,7 @@
     </service-properties>
   </service>
 
-  <!-- Health servlet -->  
+  <!-- Health servlet -->
   <bean id="healthServlet" class="org.xipki.ca.server.servlet.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>
   </bean>

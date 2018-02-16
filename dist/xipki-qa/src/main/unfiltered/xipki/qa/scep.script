@@ -25,7 +25,7 @@ xi:scep-certpoll --url $SCEP_URL \
   --p12 output/scep-ocsp1.p12 --password 1234 \
   --csr output/scep-ocsp1.csr \
   --out output/scep-ocsp1-certpoll.der
-  
+
 ## Get Cert
 
 SERIAL = $(xi:cert-info --serial --hex --in output/scep-ocsp1-certpoll.der)
@@ -54,7 +54,7 @@ xi:scep-getcrl \
   --p12 output/scep-ocsp1.p12 \
   --password 1234 \
   --out output/subcawithcrl1-scep.crl
- 
+
 ## Renewal
 
 xi:csr-p12 \
@@ -80,7 +80,7 @@ xi:update-cert-p12 \
   --ca-cert output/subcawithcrl1.der \
   --ca-cert output/rootca1.der
 
-## Renewal with different CommonName 
+## Renewal with different CommonName
 
 xi:csr-p12 --hash $STDHASH \
   --p12 output/scep-ocsp2.p12 --password 1234 \

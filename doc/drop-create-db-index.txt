@@ -17,14 +17,14 @@
     <addPrimaryKey constraintName="PK_CERT" tableName="CERT" columnNames="ID"/>
     <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
       deferrable="false" initiallyDeferred="false"
-      baseTableName="PUBLISHQUEUE" baseColumnNames="CID" 
+      baseTableName="PUBLISHQUEUE" baseColumnNames="CID"
       onDelete="CASCADE"
       onUpdate="NO ACTION"
       referencedColumnNames="ID"
       referencedTableName="CERT"/>
     <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
       deferrable="false" initiallyDeferred="false"
-            baseTableName="CRAW" baseColumnNames="CID" 
+            baseTableName="CRAW" baseColumnNames="CID"
             onDelete="CASCADE"
             onUpdate="NO ACTION"
             referencedColumnNames="ID"
@@ -59,4 +59,4 @@
         <column name="FP_CN"/>
     </createIndex>
   </changeSet-->
-  
+

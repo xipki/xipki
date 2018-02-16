@@ -68,7 +68,7 @@
       <includeArchiveCutoff>true</includeArchiveCutoff>
       <includeCrlID>false</includeCrlID>
     </store>
-  </stores>  
+  </stores>
   <!-- requestOptions -->
   <requestOptions>
     <requestOption name="request1">

@@ -192,7 +192,7 @@ if { $printUsage equals "true" } {
   echo "#################################################################"
   echo "#                           CMP control                         #"
   echo "#################################################################"
-  
+
   CMP_CONTROL = 'send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA'
 
   ca:cmpcontrol-add --name qa-cmpcontrol1 --conf "${CMP_CONTROL}"

@@ -10,7 +10,7 @@
   <xs:element name="CertStore" type="CertStoreType"/>
   <xs:complexType name="CertStoreType">
     <xs:sequence>
-      <xs:element name="certhashAlgo" type="xs:string"/> 
+      <xs:element name="certhashAlgo" type="xs:string"/>
       <xs:element name="issuers">
         <xs:complexType>
           <xs:sequence>

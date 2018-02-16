@@ -3,7 +3,7 @@ ca:gencrl --ca subcawithcrl1 --out output/subcawithcrl1-camgmt-gen.crl
 
 ## Get CRL
 ca:getcrl --ca subcawithcrl1 --out output/subcawithcrl1-camgmt-get.crl
-  
+
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/cross1.p12 --password 1234 \
   --subject "CN=cross1,O=xipki,C=DE" \
@@ -31,7 +31,7 @@ xi:cmp-health --ca subcawithcrl1
 ## Enroll certificates
 # Certificate ocsp1
 
-## Create the CSR for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ocsp1.p12 --password 1234 \
   --out output/ocsp1.csr \
@@ -51,7 +51,7 @@ xi:update-cert-p12 --p12 output/ocsp1.p12 --password 1234 \
 
 # Certificate ocsp2
 
-## Create the CSR for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ocsp2.p12 --password 1234 \
   --out output/ocsp2.csr \
@@ -73,7 +73,7 @@ xi:cmp-revoke --ca subcawithcrl1 --cert output/ocsp2.der --reason keyCompromise
 
 # Certificate multiple-ous
 
-## Create the CSR for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/multiple-ous1.p12 --password 1234 \
   --out output/multiple-ous1.csr \
@@ -89,7 +89,7 @@ xi:update-cert-p12 --p12 output/multiple-ous1.p12 --password 1234 \
   --ca-cert output/subcawithcrl1.der \
   --ca-cert output/rootca1.der
 
-## Create the CSR for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/multiple-ous2.p12 --password 1234 \
   --out output/multiple-ous2.csr \
@@ -107,7 +107,7 @@ xi:update-cert-p12 --p12 output/multiple-ous2.p12 --password 1234 \
 
 # Certificate multi-valued-rdn
 
-## Create the CSR for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/multi-valued-rdn1.p12 --password 1234 \
   --out output/multi-valued-rdn1.csr \
@@ -197,8 +197,8 @@ xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
   --cert output/tls1.der \
   --ca-cert output/subca1.der \
   --ca-cert output/rootca1.der
- 
-# Certificate tls-inc-sn1 (all with same subject and profile but different key) 
+
+# Certificate tls-inc-sn1 (all with same subject and profile but different key)
 # 1.
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
@@ -228,7 +228,7 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
 
 xi:cmp-csr-enroll --csr output/tls-inc-sn1-2.csr \
   --out output/tls-inc-sn1-2.der --profile tls-inc-sn
- 
+
 # Certificate tls2
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
@@ -330,7 +330,7 @@ xi:update-cert-p12 --p12 output/max-time1.p12 --password 1234 \
   --cert output/max-time1.der \
   --ca-cert output/subcawithcrl1.der \
   --ca-cert output/rootca1.der
-  
+
 ## Get CRL
 xi:cmp-getcrl --ca subcawithcrl1 --out output/subcawithcrl1-1-get.crl
 

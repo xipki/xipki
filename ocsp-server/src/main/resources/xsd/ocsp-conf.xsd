@@ -56,7 +56,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="mode" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            Valid values are RFC2560 and RFC6960. If not present, then 
+            Valid values are RFC2560 and RFC6960. If not present, then
             RFC6960 mode will be applied.
           </xs:documentation>
         </xs:annotation>
@@ -79,7 +79,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
         </xs:complexType>
       </xs:element>
     </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>    
+    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <!-- signers -->
   <xs:complexType name="signersType">
@@ -211,7 +211,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
         <xs:annotation>
           <xs:documentation>
             Whether to include extension CertHash in OCSP response.
-            The default is false. 
+            The default is false.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -232,7 +232,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="cacheMaxAge" type="xs:int" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            max-age in seconds. Only useful for OCSP request sent by HTTP GET. 
+            max-age in seconds. Only useful for OCSP request sent by HTTP GET.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -288,7 +288,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
           <xs:documentation>
             Days of certificates stored in certstore after expiration
             0 for no, -1 for forever. The default is 0 for CRL based
-            store and -1 for database based store            
+            store and -1 for database based store
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -304,7 +304,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="includeArchiveCutoff" type="xs:boolean" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            Whether to include extension archiveCutoff in OCSP response if 
+            Whether to include extension archiveCutoff in OCSP response if
             retentionInterval is not 0. The default is true.
           </xs:documentation>
         </xs:annotation>
@@ -312,14 +312,14 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="includeCrlID" type="xs:boolean" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            Whether to include extension crlID in OCSP response if 
+            Whether to include extension crlID in OCSP response if
             retentionInterval is not 0. It is ignored for database based
-            store. The default is true for CRL based store. 
+            store. The default is true for CRL based store.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>    
+    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="versionsType">
     <xs:sequence>
@@ -329,7 +329,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
             version of the request, current support values are v1.
           </xs:documentation>
         </xs:annotation>
-      </xs:element>      
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">
@@ -337,7 +337,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="value" type="xs:base64Binary"/>
       <xs:element name="file" type="xs:string"/>
     </xs:choice>
-  </xs:complexType>  
+  </xs:complexType>
   <xs:complexType name="fileOrPlainValueType">
     <xs:choice>
       <xs:element name="value" type="xs:string"/>
