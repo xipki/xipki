@@ -198,7 +198,7 @@ public class CanonicalizeCode {
     } // method canonicalizeFile
 
     private void canonicalizeTextFile(File file) throws Exception {
-        byte[] newLine = detectNewline(file);
+        byte[] newLine = new byte[]{'\n'};
         BufferedReader reader = new BufferedReader(new FileReader(file));
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
 

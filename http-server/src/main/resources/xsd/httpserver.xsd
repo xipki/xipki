@@ -21,7 +21,7 @@
       <xs:element name="reverseProxy" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            Type of the reverse proxy before this HTTP service. Current valid 
+            Type of the reverse proxy before this HTTP service. Current valid
             values are
               - NONE: no reverse proxy
               - APACHE: Apache HTTP server as reverse proxy
@@ -97,7 +97,7 @@
       <xs:element name="keyPassword" type="xs:string" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
-  
+
   <xs:complexType name="truststoreType">
     <xs:all>
       <xs:element name="store" type="fileOrValueType"/>
@@ -105,7 +105,7 @@
       <xs:element name="password" type="xs:string"/>
     </xs:all>
   </xs:complexType>
-  
+
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:base64Binary"/>

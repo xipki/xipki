@@ -15,7 +15,7 @@
   </cm:property-placeholder>
 
   <reference id="passwordResolver" interface="org.xipki.password.PasswordResolver"/>
-  
+
   <bean id="providers" class="org.xipki.security.Providers"
       init-method="init" destroy-method="shutdown"/>
 
@@ -38,7 +38,7 @@
   <reference-list id="signerFactories"
        interface="org.xipki.security.SignerFactory"
        availability="optional">
-    <reference-listener ref="signerFactoryRegister" bind-method="bindService" 
+    <reference-listener ref="signerFactoryRegister" bind-method="bindService"
          unbind-method="unbindService"/>
   </reference-list>
 
