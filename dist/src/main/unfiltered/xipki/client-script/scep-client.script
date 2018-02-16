@@ -1,7 +1,7 @@
 HASH = SHA256
 
 URL = http://localhost:8080/scep/scep1/tls/pkiclient.exe
-	
+
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"
 echo "#################################################################"
@@ -37,7 +37,7 @@ echo "# Poll Cert"
 xi:scep-certpoll --url ${URL} --ca-cert ${CACERT} \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --csr ${OUT_DIR}/${CN}.csr \
   --out ${OUT_DIR}/${CN}-certpoll.der
-  
+
 echo "# Get Cert"
 
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}-certpoll.der)
@@ -53,7 +53,7 @@ xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
 echo "# Get CRL"
 xi:scep-getcrl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/myca1-scep.crl
- 
+
 echo "# Renewal"
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
 

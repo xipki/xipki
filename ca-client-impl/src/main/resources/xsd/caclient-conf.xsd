@@ -31,8 +31,8 @@
                 <xs:documentation>
                    - Update interval in minutes.
                    - The non-positive value indicates that the CAInfo will be retrieved only
-                     when the CA client starts. 
-                   - Value between 1 and 4 will be corrected to 5. 
+                     when the CA client starts.
+                   - Value between 1 and 4 will be corrected to 5.
                    - Default value is 10
                 </xs:documentation>
               </xs:annotation>
