@@ -161,23 +161,20 @@ public class SubjectDnSpec {
                     continue;
                 }
 
-                StringTokenizer st = new StringTokenizer(line, " \t");
+                StringTokenizer st = new StringTokenizer(line, ";");
                 final int n = st.countTokens();
                 // 1. country/area name
                 // 2. ISO ALPHA-2 code
                 // 3. ISO ALPHA-3 code
                 // 4. ISO numeric code
-                if (n < 4) {
+                if (n != 4) {
                     LOG.warn("invalid country/area line {}", line);
                     continue;
                 }
 
-                final int alpha2CodeIndex = n - 3;
-                for (int i = 0; i < alpha2CodeIndex; i++) {
-                    st.nextToken();
-                }
-
-                String areaCode = st.nextToken();
+                // skip the name
+                st.nextToken();
+                String areaCode = st.nextToken().trim();
                 countryAreaCodes.add(areaCode.toUpperCase());
             }
 
