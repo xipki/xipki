@@ -221,7 +221,7 @@ public class CanonicalizeCode {
             newFile.renameTo(file);
             System.out.println(file.getPath().substring(baseDirLen));
         }
-    } // method canonicalizeNonJavaFile
+    } // method canonicalizeTextFile
 
     private void checkWarnings() throws Exception {
         checkWarningsInDir(new File(baseDir), true);
@@ -354,46 +354,8 @@ public class CanonicalizeCode {
      * replace tab by 4 spaces, delete white spaces at the end.
      */
     private static String canonicalizeTextLine(String line) {
-        if (line.trim().startsWith("//")) {
-            // comments
-            String nline = line.replace("\t", "    ");
-            return removeTrailingSpaces(nline);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        int len = line.length();
-
-        int lastNonSpaceCharIndex = 0;
-        int index = 0;
-        for (int i = 0; i < len; i++) {
-            char ch = line.charAt(i);
-            if (ch == '\t') {
-                sb.append("    ");
-                index += 4;
-            } else if (ch == ' ') {
-                sb.append(ch);
-                index++;
-            } else {
-                sb.append(ch);
-                index++;
-                lastNonSpaceCharIndex = index;
-            }
-        }
-
-        int numSpacesAtEnd = sb.length() - lastNonSpaceCharIndex;
-        if (numSpacesAtEnd > 0) {
-            sb.delete(lastNonSpaceCharIndex, sb.length());
-        }
-
-        String ret = sb.toString();
-        if (ret.startsWith("    throws ")) {
-            ret = "        " + ret;
-        } else if (ret.startsWith("        throws ")) {
-            ret = "    " + ret;
-        }
-
-        return ret;
-    } // end canonicalizeNonJavaLine
+        return removeTrailingSpaces(line);
+    } // end canonicalizeTextLine
 
     private static String removeTrailingSpaces(String line) {
         final int n = line.length();
