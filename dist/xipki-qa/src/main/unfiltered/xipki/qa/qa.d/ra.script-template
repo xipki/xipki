@@ -317,6 +317,20 @@ xi:update-cert-p12 --p12 output/gsmc-k2.p12 --password 1234 \
   --ca-cert output/subca1.der \
   --ca-cert output/rootca1.der
 
+# Certificate extended
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/extended.p12 --password 1234 \
+  --subject "CN=extended.xipki.org,O=xipki,C=DE" \
+  --out output/extended.csr
+
+xi:cmp-csr-enroll --csr output/extended.csr --out output/extended.der --profile extended
+
+xi:update-cert-p12 --p12 output/extended.p12 --password 1234 \
+  --cert output/extended.der \
+  --ca-cert output/subca1.der \
+  --ca-cert output/rootca1.der
+
 # Certificate max-time1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \

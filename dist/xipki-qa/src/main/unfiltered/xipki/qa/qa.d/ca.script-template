@@ -52,6 +52,11 @@ ca:profile-add \
   --type XML \
   --conf-file xipki/qa/certprofile/certprofile-tls.xml
 
+ca:profile-add \
+  --name extended \
+  --type DemoXML \
+  --conf-file xipki/qa/certprofile/certprofile-extended.xml
+
 ## Publishers
 ca:publisher-add \
   --name ocsp-publisher \
@@ -352,6 +357,7 @@ ca:caprofile-add \
   --profile tls-c \
   --profile tls-inc-sn \
   --profile gsmc-k \
+  --profile extended
 
 ## Add publisher
 ca:capub-add \

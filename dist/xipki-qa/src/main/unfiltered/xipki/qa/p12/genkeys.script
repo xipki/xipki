@@ -25,7 +25,7 @@ xi:rsa-p12 --password 1234 --out p12/shared/jscep-ocsp2.p12 \
 
 list = [ cross1 ocsp1 ocsp2 multiple-ous1 multiple-ous2 multi-valued-rdn1 qc1 \
   ee-complex1 ee-complex2 tls1 tls-neg tls-inc-sn1 tls-inc-sn1-1 tls-inc-sn1-2 \
-  tls2 rest-tls1 tls-c1 tls-c2 gsmc-k1 gsmc-k2 max-time1 ]
+  tls2 rest-tls1 tls-c1 tls-c2 gsmc-k1 gsmc-k2 max-time1 extended ]
 
 each ($list) {
   filename = $it

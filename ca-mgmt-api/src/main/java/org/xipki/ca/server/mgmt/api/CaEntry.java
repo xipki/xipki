@@ -25,6 +25,7 @@ import java.util.List;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
@@ -68,7 +69,7 @@ public class CaEntry {
 
     private int keepExpiredCertInDays;
 
-    private String extraControl;
+    private UnmodifiableConfPairs extraControl;
 
     public CaEntry(NameId ident, String signerType, String signerConf, int expirationPeriod)
             throws CaMgmtException {
@@ -205,11 +206,11 @@ public class CaEntry {
         return expirationPeriod;
     }
 
-    public String extraControl() {
+    public UnmodifiableConfPairs extraControl() {
         return extraControl;
     }
 
-    public void setExtraControl(String extraControl) {
+    public void setExtraControl(UnmodifiableConfPairs extraControl) {
         this.extraControl = extraControl;
     }
 

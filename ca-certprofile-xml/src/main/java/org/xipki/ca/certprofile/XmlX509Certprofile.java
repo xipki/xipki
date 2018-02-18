@@ -284,7 +284,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         validityModel = null;
         version = null;
         subjectDirAttrsControl = null;
+        extraReset();
     } // method reset
+
+    protected void extraReset() {
+    }
 
     @Override
     public void initialize(String data) throws CertprofileException {
@@ -442,88 +446,92 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Extensions
         ExtensionsType extensionsType = conf.getExtensions();
+        // Extension controls
+        this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
+        Set<ASN1ObjectIdentifier> extnIds = new HashSet<>(this.extensionControls.keySet());
 
         // SubjectToSubjectAltName
         initSubjectToSubjectAltNames(extensionsType);
 
-        // Extension controls
-        this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
-
         // AdditionalInformation
-        initAdditionalInformation(extensionsType);
+        initAdditionalInformation(extnIds, extensionsType);
 
         // Admission
-        initAdmission(extensionsType);
+        initAdmission(extnIds, extensionsType);
 
         // AuthorityInfoAccess
-        initAuthorityInfoAccess(extensionsType);
+        initAuthorityInfoAccess(extnIds, extensionsType);
 
         // AuthorityKeyIdentifier
-        initAuthorityKeyIdentifier(extensionsType);
+        initAuthorityKeyIdentifier(extnIds, extensionsType);
 
         // AuthorizationTemplate
-        initAuthorizationTemplate(extensionsType);
+        initAuthorizationTemplate(extnIds, extensionsType);
 
         // BasicConstrains
-        initBasicConstraints(extensionsType);
+        initBasicConstraints(extnIds, extensionsType);
 
         // BiometricInfo
-        initBiometricInfo(extensionsType);
+        initBiometricInfo(extnIds, extensionsType);
 
         // Certificate Policies
-        initCertificatePolicies(extensionsType);
+        initCertificatePolicies(extnIds, extensionsType);
 
         // ExtendedKeyUsage
-        initExtendedKeyUsage(extensionsType);
+        initExtendedKeyUsage(extnIds, extensionsType);
 
         // Inhibit anyPolicy
-        initInhibitAnyPolicy(extensionsType);
+        initInhibitAnyPolicy(extnIds, extensionsType);
 
         // KeyUsage
-        initKeyUsage(extensionsType);
+        initKeyUsage(extnIds, extensionsType);
 
         // Name Constrains
-        initNameConstraints(extensionsType);
+        initNameConstraints(extnIds, extensionsType);
 
         // Policy Constraints
-        initPolicyConstraints(extensionsType);
+        initPolicyConstraints(extnIds, extensionsType);
 
         // Policy Mappings
-        initPolicyMappings(extensionsType);
+        initPolicyMappings(extnIds, extensionsType);
 
         // PrivateKeyUsagePeriod
-        initPrivateKeyUsagePeriod(extensionsType);
+        initPrivateKeyUsagePeriod(extnIds, extensionsType);
 
         // QCStatements
-        initQcStatements(extensionsType);
+        initQcStatements(extnIds, extensionsType);
 
         // Restriction
-        initRestriction(extensionsType);
+        initRestriction(extnIds, extensionsType);
 
         // SMIMECapatibilities
-        initSmimeCapabilities(extensionsType);
+        initSmimeCapabilities(extnIds, extensionsType);
 
         // SubjectAltNameMode
-        initSubjectAlternativeName(extensionsType);
+        initSubjectAlternativeName(extnIds, extensionsType);
 
         // SubjectInfoAccess
-        initSubjectInfoAccess(extensionsType);
+        initSubjectInfoAccess(extnIds, extensionsType);
 
         // TlsFeature
-        initTlsFeature(extensionsType);
+        initTlsFeature(extnIds, extensionsType);
 
         // validityModel
-        initValidityModel(extensionsType);
+        initValidityModel(extnIds, extensionsType);
 
         // SubjectDirectoryAttributes
-        initSubjectDirAttrs(extensionsType);
+        initSubjectDirAttrs(extnIds, extensionsType);
 
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
+        if (this.constantExtensions != null) {
+            extnIds.removeAll(this.constantExtensions.keySet());
+        }
 
         // validate the configuration
         if (subjectToSubjectAltNameModes != null) {
-            if (!extensionControls.containsKey(Extension.subjectAlternativeName)) {
+            ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
+            if (!extensionControls.containsKey(type)) {
                 throw new CertprofileException(
                         "subjectToSubjectAltNames cannot be configured if extension subjectAltNames"
                         + " is not permitted");
@@ -547,7 +555,44 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 }
             }
         }
+
+        // Remove the extension processed not be the CertProfile, but by the CA
+        extnIds.remove(Extension.issuerAlternativeName);
+        extnIds.remove(Extension.authorityInfoAccess);
+        extnIds.remove(Extension.cRLDistributionPoints);
+        extnIds.remove(Extension.freshestCRL);
+        extnIds.remove(Extension.subjectKeyIdentifier);
+        extnIds.remove(Extension.subjectInfoAccess);
+        extnIds.remove(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
+
+        Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
+        for (ASN1ObjectIdentifier extnId : copyOfExtnIds) {
+            Object extnValue = getExtensionValue(extnId, extensionsType, Object.class);
+            boolean processed = initExtraExtension(
+                    extnId, extensionControls.get(extnId), extnValue);
+            if (processed) {
+                extnIds.remove(extnId);
+            }
+        }
+
+        if (!extnIds.isEmpty()) {
+            throw new CertprofileException("Cannot process the extensions: " + extnIds);
+        }
     } // method initialize0
+
+    /**
+     * Process the extension.
+     *
+     * @param extensionId
+     *          ID of the extensions to be processed
+     * @param extensionValue
+     *          Configuration of the extension value
+     * @return whether the extension is processed
+     */
+    protected boolean initExtraExtension(ASN1ObjectIdentifier extnId, ExtensionControl extnControl,
+            Object extnValue) throws CertprofileException {
+        return false;
+    }
 
     private void initSubjectToSubjectAltNames(ExtensionsType extensionsType)
             throws CertprofileException {
@@ -583,12 +628,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
     }
 
-    private void initAdditionalInformation(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_additionalInformation;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(type,
                 extensionsType, AdditionalInformation.class);
@@ -603,11 +649,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initAdmission(ExtensionsType extensionsType) throws CertprofileException {
+    private void initAdmission(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         AdmissionSyntax extConf = (AdmissionSyntax) getExtensionValue(type, extensionsType,
                 AdmissionSyntax.class);
@@ -619,12 +667,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 extensionControls.get(type).isCritical(), extConf);
     }
 
-    private void initAuthorityInfoAccess(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.authorityInfoAccess;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         AuthorityInfoAccess extConf = (AuthorityInfoAccess) getExtensionValue(type, extensionsType,
                 AuthorityInfoAccess.class);
@@ -636,12 +685,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 extConf.isIncludeOcsp());
     }
 
-    private void initAuthorityKeyIdentifier(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         AuthorityKeyIdentifier extConf = (AuthorityKeyIdentifier) getExtensionValue(type,
                 extensionsType, AuthorityKeyIdentifier.class);
@@ -652,12 +702,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.includeIssuerAndSerialInAki = extConf.isIncludeIssuerAndSerial();
     }
 
-    private void initAuthorizationTemplate(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initAuthorizationTemplate(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(type,
                 extensionsType, AuthorizationTemplate.class);
@@ -673,11 +724,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 extValue);
     }
 
-    private void initBasicConstraints(ExtensionsType extensionsType) throws CertprofileException {
+    private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.basicConstraints;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         BasicConstraints extConf = (BasicConstraints) getExtensionValue(type, extensionsType,
                 BasicConstraints.class);
@@ -687,11 +740,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.pathLen = extConf.getPathLen();
     }
 
-    private void initBiometricInfo(ExtensionsType extensionsType) throws CertprofileException {
+    private void initBiometricInfo(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.biometricInfo;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         BiometricInfo extConf = (BiometricInfo) getExtensionValue(type, extensionsType,
                 BiometricInfo.class);
@@ -706,12 +761,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
     }
 
-    private void initCertificatePolicies(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initCertificatePolicies(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.certificatePolicies;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         CertificatePolicies extConf = (CertificatePolicies) getExtensionValue(type, extensionsType,
                 CertificatePolicies.class);
@@ -727,11 +783,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 value);
     }
 
-    private void initExtendedKeyUsage(ExtensionsType extensionsType) throws CertprofileException {
+    private void initExtendedKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.extendedKeyUsage;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(type, extensionsType,
                 ExtendedKeyUsage.class);
@@ -742,11 +800,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
     }
 
-    private void initInhibitAnyPolicy(ExtensionsType extensionsType) throws CertprofileException {
+    private void initInhibitAnyPolicy(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.inhibitAnyPolicy;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(type, extensionsType,
                 InhibitAnyPolicy.class);
@@ -763,11 +823,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.inhibitAnyPolicy = new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initKeyUsage(ExtensionsType extensionsType) throws CertprofileException {
+    private void initKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.keyUsage;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         KeyUsage extConf = (KeyUsage) getExtensionValue(type, extensionsType, KeyUsage.class);
         if (extConf == null) {
@@ -777,11 +839,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
     }
 
-    private void initNameConstraints(ExtensionsType extensionsType) throws CertprofileException {
+    private void initNameConstraints(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.nameConstraints;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         NameConstraints extConf = (NameConstraints) getExtensionValue(type, extensionsType,
                 NameConstraints.class);
@@ -794,12 +858,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.nameConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initPrivateKeyUsagePeriod(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initPrivateKeyUsagePeriod(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.privateKeyUsagePeriod;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(type,
                 extensionsType, PrivateKeyUsagePeriod.class);
@@ -809,11 +874,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
     }
 
-    private void initPolicyConstraints(ExtensionsType extensionsType) throws CertprofileException {
+    private void initPolicyConstraints(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.policyConstraints;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(type, extensionsType,
                 PolicyConstraints.class);
@@ -826,11 +893,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 value);
     }
 
-    private void initPolicyMappings(ExtensionsType extensionsType) throws CertprofileException {
+    private void initPolicyMappings(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.policyMappings;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         PolicyMappings extConf = (PolicyMappings) getExtensionValue(type, extensionsType,
                 PolicyMappings.class);
@@ -843,11 +912,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.policyMappings = new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initQcStatements(ExtensionsType extensionsType) throws CertprofileException {
+    private void initQcStatements(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.qCStatements;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         QcStatements extConf = (QcStatements) getExtensionValue(type, extensionsType,
                 QcStatements.class);
@@ -951,11 +1022,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         qcStatementsOption = null;
     }
 
-    private void initRestriction(ExtensionsType extensionsType) throws CertprofileException {
+    private void initRestriction(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_restriction;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         Restriction extConf = (Restriction) getExtensionValue(type, extensionsType,
                 Restriction.class);
@@ -969,11 +1042,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         restriction = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initSmimeCapabilities(ExtensionsType extensionsType) throws CertprofileException {
+    private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_smimeCapabilities;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(type, extensionsType,
                 SMIMECapabilities.class);
@@ -1006,12 +1081,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 extValue);
     }
 
-    private void initSubjectAlternativeName(ExtensionsType extensionsType)
-            throws CertprofileException {
+    private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         SubjectAltName extConf = (SubjectAltName) getExtensionValue(type, extensionsType,
                 SubjectAltName.class);
@@ -1022,11 +1098,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.subjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
     }
 
-    private void initSubjectInfoAccess(ExtensionsType extensionsType) throws CertprofileException {
+    private void initSubjectInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.subjectInfoAccess;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(type, extensionsType,
                 SubjectInfoAccess.class);
@@ -1043,11 +1121,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
     }
 
-    private void initTlsFeature(ExtensionsType extensionsType) throws CertprofileException {
+    private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_pe_tlsfeature;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         TlsFeature extConf = (TlsFeature) getExtensionValue(type, extensionsType, TlsFeature.class);
 
@@ -1073,11 +1153,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initValidityModel(ExtensionsType extensionsType) throws CertprofileException {
+    private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_validityModel;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         ValidityModel extConf = (ValidityModel) getExtensionValue(
                 type, extensionsType, ValidityModel.class);
@@ -1090,12 +1172,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         validityModel = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initSubjectDirAttrs(ExtensionsType extensionsType)
+    private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds,
+            ExtensionsType extensionsType)
             throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
         if (!extensionControls.containsKey(type)) {
             return;
         }
+        extnIds.remove(type);
 
         SubjectDirectoryAttributs extConf = (SubjectDirectoryAttributs) getExtensionValue(
                 type, extensionsType, SubjectDirectoryAttributs.class);

@@ -79,8 +79,10 @@ import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaUris;
 import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
@@ -344,7 +346,10 @@ public class CaConf {
                     caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
                     caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
                     if (ci.getExtraControl() != null) {
-                        caEntry.setExtraControl(getValue(ci.getExtraControl(), zipFile));
+                        String value = getValue(ci.getExtraControl(), zipFile);
+                        if (value != null) {
+                            caEntry.setExtraControl(new UnmodifiableConfPairs(value));
+                        }
                     }
 
                     int keepExpiredCertDays = (ci.getKeepExpiredCertDays() == null) ? -1

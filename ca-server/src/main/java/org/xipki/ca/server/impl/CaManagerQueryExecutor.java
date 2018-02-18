@@ -76,6 +76,7 @@ import org.xipki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
@@ -555,7 +556,7 @@ class CaManagerQueryExecutor {
 
             String extraControl = rs.getString("EXTRA_CONTROL");
             if (extraControl != null) {
-                entry.setExtraControl(extraControl);
+                entry.setExtraControl(new UnmodifiableConfPairs(extraControl));
             }
 
             String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
@@ -775,7 +776,8 @@ class CaManagerQueryExecutor {
             ps.setInt(idx++, entry.expirationPeriod());
             ps.setInt(idx++, entry.keepExpiredCertInDays());
             ps.setString(idx++, entry.validityMode().name());
-            ps.setString(idx++, entry.extraControl());
+            UnmodifiableConfPairs extraControl = entry.extraControl();
+            ps.setString(idx++, (extraControl == null) ? null : extraControl.getEncoded());
             ps.setString(idx++, entry.signerConf());
             ps.executeUpdate();
             if (LOG.isInfoEnabled()) {
@@ -1137,7 +1139,7 @@ class CaManagerQueryExecutor {
         Integer expirationPeriod = entry.expirationPeriod();
         Integer keepExpiredCertInDays = entry.keepExpiredCertInDays();
         ValidityMode validityMode = entry.validityMode();
-        String extraControl = entry.extraControl();
+        UnmodifiableConfPairs extraControl = entry.extraControl();
 
         if (signerType != null || signerConf != null || cert != null) {
             final String sql = "SELECT SIGNER_TYPE,CERT,SIGNER_CONF FROM CA WHERE ID=?";
@@ -1373,7 +1375,7 @@ class CaManagerQueryExecutor {
 
             if (idxExtraControl != null) {
                 sb.append("extraControl: '").append(extraControl).append("'; ");
-                ps.setString(idxExtraControl, extraControl);
+                ps.setString(idxExtraControl, extraControl.getEncoded());
             }
 
             ps.setInt(idxId, changeCaEntry.ident().id());

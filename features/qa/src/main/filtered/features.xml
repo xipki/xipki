@@ -2,7 +2,114 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <repository>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</repository>
+  <!--repository>mvn:org.xipki.pki.features/pki-jetty/${project.version}/xml/features</repository-->
+  <feature name="netty-linux-x86_64" version="${netty.version}" description="netty for platform linux-x86_64">
+    <!-- the start-level must be less than the other netty bundles -->
+    <bundle start-level="64">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
+  </feature>
+  <feature name="netty-osx-x86_64" version="${netty.version}" description="netty for platform osx-x86_64">
+    <!-- the start-level must be less than the other netty bundles -->
+    <bundle start-level="64">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/osx-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-kqueue/${netty.version}/jar/osx-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
+  </feature>
+  <feature name="netty" version="${netty.version}" description="netty for all platforms">
+    <!-- the start-level must be less than the other netty bundles -->
+    <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
+  </feature>
+  <feature name="xipki-httpserver" version="${xitk.version}" description="HTTP server">
+    <bundle start-level="70">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/servlet-api/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/http-server/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-security" version="${xitk.version}" description="security">
+    <bundle start-level="70">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/security/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-shell-base" version="${xitk.version}" description="shall base">
+    <feature>xipki-security</feature>
+    <bundle start-level="70">mvn:org.xipki.tk/shell-base/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-datasource" version="${xitk.version}" description="datasource">
+    <bundle start-level="70">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/datasource/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-caserver" version="${project.version}" description="CA server">
+    <feature>xipki-datasource</feature>
+    <feature>xipki-security</feature>
+    <bundle start-level="70">mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.pki/ca-api/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-demo/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.pki/ca-server-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-server-netty/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-camgmt-shell" version="${project.version}" description="CA management shell">
+    <feature>xipki-caserver</feature>
+    <feature>xipki-shell-base</feature>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-security-shell" version="${xitk.version}" description="CA security shell">
+    <feature>xipki-shell-base</feature>
+    <bundle start-level="80">mvn:org.xipki.tk/security-shell/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/security-speed-shell/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspserver" version="${project.version}" description="OCSP server">
+    <feature>xipki-datasource</feature>
+    <feature>xipki-security</feature>
+    <bundle start-level="70">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ocsp-server-netty/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-database-tool" version="${project.version}" description="Database tool">
+    <feature>xipki-datasource</feature>
+    <feature>xipki-shell-base</feature>
+    <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
+    <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/database-tool/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-audit" version="${xitk.version}" description="Audit">
+    <bundle start-level="70">mvn:org.xipki.tk/audit/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-audit-syslog" version="${xitk.version}" description="Syslog audit">
+    <feature>xipki-audit</feature>
+    <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/audit-syslog/${xitk.version}</bundle>
+  </feature>
   <feature name="xipki-caclient" version="${xisdk.version}" description="CA client">
     <feature>xipki-security</feature>
     <bundle start-level="80">mvn:org.xipki.tk/cmp/${xitk.version}</bundle>

@@ -48,9 +48,10 @@
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
   <modules>
-    <module>ca-certprofile-xml</module>
-    <module>ca-qa</module>
     <module>ca-api</module>
+    <module>ca-certprofile-xml</module>
+    <module>ca-certprofile-demo</module>
+    <module>ca-qa</module>
     <module>ca-mgmt-api</module>
     <module>ca-server-api</module>
     <module>ca-server</module>

@@ -110,7 +110,7 @@ public class CaCheckCmd extends CaUpdateCmd {
 
         // Extra control
         if (ey.extraControl() != null) {
-            MgmtQaShellUtil.assertEquals("Extra control", ey.extraControl(), ca.extraControl());
+            assertObjEquals("Extra control", ey.extraControl(), ca.extraControl());
         }
 
         // Max validity

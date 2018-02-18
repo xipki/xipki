@@ -25,6 +25,7 @@ import java.util.List;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -209,7 +210,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     @Override
-    public void setExtraControl(String extraControl) {
+    public void setExtraControl(UnmodifiableConfPairs extraControl) {
         super.setExtraControl(extraControl);
     }
 

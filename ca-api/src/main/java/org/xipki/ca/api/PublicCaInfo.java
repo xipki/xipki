@@ -31,6 +31,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
@@ -67,11 +68,11 @@ public class PublicCaInfo {
 
     private final List<String> deltaCrlUris;
 
-    private final String extraControl;
+    private final UnmodifiableConfPairs extraControl;
 
     public PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-            String extraControl) throws OperationException {
+            UnmodifiableConfPairs extraControl) throws OperationException {
         ParamUtil.requireNonNull("caCertificate", caCertificate);
 
         this.caCertificate = new X509Cert(caCertificate);
@@ -107,7 +108,7 @@ public class PublicCaInfo {
 
     public PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
             byte[] subjectKeyIdentifier, List<String> caCertUris, List<String> ocspUris,
-            List<String> crlUris, List<String> deltaCrlUris, String extraControl)
+            List<String> crlUris, List<String> deltaCrlUris, UnmodifiableConfPairs extraControl)
             throws OperationException {
         this.x500Subject = ParamUtil.requireNonNull("subject", subject);
         this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
@@ -190,7 +191,7 @@ public class PublicCaInfo {
         return caCertificate;
     }
 
-    public String extraControl() {
+    public UnmodifiableConfPairs extraControl() {
         return extraControl;
     }
 

@@ -145,6 +145,7 @@ import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.DateUtil;
@@ -803,21 +804,20 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     private boolean startCa(String caName) {
         X509CaInfo caEntry = caInfos.get(caName);
 
-        String extraControl = caEntry.caEntry().extraControl();
-        if (StringUtil.isNotBlank(extraControl)) {
-            ConfPairs cp = new ConfPairs(extraControl);
-            String str = cp.value(RevokeSuspendedCertsControl.KEY_REVOCATION_ENABLED);
+        UnmodifiableConfPairs extraControl = caEntry.caEntry().extraControl();
+        if (extraControl != null) {
+            String str = extraControl.value(RevokeSuspendedCertsControl.KEY_REVOCATION_ENABLED);
             boolean enabled = false;
             if (str != null) {
                 enabled = Boolean.parseBoolean(str);
             }
 
             if (enabled) {
-                str = cp.value(RevokeSuspendedCertsControl.KEY_REVOCATION_REASON);
+                str = extraControl.value(RevokeSuspendedCertsControl.KEY_REVOCATION_REASON);
                 CrlReason reason = (str == null) ? CrlReason.CESSATION_OF_OPERATION
                         : CrlReason.forNameOrText(str);
 
-                str = cp.value(RevokeSuspendedCertsControl.KEY_UNCHANGED_SINCE);
+                str = extraControl.value(RevokeSuspendedCertsControl.KEY_UNCHANGED_SINCE);
                 CertValidity unchangedSince = (str == null) ? new CertValidity(15, Unit.DAY)
                         : CertValidity.getInstance(str);
                 RevokeSuspendedCertsControl control = new RevokeSuspendedCertsControl(reason,
@@ -1540,7 +1540,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
         String name = dbEntry.ident().name();
         if (requestorDbEntries.containsKey(name)) {
-            return false;
+            throw new CaMgmtException("Requestor named " + name + " exists");
         }
 
         CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
@@ -1766,7 +1766,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
         String name = dbEntry.ident().name();
         if (certprofileDbEntries.containsKey(name)) {
-            return false;
+            throw new CaMgmtException("CertProfile named " + name + " exists");
         }
 
         dbEntry.setFaulty(true);
@@ -1792,7 +1792,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
         String name = dbEntry.name();
         if (crlSigners.containsKey(name)) {
-            return false;
+            throw new CaMgmtException("Responder named " + name + " exists");
         }
 
         String conf = dbEntry.conf();
@@ -1870,7 +1870,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
         String name = dbEntry.name();
         if (crlSigners.containsKey(name)) {
-            return false;
+            throw new CaMgmtException("CRL signer named " + name + " exists");
         }
 
         String conf = dbEntry.conf();
@@ -1951,7 +1951,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
         String name = dbEntry.ident().name();
         if (publisherDbEntries.containsKey(name)) {
-            return false;
+            throw new CaMgmtException("Publisher named" + name + " exists");
         }
 
         dbEntry.setFaulty(true);
@@ -2053,7 +2053,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
         final String name = dbEntry.name();
         if (cmpControlDbEntries.containsKey(name)) {
-            return false;
+            throw new CaMgmtException("CMP control named " + name + " exists");
         }
 
         CmpControl cmpControl;
@@ -2129,8 +2129,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("value", value);
         asssertMasterMode();
         if (envParameterResolver.parameter(name) != null) {
-            return false;
+            throw new CaMgmtException("Environment named " + name + " exists");
         }
+
         queryExecutor.addEnvParam(name, value);
         envParameterResolver.addParameter(name, value);
         return true;
@@ -2868,6 +2869,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         asssertMasterMode();
 
+        final String name = dbEntry.name();
+        if (scepDbEntries.containsKey(name)) {
+            throw new CaMgmtException("SCEP named " + name + " exists");
+        }
+
         NameId caIdent = idNameMap.ca(dbEntry.caIdent().name());
         if (caIdent == null) {
             LOG.warn("CA {} does not exist", dbEntry.caIdent().name());
@@ -2887,7 +2893,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ScepImpl scep = new ScepImpl(dbEntry, this);
         boolean bo = queryExecutor.addScep(dbEntry);
         if (bo) {
-            final String name = dbEntry.name();
             scepDbEntries.put(name, dbEntry);
             sceps.put(name, scep);
         }
@@ -3542,7 +3547,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     ciJaxb.setDuplicateSubject(entry.duplicateSubjectPermitted());
                     ciJaxb.setExpirationPeriod(entry.expirationPeriod());
                     ciJaxb.setExtraControl(
-                            createFileOrValue(zipStream, entry.extraControl(),
+                            createFileOrValue(zipStream, entry.extraControl().getEncoded(),
                                     "files/ca-" + name + "-extracontrol.conf"));
                     ciJaxb.setKeepExpiredCertDays(entry.keepExpiredCertInDays());
                     ciJaxb.setMaxValidity(entry.maxValidity().toString());
