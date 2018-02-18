@@ -74,7 +74,7 @@ public class CrlSignerInfoCmd extends CaAction {
         } else {
             X509CrlSignerEntry entry = caManager.getCrlSigner(name);
             if (entry == null) {
-                throw new CmdFailure("\tno CRL signer named '" + name + " is configured");
+                throw new CmdFailure("\tno CRL signer named '" + name + "' is configured");
             } else {
                 sb.append(entry.toString(verbose.booleanValue()));
             }

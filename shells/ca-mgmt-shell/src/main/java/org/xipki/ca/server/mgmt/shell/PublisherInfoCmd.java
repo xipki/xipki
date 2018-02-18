@@ -69,7 +69,7 @@ public class PublisherInfoCmd extends CaAction {
         } else {
             PublisherEntry entry = caManager.getPublisher(name);
             if (entry == null) {
-                throw new CmdFailure("\tno publisher named '" + name + " is configured");
+                throw new CmdFailure("\tno publisher named '" + name + "' is configured");
             } else {
                 println(entry.toString());
             }

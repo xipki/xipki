@@ -74,7 +74,7 @@ public class ProfileInfoCmd extends CaAction {
         } else {
             CertprofileEntry entry = caManager.getCertprofile(name);
             if (entry == null) {
-                throw new CmdFailure("\tno certificate profile named '" + name + " is configured");
+                throw new CmdFailure("\tno certificate profile named '" + name + "' is configured");
             } else {
                 sb.append(entry.toString(verbose));
             }

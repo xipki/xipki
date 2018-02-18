@@ -67,7 +67,7 @@ public class EnvInfoCmd extends CaAction {
         } else {
             String paramValue = caManager.getEnvParam(name);
             if (paramValue == null) {
-                throw new CmdFailure("\tno environment named '" + name + " is configured");
+                throw new CmdFailure("\tno environment named '" + name + "' is configured");
             } else {
                 println(StringUtil.concat(name, "\n\t", paramValue));
             }

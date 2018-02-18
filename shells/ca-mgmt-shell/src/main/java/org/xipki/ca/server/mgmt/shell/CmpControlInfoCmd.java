@@ -69,7 +69,7 @@ public class CmpControlInfoCmd extends CaAction {
         } else {
             CmpControlEntry entry = caManager.getCmpControl(name);
             if (entry == null) {
-                throw new CmdFailure("\tno CMP control named '" + name + " is configured");
+                throw new CmdFailure("\tno CMP control named '" + name + "' is configured");
             } else {
                 sb.append(entry.toString());
             }
