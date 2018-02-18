@@ -108,8 +108,8 @@ class X509SelfSignedCertBuilder {
     public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
             String signerType, String signerConf, IdentifiedX509Certprofile certprofile,
             CertificationRequest csr, BigInteger serialNumber, List<String> cacertUris,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
-            throws OperationException, InvalidConfException {
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
+            String extraControl) throws OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonBlank("signerType", signerType);
         ParamUtil.requireNonNull("certprofile", certprofile);
@@ -195,7 +195,7 @@ class X509SelfSignedCertBuilder {
         }
 
         X509Certificate newCert = generateCertificate(signer, certprofile, csr, serialNumber,
-                publicKeyInfo, cacertUris, ocspUris, crlUris, deltaCrlUris);
+                publicKeyInfo, cacertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
     } // method generateSelfSigned
@@ -204,7 +204,7 @@ class X509SelfSignedCertBuilder {
             IdentifiedX509Certprofile certprofile, CertificationRequest csr,
             BigInteger serialNumber, SubjectPublicKeyInfo publicKeyInfo,
             List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
-            List<String> deltaCrlUris) throws OperationException {
+            List<String> deltaCrlUris, String extraControl) throws OperationException {
 
         SubjectPublicKeyInfo tmpPublicKeyInfo;
         try {
@@ -254,7 +254,7 @@ class X509SelfSignedCertBuilder {
                 serialNumber, notBefore, notAfter, grantedSubject, tmpPublicKeyInfo);
 
         PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, serialNumber, null, null,
-                cacertUris, ocspUris, crlUris, deltaCrlUris);
+                cacertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
 
         Extensions extensions = null;
         ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();

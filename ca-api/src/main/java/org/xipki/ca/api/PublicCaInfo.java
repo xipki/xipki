@@ -67,9 +67,11 @@ public class PublicCaInfo {
 
     private final List<String> deltaCrlUris;
 
+    private final String extraControl;
+
     public PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
-            throws OperationException {
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
+            String extraControl) throws OperationException {
         ParamUtil.requireNonNull("caCertificate", caCertificate);
 
         this.caCertificate = new X509Cert(caCertificate);
@@ -86,6 +88,7 @@ public class PublicCaInfo {
         this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);
         this.crlUris = CollectionUtil.unmodifiableList(crlUris);
         this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
+        this.extraControl = extraControl;
 
         byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
                 Extension.subjectAlternativeName.getId());
@@ -104,7 +107,8 @@ public class PublicCaInfo {
 
     public PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
             byte[] subjectKeyIdentifier, List<String> caCertUris, List<String> ocspUris,
-            List<String> crlUris, List<String> deltaCrlUris) throws OperationException {
+            List<String> crlUris, List<String> deltaCrlUris, String extraControl)
+            throws OperationException {
         this.x500Subject = ParamUtil.requireNonNull("subject", subject);
         this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -125,6 +129,7 @@ public class PublicCaInfo {
         this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);
         this.crlUris = CollectionUtil.unmodifiableList(crlUris);
         this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
+        this.extraControl = extraControl;
     } // constructor
 
     public List<String> caCertUris() {
@@ -183,6 +188,10 @@ public class PublicCaInfo {
 
     public X509Cert caCertificate() {
         return caCertificate;
+    }
+
+    public String extraControl() {
+        return extraControl;
     }
 
 }

@@ -2638,7 +2638,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
                     caEntry.signerConf(), certprofile, csr, serialOfThisCert, cacertUris,
-                    ocspUris, crlUris, deltaCrlUris);
+                    ocspUris, crlUris, deltaCrlUris, caEntry.extraControl());
         } catch (OperationException | InvalidConfException ex) {
             throw new CaMgmtException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
