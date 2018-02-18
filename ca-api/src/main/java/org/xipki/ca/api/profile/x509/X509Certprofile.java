@@ -30,6 +30,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.EnvParameterResolver;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionControl;
@@ -228,6 +229,8 @@ public abstract class X509Certprofile {
      *          NotBefore. Must not be {@code null}.
      * @param notAfter
      *          NotAfter. Must not be {@code null}.
+     * @param caInfo
+     *          CA information.
      * @return extensions of the certificate to be issued.
      * @throws BadCertTemplateException
      *         if at least one of extension is not permitted.
@@ -237,8 +240,8 @@ public abstract class X509Certprofile {
     public abstract ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             X500Name requestedSubject, X500Name grantedSubject,
-            Extensions requestedExtensions, Date notBefore, Date notAfter)
-            throws CertprofileException, BadCertTemplateException;
+            Extensions requestedExtensions, Date notBefore, Date notAfter,
+            PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();
 

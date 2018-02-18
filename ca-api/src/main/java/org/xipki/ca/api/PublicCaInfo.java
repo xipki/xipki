@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.api;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -30,7 +30,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
@@ -42,7 +41,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class PublicCaInfo {
+public class PublicCaInfo {
 
     private final X500Principal subject;
 
@@ -68,8 +67,9 @@ class PublicCaInfo {
 
     private final List<String> deltaCrlUris;
 
-    PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris, List<String> ocspUris,
-            List<String> crlUris, List<String> deltaCrlUris) throws OperationException {
+    public PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris,
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
+            throws OperationException {
         ParamUtil.requireNonNull("caCertificate", caCertificate);
 
         this.caCertificate = new X509Cert(caCertificate);
@@ -102,7 +102,7 @@ class PublicCaInfo {
         }
     } // constructor
 
-    PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
+    public PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
             byte[] subjectKeyIdentifier, List<String> caCertUris, List<String> ocspUris,
             List<String> crlUris, List<String> deltaCrlUris) throws OperationException {
         this.x500Subject = ParamUtil.requireNonNull("subject", subject);

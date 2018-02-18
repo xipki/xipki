@@ -71,6 +71,7 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.DirectoryStringType;
@@ -1120,8 +1121,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     public ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
             X500Name requestedSubject, X500Name grantedSubject,
-            Extensions requestedExtensions, Date notBefore, Date notAfter)
-            throws CertprofileException, BadCertTemplateException {
+            Extensions requestedExtensions, Date notBefore, Date notAfter,
+            PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
         ExtensionValues values = new ExtensionValues();
         if (CollectionUtil.isEmpty(extensionOccurences)) {
             return values;

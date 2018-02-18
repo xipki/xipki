@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;

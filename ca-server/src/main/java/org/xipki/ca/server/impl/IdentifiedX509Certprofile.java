@@ -54,6 +54,7 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionControl;
@@ -254,6 +255,8 @@ class IdentifiedX509Certprofile {
      *          NotBefore. Must not be {@code null}.
      * @param notAfter
      *          NotAfter. Must not be {@code null}.
+     * @param caInfo
+     *          CA information.
      * @return the extensions of the certificate to be issued.
      */
     public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
@@ -460,9 +463,9 @@ class IdentifiedX509Certprofile {
             addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
 
-        ExtensionValues subvalues = certprofile.getExtensions(
-                Collections.unmodifiableMap(controls), requestedSubject, grantedSubject,
-                requestedExtensions, notBefore, notAfter);
+        ExtensionValues subvalues = certprofile.getExtensions(Collections.unmodifiableMap(controls),
+                requestedSubject, grantedSubject, requestedExtensions, notBefore, notAfter,
+                publicCaInfo);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
         for (ASN1ObjectIdentifier type : extTypes) {

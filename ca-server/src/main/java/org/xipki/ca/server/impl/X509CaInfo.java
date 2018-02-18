@@ -30,6 +30,7 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.store.CertificateStore;
