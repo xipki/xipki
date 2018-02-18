@@ -76,4 +76,8 @@ public class ExtensionValues {
         return extensions.containsKey(type);
     }
 
+    public int size() {
+        return extensions.size();
+    }
+
 }

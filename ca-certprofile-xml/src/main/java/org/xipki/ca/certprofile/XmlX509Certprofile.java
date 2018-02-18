@@ -1698,8 +1698,23 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
         }
 
+        ExtensionValues extraExtensions = getExtraExtensions(extensionOccurences, requestedSubject,
+                grantedSubject, requestedExtensions, notBefore, notAfter, caInfo);
+        if (extraExtensions != null) {
+            for (ASN1ObjectIdentifier m : extraExtensions.extensionTypes()) {
+                values.addExtension(m, extraExtensions.getExtensionValue(m));
+            }
+        }
         return values;
     } // method getExtensions
+
+    protected ExtensionValues getExtraExtensions(
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
+            X500Name requestedSubject, X500Name grantedSubject,
+            Extensions requestedExtensions, Date notBefore, Date notAfter,
+            PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
+        return null;
+    }
 
     private GeneralNames createRequestedSubjectAltNames(X500Name requestedSubject,
             X500Name grantedSubject, Extensions requestedExtensions)
