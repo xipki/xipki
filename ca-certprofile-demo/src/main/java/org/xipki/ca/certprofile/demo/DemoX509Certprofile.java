@@ -64,10 +64,16 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
     public static final ASN1ObjectIdentifier id_demo_other_namespace =
             new ASN1ObjectIdentifier("1.2.3.4.2");
 
+    private boolean addCaExtraControl;
+
+    private boolean addSequence;
+
     private ASN1Sequence sequence;
 
     @Override
     protected void extraReset() {
+        addCaExtraControl = false;
+        addSequence = false;
         sequence = null;
     }
 
@@ -75,6 +81,7 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
     protected boolean initExtraExtension(ASN1ObjectIdentifier extnId,
             ExtensionControl extnControl, Object extnValue) throws CertprofileException {
         if (id_demo_ca_extra_control.equals(extnId)) {
+            this.addCaExtraControl = true;
             return true;
         } else if (id_demo_other_namespace.equals(extnId)) {
             if (!(extnValue instanceof Element)) {
@@ -101,6 +108,7 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
 
             this.sequence = new DERSequence(texts);
 
+            this.addSequence = true;
             return true;
         } else {
             return false;
@@ -114,26 +122,31 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
             Extensions requestedExtensions, Date notBefore, Date notAfter,
             PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
         ExtensionValues extnValues = new ExtensionValues();
-        ASN1ObjectIdentifier type = id_demo_ca_extra_control;
-        ExtensionControl extnControl = extensionOccurences.get(type);
-        if (extnControl != null) {
-            UnmodifiableConfPairs caExtraControl = caInfo.extraControl();
-            String text = (caExtraControl == null)
-                    ? "<NO EXTRA CONTROL>" : caExtraControl.getEncoded();
-            ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(),
-                    new DERUTF8String(text));
-            extnValues.addExtension(type, extnValue);
+
+        if (addCaExtraControl) {
+            ASN1ObjectIdentifier type = id_demo_ca_extra_control;
+            ExtensionControl extnControl = extensionOccurences.get(type);
+            if (extnControl != null) {
+                UnmodifiableConfPairs caExtraControl = caInfo.extraControl();
+                String text = (caExtraControl == null)
+                        ? "<NO EXTRA CONTROL>" : caExtraControl.getEncoded();
+                ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(),
+                        new DERUTF8String(text));
+                extnValues.addExtension(type, extnValue);
+            }
         }
 
-        type = id_demo_other_namespace;
-        extnControl = extensionOccurences.get(type);
-        if (extnControl != null) {
-            if (sequence == null) {
-                throw new IllegalStateException("CertProfile is not initialized");
-            }
+        if (addSequence) {
+            ASN1ObjectIdentifier type = id_demo_other_namespace;
+            ExtensionControl extnControl = extensionOccurences.get(type);
+            if (extnControl != null) {
+                if (sequence == null) {
+                    throw new IllegalStateException("CertProfile is not initialized");
+                }
 
-            ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(), sequence);
-            extnValues.addExtension(type, extnValue);
+                ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(), sequence);
+                extnValues.addExtension(type, extnValue);
+            }
         }
 
         return extnValues.size() == 0 ? null : extnValues;
