@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/ca/xmlprofile/v2" maxSize="5000">
   <appInfo>
-    <my:myDescription xmlns:my="http://example.org">
-      <my:category>cat A</my:category>
-      <my:details>Certprofile SubCA</my:details>
-    </my:myDescription>
+    <myDescription xmlns="http://example.org">
+      <category>cat A</category>
+      <details>certprofile subca</details>
+    </myDescription>
   </appInfo>
   <version>v3</version>
   <signatureAlgorithms>

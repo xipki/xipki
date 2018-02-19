@@ -39,6 +39,7 @@ import javax.xml.validation.SchemaFactory;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
@@ -181,64 +182,53 @@ public class ProfileConfCreatorDemo {
             ms.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             ms.setProperty("com.sun.xml.internal.bind.indentString", "  ");
 
-            // RootCA
             X509ProfileType profile = certprofileRootCa();
-            marshall(ms, profile, "Certprofile_RootCA.xml");
+            marshall(ms, profile, "certprofile-rootca.xml");
 
-            // Cross
             profile = certprofileCross();
-            marshall(ms, profile, "Certprofile_Cross.xml");
+            marshall(ms, profile, "certprofile-cross.xml");
 
-            // SubCA
             profile = certprofileSubCa();
-            marshall(ms, profile, "Certprofile_SubCA.xml");
+            marshall(ms, profile, "certprofile-subca.xml");
 
             profile = certprofileSubCaComplex();
-            marshall(ms, profile, "Certprofile_SubCA_Complex.xml");
+            marshall(ms, profile, "certprofile-subca-complex.xml");
 
-            // OCSP
             profile = certprofileOcsp();
-            marshall(ms, profile, "Certprofile_OCSP.xml");
+            marshall(ms, profile, "certprofile-ocsp.xml");
 
-            // SCEP
             profile = certprofileScep();
-            marshall(ms, profile, "Certprofile_SCEP.xml");
+            marshall(ms, profile, "certprofile-scep.xml");
 
-            // EE_Complex
             profile = certprofileEeComplex();
-            marshall(ms, profile, "Certprofile_EE_Complex.xml");
+            marshall(ms, profile, "certprofile-ee-complex.xml");
 
-            // EE_Complex
             profile = certprofileQc();
-            marshall(ms, profile, "Certprofile_QC.xml");
+            marshall(ms, profile, "certprofile-qc.xml");
 
-            // TLS
             profile = certprofileTls();
-            marshall(ms, profile, "Certprofile_TLS.xml");
+            marshall(ms, profile, "certprofile-tls.xml");
 
-            // TLS_C
             profile = certprofileTlsC();
-            marshall(ms, profile, "Certprofile_TLS_C.xml");
+            marshall(ms, profile, "certprofile-tls-c.xml");
 
-            // TLSwithIncSN
             profile = certprofileTlsWithIncSerial();
-            marshall(ms, profile, "Certprofile_TLSwithIncSN.xml");
+            marshall(ms, profile, "certprofile-tls-inc-sn.xml");
 
-            //gSMC-K
             profile = certprofileGsmcK();
-            marshall(ms, profile, "Certprofile_gSMC_K.xml");
+            marshall(ms, profile, "certprofile-gsmc-k.xml");
 
-            //multiple-OUs
             profile = certprofileMultipleOus();
-            marshall(ms, profile, "Certprofile_multipleOUs.xml");
+            marshall(ms, profile, "certprofile-multiple-ous.xml");
 
-            //multiple-valued RDN
             profile = certprofileMultipleValuedRdn();
-            marshall(ms, profile, "Certprofile_multiValuedRDN.xml");
+            marshall(ms, profile, "certprofile-multi-valued-rdn.xml");
 
-            //NOTAFTER = 9999-12-31-59-59
             profile = certprofileMaxTime();
-            marshall(ms, profile, "Certprofile_MaxTime.xml");
+            marshall(ms, profile, "certprofile-max-time.xml");
+
+            profile = certprofileExtended();
+            marshall(ms, profile, "certprofile-extended.xml");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -257,10 +247,11 @@ public class ProfileConfCreatorDemo {
         } finally {
             out.close();
         }
+        System.out.println("Generated certprofile in " + filename);
     } // method marshal
 
     private static X509ProfileType certprofileRootCa() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile RootCA", X509CertLevel.RootCA, "10y",
+        X509ProfileType profile = getBaseProfile("certprofile rootca", X509CertLevel.RootCA, "10y",
                 false);
 
         // Subject
@@ -300,7 +291,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileRootCa
 
     private static X509ProfileType certprofileCross() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile Cross", X509CertLevel.SubCA, "10y",
+        X509ProfileType profile = getBaseProfile("certprofile cross", X509CertLevel.SubCA, "10y",
                 false);
 
         // Subject
@@ -343,7 +334,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileCross
 
     private static X509ProfileType certprofileSubCa() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile SubCA", X509CertLevel.SubCA, "8y",
+        X509ProfileType profile = getBaseProfile("certprofile subca", X509CertLevel.SubCA, "8y",
                 false);
 
         // Subject
@@ -388,7 +379,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileSubCa
 
     private static X509ProfileType certprofileSubCaComplex() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile SubCA with most extensions",
+        X509ProfileType profile = getBaseProfile("certprofile subca-complex (with most extensions)",
                 X509CertLevel.SubCA, "8y", false);
 
         // Subject
@@ -500,7 +491,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileSubCaComplex
 
     private static X509ProfileType certprofileOcsp() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile OCSP", X509CertLevel.EndEntity, "5y",
+        X509ProfileType profile = getBaseProfile("certprofile ocsp", X509CertLevel.EndEntity, "5y",
                 false);
 
         // Subject
@@ -551,7 +542,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileOcsp
 
     private static X509ProfileType certprofileScep() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile SCEP", X509CertLevel.EndEntity, "5y",
+        X509ProfileType profile = getBaseProfile("certprofile scep", X509CertLevel.EndEntity, "5y",
                 false);
 
         profile.setKeyAlgorithms(createRSAKeyAlgorithms());
@@ -598,7 +589,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileScep
 
     private static X509ProfileType certprofileTls() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile TLS", X509CertLevel.EndEntity, "5y",
+        X509ProfileType profile = getBaseProfile("certprofile tls", X509CertLevel.EndEntity, "5y",
                 true);
 
         profile.setDuplicateKey(true);
@@ -682,7 +673,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileTls
 
     private static X509ProfileType certprofileTlsC() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile TLS_C", X509CertLevel.EndEntity, "5y",
+        X509ProfileType profile = getBaseProfile("certprofile tls-c", X509CertLevel.EndEntity, "5y",
                 false);
 
         // Subject
@@ -733,7 +724,8 @@ public class ProfileConfCreatorDemo {
     } // method certprofileTlsC
 
     private static X509ProfileType certprofileTlsWithIncSerial() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN",
+        X509ProfileType profile = getBaseProfile("certprofile tls-inc-sn "
+                + "(serial number will be added automatically)",
                 X509CertLevel.EndEntity, "5y", false);
 
         profile.setDuplicateKey(true);
@@ -792,7 +784,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileTlsWithIncSerial
 
     private static X509ProfileType certprofileGsmcK() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", X509CertLevel.EndEntity,
+        X509ProfileType profile = getBaseProfile("certprofile gsmc-k", X509CertLevel.EndEntity,
                 "5y", false);
 
         // SpecialBehavior
@@ -894,7 +886,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileGsmcK
 
     private static X509ProfileType certprofileMultipleOus() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO",
+        X509ProfileType profile = getBaseProfile("certprofile multiple-ous",
                 X509CertLevel.EndEntity, "5y", false);
 
         // Subject
@@ -945,7 +937,7 @@ public class ProfileConfCreatorDemo {
      * O and OU in one RDN
      */
     private static X509ProfileType certprofileMultipleValuedRdn() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile Multiple Valued RDN",
+        X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn",
                 X509CertLevel.EndEntity, "5y", false);
 
         // Subject
@@ -989,7 +981,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileMultipleValuedRdn
 
     private static X509ProfileType certprofileQc() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile QC", X509CertLevel.EndEntity,
+        X509ProfileType profile = getBaseProfile("certprofile qc", X509CertLevel.EndEntity,
                 "5y", false);
 
         // Subject
@@ -1050,7 +1042,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileEeComplex
 
     private static X509ProfileType certprofileEeComplex() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile EE complex", X509CertLevel.EndEntity,
+        X509ProfileType profile = getBaseProfile("certprofile ee-complex", X509CertLevel.EndEntity,
                 "5y", true);
 
         // Subject
@@ -1245,7 +1237,7 @@ public class ProfileConfCreatorDemo {
     } // method certprofileEeComplex
 
     private static X509ProfileType certprofileMaxTime() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile MaxTime", X509CertLevel.EndEntity,
+        X509ProfileType profile = getBaseProfile("certprofile max-time", X509CertLevel.EndEntity,
                 "9999y", false);
 
         // Subject
@@ -1291,6 +1283,110 @@ public class ProfileConfCreatorDemo {
 
         return profile;
     } // method certprofileMaxTime
+
+    private static X509ProfileType certprofileExtended() throws Exception {
+        X509ProfileType profile = getBaseProfile("certprofile extended", X509CertLevel.EndEntity,
+                "5y", false);
+
+        profile.setDuplicateKey(true);
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setDuplicateSubjectPermitted(true);
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null,
+                null));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // SubjectToSubjectAltName
+        extensions.setSubjectToSubjectAltNames(new SubjectToSubjectAltNamesType());
+        SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
+        extensions.getSubjectToSubjectAltNames().getSubjectToSubjectAltName().add(s2sType);
+        s2sType.setSource(createOidType(ObjectIdentifiers.DN_CN));
+        s2sType.setTarget(new Target());
+        s2sType.getTarget().setDnsName("");
+
+        // Extensions - controls
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - SubjectAltNames
+        SubjectAltName subjectAltNameMode = new SubjectAltName();
+        subjectAltNameMode.setDnsName("");
+        subjectAltNameMode.setIpAddress("");
+        ExtensionValueType extensionValue = createExtensionValueType(subjectAltNameMode);
+        list.add(createExtension(Extension.subjectAlternativeName, true, false, extensionValue));
+
+        // Extensions - basicConstraints
+        extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                    KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+        // Extensions - extenedKeyUsage
+        extensionValue = createExtendedKeyUsage(
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
+
+        // Extensions - tlsFeature
+        extensionValue = createTlsFeature(
+                new TlsExtensionType[]{TlsExtensionType.STATUS_REQUEST,
+                    TlsExtensionType.CLIENT_CERTIFICATE_URL});
+        list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
+
+        // Extensions - SMIMECapabilities
+        extensionValue = createSmimeCapabilities();
+        list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false,
+                extensionValue));
+
+        // Extensions - 1.2.3.4.1 (demo-ca-extraInfo)
+        list.add(createExtension(
+                new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, null, "demo-ca-extraInfo"));
+
+        // Extensions - 1.2.3.4.2 (demo-other-namespace)
+        String xmlBlock = "<sequence xmlns='urn:extra'>"
+            + "\n          <text>aaa</text>"
+            + "\n          <text>bbb</text>"
+            + "\n        </sequence>";
+        Element element;
+        try {
+            element = XmlUtil.getDocumentElment(xmlBlock.getBytes());
+        } catch (IOException | SAXException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+        ExtensionValueType extnValue = new ExtensionValueType();
+        extnValue.setAny(element);
+        list.add(createExtension(new ASN1ObjectIdentifier("1.2.3.4.2"), true, false,
+                extnValue, "demo-other-namespace"));
+
+        return profile;
+    } // method certprofileExtended
 
     private static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max) {
         return createRdn(type, min, max, null, null, null);
@@ -1708,6 +1804,8 @@ public class ProfileConfCreatorDemo {
             }
         }
 
+        algos.add("SM3withSM2");
+
         // Subject
         Subject subject = new Subject();
         subject.setDuplicateSubjectPermitted(false);
@@ -1715,8 +1813,8 @@ public class ProfileConfCreatorDemo {
         subject.setKeepRdnOrder(false);
 
         ASN1ObjectIdentifier[] curveIds = (X509CertLevel.EndEntity != certLevel) ? null :
-            new ASN1ObjectIdentifier[] {
-                SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+            new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
+                TeleTrusTObjectIdentifiers.brainpoolP256r1, GMObjectIdentifiers.sm2p256v1};
 
         // Key
         profile.setKeyAlgorithms(createKeyAlgorithms(curveIds));
@@ -1839,10 +1937,10 @@ public class ProfileConfCreatorDemo {
 
     private static AnyType createDescription(String details) {
         String str = StringUtil.concat(
-                "<my:myDescription xmlns:my=\"http://example.org\">\n"
-                + "  <my:category>cat A</my:category>\n"
-                + "  <my:details>", details, "</my:details>\n"
-                + "</my:myDescription>\n");
+                "<myDescription xmlns=\"http://example.org\">\n"
+                + "      <category>cat A</category>\n"
+                + "      <details>", details, "</details>\n"
+                + "    </myDescription>\n");
         Element element;
         try {
             element = XmlUtil.getDocumentElment(str.getBytes());
