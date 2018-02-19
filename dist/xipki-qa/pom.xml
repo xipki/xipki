@@ -269,6 +269,7 @@
                 <feature>xipki-jscepclient-shell</feature>
                 <feature>xipki-caqa-shell</feature>
                 <feature>xipki-ocspqa-shell</feature>
+                <feature>xipki-custom-certprofiles</feature>
               </features>
             </configuration>
           </execution>
@@ -301,6 +302,7 @@
                 <feature>xipki-jscepclient-shell</feature>
                 <feature>xipki-caqa-shell</feature>
                 <feature>xipki-ocspqa-shell</feature>
+                <feature>xipki-custom-certprofiles</feature>
               </features>
             </configuration>
           </execution>

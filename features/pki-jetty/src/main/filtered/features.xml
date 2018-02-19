@@ -20,7 +20,7 @@
     <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.tk/datasource/${xitk.version}</bundle>
   </feature>
-  <feature name="xipki-caserver" version="${project.version}" description="CA server">
+  <feature name="xipki-ca-base" version="${project.version}" description="CA server base">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <bundle start-level="70">mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
@@ -29,6 +29,9 @@
     <bundle start-level="70">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.pki/ca-server-api/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caserver" version="${project.version}" description="CA server">
+    <feature>xipki-ca-base</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-server-servlet/${project.version}</bundle>
   </feature>
