@@ -128,10 +128,18 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
             ExtensionControl extnControl = extensionOccurences.get(type);
             if (extnControl != null) {
                 UnmodifiableConfPairs caExtraControl = caInfo.extraControl();
-                String text = (caExtraControl == null)
-                        ? "<NO EXTRA CONTROL>" : caExtraControl.getEncoded();
+                String name = "name-a";
+                String value = null;
+                if (caExtraControl != null) {
+                    value = caExtraControl.value(name);
+                }
+
+                if (value == null) {
+                    value = "UNDEF";
+                }
+
                 ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(),
-                        new DERUTF8String(text));
+                        new DERUTF8String(name + ": " + value));
                 extnValues.addExtension(type, extnValue);
             }
         }

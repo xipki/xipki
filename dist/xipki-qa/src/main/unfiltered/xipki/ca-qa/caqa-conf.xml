@@ -71,5 +71,8 @@
     <X509Certprofile name="max-time">
       <file>xipki/qa/certprofile/certprofile-max-time.xml</file>
     </X509Certprofile>
+    <X509Certprofile name="extended">
+      <file>xipki/ca-qa/certprofile/certprofile-extended-qa.xml</file>
+    </X509Certprofile>
   </X509Certprofiles>
 </QAConf>
