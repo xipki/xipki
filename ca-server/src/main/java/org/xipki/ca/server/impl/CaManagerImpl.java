@@ -93,7 +93,6 @@ import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
 import org.xipki.ca.server.impl.ocsp.OcspCertPublisher;
 import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
-import org.xipki.ca.server.impl.scep.ScepManager;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
@@ -170,7 +169,7 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManager {
+public class CaManagerImpl implements CaManager, CmpResponderManager {
 
     private class CertsInQueuePublisher implements Runnable {
 
@@ -2956,12 +2955,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public Scep getScep(String name) {
-        name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-        return (sceps == null) ? null : sceps.get(name);
-    }
-
-    @Override
-    public ScepImpl getScepImpl(String name) {
         name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         return (sceps == null) ? null : sceps.get(name);
     }

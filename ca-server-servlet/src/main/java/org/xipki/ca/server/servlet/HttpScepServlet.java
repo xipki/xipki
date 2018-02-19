@@ -42,8 +42,8 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.CmpResponderManager;
 import org.xipki.ca.server.api.Scep;
-import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
@@ -74,7 +74,7 @@ public class HttpScepServlet extends HttpServlet {
 
     private AuditServiceRegister auditServiceRegister;
 
-    private CaManagerImpl responderManager;
+    private CmpResponderManager responderManager;
 
     public HttpScepServlet() {
     }
@@ -283,7 +283,7 @@ public class HttpScepServlet extends HttpServlet {
         }
     } // method generatePKIMessage
 
-    public void setResponderManager(CaManagerImpl responderManager) {
+    public void setResponderManager(CmpResponderManager responderManager) {
         this.responderManager = responderManager;
     }
 

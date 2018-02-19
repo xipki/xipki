@@ -4,12 +4,12 @@
   <reference id="auditServiceRegister"
       interface="org.xipki.audit.AuditServiceRegister"/>
 
-  <reference id="caManager"
+  <reference id="responderManager"
       interface="org.xipki.ca.server.api.CmpResponderManager"/>
 
   <!-- CMP servlet -->
   <bean id="cmpServlet" class="org.xipki.ca.server.netty.HttpCmpServlet">
-    <property name="responderManager" ref="caManager"/>
+    <property name="responderManager" ref="responderManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <service ref="cmpServlet" interface="org.xipki.http.servlet.HttpServlet">
@@ -20,7 +20,7 @@
 
   <!-- REST servlet -->
   <bean id="restServlet" class="org.xipki.ca.server.netty.HttpRestServlet">
-    <property name="responderManager" ref="caManager"/>
+    <property name="responderManager" ref="responderManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <service ref="restServlet" interface="org.xipki.http.servlet.HttpServlet">
@@ -31,7 +31,7 @@
 
   <!-- SCEP servlet -->
   <bean id="scepServlet" class="org.xipki.ca.server.netty.HttpScepServlet">
-    <property name="responderManager" ref="caManager"/>
+    <property name="responderManager" ref="responderManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <service ref="scepServlet" interface="org.xipki.http.servlet.HttpServlet">
@@ -42,7 +42,7 @@
 
   <!-- Health servlet -->
   <bean id="healthServlet" class="org.xipki.ca.server.netty.HealthCheckServlet">
-    <property name="responderManager" ref="caManager"/>
+    <property name="responderManager" ref="responderManager"/>
   </bean>
   <service ref="healthServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
