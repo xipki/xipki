@@ -79,9 +79,9 @@ import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaUris;
 import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
-import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
@@ -347,7 +347,7 @@ public class CaConf {
                     if (ci.getExtraControl() != null) {
                         String value = getValue(ci.getExtraControl(), zipFile);
                         if (value != null) {
-                            caEntry.setExtraControl(new UnmodifiableConfPairs(value));
+                            caEntry.setExtraControl(new ConfPairs(value).unmodifiable());
                         }
                     }
 

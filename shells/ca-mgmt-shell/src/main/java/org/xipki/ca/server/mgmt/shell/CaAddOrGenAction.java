@@ -35,7 +35,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
-import org.xipki.common.UnmodifiableConfPairs;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -219,7 +219,7 @@ public abstract class CaAddOrGenAction extends CaAction {
             extraControl = extraControl.trim();
         }
         if (StringUtil.isNotBlank(extraControl)) {
-            entry.setExtraControl(new UnmodifiableConfPairs(extraControl));
+            entry.setExtraControl(new ConfPairs(extraControl).unmodifiable());
         }
         return entry;
     } // method getCaEntry

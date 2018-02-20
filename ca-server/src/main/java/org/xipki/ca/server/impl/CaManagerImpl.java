@@ -144,7 +144,6 @@ import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
-import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.DateUtil;
@@ -803,7 +802,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     private boolean startCa(String caName) {
         X509CaInfo caEntry = caInfos.get(caName);
 
-        UnmodifiableConfPairs extraControl = caEntry.caEntry().extraControl();
+        ConfPairs extraControl = caEntry.caEntry().extraControl();
         if (extraControl != null) {
             String str = extraControl.value(RevokeSuspendedCertsControl.KEY_REVOCATION_ENABLED);
             boolean enabled = false;

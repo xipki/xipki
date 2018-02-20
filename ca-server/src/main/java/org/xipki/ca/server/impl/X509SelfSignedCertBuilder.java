@@ -61,7 +61,6 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
-import org.xipki.common.UnmodifiableConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentBagEntrySigner;
@@ -110,7 +109,7 @@ class X509SelfSignedCertBuilder {
             String signerType, String signerConf, IdentifiedX509Certprofile certprofile,
             CertificationRequest csr, BigInteger serialNumber, List<String> cacertUris,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-            UnmodifiableConfPairs extraControl) throws OperationException, InvalidConfException {
+            ConfPairs extraControl) throws OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonBlank("signerType", signerType);
         ParamUtil.requireNonNull("certprofile", certprofile);
@@ -205,7 +204,7 @@ class X509SelfSignedCertBuilder {
             IdentifiedX509Certprofile certprofile, CertificationRequest csr,
             BigInteger serialNumber, SubjectPublicKeyInfo publicKeyInfo,
             List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
-            List<String> deltaCrlUris, UnmodifiableConfPairs extraControl)
+            List<String> deltaCrlUris, ConfPairs extraControl)
             throws OperationException {
 
         SubjectPublicKeyInfo tmpPublicKeyInfo;

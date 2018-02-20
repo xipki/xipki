@@ -41,7 +41,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
-import org.xipki.common.UnmodifiableConfPairs;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -256,7 +256,7 @@ public class CaUpdateCmd extends CaAction {
         }
 
         if (extraControl != null) {
-            entry.setExtraControl(new UnmodifiableConfPairs(extraControl));
+            entry.setExtraControl(new ConfPairs(extraControl).unmodifiable());
         }
 
         if (numCrls != null) {

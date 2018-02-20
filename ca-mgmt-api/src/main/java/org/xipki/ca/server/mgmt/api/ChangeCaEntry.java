@@ -19,7 +19,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.common.UnmodifiableConfPairs;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -57,7 +57,7 @@ public class ChangeCaEntry {
 
     private Integer expirationPeriod;
 
-    private UnmodifiableConfPairs extraControl;
+    private ConfPairs extraControl;
 
     public ChangeCaEntry(NameId ident) throws CaMgmtException {
         this.ident = ParamUtil.requireNonNull("ident", ident);
@@ -171,11 +171,11 @@ public class ChangeCaEntry {
         this.keepExpiredCertInDays = days;
     }
 
-    public UnmodifiableConfPairs extraControl() {
+    public ConfPairs extraControl() {
         return extraControl;
     }
 
-    public void setExtraControl(UnmodifiableConfPairs extraControl) {
+    public void setExtraControl(ConfPairs extraControl) {
         this.extraControl = extraControl;
     }
 
