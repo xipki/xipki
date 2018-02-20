@@ -33,6 +33,20 @@ import org.xipki.common.util.ParamUtil;
 
 public class ConfPairs {
 
+    private class Unmodifiable extends ConfPairs {
+
+        @Override
+        public void putPair(String name, String value) {
+            throw new UnsupportedOperationException("putPair() is not supported");
+        }
+
+        @Override
+        public void removePair(String name) {
+            throw new UnsupportedOperationException("removePair() is not supported");
+        }
+
+    }
+
     public static final char NAME_TERM = '=';
 
     public static final char TOKEN_TERM = ',';
@@ -239,6 +253,10 @@ public class ConfPairs {
             sb.append(ch);
         }
         return sb.toString();
+    }
+
+    public ConfPairs unmodifiable() {
+        return new Unmodifiable();
     }
 
 }
