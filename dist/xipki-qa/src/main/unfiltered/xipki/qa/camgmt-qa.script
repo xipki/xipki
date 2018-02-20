@@ -193,24 +193,24 @@ if { $printUsage equals "true" } {
   echo "#                           CMP control                         #"
   echo "#################################################################"
 
-  CMP_CONTROL = 'send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA'
+  CMP_CONTROL = 'send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA'
 
   ca:cmpcontrol-add --name qa-cmpcontrol1 --conf "${CMP_CONTROL}"
 
   caqa:cmpcontrol-check --name qa-cmpcontrol1 --conf "${CMP_CONTROL}"
 
   ca:cmpcontrol-up --name qa-cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300
+    --conf send.ca=true,messagetime.bias=300
 
   caqa:neg-cmpcontrol-up --name qa-cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300,protection.sigalgo=INVALIDALGO
+    --conf send.ca=true,messagetime.bias=300,protection.sigalgo=INVALIDALGO
 
   caqa:cmpcontrol-check --name qa-cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300
+    --conf send.ca=true,messagetime.bias=300
 
   # name already exists
   caqa:neg-cmpcontrol-add --name qa-cmpcontrol1 \
-    --conf send.ca=true,messageTime.bias=300
+    --conf send.ca=true,messagetime.bias=300
 
   ca:cmpcontrol-rm qa-cmpcontrol1
 
@@ -686,14 +686,14 @@ if { $printUsage equals "true" } {
   ##### cmpcontrol #####
 
   ca:cmpcontrol-add --name cmpcontrol2 \
-    --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
+    --conf send.ca=true,messagetime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
   ca:cmpcontrol-info
 
   ca:cmpcontrol-info cmpcontrol2
 
   ca:cmpcontrol-up --name cmpcontrol2 \
-    --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA
+    --conf send.ca=true,messagetime.bias=300,protection.sigalgo=SHA256withRSA
 
   ca:cmpcontrol-rm cmpcontrol2
 

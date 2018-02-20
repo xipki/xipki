@@ -43,9 +43,9 @@ public class CmpControl {
 
     public static final String KEY_SEND_RESPONDER = "send.responder";
 
-    public static final String KEY_MESSAGETIME_REQUIRED = "messageTime.required";
+    public static final String KEY_MESSAGETIME_REQUIRED = "messagetime.required";
 
-    public static final String KEY_MESSAGETIME_BIAS = "messageTime.bias";
+    public static final String KEY_MESSAGETIME_BIAS = "messagetime.bias";
 
     public static final String KEY_CONFIRM_WAITTIME = "confirm.waittime";
 
@@ -104,25 +104,25 @@ public class CmpControl {
 
         // protection algorithms
         String str = pairs.value(KEY_PROTECTION_SIGALGO);
-        Set<String> algos = (str == null) ? null : StringUtil.splitAsSet(str, ALGO_DELIMITER);
+        Set<String> algos = (str == null) ? null : splitAlgos(str);
         try {
             this.sigAlgoValidator = new CollectionAlgorithmValidator(algos);
         } catch (NoSuchAlgorithmException ex) {
             throw new InvalidConfException("invalid " + KEY_PROTECTION_SIGALGO + ": " + str, ex);
         }
         algos = this.sigAlgoValidator.algoNames();
-        pairs.putPair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(algos, ALGO_DELIMITER));
+        pairs.putPair(KEY_PROTECTION_SIGALGO, algosAsString(algos));
 
         // popo algorithms
         str = pairs.value(KEY_POPO_SIGALGO);
-        algos = (str == null) ? null : StringUtil.splitAsSet(str, ALGO_DELIMITER);
+        algos = (str == null) ? null : splitAlgos(str);
         try {
             this.popoAlgoValidator = new CollectionAlgorithmValidator(algos);
         } catch (NoSuchAlgorithmException ex) {
             throw new InvalidConfException("invalid " + KEY_POPO_SIGALGO + ": " + str, ex);
         }
         algos = this.popoAlgoValidator.algoNames();
-        pairs.putPair(KEY_POPO_SIGALGO, StringUtil.collectionAsString(algos, ALGO_DELIMITER));
+        pairs.putPair(KEY_POPO_SIGALGO, algosAsString(algos));
 
         this.dbEntry = new CmpControlEntry(dbEntry.name(), pairs.getEncoded());
     } // constructor
@@ -170,8 +170,7 @@ public class CmpControl {
         }
 
         if (CollectionUtil.isNonEmpty(sigAlgos)) {
-            pairs.putPair(KEY_PROTECTION_SIGALGO,
-                StringUtil.collectionAsString(this.sigAlgoValidator.algoNames(), ALGO_DELIMITER));
+            pairs.putPair(KEY_PROTECTION_SIGALGO, algosAsString(this.sigAlgoValidator.algoNames()));
         }
 
         try {
@@ -181,8 +180,7 @@ public class CmpControl {
         }
 
         if (CollectionUtil.isNonEmpty(popoAlgos)) {
-            pairs.putPair(KEY_POPO_SIGALGO,
-                StringUtil.collectionAsString(this.popoAlgoValidator.algoNames(), ALGO_DELIMITER));
+            pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popoAlgoValidator.algoNames()));
         }
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
@@ -238,10 +236,8 @@ public class CmpControl {
 
     @Override
     public String toString() {
-        String protAlgos = StringUtil.collectionAsString(
-                sigAlgoValidator.algoNames(), ALGO_DELIMITER);
-        String popoAlgos = StringUtil.collectionAsString(
-                popoAlgoValidator.algoNames(), ALGO_DELIMITER);
+        String protAlgos = algosAsString(sigAlgoValidator.algoNames());
+        String popoAlgos = algosAsString(popoAlgoValidator.algoNames());
         return StringUtil.concatObjectsCap(500, "name: ", dbEntry.name(),
                 "\nconfirmCert: ", getYesNo(confirmCert),
                 "\nsendCaCert: ", getYesNo(sendCaCert),
@@ -270,6 +266,14 @@ public class CmpControl {
 
     private static String getYesNo(boolean bo) {
         return bo ? "yes" : "no";
+    }
+
+    private static String algosAsString(Set<String> algos) {
+        return StringUtil.collectionAsString(algos, ALGO_DELIMITER);
+    }
+
+    private static Set<String> splitAlgos(String encoded) {
+        return StringUtil.splitAsSet(encoded, ALGO_DELIMITER);
     }
 
 }

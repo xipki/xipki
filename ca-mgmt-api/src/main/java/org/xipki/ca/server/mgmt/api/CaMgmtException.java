@@ -31,7 +31,6 @@ public class CaMgmtException extends Exception {
     private static final long serialVersionUID = 1L;
 
     public CaMgmtException() {
-        super();
     }
 
     public CaMgmtException(String message, Throwable cause) {

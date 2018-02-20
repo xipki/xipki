@@ -76,8 +76,7 @@ class CertRepublisher {
             try {
                 List<SerialWithId> serials;
                 do {
-                    serials = certstore.getCertSerials(ca, startId, numEntries,
-                            onlyRevokedCerts);
+                    serials = certstore.getCertSerials(ca, startId, numEntries, onlyRevokedCerts);
                     long maxId = 1;
                     for (SerialWithId sid : serials) {
                         if (sid.id() > maxId) {
@@ -144,8 +143,7 @@ class CertRepublisher {
                 X509CertificateInfo certInfo;
 
                 try {
-                    certInfo = certstore.getCertificateInfoForId(ca, caCert, sid.id(),
-                            caIdNameMap);
+                    certInfo = certstore.getCertificateInfoForId(ca, caCert, sid.id(), caIdNameMap);
                 } catch (OperationException | CertificateException ex) {
                     LogUtil.error(LOG, ex);
                     failed = true;

@@ -379,8 +379,12 @@ public class RestImpl implements Rest {
             return new RestResponse(HttpResponseStatus.OK, respCt, headers, respBytes);
         } catch (OperationException ex) {
             ErrorCode code = ex.errorCode();
-            LOG.warn("generate certificate, OperationException: code={}, message={}",
-                    code.name(), ex.errorMessage());
+            if (LOG.isWarnEnabled()) {
+                String msg = StringUtil.concat("generate certificate, OperationException: code=",
+                        code.name(), ", message=", ex.errorMessage());
+                LOG.warn(msg);
+                LOG.debug(msg, ex);
+            }
 
             int sc;
             String failureInfo;

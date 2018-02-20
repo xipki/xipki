@@ -172,6 +172,7 @@ class IdentifiedX509Certprofile {
             } catch (NumberFormatException ex) {
                 throw new CertprofileException("invalid " + paramName + ": " + str);
             }
+
             if (idx < 1) {
                 throw new CertprofileException("invalid " + paramName + ": " + str);
             }

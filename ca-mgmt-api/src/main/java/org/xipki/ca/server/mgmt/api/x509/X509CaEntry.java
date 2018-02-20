@@ -26,6 +26,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -126,7 +127,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     public String crlUrisAsString() {
-        return toString(crlUris);
+        return urisToString(crlUris);
     }
 
     public List<String> deltaCrlUris() {
@@ -134,7 +135,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     public String deltaCrlUrisAsString() {
-        return toString(deltaCrlUris);
+        return urisToString(deltaCrlUris);
     }
 
     public List<String> ocspUris() {
@@ -142,7 +143,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     public String ocspUrisAsString() {
-        return toString(ocspUris);
+        return urisToString(ocspUris);
     }
 
     public List<String> cacertUris() {
@@ -150,7 +151,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     public String cacertUrisAsString() {
-        return toString(cacertUris);
+        return urisToString(cacertUris);
     }
 
     public X509Certificate certificate() {
@@ -172,10 +173,10 @@ public class X509CaEntry extends CaEntry {
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
         String superToStr = super.toString(verbose, ignoreSensitiveInfo);
         String str = StringUtil.concatObjectsCap(1000, superToStr,
-                (superToStr.charAt(superToStr.length() - 1) == '\n' ? "\n" : ""),
+                (superToStr.charAt(superToStr.length() - 1) == '\n' ? "" : "\n"),
                 "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
-                "\ndeltaCrlUris: ", deltaCrlUrisAsString(), "\ncrlUris: ", crlUrisAsString(),
-                "\nocspUris: ", ocspUrisAsString(), "\ncaCertUris: ", cacertUrisAsString(),
+                "\ndeltaCrlUris:", formatUris(deltaCrlUris), "\ncrlUris:", formatUris(crlUris),
+                "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(cacertUris),
                 "\ncert: \n", InternUtil.formatCert(cert, verbose),
                 "\ncrlSignerName: ", crlSignerName,
                 "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), "\n");
@@ -280,4 +281,14 @@ public class X509CaEntry extends CaEntry {
         return ident().hashCode();
     }
 
+    private static String formatUris(List<String> uris) {
+        if (CollectionUtil.isEmpty(uris)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String uri : uris) {
+            sb.append("\n    ").append(uri);
+        }
+        return sb.toString();
+    }
 }

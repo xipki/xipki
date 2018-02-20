@@ -27,7 +27,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -291,7 +290,7 @@ class CaManagerQueryExecutor {
     }
 
     List<String> namesFromTable(String table, String nameColumn) throws CaMgmtException {
-        final String sql = StringUtil.concat("SELECT ", nameColumn, " FROM ", table);
+        final String sql = concat("SELECT ", nameColumn, " FROM ", table);
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -496,24 +495,24 @@ class CaManagerQueryExecutor {
 
             List<String> tmpCrlUris = null;
             if (StringUtil.isNotBlank(crlUris)) {
-                tmpCrlUris = StringUtil.split(crlUris, " \t");
+                tmpCrlUris = StringUtil.splitByComma(crlUris);
             }
 
             List<String> tmpDeltaCrlUris = null;
             if (StringUtil.isNotBlank(deltaCrlUris)) {
-                tmpDeltaCrlUris = StringUtil.split(deltaCrlUris, " \t");
+                tmpDeltaCrlUris = StringUtil.splitByComma(deltaCrlUris);
             }
 
             String ocspUris = rs.getString("OCSP_URIS");
             List<String> tmpOcspUris = null;
             if (StringUtil.isNotBlank(ocspUris)) {
-                tmpOcspUris = StringUtil.split(ocspUris, " \t");
+                tmpOcspUris = StringUtil.splitByComma(ocspUris);
             }
 
             String cacertUris = rs.getString("CACERT_URIS");
             List<String> tmpCacertUris = null;
             if (StringUtil.isNotBlank(cacertUris)) {
-                tmpCacertUris = StringUtil.split(cacertUris, " \t");
+                tmpCacertUris = StringUtil.splitByComma(cacertUris);
             }
 
             X509CaUris caUris = new X509CaUris(tmpCacertUris, tmpOcspUris, tmpCrlUris,
@@ -545,22 +544,22 @@ class CaManagerQueryExecutor {
             entry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
             String crlsignerName = rs.getString("CRLSIGNER_NAME");
-            if (crlsignerName != null) {
+            if (StringUtil.isNotBlank(crlsignerName)) {
                 entry.setCrlSignerName(crlsignerName);
             }
 
             String responderName = rs.getString("RESPONDER_NAME");
-            if (responderName != null) {
+            if (StringUtil.isNotBlank(responderName)) {
                 entry.setResponderName(responderName);
             }
 
             String extraControl = rs.getString("EXTRA_CONTROL");
-            if (extraControl != null) {
+            if (StringUtil.isNotBlank(extraControl)) {
                 entry.setExtraControl(new ConfPairs(extraControl).unmodifiable());
             }
 
             String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
-            if (cmpcontrolName != null) {
+            if (StringUtil.isNotBlank(cmpcontrolName)) {
                 entry.setCmpControlName(cmpcontrolName);
             }
 
@@ -619,7 +618,7 @@ class CaManagerQueryExecutor {
                 boolean ra = rs.getBoolean("RA");
                 int permission = rs.getInt("PERMISSION");
                 String str = rs.getString("PROFILES");
-                List<String> list = StringUtil.split(str, ",");
+                List<String> list = StringUtil.splitByComma(str);
                 Set<String> profiles = (list == null) ? null : new HashSet<>(list);
                 CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
                 entry.setRa(ra);
@@ -697,7 +696,7 @@ class CaManagerQueryExecutor {
             }
         }
 
-        final String sql = StringUtil.concat("DELETE FROM ", table, " WHERE NAME=?");
+        final String sql = concat("DELETE FROM ", table, " WHERE NAME=?");
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -777,7 +776,12 @@ class CaManagerQueryExecutor {
             ps.setInt(idx++, entry.keepExpiredCertInDays());
             ps.setString(idx++, entry.validityMode().name());
             ConfPairs extraControl = entry.extraControl();
-            ps.setString(idx++, (extraControl == null) ? null : extraControl.getEncoded());
+            String encodedExtraCtrl = (extraControl == null) ? null : extraControl.getEncoded();
+            if (StringUtil.isBlank(encodedExtraCtrl)) {
+                ps.setString(idx++, null);
+            } else {
+                ps.setString(idx++, encodedExtraCtrl);
+            }
             ps.setString(idx++, entry.signerConf());
             ps.executeUpdate();
             if (LOG.isInfoEnabled()) {
@@ -961,7 +965,7 @@ class CaManagerQueryExecutor {
             setBoolean(ps, idx++, ra);
             int permission = requestor.permission();
             ps.setInt(idx++, permission);
-            String profilesText = toString(requestor.profiles(), ",");
+            String profilesText = StringUtil.collectionAsStringByComma(requestor.profiles());
             ps.setString(idx++, profilesText);
 
             ps.executeUpdate();
@@ -982,7 +986,7 @@ class CaManagerQueryExecutor {
             try {
                 new CrlControl(crlControl);
             } catch (InvalidConfException ex) {
-                throw new CaMgmtException("invalid CRL control '" + crlControl + "'");
+                throw new CaMgmtException(concat("invalid CRL control '", crlControl, "'"));
             }
         }
 
@@ -1274,25 +1278,25 @@ class CaManagerQueryExecutor {
             }
 
             if (idxCrlUris != null) {
-                String txt = toString(crlUris, ", ");
+                String txt = StringUtil.collectionAsStringByComma(crlUris);
                 sb.append("crlUri: '").append(txt).append("'; ");
                 ps.setString(idxCrlUris, txt);
             }
 
             if (idxDeltaCrlUris != null) {
-                String txt = toString(deltaCrlUris, ", ");
+                String txt = StringUtil.collectionAsStringByComma(deltaCrlUris);
                 sb.append("deltaCrlUri: '").append(txt).append("'; ");
                 ps.setString(idxDeltaCrlUris, txt);
             }
 
             if (idxOcspUris != null) {
-                String txt = toString(ocspUris, ", ");
+                String txt = StringUtil.collectionAsStringByComma(ocspUris);
                 sb.append("ocspUri: '").append(txt).append("'; ");
                 ps.setString(idxOcspUris, txt);
             }
 
             if (idxCacertUris != null) {
-                String txt = toString(cacertUris, ", ");
+                String txt = StringUtil.collectionAsStringByComma(cacertUris);
                 sb.append("caCertUri: '").append(txt).append("'; ");
                 ps.setString(idxCacertUris, txt);
             }
@@ -1727,7 +1731,7 @@ class CaManagerQueryExecutor {
             try {
                 new CrlControl(tmpCrlControl);
             } catch (InvalidConfException ex) {
-                throw new CaMgmtException("invalid CRL control '" + tmpCrlControl + "'");
+                throw new CaMgmtException(concat("invalid CRL control '", tmpCrlControl, "'"));
             }
         }
 
@@ -1918,7 +1922,7 @@ class CaManagerQueryExecutor {
 
             if (idxProfiles != null) {
                 sb.append("profiles: '").append(certProfiles).append("'; ");
-                ps.setString(idxProfiles, StringUtil.collectionAsString(certProfiles, ","));
+                ps.setString(idxProfiles, StringUtil.collectionAsStringByComma(certProfiles));
             }
 
             if (idxControl != null) {
@@ -1951,7 +1955,7 @@ class CaManagerQueryExecutor {
     boolean changeEnvParam(String name, String value) throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
-            throw new CaMgmtException("environment " + name + " is reserved");
+            throw new CaMgmtException(concat("environment ", name, " is reserved"));
         }
         if (value == null) {
             return false;
@@ -2256,7 +2260,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, scepEntry.name());
             ps.setInt(idx++, scepEntry.caIdent().id());
             setBoolean(ps, idx++, scepEntry.active());
-            ps.setString(idx++, StringUtil.collectionAsString(scepEntry.certProfiles(), ","));
+            ps.setString(idx++, StringUtil.collectionAsStringByComma(scepEntry.certProfiles()));
             ps.setString(idx++, scepEntry.control());
             ps.setString(idx++, scepEntry.responderType());
             ps.setString(idx++, scepEntry.base64Cert());
@@ -2314,7 +2318,7 @@ class CaManagerQueryExecutor {
                 cert = null;
             }
 
-            Set<String> profiles = StringUtil.splitAsSet(profilesText, ", ");
+            Set<String> profiles = StringUtil.splitByCommaAsSet(profilesText);
 
             return new ScepEntry(name, idNameMap.ca(caId), active, type, conf, cert, profiles,
                     control);
@@ -2332,7 +2336,7 @@ class CaManagerQueryExecutor {
         final String name = userEntry.ident().name();
         Integer existingId = getIdForName(sqls.sqlSelectUserId, name);
         if (existingId != null) {
-            throw new CaMgmtException("user named '" + name + " ' already exists");
+            throw new CaMgmtException(concat("user named '", name, " ' already exists"));
         }
         userEntry.ident().setId(existingId);
 
@@ -2389,7 +2393,7 @@ class CaManagerQueryExecutor {
 
         Integer existingId = getIdForName(sqls.sqlSelectUserId, userName);
         if (existingId == null) {
-            throw new CaMgmtException("user '" + userName + " ' does not exist");
+            throw new CaMgmtException(concat("user '", userName, " ' does not exist"));
         }
         userEntry.ident().setId(existingId);
 
@@ -2487,7 +2491,7 @@ class CaManagerQueryExecutor {
         final NameId userIdent = user.userIdent();
         Integer existingId = getIdForName(sqls.sqlSelectUserId, userIdent.name());
         if (existingId == null) {
-            throw new CaMgmtException("user '" + userIdent.name() + " ' does not exist");
+            throw new CaMgmtException(concat("user '", userIdent.name(), " ' does not exist"));
         }
         userIdent.setId(existingId);
 
@@ -2511,7 +2515,7 @@ class CaManagerQueryExecutor {
             ps.setInt(idx++, userIdent.id());
             ps.setInt(idx++, user.permission());
 
-            String profilesText = toString(user.profiles(), ",");
+            String profilesText = StringUtil.collectionAsStringByComma(user.profiles());
             ps.setString(idx++, profilesText);
 
             int num = ps.executeUpdate();
@@ -2529,7 +2533,7 @@ class CaManagerQueryExecutor {
             throws CaMgmtException {
         Integer existingId = getIdForName(sqls.sqlSelectUserId, user);
         if (existingId == null) {
-            throw new CaMgmtException("user '" + user + " ' does not exist");
+            throw new CaMgmtException(concat("user '", user, " ' does not exist"));
         }
 
         final String sql = "SELECT CA_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
@@ -2544,7 +2548,7 @@ class CaManagerQueryExecutor {
             while (rs.next()) {
                 int permission = rs.getInt("PERMISSION");
                 String str = rs.getString("PROFILES");
-                List<String> list = StringUtil.split(str, ",");
+                List<String> list = StringUtil.splitByComma(str);
                 Set<String> profiles = (list == null) ? null : new HashSet<>(list);
                 CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
                 caHasUser.setPermission(permission);
@@ -2607,10 +2611,6 @@ class CaManagerQueryExecutor {
         return index.getAndIncrement();
     }
 
-    private static String toString(Collection<String> tokens, String seperator) {
-        return StringUtil.collectionAsString(tokens, seperator);
-    }
-
     private static String getRealString(String str) {
         return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
     }
@@ -2627,7 +2627,7 @@ class CaManagerQueryExecutor {
             return id.intValue();
         }
 
-        throw new CaMgmtException("Found no entry named '" + name + "'");
+        throw new CaMgmtException(concat("Found no entry named ",name));
     }
 
     private Integer getIdForName(String sql, String name) throws CaMgmtException {
@@ -2650,7 +2650,7 @@ class CaManagerQueryExecutor {
     }
 
     private Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
-        final String sql = "SELECT ID,NAME FROM " + tableName;
+        final String sql = concat("SELECT ID,NAME FROM ", tableName);
         Statement ps = null;
         ResultSet rs = null;
 
@@ -2668,6 +2668,10 @@ class CaManagerQueryExecutor {
         }
 
         return ret;
+    }
+
+    private static String concat(String s1, String... strs) {
+        return StringUtil.concat(s1, strs);
     }
 
 }

@@ -1512,7 +1512,7 @@ class CertStoreQueryExecutor {
 
             int permission = rs.getInt("PERMISSION");
             String str = rs.getString("PROFILES");
-            List<String> list = StringUtil.split(str, ",");
+            List<String> list = StringUtil.splitByComma(str);
             Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
             CaHasUserEntry entry = new CaHasUserEntry(user);

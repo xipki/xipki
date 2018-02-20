@@ -27,13 +27,13 @@ import org.xipki.common.util.StringUtil;
  *
  * <pre>
  *
- * caCert.included?true%signerCert.included?false
+ * cacert.included?true%signercert.included?false
  *
  * # Whether CA certificate is included in the response. Default is true
- * caCert.included=&lt;'true'|'false'&gt;
+ * cacert.included=&lt;'true'|'false'&gt;
  *
  * # Whether CMS signer certificate is embedded in the CMS message. Default is true
- * signerCert.included=&lt;'true'|'false'&gt;
+ * signercert.included=&lt;'true'|'false'&gt;
  *
  *</pre>
  *
@@ -43,9 +43,9 @@ import org.xipki.common.util.StringUtil;
 
 public class ScepControl {
 
-    public static final String KEY_CACERT_INCLUDED = "caCert.included";
+    public static final String KEY_CACERT_INCLUDED = "cacert.included";
 
-    public static final String KEY_SIGNERCERT_INCLUDED = "signerCert.included";
+    public static final String KEY_SIGNERCERT_INCLUDED = "signercert.included";
 
     public static final String KEY_SUPPORT_GETCRL = "support.getcrl";
 

@@ -9,7 +9,7 @@
   <cmpcontrols>
     <cmpcontrol name="cmpcontrol1">
       <conf>
-        <value>send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</value>
+        <value>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</value>
        </conf>
     </cmpcontrol>
   </cmpcontrols>
@@ -135,7 +135,7 @@
       <profiles>
         <str>all</str>
       </profiles>
-      <control>caCert.included=false,signerCert.included=true,support.getcrl=true</control>
+      <control>cacert.included=false,signercert.included=true,support.getcrl=true</control>
     </scep>
   </sceps>
 </CAConf>

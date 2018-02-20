@@ -163,7 +163,7 @@ public class ScepImpl implements Scep {
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
-        LOG.info("SCEP {}: caCert.included={}, signerCert.included={},support.getcrl={}",
+        LOG.info("SCEP {}: cacert.included={}, signercert.included={},support.getcrl={}",
                 this.caIdent, this.control.includeCaCert(), this.control.includeSignerCert(),
                 this.control.supportGetCrl());
 

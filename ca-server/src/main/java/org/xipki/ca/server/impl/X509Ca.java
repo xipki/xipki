@@ -2050,6 +2050,7 @@ public class X509Ca {
         try {
             grantedPublicKeyInfo = X509Util.toRfc3279Style(certTemplate.publicKeyInfo());
         } catch (InvalidKeySpecException ex) {
+            LogUtil.warn(LOG, ex, "invalid SubjectPublicKeyInfo");
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                     "invalid SubjectPublicKeyInfo");
         }

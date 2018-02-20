@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -43,6 +44,7 @@ public class CaProfileRemoveCmd extends CaAction {
 
     @Option(name = "--profile", required = true, multiValued = true,
             description = "certificate profile name\n(required, multi-valued)")
+    @Completion(ProfileNameCompleter.class)
     private List<String> profileNames;
 
     @Override

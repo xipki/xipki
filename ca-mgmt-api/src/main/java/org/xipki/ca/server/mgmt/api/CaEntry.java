@@ -223,6 +223,16 @@ public class CaEntry {
     }
 
     public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
+        String extraCtrlText;
+        if (extraControl == null) {
+            extraCtrlText = "null";
+        } else {
+            extraCtrlText = extraControl.getEncoded();
+            if (!verbose && extraCtrlText.length() > 100) {
+                extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97), "...");
+            }
+        }
+
         return StringUtil.concatObjectsCap(500, "id: ", ident.id(), "\nname: ", ident.name(),
                 "\nstatus: ", (status == null ? "null" : status.status()),
                 "\nmaxValidity: ", maxValidity,
@@ -237,12 +247,12 @@ public class CaEntry {
                 "\nsaveRequest: ", saveRequest,
                 "\nvalidityMode: ", validityMode,
                 "\npermission: ", permission,
-                "\nkeepExpiredCerts: ",
-                    (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
-                "\nextraControl: ", extraControl, "\n");
+                "\nkeepExpiredCerts: ", (keepExpiredCertInDays < 0
+                                            ? "forever" : keepExpiredCertInDays + " days"),
+                "\nextraControl: ", extraCtrlText, "\n");
     } // method toString
 
-    protected static String toString(Collection<? extends Object> tokens) {
+    protected static String urisToString(Collection<? extends Object> tokens) {
         if (CollectionUtil.isEmpty(tokens)) {
             return null;
         }
@@ -254,7 +264,7 @@ public class CaEntry {
         for (Object token : tokens) {
             sb.append(token);
             if (idx++ < size - 1) {
-                sb.append(", ");
+                sb.append(" ");
             }
         }
         return sb.toString();
