@@ -29,85 +29,85 @@ import org.xipki.scep.client.exception.ScepClientException;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class ScepClient extends Client {
 
-    public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator)
-            throws MalformedURLException {
-        super(caId, caCertValidator);
-    }
+  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator)
+      throws MalformedURLException {
+    super(caId, caCertValidator);
+  }
 
-    @Override
-    protected ScepHttpResponse httpGet(String url) throws ScepClientException {
-        ScepUtil.requireNonNull("url", url);
-        try {
-            HttpURLConnection httpConn = openHttpConn(new URL(url));
-            httpConn.setRequestMethod("GET");
-            return parseResponse(httpConn);
-        } catch (IOException ex) {
-            throw new ScepClientException(ex);
+  @Override
+  protected ScepHttpResponse httpGet(String url) throws ScepClientException {
+    ScepUtil.requireNonNull("url", url);
+    try {
+      HttpURLConnection httpConn = openHttpConn(new URL(url));
+      httpConn.setRequestMethod("GET");
+      return parseResponse(httpConn);
+    } catch (IOException ex) {
+      throw new ScepClientException(ex);
+    }
+  }
+
+  @Override
+  protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
+      throws ScepClientException {
+    ScepUtil.requireNonNull("url", url);
+    try {
+      HttpURLConnection httpConn = openHttpConn(new URL(url));
+      httpConn.setDoOutput(true);
+      httpConn.setUseCaches(false);
+
+      httpConn.setRequestMethod("POST");
+      if (request != null) {
+        if (requestContentType != null) {
+          httpConn.setRequestProperty("Content-Type", requestContentType);
         }
+        httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
+        OutputStream outputstream = httpConn.getOutputStream();
+        outputstream.write(request);
+        outputstream.flush();
+      }
+
+      return parseResponse(httpConn);
+    } catch (IOException ex) {
+      throw new ScepClientException(ex.getMessage(), ex);
     }
+  }
 
-    @Override
-    protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
-            throws ScepClientException {
-        ScepUtil.requireNonNull("url", url);
-        try {
-            HttpURLConnection httpConn = openHttpConn(new URL(url));
-            httpConn.setDoOutput(true);
-            httpConn.setUseCaches(false);
+  protected ScepHttpResponse parseResponse(HttpURLConnection conn) throws ScepClientException {
+    ScepUtil.requireNonNull("conn", conn);
+    try {
+      InputStream inputstream = conn.getInputStream();
+      if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        inputstream.close();
+        throw new ScepClientException("bad response: " + conn.getResponseCode() + "    "
+                + conn.getResponseMessage());
+      }
+      String contentType = conn.getContentType();
+      int contentLength = conn.getContentLength();
 
-            httpConn.setRequestMethod("POST");
-            if (request != null) {
-                if (requestContentType != null) {
-                    httpConn.setRequestProperty("Content-Type", requestContentType);
-                }
-                httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
-                OutputStream outputstream = httpConn.getOutputStream();
-                outputstream.write(request);
-                outputstream.flush();
-            }
-
-            return parseResponse(httpConn);
-        } catch (IOException ex) {
-            throw new ScepClientException(ex.getMessage(), ex);
-        }
+      ScepHttpResponse resp = new ScepHttpResponse(contentType, contentLength, inputstream);
+      String contentEncoding = conn.getContentEncoding();
+      if (contentEncoding != null && !contentEncoding.isEmpty()) {
+        resp.setContentEncoding(contentEncoding);
+      }
+      return resp;
+    } catch (IOException ex) {
+      throw new ScepClientException(ex);
     }
+  }
 
-    protected ScepHttpResponse parseResponse(HttpURLConnection conn) throws ScepClientException {
-        ScepUtil.requireNonNull("conn", conn);
-        try {
-            InputStream inputstream = conn.getInputStream();
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                inputstream.close();
-
-                throw new ScepClientException("bad response: " + conn.getResponseCode() + "    "
-                        + conn.getResponseMessage());
-            }
-            String contentType = conn.getContentType();
-            int contentLength = conn.getContentLength();
-
-            ScepHttpResponse resp = new ScepHttpResponse(contentType, contentLength, inputstream);
-            String contentEncoding = conn.getContentEncoding();
-            if (contentEncoding != null && !contentEncoding.isEmpty()) {
-                resp.setContentEncoding(contentEncoding);
-            }
-            return resp;
-        } catch (IOException ex) {
-            throw new ScepClientException(ex);
-        }
+  private static HttpURLConnection openHttpConn(URL url) throws IOException {
+    ScepUtil.requireNonNull("url", url);
+    URLConnection conn = url.openConnection();
+    if (conn instanceof HttpURLConnection) {
+      return (HttpURLConnection) conn;
     }
-
-    private static HttpURLConnection openHttpConn(URL url) throws IOException {
-        ScepUtil.requireNonNull("url", url);
-        URLConnection conn = url.openConnection();
-        if (conn instanceof HttpURLConnection) {
-            return (HttpURLConnection) conn;
-        }
-        throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
-    }
+    throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
+  }
 
 }

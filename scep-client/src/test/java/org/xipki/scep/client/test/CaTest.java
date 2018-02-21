@@ -20,19 +20,20 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class CaTest extends AbstractCaTest {
 
-    @Override
-    protected boolean isWithRa() {
-        return true;
-    }
+  @Override
+  protected boolean isWithRa() {
+    return true;
+  }
 
-    @Override
-    protected CaCapability[] getExcludedCaCaps() {
-        return null;
-    }
+  @Override
+  protected CaCapability[] getExcludedCaCaps() {
+    return null;
+  }
 
 }

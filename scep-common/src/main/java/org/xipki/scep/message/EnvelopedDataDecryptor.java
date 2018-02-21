@@ -28,46 +28,47 @@ import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public final class EnvelopedDataDecryptor {
 
-    private final List<EnvelopedDataDecryptorInstance> decryptors;
+  private final List<EnvelopedDataDecryptorInstance> decryptors;
 
-    public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
-        ScepUtil.requireNonEmpty("decryptors", decryptors);
-        this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
+  public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
+    ScepUtil.requireNonEmpty("decryptors", decryptors);
+    this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
+  }
+
+  public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
+    ScepUtil.requireNonNull("decryptor", decryptor);
+    this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
+    this.decryptors.add(decryptor);
+  }
+
+  public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {
+    ScepUtil.requireNonNull("envData", envData);
+    final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
+    RecipientInformation recipientInfo = null;
+    EnvelopedDataDecryptorInstance decryptor = null;
+    for (EnvelopedDataDecryptorInstance m : decryptors) {
+      recipientInfo = recipientInfos.get(m.recipientId());
+      if (recipientInfo != null) {
+        decryptor = m;
+        break;
+      }
     }
 
-    public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
-        ScepUtil.requireNonNull("decryptor", decryptor);
-        this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
-        this.decryptors.add(decryptor);
+    if (recipientInfo == null || decryptor == null) {
+      throw new MessageDecodingException("missing expected key transfer recipient");
     }
 
-    public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {
-        ScepUtil.requireNonNull("envData", envData);
-        final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
-        RecipientInformation recipientInfo = null;
-        EnvelopedDataDecryptorInstance decryptor = null;
-        for (EnvelopedDataDecryptorInstance m : decryptors) {
-            recipientInfo = recipientInfos.get(m.recipientId());
-            if (recipientInfo != null) {
-                decryptor = m;
-                break;
-            }
-        }
-
-        if (recipientInfo == null || decryptor == null) {
-            throw new MessageDecodingException("missing expected key transfer recipient");
-        }
-
-        try {
-            return recipientInfo.getContent(decryptor.recipient());
-        } catch (CMSException ex) {
-            throw new MessageDecodingException("could not decrypt the envelopedData");
-        }
+    try {
+      return recipientInfo.getContent(decryptor.recipient());
+    } catch (CMSException ex) {
+      throw new MessageDecodingException("could not decrypt the envelopedData");
     }
+  }
 
 }

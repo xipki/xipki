@@ -20,14 +20,15 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class HttpGetOnlyCaTest extends AbstractCaTest {
 
-    @Override
-    protected CaCapability[] getExcludedCaCaps() {
-        return new CaCapability[]{CaCapability.POSTPKIOperation};
-    }
+  @Override
+  protected CaCapability[] getExcludedCaCaps() {
+    return new CaCapability[]{CaCapability.POSTPKIOperation};
+  }
 
 }

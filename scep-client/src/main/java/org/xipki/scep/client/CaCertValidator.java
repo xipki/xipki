@@ -27,12 +27,12 @@ import java.security.cert.X509Certificate;
 
 public interface CaCertValidator {
 
-    /**
-     *
-     * @param cert
-     *          Target certificate.
-     * @return whether the certificate is trusted.
-     */
-    boolean isTrusted(X509Certificate cert);
+  /**
+   * TODO.
+   * @param cert
+   *          Target certificate.
+   * @return whether the certificate is trusted.
+   */
+  boolean isTrusted(X509Certificate cert);
 
 }

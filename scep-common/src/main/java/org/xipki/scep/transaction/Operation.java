@@ -20,34 +20,35 @@ package org.xipki.scep.transaction;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public enum Operation {
 
-    GetCACaps("GetCACaps"),
-    PKIOperation("PKIOperation"),
-    GetCACert("GetCACert"),
-    GetNextCACert("GetNextCACert");
+  GetCACaps("GetCACaps"),
+  PKIOperation("PKIOperation"),
+  GetCACert("GetCACert"),
+  GetNextCACert("GetNextCACert");
 
-    private final String code;
+  private final String code;
 
-    Operation(String code) {
-        this.code = code;
+  Operation(String code) {
+    this.code = code;
+  }
+
+  public String code() {
+    return code;
+  }
+
+  public static Operation forValue(String code) {
+    ScepUtil.requireNonNull("code", code);
+    for (Operation m : values()) {
+      if (code.equalsIgnoreCase(m.code)) {
+        return m;
+      }
     }
-
-    public String code() {
-        return code;
-    }
-
-    public static Operation forValue(String code) {
-        ScepUtil.requireNonNull("code", code);
-        for (Operation m : values()) {
-            if (code.equalsIgnoreCase(m.code)) {
-                return m;
-            }
-        }
-        throw new IllegalArgumentException("invalid Operation " + code);
-    }
+    throw new IllegalArgumentException("invalid Operation " + code);
+  }
 
 }

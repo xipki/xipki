@@ -20,48 +20,49 @@ package org.xipki.scep.serveremulator;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class ScepControl {
 
-    private final boolean sendCaCert;
+  private final boolean sendCaCert;
 
-    private final boolean pendingCert;
+  private final boolean pendingCert;
 
-    private final boolean useInsecureAlg;
+  private final boolean useInsecureAlg;
 
-    private final boolean sendSignerCert;
+  private final boolean sendSignerCert;
 
-    private final String secret;
+  private final String secret;
 
-    public ScepControl(boolean sendCaCert, boolean pendingCert, boolean sendSignerCert,
-            boolean useInsecureAlg, String secret) {
-        this.secret = ScepUtil.requireNonBlank("secret", secret);
-        this.sendCaCert = sendCaCert;
-        this.pendingCert = pendingCert;
-        this.sendSignerCert = sendSignerCert;
-        this.useInsecureAlg = useInsecureAlg;
-    }
+  public ScepControl(boolean sendCaCert, boolean pendingCert, boolean sendSignerCert,
+      boolean useInsecureAlg, String secret) {
+    this.secret = ScepUtil.requireNonBlank("secret", secret);
+    this.sendCaCert = sendCaCert;
+    this.pendingCert = pendingCert;
+    this.sendSignerCert = sendSignerCert;
+    this.useInsecureAlg = useInsecureAlg;
+  }
 
-    public boolean sendCaCert() {
-        return sendCaCert;
-    }
+  public boolean sendCaCert() {
+    return sendCaCert;
+  }
 
-    public boolean isPendingCert() {
-        return pendingCert;
-    }
+  public boolean isPendingCert() {
+    return pendingCert;
+  }
 
-    public boolean isUseInsecureAlg() {
-        return useInsecureAlg;
-    }
+  public boolean isUseInsecureAlg() {
+    return useInsecureAlg;
+  }
 
-    public boolean isSendSignerCert() {
-        return sendSignerCert;
-    }
+  public boolean isSendSignerCert() {
+    return sendSignerCert;
+  }
 
-    public String secret() {
-        return secret;
-    }
+  public String secret() {
+    return secret;
+  }
 
 }

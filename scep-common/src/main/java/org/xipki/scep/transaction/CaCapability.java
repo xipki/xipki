@@ -20,39 +20,40 @@ package org.xipki.scep.transaction;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public enum CaCapability {
 
-    AES("AES"),
-    DES3("DES3"),
-    GetNextCACert("GetNextCACert"),
-    POSTPKIOperation("POSTPKIOperation"),
-    Renewal("Renewal"),
-    SHA1("SHA-1"),
-    SHA256("SHA-256"),
-    SHA512("SHA-512"),
-    Update("Update");
+  AES("AES"),
+  DES3("DES3"),
+  GetNextCACert("GetNextCACert"),
+  POSTPKIOperation("POSTPKIOperation"),
+  Renewal("Renewal"),
+  SHA1("SHA-1"),
+  SHA256("SHA-256"),
+  SHA512("SHA-512"),
+  Update("Update");
 
-    private String text;
+  private String text;
 
-    CaCapability(String text) {
-        this.text = text;
+  CaCapability(String text) {
+    this.text = text;
+  }
+
+  public String text() {
+    return text;
+  }
+
+  public static CaCapability forValue(String text) {
+    ScepUtil.requireNonNull("text", text);
+    for (CaCapability m : values()) {
+      if (m.text.equalsIgnoreCase(text)) {
+        return m;
+      }
     }
-
-    public String text() {
-        return text;
-    }
-
-    public static CaCapability forValue(String text) {
-        ScepUtil.requireNonNull("text", text);
-        for (CaCapability m : values()) {
-            if (m.text.equalsIgnoreCase(text)) {
-                return m;
-            }
-        }
-        throw new IllegalArgumentException("invalid CaCapability " + text);
-    }
+    throw new IllegalArgumentException("invalid CaCapability " + text);
+  }
 
 }

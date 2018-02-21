@@ -27,58 +27,59 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class TransactionId {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+  private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final String id;
+  private final String id;
 
-    public TransactionId(String id) {
-        this.id = ScepUtil.requireNonBlank("id", id);
+  public TransactionId(String id) {
+    this.id = ScepUtil.requireNonBlank("id", id);
+  }
+
+  private TransactionId(byte[] bytes) {
+    if (bytes == null || bytes.length == 0) {
+      throw new IllegalArgumentException("bytes must not be empty");
+    }
+    this.id = Hex.toHexString(bytes);
+  }
+
+  public String id() {
+    return id;
+  }
+
+  public static TransactionId randomTransactionId() {
+    byte[] bytes = new byte[20];
+    RANDOM.nextBytes(bytes);
+    return new TransactionId(bytes);
+  }
+
+  public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki)
+      throws InvalidKeySpecException {
+    ScepUtil.requireNonNull("spki", spki);
+
+    byte[] encoded;
+    try {
+      encoded = spki.getEncoded();
+    } catch (IOException ex) {
+      throw new InvalidKeySpecException("IOException while ");
     }
 
-    private TransactionId(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
-            throw new IllegalArgumentException("bytes must not be empty");
-        }
-        this.id = Hex.toHexString(bytes);
-    }
+    return sha1TransactionId(encoded);
+  }
 
-    public String id() {
-        return id;
-    }
+  public static TransactionId sha1TransactionId(byte[] content) {
+    ScepUtil.requireNonNull("content", content);
 
-    public static TransactionId randomTransactionId() {
-        byte[] bytes = new byte[20];
-        RANDOM.nextBytes(bytes);
-        return new TransactionId(bytes);
-    }
-
-    public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki)
-            throws InvalidKeySpecException {
-        ScepUtil.requireNonNull("spki", spki);
-
-        byte[] encoded;
-        try {
-            encoded = spki.getEncoded();
-        } catch (IOException ex) {
-            throw new InvalidKeySpecException("IOException while ");
-        }
-
-        return sha1TransactionId(encoded);
-    }
-
-    public static TransactionId sha1TransactionId(byte[] content) {
-        ScepUtil.requireNonNull("content", content);
-
-        SHA1Digest dgst = new SHA1Digest();
-        dgst.update(content, 0, content.length);
-        byte[] digest = new byte[20];
-        dgst.doFinal(digest, 0);
-        return new TransactionId(digest);
-    }
+    SHA1Digest dgst = new SHA1Digest();
+    dgst.update(content, 0, content.length);
+    byte[] digest = new byte[20];
+    dgst.doFinal(digest, 0);
+    return new TransactionId(digest);
+  }
 
 }

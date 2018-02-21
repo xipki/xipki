@@ -26,83 +26,84 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public enum ScepHashAlgoType {
 
-    MD5(16, "1.2.840.113549.2.5", "MD5"),
-    SHA1(20, "1.3.14.3.2.26", "SHA1"),
-    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),
-    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512");
+  MD5(16, "1.2.840.113549.2.5", "MD5"),
+  SHA1(20, "1.3.14.3.2.26", "SHA1"),
+  SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),
+  SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512");
 
-    private final int length;
+  private final int length;
 
-    private final String oid;
+  private final String oid;
 
-    private final String name;
+  private final String name;
 
-    ScepHashAlgoType(int length, String oid, String name) {
-        this.length = length;
-        this.oid = oid;
-        this.name = name;
+  ScepHashAlgoType(int length, String oid, String name) {
+    this.length = length;
+    this.oid = oid;
+    this.name = name;
+  }
+
+  public int length() {
+    return length;
+  }
+
+  public String oid() {
+    return oid;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String hexDigest(byte[] content) {
+    byte[] dgst = digest(content);
+    return (dgst == null) ? null : Hex.toHexString(dgst);
+  }
+
+  public byte[] digest(byte[] content) {
+    ScepUtil.requireNonNull("content", content);
+    Digest digest;
+    if (this == SHA1) {
+      digest = new SHA1Digest();
+    } else if (this == SHA256) {
+      digest = new SHA256Digest();
+    } else if (this == SHA512) {
+      digest = new SHA512Digest();
+    } else if (this == MD5) {
+      digest = new MD5Digest();
+    } else {
+      throw new RuntimeException("should not reach here");
+    }
+    byte[] ret = new byte[length];
+    digest.doFinal(ret, 0);
+    return ret;
+  }
+
+  public static ScepHashAlgoType forNameOrOid(String nameOrOid) {
+
+    String tmpNameOrOid = nameOrOid;
+
+    for (ScepHashAlgoType hashAlgo : values()) {
+      if (hashAlgo.oid.equals(tmpNameOrOid)) {
+        return hashAlgo;
+      }
+
+      if (tmpNameOrOid.indexOf('-') != -1) {
+        tmpNameOrOid = tmpNameOrOid.replace("-", "");
+      }
+
+      if (hashAlgo.name.equalsIgnoreCase(tmpNameOrOid)) {
+        return hashAlgo;
+      }
     }
 
-    public int length() {
-        return length;
-    }
-
-    public String oid() {
-        return oid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String hexDigest(byte[] content) {
-        byte[] dgst = digest(content);
-        return (dgst == null) ? null : Hex.toHexString(dgst);
-    }
-
-    public byte[] digest(byte[] content) {
-        ScepUtil.requireNonNull("content", content);
-        Digest digest;
-        if (this == SHA1) {
-            digest = new SHA1Digest();
-        } else if (this == SHA256) {
-            digest = new SHA256Digest();
-        } else if (this == SHA512) {
-            digest = new SHA512Digest();
-        } else if (this == MD5) {
-            digest = new MD5Digest();
-        } else {
-            throw new RuntimeException("should not reach here");
-        }
-        byte[] ret = new byte[length];
-        digest.doFinal(ret, 0);
-        return ret;
-    }
-
-    public static ScepHashAlgoType forNameOrOid(String nameOrOid) {
-
-        String tmpNameOrOid = nameOrOid;
-
-        for (ScepHashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(tmpNameOrOid)) {
-                return hashAlgo;
-            }
-
-            if (tmpNameOrOid.indexOf('-') != -1) {
-                tmpNameOrOid = tmpNameOrOid.replace("-", "");
-            }
-
-            if (hashAlgo.name.equalsIgnoreCase(tmpNameOrOid)) {
-                return hashAlgo;
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

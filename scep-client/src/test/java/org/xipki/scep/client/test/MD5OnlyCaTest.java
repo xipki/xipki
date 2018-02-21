@@ -20,18 +20,19 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class MD5OnlyCaTest extends AbstractCaTest {
 
-    protected boolean useInsecureAlgorithms() {
-        return true;
-    }
+  protected boolean useInsecureAlgorithms() {
+    return true;
+  }
 
-    @Override
-    protected CaCapability[] getExcludedCaCaps() {
-        return new CaCapability[]{CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512};
-    }
+  @Override
+  protected CaCapability[] getExcludedCaCaps() {
+    return new CaCapability[]{CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512};
+  }
 
 }

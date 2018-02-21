@@ -18,43 +18,44 @@
 package org.xipki.scep.transaction;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public enum PkiStatus {
 
-    /**
-     * request granted.
-     */
-    SUCCESS(0),
+  /**
+   * request granted.
+   */
+  SUCCESS(0),
 
-    /**
-     * request rejected.
-     */
-    FAILURE(2),
+  /**
+   * request rejected.
+   */
+  FAILURE(2),
 
-    /**
-     * request pending for manual approval.
-     */
-    PENDING(3);
+  /**
+   * request pending for manual approval.
+   */
+  PENDING(3);
 
-    private final int code;
+  private final int code;
 
-    PkiStatus(int code) {
-        this.code = code;
+  PkiStatus(int code) {
+    this.code = code;
+  }
+
+  public int code() {
+    return code;
+  }
+
+  public static PkiStatus forValue(int code) {
+    for (PkiStatus m : values()) {
+      if (m.code == code) {
+        return m;
+      }
     }
-
-    public int code() {
-        return code;
-    }
-
-    public static PkiStatus forValue(int code) {
-        for (PkiStatus m : values()) {
-            if (m.code == code) {
-                return m;
-            }
-        }
-        throw new IllegalArgumentException("invalid PkiStatus " + code);
-    }
+    throw new IllegalArgumentException("invalid PkiStatus " + code);
+  }
 
 }

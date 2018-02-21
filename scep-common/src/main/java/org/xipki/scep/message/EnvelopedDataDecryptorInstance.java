@@ -27,29 +27,30 @@ import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public final class EnvelopedDataDecryptorInstance {
 
-    private final RecipientId recipientId;
+  private final RecipientId recipientId;
 
-    private final KeyTransRecipient recipient;
+  private final KeyTransRecipient recipient;
 
-    public EnvelopedDataDecryptorInstance(X509Certificate recipientCert, PrivateKey privKey) {
-        ScepUtil.requireNonNull("recipientCert", recipientCert);
-        ScepUtil.requireNonNull("privKey", privKey);
+  public EnvelopedDataDecryptorInstance(X509Certificate recipientCert, PrivateKey privKey) {
+    ScepUtil.requireNonNull("recipientCert", recipientCert);
+    ScepUtil.requireNonNull("privKey", privKey);
 
-        this.recipientId = new JceKeyTransRecipientId(recipientCert);
-        this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
-    }
+    this.recipientId = new JceKeyTransRecipientId(recipientCert);
+    this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
+  }
 
-    public KeyTransRecipient recipient() {
-        return recipient;
-    }
+  public KeyTransRecipient recipient() {
+    return recipient;
+  }
 
-    public RecipientId recipientId() {
-        return recipientId;
-    }
+  public RecipientId recipientId() {
+    return recipientId;
+  }
 
 }

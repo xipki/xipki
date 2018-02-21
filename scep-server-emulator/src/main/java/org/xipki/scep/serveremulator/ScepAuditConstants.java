@@ -18,19 +18,20 @@
 package org.xipki.scep.serveremulator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class ScepAuditConstants {
 
-    public static final String NAME_failInfo = "failInfo";
+  public static final String NAME_failInfo = "failInfo";
 
-    public static final String NAME_PERF = "PERF";
+  public static final String NAME_PERF = "PERF";
 
-    public static final String NAME_operation = "operation";
+  public static final String NAME_operation = "operation";
 
-    public static final String NAME_pkiStatus = "pkiStatus";
+  public static final String NAME_pkiStatus = "pkiStatus";
 
-    public static final String NAME_servletPath = "servletPath";
+  public static final String NAME_servletPath = "servletPath";
 
 }

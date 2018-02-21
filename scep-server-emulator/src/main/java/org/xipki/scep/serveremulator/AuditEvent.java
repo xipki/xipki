@@ -24,77 +24,78 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class AuditEvent {
 
-    public static enum AuditLevel {
+  public static enum AuditLevel {
 
-        ERROR,
-        INFO;
+    ERROR,
+    INFO;
 
+  }
+
+  /**
+   * The name of the event type.
+   */
+  private String name;
+
+  /**
+   * The AuditLevel this Event belongs to.
+   */
+  private AuditLevel level;
+
+  /**
+   * The data array belonging to the event.
+   */
+  private final Map<String, String> eventDatas = new HashMap<>();
+
+  public AuditEvent() {
+    this.level = AuditLevel.INFO;
+  }
+
+  public AuditLevel level() {
+    return level;
+  }
+
+  public void setLevel(AuditLevel level) {
+    this.level = level;
+  }
+
+  public String name() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Map<String, String> eventDatas() {
+    return Collections.unmodifiableMap(eventDatas);
+  }
+
+  public void putEventData(String name, Object value) {
+    eventDatas.put(name, value.toString());
+  }
+
+  public void log(Logger log) {
+    StringBuilder sb = new StringBuilder();
+    for (String name : eventDatas.keySet()) {
+      sb.append(name).append(": ").append(eventDatas.get(name)).append(" | ");
     }
 
-    /**
-     * The name of the event type.
-     */
-    private String name;
-
-    /**
-     * The AuditLevel this Event belongs to.
-     */
-    private AuditLevel level;
-
-    /**
-     * The data array belonging to the event.
-     */
-    private final Map<String, String> eventDatas = new HashMap<>();
-
-    public AuditEvent() {
-        this.level = AuditLevel.INFO;
+    int len = sb.length();
+    if (len > 2) {
+      sb.delete(len - 2, len);
     }
 
-    public AuditLevel level() {
-        return level;
+    if (level == AuditLevel.ERROR) {
+      log.error("{} | {}", name, sb);
+    } else {
+      log.info("{} | {}", name, sb);
     }
-
-    public void setLevel(AuditLevel level) {
-        this.level = level;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Map<String, String> eventDatas() {
-        return Collections.unmodifiableMap(eventDatas);
-    }
-
-    public void putEventData(String name, Object value) {
-        eventDatas.put(name, value.toString());
-    }
-
-    public void log(Logger log) {
-        StringBuilder sb = new StringBuilder();
-        for (String name : eventDatas.keySet()) {
-            sb.append(name).append(": ").append(eventDatas.get(name)).append(" | ");
-        }
-
-        int len = sb.length();
-        if (len > 2) {
-            sb.delete(len - 2, len);
-        }
-
-        if (level == AuditLevel.ERROR) {
-            log.error("{} | {}", name, sb);
-        } else {
-            log.info("{} | {}", name, sb);
-        }
-    }
+  }
 
 }

@@ -20,19 +20,20 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class NoCmsSignerCertCaTest extends AbstractCaTest {
 
-    @Override
-    protected boolean sendSignerCert() {
-        return false;
-    }
+  @Override
+  protected boolean sendSignerCert() {
+    return false;
+  }
 
-    @Override
-    protected CaCapability[] getExcludedCaCaps() {
-        return null;
-    }
+  @Override
+  protected CaCapability[] getExcludedCaCaps() {
+    return null;
+  }
 
 }

@@ -26,51 +26,52 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class IssuerAndSubject extends ASN1Object {
 
-    private X500Name issuer;
+  private X500Name issuer;
 
-    private X500Name subject;
+  private X500Name subject;
 
-    private IssuerAndSubject(ASN1Sequence seq) {
-        ScepUtil.requireNonNull("seq", seq);
-        this.issuer = X500Name.getInstance(seq.getObjectAt(0));
-        this.subject = X500Name.getInstance(seq.getObjectAt(1));
+  private IssuerAndSubject(ASN1Sequence seq) {
+    ScepUtil.requireNonNull("seq", seq);
+    this.issuer = X500Name.getInstance(seq.getObjectAt(0));
+    this.subject = X500Name.getInstance(seq.getObjectAt(1));
+  }
+
+  public IssuerAndSubject(X500Name issuer, X500Name subject) {
+    this.issuer = ScepUtil.requireNonNull("issuer", issuer);
+    this.subject = ScepUtil.requireNonNull("subject", subject);
+  }
+
+  public X500Name issuer() {
+    return issuer;
+  }
+
+  public X500Name subject() {
+    return subject;
+  }
+
+  @Override
+  // CHECKSTYLE:SKIP
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    vec.add(issuer);
+    vec.add(subject);
+    return new DERSequence(vec);
+  }
+
+  public static IssuerAndSubject getInstance(Object obj) {
+    if (obj instanceof IssuerAndSubject) {
+      return (IssuerAndSubject) obj;
+    } else if (obj != null) {
+      return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
+    } else {
+      return null;
     }
-
-    public IssuerAndSubject(X500Name issuer, X500Name subject) {
-        this.issuer = ScepUtil.requireNonNull("issuer", issuer);
-        this.subject = ScepUtil.requireNonNull("subject", subject);
-    }
-
-    public X500Name issuer() {
-        return issuer;
-    }
-
-    public X500Name subject() {
-        return subject;
-    }
-
-    @Override
-    // CHECKSTYLE:SKIP
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(issuer);
-        vec.add(subject);
-        return new DERSequence(vec);
-    }
-
-    public static IssuerAndSubject getInstance(Object obj) {
-        if (obj instanceof IssuerAndSubject) {
-            return (IssuerAndSubject) obj;
-        } else if (obj != null) {
-            return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
-        } else {
-            return null;
-        }
-    }
+  }
 
 }

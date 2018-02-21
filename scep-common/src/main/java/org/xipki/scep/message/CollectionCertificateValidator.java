@@ -26,55 +26,53 @@ import org.xipki.scep.crypto.ScepHashAlgoType;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class CollectionCertificateValidator implements CertificateValidator {
 
-    private final Collection<String> certHashes;
+  private final Collection<String> certHashes;
 
-    public CollectionCertificateValidator(Collection<X509Certificate> certs) {
-        ScepUtil.requireNonEmpty("certs", certs);
+  public CollectionCertificateValidator(Collection<X509Certificate> certs) {
+    ScepUtil.requireNonEmpty("certs", certs);
 
-        certHashes = new HashSet<String>(certs.size());
-        for (X509Certificate cert : certs) {
-            String hash;
-            try {
-                hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
-            } catch (CertificateEncodingException ex) {
-                throw new IllegalArgumentException(
-                        "could not encode certificate: " + ex.getMessage(), ex);
-            }
-            certHashes.add(hash);
-        }
+    certHashes = new HashSet<String>(certs.size());
+    for (X509Certificate cert : certs) {
+      String hash;
+      try {
+        hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
+      } catch (CertificateEncodingException ex) {
+        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
+      }
+      certHashes.add(hash);
     }
+  }
 
-    public CollectionCertificateValidator(X509Certificate cert) {
-        ScepUtil.requireNonNull("cert", cert);
+  public CollectionCertificateValidator(X509Certificate cert) {
+    ScepUtil.requireNonNull("cert", cert);
 
-        certHashes = new HashSet<String>(1);
-        String hash;
-        try {
-            hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException ex) {
-            throw new IllegalArgumentException(
-                    "could not encode certificate: " + ex.getMessage(), ex);
-        }
-        certHashes.add(hash);
+    certHashes = new HashSet<String>(1);
+    String hash;
+    try {
+      hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
+    } catch (CertificateEncodingException ex) {
+      throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
     }
+    certHashes.add(hash);
+  }
 
-    @Override
-    public boolean trustCertificate(X509Certificate signerCert, X509Certificate[] otherCerts) {
-        ScepUtil.requireNonNull("signerCert", signerCert);
+  @Override
+  public boolean trustCertificate(X509Certificate signerCert, X509Certificate[] otherCerts) {
+    ScepUtil.requireNonNull("signerCert", signerCert);
 
-        String hash;
-        try {
-            hash = ScepHashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
-        } catch (CertificateEncodingException ex) {
-            throw new IllegalArgumentException(
-                    "could not encode certificate: " + ex.getMessage(), ex);
-        }
-        return certHashes.contains(hash);
+    String hash;
+    try {
+      hash = ScepHashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
+    } catch (CertificateEncodingException ex) {
+      throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
     }
+    return certHashes.contains(hash);
+  }
 
 }

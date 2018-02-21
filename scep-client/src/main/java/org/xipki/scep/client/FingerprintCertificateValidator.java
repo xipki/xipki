@@ -23,45 +23,45 @@ import java.security.cert.X509Certificate;
 import org.xipki.scep.crypto.ScepHashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public abstract class FingerprintCertificateValidator implements CaCertValidator {
 
-    private static final ScepHashAlgoType DEFAULT_HASHALGO = ScepHashAlgoType.SHA256;
+  private static final ScepHashAlgoType DEFAULT_HASHALGO = ScepHashAlgoType.SHA256;
 
-    private ScepHashAlgoType hashAlgo;
+  private ScepHashAlgoType hashAlgo;
 
-    public ScepHashAlgoType hashAlgo() {
-        return hashAlgo;
+  public ScepHashAlgoType hashAlgo() {
+    return hashAlgo;
+  }
+
+  public void setHashAlgo(ScepHashAlgoType hashAlgo) {
+    this.hashAlgo = hashAlgo;
+  }
+
+  @Override
+  public boolean isTrusted(X509Certificate cert) {
+    ScepHashAlgoType algo = (hashAlgo == null) ? DEFAULT_HASHALGO : hashAlgo;
+    byte[] actual;
+    try {
+      actual = algo.digest(cert.getEncoded());
+    } catch (CertificateEncodingException ex) {
+      return false;
     }
 
-    public void setHashAlgo(ScepHashAlgoType hashAlgo) {
-        this.hashAlgo = hashAlgo;
-    }
+    return isCertTrusted(algo, actual);
+  }
 
-    @Override
-    public boolean isTrusted(X509Certificate cert) {
-        ScepHashAlgoType algo = (hashAlgo == null) ? DEFAULT_HASHALGO : hashAlgo;
-        byte[] actual;
-        try {
-            actual = algo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException ex) {
-            return false;
-        }
-
-        return isCertTrusted(algo, actual);
-    }
-
-    /**
-     *
-     * @param hashAlgo
-     *          Hash algorithm. Must not be {@code null}.
-     * @param hashValue
-     *          Hash value of the certificate to be checked. Must not be {@code null}.
-     * @return whether the given certificate is trusted.
-     */
-    protected abstract boolean isCertTrusted(ScepHashAlgoType hashAlgo,
-            byte[] hashValue);
+  /**
+   * TODO.
+   * @param hashAlgo
+   *          Hash algorithm. Must not be {@code null}.
+   * @param hashValue
+   *          Hash value of the certificate to be checked. Must not be {@code null}.
+   * @return whether the given certificate is trusted.
+   */
+  protected abstract boolean isCertTrusted(ScepHashAlgoType hashAlgo, byte[] hashValue);
 
 }

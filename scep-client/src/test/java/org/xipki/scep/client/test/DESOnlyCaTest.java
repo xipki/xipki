@@ -20,19 +20,20 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 // CHECKSTYLE:SKIP
 public class DESOnlyCaTest extends AbstractCaTest {
 
-    protected boolean useInsecureAlgorithms() {
-        return true;
-    }
+  protected boolean useInsecureAlgorithms() {
+    return true;
+  }
 
-    @Override
-    protected CaCapability[] getExcludedCaCaps() {
-        return new CaCapability[]{CaCapability.AES, CaCapability.DES3};
-    }
+  @Override
+  protected CaCapability[] getExcludedCaCaps() {
+    return new CaCapability[]{CaCapability.AES, CaCapability.DES3};
+  }
 
 }

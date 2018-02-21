@@ -26,42 +26,43 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class ScepServerContainer {
 
-    private Server server;
+  private Server server;
 
-    public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
-        this(port, Arrays.asList(ScepUtil.requireNonNull("scepServer", scepServer)));
+  public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
+      this(port, Arrays.asList(ScepUtil.requireNonNull("scepServer", scepServer)));
+  }
+
+  public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {
+    ScepUtil.requireNonEmpty("scepServers", scepServers);
+    server = new Server(port);
+    ServletHandler handler = new ServletHandler();
+    server.setHandler(handler);
+
+    for (ScepServer m : scepServers) {
+      ServletHolder servletHolder = new ServletHolder(m.name(), m.getServlet());
+      handler.addServletWithMapping(servletHolder, "/" + m.name() + "/pkiclient.exe");
     }
 
-    public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {
-        ScepUtil.requireNonEmpty("scepServers", scepServers);
-        server = new Server(port);
-        ServletHandler handler = new ServletHandler();
-        server.setHandler(handler);
+    server.join();
+  }
 
-        for (ScepServer m : scepServers) {
-            ServletHolder servletHolder = new ServletHolder(m.name(), m.getServlet());
-            handler.addServletWithMapping(servletHolder, "/" + m.name() + "/pkiclient.exe");
-        }
-
-        server.join();
+  public void start() throws Exception {
+    try {
+      server.start();
+    } catch (Exception ex) {
+      server.stop();
+      throw ex;
     }
+  }
 
-    public void start() throws Exception {
-        try {
-            server.start();
-        } catch (Exception ex) {
-            server.stop();
-            throw ex;
-        }
-    }
-
-    public void stop() throws Exception {
-        server.stop();
-    }
+  public void stop() throws Exception {
+    server.stop();
+  }
 
 }

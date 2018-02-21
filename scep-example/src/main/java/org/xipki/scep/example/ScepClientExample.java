@@ -37,97 +37,92 @@ import org.xipki.scep.client.ScepClient;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class ScepClientExample extends CaClientExample {
 
-    private static final String XIPKI_DIR =
-            "~/source/xipki/dist/xipki-pki/target/xipki-pki-2.3.0-SNAPSHOT";
+  private static final String XIPKI_DIR =
+      "~/source/xipki/dist/xipki-pki/target/xipki-pki-2.3.0-SNAPSHOT";
 
-    private static final String CA_URL = "http://localhost:8080/scep/scep1/tls/pkiclient.exe";
+  private static final String CA_URL = "http://localhost:8080/scep/scep1/tls/pkiclient.exe";
 
-    private static final String CA_CERT_FILE =
-            XIPKI_DIR + "/xipki/setup/keycerts/MYCA1.der";
+  private static final String CA_CERT_FILE = XIPKI_DIR + "/xipki/setup/keycerts/MYCA1.der";
 
-    private static final String challengePassword = "user1:password1";
+  private static final String challengePassword = "user1:password1";
 
-    private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
+  private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
 
-    public static void main(String[] args) {
-        //System.setProperty("javax.net.debug", "all");
+  public static void main(String[] args) {
+    //System.setProperty("javax.net.debug", "all");
 
-        try {
-            X509Certificate caCert = ScepUtil.parseCert(
-                    ScepUtil.read(
-                            new FileInputStream(expandPath(CA_CERT_FILE))));
-            CaIdentifier tmpCaId = new CaIdentifier(CA_URL, null);
-            CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(caCert);
-            ScepClient client = new ScepClient(tmpCaId, caCertValidator);
+    try {
+      X509Certificate caCert = ScepUtil.parseCert(
+          ScepUtil.read(new FileInputStream(expandPath(CA_CERT_FILE))));
+      CaIdentifier tmpCaId = new CaIdentifier(CA_URL, null);
+      CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(caCert);
+      ScepClient client = new ScepClient(tmpCaId, caCertValidator);
 
-            client.init();
+      client.init();
 
-            // Self-Signed Identity Certificate
-            MyKeypair keypair = generateRsaKeypair();
-            CertificationRequest csr = genCsr(keypair, getSubject(), challengePassword);
+      // Self-Signed Identity Certificate
+      MyKeypair keypair = generateRsaKeypair();
+      CertificationRequest csr = genCsr(keypair, getSubject(), challengePassword);
 
-            // self-signed cert must use the same subject as in CSR
-            X500Name subjectDn = csr.getCertificationRequestInfo().getSubject();
-            X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                    subjectDn,
-                    BigInteger.valueOf(1),
-                    new Date(),
-                    new Date(System.currentTimeMillis() + 24 * 3600 * 1000),
-                    subjectDn,
-                    keypair.getPublic());
-            ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
-                    .build(keypair.getPrivate());
-            X509Certificate selfSignedCert = ScepUtil.parseCert(
-                    certGenerator.build(signer).getEncoded());
+      // self-signed cert must use the same subject as in CSR
+      X500Name subjectDn = csr.getCertificationRequestInfo().getSubject();
+      X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
+          subjectDn, BigInteger.valueOf(1), new Date(),
+          new Date(System.currentTimeMillis() + 24 * 3600 * 1000),
+          subjectDn, keypair.getPublic());
+      ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
+          .build(keypair.getPrivate());
+      X509Certificate selfSignedCert = ScepUtil.parseCert(certGenerator.build(signer).getEncoded());
 
-            // Enroll certificate - RSA
-            EnrolmentResponse resp = (EnrolmentResponse) client.scepEnrol(
-                    csr, keypair.getPrivate(), selfSignedCert);
-            if (resp.isFailure()) {
-                throw new Exception("server returned 'failure'");
-            }
+      // Enroll certificate - RSA
+      EnrolmentResponse resp = (EnrolmentResponse) client.scepEnrol(csr, keypair.getPrivate(),
+          selfSignedCert);
+      if (resp.isFailure()) {
+        throw new Exception("server returned 'failure'");
+      }
 
-            if (resp.isPending()) {
-                throw new Exception("server returned 'pending'");
-            }
+      if (resp.isPending()) {
+        throw new Exception("server returned 'pending'");
+      }
 
-            X509Certificate cert = resp.certificates().get(0);
-            printCert("SCEP (RSA, Self-Signed Identity Cert)", cert);
+      X509Certificate cert = resp.certificates().get(0);
+      printCert("SCEP (RSA, Self-Signed Identity Cert)", cert);
 
-            // Use the CA signed identity certificate
-            X509Certificate identityCert = cert;
-            PrivateKey identityKey = keypair.getPrivate();
+      // Use the CA signed identity certificate
+      X509Certificate identityCert = cert;
+      PrivateKey identityKey = keypair.getPrivate();
 
-            keypair = generateRsaKeypair();
-            csr = genCsr(keypair, getSubject(), challengePassword);
+      keypair = generateRsaKeypair();
+      csr = genCsr(keypair, getSubject(), challengePassword);
 
-            // Enroll certificate - RSA
-            resp = (EnrolmentResponse) client.scepEnrol(csr, identityKey, identityCert);
-            if (resp.isFailure()) {
-                throw new Exception("server returned 'failure'");
-            }
+      // Enroll certificate - RSA
+      resp = (EnrolmentResponse) client.scepEnrol(csr, identityKey, identityCert);
+      if (resp.isFailure()) {
+        throw new Exception("server returned 'failure'");
+      }
 
-            if (resp.isPending()) {
-                throw new Exception("server returned 'pending'");
-            }
+      if (resp.isPending()) {
+        throw new Exception("server returned 'pending'");
+      }
 
-            cert = resp.certificates().get(0);
-            printCert("SCEP (RSA, CA issued identity Cert)", cert);
+      cert = resp.certificates().get(0);
+      printCert("SCEP (RSA, CA issued identity Cert)", cert);
 
-            client.destroy();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
+      client.destroy();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      System.exit(-1);
     }
+  }
 
-    private static String getSubject() {
-        return "CN=SCEP-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";
-    }
+  private static String getSubject() {
+    return "CN=SCEP-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";
+  }
 
 }

@@ -31,34 +31,34 @@ import org.xipki.scep.util.ScepUtil;
 
 public final class CachingCertificateValidator implements CaCertValidator {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+  private final ConcurrentHashMap<String, Boolean> cachedAnswers;
 
-    private final CaCertValidator delegate;
+  private final CaCertValidator delegate;
 
-    public CachingCertificateValidator(CaCertValidator delegate) {
-        this.delegate = ScepUtil.requireNonNull("delegate", delegate);
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+  public CachingCertificateValidator(CaCertValidator delegate) {
+    this.delegate = ScepUtil.requireNonNull("delegate", delegate);
+    this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+  }
+
+  @Override
+  public boolean isTrusted(X509Certificate cert) {
+    ScepUtil.requireNonNull("cert", cert);
+    String hexFp;
+    try {
+      hexFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
+    } catch (CertificateEncodingException ex) {
+      return false;
     }
 
-    @Override
-    public boolean isTrusted(X509Certificate cert) {
-        ScepUtil.requireNonNull("cert", cert);
-        String hexFp;
-        try {
-            hexFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException ex) {
-            return false;
-        }
+    Boolean bo = cachedAnswers.get(hexFp);
 
-        Boolean bo = cachedAnswers.get(hexFp);
-
-        if (bo != null) {
-            return bo.booleanValue();
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
-        }
+    if (bo != null) {
+      return bo.booleanValue();
+    } else {
+      boolean answer = delegate.isTrusted(cert);
+      cachedAnswers.put(hexFp, answer);
+      return answer;
     }
+  }
 
 }

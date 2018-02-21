@@ -51,252 +51,248 @@ import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public abstract class AbstractCaTest {
 
-    private final String secret = "preshared-secret";
+  private final String secret = "preshared-secret";
 
-    private final int port = 8081;
+  private final int port = 8081;
 
-    private ScepServerContainer scepServerContainer;
+  private ScepServerContainer scepServerContainer;
 
-    private ScepServer scepServer;
+  private ScepServer scepServer;
 
-    protected abstract CaCapability[] getExcludedCaCaps();
+  protected abstract CaCapability[] getExcludedCaCaps();
 
-    protected boolean isWithRa() {
-        return true;
+  protected boolean isWithRa() {
+    return true;
+  }
+
+  protected boolean sendSignerCert() {
+    return true;
+  }
+
+  protected boolean useInsecureAlgorithms() {
+    return false;
+  }
+
+  protected boolean isWithNextCa() {
+    return true;
+  }
+
+  protected boolean isSendCaCert() {
+    return false;
+  }
+
+  protected boolean isPendingCert() {
+    return false;
+  }
+
+  protected boolean isGenerateCrl() {
+    return true;
+  }
+
+  @Before
+  public void init() {
+  }
+
+  protected CaCaps getDefaultCaCaps() {
+    final CaCaps caCaps = new CaCaps();
+    caCaps.addCapabilities(CaCapability.DES3, CaCapability.AES, CaCapability.SHA1,
+        CaCapability.SHA256, CaCapability.POSTPKIOperation);
+    return caCaps;
+  }
+
+  @Before
+  public synchronized void startScepServer() throws Exception {
+    if (scepServerContainer == null) {
+      CaCaps caCaps = getExpectedCaCaps();
+
+      ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(), sendSignerCert(),
+          useInsecureAlgorithms(), secret);
+
+      this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(), isGenerateCrl(),
+          control);
+      this.scepServerContainer = new ScepServerContainer(port, scepServer);
     }
 
-    protected boolean sendSignerCert() {
-        return true;
+    this.scepServerContainer.start();
+  }
+
+  @After
+  public synchronized void stopScepServer() throws Exception {
+    if (this.scepServerContainer != null) {
+      this.scepServerContainer.stop();
+    }
+  }
+
+  @Test
+  public void test() throws Exception {
+    CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
+    CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(
+            ScepUtil.toX509Cert(scepServer.caCert()));
+    ScepClient client = new ScepClient(caId, caCertValidator);
+    client.setUseInsecureAlgorithms(useInsecureAlgorithms());
+
+    client.refresh();
+
+    CaCaps expCaCaps = getExpectedCaCaps();
+
+    // CACaps
+    CaCaps caCaps = client.caCaps();
+    Assert.assertEquals("CACaps", expCaCaps, caCaps);
+
+    // CA certificate
+    Certificate expCaCert = scepServer.caCert();
+    X509Certificate caCert = client.authorityCertStore().caCert();
+    if (!equals(expCaCert, caCert)) {
+      Assert.fail("Configured and received CA certificate not the same");
     }
 
-    protected boolean useInsecureAlgorithms() {
-        return false;
+    boolean withRa = isWithRa();
+    // RA
+    if (withRa) {
+      Certificate expRaCert = scepServer.raCert();
+      X509Certificate raSigCert = client.authorityCertStore().signatureCert();
+      X509Certificate raEncCert = client.authorityCertStore().encryptionCert();
+      Assert.assertEquals("RA certificate", raSigCert, raEncCert);
+
+      if (!equals(expRaCert, raSigCert)) {
+        Assert.fail("Configured and received RA certificate not the same");
+      }
     }
 
-    protected boolean isWithNextCa() {
-        return true;
-    }
+    // getNextCA
+    if (isWithNextCa()) {
+      AuthorityCertStore nextCa = client.scepNextCaCert();
 
-    protected boolean isSendCaCert() {
-        return false;
-    }
+      Certificate expNextCaCert = scepServer.nextCaCert();
+      X509Certificate nextCaCert = nextCa.caCert();
+      if (!equals(expNextCaCert, nextCaCert)) {
+        Assert.fail("Configured and received next CA certificate not the same");
+      }
 
-    protected boolean isPendingCert() {
-        return false;
-    }
+      if (withRa) {
+        Certificate expNextRaCert = scepServer.nextRaCert();
+        X509Certificate nextRaSigCert = nextCa.signatureCert();
+        X509Certificate nextRaEncCert = nextCa.encryptionCert();
+        Assert.assertEquals("Next RA certificate", nextRaSigCert, nextRaEncCert);
 
-    protected boolean isGenerateCrl() {
-        return true;
-    }
-
-    @Before
-    public void init() {
-    }
-
-    protected CaCaps getDefaultCaCaps() {
-        final CaCaps caCaps = new CaCaps();
-        caCaps.addCapability(CaCapability.DES3);
-        caCaps.addCapability(CaCapability.AES);
-        caCaps.addCapability(CaCapability.SHA1);
-        caCaps.addCapability(CaCapability.SHA256);
-        caCaps.addCapability(CaCapability.POSTPKIOperation);
-        return caCaps;
-    }
-
-    @Before
-    public synchronized void startScepServer() throws Exception {
-        if (scepServerContainer == null) {
-            CaCaps caCaps = getExpectedCaCaps();
-
-            ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(),
-                    sendSignerCert(), useInsecureAlgorithms(), secret);
-
-            this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(),
-                    isGenerateCrl(), control);
-            this.scepServerContainer = new ScepServerContainer(port, scepServer);
+        if (!equals(expNextRaCert, nextRaSigCert)) {
+          Assert.fail("Configured and received next RA certificate not the same");
         }
-
-        this.scepServerContainer.start();
+      }
     }
 
-    @After
-    public synchronized void stopScepServer() throws Exception {
-        if (this.scepServerContainer != null) {
-            this.scepServerContainer.stop();
-        }
+    // enroll
+    CertificationRequest csr;
+
+    X509Certificate selfSignedCert;
+    X509Certificate enroledCert;
+    X500Name issuerName = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+    PrivateKey privKey;
+
+    {
+      KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
+      kpGen.initialize(2048);
+      KeyPair keypair = kpGen.generateKeyPair();
+      privKey = keypair.getPrivate();
+      SubjectPublicKeyInfo subjectPublicKeyInfo = ScepUtil.createSubjectPublicKeyInfo(
+              keypair.getPublic());
+      X500Name subject = new X500Name("CN=EE1, OU=emulator, O=xipki.org, C=DE");
+
+      // first try without secret
+      PKCS10CertificationRequest p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo,
+          subject, null, null);
+      csr = p10Req.toASN1Structure();
+
+      selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
+      EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
+          selfSignedCert);
+      PkiStatus status = enrolResp.pkcsRep().pkiStatus();
+      Assert.assertEquals("PkiStatus without secret", PkiStatus.FAILURE, status);
+
+      // then try invalid secret
+      p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
+          "invalid-" + secret, null);
+      csr = p10Req.toASN1Structure();
+
+      selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
+      enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
+      status = enrolResp.pkcsRep().pkiStatus();
+      Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
+
+      // try with valid secret
+      p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
+      csr = p10Req.toASN1Structure();
+
+      selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
+      enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
+
+      List<X509Certificate> certs = enrolResp.certificates();
+      Assert.assertTrue("number of received certificates", certs.size() > 0);
+      X509Certificate cert = certs.get(0);
+      Assert.assertNotNull("enroled certificate", cert);
+      enroledCert = cert;
+
+      // try :: self-signed certificate's subject different from the one of CSR
+      p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
+      csr = p10Req.toASN1Structure();
+
+      selfSignedCert = ScepUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
+          csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), privKey);
+      enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
+      status = enrolResp.pkcsRep().pkiStatus();
+      Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
     }
 
-    @Test
-    public void test() throws Exception {
-        CaIdentifier caId = new CaIdentifier(
-                "http://localhost:" + port + "/scep/pkiclient.exe", null);
-        CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(
-                ScepUtil.toX509Cert(scepServer.caCert()));
-        ScepClient client = new ScepClient(caId, caCertValidator);
-        client.setUseInsecureAlgorithms(useInsecureAlgorithms());
+    // certPoll
+    EnrolmentResponse enrolResp = client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
 
-        client.refresh();
+    List<X509Certificate> certs = enrolResp.certificates();
+    Assert.assertTrue("number of received certificates", certs.size() > 0);
+    X509Certificate cert = certs.get(0);
+    Assert.assertNotNull("enrolled certificate", cert);
 
-        CaCaps expCaCaps = getExpectedCaCaps();
+    // getCert
+    certs = client.scepGetCert(privKey, selfSignedCert, issuerName, enroledCert.getSerialNumber());
+    Assert.assertTrue("number of received certificates", certs.size() > 0);
+    cert = certs.get(0);
+    Assert.assertNotNull("received certificate", cert);
 
-        // CACaps
-        CaCaps caCaps = client.caCaps();
-        Assert.assertEquals("CACaps", expCaCaps, caCaps);
+    // getCRL
+    X509CRL crl = client.scepGetCrl(privKey, enroledCert, issuerName,
+        enroledCert.getSerialNumber());
+    Assert.assertNotNull("received CRL", crl);
 
-        // CA certificate
-        Certificate expCaCert = scepServer.caCert();
-        X509Certificate caCert = client.authorityCertStore().caCert();
-        if (!equals(expCaCert, caCert)) {
-            Assert.fail("Configured and received CA certificate not the same");
-        }
+    // getNextCA
+    AuthorityCertStore nextCa = client.scepNextCaCert();
+    Assert.assertNotNull("nextCa", nextCa);
+  }
 
-        boolean withRa = isWithRa();
-        // RA
-        if (withRa) {
-            Certificate expRaCert = scepServer.raCert();
-            X509Certificate raSigCert = client.authorityCertStore().signatureCert();
-            X509Certificate raEncCert = client.authorityCertStore().encryptionCert();
-            Assert.assertEquals("RA certificate", raSigCert, raEncCert);
-
-            if (!equals(expRaCert, raSigCert)) {
-                Assert.fail("Configured and received RA certificate not the same");
-            }
-        }
-
-        // getNextCA
-        if (isWithNextCa()) {
-            AuthorityCertStore nextCa = client.scepNextCaCert();
-
-            Certificate expNextCaCert = scepServer.nextCaCert();
-            X509Certificate nextCaCert = nextCa.caCert();
-            if (!equals(expNextCaCert, nextCaCert)) {
-                Assert.fail("Configured and received next CA certificate not the same");
-            }
-
-            if (withRa) {
-                Certificate expNextRaCert = scepServer.nextRaCert();
-                X509Certificate nextRaSigCert = nextCa.signatureCert();
-                X509Certificate nextRaEncCert = nextCa.encryptionCert();
-                Assert.assertEquals("Next RA certificate", nextRaSigCert, nextRaEncCert);
-
-                if (!equals(expNextRaCert, nextRaSigCert)) {
-                    Assert.fail("Configured and received next RA certificate not the same");
-                }
-            }
-        }
-
-        // enroll
-        CertificationRequest csr;
-
-        X509Certificate selfSignedCert;
-        X509Certificate enroledCert;
-        X500Name issuerName = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-        PrivateKey privKey; {
-            KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
-            kpGen.initialize(2048);
-            KeyPair keypair = kpGen.generateKeyPair();
-            privKey = keypair.getPrivate();
-            SubjectPublicKeyInfo subjectPublicKeyInfo = ScepUtil.createSubjectPublicKeyInfo(
-                    keypair.getPublic());
-            X500Name subject = new X500Name("CN=EE1, OU=emulator, O=xipki.org, C=DE");
-
-            // first try without secret
-            PKCS10CertificationRequest p10Req = ScepUtil.generateRequest(privKey,
-                    subjectPublicKeyInfo, subject, null, null);
-            csr = p10Req.toASN1Structure();
-
-            selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-            EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
-                    selfSignedCert);
-            PkiStatus status = enrolResp.pkcsRep().pkiStatus();
-            Assert.assertEquals("PkiStatus without secret", PkiStatus.FAILURE, status);
-
-            // then try invalid secret
-            p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
-                    "invalid-" + secret, null);
-            csr = p10Req.toASN1Structure();
-
-            selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-            enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
-                    selfSignedCert);
-            status = enrolResp.pkcsRep().pkiStatus();
-            Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
-
-            // try with valid secret
-            p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
-            csr = p10Req.toASN1Structure();
-
-            selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-            enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
-
-            List<X509Certificate> certs = enrolResp.certificates();
-            Assert.assertTrue("number of received certificates", certs.size() > 0);
-            X509Certificate cert = certs.get(0);
-            Assert.assertNotNull("enroled certificate", cert);
-            enroledCert = cert;
-
-            // try :: self-signed certificate's subject different from the one of CSR
-            p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
-            csr = p10Req.toASN1Structure();
-
-            selfSignedCert = ScepUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
-                    csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), privKey);
-            enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
-            status = enrolResp.pkcsRep().pkiStatus();
-            Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
-        }
-
-        // certPoll
-        EnrolmentResponse enrolResp = client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
-
-        List<X509Certificate> certs = enrolResp.certificates();
-        Assert.assertTrue("number of received certificates", certs.size() > 0);
-        X509Certificate cert = certs.get(0);
-        Assert.assertNotNull("enrolled certificate", cert);
-
-        // getCert
-        certs = client.scepGetCert(privKey, selfSignedCert, issuerName,
-                enroledCert.getSerialNumber());
-        Assert.assertTrue("number of received certificates", certs.size() > 0);
-        cert = certs.get(0);
-        Assert.assertNotNull("received certificate", cert);
-
-        // getCRL
-        X509CRL crl = client.scepGetCrl(privKey, enroledCert, issuerName,
-                enroledCert.getSerialNumber());
-        Assert.assertNotNull("received CRL", crl);
-
-        // getNextCA
-        AuthorityCertStore nextCa = client.scepNextCaCert();
-        Assert.assertNotNull("nextCa", nextCa);
+  private CaCaps getExpectedCaCaps() {
+    CaCaps caCaps = getDefaultCaCaps();
+    CaCapability[] excludedCaCaps = getExcludedCaCaps();
+    if (excludedCaCaps != null) {
+      caCaps.removeCapabilities(excludedCaCaps);
     }
 
-    private CaCaps getExpectedCaCaps() {
-        CaCaps caCaps = getDefaultCaCaps();
-        CaCapability[] excludedCaCaps = getExcludedCaCaps();
-        if (excludedCaCaps != null) {
-            for (CaCapability m : excludedCaCaps) {
-                caCaps.removeCapability(m);
-            }
-        }
-        if (isWithNextCa()) {
-            if (!caCaps.containsCapability(CaCapability.GetNextCACert)) {
-                caCaps.addCapability(CaCapability.GetNextCACert);
-            }
-        } else {
-            caCaps.removeCapability(CaCapability.GetNextCACert);
-        }
-        return caCaps;
+    if (isWithNextCa()) {
+      if (!caCaps.containsCapability(CaCapability.GetNextCACert)) {
+        caCaps.addCapabilities(CaCapability.GetNextCACert);
+      }
+    } else {
+      caCaps.removeCapabilities(CaCapability.GetNextCACert);
     }
+    return caCaps;
+  }
 
-    private boolean equals(Certificate bcCert, X509Certificate cert)
-            throws CertificateException, IOException {
-        return Arrays.equals(cert.getEncoded(), bcCert.getEncoded());
-    }
+  private boolean equals(Certificate bcCert, X509Certificate cert)
+      throws CertificateException, IOException {
+    return Arrays.equals(cert.getEncoded(), bcCert.getEncoded());
+  }
 
 }

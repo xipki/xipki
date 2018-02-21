@@ -23,37 +23,38 @@ import java.util.Arrays;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class Nonce {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+  private static final SecureRandom RANDOM = new SecureRandom();
 
-    private static final int NONCE_LEN = 16;
+  private static final int NONCE_LEN = 16;
 
-    private final byte[] bytes;
+  private final byte[] bytes;
 
-    private Nonce(byte[] bytes, boolean cloneBytes) {
-        ScepUtil.requireNonNull("bytes", bytes);
-        if (bytes.length != 16) {
-            throw new IllegalArgumentException("bytes.length is not of 16");
-        }
-        this.bytes = cloneBytes ? Arrays.copyOf(bytes, bytes.length) : bytes;
+  private Nonce(byte[] bytes, boolean cloneBytes) {
+    ScepUtil.requireNonNull("bytes", bytes);
+    if (bytes.length != 16) {
+      throw new IllegalArgumentException("bytes.length is not of 16");
     }
+    this.bytes = cloneBytes ? Arrays.copyOf(bytes, bytes.length) : bytes;
+  }
 
-    public Nonce(byte[] bytes) {
-        this(bytes, true);
-    }
+  public Nonce(byte[] bytes) {
+    this(bytes, true);
+  }
 
-    public byte[] bytes() {
-        return Arrays.copyOf(bytes, bytes.length);
-    }
+  public byte[] bytes() {
+    return Arrays.copyOf(bytes, bytes.length);
+  }
 
-    public static Nonce randomNonce() {
-        byte[] bytes = new byte[NONCE_LEN];
-        RANDOM.nextBytes(bytes);
-        return new Nonce(bytes, false);
-    }
+  public static Nonce randomNonce() {
+    byte[] bytes = new byte[NONCE_LEN];
+    RANDOM.nextBytes(bytes);
+    return new Nonce(bytes, false);
+  }
 
 }

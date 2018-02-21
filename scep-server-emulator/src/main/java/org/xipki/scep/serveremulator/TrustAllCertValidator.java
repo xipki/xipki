@@ -22,13 +22,15 @@ import java.security.cert.X509Certificate;
 import org.xipki.scep.message.CertificateValidator;
 
 /**
+ * TODO.
  * @author Lijun Liao
+ *
  */
 
 public class TrustAllCertValidator implements CertificateValidator {
 
-    public boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts) {
-        return true;
-    }
+  public boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts) {
+    return true;
+  }
 
 }

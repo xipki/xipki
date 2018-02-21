@@ -20,19 +20,20 @@ package org.xipki.scep.message;
 import java.security.cert.X509Certificate;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public interface CertificateValidator {
 
-    /**
-     *
-     * @param target
-     *          The certificate to be verified. Must not be {@code null}.
-     * @param otherCerts
-     *          Additional certificate that may be used. Could be {@code null}.
-     * @return whether the target certificate is trusted.
-     */
-    boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts);
+  /**
+   * TODO.
+   * @param target
+   *          The certificate to be verified. Must not be {@code null}.
+   * @param otherCerts
+   *          Additional certificate that may be used. Could be {@code null}.
+   * @return whether the target certificate is trusted.
+   */
+  boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts);
 
 }

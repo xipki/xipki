@@ -23,86 +23,82 @@ import org.xipki.scep.crypto.KeyUsage;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class AuthorityCertStore {
 
-    private final X509Certificate caCert;
+  private final X509Certificate caCert;
 
-    private final X509Certificate signatureCert;
+  private final X509Certificate signatureCert;
 
-    private final X509Certificate encryptionCert;
+  private final X509Certificate encryptionCert;
 
-    private AuthorityCertStore(X509Certificate caCert, X509Certificate signatureCert,
-            X509Certificate encryptionCert) {
-        this.caCert = caCert;
-        this.signatureCert = signatureCert;
-        this.encryptionCert = encryptionCert;
-    }
+  private AuthorityCertStore(X509Certificate caCert, X509Certificate signatureCert,
+      X509Certificate encryptionCert) {
+    this.caCert = caCert;
+    this.signatureCert = signatureCert;
+    this.encryptionCert = encryptionCert;
+  }
 
-    public X509Certificate signatureCert() {
-        return signatureCert;
-    }
+  public X509Certificate signatureCert() {
+    return signatureCert;
+  }
 
-    public X509Certificate encryptionCert() {
-        return encryptionCert;
-    }
+  public X509Certificate encryptionCert() {
+    return encryptionCert;
+  }
 
-    public X509Certificate caCert() {
-        return caCert;
-    }
+  public X509Certificate caCert() {
+    return caCert;
+  }
 
-    public static AuthorityCertStore getInstance(X509Certificate caCert,
-            X509Certificate... raCerts) {
-        ScepUtil.requireNonNull("caCert", caCert);
+  public static AuthorityCertStore getInstance(X509Certificate caCert, X509Certificate... raCerts) {
+    ScepUtil.requireNonNull("caCert", caCert);
 
-        X509Certificate encryptionCert = null;
-        X509Certificate signatureCert = null;
+    X509Certificate encryptionCert = null;
+    X509Certificate signatureCert = null;
 
-        if (raCerts == null || raCerts.length == 0) {
-            signatureCert = caCert;
-            encryptionCert = caCert;
-        } else {
-            for (X509Certificate cert : raCerts) {
-                boolean[] keyusage = cert.getKeyUsage();
-                if (hasKeyusage(keyusage, KeyUsage.keyEncipherment)) {
-                    if (encryptionCert != null) {
-                        throw new IllegalArgumentException(
-                                "Could not determine RA certificate for encryption");
-                    }
-                    encryptionCert = cert;
-                }
-
-                if (hasKeyusage(keyusage, KeyUsage.digitalSignature)
-                        || hasKeyusage(keyusage, KeyUsage.contentCommitment)) {
-                    if (signatureCert != null) {
-                        throw new IllegalArgumentException(
-                                "Could not determine RA certificate for signature");
-                    }
-                    signatureCert = cert;
-                }
-            }
-
-            if (encryptionCert == null) {
-                throw new IllegalArgumentException(
-                        "Could not determine RA certificate for encryption");
-            }
-
-            if (signatureCert == null) {
-                throw new IllegalArgumentException(
-                        "Could not determine RA certificate for signature");
-            }
+    if (raCerts == null || raCerts.length == 0) {
+      signatureCert = caCert;
+      encryptionCert = caCert;
+    } else {
+      for (X509Certificate cert : raCerts) {
+        boolean[] keyusage = cert.getKeyUsage();
+        if (hasKeyusage(keyusage, KeyUsage.keyEncipherment)) {
+          if (encryptionCert != null) {
+            throw new IllegalArgumentException("Could not determine RA certificate for encryption");
+          }
+          encryptionCert = cert;
         }
 
-        return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
-    } // method getInstance
-
-    private static boolean hasKeyusage(boolean[] keyusage, KeyUsage usage) {
-        if (keyusage != null && keyusage.length > usage.bit()) {
-            return keyusage[usage.bit()];
+        if (hasKeyusage(keyusage, KeyUsage.digitalSignature)
+            || hasKeyusage(keyusage, KeyUsage.contentCommitment)) {
+          if (signatureCert != null) {
+            throw new IllegalArgumentException("Could not determine RA certificate for signature");
+          }
+          signatureCert = cert;
         }
-        return false;
+      }
+
+      if (encryptionCert == null) {
+        throw new IllegalArgumentException("Could not determine RA certificate for encryption");
+      }
+
+      if (signatureCert == null) {
+        throw new IllegalArgumentException("Could not determine RA certificate for signature");
+      }
     }
+
+    return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
+  } // method getInstance
+
+  private static boolean hasKeyusage(boolean[] keyusage, KeyUsage usage) {
+    if (keyusage != null && keyusage.length > usage.bit()) {
+      return keyusage[usage.bit()];
+    }
+    return false;
+  }
 
 }

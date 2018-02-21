@@ -21,26 +21,27 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class NextCaAndRa {
 
-    private final Certificate caCert;
+  private final Certificate caCert;
 
-    private final Certificate raCert;
+  private final Certificate raCert;
 
-    public NextCaAndRa(Certificate caCert, Certificate raCert) {
-        this.caCert = ScepUtil.requireNonNull("caCert", caCert);
-        this.raCert = raCert;
-    }
+  public NextCaAndRa(Certificate caCert, Certificate raCert) {
+    this.caCert = ScepUtil.requireNonNull("caCert", caCert);
+    this.raCert = raCert;
+  }
 
-    public Certificate caCert() {
-        return caCert;
-    }
+  public Certificate caCert() {
+    return caCert;
+  }
 
-    public Certificate raCert() {
-        return raCert;
-    }
+  public Certificate raCert() {
+    return raCert;
+  }
 
 }

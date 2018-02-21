@@ -23,26 +23,27 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.scep.util.ScepUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class RaEmulator {
 
-    private final PrivateKey raKey;
+  private final PrivateKey raKey;
 
-    private final Certificate raCert;
+  private final Certificate raCert;
 
-    public RaEmulator(PrivateKey raKey, Certificate raCert) {
-        this.raKey = ScepUtil.requireNonNull("raKey", raKey);
-        this.raCert = ScepUtil.requireNonNull("raCert", raCert);
-    }
+  public RaEmulator(PrivateKey raKey, Certificate raCert) {
+    this.raKey = ScepUtil.requireNonNull("raKey", raKey);
+    this.raCert = ScepUtil.requireNonNull("raCert", raCert);
+  }
 
-    public PrivateKey raKey() {
-        return raKey;
-    }
+  public PrivateKey raKey() {
+    return raKey;
+  }
 
-    public Certificate raCert() {
-        return raCert;
-    }
+  public Certificate raCert() {
+    return raCert;
+  }
 
 }
