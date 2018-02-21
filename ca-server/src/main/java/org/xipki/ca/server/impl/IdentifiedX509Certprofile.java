@@ -464,6 +464,30 @@ class IdentifiedX509Certprofile {
             addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
 
+        // remove extensions that are not required frrom the list
+        List<ASN1ObjectIdentifier> listToRm = null;
+        for (ASN1ObjectIdentifier extnType : controls.keySet()) {
+            ExtensionControl ctrl = controls.get(extnType);
+            if (ctrl.isRequired()) {
+                continue;
+            }
+
+            if (neededExtTypes.contains(extnType) || wantedExtTypes.contains(extnType)) {
+                continue;
+            }
+
+            if (listToRm == null) {
+                listToRm = new LinkedList<>();
+            }
+            listToRm.add(extnType);
+        }
+
+        if (listToRm != null) {
+            for (ASN1ObjectIdentifier extnType : listToRm) {
+                controls.remove(extnType);
+            }
+        }
+
         ExtensionValues subvalues = certprofile.getExtensions(Collections.unmodifiableMap(controls),
                 requestedSubject, grantedSubject, requestedExtensions, notBefore, notAfter,
                 publicCaInfo);
