@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -33,7 +34,58 @@ import org.xipki.common.util.ParamUtil;
 
 public class ConfPairs {
 
-    private class Unmodifiable extends ConfPairs {
+    private static class Unmodifiable extends ConfPairs {
+
+        private ConfPairs underlying;
+
+        private Unmodifiable(ConfPairs underlying) {
+            this.underlying = underlying;
+        }
+
+        @Override
+        public String value(String name) {
+            return underlying.value(name);
+        }
+
+        @Override
+        public Set<String> names() {
+            return underlying.names();
+        }
+
+        @Override
+        public String getEncoded() {
+            return underlying.getEncoded();
+        }
+
+        @Override
+        public String toString() {
+            return underlying.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            return underlying.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (obj instanceof Unmodifiable) {
+                return underlying.equals(((Unmodifiable) obj).underlying);
+            } else if (obj instanceof ConfPairs) {
+                return underlying.equals((ConfPairs) obj);
+            } else {
+                return underlying.equals(obj);
+            }
+        }
+
+        @Override
+        public ConfPairs unmodifiable() {
+            return this;
+        }
 
         @Override
         public void putPair(String name, String value) {
@@ -234,8 +286,20 @@ public class ConfPairs {
             return false;
         }
 
-        ConfPairs cp = (ConfPairs) obj;
-        return pairs.equals(cp.pairs);
+        ConfPairs other = (ConfPairs) obj;
+        Set<String> thisNames = names();
+        Set<String> otherNames = other.names();
+        if (!thisNames.equals(otherNames)) {
+            return false;
+        }
+
+        for (String name : thisNames) {
+            if (!CompareUtil.equalsObject(value(name), other.value(name))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static String encodeNameOrValue(String str) {
@@ -256,7 +320,7 @@ public class ConfPairs {
     }
 
     public ConfPairs unmodifiable() {
-        return new Unmodifiable();
+        return new Unmodifiable(this);
     }
 
 }
