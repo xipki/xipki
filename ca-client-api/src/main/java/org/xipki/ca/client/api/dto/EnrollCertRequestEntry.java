@@ -22,37 +22,38 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class EnrollCertRequestEntry extends IdentifiedObject {
 
-    private final String certprofile;
+  private final String certprofile;
 
-    private final CertRequest certReq;
+  private final CertRequest certReq;
 
-    private final ProofOfPossession popo;
+  private final ProofOfPossession popo;
 
-    public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
-            ProofOfPossession popo) {
-        super(id);
+  public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
+      ProofOfPossession popo) {
+    super(id);
+  
+    this.certprofile = certprofile;
+    this.certReq = ParamUtil.requireNonNull("certReq", certReq);
+    this.popo = popo;
+  }
 
-        this.certprofile = certprofile;
-        this.certReq = ParamUtil.requireNonNull("certReq", certReq);
-        this.popo = popo;
-    }
+  public String certprofile() {
+    return certprofile;
+  }
 
-    public String certprofile() {
-        return certprofile;
-    }
+  public CertRequest certReq() {
+    return certReq;
+  }
 
-    public CertRequest certReq() {
-        return certReq;
-    }
-
-    public ProofOfPossession popo() {
-        return popo;
-    }
+  public ProofOfPossession popo() {
+    return popo;
+  }
 
 }

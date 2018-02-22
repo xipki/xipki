@@ -20,20 +20,21 @@ package org.xipki.ca.client.api.dto;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class IdentifiedObject {
 
-    private final String id;
+  private final String id;
 
-    public IdentifiedObject(String id) {
-        this.id = ParamUtil.requireNonBlank("id", id);
-    }
+  public IdentifiedObject(String id) {
+    this.id = ParamUtil.requireNonBlank("id", id);
+  }
 
-    public String id() {
-        return id;
-    }
+  public String id() {
+    return id;
+  }
 
 }

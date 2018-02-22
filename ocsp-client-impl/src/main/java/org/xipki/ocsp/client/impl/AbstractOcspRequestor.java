@@ -74,403 +74,404 @@ import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class AbstractOcspRequestor implements OcspRequestor {
 
-    private SecurityFactory securityFactory;
+  private SecurityFactory securityFactory;
 
-    private final Object signerLock = new Object();
+  private final Object signerLock = new Object();
 
-    private ConcurrentContentSigner signer;
+  private ConcurrentContentSigner signer;
 
-    private String signerType;
+  private String signerType;
 
-    private String signerConf;
+  private String signerConf;
 
-    private String signerCertFile;
+  private String signerCertFile;
 
-    private SecureRandom random = new SecureRandom();
+  private SecureRandom random = new SecureRandom();
 
-    protected AbstractOcspRequestor() {
+  protected AbstractOcspRequestor() {
+  }
+
+  /**
+   * Sends the request to the OCSP responder.
+   * @param request
+   *          Request. Must not be {@code null}.
+   * @param responderUrl
+   *          Responder URL. Must not be {@code null}.
+   * @param requestOptions
+   *           Request options. Must not be {@code null}.
+   * @return received response
+   * @throws IOException
+   *           if the transmission failed.
+   */
+  protected abstract byte[] send(byte[] request, URL responderUrl,
+      RequestOptions requestOptions) throws IOException;
+
+  @Override
+  public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
+      URL responderUrl, RequestOptions requestOptions, RequestResponseDebug debug)
+      throws OcspResponseException, OcspRequestorException {
+    ParamUtil.requireNonNull("issuerCert", issuerCert);
+    ParamUtil.requireNonNull("cert", cert);
+
+    try {
+      if (!X509Util.issues(issuerCert, cert)) {
+        throw new IllegalArgumentException("cert and issuerCert do not match");
+      }
+    } catch (CertificateEncodingException ex) {
+      throw new OcspRequestorException(ex.getMessage(), ex);
     }
 
-    /**
-     * Sends the request to the OCSP responder
-     * @param request
-     *          Request. Must not be {@code null}.
-     * @param responderUrl
-     *          Responder URL. Must not be {@code null}.
-     * @param requestOptions
-     *           Request options. Must not be {@code null}.
-     * @return received response
-     * @throws IOException
-     *           if the transmission failed.
-     */
-    protected abstract byte[] send(byte[] request, URL responderUrl,
-            RequestOptions requestOptions) throws IOException;
+    return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl,
+        requestOptions, debug);
+  }
 
-    @Override
-    public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-            URL responderUrl, RequestOptions requestOptions, RequestResponseDebug debug)
-            throws OcspResponseException, OcspRequestorException {
-        ParamUtil.requireNonNull("issuerCert", issuerCert);
-        ParamUtil.requireNonNull("cert", cert);
+  @Override
+  public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
+      RequestOptions requestOptions, RequestResponseDebug debug)
+      throws OcspResponseException, OcspRequestorException {
+    ParamUtil.requireNonNull("issuerCert", issuerCert);
+    ParamUtil.requireNonNull("certs", certs);
+    ParamUtil.requireMin("certs.length", certs.length, 1);
 
-        try {
-            if (!X509Util.issues(issuerCert, cert)) {
-                throw new IllegalArgumentException("cert and issuerCert do not match");
-            }
-        } catch (CertificateEncodingException ex) {
-            throw new OcspRequestorException(ex.getMessage(), ex);
+    BigInteger[] serialNumbers = new BigInteger[certs.length];
+    for (int i = 0; i < certs.length; i++) {
+      X509Certificate cert = certs[i];
+      try {
+        if (!X509Util.issues(issuerCert, cert)) {
+          throw new IllegalArgumentException(
+              "cert at index " + i + " and issuerCert do not match");
+        }
+      } catch (CertificateEncodingException ex) {
+        throw new OcspRequestorException(ex.getMessage(), ex);
+      }
+      serialNumbers[i] = cert.getSerialNumber();
+    }
+
+    return ask(issuerCert, serialNumbers, responderUrl, requestOptions, debug);
+  }
+
+  @Override
+  public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
+      RequestOptions requestOptions, RequestResponseDebug debug)
+      throws OcspResponseException, OcspRequestorException {
+    return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
+  }
+
+  @Override
+  public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
+      RequestOptions requestOptions, RequestResponseDebug debug)
+      throws OcspResponseException, OcspRequestorException {
+    ParamUtil.requireNonNull("issuerCert", issuerCert);
+    ParamUtil.requireNonNull("requestOptions", requestOptions);
+    ParamUtil.requireNonNull("responderUrl", responderUrl);
+
+    byte[] nonce = null;
+    if (requestOptions.isUseNonce()) {
+      nonce = nextNonce(requestOptions.nonceLen());
+    }
+
+    OCSPRequest ocspReq = buildRequest(issuerCert, serialNumbers, nonce, requestOptions);
+    byte[] encodedReq;
+    try {
+      encodedReq = ocspReq.getEncoded();
+    } catch (IOException ex) {
+      throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(),
+          ex);
+    }
+
+    RequestResponsePair msgPair = null;
+    if (debug != null) {
+      msgPair = new RequestResponsePair();
+      debug.add(msgPair);
+      if (debug.saveRequest()) {
+        msgPair.setRequest(encodedReq);
+      }
+    }
+
+    byte[] encodedResp;
+    try {
+      encodedResp = send(encodedReq, responderUrl, requestOptions);
+    } catch (IOException ex) {
+      throw new ResponderUnreachableException("IOException: " + ex.getMessage(), ex);
+    }
+
+    if (msgPair != null && debug.saveResponse()) {
+      msgPair.setResponse(encodedResp);
+    }
+
+    OCSPResp ocspResp;
+    try {
+      ocspResp = new OCSPResp(encodedResp);
+    } catch (IOException ex) {
+      throw new InvalidOcspResponseException("IOException: " + ex.getMessage(), ex);
+    }
+
+    Object respObject;
+    try {
+      respObject = ocspResp.getResponseObject();
+    } catch (OCSPException ex) {
+      throw new InvalidOcspResponseException("responseObject is invalid");
+    }
+
+    if (ocspResp.getStatus() != 0) {
+      return ocspResp;
+    }
+
+    if (!(respObject instanceof BasicOCSPResp)) {
+      return ocspResp;
+    }
+
+    BasicOCSPResp basicOcspResp = (BasicOCSPResp) respObject;
+
+    if (nonce != null) {
+      Extension nonceExtn = basicOcspResp.getExtension(
+          OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+      if (nonceExtn == null) {
+        throw new OcspNonceUnmatchedException(nonce, null);
+      }
+      byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
+      if (!Arrays.equals(nonce, receivedNonce)) {
+        throw new OcspNonceUnmatchedException(nonce, receivedNonce);
+      }
+    }
+
+    SingleResp[] singleResponses = basicOcspResp.getResponses();
+    if (singleResponses == null || singleResponses.length == 0) {
+      String msg = StringUtil.concat(
+          "response with no singleResponse is returned, expected is ",
+          Integer.toString(serialNumbers.length));
+      throw new OcspTargetUnmatchedException(msg);
+    }
+
+    final int countSingleResponses = singleResponses.length;
+
+    if (countSingleResponses != serialNumbers.length) {
+      String msg = StringUtil.concat("response with ", Integer.toString(countSingleResponses),
+          " singleResponse", (countSingleResponses > 1 ? "s" : ""),
+          " is returned, expected is ", Integer.toString(serialNumbers.length));
+      throw new OcspTargetUnmatchedException(msg);
+    }
+
+    Request reqAt0 =
+        Request.getInstance(ocspReq.getTbsRequest().getRequestList().getObjectAt(0));
+
+    CertID certId = reqAt0.getReqCert();
+    ASN1ObjectIdentifier issuerHashAlg = certId.getHashAlgorithm().getAlgorithm();
+    byte[] issuerKeyHash = certId.getIssuerKeyHash().getOctets();
+    byte[] issuerNameHash = certId.getIssuerNameHash().getOctets();
+
+    if (serialNumbers.length == 1) {
+      SingleResp singleResp = singleResponses[0];
+      CertificateID cid = singleResp.getCertID();
+      boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
+          && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
+          && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
+
+      if (!issuerMatch) {
+        throw new OcspTargetUnmatchedException("the issuer is not requested");
+      }
+
+      BigInteger serialNumber = cid.getSerialNumber();
+      if (!serialNumbers[0].equals(serialNumber)) {
+        throw new OcspTargetUnmatchedException("the serialNumber is not requested");
+      }
+    } else {
+      List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
+      List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
+
+      for (int i = 0; i < countSingleResponses; i++) {
+        SingleResp singleResp = singleResponses[i];
+        CertificateID cid = singleResp.getCertID();
+        boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
+            && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
+            && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
+
+        if (!issuerMatch) {
+          throw new OcspTargetUnmatchedException(
+              "the issuer specified in singleResponse[" + i + "] is not requested");
         }
 
-        return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl,
-                requestOptions, debug);
+        BigInteger serialNumber = cid.getSerialNumber();
+        if (!tmpSerials2.remove(serialNumber)) {
+          if (tmpSerials1.contains(serialNumber)) {
+            throw new OcspTargetUnmatchedException("serialNumber "
+                + LogUtil.formatCsn(serialNumber)
+                + "is contained in at least two singleResponses");
+          } else {
+            throw new OcspTargetUnmatchedException(
+                "serialNumber " + LogUtil.formatCsn(serialNumber)
+                + " specified in singleResponse[" + i + "] is not requested");
+          }
+        }
+      } // end for
+    } // end if
+
+    return ocspResp;
+  } // method ask
+
+  private OCSPRequest buildRequest(X509Certificate caCert, BigInteger[] serialNumbers,
+      byte[] nonce, RequestOptions requestOptions) throws OcspRequestorException {
+    HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.hashAlgorithmId());
+    if (hashAlgo == null) {
+      throw new OcspRequestorException("unknown HashAlgo "
+          + requestOptions.hashAlgorithmId().getId());
+    }
+    List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
+
+    XiOCSPReqBuilder reqBuilder = new XiOCSPReqBuilder();
+    List<Extension> extensions = new LinkedList<>();
+    if (nonce != null) {
+      extensions.add(new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
+          new DEROctetString(nonce)));
     }
 
-    @Override
-    public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
-            throws OcspResponseException, OcspRequestorException {
-        ParamUtil.requireNonNull("issuerCert", issuerCert);
-        ParamUtil.requireNonNull("certs", certs);
-        ParamUtil.requireMin("certs.length", certs.length, 1);
+    if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
+      ASN1EncodableVector vec = new ASN1EncodableVector();
+      for (AlgorithmIdentifier algId : prefSigAlgs) {
+        vec.add(new DERSequence(algId));
+      }
 
-        BigInteger[] serialNumbers = new BigInteger[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            X509Certificate cert = certs[i];
+      ASN1Sequence extnValue = new DERSequence(vec);
+      Extension extn;
+      try {
+        extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
+            new DEROctetString(extnValue));
+      } catch (IOException ex) {
+        throw new OcspRequestorException(ex.getMessage(), ex);
+      }
+      extensions.add(extn);
+    }
+
+    if (CollectionUtil.isNonEmpty(extensions)) {
+      reqBuilder.setRequestExtensions(new Extensions(extensions.toArray(new Extension[0])));
+    }
+
+    try {
+      DEROctetString issuerNameHash = new DEROctetString(hashAlgo.hash(
+          caCert.getSubjectX500Principal().getEncoded()));
+
+      TBSCertificate tbsCert;
+      try {
+        tbsCert = TBSCertificate.getInstance(caCert.getTBSCertificate());
+      } catch (CertificateEncodingException ex) {
+        throw new OcspRequestorException(ex);
+      }
+      DEROctetString issuerKeyHash = new DEROctetString(hashAlgo.hash(
+          tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
+
+      for (BigInteger serialNumber : serialNumbers) {
+        CertID certId = new CertID(hashAlgo.algorithmIdentifier(),
+            issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
+
+        reqBuilder.addRequest(certId);
+      }
+
+      if (requestOptions.isSignRequest()) {
+        synchronized (signerLock) {
+          if (signer == null) {
+            if (StringUtil.isBlank(signerType)) {
+              throw new OcspRequestorException("signerType is not configured");
+            }
+
+            if (StringUtil.isBlank(signerConf)) {
+              throw new OcspRequestorException("signerConf is not configured");
+            }
+
+            X509Certificate cert = null;
+            if (StringUtil.isNotBlank(signerCertFile)) {
+              try {
+                cert = X509Util.parseCert(signerCertFile);
+              } catch (CertificateException ex) {
+                throw new OcspRequestorException("could not parse certificate "
+                    + signerCertFile + ": " + ex.getMessage());
+              }
+            }
+
             try {
-                if (!X509Util.issues(issuerCert, cert)) {
-                    throw new IllegalArgumentException(
-                            "cert at index " + i + " and issuerCert do not match");
-                }
-            } catch (CertificateEncodingException ex) {
-                throw new OcspRequestorException(ex.getMessage(), ex);
+              signer = securityFactory().createSigner(signerType,
+                  new SignerConf(signerConf), cert);
+            } catch (Exception ex) {
+              throw new OcspRequestorException("could not create signer: "
+                  + ex.getMessage());
             }
-            serialNumbers[i] = cert.getSerialNumber();
+          } // end if
+        } // end synchronized
+
+        reqBuilder.setRequestorName(signer.getBcCertificate().getSubject());
+        X509CertificateHolder[] certChain0 = signer.getBcCertificateChain();
+        Certificate[] certChain = new Certificate[certChain0.length];
+        for (int i = 0; i < certChain.length; i++) {
+          certChain[i] = certChain0[i].toASN1Structure();
         }
 
-        return ask(issuerCert, serialNumbers, responderUrl, requestOptions, debug);
-    }
-
-    @Override
-    public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
-            throws OcspResponseException, OcspRequestorException {
-        return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
-    }
-
-    @Override
-    public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
-            throws OcspResponseException, OcspRequestorException {
-        ParamUtil.requireNonNull("issuerCert", issuerCert);
-        ParamUtil.requireNonNull("requestOptions", requestOptions);
-        ParamUtil.requireNonNull("responderUrl", responderUrl);
-
-        byte[] nonce = null;
-        if (requestOptions.isUseNonce()) {
-            nonce = nextNonce(requestOptions.nonceLen());
-        }
-
-        OCSPRequest ocspReq = buildRequest(issuerCert, serialNumbers, nonce, requestOptions);
-        byte[] encodedReq;
+        ConcurrentBagEntrySigner signer0;
         try {
-            encodedReq = ocspReq.getEncoded();
-        } catch (IOException ex) {
-            throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(),
-                    ex);
-        }
-
-        RequestResponsePair msgPair = null;
-        if (debug != null) {
-            msgPair = new RequestResponsePair();
-            debug.add(msgPair);
-            if (debug.saveRequest()) {
-                msgPair.setRequest(encodedReq);
-            }
-        }
-
-        byte[] encodedResp;
-        try {
-            encodedResp = send(encodedReq, responderUrl, requestOptions);
-        } catch (IOException ex) {
-            throw new ResponderUnreachableException("IOException: " + ex.getMessage(), ex);
-        }
-
-        if (msgPair != null && debug.saveResponse()) {
-            msgPair.setResponse(encodedResp);
-        }
-
-        OCSPResp ocspResp;
-        try {
-            ocspResp = new OCSPResp(encodedResp);
-        } catch (IOException ex) {
-            throw new InvalidOcspResponseException("IOException: " + ex.getMessage(), ex);
-        }
-
-        Object respObject;
-        try {
-            respObject = ocspResp.getResponseObject();
-        } catch (OCSPException ex) {
-            throw new InvalidOcspResponseException("responseObject is invalid");
-        }
-
-        if (ocspResp.getStatus() != 0) {
-            return ocspResp;
-        }
-
-        if (!(respObject instanceof BasicOCSPResp)) {
-            return ocspResp;
-        }
-
-        BasicOCSPResp basicOcspResp = (BasicOCSPResp) respObject;
-
-        if (nonce != null) {
-            Extension nonceExtn = basicOcspResp.getExtension(
-                    OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-            if (nonceExtn == null) {
-                throw new OcspNonceUnmatchedException(nonce, null);
-            }
-            byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
-            if (!Arrays.equals(nonce, receivedNonce)) {
-                throw new OcspNonceUnmatchedException(nonce, receivedNonce);
-            }
-        }
-
-        SingleResp[] singleResponses = basicOcspResp.getResponses();
-        if (singleResponses == null || singleResponses.length == 0) {
-            String msg = StringUtil.concat(
-                    "response with no singleResponse is returned, expected is ",
-                    Integer.toString(serialNumbers.length));
-            throw new OcspTargetUnmatchedException(msg);
-        }
-
-        final int countSingleResponses = singleResponses.length;
-
-        if (countSingleResponses != serialNumbers.length) {
-            String msg = StringUtil.concat("response with ", Integer.toString(countSingleResponses),
-                    " singleResponse", (countSingleResponses > 1 ? "s" : ""),
-                    " is returned, expected is ", Integer.toString(serialNumbers.length));
-            throw new OcspTargetUnmatchedException(msg);
-        }
-
-        Request reqAt0 =
-                Request.getInstance(ocspReq.getTbsRequest().getRequestList().getObjectAt(0));
-
-        CertID certId = reqAt0.getReqCert();
-        ASN1ObjectIdentifier issuerHashAlg = certId.getHashAlgorithm().getAlgorithm();
-        byte[] issuerKeyHash = certId.getIssuerKeyHash().getOctets();
-        byte[] issuerNameHash = certId.getIssuerNameHash().getOctets();
-
-        if (serialNumbers.length == 1) {
-            SingleResp singleResp = singleResponses[0];
-            CertificateID cid = singleResp.getCertID();
-            boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
-                    && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
-                    && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
-
-            if (!issuerMatch) {
-                throw new OcspTargetUnmatchedException("the issuer is not requested");
-            }
-
-            BigInteger serialNumber = cid.getSerialNumber();
-            if (!serialNumbers[0].equals(serialNumber)) {
-                throw new OcspTargetUnmatchedException("the serialNumber is not requested");
-            }
-        } else {
-            List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
-            List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
-
-            for (int i = 0; i < countSingleResponses; i++) {
-                SingleResp singleResp = singleResponses[i];
-                CertificateID cid = singleResp.getCertID();
-                boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
-                        && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
-                        && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
-
-                if (!issuerMatch) {
-                    throw new OcspTargetUnmatchedException(
-                            "the issuer specified in singleResponse[" + i + "] is not requested");
-                }
-
-                BigInteger serialNumber = cid.getSerialNumber();
-                if (!tmpSerials2.remove(serialNumber)) {
-                    if (tmpSerials1.contains(serialNumber)) {
-                        throw new OcspTargetUnmatchedException("serialNumber "
-                                + LogUtil.formatCsn(serialNumber)
-                                + "is contained in at least two singleResponses");
-                    } else {
-                        throw new OcspTargetUnmatchedException(
-                                "serialNumber " + LogUtil.formatCsn(serialNumber)
-                                + " specified in singleResponse[" + i + "] is not requested");
-                    }
-                }
-            } // end for
-        } // end if
-
-        return ocspResp;
-    } // method ask
-
-    private OCSPRequest buildRequest(X509Certificate caCert, BigInteger[] serialNumbers,
-            byte[] nonce, RequestOptions requestOptions) throws OcspRequestorException {
-        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.hashAlgorithmId());
-        if (hashAlgo == null) {
-            throw new OcspRequestorException("unknown HashAlgo "
-                    + requestOptions.hashAlgorithmId().getId());
-        }
-        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
-
-        XiOCSPReqBuilder reqBuilder = new XiOCSPReqBuilder();
-        List<Extension> extensions = new LinkedList<>();
-        if (nonce != null) {
-            extensions.add(new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-                    new DEROctetString(nonce)));
-        }
-
-        if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
-            ASN1EncodableVector vec = new ASN1EncodableVector();
-            for (AlgorithmIdentifier algId : prefSigAlgs) {
-                vec.add(new DERSequence(algId));
-            }
-
-            ASN1Sequence extnValue = new DERSequence(vec);
-            Extension extn;
-            try {
-                extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
-                        new DEROctetString(extnValue));
-            } catch (IOException ex) {
-                throw new OcspRequestorException(ex.getMessage(), ex);
-            }
-            extensions.add(extn);
-        }
-
-        if (CollectionUtil.isNonEmpty(extensions)) {
-            reqBuilder.setRequestExtensions(new Extensions(extensions.toArray(new Extension[0])));
+          signer0 = signer.borrowSigner();
+        } catch (NoIdleSignerException ex) {
+          throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
         }
 
         try {
-            DEROctetString issuerNameHash = new DEROctetString(hashAlgo.hash(
-                    caCert.getSubjectX500Principal().getEncoded()));
-
-            TBSCertificate tbsCert;
-            try {
-                tbsCert = TBSCertificate.getInstance(caCert.getTBSCertificate());
-            } catch (CertificateEncodingException ex) {
-                throw new OcspRequestorException(ex);
-            }
-            DEROctetString issuerKeyHash = new DEROctetString(hashAlgo.hash(
-                    tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
-
-            for (BigInteger serialNumber : serialNumbers) {
-                CertID certId = new CertID(hashAlgo.algorithmIdentifier(),
-                        issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
-
-                reqBuilder.addRequest(certId);
-            }
-
-            if (requestOptions.isSignRequest()) {
-                synchronized (signerLock) {
-                    if (signer == null) {
-                        if (StringUtil.isBlank(signerType)) {
-                            throw new OcspRequestorException("signerType is not configured");
-                        }
-
-                        if (StringUtil.isBlank(signerConf)) {
-                            throw new OcspRequestorException("signerConf is not configured");
-                        }
-
-                        X509Certificate cert = null;
-                        if (StringUtil.isNotBlank(signerCertFile)) {
-                            try {
-                                cert = X509Util.parseCert(signerCertFile);
-                            } catch (CertificateException ex) {
-                                throw new OcspRequestorException("could not parse certificate "
-                                        + signerCertFile + ": " + ex.getMessage());
-                            }
-                        }
-
-                        try {
-                            signer = securityFactory().createSigner(signerType,
-                                    new SignerConf(signerConf), cert);
-                        } catch (Exception ex) {
-                            throw new OcspRequestorException("could not create signer: "
-                                    + ex.getMessage());
-                        }
-                    } // end if
-                } // end synchronized
-
-                reqBuilder.setRequestorName(signer.getBcCertificate().getSubject());
-                X509CertificateHolder[] certChain0 = signer.getBcCertificateChain();
-                Certificate[] certChain = new Certificate[certChain0.length];
-                for (int i = 0; i < certChain.length; i++) {
-                    certChain[i] = certChain0[i].toASN1Structure();
-                }
-
-                ConcurrentBagEntrySigner signer0;
-                try {
-                    signer0 = signer.borrowSigner();
-                } catch (NoIdleSignerException ex) {
-                    throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
-                }
-
-                try {
-                    return reqBuilder.build(signer0.value(), certChain);
-                } finally {
-                    signer.requiteSigner(signer0);
-                }
-            } else {
-                return reqBuilder.build();
-            } // end if
-        } catch (OCSPException | IOException ex) {
-            throw new OcspRequestorException(ex.getMessage(), ex);
+          return reqBuilder.build(signer0.value(), certChain);
+        } finally {
+          signer.requiteSigner(signer0);
         }
-    } // method buildRequest
-
-    private byte[] nextNonce(int nonceLen) {
-        byte[] nonce = new byte[nonceLen];
-        random.nextBytes(nonce);
-        return nonce;
+      } else {
+        return reqBuilder.build();
+      } // end if
+    } catch (OCSPException | IOException ex) {
+      throw new OcspRequestorException(ex.getMessage(), ex);
     }
+  } // method buildRequest
 
-    public String signerConf() {
-        return signerConf;
-    }
+  private byte[] nextNonce(int nonceLen) {
+    byte[] nonce = new byte[nonceLen];
+    random.nextBytes(nonce);
+    return nonce;
+  }
 
-    public void setSignerConf(String signerConf) {
-        this.signer = null;
-        this.signerConf = signerConf;
-    }
+  public String signerConf() {
+    return signerConf;
+  }
 
-    public String signerCertFile() {
-        return signerCertFile;
-    }
+  public void setSignerConf(String signerConf) {
+    this.signer = null;
+    this.signerConf = signerConf;
+  }
 
-    public void setSignerCertFile(String signerCertFile) {
-        if (StringUtil.isNotBlank(signerCertFile)) {
-            this.signer = null;
-            this.signerCertFile = signerCertFile;
-        }
-    }
+  public String signerCertFile() {
+    return signerCertFile;
+  }
 
-    public String signerType() {
-        return signerType;
+  public void setSignerCertFile(String signerCertFile) {
+    if (StringUtil.isNotBlank(signerCertFile)) {
+      this.signer = null;
+      this.signerCertFile = signerCertFile;
     }
+  }
 
-    public void setSignerType(String signerType) {
-        this.signer = null;
-        this.signerType = signerType;
-    }
+  public String signerType() {
+    return signerType;
+  }
 
-    public SecurityFactory securityFactory() {
-        return securityFactory;
-    }
+  public void setSignerType(String signerType) {
+    this.signer = null;
+    this.signerType = signerType;
+  }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
-        this.securityFactory = securityFactory;
-    }
+  public SecurityFactory securityFactory() {
+    return securityFactory;
+  }
+
+  public void setSecurityFactory(SecurityFactory securityFactory) {
+    this.securityFactory = securityFactory;
+  }
 
 }

@@ -32,39 +32,40 @@ import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "cmp-enroll-p12",
-        description = "enroll certificate (PKCS#12 keystore)")
+    description = "enroll certificate (PKCS#12 keystore)")
 @Service
 public class P12EnrollCertCmd extends EnrollCertAction {
 
-    @Option(name = "--p12", required = true,
-            description = "PKCS#12 request file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String p12File;
+  @Option(name = "--p12", required = true,
+      description = "PKCS#12 request file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  private String password;
 
-    @Override
-    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
-            throws ObjectCreationException {
-        if (password == null) {
-            try {
-                password = new String(readPassword());
-            } catch (IOException ex) {
-                throw new ObjectCreationException("could not read password: " + ex.getMessage(),
-                        ex);
-            }
-        }
-
-        SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, password,
-                HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
-        return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+  @Override
+  protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
+      throws ObjectCreationException {
+    if (password == null) {
+      try {
+        password = new String(readPassword());
+      } catch (IOException ex) {
+        throw new ObjectCreationException("could not read password: " + ex.getMessage(),
+            ex);
+      }
     }
+
+    SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, password,
+        HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+    return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+  }
 
 }

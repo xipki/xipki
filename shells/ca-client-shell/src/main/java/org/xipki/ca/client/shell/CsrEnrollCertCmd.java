@@ -37,76 +37,77 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "cmp-csr-enroll",
-        description = "enroll certificate via CSR")
+    description = "enroll certificate via CSR")
 @Service
 public class CsrEnrollCertCmd extends ClientAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--profile", aliases = "-p", required = true,
-            description = "certificate profile\n(required)")
-    private String profile;
+  @Option(name = "--profile", aliases = "-p", required = true,
+      description = "certificate profile\n(required)")
+  private String profile;
 
-    @Option(name = "--not-before",
-            description = "notBefore, UTC time of format yyyyMMddHHmmss")
-    private String notBeforeS;
+  @Option(name = "--not-before",
+      description = "notBefore, UTC time of format yyyyMMddHHmmss")
+  private String notBeforeS;
 
-    @Option(name = "--not-after",
-            description = "notAfter, UTC time of format yyyyMMddHHmmss")
-    private String notAfterS;
+  @Option(name = "--not-after",
+      description = "notAfter, UTC time of format yyyyMMddHHmmss")
+  private String notAfterS;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Option(name = "--ca",
-            description = "CA name\n(required if the profile is supported by more than one CA)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      description = "CA name\n(required if the profile is supported by more than one CA)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (caName != null) {
-            caName = caName.toLowerCase();
-        }
-
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
-
-        Date notBefore = StringUtil.isNotBlank(notBeforeS)
-                ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-        Date notAfter = StringUtil.isNotBlank(notAfterS)
-                  ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
-        EnrollCertResult result;
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            result = caClient.requestCert(caName, csr, profile, notBefore, notAfter, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
-
-        X509Certificate cert = null;
-        if (result != null) {
-            String id = result.allIds().iterator().next();
-            CertOrError certOrError = result.getCertOrError(id);
-            cert = (X509Certificate) certOrError.certificate();
-        }
-
-        if (cert == null) {
-            throw new CmdFailure("no certificate received from the server");
-        }
-
-        File certFile = new File(outputFile);
-        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (caName != null) {
+      caName = caName.toLowerCase();
     }
+
+    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+
+    Date notBefore = StringUtil.isNotBlank(notBeforeS)
+        ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+    Date notAfter = StringUtil.isNotBlank(notAfterS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+    EnrollCertResult result;
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      result = caClient.requestCert(caName, csr, profile, notBefore, notAfter, debug);
+    } finally {
+      saveRequestResponse(debug);
+    }
+
+    X509Certificate cert = null;
+    if (result != null) {
+      String id = result.allIds().iterator().next();
+      CertOrError certOrError = result.getCertOrError(id);
+      cert = (X509Certificate) certOrError.certificate();
+    }
+
+    if (cert == null) {
+      throw new CmdFailure("no certificate received from the server");
+    }
+
+    File certFile = new File(outputFile);
+    saveVerbose("certificate saved to file", certFile, cert.getEncoded());
+    return null;
+  }
 
 }

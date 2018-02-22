@@ -23,32 +23,33 @@ import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertOrError {
 
-    private final Certificate certificate;
+  private final Certificate certificate;
 
-    private final PkiStatusInfo error;
+  private final PkiStatusInfo error;
 
-    public CertOrError(Certificate certificate) {
-        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
-        this.error = null;
-    }
+  public CertOrError(Certificate certificate) {
+    this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+    this.error = null;
+  }
 
-    public CertOrError(PkiStatusInfo error) {
-        this.certificate = null;
-        this.error = ParamUtil.requireNonNull("error", error);
-    }
+  public CertOrError(PkiStatusInfo error) {
+    this.certificate = null;
+    this.error = ParamUtil.requireNonNull("error", error);
+  }
 
-    public Certificate certificate() {
-        return certificate;
-    }
+  public Certificate certificate() {
+    return certificate;
+  }
 
-    public PkiStatusInfo error() {
-        return error;
-    }
+  public PkiStatusInfo error() {
+    return error;
+  }
 
 }

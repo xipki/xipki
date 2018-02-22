@@ -21,32 +21,33 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class EnrollCertResultEntry extends ResultEntry {
 
-    private final CMPCertificate cert;
+  private final CMPCertificate cert;
 
-    private final int status;
+  private final int status;
 
-    public EnrollCertResultEntry(String id, CMPCertificate cert) {
-        this(id, cert, PKIStatus.GRANTED);
-    }
+  public EnrollCertResultEntry(String id, CMPCertificate cert) {
+    this(id, cert, PKIStatus.GRANTED);
+  }
 
-    public EnrollCertResultEntry(String id, CMPCertificate cert, int status) {
-        super(id);
-        this.cert = cert;
-        this.status = status;
-    }
+  public EnrollCertResultEntry(String id, CMPCertificate cert, int status) {
+    super(id);
+    this.cert = cert;
+    this.status = status;
+  }
 
-    public CMPCertificate cert() {
-        return cert;
-    }
+  public CMPCertificate cert() {
+    return cert;
+  }
 
-    public int status() {
-        return status;
-    }
+  public int status() {
+    return status;
+  }
 
 }

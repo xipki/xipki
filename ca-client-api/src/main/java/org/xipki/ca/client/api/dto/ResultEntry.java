@@ -18,14 +18,15 @@
 package org.xipki.ca.client.api.dto;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class ResultEntry extends IdentifiedObject {
 
-    public ResultEntry(String id) {
-        super(id);
-    }
+  public ResultEntry(String id) {
+    super(id);
+  }
 
 }

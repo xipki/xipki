@@ -23,6 +23,7 @@ import java.util.Map;
 import org.xipki.ocsp.client.api.OcspResponseException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -30,34 +31,34 @@ import org.xipki.ocsp.client.api.OcspResponseException;
 @SuppressWarnings("serial")
 public class OcspResponseUnsuccessfulException extends OcspResponseException {
 
-    private static final Map<Integer, String> codeStatusMap = new HashMap<>();
+  private static final Map<Integer, String> codeStatusMap = new HashMap<>();
 
-    private int status;
+  private int status;
 
-    static {
-        codeStatusMap.put(1, "malformedRequest");
-        codeStatusMap.put(2, "internalError");
-        codeStatusMap.put(3, "tryLater");
-        codeStatusMap.put(5, "sigRequired");
-        codeStatusMap.put(6, "unauthorized");
-    }
+  static {
+    codeStatusMap.put(1, "malformedRequest");
+    codeStatusMap.put(2, "internalError");
+    codeStatusMap.put(3, "tryLater");
+    codeStatusMap.put(5, "sigRequired");
+    codeStatusMap.put(6, "unauthorized");
+  }
 
-    public OcspResponseUnsuccessfulException(int status) {
-        super(getOcspResponseStatus(status));
-        this.status = status;
-    }
+  public OcspResponseUnsuccessfulException(int status) {
+    super(getOcspResponseStatus(status));
+    this.status = status;
+  }
 
-    public int status() {
-        return status;
-    }
+  public int status() {
+    return status;
+  }
 
-    public String statusText() {
-        return getOcspResponseStatus(status);
-    }
+  public String statusText() {
+    return getOcspResponseStatus(status);
+  }
 
-    private static String getOcspResponseStatus(int statusCode) {
-        String status = codeStatusMap.get(statusCode);
-        return (status == null) ? "undefined" : status;
-    }
+  private static String getOcspResponseStatus(int statusCode) {
+    String status = codeStatusMap.get(statusCode);
+    return (status == null) ? "undefined" : status;
+  }
 
 }

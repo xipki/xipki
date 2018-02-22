@@ -24,32 +24,33 @@ import java.util.Set;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class EnrollCertResult {
 
-    private final Certificate caCert;
+  private final Certificate caCert;
 
-    private final Map<String, CertOrError> certsOrErrors;
+  private final Map<String, CertOrError> certsOrErrors;
 
-    public EnrollCertResult(Certificate caCert, Map<String, CertOrError> certsOrErrors) {
-        this.certsOrErrors = ParamUtil.requireNonEmpty("certsOrErrors", certsOrErrors);
-        this.caCert = caCert;
-    }
+  public EnrollCertResult(Certificate caCert, Map<String, CertOrError> certsOrErrors) {
+    this.certsOrErrors = ParamUtil.requireNonEmpty("certsOrErrors", certsOrErrors);
+    this.caCert = caCert;
+  }
 
-    public Certificate caCert() {
-        return caCert;
-    }
+  public Certificate caCert() {
+    return caCert;
+  }
 
-    public CertOrError getCertOrError(String id) {
-        ParamUtil.requireNonBlank("id", id);
-        return certsOrErrors.get(id);
-    }
+  public CertOrError getCertOrError(String id) {
+    ParamUtil.requireNonBlank("id", id);
+    return certsOrErrors.get(id);
+  }
 
-    public Set<String> allIds() {
-        return certsOrErrors.keySet();
-    }
+  public Set<String> allIds() {
+    return certsOrErrors.keySet();
+  }
 
 }

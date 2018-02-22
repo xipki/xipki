@@ -24,28 +24,29 @@ import java.util.List;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RevokeCertRequest {
 
-    private final List<RevokeCertRequestEntry> requestEntries = new LinkedList<>();
+  private final List<RevokeCertRequestEntry> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(RevokeCertRequestEntry requestEntry) {
-        ParamUtil.requireNonNull("requestEntry", requestEntry);
-        for (RevokeCertRequestEntry re : requestEntries) {
-            if (re.id().equals(requestEntry.id())) {
-                return false;
-            }
-        }
-
-        requestEntries.add(requestEntry);
-        return true;
+  public boolean addRequestEntry(RevokeCertRequestEntry requestEntry) {
+    ParamUtil.requireNonNull("requestEntry", requestEntry);
+    for (RevokeCertRequestEntry re : requestEntries) {
+      if (re.id().equals(requestEntry.id())) {
+        return false;
+      }
     }
 
-    public List<RevokeCertRequestEntry> requestEntries() {
-        return Collections.unmodifiableList(requestEntries);
-    }
+    requestEntries.add(requestEntry);
+    return true;
+  }
+
+  public List<RevokeCertRequestEntry> requestEntries() {
+    return Collections.unmodifiableList(requestEntries);
+  }
 
 }

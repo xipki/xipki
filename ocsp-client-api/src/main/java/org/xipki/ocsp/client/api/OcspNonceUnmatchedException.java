@@ -21,6 +21,7 @@ import org.xipki.common.util.Hex;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -28,14 +29,14 @@ import org.xipki.common.util.StringUtil;
 @SuppressWarnings("serial")
 public class OcspNonceUnmatchedException extends OcspResponseException {
 
-    public OcspNonceUnmatchedException(byte[] expected, byte[] is) {
-        super(buildMessage(expected, is));
-    }
+  public OcspNonceUnmatchedException(byte[] expected, byte[] is) {
+    super(buildMessage(expected, is));
+  }
 
-    private static String buildMessage(byte[] expected, byte[] is) {
-        return StringUtil.concat("nonce unmatch (received ",
-                (is == null || is.length == 0 ? "none" : Hex.encode(is)), ", but expected ",
-                (expected == null || expected.length == 0 ? "none" : Hex.encode(expected)), ")");
-    }
+  private static String buildMessage(byte[] expected, byte[] is) {
+    return StringUtil.concat("nonce unmatch (received ",
+        (is == null || is.length == 0 ? "none" : Hex.encode(is)), ", but expected ",
+        (expected == null || expected.length == 0 ? "none" : Hex.encode(expected)), ")");
+  }
 
 }

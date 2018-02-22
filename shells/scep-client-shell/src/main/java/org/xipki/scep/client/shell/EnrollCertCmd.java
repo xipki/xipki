@@ -35,6 +35,7 @@ import org.xipki.scep.client.ScepClient;
 import org.xipki.scep.client.shell.completer.EnrollMetodCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -42,53 +43,53 @@ import org.xipki.scep.client.shell.completer.EnrollMetodCompleter;
 @Service
 public class EnrollCertCmd extends ClientAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Option(name = "--method",
-            description = "method to enroll the certificate.")
-    @Completion(EnrollMetodCompleter.class)
-    private String method;
+  @Option(name = "--method",
+      description = "method to enroll the certificate.")
+  @Completion(EnrollMetodCompleter.class)
+  private String method;
 
-    @Override
-    protected Object execute0() throws Exception {
-        ScepClient client = getScepClient();
+  @Override
+  protected Object execute0() throws Exception {
+    ScepClient client = getScepClient();
 
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
-        EnrolmentResponse resp;
+    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+    EnrolmentResponse resp;
 
-        PrivateKey key0 = getIdentityKey();
-        X509Certificate cert0 = getIdentityCert();
-        if (StringUtil.isBlank(method)) {
-            resp = client.scepEnrol(csr, key0, cert0);
-        } else if ("pkcs".equalsIgnoreCase(method)) {
-            resp = client.scepPkcsReq(csr, key0, cert0);
-        } else if ("renewal".equalsIgnoreCase(method)) {
-            resp = client.scepRenewalReq(csr, key0, cert0);
-        } else if ("update".equalsIgnoreCase(method)) {
-            resp = client.scepUpdateReq(csr, key0, cert0);
-        } else {
-            throw new CmdFailure("invalid enroll method");
-        }
-
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
-        }
-
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
-        }
-
-        X509Certificate cert = resp.certificates().get(0);
-        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    PrivateKey key0 = getIdentityKey();
+    X509Certificate cert0 = getIdentityCert();
+    if (StringUtil.isBlank(method)) {
+      resp = client.scepEnrol(csr, key0, cert0);
+    } else if ("pkcs".equalsIgnoreCase(method)) {
+      resp = client.scepPkcsReq(csr, key0, cert0);
+    } else if ("renewal".equalsIgnoreCase(method)) {
+      resp = client.scepRenewalReq(csr, key0, cert0);
+    } else if ("update".equalsIgnoreCase(method)) {
+      resp = client.scepUpdateReq(csr, key0, cert0);
+    } else {
+      throw new CmdFailure("invalid enroll method");
     }
+
+    if (resp.isFailure()) {
+      throw new CmdFailure("server returned 'failure'");
+    }
+
+    if (resp.isPending()) {
+      throw new CmdFailure("server returned 'pending'");
+    }
+
+    X509Certificate cert = resp.certificates().get(0);
+    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

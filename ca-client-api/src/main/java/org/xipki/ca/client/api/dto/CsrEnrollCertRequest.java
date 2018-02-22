@@ -21,28 +21,29 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CsrEnrollCertRequest extends IdentifiedObject {
 
-    private final String certprofile;
+  private final String certprofile;
 
-    private final CertificationRequest csr;
+  private final CertificationRequest csr;
 
-    public CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
-        super(id);
-        this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-        this.csr = ParamUtil.requireNonNull("csr", csr);
-    }
+  public CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
+    super(id);
+    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+    this.csr = ParamUtil.requireNonNull("csr", csr);
+  }
 
-    public CertificationRequest csr() {
-        return csr;
-    }
+  public CertificationRequest csr() {
+    return csr;
+  }
 
-    public String certprofile() {
-        return certprofile;
-    }
+  public String certprofile() {
+    return certprofile;
+  }
 
 }

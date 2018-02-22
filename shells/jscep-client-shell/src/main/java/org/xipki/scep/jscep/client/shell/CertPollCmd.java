@@ -36,51 +36,52 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "jscep-certpoll",
-        description = "poll certificate")
+    description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
+  @Override
+  protected Object execute0() throws Exception {
+    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
 
-        Client client = getScepClient();
+    Client client = getScepClient();
 
-        TransactionId transId = TransactionId.createTransactionId(
-                CertificationRequestUtils.getPublicKey(csr), "SHA-1");
-        EnrollmentResponse resp = client.poll(getIdentityCert(), getIdentityKey(),
-                new X500Principal(csr.getSubject().getEncoded()), transId);
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
-        }
-
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
-        }
-
-        X509Certificate cert = extractEeCerts(resp.getCertStore());
-
-        if (cert == null) {
-            throw new Exception("received no certificate");
-        }
-
-        saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    TransactionId transId = TransactionId.createTransactionId(
+        CertificationRequestUtils.getPublicKey(csr), "SHA-1");
+    EnrollmentResponse resp = client.poll(getIdentityCert(), getIdentityKey(),
+        new X500Principal(csr.getSubject().getEncoded()), transId);
+    if (resp.isFailure()) {
+      throw new CmdFailure("server returned 'failure'");
     }
+
+    if (resp.isPending()) {
+      throw new CmdFailure("server returned 'pending'");
+    }
+
+    X509Certificate cert = extractEeCerts(resp.getCertStore());
+
+    if (cert == null) {
+      throw new Exception("received no certificate");
+    }
+
+    saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

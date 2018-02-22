@@ -29,46 +29,47 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "cmp-remove-cert",
-        description = "remove certificate")
+    description = "remove certificate")
 @Service
 public class RemoveCertCmd extends UnRevRemoveCertAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (!(certFile == null ^ getSerialNumber() == null)) {
-            throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    if (!(certFile == null ^ getSerialNumber() == null)) {
+      throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
+    }
 
-        CertIdOrError certIdOrError;
-        if (certFile != null) {
-            X509Certificate cert = X509Util.parseCert(certFile);
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.removeCert(caName, cert, debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        } else {
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.removeCert(caName, getSerialNumber(), debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        }
+    CertIdOrError certIdOrError;
+    if (certFile != null) {
+      X509Certificate cert = X509Util.parseCert(certFile);
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.removeCert(caName, cert, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    } else {
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.removeCert(caName, getSerialNumber(), debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    }
 
-        if (certIdOrError.error() != null) {
-            PkiStatusInfo error = certIdOrError.error();
-            throw new CmdFailure("removing certificate failed: " + error);
-        } else {
-            println("removed certificate");
-        }
-        return null;
-    } // method execute0
+    if (certIdOrError.error() != null) {
+      PkiStatusInfo error = certIdOrError.error();
+      throw new CmdFailure("removing certificate failed: " + error);
+    } else {
+      println("removed certificate");
+    }
+    return null;
+  } // method execute0
 
 }

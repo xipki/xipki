@@ -18,19 +18,21 @@
 package org.xipki.ca.client.impl;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class ClientCmpControl {
 
-    private final boolean rrAkiRequired;
+  private final boolean rrAkiRequired;
 
-    public ClientCmpControl(boolean rrAkiRequired) {
-        this.rrAkiRequired = rrAkiRequired;
-    }
+  public ClientCmpControl(boolean rrAkiRequired) {
+    this.rrAkiRequired = rrAkiRequired;
+  }
 
-    public boolean isRrAkiRequired() {
-        return this.rrAkiRequired;
-    }
+  public boolean isRrAkiRequired() {
+    return this.rrAkiRequired;
+  }
+
 }

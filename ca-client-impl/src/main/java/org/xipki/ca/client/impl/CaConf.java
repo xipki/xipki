@@ -32,156 +32,156 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class CaConf {
 
-    private final String name;
+  private final String name;
 
-    private final String url;
+  private final String url;
 
-    private final String healthUrl;
+  private final String healthUrl;
 
-    private final String requestorName;
+  private final String requestorName;
 
-    private final CmpResponder responder;
+  private final CmpResponder responder;
 
-    private X509CmpRequestor requestor;
+  private X509CmpRequestor requestor;
 
-    private boolean certAutoconf;
+  private boolean certAutoconf;
 
-    private boolean certprofilesAutoconf;
+  private boolean certprofilesAutoconf;
 
-    private boolean cmpControlAutoconf;
+  private boolean cmpControlAutoconf;
 
-    private X509Certificate cert;
+  private X509Certificate cert;
 
-    private X500Name subject;
+  private X500Name subject;
 
-    private byte[] subjectKeyIdentifier;
+  private byte[] subjectKeyIdentifier;
 
-    private ClientCmpControl cmpControl;
+  private ClientCmpControl cmpControl;
 
-    private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
+  private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-    CaConf(String name, String url, String healthUrl, String requestorName,
-            CmpResponder responder) {
-        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-        this.url = ParamUtil.requireNonBlank("url", url);
-        this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
-        this.responder = ParamUtil.requireNonNull("responder", responder);
-        this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
+  CaConf(String name, String url, String healthUrl, String requestorName, CmpResponder responder) {
+    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.url = ParamUtil.requireNonBlank("url", url);
+    this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
+    this.responder = ParamUtil.requireNonNull("responder", responder);
+    this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
+  }
+
+  public String name() {
+    return name;
+  }
+
+  public String url() {
+    return url;
+  }
+
+  public String healthUrl() {
+    return healthUrl;
+  }
+
+  public void setCert(X509Certificate cert) throws CertificateEncodingException {
+    this.cert = cert;
+    this.subject = (cert == null) ? null
+        : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+    this.subjectKeyIdentifier = X509Util.extractSki(cert);
+  }
+
+  public void setCertprofiles(Set<CertprofileInfo> certProfiles) {
+    if (profiles == null) {
+      this.profiles = Collections.emptyMap();
+    } else {
+      this.profiles = new HashMap<>();
+      for (CertprofileInfo m : certProfiles) {
+        this.profiles.put(m.name(), m);
+      }
     }
+  }
 
-    public String name() {
-        return name;
-    }
+  public X509Certificate cert() {
+    return cert;
+  }
 
-    public String url() {
-        return url;
-    }
+  public X500Name subject() {
+    return subject;
+  }
 
-    public String healthUrl() {
-        return healthUrl;
-    }
+  public Set<String> profileNames() {
+    return profiles.keySet();
+  }
 
-    public void setCert(X509Certificate cert) throws CertificateEncodingException {
-        this.cert = cert;
-        this.subject = (cert == null) ? null
-                : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        this.subjectKeyIdentifier = X509Util.extractSki(cert);
-    }
+  public boolean supportsProfile(String profileName) {
+    ParamUtil.requireNonNull("profileName", profileName);
+    return profiles.containsKey(profileName.toLowerCase());
+  }
 
-    public void setCertprofiles(Set<CertprofileInfo> certProfiles) {
-        if (profiles == null) {
-            this.profiles = Collections.emptyMap();
-        } else {
-            this.profiles = new HashMap<>();
-            for (CertprofileInfo m : certProfiles) {
-                this.profiles.put(m.name(), m);
-            }
-        }
-    }
+  public CertprofileInfo profile(String profileName) {
+    ParamUtil.requireNonNull("profileName", profileName);
+    return profiles.get(profileName.toLowerCase());
+  }
 
-    public X509Certificate cert() {
-        return cert;
-    }
+  public boolean isCaInfoConfigured() {
+    return cert != null;
+  }
 
-    public X500Name subject() {
-        return subject;
-    }
+  public CmpResponder responder() {
+    return responder;
+  }
 
-    public Set<String> profileNames() {
-        return profiles.keySet();
-    }
+  public boolean isCertAutoconf() {
+    return certAutoconf;
+  }
 
-    public boolean supportsProfile(String profileName) {
-        ParamUtil.requireNonNull("profileName", profileName);
-        return profiles.containsKey(profileName.toLowerCase());
-    }
+  public void setCertAutoconf(boolean autoconf) {
+    this.certAutoconf = autoconf;
+  }
 
-    public CertprofileInfo profile(String profileName) {
-        ParamUtil.requireNonNull("profileName", profileName);
-        return profiles.get(profileName.toLowerCase());
-    }
+  public boolean isCertprofilesAutoconf() {
+    return certprofilesAutoconf;
+  }
 
-    public boolean isCaInfoConfigured() {
-        return cert != null;
-    }
+  public void setCertprofilesAutoconf(boolean autoconf) {
+    this.certprofilesAutoconf = autoconf;
+  }
 
-    public CmpResponder responder() {
-        return responder;
-    }
+  public void setRequestor(X509CmpRequestor requestor) {
+    this.requestor = requestor;
+  }
 
-    public boolean isCertAutoconf() {
-        return certAutoconf;
-    }
+  public String requestorName() {
+    return requestorName;
+  }
 
-    public void setCertAutoconf(boolean autoconf) {
-        this.certAutoconf = autoconf;
-    }
+  public X509CmpRequestor requestor() {
+    return requestor;
+  }
 
-    public boolean isCertprofilesAutoconf() {
-        return certprofilesAutoconf;
-    }
+  public void setCmpControlAutoconf(boolean autoconf) {
+    this.cmpControlAutoconf = autoconf;
+  }
 
-    public void setCertprofilesAutoconf(boolean autoconf) {
-        this.certprofilesAutoconf = autoconf;
-    }
+  public boolean isCmpControlAutoconf() {
+    return cmpControlAutoconf;
+  }
 
-    public void setRequestor(X509CmpRequestor requestor) {
-        this.requestor = requestor;
-    }
+  public void setCmpControl(ClientCmpControl cmpControl) {
+    this.cmpControl = cmpControl;
+  }
 
-    public String requestorName() {
-        return requestorName;
-    }
+  public ClientCmpControl cmpControl() {
+    return cmpControl;
+  }
 
-    public X509CmpRequestor requestor() {
-        return requestor;
-    }
-
-    public void setCmpControlAutoconf(boolean autoconf) {
-        this.cmpControlAutoconf = autoconf;
-    }
-
-    public boolean isCmpControlAutoconf() {
-        return cmpControlAutoconf;
-    }
-
-    public void setCmpControl(ClientCmpControl cmpControl) {
-        this.cmpControl = cmpControl;
-    }
-
-    public ClientCmpControl cmpControl() {
-        return cmpControl;
-    }
-
-    public byte[] subjectKeyIdentifier() {
-        return (subjectKeyIdentifier == null) ? null
-                : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
-    }
+  public byte[] subjectKeyIdentifier() {
+    return (subjectKeyIdentifier == null) ? null
+        : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+  }
 
 }

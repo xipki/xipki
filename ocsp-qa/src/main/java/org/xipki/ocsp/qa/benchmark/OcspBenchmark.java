@@ -39,191 +39,192 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspBenchmark extends LoadExecutor {
 
-    final class Testor implements Runnable {
+  final class Testor implements Runnable {
 
-        private OcspBenchRequestor requestor;
+    private OcspBenchRequestor requestor;
 
-        Testor() throws Exception {
-            this.requestor = new OcspBenchRequestor();
-            this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions,
-                    queueSize);
-        }
-
-        @Override
-        public void run() {
-            while (!stop()) {
-                BigInteger sn = nextSerialNumber();
-                if (sn == null) {
-                    break;
-                }
-                testNext(sn);
-            }
-
-            try {
-                requestor.shutdown();
-            } catch (Exception ex) {
-                LOG.warn("got IOException in requestor.stop()");
-            }
-        }
-
-        private void testNext(BigInteger sn) {
-            try {
-                requestor.ask(new BigInteger[]{sn});
-            } catch (OcspRequestorException ex) {
-                LOG.warn("OCSPRequestorException: {}", ex.getMessage());
-                account(1, 1);
-            } catch (Throwable th) {
-                LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
-                account(1, 1);
-            }
-        } // method testNext
-
-    } // class Testor
-
-    private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
-
-    private final Certificate issuerCert;
-
-    private final String responderUrl;
-
-    private final RequestOptions requestOptions;
-
-    private final Iterator<BigInteger> serials;
-
-    private final int maxRequests;
-
-    private final boolean parseResponse;
-
-    private final int queueSize;
-
-    private AtomicInteger processedRequests = new AtomicInteger(0);
-
-    public OcspBenchmark(Certificate issuerCert, String responderUrl, RequestOptions requestOptions,
-            Iterator<BigInteger> serials, int maxRequests, boolean parseResponse, int queueSize,
-            String description) {
-        super(description);
-
-        this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
-        this.responderUrl = ParamUtil.requireNonNull("responderUrl", responderUrl);
-        this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
-        this.maxRequests = maxRequests;
-        this.serials = ParamUtil.requireNonNull("serials", serials);
-        this.parseResponse = parseResponse;
-        this.queueSize = queueSize;
+    Testor() throws Exception {
+      this.requestor = new OcspBenchRequestor();
+      this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions,
+          queueSize);
     }
 
     @Override
-    protected Runnable getTestor() throws Exception {
-        return new Testor();
+    public void run() {
+      while (!stop()) {
+        BigInteger sn = nextSerialNumber();
+        if (sn == null) {
+          break;
+        }
+        testNext(sn);
+      }
+
+      try {
+        requestor.shutdown();
+      } catch (Exception ex) {
+        LOG.warn("got IOException in requestor.stop()");
+      }
     }
 
-    private BigInteger nextSerialNumber() {
-        if (maxRequests > 0) {
-            int num = processedRequests.getAndAdd(1);
-            if (num >= maxRequests) {
-                return null;
-            }
-        }
-
-        try {
-            return this.serials.next();
-        } catch (NoSuchElementException ex) {
-            return null;
-        }
-    }
-
-    public void onComplete(FullHttpResponse response) {
-        boolean success;
-        try {
-            success = onComplete0(response);
-        } catch (Throwable th) {
-            LOG.warn("unexpected exception", th);
-            success = false;
-        }
-
-        account(1, success ? 0 : 1);
-    }
-
-    public synchronized void onError() {
+    private void testNext(BigInteger sn) {
+      try {
+        requestor.ask(new BigInteger[]{sn});
+      } catch (OcspRequestorException ex) {
+        LOG.warn("OCSPRequestorException: {}", ex.getMessage());
         account(1, 1);
+      } catch (Throwable th) {
+        LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
+        account(1, 1);
+      }
+    } // method testNext
+
+  } // class Testor
+
+  private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
+
+  private final Certificate issuerCert;
+
+  private final String responderUrl;
+
+  private final RequestOptions requestOptions;
+
+  private final Iterator<BigInteger> serials;
+
+  private final int maxRequests;
+
+  private final boolean parseResponse;
+
+  private final int queueSize;
+
+  private AtomicInteger processedRequests = new AtomicInteger(0);
+
+  public OcspBenchmark(Certificate issuerCert, String responderUrl, RequestOptions requestOptions,
+      Iterator<BigInteger> serials, int maxRequests, boolean parseResponse, int queueSize,
+      String description) {
+    super(description);
+
+    this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
+    this.responderUrl = ParamUtil.requireNonNull("responderUrl", responderUrl);
+    this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
+    this.maxRequests = maxRequests;
+    this.serials = ParamUtil.requireNonNull("serials", serials);
+    this.parseResponse = parseResponse;
+    this.queueSize = queueSize;
+  }
+
+  @Override
+  protected Runnable getTestor() throws Exception {
+    return new Testor();
+  }
+
+  private BigInteger nextSerialNumber() {
+    if (maxRequests > 0) {
+      int num = processedRequests.getAndAdd(1);
+      if (num >= maxRequests) {
+        return null;
+      }
     }
 
-    private boolean onComplete0(FullHttpResponse response) {
-        if (response == null) {
-            LOG.warn("bad response: response is null");
-            return false;
-        }
+    try {
+      return this.serials.next();
+    } catch (NoSuchElementException ex) {
+      return null;
+    }
+  }
 
-        if (response.decoderResult().isFailure()) {
-            LOG.warn("failed: {}", response.decoderResult());
-            return false;
-        }
+  public void onComplete(FullHttpResponse response) {
+    boolean success;
+    try {
+      success = onComplete0(response);
+    } catch (Throwable th) {
+      LOG.warn("unexpected exception", th);
+      success = false;
+    }
 
-        if (response.status().code() != HttpResponseStatus.OK.code()) {
-            LOG.warn("bad response: {}", response.status());
-            return false;
-        }
+    account(1, success ? 0 : 1);
+  }
 
-        String responseContentType = response.headers().get("Content-Type");
-        if (responseContentType == null) {
-            LOG.warn("bad response: mandatory Content-Type not specified");
-            return false;
-        } else if (!responseContentType.equalsIgnoreCase("application/ocsp-response")) {
-            LOG.warn("bad response: Content-Type {} unsupported", responseContentType);
-            return false;
-        }
+  public synchronized void onError() {
+    account(1, 1);
+  }
 
-        ByteBuf buf = response.content();
-        if (buf == null || buf.readableBytes() == 0) {
-            LOG.warn("no body in response");
-            return false;
-        }
-        byte[] respBytes = new byte[buf.readableBytes()];
-        buf.getBytes(buf.readerIndex(), respBytes);
+  private boolean onComplete0(FullHttpResponse response) {
+    if (response == null) {
+      LOG.warn("bad response: response is null");
+      return false;
+    }
 
-        if (!parseResponse) {
-            // a valid response should at least of size 10.
-            if (respBytes.length < 10) {
-                LOG.warn("bad response: response too short");
-                return false;
-            } else {
-                return true;
-            }
-        }
+    if (response.decoderResult().isFailure()) {
+      LOG.warn("failed: {}", response.decoderResult());
+      return false;
+    }
 
-        OCSPResp ocspResp;
-        try {
-            ocspResp = new OCSPResp(respBytes);
-        } catch (IOException ex) {
-            LOG.warn("could not parse OCSP response", ex);
-            return false;
-        }
+    if (response.status().code() != HttpResponseStatus.OK.code()) {
+      LOG.warn("bad response: {}", response.status());
+      return false;
+    }
 
-        Object respObject;
-        try {
-            respObject = ocspResp.getResponseObject();
-        } catch (OCSPException ex) {
-            LOG.warn("responseObject is invalid", ex);
-            return false;
-        }
+    String responseContentType = response.headers().get("Content-Type");
+    if (responseContentType == null) {
+      LOG.warn("bad response: mandatory Content-Type not specified");
+      return false;
+    } else if (!responseContentType.equalsIgnoreCase("application/ocsp-response")) {
+      LOG.warn("bad response: Content-Type {} unsupported", responseContentType);
+      return false;
+    }
 
-        if (ocspResp.getStatus() != 0) {
-            LOG.warn("bad response: response status is other than OK");
-            return false;
-        }
+    ByteBuf buf = response.content();
+    if (buf == null || buf.readableBytes() == 0) {
+      LOG.warn("no body in response");
+      return false;
+    }
+    byte[] respBytes = new byte[buf.readableBytes()];
+    buf.getBytes(buf.readerIndex(), respBytes);
 
-        if (!(respObject instanceof BasicOCSPResp)) {
-            LOG.warn("bad response: response is not BasiOCSPResp");
-            return false;
-        }
-
+    if (!parseResponse) {
+      // a valid response should at least of size 10.
+      if (respBytes.length < 10) {
+        LOG.warn("bad response: response too short");
+        return false;
+      } else {
         return true;
+      }
     }
+
+    OCSPResp ocspResp;
+    try {
+      ocspResp = new OCSPResp(respBytes);
+    } catch (IOException ex) {
+      LOG.warn("could not parse OCSP response", ex);
+      return false;
+    }
+
+    Object respObject;
+    try {
+      respObject = ocspResp.getResponseObject();
+    } catch (OCSPException ex) {
+      LOG.warn("responseObject is invalid", ex);
+      return false;
+    }
+
+    if (ocspResp.getStatus() != 0) {
+      LOG.warn("bad response: response status is other than OK");
+      return false;
+    }
+
+    if (!(respObject instanceof BasicOCSPResp)) {
+      LOG.warn("bad response: response is not BasiOCSPResp");
+      return false;
+    }
+
+    return true;
+  }
 
 }

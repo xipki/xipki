@@ -18,40 +18,41 @@
 package org.xipki.ocsp.qa;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum OcspCertStatus {
 
-    issuerUnknown,
-    unknown,
-    good,
-    rev_noreason,
-    unspecified,
-    keyCompromise,
-    cACompromise,
-    affiliationChanged,
-    superseded,
-    cessationOfOperation,
-    certificateHold,
-    removeFromCRL,
-    privilegeWithdrawn,
-    aACompromise,
-    malformedRequest,
-    internalError,
-    tryLater,
-    sigRequired,
-    unauthorized;
+  issuerUnknown,
+  unknown,
+  good,
+  rev_noreason,
+  unspecified,
+  keyCompromise,
+  cACompromise,
+  affiliationChanged,
+  superseded,
+  cessationOfOperation,
+  certificateHold,
+  removeFromCRL,
+  privilegeWithdrawn,
+  aACompromise,
+  malformedRequest,
+  internalError,
+  tryLater,
+  sigRequired,
+  unauthorized;
 
-    public static OcspCertStatus forName(String name) {
-        for (OcspCertStatus entry : values()) {
-            if (entry.name().equals(name)) {
-                return entry;
-            }
-        }
-
-        throw new IllegalArgumentException("invalid OcspCertStatus " + name);
+  public static OcspCertStatus forName(String name) {
+    for (OcspCertStatus entry : values()) {
+      if (entry.name().equals(name)) {
+        return entry;
+      }
     }
+
+    throw new IllegalArgumentException("invalid OcspCertStatus " + name);
+  }
 
 }

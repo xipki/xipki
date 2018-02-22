@@ -29,6 +29,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -38,45 +39,44 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Service
 public class CaLoadTestTemplateEnrollCmd extends CaLoadTestAction {
 
-    @Option(name = "--template", aliases = "-t", required = true,
-            description = "template file. Note the contained profiles must allow duplication of"
-                    + " public key\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String templateFile;
+  @Option(name = "--template", aliases = "-t", required = true,
+      description = "template file. Note the contained profiles must allow duplication of"
+          + " public key\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String templateFile;
 
-    @Option(name = "--duration",
-            description = "duration")
-    private String duration = "30s";
+  @Option(name = "--duration",
+      description = "duration")
+  private String duration = "30s";
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    @Option(name = "--max-num",
-            description = "maximal number of requests\n0 for unlimited")
-    private Integer maxRequests = 0;
+  @Option(name = "--max-num",
+      description = "maximal number of requests\n0 for unlimited")
+  private Integer maxRequests = 0;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (numThreads < 1) {
-            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    if (numThreads < 1) {
+      throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+    }
 
-        EnrollTemplateType template = CaLoadTestTemplateEnroll.parse(
-                new FileInputStream(templateFile));
-        int size = template.getEnrollCert().size();
+    EnrollTemplateType template = CaLoadTestTemplateEnroll.parse(new FileInputStream(templateFile));
+    int size = template.getEnrollCert().size();
 
-        String description = StringUtil.concatObjectsCap(200,
-                "template: ", templateFile, "\nmaxRequests: ", maxRequests,
-                "\nunit: ", size, " certificate", (size > 1 ? "s" : ""), "\n");
+    String description = StringUtil.concatObjectsCap(200, "template: ", templateFile,
+        "\nmaxRequests: ", maxRequests, "\nunit: ", size, " certificate", (size > 1 ? "s" : ""),
+        "\n");
 
-        CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient, template,
-                maxRequests, description);
-        loadTest.setDuration(duration);
-        loadTest.setThreads(numThreads);
-        loadTest.test();
+    CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient, template,
+        maxRequests, description);
+    loadTest.setDuration(duration);
+    loadTest.setThreads(numThreads);
+    loadTest.test();
 
-        return null;
-    } // method execute0
+    return null;
+  } // method execute0
 
 }

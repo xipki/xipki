@@ -35,69 +35,70 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "cmp-revoke",
-        description = "revoke certificate")
+    description = "revoke certificate")
 @Service
 public class RevokeCertCmd extends UnRevRemoveCertAction {
 
-    @Option(name = "--reason", aliases = "-r", required = true,
-            description = "CRL reason\n(required)")
-    @Completion(ClientCrlReasonCompleter.class)
-    private String reason;
+  @Option(name = "--reason", aliases = "-r", required = true,
+      description = "CRL reason\n(required)")
+  @Completion(ClientCrlReasonCompleter.class)
+  private String reason;
 
-    @Option(name = "--inv-date",
-            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
-    private String invalidityDateS;
+  @Option(name = "--inv-date",
+      description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+  private String invalidityDateS;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (!(certFile == null ^ getSerialNumber() == null)) {
-            throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    if (!(certFile == null ^ getSerialNumber() == null)) {
+      throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
+    }
 
-        CrlReason crlReason = CrlReason.forNameOrText(reason);
+    CrlReason crlReason = CrlReason.forNameOrText(reason);
 
-        if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
-            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
-        }
+    if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
+      throw new IllegalCmdParamException("reason " + reason + " is not permitted");
+    }
 
-        CertIdOrError certIdOrError;
+    CertIdOrError certIdOrError;
 
-        Date invalidityDate = null;
-        if (isNotBlank(invalidityDateS)) {
-            invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
-        }
+    Date invalidityDate = null;
+    if (isNotBlank(invalidityDateS)) {
+      invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
+    }
 
-        if (certFile != null) {
-            X509Certificate cert = X509Util.parseCert(certFile);
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.revokeCert(caName, cert, crlReason.code(),
-                        invalidityDate, debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        } else {
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.code(),
-                        invalidityDate, debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        }
+    if (certFile != null) {
+      X509Certificate cert = X509Util.parseCert(certFile);
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.revokeCert(caName, cert, crlReason.code(),
+            invalidityDate, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    } else {
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.code(),
+            invalidityDate, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    }
 
-        if (certIdOrError.error() != null) {
-            PkiStatusInfo error = certIdOrError.error();
-            throw new CmdFailure("revocation failed: " + error);
-        } else {
-            println("revoked certificate");
-        }
-        return null;
-    } // method execute0
+    if (certIdOrError.error() != null) {
+      PkiStatusInfo error = certIdOrError.error();
+      throw new CmdFailure("revocation failed: " + error);
+    } else {
+      println("revoked certificate");
+    }
+    return null;
+  } // method execute0
 
 }

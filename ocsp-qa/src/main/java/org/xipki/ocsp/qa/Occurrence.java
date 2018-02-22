@@ -20,25 +20,26 @@ package org.xipki.ocsp.qa;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum Occurrence {
 
-    required,
-    optional,
-    forbidden;
+  required,
+  optional,
+  forbidden;
 
-    public static Occurrence forName(String name) {
-        ParamUtil.requireNonNull("name", name);
-        for (Occurrence entry : values()) {
-            if (entry.name().equals(name)) {
-                return entry;
-            }
-        }
-
-        throw new IllegalArgumentException("invalid Occurrence " + name);
+  public static Occurrence forName(String name) {
+    ParamUtil.requireNonNull("name", name);
+    for (Occurrence entry : values()) {
+      if (entry.name().equals(name)) {
+        return entry;
+      }
     }
+
+    throw new IllegalArgumentException("invalid Occurrence " + name);
+  }
 
 }

@@ -33,67 +33,68 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class EnrollCertAction extends ClientAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    /**
-     * Enrolls certificate.
-     *
-     * @param client
-     *          Client. Must not be {@code null}.
-     * @param csr
-     *          CSR. Must not be {@code null}.
-     * @param identityKey
-     *          Identity key. Must not be {@code null}.
-     * @param identityCert
-     *          Identity certificate. Must not be {@code null}.
-     * @return the enrollment response
-     * @throws ClientException
-     *             if any client error occurs.
-     * @throws TransactionException
-     *             if there is a problem with the SCEP transaction.
-     */
-    protected abstract EnrollmentResponse requestCertificate(Client client,
-            PKCS10CertificationRequest csr, PrivateKey identityKey, X509Certificate identityCert)
-            throws ClientException, TransactionException;
+  /**
+   * Enrolls certificate.
+   *
+   * @param client
+   *          Client. Must not be {@code null}.
+   * @param csr
+   *          CSR. Must not be {@code null}.
+   * @param identityKey
+   *          Identity key. Must not be {@code null}.
+   * @param identityCert
+   *          Identity certificate. Must not be {@code null}.
+   * @return the enrollment response
+   * @throws ClientException
+   *             if any client error occurs.
+   * @throws TransactionException
+   *             if there is a problem with the SCEP transaction.
+   */
+  protected abstract EnrollmentResponse requestCertificate(Client client,
+      PKCS10CertificationRequest csr, PrivateKey identityKey, X509Certificate identityCert)
+      throws ClientException, TransactionException;
 
-    @Override
-    protected Object execute0() throws Exception {
-        Client client = getScepClient();
+  @Override
+  protected Object execute0() throws Exception {
+    Client client = getScepClient();
 
-        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
+    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
 
-        EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
-                getIdentityCert());
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
-        }
-
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
-        }
-
-        X509Certificate cert = extractEeCerts(resp.getCertStore());
-
-        if (cert == null) {
-            throw new Exception("received no certificate");
-        }
-
-        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
+        getIdentityCert());
+    if (resp.isFailure()) {
+      throw new CmdFailure("server returned 'failure'");
     }
+
+    if (resp.isPending()) {
+      throw new CmdFailure("server returned 'pending'");
+    }
+
+    X509Certificate cert = extractEeCerts(resp.getCertStore());
+
+    if (cert == null) {
+      throw new Exception("received no certificate");
+    }
+
+    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

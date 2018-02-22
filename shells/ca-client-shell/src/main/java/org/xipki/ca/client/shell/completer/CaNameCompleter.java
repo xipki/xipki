@@ -25,6 +25,7 @@ import org.xipki.ca.client.api.CaClient;
 import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -32,12 +33,12 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 @Service
 public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference
-    protected CaClient caClient;
+  @Reference
+  protected CaClient caClient;
 
-    @Override
-    protected Set<String> getEnums() {
-        return caClient.caNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return caClient.caNames();
+  }
 
 }

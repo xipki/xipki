@@ -18,6 +18,7 @@
 package org.xipki.ocsp.client.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -25,20 +26,20 @@ package org.xipki.ocsp.client.api;
 @SuppressWarnings("serial")
 public class OcspTargetUnmatchedException extends OcspResponseException {
 
-    public OcspTargetUnmatchedException() {
-        super();
-    }
+  public OcspTargetUnmatchedException() {
+    super();
+  }
 
-    public OcspTargetUnmatchedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public OcspTargetUnmatchedException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public OcspTargetUnmatchedException(String message) {
-        super(message);
-    }
+  public OcspTargetUnmatchedException(String message) {
+    super(message);
+  }
 
-    public OcspTargetUnmatchedException(Throwable cause) {
-        super(cause);
-    }
+  public OcspTargetUnmatchedException(Throwable cause) {
+    super(cause);
+  }
 
 }

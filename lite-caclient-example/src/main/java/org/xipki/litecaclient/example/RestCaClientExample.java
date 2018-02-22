@@ -26,84 +26,85 @@ import org.bouncycastle.asn1.x509.CRLReason;
 import org.xipki.litecaclient.RestCaClient;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class RestCaClientExample extends CaClientExample {
 
-    private static final String CA_URL = "https://localhost:8443/rest/myca";
+  private static final String CA_URL = "https://localhost:8443/rest/myca";
 
-    private static final String USER = "user1";
+  private static final String USER = "user1";
 
-    private static final String PASSWORD = "password1";
+  private static final String PASSWORD = "password1";
 
-    private static final String CERT_PROFILE = "TLS";
+  private static final String CERT_PROFILE = "TLS";
 
-    private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
+  private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
 
-    public static void main(String[] args) {
-        //System.setProperty("javax.net.debug", "all");
-        try {
-            RestCaClient client = new RestCaClient(CA_URL, USER, PASSWORD);
+  public static void main(String[] args) {
+    //System.setProperty("javax.net.debug", "all");
+    try {
+      RestCaClient client = new RestCaClient(CA_URL, USER, PASSWORD);
 
-            client.init();
+      client.init();
 
-            // retrieve CA certificate
-            printCert("===== CA Certificate (REST) =====", client.getCaCert());
+      // retrieve CA certificate
+      printCert("===== CA Certificate (REST) =====", client.getCaCert());
 
-            // Enroll certificate - RSA
-            MyKeypair kp = generateRsaKeypair();
-            CertificationRequest csr = genCsr(kp, getSubject());
-            X509Certificate cert = client.requestCert(CERT_PROFILE, csr);
-            printCert("===== RSA (REST) =====", cert);
+      // Enroll certificate - RSA
+      MyKeypair kp = generateRsaKeypair();
+      CertificationRequest csr = genCsr(kp, getSubject());
+      X509Certificate cert = client.requestCert(CERT_PROFILE, csr);
+      printCert("===== RSA (REST) =====", cert);
 
-            // Enroll certificate - EC
-            kp = generateEcKeypair();
-            csr = genCsr(kp, getSubject());
-            cert = client.requestCert(CERT_PROFILE, csr);
-            printCert("===== EC (REST) =====", cert);
+      // Enroll certificate - EC
+      kp = generateEcKeypair();
+      csr = genCsr(kp, getSubject());
+      cert = client.requestCert(CERT_PROFILE, csr);
+      printCert("===== EC (REST) =====", cert);
 
-            // Enroll certificate - DSA
-            kp = generateDsaKeypair();
-            csr = genCsr(kp, getSubject());
-            cert = client.requestCert(CERT_PROFILE, csr);
-            printCert("===== DSA =====", cert);
+      // Enroll certificate - DSA
+      kp = generateDsaKeypair();
+      csr = genCsr(kp, getSubject());
+      cert = client.requestCert(CERT_PROFILE, csr);
+      printCert("===== DSA =====", cert);
 
-            BigInteger serialNumber = cert.getSerialNumber();
-            // Suspend certificate
-            boolean flag =
-                    client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.certificateHold));
-            if (flag) {
-                System.out.println("(REST) suspended certificate" );
-            } else {
-                System.err.println("(REST) suspending certificate failed");
-            }
+      BigInteger serialNumber = cert.getSerialNumber();
+      // Suspend certificate
+      boolean flag =
+          client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.certificateHold));
+      if (flag) {
+        System.out.println("(REST) suspended certificate");
+      } else {
+        System.err.println("(REST) suspending certificate failed");
+      }
 
-            // Unsuspend certificate
-            flag = client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.removeFromCRL));
-            if (flag) {
-                System.out.println("(REST) unsuspended certificate" );
-            } else {
-                System.err.println("(REST) unsuspending certificate failed");
-            }
+      // Unsuspend certificate
+      flag = client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.removeFromCRL));
+      if (flag) {
+        System.out.println("(REST) unsuspended certificate");
+      } else {
+        System.err.println("(REST) unsuspending certificate failed");
+      }
 
-            // Revoke certificate
-            flag = client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.keyCompromise));
-            if (flag) {
-                System.out.println("(REST) revoked certificate" );
-            } else {
-                System.err.println("(REST) revoking certificate failed");
-            }
+      // Revoke certificate
+      flag = client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.keyCompromise));
+      if (flag) {
+        System.out.println("(REST) revoked certificate");
+      } else {
+        System.err.println("(REST) revoking certificate failed");
+      }
 
-            client.shutdown();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
+      client.shutdown();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      System.exit(-1);
     }
+  }
 
-    private static String getSubject() {
-        return "CN=REST-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";
-    }
+  private static String getSubject() {
+    return "CN=REST-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";
+  }
 
 }

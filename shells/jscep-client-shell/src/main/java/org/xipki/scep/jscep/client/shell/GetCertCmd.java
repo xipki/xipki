@@ -31,37 +31,38 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "jscep-getcert",
-        description = "download certificate")
+    description = "download certificate")
 @Service
 public class GetCertCmd extends ClientAction {
 
-    @Option(name = "--serial", aliases = "-s", required = true,
-            description = "serial number\n(required)")
-    private String serialNumber;
+  @Option(name = "--serial", aliases = "-s", required = true,
+      description = "serial number\n(required)")
+  private String serialNumber;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        Client client = getScepClient();
-        BigInteger serial = toBigInt(serialNumber);
-        CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
-        X509Certificate cert = extractEeCerts(certs);
+  @Override
+  protected Object execute0() throws Exception {
+    Client client = getScepClient();
+    BigInteger serial = toBigInt(serialNumber);
+    CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
+    X509Certificate cert = extractEeCerts(certs);
 
-        if (cert == null) {
-            throw new CmdFailure("received no certificate from server");
-        }
-
-        saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    if (cert == null) {
+      throw new CmdFailure("received no certificate from server");
     }
+
+    saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

@@ -22,13 +22,14 @@ import org.xipki.ca.client.api.CaClient;
 import org.xipki.console.karaf.XiAction;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class CaLoadTestAction extends XiAction {
 
-    @Reference
-    protected CaClient caClient;
+  @Reference
+  protected CaClient caClient;
 
 }

@@ -41,125 +41,126 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.security.CrlReason;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaLoadTestRevoke extends LoadExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaLoadTestRevoke.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaLoadTestRevoke.class);
 
-    private static final CrlReason[] REASONS = {CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE,
-        CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
-        CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN};
+  private static final CrlReason[] REASONS = {CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE,
+      CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
+      CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN};
 
-    private final CaClient caClient;
+  private final CaClient caClient;
 
-    private final X500Name caSubject;
+  private final X500Name caSubject;
 
-    private final int num;
+  private final int num;
 
-    private final int maxCerts;
+  private final int maxCerts;
 
-    private final Iterator<BigInteger> serialNumberIterator;
+  private final Iterator<BigInteger> serialNumberIterator;
 
-    private AtomicInteger processedCerts = new AtomicInteger(0);
+  private AtomicInteger processedCerts = new AtomicInteger(0);
 
-    public CaLoadTestRevoke(CaClient caClient, Certificate caCert,
-            Iterator<BigInteger> serialNumberIterator, int maxCerts, int num, String description)
-            throws Exception {
-        super(description);
-        ParamUtil.requireNonNull("caCert", caCert);
-        this.num = ParamUtil.requireMin("num", num, 1);
-        this.caClient = ParamUtil.requireNonNull("caClient", caClient);
-        this.serialNumberIterator = ParamUtil.requireNonNull("serialNumberIterator",
-                serialNumberIterator);
-        this.caSubject = caCert.getSubject();
-        this.maxCerts = maxCerts;
-    } // constructor
+  public CaLoadTestRevoke(CaClient caClient, Certificate caCert,
+      Iterator<BigInteger> serialNumberIterator, int maxCerts, int num, String description)
+      throws Exception {
+    super(description);
+    ParamUtil.requireNonNull("caCert", caCert);
+    this.num = ParamUtil.requireMin("num", num, 1);
+    this.caClient = ParamUtil.requireNonNull("caClient", caClient);
+    this.serialNumberIterator = ParamUtil.requireNonNull("serialNumberIterator",
+        serialNumberIterator);
+    this.caSubject = caCert.getSubject();
+    this.maxCerts = maxCerts;
+  } // constructor
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                List<BigInteger> serialNumbers;
-                try {
-                    serialNumbers = nextSerials();
-                } catch (DataAccessException ex) {
-                    account(1, 1);
-                    break;
-                }
-
-                if (CollectionUtil.isEmpty(serialNumbers)) {
-                    break;
-                }
-
-                boolean successful = testNext(serialNumbers);
-                int numFailed = successful ? 0 : 1;
-                account(1, numFailed);
-            }
-        }
-
-        private boolean testNext(List<BigInteger> serialNumbers) {
-            RevokeCertRequest request = new RevokeCertRequest();
-            int id = 1;
-            for (BigInteger serialNumber : serialNumbers) {
-                CrlReason reason = REASONS[Math.abs(serialNumber.intValue()) % REASONS.length];
-                RevokeCertRequestEntry entry = new RevokeCertRequestEntry(Integer.toString(id++),
-                        caSubject, serialNumber, reason.code(), null);
-                request.addRequestEntry(entry);
-            }
-
-            Map<String, CertIdOrError> result;
-            try {
-                result = caClient.revokeCerts(request, null);
-            } catch (CaClientException | PkiErrorException ex) {
-                LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
-                return false;
-            } catch (Throwable th) {
-                LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
-                return false;
-            }
-
-            if (result == null) {
-                return false;
-            }
-
-            int numSuccess = 0;
-            for (CertIdOrError entry : result.values()) {
-                if (entry.certId() != null) {
-                    numSuccess++;
-                }
-            }
-            return numSuccess == serialNumbers.size();
-        } // method testNext
-
-    } // class Testor
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor() throws Exception {
-        return new Testor();
-    }
-
-    private List<BigInteger> nextSerials() throws DataAccessException {
-        List<BigInteger> ret = new ArrayList<>(num);
-        for (int i = 0; i < num; i++) {
-            if (maxCerts > 0) {
-                int num = processedCerts.getAndAdd(1);
-                if (num >= maxCerts) {
-                    break;
-                }
-            }
-
-            if (serialNumberIterator.hasNext()) {
-                BigInteger serial = serialNumberIterator.next();
-                ret.add(serial);
-            } else {
-                break;
-            }
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        List<BigInteger> serialNumbers;
+        try {
+          serialNumbers = nextSerials();
+        } catch (DataAccessException ex) {
+          account(1, 1);
+          break;
         }
-        return ret;
+
+        if (CollectionUtil.isEmpty(serialNumbers)) {
+          break;
+        }
+
+        boolean successful = testNext(serialNumbers);
+        int numFailed = successful ? 0 : 1;
+        account(1, numFailed);
+      }
     }
+
+    private boolean testNext(List<BigInteger> serialNumbers) {
+      RevokeCertRequest request = new RevokeCertRequest();
+      int id = 1;
+      for (BigInteger serialNumber : serialNumbers) {
+        CrlReason reason = REASONS[Math.abs(serialNumber.intValue()) % REASONS.length];
+        RevokeCertRequestEntry entry = new RevokeCertRequestEntry(Integer.toString(id++),
+                caSubject, serialNumber, reason.code(), null);
+        request.addRequestEntry(entry);
+      }
+
+      Map<String, CertIdOrError> result;
+      try {
+        result = caClient.revokeCerts(request, null);
+      } catch (CaClientException | PkiErrorException ex) {
+        LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
+        return false;
+      } catch (Throwable th) {
+        LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
+        return false;
+      }
+
+      if (result == null) {
+        return false;
+      }
+
+      int numSuccess = 0;
+      for (CertIdOrError entry : result.values()) {
+        if (entry.certId() != null) {
+          numSuccess++;
+        }
+      }
+      return numSuccess == serialNumbers.size();
+    } // method testNext
+
+  } // class Testor
+
+  @Override
+  protected Runnable getTestor() throws Exception {
+    return new Testor();
+  }
+
+  private List<BigInteger> nextSerials() throws DataAccessException {
+    List<BigInteger> ret = new ArrayList<>(num);
+    for (int i = 0; i < num; i++) {
+      if (maxCerts > 0) {
+        int num = processedCerts.getAndAdd(1);
+        if (num >= maxCerts) {
+          break;
+        }
+      }
+
+      if (serialNumberIterator.hasNext()) {
+        BigInteger serial = serialNumberIterator.next();
+        ret.add(serial);
+      } else {
+        break;
+      }
+    }
+    return ret;
+  }
 
 }

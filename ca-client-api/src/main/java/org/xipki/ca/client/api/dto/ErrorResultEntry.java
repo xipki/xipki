@@ -21,32 +21,32 @@ import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ErrorResultEntry extends ResultEntry {
 
-    private final PkiStatusInfo statusInfo;
+  private final PkiStatusInfo statusInfo;
 
-    public ErrorResultEntry(String id, PkiStatusInfo statusInfo) {
-        super(id);
+  public ErrorResultEntry(String id, PkiStatusInfo statusInfo) {
+    super(id);
+    this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
+  }
 
-        this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
-    }
+  public ErrorResultEntry(String id, int status, int pkiFailureInfo, String statusMessage) {
+    super(id);
+    this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
+  }
 
-    public ErrorResultEntry(String id, int status, int pkiFailureInfo, String statusMessage) {
-        super(id);
-        this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
-    }
+  public ErrorResultEntry(String id, int status) {
+    super(id);
+    this.statusInfo = new PkiStatusInfo(status);
+  }
 
-    public ErrorResultEntry(String id, int status) {
-        super(id);
-        this.statusInfo = new PkiStatusInfo(status);
-    }
-
-    public PkiStatusInfo statusInfo() {
-        return statusInfo;
-    }
+  public PkiStatusInfo statusInfo() {
+    return statusInfo;
+  }
 
 }

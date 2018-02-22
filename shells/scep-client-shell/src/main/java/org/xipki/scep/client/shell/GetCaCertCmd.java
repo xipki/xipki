@@ -32,47 +32,48 @@ import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.ScepClient;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "scep-cacert",
-        description = "get CA certificate")
+    description = "get CA certificate")
 @Service
 public class GetCaCertCmd extends XiAction {
 
-    @Option(name = "--url", required = true,
-            description = "URL of the SCEP server\n(required)")
-    private String url;
+  @Option(name = "--url", required = true,
+      description = "URL of the SCEP server\n(required)")
+  private String url;
 
-    @Option(name = "--ca-id",
-            description = "CA identifier")
-    private String caId;
+  @Option(name = "--ca-id",
+      description = "CA identifier")
+  private String caId;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the CA certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    protected String outFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the CA certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  protected String outFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CaIdentifier tmpCaId = new CaIdentifier(url, caId);
-        CaCertValidator caCertValidator = new CaCertValidator() {
-            @Override
-            public boolean isTrusted(X509Certificate cert) {
-                return true;
-            }
-        };
+  @Override
+  protected Object execute0() throws Exception {
+    CaIdentifier tmpCaId = new CaIdentifier(url, caId);
+    CaCertValidator caCertValidator = new CaCertValidator() {
+      @Override
+      public boolean isTrusted(X509Certificate cert) {
+        return true;
+      }
+    };
 
-        ScepClient client = new ScepClient(tmpCaId, caCertValidator);
-        client.init();
-        X509Certificate cacert = client.getCaCert();
-        if (cacert == null) {
-            throw new CmdFailure("received no CA certficate from server");
-        }
-
-        saveVerbose("saved certificate to file", new File(outFile), cacert.getEncoded());
-        return null;
+    ScepClient client = new ScepClient(tmpCaId, caCertValidator);
+    client.init();
+    X509Certificate cacert = client.getCaCert();
+    if (cacert == null) {
+      throw new CmdFailure("received no CA certficate from server");
     }
+
+    saveVerbose("saved certificate to file", new File(outFile), cacert.getEncoded());
+    return null;
+  }
 
 }

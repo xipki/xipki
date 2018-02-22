@@ -25,74 +25,75 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspResponseOption {
 
-    private X509Certificate respIssuer;
+  private X509Certificate respIssuer;
 
-    private Occurrence nonceOccurrence;
+  private Occurrence nonceOccurrence;
 
-    private Occurrence certhashOccurrence;
+  private Occurrence certhashOccurrence;
 
-    private Occurrence nextUpdateOccurrence;
+  private Occurrence nextUpdateOccurrence;
 
-    private ASN1ObjectIdentifier certhashAlgId;
+  private ASN1ObjectIdentifier certhashAlgId;
 
-    private String signatureAlgName;
+  private String signatureAlgName;
 
-    public OcspResponseOption() {
-    }
+  public OcspResponseOption() {
+  }
 
-    public X509Certificate respIssuer() {
-        return respIssuer;
-    }
+  public X509Certificate respIssuer() {
+    return respIssuer;
+  }
 
-    public void setRespIssuer(X509Certificate respIssuer) {
-        this.respIssuer = respIssuer;
-    }
+  public void setRespIssuer(X509Certificate respIssuer) {
+    this.respIssuer = respIssuer;
+  }
 
-    public Occurrence nonceOccurrence() {
-        return nonceOccurrence;
-    }
+  public Occurrence nonceOccurrence() {
+    return nonceOccurrence;
+  }
 
-    public void setNonceOccurrence(Occurrence nonceOccurrence) {
-        this.nonceOccurrence = nonceOccurrence;
-    }
+  public void setNonceOccurrence(Occurrence nonceOccurrence) {
+    this.nonceOccurrence = nonceOccurrence;
+  }
 
-    public Occurrence certhashOccurrence() {
-        return certhashOccurrence;
-    }
+  public Occurrence certhashOccurrence() {
+    return certhashOccurrence;
+  }
 
-    public void setCerthashOccurrence(Occurrence certhashOccurrence) {
-        this.certhashOccurrence = certhashOccurrence;
-    }
+  public void setCerthashOccurrence(Occurrence certhashOccurrence) {
+    this.certhashOccurrence = certhashOccurrence;
+  }
 
-    public Occurrence nextUpdateOccurrence() {
-        return nextUpdateOccurrence;
-    }
+  public Occurrence nextUpdateOccurrence() {
+    return nextUpdateOccurrence;
+  }
 
-    public void setNextUpdateOccurrence(Occurrence nextUpdateOccurrence) {
-        this.nextUpdateOccurrence = nextUpdateOccurrence;
-    }
+  public void setNextUpdateOccurrence(Occurrence nextUpdateOccurrence) {
+    this.nextUpdateOccurrence = nextUpdateOccurrence;
+  }
 
-    public ASN1ObjectIdentifier certhashAlgId() {
-        return certhashAlgId;
-    }
+  public ASN1ObjectIdentifier certhashAlgId() {
+    return certhashAlgId;
+  }
 
-    public void setCerthashAlgId(ASN1ObjectIdentifier certhashAlgId) {
-        this.certhashAlgId = certhashAlgId;
-    }
+  public void setCerthashAlgId(ASN1ObjectIdentifier certhashAlgId) {
+    this.certhashAlgId = certhashAlgId;
+  }
 
-    public String signatureAlgName() {
-        return signatureAlgName;
-    }
+  public String signatureAlgName() {
+    return signatureAlgName;
+  }
 
-    public void setSignatureAlgName(String signatureAlgName) throws NoSuchAlgorithmException {
-        this.signatureAlgName = StringUtil.isBlank(signatureAlgName) ? null
-                : AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
-    }
+  public void setSignatureAlgName(String signatureAlgName) throws NoSuchAlgorithmException {
+    this.signatureAlgName = StringUtil.isBlank(signatureAlgName) ? null
+        : AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
+  }
 
 }

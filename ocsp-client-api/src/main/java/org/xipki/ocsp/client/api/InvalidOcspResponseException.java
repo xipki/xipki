@@ -18,6 +18,7 @@
 package org.xipki.ocsp.client.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -25,20 +26,20 @@ package org.xipki.ocsp.client.api;
 @SuppressWarnings("serial")
 public class InvalidOcspResponseException extends OcspResponseException {
 
-    public InvalidOcspResponseException() {
-        super();
-    }
+  public InvalidOcspResponseException() {
+    super();
+  }
 
-    public InvalidOcspResponseException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public InvalidOcspResponseException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public InvalidOcspResponseException(String message) {
-        super(message);
-    }
+  public InvalidOcspResponseException(String message) {
+    super(message);
+  }
 
-    public InvalidOcspResponseException(Throwable cause) {
-        super(cause);
-    }
+  public InvalidOcspResponseException(Throwable cause) {
+    super(cause);
+  }
 
 }

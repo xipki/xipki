@@ -24,34 +24,35 @@ import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class CaInfo {
 
-    private final X509Certificate cert;
+  private final X509Certificate cert;
 
-    private final Set<CertprofileInfo> certprofiles;
+  private final Set<CertprofileInfo> certprofiles;
 
-    private final ClientCmpControl cmpControl;
+  private final ClientCmpControl cmpControl;
 
-    CaInfo(X509Certificate cert, ClientCmpControl cmpControl, Set<CertprofileInfo> certprofiles) {
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-        this.cmpControl = ParamUtil.requireNonNull("cmpControl", cmpControl);
-        this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
-    }
+  CaInfo(X509Certificate cert, ClientCmpControl cmpControl, Set<CertprofileInfo> certprofiles) {
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.cmpControl = ParamUtil.requireNonNull("cmpControl", cmpControl);
+    this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
+  }
 
-    X509Certificate cert() {
-        return cert;
-    }
+  X509Certificate cert() {
+    return cert;
+  }
 
-    ClientCmpControl cmpControl() {
-        return cmpControl;
-    }
+  ClientCmpControl cmpControl() {
+    return cmpControl;
+  }
 
-    Set<CertprofileInfo> certprofiles() {
-        return certprofiles;
-    }
+  Set<CertprofileInfo> certprofiles() {
+    return certprofiles;
+  }
 
 }

@@ -23,29 +23,30 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.x500.X500Name;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class UnrevokeOrRemoveCertEntry extends IssuerSerialEntry {
 
-    private byte[] authorityKeyIdentifier;
+  private byte[] authorityKeyIdentifier;
 
-    public UnrevokeOrRemoveCertEntry(String id, X509Certificate cert) {
-        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-                cert.getSerialNumber());
-    }
+  public UnrevokeOrRemoveCertEntry(String id, X509Certificate cert) {
+    this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+        cert.getSerialNumber());
+  }
 
-    public UnrevokeOrRemoveCertEntry(String id, X500Name issuer, BigInteger serialNumber) {
-        super(id, issuer, serialNumber);
-    }
+  public UnrevokeOrRemoveCertEntry(String id, X500Name issuer, BigInteger serialNumber) {
+    super(id, issuer, serialNumber);
+  }
 
-    public byte[] authorityKeyIdentifier() {
-        return authorityKeyIdentifier;
-    }
+  public byte[] authorityKeyIdentifier() {
+    return authorityKeyIdentifier;
+  }
 
-    public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
-        this.authorityKeyIdentifier = authorityKeyIdentifier;
-    }
+  public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
+    this.authorityKeyIdentifier = authorityKeyIdentifier;
+  }
 
 }

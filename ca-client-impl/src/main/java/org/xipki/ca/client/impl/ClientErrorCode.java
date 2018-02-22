@@ -18,20 +18,21 @@
 package org.xipki.ca.client.impl;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ClientErrorCode {
 
-    /**
-     * Intern status to indicate that there are errors in the response.
-     */
-    public static final int PKISTATUS_RESPONSE_ERROR = -1;
+  /**
+   * Intern status to indicate that there are errors in the response.
+   */
+  public static final int PKISTATUS_RESPONSE_ERROR = -1;
 
-    public static final int PKISTATUS_NO_ANSWER = -2;
+  public static final int PKISTATUS_NO_ANSWER = -2;
 
-    private ClientErrorCode() {
-    }
+  private ClientErrorCode() {
+  }
 
 }

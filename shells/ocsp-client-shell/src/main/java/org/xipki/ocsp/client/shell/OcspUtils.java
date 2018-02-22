@@ -25,30 +25,31 @@ import org.xipki.ocsp.client.api.InvalidOcspResponseException;
 import org.xipki.ocsp.client.api.OcspResponseException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspUtils {
 
-    private OcspUtils() {
-    }
+  private OcspUtils() {
+  }
 
-    public static BasicOCSPResp extractBasicOcspResp(OCSPResp response)
-            throws OcspResponseException {
-        ParamUtil.requireNonNull("response", response);
-        int status = response.getStatus();
-        if (status == 0) {
-            BasicOCSPResp basicOcspResp;
-            try {
-                basicOcspResp = (BasicOCSPResp) response.getResponseObject();
-            } catch (OCSPException ex) {
-                throw new InvalidOcspResponseException(ex.getMessage(), ex);
-            }
-            return basicOcspResp;
-        } else {
-            throw new OcspResponseUnsuccessfulException(status);
-        }
+  public static BasicOCSPResp extractBasicOcspResp(OCSPResp response)
+      throws OcspResponseException {
+    ParamUtil.requireNonNull("response", response);
+    int status = response.getStatus();
+    if (status == 0) {
+      BasicOCSPResp basicOcspResp;
+      try {
+        basicOcspResp = (BasicOCSPResp) response.getResponseObject();
+      } catch (OCSPException ex) {
+        throw new InvalidOcspResponseException(ex.getMessage(), ex);
+      }
+      return basicOcspResp;
+    } else {
+      throw new OcspResponseUnsuccessfulException(status);
     }
+  }
 
 }

@@ -31,37 +31,38 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.ScepClient;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "scep-getcrl",
-        description = "download CRL")
+    description = "download CRL")
 @Service
 public class GetCrlCmd extends ClientAction {
 
-    @Option(name = "--cert", aliases = "-c", required = true,
-            description = "certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert", aliases = "-c", required = true,
+      description = "certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
-        ScepClient client = getScepClient();
-        X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
-                cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
-        if (crl == null) {
-            throw new CmdFailure("received no CRL from server");
-        }
-
-        saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
+    ScepClient client = getScepClient();
+    X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
+        cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
+    if (crl == null) {
+      throw new CmdFailure("received no CRL from server");
     }
+
+    saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
+    return null;
+  }
 
 }

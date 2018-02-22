@@ -18,27 +18,28 @@
 package org.xipki.ca.client.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaClientException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CaClientException() {
-    }
+  public CaClientException() {
+  }
 
-    public CaClientException(String message) {
-        super(message);
-    }
+  public CaClientException(String message) {
+    super(message);
+  }
 
-    public CaClientException(Throwable cause) {
-        super(cause);
-    }
+  public CaClientException(Throwable cause) {
+    super(cause);
+  }
 
-    public CaClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CaClientException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

@@ -24,50 +24,50 @@ import java.util.Date;
 import org.bouncycastle.asn1.x500.X500Name;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RevokeCertRequestEntry extends IssuerSerialEntry {
 
-    private int reason;
+  private int reason;
 
-    private Date invalidityDate;
+  private Date invalidityDate;
 
-    private byte[] authorityKeyIdentifier;
+  private byte[] authorityKeyIdentifier;
 
-    public RevokeCertRequestEntry(String id, X509Certificate cert, int reason,
-            Date invalidityDate) {
-        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-                cert.getSerialNumber(), reason, invalidityDate);
+  public RevokeCertRequestEntry(String id, X509Certificate cert, int reason, Date invalidityDate) {
+    this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+        cert.getSerialNumber(), reason, invalidityDate);
+  }
+
+  public RevokeCertRequestEntry(String id, X500Name issuer, BigInteger serialNumber, int reason,
+      Date invalidityDate) {
+    super(id, issuer, serialNumber);
+
+    if (!(reason >= 0 && reason <= 10 && reason != 7)) {
+      throw new IllegalArgumentException("invalid reason: " + reason);
     }
 
-    public RevokeCertRequestEntry(String id, X500Name issuer, BigInteger serialNumber, int reason,
-            Date invalidityDate) {
-        super(id, issuer, serialNumber);
+    this.reason = reason;
+    this.invalidityDate = invalidityDate;
+  }
 
-        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
-            throw new IllegalArgumentException("invalid reason: " + reason);
-        }
+  public int reason() {
+    return reason;
+  }
 
-        this.reason = reason;
-        this.invalidityDate = invalidityDate;
-    }
+  public Date invalidityDate() {
+    return invalidityDate;
+  }
 
-    public int reason() {
-        return reason;
-    }
+  public byte[] authorityKeyIdentifier() {
+    return authorityKeyIdentifier;
+  }
 
-    public Date invalidityDate() {
-        return invalidityDate;
-    }
-
-    public byte[] authorityKeyIdentifier() {
-        return authorityKeyIdentifier;
-    }
-
-    public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
-        this.authorityKeyIdentifier = authorityKeyIdentifier;
-    }
+  public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
+    this.authorityKeyIdentifier = authorityKeyIdentifier;
+  }
 
 }

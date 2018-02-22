@@ -33,75 +33,76 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 public class TlsInit {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SdkHostnameVerifier.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SdkHostnameVerifier.class);
 
-    private static HostnameVerifier oldHostnameVerifier;
+  private static HostnameVerifier oldHostnameVerifier;
 
-    private static final class InternX509TrustManager implements X509TrustManager {
+  private static final class InternX509TrustManager implements X509TrustManager {
 
-        @Override
-        public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-                throws CertificateException {
-            // TODO: implement me
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-                throws CertificateException {
-            // TODO: implement me
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            // TODO: implement me
-            return new X509Certificate[0];
-        }
-
+    @Override
+    public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+        throws CertificateException {
+      // TODO: implement me
     }
 
-    private static class SdkHostnameVerifier implements HostnameVerifier {
-
-        private static SdkHostnameVerifier INSTANCE = new SdkHostnameVerifier();
-
-        /**
-         * Verify that the host name is an acceptable match with the server's authentication scheme.
-         *
-         * @param hostname the host name
-         * @param session SSLSession used on the connection to host
-         * @return true if the host name is acceptable
-         */
-        @Override
-        public boolean verify(String hostname, SSLSession session) {
-            // TODO: implement the verification
-            return true;
-        }
-
+    @Override
+    public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+        throws CertificateException {
+      // TODO: implement me
     }
 
-    public static void init() throws GeneralSecurityException {
-        System.err.println("***** ONLY FOR TEST, DO NOT USE IT IN PRODUCTION ENVIRONMENT ******");
-        TrustManager[] trustManagers = new TrustManager[]{new InternX509TrustManager()};
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustManagers, new SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-        LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
-                oldHostnameVerifier);
-        HttpsURLConnection.setDefaultHostnameVerifier(SdkHostnameVerifier.INSTANCE);
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+      // TODO: implement me
+      return new X509Certificate[0];
     }
 
-    public static void shutdown() {
-        if (HttpsURLConnection.getDefaultHostnameVerifier() == SdkHostnameVerifier.INSTANCE) {
-            LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
-                    oldHostnameVerifier);
-            HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
-        }
+  }
+
+  private static class SdkHostnameVerifier implements HostnameVerifier {
+
+    private static SdkHostnameVerifier INSTANCE = new SdkHostnameVerifier();
+
+    /**
+     * Verify that the host name is an acceptable match with the server's authentication scheme.
+     *
+     * @param hostname the host name
+     * @param session SSLSession used on the connection to host
+     * @return true if the host name is acceptable
+     */
+    @Override
+    public boolean verify(String hostname, SSLSession session) {
+      // TODO: implement the verification
+      return true;
     }
+
+  }
+
+  public static void init() throws GeneralSecurityException {
+    System.err.println("***** ONLY FOR TEST, DO NOT USE IT IN PRODUCTION ENVIRONMENT ******");
+    TrustManager[] trustManagers = new TrustManager[]{new InternX509TrustManager()};
+    SSLContext sc = SSLContext.getInstance("SSL");
+    sc.init(null, trustManagers, new SecureRandom());
+    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+    oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+    LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
+        oldHostnameVerifier);
+    HttpsURLConnection.setDefaultHostnameVerifier(SdkHostnameVerifier.INSTANCE);
+  }
+
+  public static void shutdown() {
+    if (HttpsURLConnection.getDefaultHostnameVerifier() == SdkHostnameVerifier.INSTANCE) {
+      LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
+          oldHostnameVerifier);
+      HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
+    }
+  }
 
 }

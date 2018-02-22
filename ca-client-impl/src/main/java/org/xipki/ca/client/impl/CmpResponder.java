@@ -23,27 +23,28 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.AlgorithmValidator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 class CmpResponder {
 
-    private final X509Certificate cert;
+  private final X509Certificate cert;
 
-    private final AlgorithmValidator sigAlgoValidator;
+  private final AlgorithmValidator sigAlgoValidator;
 
-    public CmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-        this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
-    }
+  public CmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
+  }
 
-    public X509Certificate cert() {
-        return cert;
-    }
+  public X509Certificate cert() {
+    return cert;
+  }
 
-    public AlgorithmValidator sigAlgoValidator() {
-        return sigAlgoValidator;
-    }
+  public AlgorithmValidator sigAlgoValidator() {
+    return sigAlgoValidator;
+  }
 
 }

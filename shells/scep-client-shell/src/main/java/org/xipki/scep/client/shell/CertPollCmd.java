@@ -34,50 +34,51 @@ import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "scep-certpoll",
-        description = "poll certificate")
+    description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+  @Override
+  protected Object execute0() throws Exception {
+    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
-        ScepClient client = getScepClient();
-        X509Certificate caCert = client.authorityCertStore().caCert();
-        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+    ScepClient client = getScepClient();
+    X509Certificate caCert = client.authorityCertStore().caCert();
+    X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
-        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr,
-                caSubject);
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
-        }
-
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
-        }
-
-        List<X509Certificate> certs = resp.certificates();
-        if (certs == null || certs.isEmpty()) {
-            throw new CmdFailure("received no certficate from server");
-        }
-
-        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
-        return null;
+    EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr,
+        caSubject);
+    if (resp.isFailure()) {
+      throw new CmdFailure("server returned 'failure'");
     }
+
+    if (resp.isPending()) {
+      throw new CmdFailure("server returned 'pending'");
+    }
+
+    List<X509Certificate> certs = resp.certificates();
+    if (certs == null || certs.isEmpty()) {
+      throw new CmdFailure("received no certficate from server");
+    }
+
+    saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+    return null;
+  }
 
 }

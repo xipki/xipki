@@ -29,20 +29,21 @@ import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "jscep-enroll",
-        description = "enroll certificate via automatic selected messageType")
+    description = "enroll certificate via automatic selected messageType")
 @Service
 public class EnrollCertCmd extends EnrollCertAction {
 
-    @Override
-    protected EnrollmentResponse requestCertificate(Client client, PKCS10CertificationRequest csr,
-            PrivateKey identityKey, X509Certificate identityCert)
-            throws ClientException, TransactionException {
-        return client.enrol(identityCert, identityKey, csr);
-    }
+  @Override
+  protected EnrollmentResponse requestCertificate(Client client, PKCS10CertificationRequest csr,
+      PrivateKey identityKey, X509Certificate identityCert)
+      throws ClientException, TransactionException {
+    return client.enrol(identityCert, identityKey, csr);
+  }
 
 }

@@ -29,58 +29,59 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "cmp-health",
-        description = "check healty status of CA")
+    description = "check healty status of CA")
 @Service
 public class HealthCmd extends ClientAction {
 
-    @Option(name = "--ca",
-            description = "CA name\n"
-                    + "(required if multiple CAs are configured)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      description = "CA name\n"
+          + "(required if multiple CAs are configured)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show status verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show status verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (caName != null) {
-            caName = caName.toLowerCase();
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    if (caName != null) {
+      caName = caName.toLowerCase();
+    }
 
-        Set<String> caNames = caClient.caNames();
-        if (isEmpty(caNames)) {
-            throw new IllegalCmdParamException("no CA is configured");
-        }
+    Set<String> caNames = caClient.caNames();
+    if (isEmpty(caNames)) {
+      throw new IllegalCmdParamException("no CA is configured");
+    }
 
-        if (caName != null && !caNames.contains(caName)) {
-            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
-                    + caNames);
-        }
+    if (caName != null && !caNames.contains(caName)) {
+      throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+          + caNames);
+    }
 
-        if (caName == null) {
-            if (caNames.size() == 1) {
-                caName = caNames.iterator().next();
-            } else {
-                throw new IllegalCmdParamException("no CA is specified, one of " + caNames
-                        + " is required");
-            }
-        }
+    if (caName == null) {
+      if (caNames.size() == 1) {
+        caName = caNames.iterator().next();
+      } else {
+        throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+            + " is required");
+      }
+    }
 
-        HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
-        String str = StringUtil.concat("healthy status for CA ", caName, ": ",
-                (healthResult.isHealthy() ? "healthy" : "not healthy"));
-        if (verbose) {
-            str = StringUtil.concat(str, "\n", healthResult.toJsonMessage(true));
-        }
-        System.out.println(str);
-        return null;
-    } // method execute0
+    HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
+    String str = StringUtil.concat("healthy status for CA ", caName, ": ",
+        (healthResult.isHealthy() ? "healthy" : "not healthy"));
+    if (verbose) {
+      str = StringUtil.concat(str, "\n", healthResult.toJsonMessage(true));
+    }
+    System.out.println(str);
+    return null;
+  } // method execute0
 
 }

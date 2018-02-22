@@ -21,14 +21,15 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  */
 
 @Service
 public class EnrollMetodCompleter extends AbstractEnumCompleter {
 
-    public EnrollMetodCompleter() {
-        setTokens("pkcs,renewal,update");
-    }
+  public EnrollMetodCompleter() {
+    setTokens("pkcs,renewal,update");
+  }
 
 }

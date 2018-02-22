@@ -24,48 +24,49 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class EnrollCertResultResp {
 
-    private List<CMPCertificate> caCertificates;
+  private List<CMPCertificate> caCertificates;
 
-    private List<ResultEntry> resultEntries;
+  private List<ResultEntry> resultEntries;
 
-    public EnrollCertResultResp() {
+  public EnrollCertResultResp() {
+  }
+
+  public void addCaCertificate(CMPCertificate caCertificate) {
+    if (caCertificates == null) {
+      caCertificates = new ArrayList<>(1);
+    }
+    caCertificates.add(caCertificate);
+  }
+
+  public void addResultEntry(ResultEntry resultEntry) {
+    ParamUtil.requireNonNull("resultEntry", resultEntry);
+
+    if (!(resultEntry instanceof EnrollCertResultEntry
+        || resultEntry instanceof ErrorResultEntry)) {
+      throw new IllegalArgumentException(
+          "Unaccepted parameter of class " + resultEntry.getClass().getName());
     }
 
-    public void addCaCertificate(CMPCertificate caCertificate) {
-        if (caCertificates == null) {
-            caCertificates = new ArrayList<>(1);
-        }
-        caCertificates.add(caCertificate);
+    if (resultEntries == null) {
+      resultEntries = new ArrayList<>(1);
     }
 
-    public void addResultEntry(ResultEntry resultEntry) {
-        ParamUtil.requireNonNull("resultEntry", resultEntry);
+    resultEntries.add(resultEntry);
+  }
 
-        if (!(resultEntry instanceof EnrollCertResultEntry
-                || resultEntry instanceof ErrorResultEntry)) {
-            throw new IllegalArgumentException(
-                    "Unaccepted parameter of class " + resultEntry.getClass().getName());
-        }
+  public List<CMPCertificate> caCertificates() {
+    return caCertificates;
+  }
 
-        if (resultEntries == null) {
-            resultEntries = new ArrayList<>(1);
-        }
-
-        resultEntries.add(resultEntry);
-    }
-
-    public List<CMPCertificate> caCertificates() {
-        return caCertificates;
-    }
-
-    public List<ResultEntry> resultEntries() {
-        return resultEntries;
-    }
+  public List<ResultEntry> resultEntries() {
+    return resultEntries;
+  }
 
 }

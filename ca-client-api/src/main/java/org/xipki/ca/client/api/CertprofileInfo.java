@@ -21,34 +21,35 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertprofileInfo {
 
-    private final String name;
+  private final String name;
 
-    private final String type;
+  private final String type;
 
-    private final String conf;
+  private final String conf;
 
-    public CertprofileInfo(String name, String type, String conf) {
-        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-        this.type = StringUtil.isBlank(type) ? null : type;
-        this.conf = StringUtil.isBlank(conf) ? null : conf;
-    }
+  public CertprofileInfo(String name, String type, String conf) {
+    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.type = StringUtil.isBlank(type) ? null : type;
+    this.conf = StringUtil.isBlank(conf) ? null : conf;
+  }
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    public String type() {
-        return type;
-    }
+  public String type() {
+    return type;
+  }
 
-    public String conf() {
-        return conf;
-    }
+  public String conf() {
+    return conf;
+  }
 
 }

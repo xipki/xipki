@@ -31,62 +31,63 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class CrlAction extends ClientAction {
 
-    @Option(name = "--ca",
-            description = "CA name\n(required if multiple CAs are configured)")
-    @Completion(CaNameCompleter.class)
-    protected String caName;
+  @Option(name = "--ca",
+      description = "CA name\n(required if multiple CAs are configured)")
+  @Completion(CaNameCompleter.class)
+  protected String caName;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the CRL\n(required)")
-    @Completion(FilePathCompleter.class)
-    protected String outFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the CRL\n(required)")
+  @Completion(FilePathCompleter.class)
+  protected String outFile;
 
-    protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;
+  protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (caName != null) {
-            caName = caName.toLowerCase();
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    if (caName != null) {
+      caName = caName.toLowerCase();
+    }
 
-        Set<String> caNames = caClient.caNames();
-        if (isEmpty(caNames)) {
-            throw new CmdFailure("no CA is configured");
-        }
+    Set<String> caNames = caClient.caNames();
+    if (isEmpty(caNames)) {
+      throw new CmdFailure("no CA is configured");
+    }
 
-        if (caName != null && !caNames.contains(caName)) {
-            throw new IllegalCmdParamException("CA " + caName
-                    + " is not within the configured CAs " + caNames);
-        }
+    if (caName != null && !caNames.contains(caName)) {
+      throw new IllegalCmdParamException("CA " + caName
+          + " is not within the configured CAs " + caNames);
+    }
 
-        if (caName == null) {
-            if (caNames.size() == 1) {
-                caName = caNames.iterator().next();
-            } else {
-                throw new IllegalCmdParamException("no CA is specified, one of " + caNames
-                        + " is required");
-            }
-        }
+    if (caName == null) {
+      if (caNames.size() == 1) {
+        caName = caNames.iterator().next();
+      } else {
+        throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+            + " is required");
+      }
+    }
 
-        X509CRL crl = null;
-        try {
-            crl = retrieveCrl();
-        } catch (PkiErrorException ex) {
-            throw new CmdFailure("received no CRL from server: " + ex.getMessage());
-        }
+    X509CRL crl = null;
+    try {
+      crl = retrieveCrl();
+    } catch (PkiErrorException ex) {
+      throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+    }
 
-        if (crl == null) {
-            throw new CmdFailure("received no CRL from server");
-        }
+    if (crl == null) {
+      throw new CmdFailure("received no CRL from server");
+    }
 
-        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
-        return null;
-    } // method execute0
+    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+    return null;
+  } // method execute0
 
 }

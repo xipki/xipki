@@ -49,234 +49,235 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 final class HttpClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
 
-    private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
+  private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
-        public HttpClientInitializer() {
-        }
-
-        @Override
-        public void initChannel(SocketChannel ch) {
-            ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
-                .addLast(new WriteTimeoutHandler(60, TimeUnit.SECONDS))
-                .addLast(new HttpClientCodec())
-                .addLast(new HttpObjectAggregator(65536))
-                .addLast(new HttpClientHandler());
-        }
+    public HttpClientInitializer() {
     }
 
-    private class HttpClientHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
+    @Override
+    public void initChannel(SocketChannel ch) {
+      ChannelPipeline pipeline = ch.pipeline();
+      pipeline.addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
+        .addLast(new WriteTimeoutHandler(60, TimeUnit.SECONDS))
+        .addLast(new HttpClientCodec())
+        .addLast(new HttpObjectAggregator(65536))
+        .addLast(new HttpClientHandler());
+    }
+  }
 
-        @Override
-        public void channelRead0(ChannelHandlerContext ctx, FullHttpResponse resp) {
-            try {
-                decrementPendingRequests();
-                responseHandler.onComplete(resp);
-            } catch (Throwable th) {
-                LOG.error("unexpected error", th);
-            }
-        }
+  private class HttpClientHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
 
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            decrementPendingRequests();
-            ctx.close();
-            LOG.warn("error", cause);
-            responseHandler.onError();
-        }
+    @Override
+    public void channelRead0(ChannelHandlerContext ctx, FullHttpResponse resp) {
+      try {
+        decrementPendingRequests();
+        responseHandler.onComplete(resp);
+      } catch (Throwable th) {
+        LOG.error("unexpected error", th);
+      }
     }
 
-    private static Boolean epollAvailable;
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+      decrementPendingRequests();
+      ctx.close();
+      LOG.warn("error", cause);
+      responseHandler.onError();
+    }
+  }
 
-    private static Boolean kqueueAvailable;
+  private static Boolean epollAvailable;
 
-    private final CountLatch latch = new CountLatch(0, 0);
+  private static Boolean kqueueAvailable;
 
-    private int queueSize = 1000;
+  private final CountLatch latch = new CountLatch(0, 0);
 
-    private String uri;
+  private int queueSize = 1000;
 
-    private OcspBenchmark responseHandler;
+  private String uri;
 
-    private EventLoopGroup workerGroup;
+  private OcspBenchmark responseHandler;
 
-    private Channel channel;
+  private EventLoopGroup workerGroup;
 
-    private int pendingRequests = 0;
+  private Channel channel;
 
-    static {
-        String os = System.getProperty("os.name").toLowerCase();
-        ClassLoader loader = HttpClient.class.getClassLoader();
-        if (os.contains("linux")) {
-            try {
-                Class<?> checkClazz = Class.forName(
-                        "io.netty.channel.epoll.Epoll", false, loader);
-                Method mt = checkClazz.getMethod("isAvailable");
-                Object obj = mt.invoke(null);
+  private int pendingRequests = 0;
 
-                if (obj instanceof Boolean) {
-                    epollAvailable = (Boolean) obj;
-                }
-            } catch (Throwable th) {
-                if (th instanceof ClassNotFoundException) {
-                    LOG.info("epoll linux is not in classpath");
-                } else {
-                    LogUtil.warn(LOG, th, "could not use Epoll transport");
-                }
-            }
-        } else if (os.contains("mac os") || os.contains("os x")) {
-            try {
-                Class<?> checkClazz = Class.forName(
-                        "io.netty.channel.epoll.kqueue.KQueue", false, loader);
-                Method mt = checkClazz.getMethod("isAvailable");
-                Object obj = mt.invoke(null);
-                if (obj instanceof Boolean) {
-                    kqueueAvailable = (Boolean) obj;
-                }
-            } catch (Throwable th) {
-                LogUtil.warn(LOG, th, "could not use KQueue transport");
-            }
+  static {
+    String os = System.getProperty("os.name").toLowerCase();
+    ClassLoader loader = HttpClient.class.getClassLoader();
+    if (os.contains("linux")) {
+      try {
+        Class<?> checkClazz = Class.forName(
+            "io.netty.channel.epoll.Epoll", false, loader);
+        Method mt = checkClazz.getMethod("isAvailable");
+        Object obj = mt.invoke(null);
+
+        if (obj instanceof Boolean) {
+          epollAvailable = (Boolean) obj;
         }
+      } catch (Throwable th) {
+        if (th instanceof ClassNotFoundException) {
+          LOG.info("epoll linux is not in classpath");
+        } else {
+          LogUtil.warn(LOG, th, "could not use Epoll transport");
+        }
+      }
+    } else if (os.contains("mac os") || os.contains("os x")) {
+      try {
+        Class<?> checkClazz = Class.forName(
+            "io.netty.channel.epoll.kqueue.KQueue", false, loader);
+        Method mt = checkClazz.getMethod("isAvailable");
+        Object obj = mt.invoke(null);
+        if (obj instanceof Boolean) {
+          kqueueAvailable = (Boolean) obj;
+        }
+      } catch (Throwable th) {
+        LogUtil.warn(LOG, th, "could not use KQueue transport");
+      }
+    }
+  }
+
+  public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize) {
+    this.uri = ParamUtil.requireNonNull("uri", uri);
+    if (queueSize > 0) {
+      this.queueSize = queueSize;
+    }
+    this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
+    this.workerGroup = new NioEventLoopGroup(1);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void start() throws Exception {
+    URI uri = new URI(this.uri);
+    String scheme = (uri.getScheme() == null) ? "http" : uri.getScheme();
+
+    if (!"http".equalsIgnoreCase(scheme)) {
+      System.err.println("Only HTTP is supported.");
+      return;
     }
 
-    public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize) {
-        this.uri = ParamUtil.requireNonNull("uri", uri);
-        if (queueSize > 0) {
-            this.queueSize = queueSize;
-        }
-        this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
-        this.workerGroup = new NioEventLoopGroup(1);
+    int port = uri.getPort();
+    if (port == -1) {
+      port = 80;
     }
 
-    @SuppressWarnings("unchecked")
-    public void start() throws Exception {
-        URI uri = new URI(this.uri);
-        String scheme = (uri.getScheme() == null) ? "http" : uri.getScheme();
+    Class<? extends SocketChannel> channelClass = NioSocketChannel.class;
 
-        if (!"http".equalsIgnoreCase(scheme)) {
-            System.err.println("Only HTTP is supported.");
-            return;
+    final int numThreads = 1;
+
+    ClassLoader loader = getClass().getClassLoader();
+    if (epollAvailable != null && epollAvailable.booleanValue()) {
+      try {
+        channelClass = (Class<? extends SocketChannel>)
+            Class.forName("io.netty.channel.epoll.EpollSocketChannel",
+                false, loader);
+
+        Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup",
+                  true, loader);
+        Constructor<?> constructor = clazz.getConstructor(int.class);
+        this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+        LOG.info("use Epoll Transport");
+      } catch (Throwable th) {
+        if (th instanceof ClassNotFoundException) {
+          LOG.info("epoll linux is not in classpath");
+        } else {
+          LogUtil.warn(LOG, th, "could not use Epoll transport");
         }
+        channelClass = null;
+        this.workerGroup = null;
+      }
+    } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
+      try {
+        channelClass = (Class<? extends SocketChannel>)
+                Class.forName("io.netty.channel.kqueue.KQueueSocketChannel",
+                    false, loader);
 
-        int port = uri.getPort();
-        if (port == -1) {
-            port = 80;
-        }
-
-        Class<? extends SocketChannel> channelClass = NioSocketChannel.class;
-
-        final int numThreads = 1;
-
-        ClassLoader loader = getClass().getClassLoader();
-        if (epollAvailable != null && epollAvailable.booleanValue()) {
-            try {
-                channelClass = (Class<? extends SocketChannel>)
-                        Class.forName("io.netty.channel.epoll.EpollSocketChannel",
-                                false, loader);
-
-                Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup",
-                                    true, loader);
-                Constructor<?> constructor = clazz.getConstructor(int.class);
-                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
-                LOG.info("use Epoll Transport");
-            } catch (Throwable th) {
-                if (th instanceof ClassNotFoundException) {
-                    LOG.info("epoll linux is not in classpath");
-                } else {
-                    LogUtil.warn(LOG, th, "could not use Epoll transport");
-                }
-                channelClass = null;
-                this.workerGroup = null;
-            }
-        } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
-            try {
-                channelClass = (Class<? extends SocketChannel>)
-                                Class.forName("io.netty.channel.kqueue.KQueueSocketChannel",
-                                        false, loader);
-
-                Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
-                                        true, loader);
-                Constructor<?> constructor = clazz.getConstructor(int.class);
-                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
-                LOG.info("Use KQueue Transport");
-            } catch (Exception ex) {
-                LogUtil.warn(LOG, ex, "could not use KQueue transport");
-                channelClass = null;
-                this.workerGroup = null;
-            }
-        }
-
-        if (this.workerGroup == null) {
-            channelClass = NioSocketChannel.class;
-            this.workerGroup = new NioEventLoopGroup(numThreads);
-        }
-
-        Bootstrap bootstrap = new Bootstrap();
-        bootstrap.group(workerGroup)
-            .option(ChannelOption.SO_KEEPALIVE, true)
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
-            .channel(channelClass)
-            .handler(new HttpClientInitializer());
-
-        String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
-        // Make the connection attempt.
-        this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
+        Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
+                    true, loader);
+        Constructor<?> constructor = clazz.getConstructor(int.class);
+        this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+        LOG.info("Use KQueue Transport");
+      } catch (Exception ex) {
+        LogUtil.warn(LOG, ex, "could not use KQueue transport");
+        channelClass = null;
+        this.workerGroup = null;
+      }
     }
 
-    public void send(FullHttpRequest request) throws OcspRequestorException {
-        if (!channel.isActive()) {
-            throw new OcspRequestorException("channel is not active");
-        }
-
-        try {
-            latch.await(5, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
-            throw new OcspRequestorException("sending poll is full");
-        }
-        incrementPendingRequests();
-        ChannelFuture future = this.channel.writeAndFlush(request);
-        future.awaitUninterruptibly();
+    if (this.workerGroup == null) {
+      channelClass = NioSocketChannel.class;
+      this.workerGroup = new NioEventLoopGroup(numThreads);
     }
 
-    public void shutdown() {
-        if (channel != null) {
-            channel = null;
-        }
-        this.workerGroup.shutdownGracefully();
+    Bootstrap bootstrap = new Bootstrap();
+    bootstrap.group(workerGroup)
+      .option(ChannelOption.SO_KEEPALIVE, true)
+      .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
+      .channel(channelClass)
+      .handler(new HttpClientInitializer());
+
+    String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
+    // Make the connection attempt.
+    this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
+  }
+
+  public void send(FullHttpRequest request) throws OcspRequestorException {
+    if (!channel.isActive()) {
+      throw new OcspRequestorException("channel is not active");
     }
 
-    private void incrementPendingRequests() {
-        synchronized (latch) {
-            if (++pendingRequests >= queueSize) {
-                if (latch.getCount() == 0) {
-                    latch.countUp();
-                }
-            }
-        }
+    try {
+      latch.await(5, TimeUnit.SECONDS);
+    } catch (InterruptedException ex) {
+      throw new OcspRequestorException("sending poll is full");
     }
+    incrementPendingRequests();
+    ChannelFuture future = this.channel.writeAndFlush(request);
+    future.awaitUninterruptibly();
+  }
 
-    private void decrementPendingRequests() {
-        synchronized (latch) {
-            if (--pendingRequests < queueSize) {
-                final int count = (int) latch.getCount();
-                if (count > 0) {
-                    while (latch.getCount() != 0) {
-                        latch.countDown();
-                    }
-                } else if (count < 0) {
-                    while (latch.getCount() != 0) {
-                        latch.countUp();
-                    }
-                }
-            }
-        }
+  public void shutdown() {
+    if (channel != null) {
+      channel = null;
     }
+    this.workerGroup.shutdownGracefully();
+  }
+
+  private void incrementPendingRequests() {
+    synchronized (latch) {
+      if (++pendingRequests >= queueSize) {
+        if (latch.getCount() == 0) {
+          latch.countUp();
+        }
+      }
+    }
+  }
+
+  private void decrementPendingRequests() {
+    synchronized (latch) {
+      if (--pendingRequests < queueSize) {
+        final int count = (int) latch.getCount();
+        if (count > 0) {
+          while (latch.getCount() != 0) {
+            latch.countDown();
+          }
+        } else if (count < 0) {
+          while (latch.getCount() != 0) {
+            latch.countUp();
+          }
+        }
+      }
+    }
+  }
 }

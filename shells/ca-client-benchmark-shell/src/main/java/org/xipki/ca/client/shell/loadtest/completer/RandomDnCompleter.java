@@ -22,6 +22,7 @@ import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDn;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -29,14 +30,14 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 @Service
 public class RandomDnCompleter extends AbstractEnumCompleter {
 
-    public RandomDnCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public RandomDnCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (RandomDn dn : RandomDn.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (RandomDn dn : RandomDn.values()) {
+      enums.append(dn.name()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

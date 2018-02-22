@@ -35,69 +35,70 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class UnRevRemoveCertAction extends ClientAction {
 
-    @Option(name = "--ca",
-            description = "CA name\n(required if more than one CA is configured)")
-    @Completion(CaNameCompleter.class)
-    protected String caName;
+  @Option(name = "--ca",
+      description = "CA name\n(required if more than one CA is configured)")
+  @Completion(CaNameCompleter.class)
+  protected String caName;
 
-    @Option(name = "--cert", aliases = "-c",
-            description = "certificate file (either cert or serial must be specified)")
-    @Completion(FilePathCompleter.class)
-    protected String certFile;
+  @Option(name = "--cert", aliases = "-c",
+      description = "certificate file (either cert or serial must be specified)")
+  @Completion(FilePathCompleter.class)
+  protected String certFile;
 
-    @Option(name = "--serial", aliases = "-s",
-            description = "serial number (either cert or serial must be specified)")
-    private String serialNumberS;
+  @Option(name = "--serial", aliases = "-s",
+      description = "serial number (either cert or serial must be specified)")
+  private String serialNumberS;
 
-    private BigInteger serialNumber;
+  private BigInteger serialNumber;
 
-    protected BigInteger getSerialNumber() {
-        if (serialNumber == null) {
-            if (isNotBlank(serialNumberS)) {
-                this.serialNumber = toBigInt(serialNumberS);
-            }
-        }
-        return serialNumber;
+  protected BigInteger getSerialNumber() {
+    if (serialNumber == null) {
+      if (isNotBlank(serialNumberS)) {
+        this.serialNumber = toBigInt(serialNumberS);
+      }
+    }
+    return serialNumber;
+  }
+
+  protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
+      throws CertificateEncodingException {
+    if (caName != null) {
+      caName = caName.toLowerCase();
     }
 
-    protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
-            throws CertificateEncodingException {
-        if (caName != null) {
-            caName = caName.toLowerCase();
-        }
+    ParamUtil.requireNonNull("cert", cert);
+    ParamUtil.requireNonNull("caCert", caCert);
 
-        ParamUtil.requireNonNull("cert", cert);
-        ParamUtil.requireNonNull("caCert", caCert);
-
-        if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
-            return "the given certificate is not issued by the given issuer";
-        }
-
-        byte[] caSki = X509Util.extractSki(caCert);
-        byte[] aki = X509Util.extractAki(cert);
-        if (caSki != null && aki != null) {
-            if (!Arrays.equals(aki, caSki)) {
-                return "the given certificate is not issued by the given issuer";
-            }
-        }
-
-        try {
-            cert.verify(caCert.getPublicKey(), "BC");
-        } catch (SignatureException ex) {
-            return "could not verify the signature of given certificate by the issuer";
-        } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException
-                | NoSuchProviderException ex) {
-            return "could not verify the signature of given certificate by the issuer: "
-                    + ex.getMessage();
-        }
-
-        return null;
+    if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
+      return "the given certificate is not issued by the given issuer";
     }
+
+    byte[] caSki = X509Util.extractSki(caCert);
+    byte[] aki = X509Util.extractAki(cert);
+    if (caSki != null && aki != null) {
+      if (!Arrays.equals(aki, caSki)) {
+        return "the given certificate is not issued by the given issuer";
+      }
+    }
+
+    try {
+      cert.verify(caCert.getPublicKey(), "BC");
+    } catch (SignatureException ex) {
+      return "could not verify the signature of given certificate by the issuer";
+    } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException
+        | NoSuchProviderException ex) {
+      return "could not verify the signature of given certificate by the issuer: "
+          + ex.getMessage();
+    }
+
+    return null;
+  }
 
 }

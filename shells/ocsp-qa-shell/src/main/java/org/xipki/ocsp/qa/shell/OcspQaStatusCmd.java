@@ -51,181 +51,182 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xiqa", name = "qa-ocsp-status",
-        description = "request certificate status (QA)")
+    description = "request certificate status (QA)")
 @Service
 public class OcspQaStatusCmd extends BaseOcspStatusAction {
 
-    @Option(name = "--exp-error",
-            description = "expected error")
-    @Completion(OcspErrorCompleter.class)
-    private String errorText;
+  @Option(name = "--exp-error",
+      description = "expected error")
+  @Completion(OcspErrorCompleter.class)
+  private String errorText;
 
-    @Option(name = "--exp-status", multiValued = true,
-            description = "expected status\n(multi-valued)")
-    @Completion(CertStatusCompleter.class)
-    private List<String> statusTexts;
+  @Option(name = "--exp-status", multiValued = true,
+      description = "expected status\n(multi-valued)")
+  @Completion(CertStatusCompleter.class)
+  private List<String> statusTexts;
 
-    @Option(name = "--rev-time", multiValued = true,
-            description = "revocation time, UTC time of format yyyyMMddHHmmss\n(multi-valued)")
-    private List<String> revTimeTexts;
+  @Option(name = "--rev-time", multiValued = true,
+      description = "revocation time, UTC time of format yyyyMMddHHmmss\n(multi-valued)")
+  private List<String> revTimeTexts;
 
-    @Option(name = "--exp-sig-alg",
-            description = "expected signature algorithm")
-    @Completion(SigAlgCompleter.class)
-    private String sigAlg;
+  @Option(name = "--exp-sig-alg",
+      description = "expected signature algorithm")
+  @Completion(SigAlgCompleter.class)
+  private String sigAlg;
 
-    @Option(name = "--no-sig-verify",
-            description = "where to verify the signature")
-    private Boolean noSigVerify = Boolean.FALSE;
+  @Option(name = "--no-sig-verify",
+      description = "where to verify the signature")
+  private Boolean noSigVerify = Boolean.FALSE;
 
-    @Option(name = "--exp-nextupdate",
-            description = "occurrence of nextUpdate")
-    @Completion(OccurrenceCompleter.class)
-    private String nextUpdateOccurrenceText = Occurrence.optional.name();
+  @Option(name = "--exp-nextupdate",
+      description = "occurrence of nextUpdate")
+  @Completion(OccurrenceCompleter.class)
+  private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
-    @Option(name = "--exp-certhash",
-            description = "occurrence of certHash, "
-                    + "will be set to forbidden for status unknown and issuerUnknown")
-    @Completion(OccurrenceCompleter.class)
-    private String certhashOccurrenceText = Occurrence.optional.name();
+  @Option(name = "--exp-certhash",
+      description = "occurrence of certHash, "
+          + "will be set to forbidden for status unknown and issuerUnknown")
+  @Completion(OccurrenceCompleter.class)
+  private String certhashOccurrenceText = Occurrence.optional.name();
 
-    @Option(name = "--exp-certhash-alg",
-            description = "occurrence of certHash")
-    @Completion(HashAlgCompleter.class)
-    private String certhashAlg;
+  @Option(name = "--exp-certhash-alg",
+      description = "occurrence of certHash")
+  @Completion(HashAlgCompleter.class)
+  private String certhashAlg;
 
-    @Option(name = "--exp-nonce",
-            description = "occurrence of nonce")
-    @Completion(OccurrenceCompleter.class)
-    private String nonceOccurrenceText = Occurrence.optional.name();
+  @Option(name = "--exp-nonce",
+      description = "occurrence of nonce")
+  @Completion(OccurrenceCompleter.class)
+  private String nonceOccurrenceText = Occurrence.optional.name();
 
-    @Reference
-    private SecurityFactory securityFactory;
+  @Reference
+  private SecurityFactory securityFactory;
 
-    private OcspQa ocspQa;
+  private OcspQa ocspQa;
 
-    private OcspError expectedOcspError;
+  private OcspError expectedOcspError;
 
-    private Map<BigInteger, OcspCertStatus> expectedStatuses;
+  private Map<BigInteger, OcspCertStatus> expectedStatuses;
 
-    private Map<BigInteger, Date> expecteRevTimes;
+  private Map<BigInteger, Date> expecteRevTimes;
 
-    private Occurrence expectedNextUpdateOccurrence;
+  private Occurrence expectedNextUpdateOccurrence;
 
-    private Occurrence expectedCerthashOccurrence;
+  private Occurrence expectedCerthashOccurrence;
 
-    private Occurrence expectedNonceOccurrence;
+  private Occurrence expectedNonceOccurrence;
 
-    @Override
-    protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts) throws Exception {
-        ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
+  @Override
+  protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
+      Map<BigInteger, byte[]> encodedCerts) throws Exception {
+    ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
 
-        if (isBlank(errorText) && isEmpty(statusTexts)) {
-            throw new IllegalArgumentException(
-                    "neither expError nor expStatus is set, this is not permitted");
-        }
-
-        if (isNotBlank(errorText) && isNotEmpty(statusTexts)) {
-            throw new IllegalArgumentException(
-                    "both expError and expStatus are set, this is not permitted");
-        }
-
-        if (isNotBlank(errorText)) {
-            expectedOcspError = OcspError.forName(errorText);
-        }
-
-        if (isNotEmpty(statusTexts)) {
-            if (statusTexts.size() != serialNumbers.size()) {
-                throw new IllegalArgumentException("number of expStatus is invalid: "
-                        + (statusTexts.size()) + ", it should be " + serialNumbers.size());
-            }
-
-            expectedStatuses = new HashMap<>();
-            final int n = serialNumbers.size();
-
-            for (int i = 0; i < n; i++) {
-                String expectedStatusText = statusTexts.get(i);
-                OcspCertStatus certStatus = OcspCertStatus.forName(expectedStatusText);
-                expectedStatuses.put(serialNumbers.get(i), certStatus);
-            }
-        }
-
-        if (isNotEmpty(revTimeTexts)) {
-            if (revTimeTexts.size() != serialNumbers.size()) {
-                throw new IllegalArgumentException("number of revTimes is invalid: "
-                        + (revTimeTexts.size()) + ", it should be " + serialNumbers.size());
-            }
-
-            expecteRevTimes = new HashMap<>();
-            final int n = serialNumbers.size();
-
-            for (int i = 0; i < n; i++) {
-                Date revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(revTimeTexts.get(i));
-                expecteRevTimes.put(serialNumbers.get(i), revTime);
-            }
-        }
-
-        expectedCerthashOccurrence = Occurrence.forName(certhashOccurrenceText);
-        expectedNextUpdateOccurrence = Occurrence.forName(nextUpdateOccurrenceText);
-        expectedNonceOccurrence = Occurrence.forName(nonceOccurrenceText);
-    } // method checkParameters
-
-    @Override
-    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
-            IssuerHash issuerHash, List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts) throws Exception {
-        OcspResponseOption responseOption = new OcspResponseOption();
-        responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
-        responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
-        responseOption.setNonceOccurrence(expectedNonceOccurrence);
-        responseOption.setRespIssuer(respIssuer);
-        responseOption.setSignatureAlgName(sigAlg);
-        if (isNotBlank(certhashAlg)) {
-            responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
-        }
-
-        if (ocspQa == null) {
-            ocspQa = new OcspQa(securityFactory);
-        }
-
-        ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
-                encodedCerts, expectedOcspError, expectedStatuses, expecteRevTimes,
-                responseOption, noSigVerify.booleanValue());
-
-        StringBuilder sb = new StringBuilder(50);
-        sb.append("OCSP response is ");
-        String txt = result.isAllSuccessful() ? "valid" : "invalid";
-        sb.append(txt);
-
-        if (verbose.booleanValue()) {
-            for (ValidationIssue issue : result.validationIssues()) {
-                sb.append("\n");
-                format(issue, "    ", sb);
-            }
-        }
-
-        println(sb.toString());
-        if (!result.isAllSuccessful()) {
-            throw new CmdFailure("OCSP response is invalid");
-        }
-        return null;
-    } // method processResponse
-
-    static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
-        sb.append(prefix);
-        sb.append(issue.code());
-        sb.append(", ").append(issue.description());
-        sb.append(", ");
-        sb.append(issue.isFailed() ? "failed" : "successful");
-        if (issue.failureMessage() != null) {
-            sb.append(", ").append(issue.failureMessage());
-        }
+    if (isBlank(errorText) && isEmpty(statusTexts)) {
+      throw new IllegalArgumentException(
+          "neither expError nor expStatus is set, this is not permitted");
     }
+
+    if (isNotBlank(errorText) && isNotEmpty(statusTexts)) {
+      throw new IllegalArgumentException(
+          "both expError and expStatus are set, this is not permitted");
+    }
+
+    if (isNotBlank(errorText)) {
+      expectedOcspError = OcspError.forName(errorText);
+    }
+
+    if (isNotEmpty(statusTexts)) {
+      if (statusTexts.size() != serialNumbers.size()) {
+        throw new IllegalArgumentException("number of expStatus is invalid: "
+            + (statusTexts.size()) + ", it should be " + serialNumbers.size());
+      }
+
+      expectedStatuses = new HashMap<>();
+      final int n = serialNumbers.size();
+
+      for (int i = 0; i < n; i++) {
+        String expectedStatusText = statusTexts.get(i);
+        OcspCertStatus certStatus = OcspCertStatus.forName(expectedStatusText);
+        expectedStatuses.put(serialNumbers.get(i), certStatus);
+      }
+    }
+
+    if (isNotEmpty(revTimeTexts)) {
+      if (revTimeTexts.size() != serialNumbers.size()) {
+        throw new IllegalArgumentException("number of revTimes is invalid: "
+            + (revTimeTexts.size()) + ", it should be " + serialNumbers.size());
+      }
+
+      expecteRevTimes = new HashMap<>();
+      final int n = serialNumbers.size();
+
+      for (int i = 0; i < n; i++) {
+        Date revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(revTimeTexts.get(i));
+        expecteRevTimes.put(serialNumbers.get(i), revTime);
+      }
+    }
+
+    expectedCerthashOccurrence = Occurrence.forName(certhashOccurrenceText);
+    expectedNextUpdateOccurrence = Occurrence.forName(nextUpdateOccurrenceText);
+    expectedNonceOccurrence = Occurrence.forName(nonceOccurrenceText);
+  } // method checkParameters
+
+  @Override
+  protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
+      IssuerHash issuerHash, List<BigInteger> serialNumbers,
+      Map<BigInteger, byte[]> encodedCerts) throws Exception {
+    OcspResponseOption responseOption = new OcspResponseOption();
+    responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
+    responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
+    responseOption.setNonceOccurrence(expectedNonceOccurrence);
+    responseOption.setRespIssuer(respIssuer);
+    responseOption.setSignatureAlgName(sigAlg);
+    if (isNotBlank(certhashAlg)) {
+      responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
+    }
+
+    if (ocspQa == null) {
+      ocspQa = new OcspQa(securityFactory);
+    }
+
+    ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
+        encodedCerts, expectedOcspError, expectedStatuses, expecteRevTimes,
+        responseOption, noSigVerify.booleanValue());
+
+    StringBuilder sb = new StringBuilder(50);
+    sb.append("OCSP response is ");
+    String txt = result.isAllSuccessful() ? "valid" : "invalid";
+    sb.append(txt);
+
+    if (verbose.booleanValue()) {
+      for (ValidationIssue issue : result.validationIssues()) {
+        sb.append("\n");
+        format(issue, "    ", sb);
+      }
+    }
+
+    println(sb.toString());
+    if (!result.isAllSuccessful()) {
+      throw new CmdFailure("OCSP response is invalid");
+    }
+    return null;
+  } // method processResponse
+
+  static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
+    sb.append(prefix);
+    sb.append(issue.code());
+    sb.append(", ").append(issue.description());
+    sb.append(", ");
+    sb.append(issue.isFailed() ? "failed" : "successful");
+    if (issue.failureMessage() != null) {
+      sb.append(", ").append(issue.failureMessage());
+    }
+  }
 
 }

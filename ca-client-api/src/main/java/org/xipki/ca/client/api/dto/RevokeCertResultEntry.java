@@ -20,21 +20,22 @@ package org.xipki.ca.client.api.dto;
 import org.bouncycastle.asn1.crmf.CertId;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RevokeCertResultEntry extends ResultEntry {
 
-    private final CertId certId;
+  private final CertId certId;
 
-    public RevokeCertResultEntry(String id, CertId certId) {
-        super(id);
-        this.certId = certId;
-    }
+  public RevokeCertResultEntry(String id, CertId certId) {
+    super(id);
+    this.certId = certId;
+  }
 
-    public CertId certId() {
-        return certId;
-    }
+  public CertId certId() {
+    return certId;
+  }
 
 }

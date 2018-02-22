@@ -43,136 +43,137 @@ import org.xipki.ocsp.qa.benchmark.OcspBenchmark;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xiqa", name = "benchmark-ocsp-status",
-        description = "OCSP benchmark")
+    description = "OCSP benchmark")
 @Service
 public class BenchmarkOcspStatusCmd extends OcspStatusAction {
-    @Option(name = "--hex",
-            description = "serial number without prefix is hex number")
-    private Boolean hex = Boolean.FALSE;
+  @Option(name = "--hex",
+      description = "serial number without prefix is hex number")
+  private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--serial", aliases = "-s",
-            description = "comma-separated serial numbers or ranges (like 1,3,6-10)\n"
-                    + "(exactly one of serial, serial-file and cert must be specified)")
-    private String serialNumberList;
+  @Option(name = "--serial", aliases = "-s",
+      description = "comma-separated serial numbers or ranges (like 1,3,6-10)\n"
+          + "(exactly one of serial, serial-file and cert must be specified)")
+  private String serialNumberList;
 
-    @Option(name = "--serial-file",
-            description = "file that contains serial numbers")
-    @Completion(FilePathCompleter.class)
-    private String serialNumberFile;
+  @Option(name = "--serial-file",
+      description = "file that contains serial numbers")
+  @Completion(FilePathCompleter.class)
+  private String serialNumberFile;
 
-    @Option(name = "--cert", multiValued = true,
-            description = "certificate\n(multi-valued)")
-    @Completion(FilePathCompleter.class)
-    private List<String> certFiles;
+  @Option(name = "--cert", multiValued = true,
+      description = "certificate\n(multi-valued)")
+  @Completion(FilePathCompleter.class)
+  private List<String> certFiles;
 
-    @Option(name = "--duration",
-            description = "duration")
-    private String duration = "30s";
+  @Option(name = "--duration",
+      description = "duration")
+  private String duration = "30s";
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    @Option(name = "--analyze-response",
-            description = "whether to analyze the received OCSP response")
-    private Boolean analyzeResponse = Boolean.FALSE;
+  @Option(name = "--analyze-response",
+      description = "whether to analyze the received OCSP response")
+  private Boolean analyzeResponse = Boolean.FALSE;
 
-    @Option(name = "--url", required = true,
-            description = "OCSP responder URL\n(required)")
-    private String serverUrl;
+  @Option(name = "--url", required = true,
+      description = "OCSP responder URL\n(required)")
+  private String serverUrl;
 
-    @Option(name = "--max-num",
-            description = "maximal number of OCSP queries\n0 for unlimited")
-    private Integer maxRequests = 0;
+  @Option(name = "--max-num",
+      description = "maximal number of OCSP queries\n0 for unlimited")
+  private Integer maxRequests = 0;
 
-    @Option(name = "--queue-size",
-            description = "Number of maximal HTTP requests in the sending queue\n"
-                    + "0 for implemention default")
-    private Integer queueSize = 0;
+  @Option(name = "--queue-size",
+      description = "Number of maximal HTTP requests in the sending queue\n"
+          + "0 for implemention default")
+  private Integer queueSize = 0;
 
-    @Override
-    protected Object execute0() throws Exception {
-        int ii = 0;
-        if (serialNumberList != null) {
-            ii++;
+  @Override
+  protected Object execute0() throws Exception {
+    int ii = 0;
+    if (serialNumberList != null) {
+      ii++;
+    }
+
+    if (serialNumberFile != null) {
+      ii++;
+    }
+
+    if (CollectionUtil.isNonEmpty(certFiles)) {
+      ii++;
+    }
+
+    if (ii != 1) {
+      throw new IllegalCmdParamException(
+          "exactly one of serial, serial-file and cert must be specified");
+    }
+
+    if (numThreads < 1) {
+      throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+    }
+
+    Iterator<BigInteger> serialNumberIterator;
+
+    if (serialNumberFile != null) {
+      serialNumberIterator = new FileBigIntegerIterator(
+          IoUtil.expandFilepath(serialNumberFile), hex, true);
+    } else {
+      List<BigIntegerRange> serialNumbers = new LinkedList<>();
+      if (serialNumberList != null) {
+        StringTokenizer st = new StringTokenizer(serialNumberList, ", ");
+        while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          StringTokenizer st2 = new StringTokenizer(token, "-");
+          BigInteger from = toBigInt(st2.nextToken(), hex);
+          BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
+          serialNumbers.add(new BigIntegerRange(from, to));
         }
-
-        if (serialNumberFile != null) {
-            ii++;
-        }
-
-        if (CollectionUtil.isNonEmpty(certFiles)) {
-            ii++;
-        }
-
-        if (ii != 1) {
+      } else  if (certFiles != null) {
+        for (String certFile : certFiles) {
+          X509Certificate cert;
+          try {
+            cert = X509Util.parseCert(certFile);
+          } catch (Exception ex) {
             throw new IllegalCmdParamException(
-                    "exactly one of serial, serial-file and cert must be specified");
+                "invalid certificate file  '" + certFile + "'", ex);
+          }
+          BigInteger serial = cert.getSerialNumber();
+          serialNumbers.add(new BigIntegerRange(serial, serial));
         }
+      }
 
-        if (numThreads < 1) {
-            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-        }
+      serialNumberIterator = new RangeBigIntegerIterator(serialNumbers, true);
+    }
 
-        Iterator<BigInteger> serialNumberIterator;
+    try {
+      String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
+          "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests,
+          "\nhash: ", hashAlgo);
 
-        if (serialNumberFile != null) {
-            serialNumberIterator = new FileBigIntegerIterator(
-                    IoUtil.expandFilepath(serialNumberFile), hex, true);
-        } else {
-            List<BigIntegerRange> serialNumbers = new LinkedList<>();
-            if (serialNumberList != null) {
-                StringTokenizer st = new StringTokenizer(serialNumberList, ", ");
-                while (st.hasMoreTokens()) {
-                    String token = st.nextToken();
-                    StringTokenizer st2 = new StringTokenizer(token, "-");
-                    BigInteger from = toBigInt(st2.nextToken(), hex);
-                    BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
-                    serialNumbers.add(new BigIntegerRange(from, to));
-                }
-            } else  if (certFiles != null) {
-                for (String certFile : certFiles) {
-                    X509Certificate cert;
-                    try {
-                        cert = X509Util.parseCert(certFile);
-                    } catch (Exception ex) {
-                        throw new IllegalCmdParamException(
-                                "invalid certificate file  '" + certFile + "'", ex);
-                    }
-                    BigInteger serial = cert.getSerialNumber();
-                    serialNumbers.add(new BigIntegerRange(serial, serial));
-                }
-            }
+      Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
 
-            serialNumberIterator = new RangeBigIntegerIterator(serialNumbers, true);
-        }
+      RequestOptions options = getRequestOptions();
+      OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
+          serialNumberIterator, maxRequests, analyzeResponse, queueSize,
+          description.toString());
+      loadTest.setDuration(duration);
+      loadTest.setThreads(numThreads);
+      loadTest.test();
+    } finally {
+      if (serialNumberIterator instanceof FileBigIntegerIterator) {
+        ((FileBigIntegerIterator) serialNumberIterator).close();
+      }
+    }
 
-        try {
-            String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
-                    "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests,
-                    "\nhash: ", hashAlgo);
-
-            Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
-
-            RequestOptions options = getRequestOptions();
-            OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
-                    serialNumberIterator, maxRequests, analyzeResponse, queueSize,
-                    description.toString());
-            loadTest.setDuration(duration);
-            loadTest.setThreads(numThreads);
-            loadTest.test();
-        } finally {
-            if (serialNumberIterator instanceof FileBigIntegerIterator) {
-                ((FileBigIntegerIterator) serialNumberIterator).close();
-            }
-        }
-
-        return null;
-    } // end execute0
+    return null;
+  } // end execute0
 
 }
