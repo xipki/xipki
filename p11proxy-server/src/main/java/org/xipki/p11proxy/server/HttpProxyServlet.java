@@ -37,62 +37,63 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class HttpProxyServlet extends AbstractHttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpProxyServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpProxyServlet.class);
 
-    private static final String REQUEST_MIMETYPE = "application/x-xipki-pkcs11";
+  private static final String REQUEST_MIMETYPE = "application/x-xipki-pkcs11";
 
-    private static final String RESPONSE_MIMETYPE = "application/x-xipki-pkcs11";
+  private static final String RESPONSE_MIMETYPE = "application/x-xipki-pkcs11";
 
-    private final P11ProxyResponder responder;
+  private final P11ProxyResponder responder;
 
-    private LocalP11CryptServicePool localP11CryptServicePool;
+  private LocalP11CryptServicePool localP11CryptServicePool;
 
-    public HttpProxyServlet() {
-        responder = new P11ProxyResponder();
+  public HttpProxyServlet() {
+    responder = new P11ProxyResponder();
+  }
+
+  @Override
+  public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+      SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
+    HttpVersion version = request.protocolVersion();
+    HttpMethod method = request.method();
+
+    if (method != HttpMethod.POST) {
+      return createErrorResponse(version, METHOD_NOT_ALLOWED);
     }
 
-    @Override
-    public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
-        HttpVersion version = request.protocolVersion();
-        HttpMethod method = request.method();
+    try {
+      if (!REQUEST_MIMETYPE.equalsIgnoreCase(
+          request.headers().get("Content-Type"))) {
+        return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
+      }
 
-        if (method != HttpMethod.POST) {
-            return createErrorResponse(version, METHOD_NOT_ALLOWED);
-        }
+      if (localP11CryptServicePool == null) {
+        LOG.error("localP11CryptService in servlet not configured");
+        return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+      }
 
-        try {
-            if (!REQUEST_MIMETYPE.equalsIgnoreCase(
-                    request.headers().get("Content-Type"))) {
-                return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
-            }
-
-            if (localP11CryptServicePool == null) {
-                LOG.error("localP11CryptService in servlet not configured");
-                return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            byte[] requestBytes = readContent(request);
-            byte[] responseBytes = responder.processRequest(localP11CryptServicePool, requestBytes);
-            return createOKResponse(version, RESPONSE_MIMETYPE, responseBytes);
-        } catch (Throwable th) {
-            if (th instanceof EOFException) {
-                LogUtil.warn(LOG, th, "connection reset by peer");
-            } else {
-                LOG.error("Throwable thrown, this should not happen.", th);
-            }
-            return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        }
-    } // method service
-
-    public void setLocalP11CryptServicePool(LocalP11CryptServicePool localP11CryptServicePool) {
-        this.localP11CryptServicePool = localP11CryptServicePool;
+      byte[] requestBytes = readContent(request);
+      byte[] responseBytes = responder.processRequest(localP11CryptServicePool, requestBytes);
+      return createOKResponse(version, RESPONSE_MIMETYPE, responseBytes);
+    } catch (Throwable th) {
+      if (th instanceof EOFException) {
+        LogUtil.warn(LOG, th, "connection reset by peer");
+      } else {
+        LOG.error("Throwable thrown, this should not happen.", th);
+      }
+      return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
     }
+  } // method service
+
+  public void setLocalP11CryptServicePool(LocalP11CryptServicePool localP11CryptServicePool) {
+    this.localP11CryptServicePool = localP11CryptServicePool;
+  }
 
 }
