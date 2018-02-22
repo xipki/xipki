@@ -473,7 +473,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     if (CollectionUtil.isNonEmpty(reqIdIdMap)) {
       for (BigInteger reqId : reqIdIdMap.keySet()) {
-        ErrorResultEntry ere = 
+        ErrorResultEntry ere =
             new ErrorResultEntry(reqIdIdMap.get(reqId), ClientErrorCode.PKISTATUS_NO_ANSWER);
         result.addResultEntry(ere);
       }
@@ -756,7 +756,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
       throw new RuntimeException("could not create XML document builder", ex);
     }
   }
-  
+
   private static Extensions getCertTempExtensions(byte[] authorityKeyIdentifier)
       throws CmpRequestorException {
     AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(authorityKeyIdentifier);

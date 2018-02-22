@@ -31,7 +31,7 @@ public class XiOCSPReqBuilder {
   private Extensions requestExtensions = null;
 
   private class RequestObject {
-    CertID   certId;
+    CertID certId;
     Extensions  extensions;
 
     public RequestObject(CertID certId, Extensions  extensions) {
@@ -50,7 +50,7 @@ public class XiOCSPReqBuilder {
    * @param certId certificate ID of interest
    * @return a reference to this object.
    */
-  public XiOCSPReqBuilder addRequest(CertID   certId) {
+  public XiOCSPReqBuilder addRequest(CertID certId) {
     list.add(new RequestObject(certId, null));
 
     return this;
@@ -63,7 +63,7 @@ public class XiOCSPReqBuilder {
    * @param singleRequestExtensions the extensions to attach to the request
    * @return a reference to this object.
    */
-  public XiOCSPReqBuilder addRequest(CertID   certId, Extensions singleRequestExtensions) {
+  public XiOCSPReqBuilder addRequest(CertID certId, Extensions singleRequestExtensions) {
     list.add(new RequestObject(certId, singleRequestExtensions));
 
     return this;
@@ -107,8 +107,7 @@ public class XiOCSPReqBuilder {
       }
     }
 
-    TBSRequest tbsReq = new TBSRequest(requestorName, new DERSequence(requests),
-        requestExtensions);
+    TBSRequest tbsReq = new TBSRequest(requestorName, new DERSequence(requests), requestExtensions);
 
     Signature signature = null;
 

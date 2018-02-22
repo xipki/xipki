@@ -77,8 +77,7 @@ public class RevokeCertCmd extends UnRevRemoveCertAction {
       X509Certificate cert = X509Util.parseCert(certFile);
       RequestResponseDebug debug = getRequestResponseDebug();
       try {
-        certIdOrError = caClient.revokeCert(caName, cert, crlReason.code(),
-            invalidityDate, debug);
+        certIdOrError = caClient.revokeCert(caName, cert, crlReason.code(), invalidityDate, debug);
       } finally {
         saveRequestResponse(debug);
       }

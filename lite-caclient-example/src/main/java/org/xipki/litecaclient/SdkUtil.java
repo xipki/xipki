@@ -68,8 +68,7 @@ public class SdkUtil {
     requireNonNull("certStream", certStream);
     X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
     if (cert == null) {
-      throw new CertificateEncodingException(
-          "the given one is not a valid X.509 certificate");
+      throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
     }
     return cert;
   }

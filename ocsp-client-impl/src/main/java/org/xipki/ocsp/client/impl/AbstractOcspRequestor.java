@@ -182,8 +182,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     try {
       encodedReq = ocspReq.getEncoded();
     } catch (IOException ex) {
-      throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(),
-          ex);
+      throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(), ex);
     }
 
     RequestResponsePair msgPair = null;
@@ -231,11 +230,11 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     BasicOCSPResp basicOcspResp = (BasicOCSPResp) respObject;
 
     if (nonce != null) {
-      Extension nonceExtn = basicOcspResp.getExtension(
-          OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+      Extension nonceExtn = basicOcspResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
       if (nonceExtn == null) {
         throw new OcspNonceUnmatchedException(nonce, null);
       }
+
       byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
       if (!Arrays.equals(nonce, receivedNonce)) {
         throw new OcspNonceUnmatchedException(nonce, receivedNonce);
@@ -244,8 +243,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     SingleResp[] singleResponses = basicOcspResp.getResponses();
     if (singleResponses == null || singleResponses.length == 0) {
-      String msg = StringUtil.concat(
-          "response with no singleResponse is returned, expected is ",
+      String msg = StringUtil.concat("response with no singleResponse is returned, expected is ",
           Integer.toString(serialNumbers.length));
       throw new OcspTargetUnmatchedException(msg);
     }
@@ -259,8 +257,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       throw new OcspTargetUnmatchedException(msg);
     }
 
-    Request reqAt0 =
-        Request.getInstance(ocspReq.getTbsRequest().getRequestList().getObjectAt(0));
+    Request reqAt0 = Request.getInstance(ocspReq.getTbsRequest().getRequestList().getObjectAt(0));
 
     CertID certId = reqAt0.getReqCert();
     ASN1ObjectIdentifier issuerHashAlg = certId.getHashAlgorithm().getAlgorithm();
@@ -301,12 +298,10 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         BigInteger serialNumber = cid.getSerialNumber();
         if (!tmpSerials2.remove(serialNumber)) {
           if (tmpSerials1.contains(serialNumber)) {
-            throw new OcspTargetUnmatchedException("serialNumber "
-                + LogUtil.formatCsn(serialNumber)
+            throw new OcspTargetUnmatchedException("serialNumber " + LogUtil.formatCsn(serialNumber)
                 + "is contained in at least two singleResponses");
           } else {
-            throw new OcspTargetUnmatchedException(
-                "serialNumber " + LogUtil.formatCsn(serialNumber)
+            throw new OcspTargetUnmatchedException("serialNumber " + LogUtil.formatCsn(serialNumber)
                 + " specified in singleResponse[" + i + "] is not requested");
           }
         }
@@ -367,8 +362,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
       for (BigInteger serialNumber : serialNumbers) {
-        CertID certId = new CertID(hashAlgo.algorithmIdentifier(),
-            issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
+        CertID certId = new CertID(hashAlgo.algorithmIdentifier(), issuerNameHash, issuerKeyHash,
+            new ASN1Integer(serialNumber));
 
         reqBuilder.addRequest(certId);
       }
@@ -395,8 +390,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             }
 
             try {
-              signer = securityFactory().createSigner(signerType,
-                  new SignerConf(signerConf), cert);
+              signer = securityFactory().createSigner(signerType, new SignerConf(signerConf), cert);
             } catch (Exception ex) {
               throw new OcspRequestorException("could not create signer: "
                   + ex.getMessage());

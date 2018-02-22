@@ -48,8 +48,7 @@ public class RequestOptions {
   static {
     String[] algoNames = {"SHA1WITHRSA", "SHA256WITHRSA", "SHA384WITHRSA", "SHA512WITHRSA",
       "SHA1WITHECDSA", "SHA256WITHECDSA", "SHA384WITHECDSA", "SHA512WITHECDSA",
-      "SHA1WITHRSAANDMGF1", "SHA256WITHRSAANDMGF1", "SHA384WITHRSAANDMGF1",
-      "SHA512WITHRSAANDMGF1"};
+      "SHA1WITHRSAANDMGF1", "SHA256WITHRSAANDMGF1", "SHA384WITHRSAANDMGF1", "SHA512WITHRSAANDMGF1"};
 
     for (String algoName : algoNames) {
       SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
@@ -118,8 +117,7 @@ public class RequestOptions {
       }
 
       if (this.preferredSignatureAlgorithms == null) {
-        this.preferredSignatureAlgorithms = new ArrayList<>(
-            preferredSignatureAlgoNames.length);
+        this.preferredSignatureAlgorithms = new ArrayList<>(preferredSignatureAlgoNames.length);
       }
       this.preferredSignatureAlgorithms.add(sigAlgId);
     }
@@ -160,10 +158,8 @@ public class RequestOptions {
       algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
     } else if ("SHA512WITHECDSA".equals(algoName)) {
       algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-    } else if ("SHA1WITHRSAANDMGF1".equals(algoName)
-        || "SHA256WITHRSAANDMGF1".equals(algoName)
-        || "SHA384WITHRSAANDMGF1".equals(algoName)
-        || "SHA512WITHRSAANDMGF1".equals(algoName)) {
+    } else if ("SHA1WITHRSAANDMGF1".equals(algoName) || "SHA256WITHRSAANDMGF1".equals(algoName)
+        || "SHA384WITHRSAANDMGF1".equals(algoName) || "SHA512WITHRSAANDMGF1".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
     } else {
       throw new RuntimeException("Unsupported algorithm " + algoName); // should not happen

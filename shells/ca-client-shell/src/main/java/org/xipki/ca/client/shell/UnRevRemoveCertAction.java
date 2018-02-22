@@ -95,7 +95,7 @@ public abstract class UnRevRemoveCertAction extends ClientAction {
     } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException
         | NoSuchProviderException ex) {
       return "could not verify the signature of given certificate by the issuer: "
-          + ex.getMessage();
+                + ex.getMessage();
     }
 
     return null;

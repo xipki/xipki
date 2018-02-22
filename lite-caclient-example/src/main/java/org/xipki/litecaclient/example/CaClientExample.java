@@ -98,12 +98,10 @@ public class CaClientExample {
   }
 
   protected static String expandPath(String path) {
-    return path.startsWith("~")
-        ? System.getProperty("user.home") + path.substring(1) : path;
+    return path.startsWith("~") ? System.getProperty("user.home") + path.substring(1) : path;
   }
 
-  protected static MyKeypair generateRsaKeypair()
-      throws Exception {
+  protected static MyKeypair generateRsaKeypair() throws Exception {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
     kpGen.initialize(2048);
 
@@ -111,15 +109,13 @@ public class CaClientExample {
     RSAPublicKey pubKey = (RSAPublicKey) kp.getPublic();
 
     SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(
-        new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
-            DERNull.INSTANCE),
+        new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
         new org.bouncycastle.asn1.pkcs.RSAPublicKey(pubKey.getModulus(),
             pubKey.getPublicExponent()));
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
   }
 
-  protected static MyKeypair generateEcKeypair()
-      throws GeneralSecurityException {
+  protected static MyKeypair generateEcKeypair() throws GeneralSecurityException {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("EC");
     ECGenParameterSpec spec = new ECGenParameterSpec("secp256r1");
     kpGen.initialize(spec);

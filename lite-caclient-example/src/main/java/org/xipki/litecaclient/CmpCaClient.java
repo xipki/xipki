@@ -158,31 +158,25 @@ public class CmpCaClient {
     this.responderCert = SdkUtil.requireNonNull("responderCert", responderCert);
     this.random = new SecureRandom();
 
-    X500Name x500Name = X500Name.getInstance(
-        requestorCert.getSubjectX500Principal().getEncoded());
+    X500Name x500Name = X500Name.getInstance(requestorCert.getSubjectX500Principal().getEncoded());
     this.requestorSubject = new GeneralName(x500Name);
 
-    X500Name subject = X500Name.getInstance(
-        responderCert.getSubjectX500Principal().getEncoded());
+    X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
     this.responderSubject = new GeneralName(subject);
     this.requestorSigner = buildSigner(requestorKey);
 
-    ASN1ObjectIdentifier[] oids = {
-      PKCSObjectIdentifiers.sha256WithRSAEncryption,
-      PKCSObjectIdentifiers.sha384WithRSAEncryption,
-      PKCSObjectIdentifiers.sha512WithRSAEncryption,
-      X9ObjectIdentifiers.ecdsa_with_SHA256,  X9ObjectIdentifiers.ecdsa_with_SHA384,
-      X9ObjectIdentifiers.ecdsa_with_SHA512,
-      NISTObjectIdentifiers.dsa_with_sha256, NISTObjectIdentifiers.dsa_with_sha384,
-      NISTObjectIdentifiers.dsa_with_sha512};
+    ASN1ObjectIdentifier[] oids = {PKCSObjectIdentifiers.sha256WithRSAEncryption,
+      PKCSObjectIdentifiers.sha384WithRSAEncryption, PKCSObjectIdentifiers.sha512WithRSAEncryption,
+      X9ObjectIdentifiers.ecdsa_with_SHA256, X9ObjectIdentifiers.ecdsa_with_SHA384,
+      X9ObjectIdentifiers.ecdsa_with_SHA512, NISTObjectIdentifiers.dsa_with_sha256,
+      NISTObjectIdentifiers.dsa_with_sha384, NISTObjectIdentifiers.dsa_with_sha512};
     for (ASN1ObjectIdentifier oid : oids) {
       trustedProtectionAlgOids.add(oid.getId());
     }
 
     if (caCert != null) {
       this.caCert = caCert;
-      this.caSubject = X500Name.getInstance(
-          caCert.getSubjectX500Principal().getEncoded());
+      this.caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
       this.caSubjectKeyIdentifier = SdkUtil.extractSki(caCert);
     }
   }
@@ -251,12 +245,10 @@ public class CmpCaClient {
 
     if (PKIBody.TYPE_ERROR == bodyType) {
       ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
-      throw new Exception("Server returned PKIStatus: "
-          + buildText(content.getPKIStatusInfo()));
+      throw new Exception("Server returned PKIStatus: " + buildText(content.getPKIStatusInfo()));
     } else if (PKIBody.TYPE_GEN_REP != bodyType) {
-      throw new Exception(String.format(
-          "unknown PKI body type %s instead the expected [%s, %s]", bodyType,
-          PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
+      throw new Exception(String.format("unknown PKI body type %s instead the expected [%s, %s]",
+          bodyType, PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
     }
 
     GenRepContent genRep = GenRepContent.getInstance(respBody.getContent());
@@ -279,7 +271,7 @@ public class CmpCaClient {
   } // method extractGeneralRepContent
 
   private boolean verifyProtection(GeneralPKIMessage pkiMessage)
-      throws CMPException, InvalidKeyException, OperatorCreationException {
+      throws CMPException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {
@@ -316,8 +308,7 @@ public class CmpCaClient {
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
 
-    DigestAlgorithmIdentifierFinder digAlgFinder =
-        new DefaultDigestAlgorithmIdentifierFinder();
+    DigestAlgorithmIdentifierFinder digAlgFinder = new DefaultDigestAlgorithmIdentifierFinder();
     BcContentVerifierProviderBuilder builder;
     if ("RSA".equals(keyAlg)) {
       builder = new BcRSAContentVerifierProviderBuilder(digAlgFinder);
@@ -391,12 +382,10 @@ public class CmpCaClient {
 
     if (PKIBody.TYPE_ERROR == bodyType) {
       ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
-      throw new Exception("Server returned PKIStatus: "
-          + buildText(content.getPKIStatusInfo()));
+      throw new Exception("Server returned PKIStatus: " + buildText(content.getPKIStatusInfo()));
     } else if (PKIBody.TYPE_CERT_REP != bodyType) {
-      throw new Exception(String.format(
-          "unknown PKI body type %s instead the expected [%s, %s]", bodyType,
-          PKIBody.TYPE_CERT_REP, PKIBody.TYPE_ERROR));
+      throw new Exception(String.format("unknown PKI body type %s instead the expected [%s, %s]",
+          bodyType, PKIBody.TYPE_CERT_REP, PKIBody.TYPE_ERROR));
     }
 
     CertRepMessage certRep = CertRepMessage.getInstance(respBody.getContent());
@@ -469,9 +458,8 @@ public class CmpCaClient {
     PKIStatusInfo[] statuses = content.getStatus();
     int statusesLen = (statuses == null) ? 0 : statuses.length;
     if (statusesLen != 1) {
-      throw new Exception(String.format(
-        "incorrect number of status entries in response '%s' instead the expected '1'",
-        statusesLen));
+      throw new Exception(String.format("incorrect number of status entries in response '%s'"
+          + " instead the expected '1'", statusesLen));
     }
 
     PKIStatusInfo statusInfo = statuses[0];
@@ -551,8 +539,7 @@ public class CmpCaClient {
 
     ASN1Enumerated asn1Reason = new ASN1Enumerated(reason.getValue().intValue());
     Extensions exts = new Extensions(
-        new Extension(Extension.reasonCode, true,
-            new DEROctetString(asn1Reason.getEncoded())));
+        new Extension(Extension.reasonCode, true, new DEROctetString(asn1Reason.getEncoded())));
     RevDetails revDetails = new RevDetails(certTempBuilder.build(), exts);
 
     RevReqContent content = new RevReqContent(revDetails);
@@ -578,8 +565,7 @@ public class CmpCaClient {
     }
   } // method verify
 
-  public boolean unrevokeCert(BigInteger serialNumber)
-      throws Exception {
+  public boolean unrevokeCert(BigInteger serialNumber) throws Exception {
     return revokeCert(serialNumber, CRLReason.lookup(CRLReason.removeFromCRL));
   }
 
@@ -611,8 +597,7 @@ public class CmpCaClient {
     }
     if (!isValidContentType) {
       inputStream.close();
-      throw new IOException("bad response: mime type " + responseContentType
-          + " not supported!");
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
     return SdkUtil.read(inputStream);

@@ -407,7 +407,7 @@ abstract class CmpRequestor {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {
-      LOG.warn("NOT_SIGNAUTRE_BASED: {}", 
+      LOG.warn("NOT_SIGNAUTRE_BASED: {}",
           pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
       return new ProtectionVerificationResult(null, ProtectionResult.NOT_SIGNATURE_BASED);
     }

@@ -56,8 +56,7 @@ public class RestCaClient {
 
   public RestCaClient(String caUrl, String user, String password) throws Exception {
     this.caUrl = new URL(SdkUtil.requireNonBlank("caUrl", caUrl)).toString();
-    this.authorization = Base64.getEncoder().encodeToString(
-        (user + ":" + password).getBytes());
+    this.authorization = Base64.getEncoder().encodeToString((user + ":" + password).getBytes());
   }
 
   public void init() throws Exception {
@@ -132,38 +131,37 @@ public class RestCaClient {
   } // method verify
 
   private boolean simpleHttpGet(String url) throws IOException {
-    HttpURLConnection httpUrlConnection = SdkUtil.openHttpConn(new URL(url));
-    httpUrlConnection.setDoOutput(true);
-    httpUrlConnection.setUseCaches(false);
+    HttpURLConnection conn = SdkUtil.openHttpConn(new URL(url));
+    conn.setDoOutput(true);
+    conn.setUseCaches(false);
 
-    httpUrlConnection.setRequestMethod("GET");
-    httpUrlConnection.setRequestProperty("Authorization", "Basic " + authorization);
+    conn.setRequestMethod("GET");
+    conn.setRequestProperty("Authorization", "Basic " + authorization);
 
-    int responseCode = httpUrlConnection.getResponseCode();
+    int responseCode = conn.getResponseCode();
     boolean ok = (responseCode == HttpURLConnection.HTTP_OK);
     if (!ok) {
-      LOG.warn("bad response: " + httpUrlConnection.getResponseCode() + "    "
-          + httpUrlConnection.getResponseMessage());
+      LOG.warn("bad response: {}    {}", conn.getResponseCode(), conn.getResponseMessage());
     }
     return ok;
   } // method send
 
   private byte[] httpGet(String url, String responseCt) throws IOException {
-    HttpURLConnection httpUrlConnection = SdkUtil.openHttpConn(new URL(url));
-    httpUrlConnection.setDoOutput(true);
-    httpUrlConnection.setUseCaches(false);
+    HttpURLConnection conn = SdkUtil.openHttpConn(new URL(url));
+    conn.setDoOutput(true);
+    conn.setUseCaches(false);
 
-    httpUrlConnection.setRequestMethod("GET");
-    httpUrlConnection.setRequestProperty("Authorization", "Basic " + authorization);
+    conn.setRequestMethod("GET");
+    conn.setRequestProperty("Authorization", "Basic " + authorization);
 
-    InputStream inputStream = httpUrlConnection.getInputStream();
-    if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+    InputStream inputStream = conn.getInputStream();
+    if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
       inputStream.close();
-      throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
-          + httpUrlConnection.getResponseMessage());
+      throw new IOException("bad response: " + conn.getResponseCode() + "    "
+          + conn.getResponseMessage());
     }
 
-    String responseContentType = httpUrlConnection.getContentType();
+    String responseContentType = conn.getContentType();
     boolean isValidContentType = false;
     if (responseContentType != null) {
       if (responseContentType.equalsIgnoreCase(responseCt)) {
@@ -173,8 +171,7 @@ public class RestCaClient {
 
     if (!isValidContentType) {
       inputStream.close();
-      throw new IOException("bad response: mime type " + responseContentType
-          + " not supported!");
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
     return SdkUtil.read(inputStream);
@@ -214,8 +211,7 @@ public class RestCaClient {
 
     if (!isValidContentType) {
       inputStream.close();
-      throw new IOException("bad response: mime type " + responseContentType
-          + " not supported!");
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
     return SdkUtil.read(inputStream);

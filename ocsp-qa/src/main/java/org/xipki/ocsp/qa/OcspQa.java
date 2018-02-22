@@ -168,8 +168,8 @@ public class OcspQa {
 
     // check the signature if available
     if (noSigVerify) {
-      issue = new ValidationIssue("OCSP.SIG", hasSignature
-          ? "signature presence (Ignore)" : "signature presence");
+      issue = new ValidationIssue("OCSP.SIG",
+          (hasSignature ? "signature presence (Ignore)" : "signature presence"));
     } else {
       issue = new ValidationIssue("OCSP.SIG", "signature presence");
     }
@@ -239,8 +239,7 @@ public class OcspQa {
         }
 
         if (respSigner == null) {
-          sigSignerCertIssue.setFailureMessage(
-              "no responder certificate match the ResponderId");
+          sigSignerCertIssue.setFailureMessage("no responder certificate match the ResponderId");
           sigValIssue.setFailureMessage("could not find certificate matching the"
               + " ResponderId to validate signature");
         }
@@ -312,9 +311,8 @@ public class OcspQa {
         encodedCert = encodedCerts.get(serialNumber);
       }
 
-      List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash,
-          expectedStatus, encodedCert, expectedRevTime, extendedRevoke,
-          responseOption.nextUpdateOccurrence(),
+      List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash, expectedStatus,
+          encodedCert, expectedRevTime, extendedRevoke, responseOption.nextUpdateOccurrence(),
           responseOption.certhashOccurrence(), responseOption.certhashAlgId());
       resultIssues.addAll(issues);
     } // end for
@@ -324,9 +322,8 @@ public class OcspQa {
 
   private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
       IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
-      Date expectedRevTime, boolean extendedRevoke,
-      Occurrence nextupdateOccurrence, Occurrence certhashOccurrence,
-      ASN1ObjectIdentifier certhashAlg) {
+      Date expectedRevTime, boolean extendedRevoke, Occurrence nextupdateOccurrence,
+      Occurrence certhashOccurrence, ASN1ObjectIdentifier certhashAlg) {
     if (expectedStatus == OcspCertStatus.unknown
         || expectedStatus == OcspCertStatus.issuerUnknown) {
       if (certhashOccurrence != Occurrence.forbidden) {
@@ -346,8 +343,7 @@ public class OcspQa {
     if (hashAlgo == null) {
       issue.setFailureMessage("unknown hash algorithm " + certId.getHashAlgOID().getId());
     } else {
-      if (!issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
-          certId.getIssuerKeyHash())) {
+      if (!issuerHash.match(hashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash())) {
         issue.setFailureMessage("issuer not match");
       }
     }
@@ -368,8 +364,7 @@ public class OcspQa {
 
       if (revStatus.hasRevocationReason()) {
         int reason = revStatus.getRevocationReason();
-        if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code()
-            && revTimeSec == 0) {
+        if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code() && revTimeSec == 0) {
           status = OcspCertStatus.unknown;
           revTimeSec = null;
         } else {
@@ -429,8 +424,7 @@ public class OcspQa {
     issues.add(issue);
     if (expectedRevTime != null) {
       if (revTimeSec == null) {
-        issue.setFailureMessage("is='null', but expected='"
-            + formatTime(expectedRevTime) + "'");
+        issue.setFailureMessage("is='null', but expected='" + formatTime(expectedRevTime) + "'");
       } else if (revTimeSec != expectedRevTime.getTime() / 1000) {
         issue.setFailureMessage("is='" +  formatTime(new Date(revTimeSec * 1000))
             + "', but expected='" + formatTime(expectedRevTime) + "'");
@@ -440,13 +434,11 @@ public class OcspQa {
     // nextUpdate
     Date nextUpdate = singleResp.getNextUpdate();
     issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE",
-          nextUpdate, nextupdateOccurrence);
+        nextUpdate, nextupdateOccurrence);
     issues.add(issue);
 
-    Extension extension = singleResp.getExtension(
-        ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-    issue = checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH",
-          extension, certhashOccurrence);
+    Extension extension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
+    issue = checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH", extension, certhashOccurrence);
     issues.add(issue);
 
     if (extension != null) {
@@ -455,8 +447,7 @@ public class OcspQa {
       ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
       if (certhashAlg != null) {
         // certHash algorithm
-        issue = new ValidationIssue(
-            "OCSP.RESPONSE." + index + ".CHASH.ALG", "certhash algorithm");
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.ALG", "certhash algorithm");
         issues.add(issue);
 
         ASN1ObjectIdentifier is = certHash.getHashAlgorithm().getAlgorithm();
@@ -468,16 +459,15 @@ public class OcspQa {
 
       byte[] hashValue = certHash.getCertificateHash();
       if (encodedCert != null) {
-        issue = new ValidationIssue(
-            "OCSP.RESPONSE." + index + ".CHASH.VALIDITY", "certhash validity");
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.VALIDITY",
+            "certhash validity");
         issues.add(issue);
 
         try {
           MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
           byte[] expectedHashValue = md.digest(encodedCert);
           if (!Arrays.equals(expectedHashValue, hashValue)) {
-            issue.setFailureMessage(
-                "certhash does not match the requested certificate");
+            issue.setFailureMessage("certhash does not match the requested certificate");
           }
         } catch (NoSuchAlgorithmException ex) {
           issue.setFailureMessage("NoSuchAlgorithm " + hashAlgOid.getId());

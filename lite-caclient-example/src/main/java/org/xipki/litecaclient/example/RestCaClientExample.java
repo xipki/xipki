@@ -72,8 +72,7 @@ public class RestCaClientExample extends CaClientExample {
 
       BigInteger serialNumber = cert.getSerialNumber();
       // Suspend certificate
-      boolean flag =
-          client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.certificateHold));
+      boolean flag = client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.certificateHold));
       if (flag) {
         System.out.println("(REST) suspended certificate");
       } else {

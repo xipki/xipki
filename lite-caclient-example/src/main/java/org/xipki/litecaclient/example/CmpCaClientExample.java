@@ -38,15 +38,13 @@ import org.xipki.litecaclient.SdkUtil;
 
 public class CmpCaClientExample extends CaClientExample {
 
-  private static final String XIPKI_DIR =
-      "~/source/xipki/dist/xipki-pki/target/xipki-pki-2.2.1";
+  private static final String XIPKI_DIR = "~/source/xipki/dist/xipki-pki/target/xipki-pki-2.2.1";
 
   //private static final String CA_URL = "http://localhost:8080/cmp/myca";
 
   private static final String CA_URL = "https://localhost:8443/cmp/myca";
 
-  private static final String CA_CERT_FILE =
-      XIPKI_DIR + "/xipki/setup/keycerts/MYCA1.der";
+  private static final String CA_CERT_FILE = XIPKI_DIR + "/xipki/setup/keycerts/MYCA1.der";
 
   private static final String REQUESTOR_KEYSTORE_PASSWORD = "1234";
 
@@ -89,8 +87,7 @@ public class CmpCaClientExample extends CaClientExample {
 
       X509Certificate caCert = SdkUtil.parseCert(new File(expandPath(CA_CERT_FILE)));
 
-      X509Certificate responderCert = SdkUtil.parseCert(
-          new File(expandPath(RESPONDER_CERT_FILE)));
+      X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
       CmpCaClient client = new CmpCaClient(CA_URL, caCert, requestorKey, requestorCert,
           responderCert, HASH_ALGO);
 
@@ -125,26 +122,22 @@ public class CmpCaClientExample extends CaClientExample {
 
       // Enroll certificate via CRMF - RSA
       kp = generateRsaKeypair();
-      cert = client.requestCertViaCrmf(
-          CERT_PROFILE, kp.getPrivate(),  kp.getPublic(), getSubject());
+      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
       printCert("===== RSA via CRMF (CMP) =====", cert);
 
       // Enroll certificate via CRMF - EC
       kp = generateEcKeypair();
-      cert = client.requestCertViaCrmf(
-          CERT_PROFILE, kp.getPrivate(),  kp.getPublic(), getSubject());
+      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
       printCert("===== EC via CRMF (CMP) =====", cert);
 
       // Enroll certificate via CRMF - DSA
       kp = generateDsaKeypair();
-      cert = client.requestCertViaCrmf(
-          CERT_PROFILE, kp.getPrivate(),  kp.getPublic(), getSubject());
+      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
       printCert("===== DSA via CRMF (CMP) =====", cert);
 
       BigInteger serialNumber = cert.getSerialNumber();
       // Suspend certificate
-      boolean flag =
-          client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.certificateHold));
+      boolean flag = client.revokeCert(serialNumber, CRLReason.lookup(CRLReason.certificateHold));
       if (flag) {
         System.out.println("(CMP) suspended certificate");
       } else {

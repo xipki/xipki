@@ -53,7 +53,7 @@ public class TlsInit {
 
     @Override
     public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-        throws CertificateException {
+            throws CertificateException {
       // TODO: implement me
     }
 

@@ -117,8 +117,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
   private OcspRequestor requestor;
 
   static {
-    EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
-        "ArchiveCutoff");
+    EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
     EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
     EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
     EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
@@ -150,8 +149,8 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
    *          Map of serial number and the corresponding certificate. Could be {@code null}.
    */
   protected abstract Object processResponse(OCSPResp response, X509Certificate respIssuer,
-      IssuerHash issuerHash, List<BigInteger> serialNumbers,
-      Map<BigInteger, byte[]> encodedCerts) throws Exception;
+      IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+      throws Exception;
 
   @Override
   protected final Object execute0() throws Exception {
@@ -277,7 +276,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
     OCSPResp response;
     try {
       response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,
-        options, debug);
+          options, debug);
     } finally {
       if (debug != null && debug.size() > 0) {
         RequestResponsePair reqResp = debug.get(0);

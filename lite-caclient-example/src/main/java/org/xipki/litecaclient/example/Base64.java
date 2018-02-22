@@ -86,8 +86,7 @@ public class Base64 {
     int left = slen - elen; // 0 - 2.
     if (left > 0) {
       // Prepare the int
-      int ii = ((sarr[elen] & 0xff) << 10)
-          | (left == 2 ? ((sarr[slen - 1] & 0xff) << 2) : 0);
+      int ii = ((sarr[elen] & 0xff) << 10) | (left == 2 ? ((sarr[slen - 1] & 0xff) << 2) : 0);
 
       // Set last four chars
       darr[dlen - 4] = CA[ii >> 12];

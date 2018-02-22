@@ -179,8 +179,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
 
   @Override
   protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
-      IssuerHash issuerHash, List<BigInteger> serialNumbers,
-      Map<BigInteger, byte[]> encodedCerts) throws Exception {
+      IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+      throws Exception {
     OcspResponseOption responseOption = new OcspResponseOption();
     responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
     responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
@@ -195,9 +195,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
       ocspQa = new OcspQa(securityFactory);
     }
 
-    ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
-        encodedCerts, expectedOcspError, expectedStatuses, expecteRevTimes,
-        responseOption, noSigVerify.booleanValue());
+    ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
+        expectedOcspError, expectedStatuses, expecteRevTimes, responseOption, noSigVerify);
 
     StringBuilder sb = new StringBuilder(50);
     sb.append("OCSP response is ");

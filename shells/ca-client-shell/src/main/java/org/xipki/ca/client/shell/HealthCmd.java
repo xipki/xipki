@@ -40,8 +40,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 public class HealthCmd extends ClientAction {
 
   @Option(name = "--ca",
-      description = "CA name\n"
-          + "(required if multiple CAs are configured)")
+      description = "CA name\n(required if multiple CAs are configured)")
   @Completion(CaNameCompleter.class)
   private String caName;
 

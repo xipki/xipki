@@ -104,9 +104,8 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
 
     final int n = singleResponses.length;
     if (n != serialNumbers.size()) {
-      throw new CmdFailure("received status with " + n
-          + " single responses from server, but " + serialNumbers.size()
-          + " were requested");
+      throw new CmdFailure("received status with " + n + " single responses from server, but "
+          + serialNumbers.size() + " were requested");
     }
 
     Date[] thisUpdates = new Date[n];
@@ -159,10 +158,8 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
       }
 
       if (validOn) {
-        PublicKey responderPubKey = KeyUtil.generatePublicKey(
-            respSigner.getSubjectPublicKeyInfo());
-        ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
-            responderPubKey);
+        PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
+        ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
         boolean sigValid = basicResp.isSignatureValid(cvp);
 
         if (!sigValid) {
@@ -172,8 +169,7 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
         // verify the OCSPResponse signer
         if (respIssuer != null) {
           boolean certValid = true;
-          X509Certificate jceRespSigner = X509Util.toX509Cert(
-              respSigner.toASN1Structure());
+          X509Certificate jceRespSigner = X509Util.toX509Cert(respSigner.toASN1Structure());
           if (X509Util.issues(respIssuer, jceRespSigner)) {
             try {
               jceRespSigner.verify(respIssuer.getPublicKey());
@@ -222,8 +218,7 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
             status = "unknown (RFC6960)";
           } else {
             status = StringUtil.concatObjects("revoked, reason = ",
-                CrlReason.forReasonCode(reason).description(),
-                ", revocationTime = ", revTime,
+                CrlReason.forReasonCode(reason).description(), ", revocationTime = ", revTime,
                 (invTime == null ? "" : ", invalidityTime = " + invTime));
           }
         } else {

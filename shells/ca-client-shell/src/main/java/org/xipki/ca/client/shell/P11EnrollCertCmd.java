@@ -70,9 +70,8 @@ public class P11EnrollCertCmd extends EnrollCertAction {
       keyIdBytes = Hex.decode(keyId);
     }
 
-    SignerConf signerConf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null,
-        keyLabel, keyIdBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo),
-        signatureAlgoControl);
+    SignerConf signerConf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, keyLabel,
+        keyIdBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
   }
 

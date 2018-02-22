@@ -415,16 +415,14 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         if (saveReq) {
           byte[] bytes = reqResp.request();
           if (bytes != null) {
-            IoUtil.save(
-                new File(messageDir, filename + FILE_SEP + "request.der"), bytes);
+            IoUtil.save(new File(messageDir, filename + FILE_SEP + "request.der"), bytes);
           }
         }
 
         if (saveResp) {
           byte[] bytes = reqResp.response();
           if (bytes != null) {
-            IoUtil.save(
-                new File(messageDir, filename + FILE_SEP + "response.der"), bytes);
+            IoUtil.save(new File(messageDir, filename + FILE_SEP + "response.der"), bytes);
           }
         }
       } // end if
@@ -447,9 +445,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
     String validity = ret.isAllSuccessful() ? "valid" : "invalid";
     String hexSerial = serialNumber.toString(16);
     StringBuilder sb = new StringBuilder(50);
-    sb.append("OCSP response for ")
-      .append(serialNumber.toString())
-      .append(" (0x").append(hexSerial)
+    sb.append("OCSP response for ").append(serialNumber).append(" (0x").append(hexSerial)
       .append(") is ").append(validity);
 
     for (ValidationIssue issue : ret.validationIssues()) {

@@ -180,8 +180,8 @@ public abstract class EnrollCertAction extends ClientAction {
   private String biometricUri;
 
   @Option(name = "--need-extension", multiValued = true,
-      description = "type (OID or name) of extension that must be contained in the"
-          + " certificate\n(multi-valued)")
+      description = "type (OID or name) of extension that must be contained in the certificate\n"
+          + "(multi-valued)")
   @Completion(ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
@@ -207,8 +207,7 @@ public abstract class EnrollCertAction extends ClientAction {
 
     CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
-    ConcurrentContentSigner signer = getSigner(
-        new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
+    ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
     X509CertificateHolder ssCert = signer.getBcCertificate();
 
     X500Name x500Subject = new X500Name(subject);
@@ -333,12 +332,10 @@ public abstract class EnrollCertAction extends ClientAction {
     }
 
     if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
-      ExtensionExistence ee = new ExtensionExistence(
-          textToAsn1ObjectIdentifers(needExtensionTypes),
+      ExtensionExistence ee = new ExtensionExistence(textToAsn1ObjectIdentifers(needExtensionTypes),
           textToAsn1ObjectIdentifers(wantExtensionTypes));
-      extensions.add(
-          new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
-              ee.toASN1Primitive().getEncoded()));
+      extensions.add(new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
+                        ee.toASN1Primitive().getEncoded()));
     }
 
     if (isNotEmpty(extensions)) {
@@ -348,8 +345,8 @@ public abstract class EnrollCertAction extends ClientAction {
 
     CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
-    ProofOfPossessionSigningKeyBuilder popoBuilder
-        = new ProofOfPossessionSigningKeyBuilder(certReq);
+    ProofOfPossessionSigningKeyBuilder popoBuilder =
+        new ProofOfPossessionSigningKeyBuilder(certReq);
     ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
     POPOSigningKey popoSk;
     try {
@@ -359,8 +356,7 @@ public abstract class EnrollCertAction extends ClientAction {
     }
 
     ProofOfPossession popo = new ProofOfPossession(popoSk);
-    EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile, certReq,
-        popo);
+    EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile, certReq, popo);
     EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.Type.CERT_REQ);
     request.addRequestEntry(reqEntry);
 
@@ -389,8 +385,8 @@ public abstract class EnrollCertAction extends ClientAction {
     return null;
   } // method execute0
 
-  private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-      List<String> oidTexts) throws InvalidOidOrNameException {
+  private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts)
+      throws InvalidOidOrNameException {
     if (oidTexts == null) {
       return null;
     }
@@ -422,8 +418,8 @@ public abstract class EnrollCertAction extends ClientAction {
     if (!isName) {
       try {
         return new ASN1ObjectIdentifier(str);
-        // CHECKSTYLE:SKIP
       } catch (IllegalArgumentException ex) {
+        // CHECKSTYLE:SKIP
       }
     }
 

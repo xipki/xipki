@@ -61,8 +61,7 @@ public class DfltHttpOcspRequestor extends AbstractOcspRequestor {
       String b64Request = Base64.encodeToString(request);
       String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
       String baseUrl = responderUrl.toString();
-      String url = StringUtil.concat(baseUrl, (baseUrl.endsWith("/") ? "" : "/"),
-          urlEncodedReq);
+      String url = StringUtil.concat(baseUrl, (baseUrl.endsWith("/") ? "" : "/"), urlEncodedReq);
 
       URL newUrl = new URL(url);
       httpUrlConnection = IoUtil.openHttpConn(newUrl);
@@ -83,8 +82,7 @@ public class DfltHttpOcspRequestor extends AbstractOcspRequestor {
     InputStream inputstream = httpUrlConnection.getInputStream();
     if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
       inputstream.close();
-      throw new IOException("bad response: "
-          + httpUrlConnection.getResponseCode() + "    "
+      throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
           + httpUrlConnection.getResponseMessage());
     }
     String responseContentType = httpUrlConnection.getContentType();
@@ -96,8 +94,7 @@ public class DfltHttpOcspRequestor extends AbstractOcspRequestor {
     }
     if (!isValidContentType) {
       inputstream.close();
-      throw new IOException("bad response: mime type " + responseContentType
-          + " not supported!");
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
     return IoUtil.read(inputstream);

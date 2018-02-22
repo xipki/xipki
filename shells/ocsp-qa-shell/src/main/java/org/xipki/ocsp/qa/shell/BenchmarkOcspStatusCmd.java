@@ -155,15 +155,13 @@ public class BenchmarkOcspStatusCmd extends OcspStatusAction {
 
     try {
       String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
-          "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests,
-          "\nhash: ", hashAlgo);
+          "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests, "\nhash: ", hashAlgo);
 
       Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
 
       RequestOptions options = getRequestOptions();
       OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
-          serialNumberIterator, maxRequests, analyzeResponse, queueSize,
-          description.toString());
+          serialNumberIterator, maxRequests, analyzeResponse, queueSize, description.toString());
       loadTest.setDuration(duration);
       loadTest.setThreads(numThreads);
       loadTest.test();

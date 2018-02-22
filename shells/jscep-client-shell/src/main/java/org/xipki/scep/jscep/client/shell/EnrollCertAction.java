@@ -77,8 +77,7 @@ public abstract class EnrollCertAction extends ClientAction {
 
     PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
 
-    EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
-        getIdentityCert());
+    EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(), getIdentityCert());
     if (resp.isFailure()) {
       throw new CmdFailure("server returned 'failure'");
     }

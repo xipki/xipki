@@ -38,7 +38,7 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
   public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
       ProofOfPossession popo) {
     super(id);
-  
+
     this.certprofile = certprofile;
     this.certReq = ParamUtil.requireNonNull("certReq", certReq);
     this.popo = popo;

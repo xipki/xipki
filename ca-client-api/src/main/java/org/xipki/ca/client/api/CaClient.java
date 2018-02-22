@@ -281,7 +281,7 @@ public interface CaClient {
    *          if client error occurs.
    */
   CertIdOrError unrevokeCert(String caName, BigInteger serial, RequestResponseDebug debug)
-        throws CaClientException, PkiErrorException;
+            throws CaClientException, PkiErrorException;
 
   /**
    * Unrevoke certificates.
