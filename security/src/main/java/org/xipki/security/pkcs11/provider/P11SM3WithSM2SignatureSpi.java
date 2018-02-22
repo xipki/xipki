@@ -43,147 +43,148 @@ import org.xipki.security.util.SignerUtil;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
 
-    private long mechanism;
+  private long mechanism;
 
-    private OutputStream outputStream;
+  private OutputStream outputStream;
 
-    private P11PrivateKey signingKey;
+  private P11PrivateKey signingKey;
 
-    private XiSM2ParameterSpec paramSpec;
+  private XiSM2ParameterSpec paramSpec;
 
-    private byte[] sm2Z;
+  private byte[] sm2Z;
 
-    private P11Params p11Params;
+  private P11Params p11Params;
 
-    public P11SM3WithSM2SignatureSpi() {
+  public P11SM3WithSM2SignatureSpi() {
+  }
+
+  @Override
+  protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
+    throw new UnsupportedOperationException("engineInitVerify unsupported");
+  }
+
+  @Override
+  protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
+    if (!(privateKey instanceof P11PrivateKey)) {
+      throw new InvalidKeyException("privateKey is not instanceof "
+          + P11PrivateKey.class.getName());
     }
 
-    @Override
-    protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
-        throw new UnsupportedOperationException("engineInitVerify unsupported");
+    this.signingKey = (P11PrivateKey) privateKey;
+    if (!(signingKey.publicKey() instanceof ECPublicKey)) {
+      throw new InvalidKeyException("only EC key is allowed");
     }
 
-    @Override
-    protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
-        if (!(privateKey instanceof P11PrivateKey)) {
-            throw new InvalidKeyException("privateKey is not instanceof "
-                    + P11PrivateKey.class.getName());
-        }
-
-        this.signingKey = (P11PrivateKey) privateKey;
-        if (!(signingKey.publicKey() instanceof ECPublicKey)) {
-            throw new InvalidKeyException("only EC key is allowed");
-        }
-
-        ECPublicKey pubKey = (ECPublicKey) signingKey.publicKey();
-        if (!GMUtil.isSm2primev2Curve(pubKey.getParams().getCurve())) {
-            throw new InvalidKeyException("only EC key of curve sm2primev2 is allowed");
-        }
-
-        String algo = privateKey.getAlgorithm();
-        if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
-            throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
-        }
-
-        byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getID();
-
-        if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
-            mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
-            outputStream = new DigestOutputStream(HashAlgoType.SM3.createDigest());
-            p11Params = null;
-
-            // CHECKSTYLE:SKIP
-            ECPoint w = pubKey.getW();
-
-            sm2Z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
-                    w.getAffineX(), w.getAffineY());
-            try {
-                outputStream.write(sm2Z, 0, sm2Z.length);
-            } catch (IOException ex) {
-                throw new InvalidKeyException("could not compute Z of SM2");
-            }
-        } else if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2_SM3)) {
-            mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2_SM3;
-            outputStream = new ByteArrayOutputStream();
-            p11Params = new P11ByteArrayParams(userId);
-        } else {
-            throw new InvalidKeyException("privateKey and algorithm does not match");
-        }
-
-        this.signingKey = (P11PrivateKey) privateKey;
+    ECPublicKey pubKey = (ECPublicKey) signingKey.publicKey();
+    if (!GMUtil.isSm2primev2Curve(pubKey.getParams().getCurve())) {
+      throw new InvalidKeyException("only EC key of curve sm2primev2 is allowed");
     }
 
-    @Override
-    protected void engineUpdate(byte input) throws SignatureException {
-        try {
-            outputStream.write((int) input);
-        } catch (IOException ex) {
-            throw new SignatureException("IOException: " + ex.getMessage(), ex);
-        }
+    String algo = privateKey.getAlgorithm();
+    if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
+      throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
     }
 
-    @Override
-    protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
-        try {
-            outputStream.write(input, off, len);
-        } catch (IOException ex) {
-            throw new SignatureException("IOException: " + ex.getMessage(), ex);
-        }
+    byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getID();
+
+    if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
+      mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
+      outputStream = new DigestOutputStream(HashAlgoType.SM3.createDigest());
+      p11Params = null;
+
+      // CHECKSTYLE:SKIP
+      ECPoint w = pubKey.getW();
+
+      sm2Z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
+          w.getAffineX(), w.getAffineY());
+      try {
+        outputStream.write(sm2Z, 0, sm2Z.length);
+      } catch (IOException ex) {
+        throw new InvalidKeyException("could not compute Z of SM2");
+      }
+    } else if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2_SM3)) {
+      mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2_SM3;
+      outputStream = new ByteArrayOutputStream();
+      p11Params = new P11ByteArrayParams(userId);
+    } else {
+      throw new InvalidKeyException("privateKey and algorithm does not match");
     }
 
-    @Override
-    protected byte[] engineSign() throws SignatureException {
-        byte[] dataToSign;
-        if (outputStream instanceof ByteArrayOutputStream) {
-            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
-            ((ByteArrayOutputStream) outputStream).reset();
-        } else {
-            dataToSign = ((DigestOutputStream) outputStream).digest();
-            ((DigestOutputStream) outputStream).reset();
-            try {
-                outputStream.write(sm2Z, 0, sm2Z.length);
-            } catch (IOException ex) {
-                throw new SignatureException(ex.getMessage(), ex);
-            }
-        }
+    this.signingKey = (P11PrivateKey) privateKey;
+  }
 
-        try {
-            byte[] plainSignature = signingKey.sign(mechanism, p11Params, dataToSign);
-            return SignerUtil.dsaSigPlainToX962(plainSignature);
-        } catch (XiSecurityException | P11TokenException ex) {
-            throw new SignatureException(ex.getMessage(), ex);
-        }
+  @Override
+  protected void engineUpdate(byte input) throws SignatureException {
+    try {
+      outputStream.write((int) input);
+    } catch (IOException ex) {
+      throw new SignatureException("IOException: " + ex.getMessage(), ex);
+    }
+  }
+
+  @Override
+  protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
+    try {
+      outputStream.write(input, off, len);
+    } catch (IOException ex) {
+      throw new SignatureException("IOException: " + ex.getMessage(), ex);
+    }
+  }
+
+  @Override
+  protected byte[] engineSign() throws SignatureException {
+    byte[] dataToSign;
+    if (outputStream instanceof ByteArrayOutputStream) {
+      dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+      ((ByteArrayOutputStream) outputStream).reset();
+    } else {
+      dataToSign = ((DigestOutputStream) outputStream).digest();
+      ((DigestOutputStream) outputStream).reset();
+      try {
+        outputStream.write(sm2Z, 0, sm2Z.length);
+      } catch (IOException ex) {
+        throw new SignatureException(ex.getMessage(), ex);
+      }
     }
 
-    @Override
-    protected void engineSetParameter(AlgorithmParameterSpec params)
-            throws InvalidAlgorithmParameterException {
-        if (params instanceof XiSM2ParameterSpec) {
-            paramSpec = (XiSM2ParameterSpec)params;
-        } else {
-            throw new InvalidAlgorithmParameterException("only XiSM2ParameterSpec supported");
-        }
+    try {
+      byte[] plainSignature = signingKey.sign(mechanism, p11Params, dataToSign);
+      return SignerUtil.dsaSigPlainToX962(plainSignature);
+    } catch (XiSecurityException | P11TokenException ex) {
+      throw new SignatureException(ex.getMessage(), ex);
     }
+  }
 
-    @Override
-    protected void engineSetParameter(String param, Object value) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
+  @Override
+  protected void engineSetParameter(AlgorithmParameterSpec params)
+      throws InvalidAlgorithmParameterException {
+    if (params instanceof XiSM2ParameterSpec) {
+      paramSpec = (XiSM2ParameterSpec)params;
+    } else {
+      throw new InvalidAlgorithmParameterException("only XiSM2ParameterSpec supported");
     }
+  }
 
-    @Override
-    protected Object engineGetParameter(String param) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
-    }
+  @Override
+  protected void engineSetParameter(String param, Object value) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
 
-    @Override
-    protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
-    }
+  @Override
+  protected Object engineGetParameter(String param) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
+
+  @Override
+  protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
+    throw new UnsupportedOperationException("engineVerify unsupported");
+  }
 
 }

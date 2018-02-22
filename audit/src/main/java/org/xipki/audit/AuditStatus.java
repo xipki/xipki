@@ -20,24 +20,25 @@ package org.xipki.audit;
 import java.util.Objects;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum AuditStatus {
 
-    SUCCESSFUL,
-    FAILED,
-    UNDEFINED;
+  SUCCESSFUL,
+  FAILED,
+  UNDEFINED;
 
-    public static AuditStatus forName(String name) {
-        Objects.requireNonNull(name, "name must not be null");
-        for (AuditStatus v : values()) {
-            if (v.name().equals(name)) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditStatus " + name);
+  public static AuditStatus forName(String name) {
+    Objects.requireNonNull(name, "name must not be null");
+    for (AuditStatus v : values()) {
+      if (v.name().equals(name)) {
+        return v;
+      }
     }
+    throw new IllegalArgumentException("invalid AuditStatus " + name);
+  }
 
 }

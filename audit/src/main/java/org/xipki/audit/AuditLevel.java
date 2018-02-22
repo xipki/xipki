@@ -20,51 +20,52 @@ package org.xipki.audit;
 import java.util.Objects;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum AuditLevel {
 
-    ERROR(3, "ERROR"),
-    WARN(4,  "WARN "),
-    INFO(6,  "INFO "),
-    DEBUG(7, "DEBUG");
+  ERROR(3, "ERROR"),
+  WARN(4,  "WARN "),
+  INFO(6,  "INFO "),
+  DEBUG(7, "DEBUG");
 
-    private final int value;
+  private final int value;
 
-    private String alignedText;
+  private String alignedText;
 
-    AuditLevel(int value, String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
-    }
+  AuditLevel(int value, String alignedText) {
+    this.value = value;
+    this.alignedText = alignedText;
+  }
 
-    public int value() {
+  public int value() {
+    return value;
+  }
+
+  public static AuditLevel forName(String name) {
+    Objects.requireNonNull("name", "name must not be null");
+    for (AuditLevel value : values()) {
+      if (value.name().equals(name)) {
         return value;
+      }
     }
+    throw new IllegalArgumentException("invalid AuditLevel name " + name);
+  }
 
-    public static AuditLevel forName(String name) {
-        Objects.requireNonNull("name", "name must not be null");
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel name " + name);
+  public static AuditLevel forValue(int value) {
+    for (AuditLevel v : values()) {
+      if (v.value() == value) {
+        return v;
+      }
     }
+    throw new IllegalArgumentException("invalid AuditLevel code " + value);
+  }
 
-    public static AuditLevel forValue(int value) {
-        for (AuditLevel v : values()) {
-            if (v.value() == value) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel code " + value);
-    }
-
-    public String alignedText() {
-        return alignedText;
-    }
+  public String alignedText() {
+    return alignedText;
+  }
 
 }

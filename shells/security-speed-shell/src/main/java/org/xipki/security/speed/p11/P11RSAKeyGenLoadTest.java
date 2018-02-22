@@ -23,29 +23,30 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
-    private final int keysize;
+  private final int keysize;
 
-    private final BigInteger publicExponent;
+  private final BigInteger publicExponent;
 
-    public P11RSAKeyGenLoadTest(P11Slot slot, int keysize, BigInteger publicExponent)
-            throws Exception {
-        super(slot, "PKCS#11 RSA key generation\nkeysize: " + keysize
-                + "\npublic exponent: " + publicExponent);
-        this.keysize = keysize;
-        this.publicExponent = publicExponent;
-    }
+  public P11RSAKeyGenLoadTest(P11Slot slot, int keysize, BigInteger publicExponent)
+      throws Exception {
+    super(slot, "PKCS#11 RSA key generation\nkeysize: " + keysize
+        + "\npublic exponent: " + publicExponent);
+    this.keysize = keysize;
+    this.publicExponent = publicExponent;
+  }
 
-    @Override
-    protected void genKeypair() throws Exception {
-        P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent,
-                getDummyLabel(), getControl());
-        slot.removeIdentity(objId);
-    }
+  @Override
+  protected void genKeypair() throws Exception {
+    P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent,
+        getDummyLabel(), getControl());
+    slot.removeIdentity(objId);
+  }
 
 }

@@ -26,24 +26,25 @@ import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-ec-gen-p11",
-        description = "performance test of PKCS#11 EC key generation")
+    description = "performance test of PKCS#11 EC key generation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP11ECKeyGenCmd extends SpeedP11Action {
 
-    @Option(name = "--curve", required = true,
-            description = "EC curve name\n(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve", required = true,
+      description = "EC curve name\n(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P11ECKeyGenLoadTest(getSlot(), curveName);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P11ECKeyGenLoadTest(getSlot(), curveName);
+  }
 
 }

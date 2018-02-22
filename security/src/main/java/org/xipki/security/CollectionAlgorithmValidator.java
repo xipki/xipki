@@ -27,72 +27,73 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
-    private final Set<String> algoNames;
+  private final Set<String> algoNames;
 
-    /**
-     * constructor.
-     * @param algoNames algorithm names that can be accepted. <code>null</code> or empty to accept
-     *            all algorithms
-     * @throws NoSuchAlgorithmException if any algoName is unknown.
-     */
-    public CollectionAlgorithmValidator(Set<String> algoNames) throws NoSuchAlgorithmException {
-        Set<String> canonicalizedNames = new HashSet<>();
-        if (algoNames != null) {
-            for (String m : algoNames) {
-                canonicalizedNames.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
-            }
-        }
-        this.algoNames = Collections.unmodifiableSet(canonicalizedNames);
+  /**
+   * constructor.
+   * @param algoNames algorithm names that can be accepted. <code>null</code> or empty to accept
+   *            all algorithms
+   * @throws NoSuchAlgorithmException if any algoName is unknown.
+   */
+  public CollectionAlgorithmValidator(Set<String> algoNames) throws NoSuchAlgorithmException {
+    Set<String> canonicalizedNames = new HashSet<>();
+    if (algoNames != null) {
+      for (String m : algoNames) {
+        canonicalizedNames.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
+      }
+    }
+    this.algoNames = Collections.unmodifiableSet(canonicalizedNames);
+  }
+
+  public Set<String> algoNames() {
+    return algoNames;
+  }
+
+  @Override
+  public boolean isAlgorithmPermitted(AlgorithmIdentifier algId) {
+    ParamUtil.requireNonNull("algId", algId);
+
+    if (algoNames.isEmpty()) {
+      return true;
     }
 
-    public Set<String> algoNames() {
-        return algoNames;
+    String name;
+    try {
+      name = AlgorithmUtil.getSignatureAlgoName(algId);
+    } catch (NoSuchAlgorithmException ex) {
+      return false;
     }
 
-    @Override
-    public boolean isAlgorithmPermitted(AlgorithmIdentifier algId) {
-        ParamUtil.requireNonNull("algId", algId);
+    return algoNames.contains(name);
+  }
 
-        if (algoNames.isEmpty()) {
-            return true;
-        }
+  @Override
+  public boolean isAlgorithmPermitted(String algoName) {
+    ParamUtil.requireNonBlank("algoName", algoName);
 
-        String name;
-        try {
-            name = AlgorithmUtil.getSignatureAlgoName(algId);
-        } catch (NoSuchAlgorithmException ex) {
-            return false;
-        }
-
-        return algoNames.contains(name);
+    if (algoNames.isEmpty()) {
+      return true;
     }
 
-    @Override
-    public boolean isAlgorithmPermitted(String algoName) {
-        ParamUtil.requireNonBlank("algoName", algoName);
-
-        if (algoNames.isEmpty()) {
-            return true;
-        }
-
-        if (algoNames.contains(algoName)) {
-            return true;
-        }
-
-        String name;
-        try {
-            name = AlgorithmUtil.canonicalizeSignatureAlgo(algoName);
-        } catch (NoSuchAlgorithmException ex) {
-            return false;
-        }
-
-        return algoNames.contains(name);
+    if (algoNames.contains(algoName)) {
+      return true;
     }
+
+    String name;
+    try {
+      name = AlgorithmUtil.canonicalizeSignatureAlgo(algoName);
+    } catch (NoSuchAlgorithmException ex) {
+      return false;
+    }
+
+    return algoNames.contains(name);
+  }
 
 }

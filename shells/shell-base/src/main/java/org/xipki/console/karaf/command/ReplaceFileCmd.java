@@ -33,76 +33,77 @@ import org.xipki.console.karaf.XiAction;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "replace",
-        description = "replace text in file")
+    description = "replace text in file")
 @Service
 public class ReplaceFileCmd extends XiAction {
 
-    @Argument(index = 0, name = "file", required = true,
-            description = "file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String source;
+  @Argument(index = 0, name = "file", required = true,
+      description = "file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String source;
 
-    @Option(name = "--old", required = true,
-            description = "text to be replaced")
-    private String oldText;
+  @Option(name = "--old", required = true,
+      description = "text to be replaced")
+  private String oldText;
 
-    @Option(name = "--new", required = true,
-            description = "next text")
-    private String newText;
+  @Option(name = "--new", required = true,
+      description = "next text")
+  private String newText;
 
-    @Override
-    protected Object execute0() throws Exception {
-        File sourceFile = new File(expandFilepath(source));
-        if (!sourceFile.exists()) {
-            System.err.println(source + " does not exist");
-            return null;
-        }
-
-        if (!sourceFile.isFile()) {
-            System.err.println(source + " is not a file");
-            return null;
-        }
-
-        ParamUtil.requireNonBlank("old", oldText);
-
-        replaceFile(sourceFile, oldText, newText);
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    File sourceFile = new File(expandFilepath(source));
+    if (!sourceFile.exists()) {
+      System.err.println(source + " does not exist");
+      return null;
     }
 
-    private void replaceFile(File file, String oldText, String newText) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-
-        ByteArrayOutputStream writer = new ByteArrayOutputStream();
-
-        boolean changed = false;
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains(oldText)) {
-                    changed = true;
-                    writer.write(line.replace(oldText, newText).getBytes());
-                } else {
-                    writer.write(line.getBytes());
-                }
-                writer.write('\n');
-            }
-        } finally {
-            writer.close();
-            reader.close();
-        }
-
-        if (changed) {
-            File newFile = new File(file.getPath() + "-new");
-            byte[] newBytes = writer.toByteArray();
-            IoUtil.save(file, newBytes);
-            newFile.renameTo(file);
-        }
+    if (!sourceFile.isFile()) {
+      System.err.println(source + " is not a file");
+      return null;
     }
+
+    ParamUtil.requireNonBlank("old", oldText);
+
+    replaceFile(sourceFile, oldText, newText);
+
+    return null;
+  }
+
+  private void replaceFile(File file, String oldText, String newText) throws Exception {
+    BufferedReader reader = new BufferedReader(new FileReader(file));
+
+    ByteArrayOutputStream writer = new ByteArrayOutputStream();
+
+    boolean changed = false;
+    try {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        if (line.contains(oldText)) {
+          changed = true;
+          writer.write(line.replace(oldText, newText).getBytes());
+        } else {
+          writer.write(line.getBytes());
+        }
+        writer.write('\n');
+      }
+    } finally {
+      writer.close();
+      reader.close();
+    }
+
+    if (changed) {
+      File newFile = new File(file.getPath() + "-new");
+      byte[] newBytes = writer.toByteArray();
+      IoUtil.save(file, newBytes);
+      newFile.renameTo(file);
+    }
+  }
 
 }

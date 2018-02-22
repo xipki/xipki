@@ -32,85 +32,86 @@ import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PBEPasswordService;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "pbe-dec",
-        description = "decrypt password with master password")
+    description = "decrypt password with master password")
 @Service
 // CHECKSTYLE:SKIP
 public class PBEDecryptCmd extends SecurityAction {
 
-    @Option(name = "--password",
-            description = "encrypted password, starts with PBE:\n"
-                    + "exactly one of password and password-file must be specified")
-    private String passwordHint;
+  @Option(name = "--password",
+      description = "encrypted password, starts with PBE:\n"
+          + "exactly one of password and password-file must be specified")
+  private String passwordHint;
 
-    @Option(name = "--password-file",
-            description = "file containing the encrypted password")
-    @Completion(FilePathCompleter.class)
-    private String passwordFile;
+  @Option(name = "--password-file",
+      description = "file containing the encrypted password")
+  @Completion(FilePathCompleter.class)
+  private String passwordFile;
 
-    @Option(name = "--mpassword-file",
-            description = "file containing the (obfuscated) master password")
-    @Completion(FilePathCompleter.class)
-    private String masterPasswordFile;
+  @Option(name = "--mpassword-file",
+      description = "file containing the (obfuscated) master password")
+  @Completion(FilePathCompleter.class)
+  private String masterPasswordFile;
 
-    @Option(name = "--mk",
-            description = "quorum of the master password parts")
-    private Integer mquorum = 1;
+  @Option(name = "--mk",
+      description = "quorum of the master password parts")
+  private Integer mquorum = 1;
 
-    @Option(name = "--out",
-            description = "where to save the password")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out",
+      description = "where to save the password")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        ParamUtil.requireRange("mk", mquorum, 1, 10);
-        if (!(passwordHint == null ^ passwordFile == null)) {
-            throw new IllegalCmdParamException(
-                    "exactly one of password and password-file must be specified");
-        }
-
-        if (passwordHint == null) {
-            passwordHint = new String(IoUtil.read(passwordFile));
-        }
-
-        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
-            throw new IllegalCmdParamException("encrypted password '" + passwordHint
-                    + "' does not start with PBE:");
-        }
-
-        char[] masterPassword;
-        if (masterPasswordFile != null) {
-            String str = new String(IoUtil.read(masterPasswordFile));
-            if (str.startsWith("OBF:") || str.startsWith("obf:")) {
-                str = OBFPasswordService.deobfuscate(str);
-            }
-            masterPassword = str.toCharArray();
-        } else {
-            if (mquorum == 1) {
-                masterPassword = readPassword("Master password");
-            } else {
-                char[][] parts = new char[mquorum][];
-                for (int i = 0; i < mquorum; i++) {
-                    parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum
-                            + ")");
-                }
-                masterPassword = StringUtil.merge(parts);
-            }
-        }
-        char[] password = PBEPasswordService.decryptPassword(masterPassword, passwordHint);
-
-        if (outFile != null) {
-            saveVerbose("saved the password to file", new File(outFile),
-                    new String(password).getBytes());
-        } else {
-            println("the password is: '" + new String(password) + "'");
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    ParamUtil.requireRange("mk", mquorum, 1, 10);
+    if (!(passwordHint == null ^ passwordFile == null)) {
+      throw new IllegalCmdParamException(
+          "exactly one of password and password-file must be specified");
     }
+
+    if (passwordHint == null) {
+      passwordHint = new String(IoUtil.read(passwordFile));
+    }
+
+    if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
+      throw new IllegalCmdParamException("encrypted password '" + passwordHint
+          + "' does not start with PBE:");
+    }
+
+    char[] masterPassword;
+    if (masterPasswordFile != null) {
+      String str = new String(IoUtil.read(masterPasswordFile));
+      if (str.startsWith("OBF:") || str.startsWith("obf:")) {
+        str = OBFPasswordService.deobfuscate(str);
+      }
+      masterPassword = str.toCharArray();
+    } else {
+      if (mquorum == 1) {
+        masterPassword = readPassword("Master password");
+      } else {
+        char[][] parts = new char[mquorum][];
+        for (int i = 0; i < mquorum; i++) {
+          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum
+              + ")");
+        }
+        masterPassword = StringUtil.merge(parts);
+      }
+    }
+    char[] password = PBEPasswordService.decryptPassword(masterPassword, passwordHint);
+
+    if (outFile != null) {
+      saveVerbose("saved the password to file", new File(outFile),
+          new String(password).getBytes());
+    } else {
+      println("the password is: '" + new String(password) + "'");
+    }
+    return null;
+  }
 
 }

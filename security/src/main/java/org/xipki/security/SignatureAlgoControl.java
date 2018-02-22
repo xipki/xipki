@@ -18,42 +18,43 @@
 package org.xipki.security;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class SignatureAlgoControl {
 
-    private final boolean rsaMgf1;
+  private final boolean rsaMgf1;
 
-    private final boolean dsaPlain;
+  private final boolean dsaPlain;
 
-    private final boolean gm;
+  private final boolean gm;
 
-    public SignatureAlgoControl() {
-        this(false, false, false);
-    }
+  public SignatureAlgoControl() {
+    this(false, false, false);
+  }
 
-    public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain) {
-        this(rsaMgf1, dsaPlain, false);
-    }
+  public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain) {
+    this(rsaMgf1, dsaPlain, false);
+  }
 
-    public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain, boolean gm) {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-        this.gm = gm;
-    }
+  public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain, boolean gm) {
+    this.rsaMgf1 = rsaMgf1;
+    this.dsaPlain = dsaPlain;
+    this.gm = gm;
+  }
 
-    public boolean isRsaMgf1() {
-        return rsaMgf1;
-    }
+  public boolean isRsaMgf1() {
+    return rsaMgf1;
+  }
 
-    public boolean isDsaPlain() {
-        return dsaPlain;
-    }
+  public boolean isDsaPlain() {
+    return dsaPlain;
+  }
 
-    public boolean isGm() {
-        return gm;
-    }
+  public boolean isGm() {
+    return gm;
+  }
 
 }

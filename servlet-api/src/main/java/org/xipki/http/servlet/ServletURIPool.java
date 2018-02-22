@@ -20,6 +20,7 @@ package org.xipki.http.servlet;
 import java.net.URISyntaxException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
@@ -27,37 +28,37 @@ import java.net.URISyntaxException;
 // CHECKSTYLE:SKIP
 public class ServletURIPool {
 
-    private static final ServletURI SLASH_URI;
+  private static final ServletURI SLASH_URI;
 
-    private static SimpleLruCache<String, ServletURI> uriMap = new SimpleLruCache<>(100);
+  private static SimpleLruCache<String, ServletURI> uriMap = new SimpleLruCache<>(100);
 
-    static {
-        try {
-            SLASH_URI = new ServletURI("/");
-        } catch (URISyntaxException ex) {
-            throw new ExceptionInInitializerError(
-                    "could not create ServletURI: " + ex.getMessage());
-        }
+  static {
+    try {
+      SLASH_URI = new ServletURI("/");
+    } catch (URISyntaxException ex) {
+      throw new ExceptionInInitializerError(
+          "could not create ServletURI: " + ex.getMessage());
     }
+  }
 
-    private ServletURIPool() {
-    }
+  private ServletURIPool() {
+  }
 
-    // CHECKSTYLE:SKIP
-    public static ServletURI getServletURI(String uri) throws URISyntaxException {
-        if (uri == null || uri.isEmpty() || uri.equals("/")) {
-            return SLASH_URI;
-        } else if (uri.length() > 50) {
-            return new ServletURI(uri);
-        } else {
-            // cache only short URI
-            ServletURI uriObj = uriMap.get(uri);
-            if (uriObj == null) {
-                uriObj = new ServletURI(uri);
-                uriMap.put(uri, uriObj);
-            }
-            return uriObj;
-        }
+  // CHECKSTYLE:SKIP
+  public static ServletURI getServletURI(String uri) throws URISyntaxException {
+    if (uri == null || uri.isEmpty() || uri.equals("/")) {
+      return SLASH_URI;
+    } else if (uri.length() > 50) {
+      return new ServletURI(uri);
+    } else {
+      // cache only short URI
+      ServletURI uriObj = uriMap.get(uri);
+      if (uriObj == null) {
+        uriObj = new ServletURI(uri);
+        uriMap.put(uri, uriObj);
+      }
+      return uriObj;
     }
+  }
 
 }

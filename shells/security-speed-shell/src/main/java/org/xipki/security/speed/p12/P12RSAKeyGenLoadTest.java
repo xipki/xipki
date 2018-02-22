@@ -24,27 +24,28 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.KeyUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
-    private final int keysize;
-    private final BigInteger publicExponent;
+  private final int keysize;
+  private final BigInteger publicExponent;
 
-    public P12RSAKeyGenLoadTest(int keysize, BigInteger publicExponent,
-            SecurityFactory securityFactory) throws Exception {
-        super("PKCS#12 RSA key generation\nkeysize: " + keysize + "\n"
-                + "public exponent: " + publicExponent, securityFactory);
+  public P12RSAKeyGenLoadTest(int keysize, BigInteger publicExponent,
+      SecurityFactory securityFactory) throws Exception {
+    super("PKCS#12 RSA key generation\nkeysize: " + keysize + "\n"
+        + "public exponent: " + publicExponent, securityFactory);
 
-        this.keysize = keysize;
-        this.publicExponent = publicExponent;
-    }
+    this.keysize = keysize;
+    this.publicExponent = publicExponent;
+  }
 
-    @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
-        KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
-    }
+  @Override
+  protected void generateKeypair(SecureRandom random) throws Exception {
+    KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+  }
 
 }

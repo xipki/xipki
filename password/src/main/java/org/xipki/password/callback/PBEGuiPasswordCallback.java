@@ -22,6 +22,7 @@ import org.xipki.password.PBEPasswordService;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -29,17 +30,17 @@ import org.xipki.password.PasswordResolverException;
 // CHECKSTYLE:SKIP
 public class PBEGuiPasswordCallback extends GuiPasswordCallback {
 
-    @Override
-    protected boolean isPasswordValid(char[] password, String testToken) {
-        if (StringUtil.isBlank(testToken)) {
-            return true;
-        }
-        try {
-            PBEPasswordService.decryptPassword(password, testToken);
-            return true;
-        } catch (PasswordResolverException ex) {
-            return false;
-        }
+  @Override
+  protected boolean isPasswordValid(char[] password, String testToken) {
+    if (StringUtil.isBlank(testToken)) {
+      return true;
     }
+    try {
+      PBEPasswordService.decryptPassword(password, testToken);
+      return true;
+    } catch (PasswordResolverException ex) {
+      return false;
+    }
+  }
 
 }

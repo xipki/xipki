@@ -23,19 +23,20 @@ import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.p12.P12SM2SignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-sm3-sign-p12",
-        description = "performance test of PKCS#12 SM2 signature creation")
+    description = "performance test of PKCS#12 SM2 signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12SM2SignCmd extends SpeedP12SignAction {
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P12SM2SignLoadTest(securityFactory);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P12SM2SignLoadTest(securityFactory);
+  }
 
 }

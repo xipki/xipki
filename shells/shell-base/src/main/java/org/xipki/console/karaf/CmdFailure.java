@@ -18,27 +18,28 @@
 package org.xipki.console.karaf;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CmdFailure extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CmdFailure() {
-    }
+  public CmdFailure() {
+  }
 
-    public CmdFailure(String message) {
-        super(message);
-    }
+  public CmdFailure(String message) {
+    super(message);
+  }
 
-    public CmdFailure(Throwable cause) {
-        super(cause);
-    }
+  public CmdFailure(Throwable cause) {
+    super(cause);
+  }
 
-    public CmdFailure(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CmdFailure(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

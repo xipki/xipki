@@ -23,42 +23,43 @@ import java.io.OutputStream;
 import org.bouncycastle.crypto.Digest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DigestOutputStream extends OutputStream {
 
-    private Digest digest;
+  private Digest digest;
 
-    public DigestOutputStream(Digest digest) {
-        this.digest = digest;
-    }
+  public DigestOutputStream(Digest digest) {
+    this.digest = digest;
+  }
 
-    public void reset() {
-        digest.reset();
-    }
+  public void reset() {
+    digest.reset();
+  }
 
-    @Override
-    public void write(byte[] bytes, int off, int len) throws IOException {
-        digest.update(bytes, off, len);
-    }
+  @Override
+  public void write(byte[] bytes, int off, int len) throws IOException {
+    digest.update(bytes, off, len);
+  }
 
-    @Override
-    public void write(byte[] bytes) throws IOException {
-        digest.update(bytes, 0, bytes.length);
-    }
+  @Override
+  public void write(byte[] bytes) throws IOException {
+    digest.update(bytes, 0, bytes.length);
+  }
 
-    @Override
-    public void write(int oneByte) throws IOException {
-        digest.update((byte) oneByte);
-    }
+  @Override
+  public void write(int oneByte) throws IOException {
+    digest.update((byte) oneByte);
+  }
 
-    public byte[] digest() {
-        byte[] result = new byte[digest.getDigestSize()];
-        digest.doFinal(result, 0);
-        reset();
-        return result;
-    }
+  public byte[] digest() {
+    byte[] result = new byte[digest.getDigestSize()];
+    digest.doFinal(result, 0);
+    reset();
+    return result;
+  }
 
 }

@@ -22,35 +22,36 @@ import java.security.cert.X509Certificate;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface SignerFactory {
 
-    /**
-     * Indicates whether a signer of the given {@code type} can be created or not.
-     *
-     * @param type
-     *          Type of the signer. Must no be {@code null}.
-     * @return true if signer of the given type can be created, false otherwise.
-     */
-    boolean canCreateSigner(String type);
+  /**
+   * Indicates whether a signer of the given {@code type} can be created or not.
+   *
+   * @param type
+   *          Type of the signer. Must no be {@code null}.
+   * @return true if signer of the given type can be created, false otherwise.
+   */
+  boolean canCreateSigner(String type);
 
-    /**
-     * Creates a new signer.
-     * @param type
-     *          Type of the signer. Must not be {@code null}.
-     * @param conf
-     *          Configuration of the signer. Must not be {@code null}.
-     * @param certificateChain
-     *          Certificate chain of the signer. Could be {@code null}.
-     *
-     * @return new signer.
-     * @throws ObjectCreationException
-     *         if signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(String type, SignerConf conf,
-            X509Certificate[] certificateChain) throws ObjectCreationException;
+  /**
+   * Creates a new signer.
+   * @param type
+   *          Type of the signer. Must not be {@code null}.
+   * @param conf
+   *          Configuration of the signer. Must not be {@code null}.
+   * @param certificateChain
+   *          Certificate chain of the signer. Could be {@code null}.
+   *
+   * @return new signer.
+   * @throws ObjectCreationException
+   *         if signer could not be created.
+   */
+  ConcurrentContentSigner newSigner(String type, SignerConf conf,
+      X509Certificate[] certificateChain) throws ObjectCreationException;
 
 }

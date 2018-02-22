@@ -18,24 +18,25 @@
 package org.xipki.security.exception;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11TokenException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public P11TokenException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public P11TokenException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public P11TokenException(String message) {
-        super(message);
-    }
+  public P11TokenException(String message) {
+    super(message);
+  }
 
-    public P11TokenException(Throwable cause) {
-        super(cause);
-    }
+  public P11TokenException(Throwable cause) {
+    super(cause);
+  }
 
 }

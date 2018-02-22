@@ -28,88 +28,89 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11PasswordsRetriever {
 
-    private static final class SingleRetriever {
+  private static final class SingleRetriever {
 
-        private final Set<P11SlotIdFilter> slots;
+    private final Set<P11SlotIdFilter> slots;
 
-        private final List<String> passwords;
+    private final List<String> passwords;
 
-        private SingleRetriever(Set<P11SlotIdFilter> slots, List<String> passwords) {
-            this.slots = slots;
-            this.passwords = CollectionUtil.isEmpty(passwords) ? null : passwords;
+    private SingleRetriever(Set<P11SlotIdFilter> slots, List<String> passwords) {
+      this.slots = slots;
+      this.passwords = CollectionUtil.isEmpty(passwords) ? null : passwords;
+    }
+
+    public boolean match(P11SlotIdentifier slot) {
+      if (slots == null) {
+        return true;
+      }
+      for (P11SlotIdFilter m : slots) {
+        if (m.match(slot)) {
+          return true;
         }
+      }
 
-        public boolean match(P11SlotIdentifier slot) {
-            if (slots == null) {
-                return true;
-            }
-            for (P11SlotIdFilter m : slots) {
-                if (m.match(slot)) {
-                    return true;
-                }
-            }
+      return false;
+    }
 
-            return false;
-        }
-
-        public List<char[]> getPasswords(PasswordResolver passwordResolver)
+    public List<char[]> getPasswords(PasswordResolver passwordResolver)
             throws PasswordResolverException {
-            if (passwords == null) {
-                return null;
-            }
-
-            List<char[]> ret = new ArrayList<char[]>(passwords.size());
-            for (String password : passwords) {
-                if (passwordResolver == null) {
-                    ret.add(password.toCharArray());
-                } else {
-                    ret.add(passwordResolver.resolvePassword(password));
-                }
-            }
-
-            return ret;
-        }
-
-    } // class SingleRetriever
-
-    private final List<SingleRetriever> singleRetrievers;
-    private PasswordResolver passwordResolver;
-
-    P11PasswordsRetriever() {
-        singleRetrievers = new LinkedList<>();
-    }
-
-    void addPasswordEntry(Set<P11SlotIdFilter> slots, List<String> passwords) {
-        singleRetrievers.add(new SingleRetriever(slots, passwords));
-    }
-
-    public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
-        ParamUtil.requireNonNull("slotId", slotId);
-        if (CollectionUtil.isEmpty(singleRetrievers)) {
-            return null;
-        }
-
-        for (SingleRetriever sr : singleRetrievers) {
-            if (sr.match(slotId)) {
-                return sr.getPasswords(passwordResolver);
-            }
-        }
-
+      if (passwords == null) {
         return null;
+      }
+
+      List<char[]> ret = new ArrayList<char[]>(passwords.size());
+      for (String password : passwords) {
+        if (passwordResolver == null) {
+          ret.add(password.toCharArray());
+        } else {
+          ret.add(passwordResolver.resolvePassword(password));
+        }
+      }
+
+      return ret;
     }
 
-    public PasswordResolver passwordResolver() {
-        return passwordResolver;
+  } // class SingleRetriever
+
+  private final List<SingleRetriever> singleRetrievers;
+  private PasswordResolver passwordResolver;
+
+  P11PasswordsRetriever() {
+    singleRetrievers = new LinkedList<>();
+  }
+
+  void addPasswordEntry(Set<P11SlotIdFilter> slots, List<String> passwords) {
+    singleRetrievers.add(new SingleRetriever(slots, passwords));
+  }
+
+  public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
+    ParamUtil.requireNonNull("slotId", slotId);
+    if (CollectionUtil.isEmpty(singleRetrievers)) {
+      return null;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
+    for (SingleRetriever sr : singleRetrievers) {
+      if (sr.match(slotId)) {
+        return sr.getPasswords(passwordResolver);
+      }
     }
+
+    return null;
+  }
+
+  public PasswordResolver passwordResolver() {
+    return passwordResolver;
+  }
+
+  public void setPasswordResolver(PasswordResolver passwordResolver) {
+    this.passwordResolver = passwordResolver;
+  }
 
 }

@@ -25,6 +25,7 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.password.PasswordProducer;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -33,9 +34,9 @@ import org.xipki.password.PasswordProducer;
 // CHECKSTYLE:SKIP
 public class PasswordNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        return new HashSet<>(PasswordProducer.getNames());
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return new HashSet<>(PasswordProducer.getNames());
+  }
 
 }

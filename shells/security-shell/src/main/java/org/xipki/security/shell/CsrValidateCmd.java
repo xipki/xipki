@@ -27,28 +27,29 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "validate-csr",
-        description = "validate CSR")
+    description = "validate CSR")
 @Service
 public class CsrValidateCmd extends SecurityAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
-        String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
-        boolean bo = securityFactory.verifyPopo(csr, null);
-        String txt = bo ? "valid" : "invalid";
-        println("The POP is " + txt + " (signature algorithm " + sigAlgo + ").");
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+    String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
+    boolean bo = securityFactory.verifyPopo(csr, null);
+    String txt = bo ? "valid" : "invalid";
+    println("The POP is " + txt + " (signature algorithm " + sigAlgo + ").");
+    return null;
+  }
 
 }

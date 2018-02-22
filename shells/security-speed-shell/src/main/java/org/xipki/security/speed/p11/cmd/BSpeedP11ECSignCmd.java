@@ -31,38 +31,39 @@ import org.xipki.security.speed.cmd.completer.ECDSASigAlgCompleter;
 import org.xipki.security.speed.p11.P11ECSignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-ec-sign-p11",
-        description = "performance test of PKCS#11 EC signature creation (batch)")
+    description = "performance test of PKCS#11 EC signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP11ECSignCmd extends BSpeedP11Action {
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(ECDSASigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(ECDSASigAlgCompleter.class)
+  private String sigAlgo;
 
-    private final Queue<ECControl> queue = new LinkedList<>();
+  private final Queue<ECControl> queue = new LinkedList<>();
 
-    public BSpeedP11ECSignCmd() {
-        for (String curveName : getECCurveNames()) {
-            queue.add(new ECControl(curveName));
-        }
+  public BSpeedP11ECSignCmd() {
+    for (String curveName : getECCurveNames()) {
+      queue.add(new ECControl(curveName));
+    }
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    ECControl control = queue.poll();
+    if (control == null) {
+      return null;
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        ECControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-
-        P11Slot slot = getSlot();
-        return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, control.curveName());
-    }
+    P11Slot slot = getSlot();
+    return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, control.curveName());
+  }
 
 }

@@ -35,84 +35,85 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P11SignLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
+  class Testor implements Runnable {
 
-        final byte[] data = new byte[1024];
+    final byte[] data = new byte[1024];
 
-        public Testor() {
-            new SecureRandom().nextBytes(data);
-        }
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    signer.sign(data);
-                    account(1, 0);
-                } catch (Exception ex) {
-                    account(1, 1);
-                }
-            }
-        }
-
-    } // class Testor
-
-    private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
-
-    private final P11Slot slot;
-
-    private final ConcurrentContentSigner signer;
-
-    private final P11ObjectIdentifier objectId;
-
-    public P11SignLoadTest(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
-            P11ObjectIdentifier objectId, String description) throws ObjectCreationException {
-        super(description + "\nsignature algorithm: " + signatureAlgorithm);
-
-        ParamUtil.requireNonNull("securityFactory", securityFactory);
-        ParamUtil.requireNonNull("slot", slot);
-        ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.requireNonNull("objectId", objectId);
-
-        this.slot = slot;
-        this.objectId = objectId;
-
-        P11SlotIdentifier slotId = slot.slotId();
-        SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.moduleName(),
-                null, slotId.id(), null, objectId.id(), signatureAlgorithm, 20);
-        try {
-            this.signer = securityFactory.createSigner("PKCS11", signerConf,
-                    (X509Certificate) null);
-        } catch (ObjectCreationException ex) {
-            shutdown();
-            throw ex;
-        }
+    public Testor() {
+      new SecureRandom().nextBytes(data);
     }
 
     @Override
-    protected void shutdown() {
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
         try {
-            slot.removeIdentity(objectId);
+          signer.sign(data);
+          account(1, 0);
         } catch (Exception ex) {
-            LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
+          account(1, 1);
         }
+      }
     }
 
-    protected static P11NewKeyControl getNewKeyControl() {
-        P11NewKeyControl control = new P11NewKeyControl();
-        control.setExtractable(true);
-        return control;
-    }
+  } // class Testor
 
-    @Override
-    protected Runnable getTestor() throws Exception {
-        return new Testor();
+  private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
+
+  private final P11Slot slot;
+
+  private final ConcurrentContentSigner signer;
+
+  private final P11ObjectIdentifier objectId;
+
+  public P11SignLoadTest(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
+      P11ObjectIdentifier objectId, String description) throws ObjectCreationException {
+    super(description + "\nsignature algorithm: " + signatureAlgorithm);
+
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    ParamUtil.requireNonNull("slot", slot);
+    ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
+    ParamUtil.requireNonNull("objectId", objectId);
+
+    this.slot = slot;
+    this.objectId = objectId;
+
+    P11SlotIdentifier slotId = slot.slotId();
+    SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.moduleName(),
+        null, slotId.id(), null, objectId.id(), signatureAlgorithm, 20);
+    try {
+      this.signer = securityFactory.createSigner("PKCS11", signerConf,
+          (X509Certificate) null);
+    } catch (ObjectCreationException ex) {
+      shutdown();
+      throw ex;
     }
+  }
+
+  @Override
+  protected void shutdown() {
+    try {
+      slot.removeIdentity(objectId);
+    } catch (Exception ex) {
+      LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
+    }
+  }
+
+  protected static P11NewKeyControl getNewKeyControl() {
+    P11NewKeyControl control = new P11NewKeyControl();
+    control.setExtractable(true);
+    return control;
+  }
+
+  @Override
+  protected Runnable getTestor() throws Exception {
+    return new Testor();
+  }
 
 }

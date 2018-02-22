@@ -24,28 +24,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class Providers {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Providers.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Providers.class);
 
-    public void init() {
-        addBcProvider();
-    }
+  public void init() {
+    addBcProvider();
+  }
 
-    public void shutdown() {
-    }
+  public void shutdown() {
+  }
 
-    private void addBcProvider() {
-        final String provName = "BC";
-        if (Security.getProvider(provName) != null) {
-            LOG.info("security provider {} already initialized by other service", provName);
-            return;
-        }
-        Security.addProvider(new BouncyCastleProvider());
+  private void addBcProvider() {
+    final String provName = "BC";
+    if (Security.getProvider(provName) != null) {
+      LOG.info("security provider {} already initialized by other service", provName);
+      return;
     }
+    Security.addProvider(new BouncyCastleProvider());
+  }
 
 }

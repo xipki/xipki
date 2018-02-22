@@ -18,23 +18,24 @@
 package org.xipki.security;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class XiSecurityConstants {
 
-    public static final String PROVIDER_NAME_XIPKI = "XIPKI";
+  public static final String PROVIDER_NAME_XIPKI = "XIPKI";
 
-    public static final int CMP_CRL_REASON_REMOVE = -1;
+  public static final int CMP_CRL_REASON_REMOVE = -1;
 
-    public static final int CMP_ACTION_GEN_CRL = 1;
+  public static final int CMP_ACTION_GEN_CRL = 1;
 
-    public static final int CMP_ACTION_GET_CRL_WITH_SN = 2;
+  public static final int CMP_ACTION_GET_CRL_WITH_SN = 2;
 
-    public static final int CMP_ACTION_GET_CAINFO = 3;
+  public static final int CMP_ACTION_GET_CAINFO = 3;
 
-    private XiSecurityConstants() {
-    }
+  private XiSecurityConstants() {
+  }
 
 }

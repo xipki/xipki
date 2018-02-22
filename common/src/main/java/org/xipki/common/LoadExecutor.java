@@ -30,199 +30,200 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class LoadExecutor {
 
-    private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
+  private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
-    private static final int DEFAULT_DURATION = 30; // 30 seconds
+  private static final int DEFAULT_DURATION = 30; // 30 seconds
 
-    private static final int DEFAULT_THREADS = 25;
+  private static final int DEFAULT_THREADS = 25;
 
-    private boolean interrupted;
+  private boolean interrupted;
 
-    private String description;
+  private String description;
 
-    private final ProcessLog processLog;
+  private final ProcessLog processLog;
 
-    private int duration = DEFAULT_DURATION; // in seconds
+  private int duration = DEFAULT_DURATION; // in seconds
 
-    private int threads = DEFAULT_THREADS;
+  private int threads = DEFAULT_THREADS;
 
-    private AtomicLong errorAccount = new AtomicLong(0);
+  private AtomicLong errorAccount = new AtomicLong(0);
 
-    private String unit = "";
+  private String unit = "";
 
-    public LoadExecutor(String description) {
-        this.description = ParamUtil.requireNonNull("description", description);
-        this.processLog = new ProcessLog(0);
+  public LoadExecutor(String description) {
+    this.description = ParamUtil.requireNonNull("description", description);
+    this.processLog = new ProcessLog(0);
+  }
+
+  protected abstract Runnable getTestor() throws Exception;
+
+  protected void shutdown() {
+  }
+
+  public void test() {
+    System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
+    List<Runnable> runnables = new ArrayList<>(threads);
+    for (int i = 0; i < threads; i++) {
+      Runnable runnable;
+      try {
+        runnable = getTestor();
+      } catch (Exception ex) {
+        System.err.println("could not initialize Testor: " + ex.getMessage());
+        return;
+      }
+
+      runnables.add(runnable);
     }
 
-    protected abstract Runnable getTestor() throws Exception;
+    StringBuilder sb = new StringBuilder();
+    if (StringUtil.isNotBlank(description)) {
+      sb.append(description);
+      char ch = description.charAt(description.length() - 1);
+      if (ch != '\n') {
+        sb.append('\n');
+      }
+    }
+    sb.append("threads: ").append(threads).append("\n");
+    sb.append("duration: ").append(StringUtil.formatTime(duration, false));
+    System.out.println(sb.toString());
 
-    protected void shutdown() {
+    resetStartTime();
+
+    ExecutorService executor = Executors.newFixedThreadPool(threads);
+    for (Runnable runnable : runnables) {
+      executor.execute(runnable);
     }
 
-    public void test() {
-        System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
-        List<Runnable> runnables = new ArrayList<>(threads);
-        for (int i = 0; i < threads; i++) {
-            Runnable runnable;
-            try {
-                runnable = getTestor();
-            } catch (Exception ex) {
-                System.err.println("could not initialize Testor: " + ex.getMessage());
-                return;
-            }
-
-            runnables.add(runnable);
+    executor.shutdown();
+    printHeader();
+    while (true) {
+      printStatus();
+      try {
+        boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
+        if (terminated) {
+          break;
         }
-
-        StringBuilder sb = new StringBuilder();
-        if (StringUtil.isNotBlank(description)) {
-            sb.append(description);
-            char ch = description.charAt(description.length() - 1);
-            if (ch != '\n') {
-                sb.append('\n');
-            }
-        }
-        sb.append("threads: ").append(threads).append("\n");
-        sb.append("duration: ").append(StringUtil.formatTime(duration, false));
-        System.out.println(sb.toString());
-
-        resetStartTime();
-
-        ExecutorService executor = Executors.newFixedThreadPool(threads);
-        for (Runnable runnable : runnables) {
-            executor.execute(runnable);
-        }
-
-        executor.shutdown();
-        printHeader();
-        while (true) {
-            printStatus();
-            try {
-                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if (terminated) {
-                    break;
-                }
-            } catch (InterruptedException ex) {
-                interrupted = true;
-            }
-        }
-
-        printStatus();
-        printSummary();
-
-        shutdown();
-        System.getProperties().remove(PROPKEY_LOADTEST);
-    } // method test
-
-    public boolean isInterrupted() {
-        return interrupted;
+      } catch (InterruptedException ex) {
+        interrupted = true;
+      }
     }
 
-    public void setDuration(String duration) {
-        ParamUtil.requireNonBlank("duration", duration);
-        char unit = duration.charAt(duration.length() - 1);
+    printStatus();
+    printSummary();
 
-        String numStr;
-        if (unit == 's' || unit == 'm' || unit == 'h') {
-            numStr = duration.substring(0, duration.length() - 1);
-        } else {
-            unit = 's';
-            numStr = duration;
-        }
+    shutdown();
+    System.getProperties().remove(PROPKEY_LOADTEST);
+  } // method test
 
-        int num;
-        try {
-            num = Integer.parseInt(numStr);
-        } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("invalid duration " + duration);
-        }
+  public boolean isInterrupted() {
+    return interrupted;
+  }
 
-        if (num < 1) {
-            throw new IllegalArgumentException("invalid duration " + duration);
-        }
+  public void setDuration(String duration) {
+    ParamUtil.requireNonBlank("duration", duration);
+    char unit = duration.charAt(duration.length() - 1);
 
-        switch (unit) {
-        case 's':
-            this.duration = num;
-            break;
-        case 'm':
-            this.duration = num * 60;
-            break;
-        case 'h':
-            this.duration = num * 1440; // 1440 = 60 * 24
-            break;
-        default:
-            throw new RuntimeException("invalid duration unit " + unit);
-        }
+    String numStr;
+    if (unit == 's' || unit == 'm' || unit == 'h') {
+      numStr = duration.substring(0, duration.length() - 1);
+    } else {
+      unit = 's';
+      numStr = duration;
     }
 
-    public void setThreads(int threads) {
-        if (threads > 0) {
-            this.threads = threads;
-        }
+    int num;
+    try {
+      num = Integer.parseInt(numStr);
+    } catch (NumberFormatException ex) {
+      throw new IllegalArgumentException("invalid duration " + duration);
     }
 
-    public long getErrorAccout() {
-        return errorAccount.get();
+    if (num < 1) {
+      throw new IllegalArgumentException("invalid duration " + duration);
     }
 
-    public void account(int all, int failed) {
-        processLog.addNumProcessed(all);
-        errorAccount.addAndGet(failed);
+    switch (unit) {
+      case 's':
+        this.duration = num;
+        break;
+      case 'm':
+        this.duration = num * 60;
+        break;
+      case 'h':
+        this.duration = num * 1440; // 1440 = 60 * 24
+        break;
+      default:
+        throw new RuntimeException("invalid duration unit " + unit);
     }
+  }
 
-    protected void resetStartTime() {
-        processLog.reset();
+  public void setThreads(int threads) {
+    if (threads > 0) {
+      this.threads = threads;
     }
+  }
 
-    protected boolean stop() {
-        return interrupted || errorAccount.get() > 0
-                || System.currentTimeMillis() - processLog.startTimeMs() >= duration * 1000L;
+  public long getErrorAccout() {
+    return errorAccount.get();
+  }
+
+  public void account(int all, int failed) {
+    processLog.addNumProcessed(all);
+    errorAccount.addAndGet(failed);
+  }
+
+  protected void resetStartTime() {
+    processLog.reset();
+  }
+
+  protected boolean stop() {
+    return interrupted || errorAccount.get() > 0
+        || System.currentTimeMillis() - processLog.startTimeMs() >= duration * 1000L;
+  }
+
+  protected void printHeader() {
+    processLog.printHeader();
+  }
+
+  protected void printStatus() {
+    processLog.printStatus();
+  }
+
+  public void setUnit(String unit) {
+    this.unit = ParamUtil.requireNonNull("unit", unit);
+  }
+
+  protected void printSummary() {
+    processLog.printTrailer();
+
+    String averageText = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
+
+    String msg = StringUtil.concatObjectsCap(400,
+        " started at: ", new Date(processLog.startTimeMs()),
+        "\nfinished at: ", new Date(processLog.endTimeMs()),
+        "\n   duration: ", StringUtil.formatTime(processLog.totalElapsedTime() / 1000, false),
+        "\n    account: ", StringUtil.formatAccount(processLog.numProcessed(), 1), " ", unit,
+        "\n     failed: ", StringUtil.formatAccount(errorAccount.get(), 1), " ", unit,
+        "\n    average: ", averageText, " ", unit, "/s\n");
+
+    System.out.println(msg);
+  }
+
+  protected static long getSecureIndex() {
+    SecureRandom random = new SecureRandom();
+    while (true) {
+      long nextLong = random.nextLong();
+      if (nextLong > 0) {
+        return nextLong;
+      }
     }
-
-    protected void printHeader() {
-        processLog.printHeader();
-    }
-
-    protected void printStatus() {
-        processLog.printStatus();
-    }
-
-    public void setUnit(String unit) {
-        this.unit = ParamUtil.requireNonNull("unit", unit);
-    }
-
-    protected void printSummary() {
-        processLog.printTrailer();
-
-        String averageText = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
-
-        String msg = StringUtil.concatObjectsCap(400,
-            " started at: ", new Date(processLog.startTimeMs()),
-            "\nfinished at: ", new Date(processLog.endTimeMs()),
-            "\n   duration: ", StringUtil.formatTime(processLog.totalElapsedTime() / 1000, false),
-            "\n    account: ", StringUtil.formatAccount(processLog.numProcessed(), 1), " ", unit,
-            "\n     failed: ", StringUtil.formatAccount(errorAccount.get(), 1), " ", unit,
-            "\n    average: ", averageText, " ", unit, "/s\n");
-
-        System.out.println(msg);
-    }
-
-    protected static long getSecureIndex() {
-        SecureRandom random = new SecureRandom();
-        while (true) {
-            long nextLong = random.nextLong();
-            if (nextLong > 0) {
-                return nextLong;
-            }
-        }
-    }
+  }
 
 }

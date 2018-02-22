@@ -32,85 +32,86 @@ import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 @Command(scope = "xi", name = "p11prov-sm2-test",
-        description = "test the SM2 implementation of Xipki PKCS#11 JCA/JCE provider")
+    description = "test the SM2 implementation of Xipki PKCS#11 JCA/JCE provider")
 @Service
 public class P11ProviderSm2TestCmd extends P11SecurityAction {
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show object information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show object information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Option(name = "--ida",
-            description = "IDA (ID user A)")
-    protected String ida;
+  @Option(name = "--ida",
+      description = "IDA (ID user A)")
+  protected String ida;
 
-    @Override
-    protected Object execute0() throws Exception {
-        KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
-        ks.load(null, null);
-        if (verbose.booleanValue()) {
-            println("available aliases:");
-            Enumeration<?> aliases = ks.aliases();
-            while (aliases.hasMoreElements()) {
-                String alias2 = (String) aliases.nextElement();
-                println("    " + alias2);
-            }
-        }
-
-        String alias = getAlias();
-        println("alias: " + alias);
-        PrivateKey key = (PrivateKey) ks.getKey(alias, null);
-        if (key == null) {
-            println("could not find key with alias '" + alias + "'");
-            return null;
-        }
-
-        Certificate cert = ks.getCertificate(alias);
-        if (cert == null) {
-            println("could not find certificate to verify signature");
-            return null;
-        }
-
-        String sigAlgo = "SM3withSM2";
-        println("signature algorithm: " + sigAlgo);
-        Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
-
-        if (StringUtil.isNotBlank(ida)) {
-            sig.setParameter(new XiSM2ParameterSpec(ida.getBytes()));
-        }
-
-        sig.initSign(key);
-
-        byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        sig.update(data);
-        byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
-        println("signature created successfully");
-
-        Signature ver = Signature.getInstance(sigAlgo, "BC");
-        if (StringUtil.isNotBlank(ida)) {
-            ver.setParameter(new SM2ParameterSpec(ida.getBytes()));
-        }
-
-        ver.initVerify(cert.getPublicKey());
-        ver.update(data);
-        boolean valid = ver.verify(signature);
-        println("signature valid: " + valid);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
+    ks.load(null, null);
+    if (verbose.booleanValue()) {
+      println("available aliases:");
+      Enumeration<?> aliases = ks.aliases();
+      while (aliases.hasMoreElements()) {
+        String alias2 = (String) aliases.nextElement();
+        println("    " + alias2);
+      }
     }
 
-    private String getAlias() {
-        if (label != null) {
-            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-                    "#keylabel-", label);
-        } else {
-            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-                    "#keyid-", id.toLowerCase());
-        }
+    String alias = getAlias();
+    println("alias: " + alias);
+    PrivateKey key = (PrivateKey) ks.getKey(alias, null);
+    if (key == null) {
+      println("could not find key with alias '" + alias + "'");
+      return null;
     }
+
+    Certificate cert = ks.getCertificate(alias);
+    if (cert == null) {
+      println("could not find certificate to verify signature");
+      return null;
+    }
+
+    String sigAlgo = "SM3withSM2";
+    println("signature algorithm: " + sigAlgo);
+    Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
+
+    if (StringUtil.isNotBlank(ida)) {
+      sig.setParameter(new XiSM2ParameterSpec(ida.getBytes()));
+    }
+
+    sig.initSign(key);
+
+    byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    sig.update(data);
+    byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
+    println("signature created successfully");
+
+    Signature ver = Signature.getInstance(sigAlgo, "BC");
+    if (StringUtil.isNotBlank(ida)) {
+      ver.setParameter(new SM2ParameterSpec(ida.getBytes()));
+    }
+
+    ver.initVerify(cert.getPublicKey());
+    ver.update(data);
+    boolean valid = ver.verify(signature);
+    println("signature valid: " + valid);
+    return null;
+  }
+
+  private String getAlias() {
+    if (label != null) {
+      return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+          "#keylabel-", label);
+    } else {
+      return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+          "#keyid-", id.toLowerCase());
+    }
+  }
 
 }

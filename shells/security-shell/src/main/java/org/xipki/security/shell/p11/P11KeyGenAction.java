@@ -30,46 +30,47 @@ import org.xipki.security.shell.KeyGenAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P11KeyGenAction extends KeyGenAction {
 
-    @Option(name = "--label", required = true,
-            description = "label of the PKCS#11 objects\n(required)")
-    protected String label;
+  @Option(name = "--label", required = true,
+      description = "label of the PKCS#11 objects\n(required)")
+  protected String label;
 
-    @Option(name = "--extractable", aliases = {"-x"},
-            description = "whether the key is extractable")
-    private Boolean extractable;
+  @Option(name = "--extractable", aliases = {"-x"},
+      description = "whether the key is extractable")
+  private Boolean extractable;
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--module",
-            description = "Name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "Name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = DEFAULT_P11MODULE_NAME;
 
-    protected abstract boolean getDefaultExtractable();
+  protected abstract boolean getDefaultExtractable();
 
-    protected void finalize(String keyType, P11ObjectIdentifier objectId) throws Exception {
-        ParamUtil.requireNonNull("objectId", objectId);
-        println("generated " + keyType + " key " + objectId);
-    }
+  protected void finalize(String keyType, P11ObjectIdentifier objectId) throws Exception {
+    ParamUtil.requireNonNull("objectId", objectId);
+    println("generated " + keyType + " key " + objectId);
+  }
 
-    protected P11Slot getSlot()
-            throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-        return getSlot(moduleName, slotIndex);
-    }
+  protected P11Slot getSlot()
+      throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    return getSlot(moduleName, slotIndex);
+  }
 
-    protected P11NewKeyControl getControl() {
-        P11NewKeyControl control = new P11NewKeyControl();
-        control.setExtractable((extractable == null)
-                ? getDefaultExtractable() : extractable.booleanValue());
-        return control;
-    }
+  protected P11NewKeyControl getControl() {
+    P11NewKeyControl control = new P11NewKeyControl();
+    control.setExtractable((extractable == null)
+        ? getDefaultExtractable() : extractable.booleanValue());
+    return control;
+  }
 
 }

@@ -20,21 +20,22 @@ package org.xipki.security.speed.cmd;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 // CHECKSTYLE:SKIP
 public class ECControl {
-    private final String curveName;
+  private final String curveName;
 
-    public ECControl(String curveName) {
-        this.curveName = ParamUtil.requireNonBlank("curveName", curveName);
-    }
+  public ECControl(String curveName) {
+    this.curveName = ParamUtil.requireNonBlank("curveName", curveName);
+  }
 
-    public String curveName() {
-        return curveName;
-    }
+  public String curveName() {
+    return curveName;
+  }
 
 }
 

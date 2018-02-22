@@ -38,73 +38,74 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 @Command(scope = "xi", name = "update-cert-p12",
-        description = "update certificate in PKCS#12 keystore")
+    description = "update certificate in PKCS#12 keystore")
 @Service
 public class P12CertUpdateCmd extends P12SecurityAction {
 
-    @Option(name = "--cert", required = true,
-            description = "certificate file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert", required = true,
+      description = "certificate file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--ca-cert", multiValued = true,
-            description = "CA Certificate file\n(multi-valued)")
-    @Completion(FilePathCompleter.class)
-    private Set<String> caCertFiles;
+  @Option(name = "--ca-cert", multiValued = true,
+      description = "CA Certificate file\n(multi-valued)")
+  @Completion(FilePathCompleter.class)
+  private Set<String> caCertFiles;
 
-    @Override
-    protected Object execute0() throws Exception {
-        KeyStore ks = getKeyStore();
+  @Override
+  protected Object execute0() throws Exception {
+    KeyStore ks = getKeyStore();
 
-        char[] pwd = getPassword();
-        X509Certificate newCert = X509Util.parseCert(certFile);
+    char[] pwd = getPassword();
+    X509Certificate newCert = X509Util.parseCert(certFile);
 
-        assertMatch(newCert, new String(pwd));
+    assertMatch(newCert, new String(pwd));
 
-        String keyname = null;
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias)) {
-                keyname = alias;
-                break;
-            }
-        }
-
-        if (keyname == null) {
-            throw new XiSecurityException("could not find private key");
-        }
-
-        Key key = ks.getKey(keyname, pwd);
-        Set<X509Certificate> caCerts = new HashSet<>();
-        if (isNotEmpty(caCertFiles)) {
-            for (String caCertFile : caCertFiles) {
-                caCerts.add(X509Util.parseCert(caCertFile));
-            }
-        }
-        X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
-        ks.setKeyEntry(keyname, key, pwd, certChain);
-
-        try (FileOutputStream out = new FileOutputStream(p12File)) {
-            ks.store(out, pwd);
-            println("updated certificate");
-            return null;
-        }
+    String keyname = null;
+    Enumeration<String> aliases = ks.aliases();
+    while (aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      if (ks.isKeyEntry(alias)) {
+        keyname = alias;
+        break;
+      }
     }
 
-    private void assertMatch(X509Certificate cert, String password)
-            throws ObjectCreationException {
-        ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
-        if (password != null) {
-            pairs.putPair("password", new String(password));
-        }
-
-        SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgoType.SHA256, null);
-        securityFactory.createSigner("PKCS12", conf, cert);
+    if (keyname == null) {
+      throw new XiSecurityException("could not find private key");
     }
+
+    Key key = ks.getKey(keyname, pwd);
+    Set<X509Certificate> caCerts = new HashSet<>();
+    if (isNotEmpty(caCertFiles)) {
+      for (String caCertFile : caCertFiles) {
+        caCerts.add(X509Util.parseCert(caCertFile));
+      }
+    }
+    X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
+    ks.setKeyEntry(keyname, key, pwd, certChain);
+
+    try (FileOutputStream out = new FileOutputStream(p12File)) {
+      ks.store(out, pwd);
+      println("updated certificate");
+      return null;
+    }
+  }
+
+  private void assertMatch(X509Certificate cert, String password)
+      throws ObjectCreationException {
+    ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
+    if (password != null) {
+      pairs.putPair("password", new String(password));
+    }
+
+    SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgoType.SHA256, null);
+    securityFactory.createSigner("PKCS12", conf, cert);
+  }
 
 }

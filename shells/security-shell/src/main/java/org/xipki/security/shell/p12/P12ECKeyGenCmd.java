@@ -26,32 +26,33 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "ec-p12",
-        description = "generate EC keypair in PKCS#12 keystore")
+    description = "generate EC keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12ECKeyGenCmd extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject of the self-signed certificate")
-    protected String subject;
+  @Option(name = "--subject", aliases = "-s",
+      description = "subject of the self-signed certificate")
+  protected String subject;
 
-    @Option(name = "--curve",
-            description = "EC curve name or OID")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName = "secp256r1";
+  @Option(name = "--curve",
+      description = "EC curve name or OID")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName = "secp256r1";
 
-    @Override
-    protected Object execute0() throws Exception {
-        P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(curveName,
-                getKeyGenParameters(), subject);
-        saveKey(keypair);
+  @Override
+  protected Object execute0() throws Exception {
+    P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(curveName,
+        getKeyGenParameters(), subject);
+    saveKey(keypair);
 
-        return null;
-    }
+    return null;
+  }
 
 }

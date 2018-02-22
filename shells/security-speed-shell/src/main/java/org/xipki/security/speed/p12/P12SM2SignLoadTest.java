@@ -25,28 +25,29 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P12SM2SignLoadTest extends P12SignLoadTest {
 
-    public P12SM2SignLoadTest(SecurityFactory securityFactory) throws Exception {
-        super(securityFactory, "SM3WITHSM2", generateKeystore("sm2p256v1"),
-                "PKCS#12 SM2 signature creation");
-    }
+  public P12SM2SignLoadTest(SecurityFactory securityFactory) throws Exception {
+    super(securityFactory, "SM3WITHSM2", generateKeystore("sm2p256v1"),
+        "PKCS#12 SM2 signature creation");
+  }
 
-    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
-        byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
-        if (keystoreBytes == null) {
-            KeystoreGenerationParameters params = new KeystoreGenerationParameters(
-                    PASSWORD.toCharArray());
-            params.setRandom(new SecureRandom());
-            P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
-                    curveNameOrOid, params, null);
-            keystoreBytes = identity.keystore();
-        }
-        return keystoreBytes;
+  private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
+    byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+    if (keystoreBytes == null) {
+      KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+          PASSWORD.toCharArray());
+      params.setRandom(new SecureRandom());
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
+          curveNameOrOid, params, null);
+      keystoreBytes = identity.keystore();
     }
+    return keystoreBytes;
+  }
 
 }

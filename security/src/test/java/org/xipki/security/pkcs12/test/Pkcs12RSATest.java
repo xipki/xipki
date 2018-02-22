@@ -33,72 +33,73 @@ import org.xipki.security.pkcs12.SoftTokenContentSignerBuilder;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public abstract class Pkcs12RSATest {
 
-    private ConcurrentContentSigner signer;
+  private ConcurrentContentSigner signer;
 
-    protected Pkcs12RSATest() {
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
+  protected Pkcs12RSATest() {
+    if (Security.getProvider("BC") == null) {
+      Security.addProvider(new BouncyCastleProvider());
+    }
+  }
+
+  protected abstract AlgorithmIdentifier getSignatureAlgorithm();
+
+  protected String getPkcs12File() {
+    return "src/test/resources/test1.p12";
+  }
+
+  protected String getCertificateFile() {
+    return "src/test/resources/test1.der";
+  }
+
+  protected String getPassword() {
+    return "1234";
+  }
+
+  private ConcurrentContentSigner getSigner() throws Exception {
+    if (signer != null) {
+      return signer;
     }
 
-    protected abstract AlgorithmIdentifier getSignatureAlgorithm();
+    String certFile = getCertificateFile();
+    X509Certificate cert = X509Util.parseCert(certFile);
 
-    protected String getPkcs12File() {
-        return "src/test/resources/test1.p12";
+    InputStream ks = new FileInputStream(getPkcs12File());
+    char[] password = getPassword().toCharArray();
+    SoftTokenContentSignerBuilder builder = new SoftTokenContentSignerBuilder("PKCS12", ks,
+        password, null, password, new X509Certificate[]{cert});
+    signer = builder.createSigner(getSignatureAlgorithm(), 1, new SecureRandom());
+    return signer;
+  }
+
+  @Test
+  public void testSignAndVerify() throws Exception {
+    byte[] data = new byte[1234];
+    for (int i = 0; i < data.length; i++) {
+      data[i] = (byte) (i & 0xFF);
     }
 
-    protected String getCertificateFile() {
-        return "src/test/resources/test1.der";
-    }
+    byte[] signatureValue = sign(data);
+    boolean signatureValid = verify(data, signatureValue, getSigner().getCertificate());
+    Assert.assertTrue("Signature invalid", signatureValid);
+  }
 
-    protected String getPassword() {
-        return "1234";
-    }
+  protected byte[] sign(byte[] data) throws Exception {
+    return getSigner().sign(data);
+  }
 
-    private ConcurrentContentSigner getSigner() throws Exception {
-        if (signer != null) {
-            return signer;
-        }
-
-        String certFile = getCertificateFile();
-        X509Certificate cert = X509Util.parseCert(certFile);
-
-        InputStream ks = new FileInputStream(getPkcs12File());
-        char[] password = getPassword().toCharArray();
-        SoftTokenContentSignerBuilder builder = new SoftTokenContentSignerBuilder("PKCS12", ks,
-                password, null, password, new X509Certificate[]{cert});
-        signer = builder.createSigner(getSignatureAlgorithm(), 1, new SecureRandom());
-        return signer;
-    }
-
-    @Test
-    public void testSignAndVerify() throws Exception {
-        byte[] data = new byte[1234];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = (byte) (i & 0xFF);
-        }
-
-        byte[] signatureValue = sign(data);
-        boolean signatureValid = verify(data, signatureValue, getSigner().getCertificate());
-        Assert.assertTrue("Signature invalid", signatureValid);
-    }
-
-    protected byte[] sign(byte[] data) throws Exception {
-        return getSigner().sign(data);
-    }
-
-    protected boolean verify(byte[] data, byte[] signatureValue, X509Certificate cert)
-            throws Exception {
-        Signature signature = Signature.getInstance(getSignatureAlgorithm().getAlgorithm().getId());
-        signature.initVerify(cert.getPublicKey());
-        signature.update(data);
-        return signature.verify(signatureValue);
-    }
+  protected boolean verify(byte[] data, byte[] signatureValue, X509Certificate cert)
+      throws Exception {
+    Signature signature = Signature.getInstance(getSignatureAlgorithm().getAlgorithm().getId());
+    signature.initVerify(cert.getPublicKey());
+    signature.update(data);
+    return signature.verify(signatureValue);
+  }
 
 }

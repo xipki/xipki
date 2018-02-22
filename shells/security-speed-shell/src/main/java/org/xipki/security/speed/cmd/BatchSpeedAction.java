@@ -28,56 +28,57 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class BatchSpeedAction extends SecurityAction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedAction.class);
 
-    protected static final String DEFAULT_P11MODULE_NAME =
-            P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
+  protected static final String DEFAULT_P11MODULE_NAME =
+      P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
-    @Option(name = "--duration",
-            description = "duration for each test case")
-    private String duration = "10s";
+  @Option(name = "--duration",
+      description = "duration for each test case")
+  private String duration = "10s";
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    protected abstract LoadExecutor nextTester() throws Exception;
+  protected abstract LoadExecutor nextTester() throws Exception;
 
-    @Override
-    protected Object execute0() throws InterruptedException {
-        while (true) {
-            println("============================================");
-            LoadExecutor tester;
-            try {
-                tester = nextTester();
-            } catch (Exception ex) {
-                String msg = "could not get nextTester";
-                LogUtil.error(LOG, ex, msg);
-                println(msg + ": " + ex.getMessage());
-                continue;
-            }
-            if (tester == null) {
-                break;
-            }
+  @Override
+  protected Object execute0() throws InterruptedException {
+    while (true) {
+      println("============================================");
+      LoadExecutor tester;
+      try {
+        tester = nextTester();
+      } catch (Exception ex) {
+        String msg = "could not get nextTester";
+        LogUtil.error(LOG, ex, msg);
+        println(msg + ": " + ex.getMessage());
+        continue;
+      }
+      if (tester == null) {
+        break;
+      }
 
-            tester.setDuration(duration);
-            tester.setThreads(Math.min(20, numThreads));
-            tester.test();
-            if (tester.isInterrupted()) {
-                throw new InterruptedException("cancelled by the user");
-            }
-        }
-        return null;
+      tester.setDuration(duration);
+      tester.setThreads(Math.min(20, numThreads));
+      tester.test();
+      if (tester.isInterrupted()) {
+        throw new InterruptedException("cancelled by the user");
+      }
     }
+    return null;
+  }
 
-    protected List<String> getECCurveNames() { // CHECKSTYLE:SKIP
-        return AlgorithmUtil.getECCurveNames();
-    }
+  protected List<String> getECCurveNames() { // CHECKSTYLE:SKIP
+    return AlgorithmUtil.getECCurveNames();
+  }
 
 }

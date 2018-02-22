@@ -44,137 +44,138 @@ import org.xipki.security.util.SignerUtil;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 //CHECKSTYLE:SKIP
 class P11SM2ContentSigner implements XiContentSigner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11SM2ContentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11SM2ContentSigner.class);
 
-    private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
+  private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
 
-    private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
+  private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
 
-    private final P11CryptService cryptService;
+  private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier identityId;
+  private final P11EntityIdentifier identityId;
 
-    private final AlgorithmIdentifier algorithmIdentifier;
+  private final AlgorithmIdentifier algorithmIdentifier;
 
-    private final byte[] encodedAlgorithmIdentifier;
+  private final byte[] encodedAlgorithmIdentifier;
 
-    private final long mechanism;
+  private final long mechanism;
 
-    private final OutputStream outputStream;
+  private final OutputStream outputStream;
 
-    // CHECKSTYLE:SKIP
-    private final byte[] z;
+  // CHECKSTYLE:SKIP
+  private final byte[] z;
 
-    static {
-        sigAlgHashMap.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(), HashAlgoType.SM3);
-        hashMechMap.put(HashAlgoType.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
+  static {
+    sigAlgHashMap.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(), HashAlgoType.SM3);
+    hashMechMap.put(HashAlgoType.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
+  }
+
+  P11SM2ContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+      AlgorithmIdentifier signatureAlgId, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
+      BigInteger pubPointY) throws XiSecurityException, P11TokenException {
+    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+    try {
+      this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
 
-    P11SM2ContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
-            AlgorithmIdentifier signatureAlgId, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
-            BigInteger pubPointY) throws XiSecurityException, P11TokenException {
-        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-        this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
-        try {
-            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
-        } catch (IOException ex) {
-            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
-        }
-
-        String algOid = signatureAlgId.getAlgorithm().getId();
-        HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
-        if (hashAlgo == null) {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid);
-        }
-
-        P11Slot slot = cryptService.getSlot(identityId.slotId());
-        if (slot.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
-            this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
-
-            this.mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
-            Digest digest = hashAlgo.createDigest();
-            this.outputStream = new DigestOutputStream(digest);
-        } else {
-            this.z = null; // not required
-
-            Long ll = hashMechMap.get(hashAlgo);
-            if (ll == null) {
-                throw new XiSecurityException("hash algorithm " + hashAlgo
-                        + " is not suitable for SM2");
-            }
-            this.mechanism = ll.longValue();
-            if (!slot.supportsMechanism(this.mechanism)) {
-                throw new XiSecurityException("unsupported signature algorithm " + algOid);
-            }
-            this.outputStream = new ByteArrayOutputStream();
-        }
+    String algOid = signatureAlgId.getAlgorithm().getId();
+    HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
+    if (hashAlgo == null) {
+      throw new XiSecurityException("unsupported signature algorithm " + algOid);
     }
 
-    @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return algorithmIdentifier;
+    P11Slot slot = cryptService.getSlot(identityId.slotId());
+    if (slot.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
+      this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
+
+      this.mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
+      Digest digest = hashAlgo.createDigest();
+      this.outputStream = new DigestOutputStream(digest);
+    } else {
+      this.z = null; // not required
+
+      Long ll = hashMechMap.get(hashAlgo);
+      if (ll == null) {
+        throw new XiSecurityException("hash algorithm " + hashAlgo
+            + " is not suitable for SM2");
+      }
+      this.mechanism = ll.longValue();
+      if (!slot.supportsMechanism(this.mechanism)) {
+        throw new XiSecurityException("unsupported signature algorithm " + algOid);
+      }
+      this.outputStream = new ByteArrayOutputStream();
+    }
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return algorithmIdentifier;
+  }
+
+  @Override
+  public byte[] getEncodedAlgorithmIdentifier() {
+    return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    reset();
+    return outputStream;
+  }
+
+  private void reset() {
+    if (outputStream instanceof ByteArrayOutputStream) {
+      ((ByteArrayOutputStream) outputStream).reset();
+    } else {
+      ((DigestOutputStream) outputStream).reset();
+      try {
+        outputStream.write(z, 0, z.length);
+      } catch (IOException ex) {
+        throw new IllegalStateException(ex.getMessage());
+      }
+    }
+  }
+
+  @Override
+  public byte[] getSignature() {
+    try {
+      byte[] plainSignature = getPlainSignature();
+      return SignerUtil.dsaSigPlainToX962(plainSignature);
+    } catch (XiSecurityException ex) {
+      LogUtil.warn(LOG, ex);
+      throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
+    } catch (Throwable th) {
+      LogUtil.warn(LOG, th);
+      throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+    }
+  }
+
+  private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    byte[] dataToSign;
+    P11ByteArrayParams params;
+    if (outputStream instanceof ByteArrayOutputStream) {
+      // dataToSign is the real message
+      params = new P11ByteArrayParams(GMUtil.getDefaultIDA());
+      dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+    } else {
+      // dataToSign is Hash(Z||Real Message)
+      params = null;
+      dataToSign = ((DigestOutputStream) outputStream).digest();
     }
 
-    @Override
-    public byte[] getEncodedAlgorithmIdentifier() {
-        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
-    }
+    reset();
 
-    @Override
-    public OutputStream getOutputStream() {
-        reset();
-        return outputStream;
-    }
-
-    private void reset() {
-        if (outputStream instanceof ByteArrayOutputStream) {
-            ((ByteArrayOutputStream) outputStream).reset();
-        } else {
-            ((DigestOutputStream) outputStream).reset();
-            try {
-                outputStream.write(z, 0, z.length);
-            } catch (IOException ex) {
-                throw new IllegalStateException(ex.getMessage());
-            }
-        }
-    }
-
-    @Override
-    public byte[] getSignature() {
-        try {
-            byte[] plainSignature = getPlainSignature();
-            return SignerUtil.dsaSigPlainToX962(plainSignature);
-        } catch (XiSecurityException ex) {
-            LogUtil.warn(LOG, ex);
-            throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
-        } catch (Throwable th) {
-            LogUtil.warn(LOG, th);
-            throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
-        }
-    }
-
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
-        byte[] dataToSign;
-        P11ByteArrayParams params;
-        if (outputStream instanceof ByteArrayOutputStream) {
-            // dataToSign is the real message
-            params = new P11ByteArrayParams(GMUtil.getDefaultIDA());
-            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
-        } else {
-            // dataToSign is Hash(Z||Real Message)
-            params = null;
-            dataToSign = ((DigestOutputStream) outputStream).digest();
-        }
-
-        reset();
-
-        return cryptService.getIdentity(identityId).sign(mechanism, params, dataToSign);
-    }
+    return cryptService.getIdentity(identityId).sign(mechanism, params, dataToSign);
+  }
 }

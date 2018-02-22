@@ -18,6 +18,7 @@
 package org.xipki.password;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
@@ -25,34 +26,34 @@ package org.xipki.password;
 // CHECKSTYLE:SKIP
 public enum PBEAlgo {
 
-    PBEWithHmacSHA256AndAES_256(1, "PBEWithHmacSHA256AndAES_256");
+  PBEWithHmacSHA256AndAES_256(1, "PBEWithHmacSHA256AndAES_256");
 
-    private int code;
+  private int code;
 
-    private String algoName;
+  private String algoName;
 
-    private PBEAlgo(int code, String algoName) {
-        this.code = code;
-        this.algoName = algoName;
+  private PBEAlgo(int code, String algoName) {
+    this.code = code;
+    this.algoName = algoName;
+  }
+
+  public int code() {
+    return code;
+  }
+
+  public String algoName() {
+    return algoName;
+  }
+
+  public static PBEAlgo forCode(int code) {
+    for (PBEAlgo value : values()) {
+      if (value.code == code) {
+        return value;
+      }
     }
 
-    public int code() {
-        return code;
-    }
-
-    public String algoName() {
-        return algoName;
-    }
-
-    public static PBEAlgo forCode(int code) {
-        for (PBEAlgo value : values()) {
-            if (value.code == code) {
-                return value;
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }
 

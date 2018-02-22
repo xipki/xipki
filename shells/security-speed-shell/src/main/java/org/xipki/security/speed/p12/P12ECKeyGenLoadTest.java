@@ -25,30 +25,31 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
-    private final ASN1ObjectIdentifier curveOid;
+  private final ASN1ObjectIdentifier curveOid;
 
-    public P12ECKeyGenLoadTest(String curveNameOrOid, SecurityFactory securityFactory)
-            throws Exception {
-        super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
+  public P12ECKeyGenLoadTest(String curveNameOrOid, SecurityFactory securityFactory)
+      throws Exception {
+    super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
 
-        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-        if (oid == null) {
-            throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
-        }
-
-        this.curveOid = oid;
+    ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+    if (oid == null) {
+      throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
     }
 
-    @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
-        KeyUtil.generateECKeypair(curveOid, random);
+    this.curveOid = oid;
+  }
 
-    }
+  @Override
+  protected void generateKeypair(SecureRandom random) throws Exception {
+    KeyUtil.generateECKeypair(curveOid, random);
+
+  }
 
 }

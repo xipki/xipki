@@ -23,27 +23,28 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "sm2-p11",
-        description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
+    description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11SM2KeyGenCmd extends P11KeyGenAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.generateSM2Keypair(label, getControl());
-        finalize("SM2", objId);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objId = slot.generateSM2Keypair(label, getControl());
+    finalize("SM2", objId);
+    return null;
+  }
 
-    @Override
-    protected boolean getDefaultExtractable() {
-        return false;
-    }
+  @Override
+  protected boolean getDefaultExtractable() {
+    return false;
+  }
 
 }

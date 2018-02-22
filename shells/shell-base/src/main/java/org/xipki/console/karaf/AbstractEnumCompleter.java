@@ -28,30 +28,31 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class AbstractEnumCompleter implements Completer {
 
-    private final List<String> enums = new LinkedList<>();
+  private final List<String> enums = new LinkedList<>();
 
-    protected void setTokens(String tokens) {
-        ParamUtil.requireNonNull("tokens", tokens);
-        enums.clear();
-        StringTokenizer st = new StringTokenizer(tokens, ", ");
-        while (st.hasMoreTokens()) {
-            enums.add(st.nextToken());
-        }
+  protected void setTokens(String tokens) {
+    ParamUtil.requireNonNull("tokens", tokens);
+    enums.clear();
+    StringTokenizer st = new StringTokenizer(tokens, ", ");
+    while (st.hasMoreTokens()) {
+      enums.add(st.nextToken());
     }
+  }
 
-    @Override
-    public int complete(Session session, CommandLine commandLine, List<String> candidates) {
-        StringsCompleter delegate = new StringsCompleter();
-        for (String entry : enums) {
-            delegate.getStrings().add(entry);
-        }
-        return delegate.complete(session, commandLine, candidates);
+  @Override
+  public int complete(Session session, CommandLine commandLine, List<String> candidates) {
+    StringsCompleter delegate = new StringsCompleter();
+    for (String entry : enums) {
+      delegate.getStrings().add(entry);
     }
+    return delegate.complete(session, commandLine, candidates);
+  }
 
 }

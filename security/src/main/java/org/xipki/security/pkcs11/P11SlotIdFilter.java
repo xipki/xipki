@@ -18,38 +18,39 @@
 package org.xipki.security.pkcs11;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class P11SlotIdFilter {
 
-    private final Integer index;
+  private final Integer index;
 
-    private final Long id;
+  private final Long id;
 
-    P11SlotIdFilter(Integer index, Long id) {
-        if (index == null && id == null) {
-            throw new IllegalArgumentException("at least one of index and id must not be null");
-        }
-        this.index = index;
-        this.id = id;
+  P11SlotIdFilter(Integer index, Long id) {
+    if (index == null && id == null) {
+      throw new IllegalArgumentException("at least one of index and id must not be null");
+    }
+    this.index = index;
+    this.id = id;
+  }
+
+  boolean match(P11SlotIdentifier slotId) {
+    if (index != null) {
+      if (index.intValue() != slotId.index()) {
+        return false;
+      }
     }
 
-    boolean match(P11SlotIdentifier slotId) {
-        if (index != null) {
-            if (index.intValue() != slotId.index()) {
-                return false;
-            }
-        }
-
-        if (id != null) {
-            if (id.longValue() != slotId.id()) {
-                return false;
-            }
-        }
-
-        return true;
+    if (id != null) {
+      if (id.longValue() != slotId.id()) {
+        return false;
+      }
     }
+
+    return true;
+  }
 
 }

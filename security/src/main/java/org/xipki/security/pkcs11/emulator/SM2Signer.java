@@ -49,106 +49,106 @@ import org.xipki.security.util.GMUtil;
  *
  */
 class SM2Signer {
+  // CHECKSTYLE:SKIP
+  private final DSAKCalculator kCalculator = new RandomDSAKCalculator();
+
+  private final Digest digest;
+
+  private final ECDomainParameters ecParams;
+
+  private final ECKeyParameters ecKey;
+
+  private final ECPoint pubPoint;
+
+  public SM2Signer(CipherParameters param) {
+    if (param instanceof ParametersWithRandom) {
+      ParametersWithRandom rdmParam = (ParametersWithRandom) param;
+
+      ecKey = (ECKeyParameters)rdmParam.getParameters();
+      ecParams = ecKey.getParameters();
+      kCalculator.init(ecParams.getN(), rdmParam.getRandom());
+    } else {
+      ecKey = (ECKeyParameters) param;
+      ecParams = ecKey.getParameters();
+      kCalculator.init(ecParams.getN(), new SecureRandom());
+    }
+
+    if (!GMUtil.isSm2primev2Curve(ecKey.getParameters().getCurve())) {
+      throw new IllegalArgumentException("Given EC key is not of the curve sm2primev2");
+    }
+
+    this.pubPoint = new FixedPointCombMultiplier().multiply(ecParams.getG(),
+        ((ECPrivateKeyParameters)ecKey).getD()).normalize();
+
+    this.digest = HashAlgoType.SM3.createDigest();
+  }
+
+  public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
+      throws CryptoException {
     // CHECKSTYLE:SKIP
-    private final DSAKCalculator kCalculator = new RandomDSAKCalculator();
-
-    private final Digest digest;
-
-    private final ECDomainParameters ecParams;
-
-    private final ECKeyParameters ecKey;
-
-    private final ECPoint pubPoint;
-
-    public SM2Signer(CipherParameters param) {
-        if (param instanceof ParametersWithRandom) {
-            ParametersWithRandom rdmParam = (ParametersWithRandom) param;
-
-            ecKey = (ECKeyParameters)rdmParam.getParameters();
-            ecParams = ecKey.getParameters();
-            kCalculator.init(ecParams.getN(), rdmParam.getRandom());
-        } else {
-            ecKey = (ECKeyParameters) param;
-            ecParams = ecKey.getParameters();
-            kCalculator.init(ecParams.getN(), new SecureRandom());
-        }
-
-        if (!GMUtil.isSm2primev2Curve(ecKey.getParameters().getCurve())) {
-            throw new IllegalArgumentException("Given EC key is not of the curve sm2primev2");
-        }
-
-        this.pubPoint = new FixedPointCombMultiplier().multiply(ecParams.getG(),
-                ((ECPrivateKeyParameters)ecKey).getD()).normalize();
-
-        this.digest = HashAlgoType.SM3.createDigest();
+    byte[] z;
+    if (userId == null) {
+      // use default userId
+      z = GMUtil.getSM2Z(GMObjectIdentifiers.sm2p256v1,
+          pubPoint.getAffineXCoord().toBigInteger(),
+          pubPoint.getAffineYCoord().toBigInteger());
+    } else {
+      z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
+        pubPoint.getAffineXCoord().toBigInteger(),
+        pubPoint.getAffineYCoord().toBigInteger());
     }
+    digest.reset();
+    digest.update(z, 0, z.length);
+    digest.update(message, 0, message.length);
+    byte[] hash = new byte[digest.getDigestSize()];
+    digest.doFinal(hash, 0);
+    return generateSignatureForHash(hash);
+  }
 
-    public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
-            throws CryptoException {
-        // CHECKSTYLE:SKIP
-        byte[] z;
-        if (userId == null) {
-            // use default userId
-            z = GMUtil.getSM2Z(GMObjectIdentifiers.sm2p256v1,
-                    pubPoint.getAffineXCoord().toBigInteger(),
-                    pubPoint.getAffineYCoord().toBigInteger());
-        } else {
-            z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
-                pubPoint.getAffineXCoord().toBigInteger(),
-                pubPoint.getAffineYCoord().toBigInteger());
-        }
-        digest.reset();
-        digest.update(z, 0, z.length);
-        digest.update(message, 0, message.length);
-        byte[] hash = new byte[digest.getDigestSize()];
-        digest.doFinal(hash, 0);
-        return generateSignatureForHash(hash);
+  // CHECKSTYLE:OFF
+  public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
+    BigInteger n = ecParams.getN();
+    BigInteger e = new BigInteger(1, eHash);
+    BigInteger d = ((ECPrivateKeyParameters)ecKey).getD();
+
+    BigInteger r;
+    BigInteger s;
+
+    ECMultiplier basePointMultiplier = new FixedPointCombMultiplier();
+
+    // 5.2.1 Draft RFC:  SM2 Public Key Algorithms
+    do { // generate s
+      BigInteger k;
+      do { // generate r
+        // A3
+        k = kCalculator.nextK();
+
+        // A4
+        ECPoint p = basePointMultiplier.multiply(ecParams.getG(), k).normalize();
+
+        // A5
+        r = e.add(p.getAffineXCoord().toBigInteger()).mod(n);
+      }
+      while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
+
+      // A6
+      BigInteger dPlus1ModN = d.add(ECConstants.ONE).modInverse(n);
+
+      s = k.subtract(r.multiply(d)).mod(n);
+      s = dPlus1ModN.multiply(s).mod(n);
     }
+    while (s.equals(ECConstants.ZERO));
 
-    // CHECKSTYLE:OFF
-    public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
-        BigInteger n = ecParams.getN();
-        BigInteger e = new BigInteger(1, eHash);
-        BigInteger d = ((ECPrivateKeyParameters)ecKey).getD();
-
-        BigInteger r;
-        BigInteger s;
-
-        ECMultiplier basePointMultiplier = new FixedPointCombMultiplier();
-
-        // 5.2.1 Draft RFC:  SM2 Public Key Algorithms
-        do { // generate s
-            BigInteger k;
-            do { // generate r
-                // A3
-                k = kCalculator.nextK();
-
-                // A4
-                ECPoint p = basePointMultiplier.multiply(ecParams.getG(), k).normalize();
-
-                // A5
-                r = e.add(p.getAffineXCoord().toBigInteger()).mod(n);
-            }
-            while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
-
-            // A6
-            BigInteger dPlus1ModN = d.add(ECConstants.ONE).modInverse(n);
-
-            s = k.subtract(r.multiply(d)).mod(n);
-            s = dPlus1ModN.multiply(s).mod(n);
-        }
-        while (s.equals(ECConstants.ZERO));
-
-        // A7
-        try {
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new ASN1Integer(r));
-            v.add(new ASN1Integer(s));
-            return new DERSequence(v).getEncoded(ASN1Encoding.DER);
-        } catch (IOException ex) {
-            throw new CryptoException("unable to encode signature: " + ex.getMessage(), ex);
-        }
+    // A7
+    try {
+      ASN1EncodableVector v = new ASN1EncodableVector();
+      v.add(new ASN1Integer(r));
+      v.add(new ASN1Integer(s));
+      return new DERSequence(v).getEncoded(ASN1Encoding.DER);
+    } catch (IOException ex) {
+      throw new CryptoException("unable to encode signature: " + ex.getMessage(), ex);
     }
-    // CHECKSTYLE:ON
+  }
+  // CHECKSTYLE:ON
 
 }

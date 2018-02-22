@@ -22,26 +22,28 @@ import java.security.cert.X509Certificate;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface SignerFactoryRegister {
 
-    /**
-     * @param securityFactory
-     *          Security factory. Must not be {@code null}.
-     * @param type
-     *          Type of the signer. Must not be {@code null}.
-     * @param conf
-     *          Configuration. Must not be {@code null}.
-     * @param certificateChain
-     *          Certificate chain. Could be {@code null}-
-     * @return new signer.
-     * @throws ObjectCreationException
-     *           If signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type, SignerConf conf,
-            X509Certificate[] certificateChain) throws ObjectCreationException;
+  /**
+   * TODO.
+   * @param securityFactory
+   *          Security factory. Must not be {@code null}.
+   * @param type
+   *          Type of the signer. Must not be {@code null}.
+   * @param conf
+   *          Configuration. Must not be {@code null}.
+   * @param certificateChain
+   *          Certificate chain. Could be {@code null}-
+   * @return new signer.
+   * @throws ObjectCreationException
+   *           If signer could not be created.
+   */
+  ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type, SignerConf conf,
+      X509Certificate[] certificateChain) throws ObjectCreationException;
 
 }

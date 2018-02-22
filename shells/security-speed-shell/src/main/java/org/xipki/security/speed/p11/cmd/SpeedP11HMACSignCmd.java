@@ -26,24 +26,25 @@ import org.xipki.security.speed.cmd.completer.HMACSigAlgCompleter;
 import org.xipki.security.speed.p11.P11HMACSignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 @Command(scope = "xi", name = "speed-hmac-sign-p11",
-        description = "performance test of PKCS#11 HMAC signature creation")
+    description = "performance test of PKCS#11 HMAC signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP11HMACSignCmd extends SpeedP11Action {
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(HMACSigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(HMACSigAlgCompleter.class)
+  private String sigAlgo;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P11HMACSignLoadTest(securityFactory, getSlot(), sigAlgo);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P11HMACSignLoadTest(securityFactory, getSlot(), sigAlgo);
+  }
 
 }

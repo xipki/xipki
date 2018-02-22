@@ -29,101 +29,102 @@ import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class HashCalculator {
 
-    private static final int PARALLELISM = 50;
+  private static final int PARALLELISM = 50;
 
-    private static final ConcurrentHashMap<HashAlgoType, ConcurrentBag<ConcurrentBagEntry<Digest>>>
-        MDS_MAP = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<HashAlgoType, ConcurrentBag<ConcurrentBagEntry<Digest>>>
+      MDS_MAP = new ConcurrentHashMap<>();
 
-    static {
-        for (HashAlgoType ha : HashAlgoType.values()) {
-            MDS_MAP.put(ha, getMessageDigests(ha));
-        }
+  static {
+    for (HashAlgoType ha : HashAlgoType.values()) {
+      MDS_MAP.put(ha, getMessageDigests(ha));
+    }
+  }
+
+  private HashCalculator() {
+  }
+
+  private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMessageDigests(
+      HashAlgoType hashAlgo) {
+    ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
+    for (int i = 0; i < PARALLELISM; i++) {
+      mds.add(new ConcurrentBagEntry<Digest>(hashAlgo.createDigest()));
+    }
+    return mds;
+  }
+
+  public static String base64Sha1(byte[] data) {
+    return base64Hash(HashAlgoType.SHA1, data);
+  }
+
+  public static String hexSha1(byte[] data) {
+    return hexHash(HashAlgoType.SHA1, data);
+  }
+
+  public static byte[] sha1(byte[] data) {
+    return hash(HashAlgoType.SHA1, data);
+  }
+
+  public static String base64Sha256(byte[] data) {
+    return base64Hash(HashAlgoType.SHA256, data);
+  }
+
+  public static String hexSha256(byte[] data) {
+    return hexHash(HashAlgoType.SHA256, data);
+  }
+
+  public static byte[] sha256(byte[] data) {
+    return hash(HashAlgoType.SHA256, data);
+  }
+
+  public static String hexHash(HashAlgoType hashAlgoType, byte[] data) {
+    byte[] bytes = hash(hashAlgoType, data);
+    return (bytes == null) ? null : Hex.encode(bytes);
+  }
+
+  public static String base64Hash(HashAlgoType hashAlgoType, byte[] data) {
+    byte[] bytes = hash(hashAlgoType, data);
+    return (bytes == null) ? null : Base64.getEncoder().encodeToString(bytes);
+  }
+
+  public static byte[] hash(HashAlgoType hashAlgoType, byte[] data) {
+    ParamUtil.requireNonNull("hashAlgoType", hashAlgoType);
+    ParamUtil.requireNonNull("data", data);
+    if (!MDS_MAP.containsKey(hashAlgoType)) {
+      throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
     }
 
-    private HashCalculator() {
+    ConcurrentBag<ConcurrentBagEntry<Digest>> mds = MDS_MAP.get(hashAlgoType);
+
+    ConcurrentBagEntry<Digest> md0 = null;
+    for (int i = 0; i < 3; i++) {
+      try {
+        md0 = mds.borrow(10, TimeUnit.SECONDS);
+        break;
+      } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+      }
     }
 
-    private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMessageDigests(
-            HashAlgoType hashAlgo) {
-        ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
-        for (int i = 0; i < PARALLELISM; i++) {
-            mds.add(new ConcurrentBagEntry<Digest>(hashAlgo.createDigest()));
-        }
-        return mds;
+    if (md0 == null) {
+      throw new RuntimeOperatorException("could not get idle MessageDigest");
     }
 
-    public static String base64Sha1(byte[] data) {
-        return base64Hash(HashAlgoType.SHA1, data);
+    try {
+      Digest md = md0.value();
+      md.reset();
+      md.update(data, 0, data.length);
+      byte[] bytes = new byte[md.getDigestSize()];
+      md.doFinal(bytes, 0);
+      return bytes;
+    } finally {
+      mds.requite(md0);
     }
-
-    public static String hexSha1(byte[] data) {
-        return hexHash(HashAlgoType.SHA1, data);
-    }
-
-    public static byte[] sha1(byte[] data) {
-        return hash(HashAlgoType.SHA1, data);
-    }
-
-    public static String base64Sha256(byte[] data) {
-        return base64Hash(HashAlgoType.SHA256, data);
-    }
-
-    public static String hexSha256(byte[] data) {
-        return hexHash(HashAlgoType.SHA256, data);
-    }
-
-    public static byte[] sha256(byte[] data) {
-        return hash(HashAlgoType.SHA256, data);
-    }
-
-    public static String hexHash(HashAlgoType hashAlgoType, byte[] data) {
-        byte[] bytes = hash(hashAlgoType, data);
-        return (bytes == null) ? null : Hex.encode(bytes);
-    }
-
-    public static String base64Hash(HashAlgoType hashAlgoType, byte[] data) {
-        byte[] bytes = hash(hashAlgoType, data);
-        return (bytes == null) ? null : Base64.getEncoder().encodeToString(bytes);
-    }
-
-    public static byte[] hash(HashAlgoType hashAlgoType, byte[] data) {
-        ParamUtil.requireNonNull("hashAlgoType", hashAlgoType);
-        ParamUtil.requireNonNull("data", data);
-        if (!MDS_MAP.containsKey(hashAlgoType)) {
-            throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
-        }
-
-        ConcurrentBag<ConcurrentBagEntry<Digest>> mds = MDS_MAP.get(hashAlgoType);
-
-        ConcurrentBagEntry<Digest> md0 = null;
-        for (int i = 0; i < 3; i++) {
-            try {
-                md0 = mds.borrow(10, TimeUnit.SECONDS);
-                break;
-            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-            }
-        }
-
-        if (md0 == null) {
-            throw new RuntimeOperatorException("could not get idle MessageDigest");
-        }
-
-        try {
-            Digest md = md0.value();
-            md.reset();
-            md.update(data, 0, data.length);
-            byte[] bytes = new byte[md.getDigestSize()];
-            md.doFinal(bytes, 0);
-            return bytes;
-        } finally {
-            mds.requite(md0);
-        }
-    } // method hash
+  } // method hash
 
 }

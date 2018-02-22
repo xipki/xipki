@@ -20,14 +20,15 @@ package org.xipki.security;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public interface AlgorithmValidator {
 
-    boolean isAlgorithmPermitted(AlgorithmIdentifier algId);
+  boolean isAlgorithmPermitted(AlgorithmIdentifier algId);
 
-    boolean isAlgorithmPermitted(String algName);
+  boolean isAlgorithmPermitted(String algName);
 
 }

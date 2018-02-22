@@ -30,52 +30,53 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.OBFPasswordService;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "deobfuscate",
-        description = "deobfuscate password")
+    description = "deobfuscate password")
 @Service
 public class DeobfuscateCmd extends SecurityAction {
 
-    @Option(name = "--password",
-            description = "obfuscated password, starts with OBF:\n"
-                    + "exactly one of password and password-file must be specified")
-    private String passwordHint;
+  @Option(name = "--password",
+      description = "obfuscated password, starts with OBF:\n"
+          + "exactly one of password and password-file must be specified")
+  private String passwordHint;
 
-    @Option(name = "--password-file", description = "file containing the obfuscated password")
-    @Completion(FilePathCompleter.class)
-    private String passwordFile;
+  @Option(name = "--password-file", description = "file containing the obfuscated password")
+  @Completion(FilePathCompleter.class)
+  private String passwordFile;
 
-    @Option(name = "--out", description = "where to save the password")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out", description = "where to save the password")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (!(passwordHint == null ^ passwordFile == null)) {
-            throw new IllegalCmdParamException(
-                    "exactly one of password and password-file must be specified");
-        }
-
-        if (passwordHint == null) {
-            passwordHint = new String(IoUtil.read(passwordFile));
-        }
-
-        if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
-            throw new IllegalCmdParamException("encrypted password '" + passwordHint
-                    + "' does not start with OBF:");
-        }
-
-        String password = OBFPasswordService.deobfuscate(passwordHint);
-        if (outFile != null) {
-            saveVerbose("saved the password to file", new File(outFile),
-                    new String(password).getBytes());
-        } else {
-            println("the password is: '" + new String(password) + "'");
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (!(passwordHint == null ^ passwordFile == null)) {
+      throw new IllegalCmdParamException(
+          "exactly one of password and password-file must be specified");
     }
+
+    if (passwordHint == null) {
+      passwordHint = new String(IoUtil.read(passwordFile));
+    }
+
+    if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
+      throw new IllegalCmdParamException("encrypted password '" + passwordHint
+          + "' does not start with OBF:");
+    }
+
+    String password = OBFPasswordService.deobfuscate(passwordHint);
+    if (outFile != null) {
+      saveVerbose("saved the password to file", new File(outFile),
+          new String(password).getBytes());
+    } else {
+      println("the password is: '" + new String(password) + "'");
+    }
+    return null;
+  }
 
 }

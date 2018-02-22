@@ -32,84 +32,85 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DataSourceFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
-    public DataSourceWrapper createDataSourceForFile(String name, String confFile,
-            PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
-        ParamUtil.requireNonNull("confFile", confFile);
-        FileInputStream fileIn = new FileInputStream(IoUtil.expandFilepath(confFile));
-        return createDataSource(name, fileIn, passwordResolver);
+  public DataSourceWrapper createDataSourceForFile(String name, String confFile,
+      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+    ParamUtil.requireNonNull("confFile", confFile);
+    FileInputStream fileIn = new FileInputStream(IoUtil.expandFilepath(confFile));
+    return createDataSource(name, fileIn, passwordResolver);
+  }
+
+  public DataSourceWrapper createDataSource(String name, InputStream conf,
+      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+    ParamUtil.requireNonNull("conf", conf);
+    Properties config = new Properties();
+    try {
+      config.load(conf);
+    } finally {
+      try {
+        conf.close();
+      } catch (Exception ex) {
+        LOG.error("could not close stream: {}", ex.getMessage());
+      }
     }
 
-    public DataSourceWrapper createDataSource(String name, InputStream conf,
-            PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
-        ParamUtil.requireNonNull("conf", conf);
-        Properties config = new Properties();
-        try {
-            config.load(conf);
-        } finally {
-            try {
-                conf.close();
-            } catch (Exception ex) {
-                LOG.error("could not close stream: {}", ex.getMessage());
-            }
+    return createDataSource(name, config, passwordResolver);
+  } // method createDataSource
+
+  public DataSourceWrapper createDataSource(String name, Properties conf,
+      PasswordResolver passwordResolver) throws PasswordResolverException {
+    ParamUtil.requireNonNull("conf", conf);
+    DatabaseType databaseType;
+    String className = conf.getProperty("dataSourceClassName");
+    if (className != null) {
+      databaseType = DatabaseType.forDataSourceClass(className);
+    } else {
+      className = conf.getProperty("driverClassName");
+      if (className != null) {
+        databaseType = DatabaseType.forDriver(className);
+      } else {
+        String jdbcUrl = conf.getProperty("jdbcUrl");
+        if (jdbcUrl == null) {
+          throw new IllegalArgumentException("none of the properties dataSourceClassName"
+              + ", driverClassName and jdbcUrl is configured");
         }
 
-        return createDataSource(name, config, passwordResolver);
-    } // method createDataSource
+        databaseType = DatabaseType.forJdbcUrl(jdbcUrl);
+      }
+    }
 
-    public DataSourceWrapper createDataSource(String name, Properties conf,
-            PasswordResolver passwordResolver) throws PasswordResolverException {
-        ParamUtil.requireNonNull("conf", conf);
-        DatabaseType databaseType;
-        String className = conf.getProperty("dataSourceClassName");
-        if (className != null) {
-            databaseType = DatabaseType.forDataSourceClass(className);
-        } else {
-            className = conf.getProperty("driverClassName");
-            if (className != null) {
-                databaseType = DatabaseType.forDriver(className);
-            } else {
-                String jdbcUrl = conf.getProperty("jdbcUrl");
-                if (jdbcUrl == null) {
-                    throw new IllegalArgumentException("none of the properties dataSourceClassName"
-                            + ", driverClassName and jdbcUrl is configured");
-                }
+    String password = conf.getProperty("password");
+    if (password != null) {
+      if (passwordResolver != null) {
+        password = new String(passwordResolver.resolvePassword(password));
+      }
+      conf.setProperty("password", password);
+    }
 
-                databaseType = DatabaseType.forJdbcUrl(jdbcUrl);
-            }
-        }
+    password = conf.getProperty("dataSource.password");
+    if (password != null) {
+      if (passwordResolver != null) {
+        password = new String(passwordResolver.resolvePassword(password));
+      }
+      conf.setProperty("dataSource.password", password);
+    }
 
-        String password = conf.getProperty("password");
-        if (password != null) {
-            if (passwordResolver != null) {
-                password = new String(passwordResolver.resolvePassword(password));
-            }
-            conf.setProperty("password", password);
-        }
+    Set<Object> keySet = new HashSet<>(conf.keySet());
+    for (Object key : keySet) {
+      if (((String) key).startsWith("liquibase")) {
+        conf.remove(key);
+      }
+    }
 
-        password = conf.getProperty("dataSource.password");
-        if (password != null) {
-            if (passwordResolver != null) {
-                password = new String(passwordResolver.resolvePassword(password));
-            }
-            conf.setProperty("dataSource.password", password);
-        }
-
-        Set<Object> keySet = new HashSet<>(conf.keySet());
-        for (Object key : keySet) {
-            if (((String) key).startsWith("liquibase")) {
-                conf.remove(key);
-            }
-        }
-
-        return DataSourceWrapper.createDataSource(name, conf, databaseType);
-    } // method createDataSource
+    return DataSourceWrapper.createDataSource(name, conf, databaseType);
+  } // method createDataSource
 
 }

@@ -23,24 +23,25 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11ECSignLoadTest extends P11SignLoadTest {
 
-    public P11ECSignLoadTest(SecurityFactory securityFactory, P11Slot slot,
-            String signatureAlgorithm, String curveNameOrOid) throws Exception {
-        super(securityFactory, slot, signatureAlgorithm, generateKey(slot, curveNameOrOid),
-                "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid);
-    }
+  public P11ECSignLoadTest(SecurityFactory securityFactory, P11Slot slot,
+      String signatureAlgorithm, String curveNameOrOid) throws Exception {
+    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, curveNameOrOid),
+        "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid);
+  }
 
-    private static P11ObjectIdentifier generateKey(P11Slot slot, String curveNameOrOid)
-            throws Exception {
-        ParamUtil.requireNonNull("slot", slot);
-        ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
-        return slot.generateECKeypair(curveNameOrOid, "loadtest-" + System.currentTimeMillis(),
-                getNewKeyControl());
-    }
+  private static P11ObjectIdentifier generateKey(P11Slot slot, String curveNameOrOid)
+      throws Exception {
+    ParamUtil.requireNonNull("slot", slot);
+    ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
+    return slot.generateECKeypair(curveNameOrOid, "loadtest-" + System.currentTimeMillis(),
+        getNewKeyControl());
+  }
 
 }

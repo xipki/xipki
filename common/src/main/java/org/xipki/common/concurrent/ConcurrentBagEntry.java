@@ -22,45 +22,46 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.xipki.common.concurrent.ConcurrentBag.IConcurrentBagEntry;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class ConcurrentBagEntry<T> implements IConcurrentBagEntry {
 
-    @SuppressWarnings({ "unused" })
-    private volatile int state = 0; // Don't delete me, will be used by the stateUpdater
+  @SuppressWarnings({ "unused" })
+  private volatile int state = 0; // Don't delete me, will be used by the stateUpdater
 
-    @SuppressWarnings("rawtypes")
-    private static final AtomicIntegerFieldUpdater<ConcurrentBagEntry> stateUpdater;
+  @SuppressWarnings("rawtypes")
+  private static final AtomicIntegerFieldUpdater<ConcurrentBagEntry> stateUpdater;
 
-    private final T value;
+  private final T value;
 
-    static {
-        stateUpdater = AtomicIntegerFieldUpdater.newUpdater(ConcurrentBagEntry.class, "state");
-    }
+  static {
+    stateUpdater = AtomicIntegerFieldUpdater.newUpdater(ConcurrentBagEntry.class, "state");
+  }
 
-    public ConcurrentBagEntry(T value) {
-        this.value = value;
-    }
+  public ConcurrentBagEntry(T value) {
+    this.value = value;
+  }
 
-    public T value() {
-        return value;
-    }
+  public T value() {
+    return value;
+  }
 
-    @Override
-    public int getState() {
-        return stateUpdater.get(this);
-    }
+  @Override
+  public int getState() {
+    return stateUpdater.get(this);
+  }
 
-    @Override
-    public boolean compareAndSet(int expect, int update) {
-        return stateUpdater.compareAndSet(this, expect, update);
-    }
+  @Override
+  public boolean compareAndSet(int expect, int update) {
+    return stateUpdater.compareAndSet(this, expect, update);
+  }
 
-    @Override
-    public void setState(int update) {
-        stateUpdater.set(this, update);
-    }
+  @Override
+  public void setState(int update) {
+    stateUpdater.set(this, update);
+  }
 
 }

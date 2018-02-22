@@ -25,73 +25,74 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DateUtil {
 
-    private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
+  private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
-    private static final DateTimeFormatter SDF1 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+  private static final DateTimeFormatter SDF1 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-    private static final DateTimeFormatter SDF2 = DateTimeFormatter.ofPattern("yyyyMMdd");
+  private static final DateTimeFormatter SDF2 = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    private DateUtil() {
+  private DateUtil() {
+  }
+
+  public static Date parseUtcTimeyyyyMMddhhmmss(String utcTime) {
+    String coreUtcTime = utcTime;
+    if (StringUtil.isNotBlank(utcTime)) {
+      char ch = utcTime.charAt(utcTime.length() - 1);
+      if (ch == 'z' || ch == 'Z') {
+        coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
+      }
     }
 
-    public static Date parseUtcTimeyyyyMMddhhmmss(String utcTime) {
-        String coreUtcTime = utcTime;
-        if (StringUtil.isNotBlank(utcTime)) {
-            char ch = utcTime.charAt(utcTime.length() - 1);
-            if (ch == 'z' || ch == 'Z') {
-                coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
-            }
-        }
-
-        if (coreUtcTime == null || coreUtcTime.length() != 14) {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
-        }
-
-        try {
-            LocalDateTime localDate = LocalDateTime.parse(coreUtcTime, SDF1);
-            Instant instant = localDate.atZone(ZONE_UTC).toInstant();
-            return Date.from(instant);
-        } catch (DateTimeParseException ex) {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-                    + ex.getMessage());
-        }
+    if (coreUtcTime == null || coreUtcTime.length() != 14) {
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
     }
 
-    public static Date parseUtcTimeyyyyMMdd(String utcTime) {
-        String coreUtcTime = utcTime;
-        if (StringUtil.isNotBlank(utcTime)) {
-            char ch = utcTime.charAt(utcTime.length() - 1);
-            if (ch == 'z' || ch == 'Z') {
-                coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
-            }
-        }
+    try {
+      LocalDateTime localDate = LocalDateTime.parse(coreUtcTime, SDF1);
+      Instant instant = localDate.atZone(ZONE_UTC).toInstant();
+      return Date.from(instant);
+    } catch (DateTimeParseException ex) {
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
+          + ex.getMessage());
+    }
+  }
 
-        if (coreUtcTime == null || coreUtcTime.length() != 8) {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
-        }
-
-        try {
-            LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
-            Instant instant = localDate.atZone(ZONE_UTC).toInstant();
-            return Date.from(instant);
-        } catch (DateTimeParseException ex) {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-                    + ex.getMessage());
-        }
+  public static Date parseUtcTimeyyyyMMdd(String utcTime) {
+    String coreUtcTime = utcTime;
+    if (StringUtil.isNotBlank(utcTime)) {
+      char ch = utcTime.charAt(utcTime.length() - 1);
+      if (ch == 'z' || ch == 'Z') {
+        coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
+      }
     }
 
-    public static String toUtcTimeyyyyMMddhhmmss(Date utcTime) {
-        return SDF1.format(utcTime.toInstant().atZone(ZONE_UTC));
+    if (coreUtcTime == null || coreUtcTime.length() != 8) {
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
     }
 
-    public static String toUtcTimeyyyyMMdd(Date utcTime) {
-        return SDF2.format(utcTime.toInstant().atZone(ZONE_UTC));
+    try {
+      LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
+      Instant instant = localDate.atZone(ZONE_UTC).toInstant();
+      return Date.from(instant);
+    } catch (DateTimeParseException ex) {
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
+          + ex.getMessage());
     }
+  }
+
+  public static String toUtcTimeyyyyMMddhhmmss(Date utcTime) {
+    return SDF1.format(utcTime.toInstant().atZone(ZONE_UTC));
+  }
+
+  public static String toUtcTimeyyyyMMdd(Date utcTime) {
+    return SDF2.format(utcTime.toInstant().atZone(ZONE_UTC));
+  }
 
 }

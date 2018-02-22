@@ -18,15 +18,16 @@
 package org.xipki.common;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class EndOfQueue implements QueueEntry {
 
-    public static final EndOfQueue INSTANCE = new EndOfQueue();
+  public static final EndOfQueue INSTANCE = new EndOfQueue();
 
-    private EndOfQueue() {
-    }
+  private EndOfQueue() {
+  }
 
 }

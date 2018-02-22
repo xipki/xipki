@@ -53,7 +53,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
- * construction of alias:
+ * Construction of alias is as follows.
  * <ul>
  *   <li><code>&lt;module name&gt;#slotid-&lt;slot id&gt;#keyid-&lt;key id&gt;</code></li>
  *   <li><code>&lt;module name&gt;#slotid-&lt;slot id&gt;#keylabel-&lt;key label&gt;</code></li>
@@ -68,219 +68,219 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 public class XiKeyStoreSpi extends KeyStoreSpi {
 
-    private static final Logger LOG = LoggerFactory.getLogger(XiKeyStoreSpi.class);
+  private static final Logger LOG = LoggerFactory.getLogger(XiKeyStoreSpi.class);
 
-    private static class MyEnumeration<E> implements Enumeration<E> {
+  private static class MyEnumeration<E> implements Enumeration<E> {
 
-        private Iterator<E> iter;
+    private Iterator<E> iter;
 
-        MyEnumeration(Iterator<E> iter) {
-            this.iter = iter;
-        }
-
-        @Override
-        public boolean hasMoreElements() {
-            return iter.hasNext();
-        }
-
-        @Override
-        public E nextElement() {
-            return iter.next();
-        }
-
-    } // class MyEnumeration
-
-    private static class KeyCertEntry {
-
-        private PrivateKey key;
-
-        private Certificate[] chain;
-
-        KeyCertEntry(PrivateKey key, Certificate[] chain) {
-            this.key = ParamUtil.requireNonNull("key", key);
-            this.chain = ParamUtil.requireNonNull("chain", chain);
-            if (chain.length < 1) {
-                throw new IllegalArgumentException("chain does not contain any certificate");
-            }
-        }
-
-        PrivateKey getKey() {
-            return key;
-        }
-
-        Certificate[] getCertificateChain() {
-            return Arrays.copyOf(chain, chain.length);
-        }
-
-        Certificate getCertificate() {
-            return chain[0];
-        }
-
-    } // class KeyCertEntry
-
-    private static P11CryptServiceFactory p11CryptServiceFactory;
-
-    private Date creationDate;
-
-    private Map<String, KeyCertEntry> keyCerts = new HashMap<>();
-
-    public static void setP11CryptServiceFactory(P11CryptServiceFactory service) {
-        p11CryptServiceFactory = service;
+    MyEnumeration(Iterator<E> iter) {
+      this.iter = iter;
     }
 
     @Override
-    public void engineLoad(InputStream stream, char[] password) {
-        this.creationDate = new Date();
+    public boolean hasMoreElements() {
+      return iter.hasNext();
+    }
 
-        Set<String> moduleNames = p11CryptServiceFactory.moduleNames();
-        for (String moduleName : moduleNames) {
-            try {
-                engineLoad(moduleName);
-            } catch (XiSecurityException | P11TokenException ex) {
-                LogUtil.error(LOG, ex, "could not load PKCS#11 module " + moduleName);
-            }
+    @Override
+    public E nextElement() {
+      return iter.next();
+    }
+
+  } // class MyEnumeration
+
+  private static class KeyCertEntry {
+
+    private PrivateKey key;
+
+    private Certificate[] chain;
+
+    KeyCertEntry(PrivateKey key, Certificate[] chain) {
+      this.key = ParamUtil.requireNonNull("key", key);
+      this.chain = ParamUtil.requireNonNull("chain", chain);
+      if (chain.length < 1) {
+        throw new IllegalArgumentException("chain does not contain any certificate");
+      }
+    }
+
+    PrivateKey getKey() {
+      return key;
+    }
+
+    Certificate[] getCertificateChain() {
+      return Arrays.copyOf(chain, chain.length);
+    }
+
+    Certificate getCertificate() {
+      return chain[0];
+    }
+
+  } // class KeyCertEntry
+
+  private static P11CryptServiceFactory p11CryptServiceFactory;
+
+  private Date creationDate;
+
+  private Map<String, KeyCertEntry> keyCerts = new HashMap<>();
+
+  public static void setP11CryptServiceFactory(P11CryptServiceFactory service) {
+    p11CryptServiceFactory = service;
+  }
+
+  @Override
+  public void engineLoad(InputStream stream, char[] password) {
+    this.creationDate = new Date();
+
+    Set<String> moduleNames = p11CryptServiceFactory.moduleNames();
+    for (String moduleName : moduleNames) {
+      try {
+        engineLoad(moduleName);
+      } catch (XiSecurityException | P11TokenException ex) {
+        LogUtil.error(LOG, ex, "could not load PKCS#11 module " + moduleName);
+      }
+    }
+
+    if (LOG.isErrorEnabled()) {
+      LOG.info("loaded key entries {}", keyCerts.keySet());
+    }
+  }
+
+  private void engineLoad(String moduleName) throws P11TokenException, XiSecurityException {
+    P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
+    P11Module module = p11Service.module();
+    List<P11SlotIdentifier> slotIds = module.slotIdentifiers();
+
+    for (P11SlotIdentifier slotId: slotIds) {
+      P11Slot slot = module.getSlot(slotId);
+      Set<P11ObjectIdentifier> identityIds = slot.identityIdentifiers();
+      for (P11ObjectIdentifier objId : identityIds) {
+        P11Identity identity = slot.getIdentity(objId);
+        X509Certificate[] chain = identity.certificateChain();
+        if (chain == null || chain.length == 0) {
+          continue;
         }
 
-        if (LOG.isErrorEnabled()) {
-            LOG.info("loaded key entries {}", keyCerts.keySet());
-        }
+        P11PrivateKey key = new P11PrivateKey(p11Service, identity.identityId());
+        KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
+        keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keyid-"
+            + objId.idHex(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keylabel-"
+              + objId.label(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keyid-"
+              + objId.idHex(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keylabel-"
+              + objId.label(), keyCertEntry);
+      }
+    }
+  } // method engineLoad
+
+  @Override
+  public void engineStore(OutputStream stream, char[] password)
+      throws IOException, NoSuchAlgorithmException, CertificateException {
+  }
+
+  @Override
+  public Key engineGetKey(String alias, char[] password)
+      throws NoSuchAlgorithmException, UnrecoverableKeyException {
+    if (!keyCerts.containsKey(alias)) {
+      return null;
     }
 
-    private void engineLoad(String moduleName) throws P11TokenException, XiSecurityException {
-        P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-        P11Module module = p11Service.module();
-        List<P11SlotIdentifier> slotIds = module.slotIdentifiers();
+    return keyCerts.get(alias).getKey();
+  }
 
-        for (P11SlotIdentifier slotId: slotIds) {
-            P11Slot slot = module.getSlot(slotId);
-            Set<P11ObjectIdentifier> identityIds = slot.identityIdentifiers();
-            for (P11ObjectIdentifier objId : identityIds) {
-                P11Identity identity = slot.getIdentity(objId);
-                X509Certificate[] chain = identity.certificateChain();
-                if (chain == null || chain.length == 0) {
-                    continue;
-                }
-
-                P11PrivateKey key = new P11PrivateKey(p11Service, identity.identityId());
-                KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
-                keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keyid-"
-                        + objId.idHex(), keyCertEntry);
-                keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keylabel-"
-                            + objId.label(), keyCertEntry);
-                keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keyid-"
-                            + objId.idHex(), keyCertEntry);
-                keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keylabel-"
-                            + objId.label(), keyCertEntry);
-            }
-        }
-    } // method engineLoad
-
-    @Override
-    public void engineStore(OutputStream stream, char[] password)
-            throws IOException, NoSuchAlgorithmException, CertificateException {
+  @Override
+  public Certificate[] engineGetCertificateChain(String alias) {
+    if (!keyCerts.containsKey(alias)) {
+      return null;
     }
 
-    @Override
-    public Key engineGetKey(String alias, char[] password)
-            throws NoSuchAlgorithmException, UnrecoverableKeyException {
-        if (!keyCerts.containsKey(alias)) {
-            return null;
-        }
+    return keyCerts.get(alias).getCertificateChain();
+  }
 
-        return keyCerts.get(alias).getKey();
+  @Override
+  public Certificate engineGetCertificate(String alias) {
+    if (!keyCerts.containsKey(alias)) {
+      return null;
     }
 
-    @Override
-    public Certificate[] engineGetCertificateChain(String alias) {
-        if (!keyCerts.containsKey(alias)) {
-            return null;
-        }
+    return keyCerts.get(alias).getCertificate();
+  }
 
-        return keyCerts.get(alias).getCertificateChain();
+  @Override
+  public Date engineGetCreationDate(String alias) {
+    if (!keyCerts.containsKey(alias)) {
+      return null;
+    }
+    return creationDate;
+  }
+
+  @Override
+  public void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain)
+      throws KeyStoreException {
+    throw new KeyStoreException("keystore is read only");
+  }
+
+  @Override
+  public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain)
+      throws KeyStoreException {
+    throw new KeyStoreException("keystore is read only");
+  }
+
+  @Override
+  public void engineSetCertificateEntry(String alias, Certificate cert)
+      throws KeyStoreException {
+    throw new KeyStoreException("keystore is read only");
+  }
+
+  @Override
+  public void engineDeleteEntry(String alias) throws KeyStoreException {
+    throw new KeyStoreException("keystore is read only");
+  }
+
+  @Override
+  public Enumeration<String> engineAliases() {
+    return new MyEnumeration<>(keyCerts.keySet().iterator());
+  }
+
+  @Override
+  public boolean engineContainsAlias(String alias) {
+    return keyCerts.containsKey(alias);
+  }
+
+  @Override
+  public int engineSize() {
+    return keyCerts.size();
+  }
+
+  @Override
+  public boolean engineIsKeyEntry(String alias) {
+    if (!keyCerts.containsKey(alias)) {
+      return false;
     }
 
-    @Override
-    public Certificate engineGetCertificate(String alias) {
-        if (!keyCerts.containsKey(alias)) {
-            return null;
-        }
+    return keyCerts.get(alias).key != null;
+  }
 
-        return keyCerts.get(alias).getCertificate();
+  @Override
+  public boolean engineIsCertificateEntry(String alias) {
+    if (!keyCerts.containsKey(alias)) {
+      return false;
     }
 
-    @Override
-    public Date engineGetCreationDate(String alias) {
-        if (!keyCerts.containsKey(alias)) {
-            return null;
-        }
-        return creationDate;
+    return keyCerts.get(alias).key == null;
+  }
+
+  @Override
+  public String engineGetCertificateAlias(Certificate cert) {
+    for (String alias : keyCerts.keySet()) {
+      if (keyCerts.get(alias).getCertificate().equals(cert)) {
+        return alias;
+      }
     }
 
-    @Override
-    public void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain)
-            throws KeyStoreException {
-        throw new KeyStoreException("keystore is read only");
-    }
-
-    @Override
-    public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain)
-            throws KeyStoreException {
-        throw new KeyStoreException("keystore is read only");
-    }
-
-    @Override
-    public void engineSetCertificateEntry(String alias, Certificate cert)
-            throws KeyStoreException {
-        throw new KeyStoreException("keystore is read only");
-    }
-
-    @Override
-    public void engineDeleteEntry(String alias) throws KeyStoreException {
-        throw new KeyStoreException("keystore is read only");
-    }
-
-    @Override
-    public Enumeration<String> engineAliases() {
-        return new MyEnumeration<>(keyCerts.keySet().iterator());
-    }
-
-    @Override
-    public boolean engineContainsAlias(String alias) {
-        return keyCerts.containsKey(alias);
-    }
-
-    @Override
-    public int engineSize() {
-        return keyCerts.size();
-    }
-
-    @Override
-    public boolean engineIsKeyEntry(String alias) {
-        if (!keyCerts.containsKey(alias)) {
-            return false;
-        }
-
-        return keyCerts.get(alias).key != null;
-    }
-
-    @Override
-    public boolean engineIsCertificateEntry(String alias) {
-        if (!keyCerts.containsKey(alias)) {
-            return false;
-        }
-
-        return keyCerts.get(alias).key == null;
-    }
-
-    @Override
-    public String engineGetCertificateAlias(Certificate cert) {
-        for (String alias : keyCerts.keySet()) {
-            if (keyCerts.get(alias).getCertificate().equals(cert)) {
-                return alias;
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

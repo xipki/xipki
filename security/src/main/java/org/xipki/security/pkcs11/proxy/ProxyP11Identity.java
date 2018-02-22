@@ -37,71 +37,72 @@ import org.xipki.security.pkcs11.proxy.msg.Asn1RSAPkcsPssParams;
 import org.xipki.security.pkcs11.proxy.msg.Asn1SignTemplate;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class ProxyP11Identity extends P11Identity {
 
-    ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId) {
-        super(slot, entityId, 0);
+  ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId) {
+    super(slot, entityId, 0);
+  }
+
+  ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId,
+      PublicKey publicKey, X509Certificate[] certificateChain) {
+    super(slot, entityId, publicKey, certificateChain);
+  }
+
+  @Override
+  protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
+      throws P11TokenException {
+    Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
+    Asn1P11Params p11Param = null;
+    if (parameters instanceof P11RSAPkcsPssParams) {
+      p11Param = new Asn1P11Params(Asn1P11Params.TAG_RSA_PKCS_PSS,
+          new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
+    } else if (parameters instanceof P11ByteArrayParams) {
+      byte[] bytes = ((P11ByteArrayParams) parameters).getBytes();
+      p11Param = new Asn1P11Params(Asn1P11Params.TAG_OPAQUE,
+          new DEROctetString(bytes));
+    } else if (parameters instanceof P11IVParams) {
+      p11Param = new Asn1P11Params(Asn1P11Params.TAG_IV,
+          new DEROctetString(((P11IVParams) parameters).getIV()));
+    } else {
+      throw new IllegalArgumentException("unkown parameter 'parameters'");
     }
 
-    ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId,
-            PublicKey publicKey, X509Certificate[] certificateChain) {
-        super(slot, entityId, publicKey, certificateChain);
+    Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
+        content);
+    byte[] result = ((ProxyP11Slot) slot).module().send(P11ProxyConstants.ACTION_SIGN,
+        signTemplate);
+
+    ASN1OctetString octetString;
+    try {
+      octetString = DEROctetString.getInstance(result);
+    } catch (IllegalArgumentException ex) {
+      throw new P11TokenException("the returned result is not OCTET STRING");
     }
 
-    @Override
-    protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
-            throws P11TokenException {
-        Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
-        Asn1P11Params p11Param = null;
-        if (parameters instanceof P11RSAPkcsPssParams) {
-            p11Param = new Asn1P11Params(Asn1P11Params.TAG_RSA_PKCS_PSS,
-                    new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
-        } else if (parameters instanceof P11ByteArrayParams) {
-            byte[] bytes = ((P11ByteArrayParams) parameters).getBytes();
-            p11Param = new Asn1P11Params(Asn1P11Params.TAG_OPAQUE,
-                    new DEROctetString(bytes));
-        } else if (parameters instanceof P11IVParams) {
-            p11Param = new Asn1P11Params(Asn1P11Params.TAG_IV,
-                    new DEROctetString(((P11IVParams) parameters).getIV()));
-        } else {
-            throw new IllegalArgumentException("unkown parameter 'parameters'");
-        }
+    return (octetString == null) ? null : octetString.getOctets();
+  }
 
-        Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
-                content);
-        byte[] result = ((ProxyP11Slot) slot).module().send(P11ProxyConstants.ACTION_SIGN,
-                signTemplate);
+  @Override
+  protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
+    Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
+    Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(
+        asn1EntityId, mechanism);
+    byte[] result = ((ProxyP11Slot) slot).module().send(
+        P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
 
-        ASN1OctetString octetString;
-        try {
-            octetString = DEROctetString.getInstance(result);
-        } catch (IllegalArgumentException ex) {
-            throw new P11TokenException("the returned result is not OCTET STRING");
-        }
-
-        return (octetString == null) ? null : octetString.getOctets();
+    ASN1OctetString octetString;
+    try {
+      octetString = DEROctetString.getInstance(result);
+    } catch (IllegalArgumentException ex) {
+      throw new P11TokenException("the returned result is not OCTET STRING");
     }
 
-    @Override
-    protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
-        Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
-        Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(
-                asn1EntityId, mechanism);
-        byte[] result = ((ProxyP11Slot) slot).module().send(
-                P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
-
-        ASN1OctetString octetString;
-        try {
-            octetString = DEROctetString.getInstance(result);
-        } catch (IllegalArgumentException ex) {
-            throw new P11TokenException("the returned result is not OCTET STRING");
-        }
-
-        return (octetString == null) ? null : octetString.getOctets();
-    }
+    return (octetString == null) ? null : octetString.getOctets();
+  }
 
 }

@@ -20,68 +20,69 @@ package org.xipki.security.pkcs11.provider;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
-    // CHECKSTYLE:SKIP
-    public static class SHA1 extends P11PlainECDSASignatureSpi {
+  // CHECKSTYLE:SKIP
+  public static class SHA1 extends P11PlainECDSASignatureSpi {
 
-        public SHA1() {
-            super(HashAlgoType.SHA1);
-        }
-
-    } // class SHA1
-
-    // CHECKSTYLE:SKIP
-    public static class NONE extends P11PlainECDSASignatureSpi {
-
-        public NONE() {
-            super(null);
-        }
-
-    } // class NONE
-
-    // CHECKSTYLE:SKIP
-    public static class SHA224 extends P11PlainECDSASignatureSpi {
-
-        public SHA224() {
-            super(HashAlgoType.SHA224);
-        }
-
-    } // class SHA224
-
-    // CHECKSTYLE:SKIP
-    public static class SHA256 extends P11PlainECDSASignatureSpi {
-
-        public SHA256() {
-            super(HashAlgoType.SHA256);
-        }
-
-    } // class SHA256
-
-    // CHECKSTYLE:SKIP
-    static class SHA384 extends P11PlainECDSASignatureSpi {
-
-        SHA384() {
-            super(HashAlgoType.SHA384);
-        }
-
-    } // class SHA384
-
-    // CHECKSTYLE:SKIP
-    public static class SHA512 extends P11PlainECDSASignatureSpi {
-
-        public SHA512() {
-            super(HashAlgoType.SHA512);
-        }
-
-    } // class SHA512
-
-    private P11PlainECDSASignatureSpi(HashAlgoType hashAlgo) {
-        super(hashAlgo, true);
+    public SHA1() {
+      super(HashAlgoType.SHA1);
     }
+
+  } // class SHA1
+
+  // CHECKSTYLE:SKIP
+  public static class NONE extends P11PlainECDSASignatureSpi {
+
+    public NONE() {
+      super(null);
+    }
+
+  } // class NONE
+
+  // CHECKSTYLE:SKIP
+  public static class SHA224 extends P11PlainECDSASignatureSpi {
+
+    public SHA224() {
+      super(HashAlgoType.SHA224);
+    }
+
+  } // class SHA224
+
+  // CHECKSTYLE:SKIP
+  public static class SHA256 extends P11PlainECDSASignatureSpi {
+
+    public SHA256() {
+      super(HashAlgoType.SHA256);
+    }
+
+  } // class SHA256
+
+  // CHECKSTYLE:SKIP
+  static class SHA384 extends P11PlainECDSASignatureSpi {
+
+    SHA384() {
+      super(HashAlgoType.SHA384);
+    }
+
+  } // class SHA384
+
+  // CHECKSTYLE:SKIP
+  public static class SHA512 extends P11PlainECDSASignatureSpi {
+
+    public SHA512() {
+      super(HashAlgoType.SHA512);
+    }
+
+  } // class SHA512
+
+  private P11PlainECDSASignatureSpi(HashAlgoType hashAlgo) {
+    super(hashAlgo, true);
+  }
 
 }

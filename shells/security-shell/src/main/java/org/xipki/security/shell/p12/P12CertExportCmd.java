@@ -30,42 +30,43 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "export-cert-p12",
-        description = "export certificate from PKCS#12 keystore")
+    description = "export certificate from PKCS#12 keystore")
 @Service
 public class P12CertExportCmd extends P12SecurityAction {
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        KeyStore ks = getKeyStore();
+  @Override
+  protected Object execute0() throws Exception {
+    KeyStore ks = getKeyStore();
 
-        String keyname = null;
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias)) {
-                keyname = alias;
-                break;
-            }
-        }
-
-        if (keyname == null) {
-            throw new CmdFailure("could not find private key");
-        }
-
-        X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
-
-        return null;
+    String keyname = null;
+    Enumeration<String> aliases = ks.aliases();
+    while (aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      if (ks.isKeyEntry(alias)) {
+        keyname = alias;
+        break;
+      }
     }
+
+    if (keyname == null) {
+      throw new CmdFailure("could not find private key");
+    }
+
+    X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
+    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+
+    return null;
+  }
 
 }

@@ -18,21 +18,22 @@
 package org.xipki.security.speed.cmd;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 // CHECKSTYLE:SKIP
 public class RSAControl {
-    private final int modulusLen;
+  private final int modulusLen;
 
-    public RSAControl(int modulusLen) {
-        this.modulusLen = modulusLen;
-    }
+  public RSAControl(int modulusLen) {
+    this.modulusLen = modulusLen;
+  }
 
-    public int modulusLen() {
-        return modulusLen;
-    }
+  public int modulusLen() {
+    return modulusLen;
+  }
 
 }
 

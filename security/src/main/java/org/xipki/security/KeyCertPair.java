@@ -23,27 +23,28 @@ import java.security.cert.X509Certificate;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class KeyCertPair {
 
-    private final PrivateKey privateKey;
+  private final PrivateKey privateKey;
 
-    private final X509Certificate certificate;
+  private final X509Certificate certificate;
 
-    public KeyCertPair(PrivateKey privateKey, X509Certificate certificate) {
-        this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
-        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
-    }
+  public KeyCertPair(PrivateKey privateKey, X509Certificate certificate) {
+    this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
+    this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+  }
 
-    public PrivateKey privateKey() {
-        return privateKey;
-    }
+  public PrivateKey privateKey() {
+    return privateKey;
+  }
 
-    public X509Certificate certificate() {
-        return certificate;
-    }
+  public X509Certificate certificate() {
+    return certificate;
+  }
 
 }

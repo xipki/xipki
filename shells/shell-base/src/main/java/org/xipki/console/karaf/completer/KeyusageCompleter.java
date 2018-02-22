@@ -26,6 +26,7 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.KeyUsage;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -33,19 +34,19 @@ import org.xipki.security.KeyUsage;
 @Service
 public class KeyusageCompleter extends AbstractDynamicEnumCompleter {
 
-    private static final Set<String> USAGES;
+  private static final Set<String> USAGES;
 
-    static {
-        Set<String> usages = new HashSet<>();
-        for (KeyUsage usage : KeyUsage.values()) {
-            usages.add(usage.getName());
-        }
-        USAGES = Collections.unmodifiableSet(usages);
+  static {
+    Set<String> usages = new HashSet<>();
+    for (KeyUsage usage : KeyUsage.values()) {
+      usages.add(usage.getName());
     }
+    USAGES = Collections.unmodifiableSet(usages);
+  }
 
-    @Override
-    protected Set<String> getEnums() {
-        return USAGES;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return USAGES;
+  }
 
 }

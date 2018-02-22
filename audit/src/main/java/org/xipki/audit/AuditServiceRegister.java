@@ -18,12 +18,13 @@
 package org.xipki.audit;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface AuditServiceRegister {
 
-    AuditService getAuditService();
+  AuditService getAuditService();
 
 }

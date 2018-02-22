@@ -24,30 +24,31 @@ import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-dsa-gen-p11",
-        description = "performance test of PKCS#11 DSA key generation")
+    description = "performance test of PKCS#11 DSA key generation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP11DSAKeyGenCmd extends SpeedP11Action {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer plen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer plen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qlen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qlen;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        if (qlen == null) {
-            qlen = (plen >= 2048) ? 256 : 160;
-        }
-        return new P11DSAKeyGenLoadTest(getSlot(), plen, qlen);
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    if (qlen == null) {
+      qlen = (plen >= 2048) ? 256 : 160;
     }
+    return new P11DSAKeyGenLoadTest(getSlot(), plen, qlen);
+  }
 
 }

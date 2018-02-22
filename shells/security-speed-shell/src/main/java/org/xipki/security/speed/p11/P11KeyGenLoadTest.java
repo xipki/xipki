@@ -25,52 +25,53 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    genKeypair();
-                    account(1, 0);
-                } catch (Exception ex) {
-                    account(1, 1);
-                }
-            }
-        }
-
-    } // class Testor
-
-    protected final P11Slot slot;
-
-    private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
-
-    public P11KeyGenLoadTest(P11Slot slot, String description) {
-        super(description);
-        this.slot = ParamUtil.requireNonNull("slot", slot);
-    }
-
-    protected abstract void genKeypair() throws Exception;
-
-    protected String getDummyLabel() {
-        return "loadtest-" + idx.getAndIncrement();
-    }
-
-    protected P11NewKeyControl getControl() {
-        P11NewKeyControl control = new P11NewKeyControl();
-        control.setExtractable(true);
-        return control;
-    }
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor() throws Exception {
-        return new Testor();
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        try {
+          genKeypair();
+          account(1, 0);
+        } catch (Exception ex) {
+          account(1, 1);
+        }
+      }
     }
+
+  } // class Testor
+
+  protected final P11Slot slot;
+
+  private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
+
+  public P11KeyGenLoadTest(P11Slot slot, String description) {
+    super(description);
+    this.slot = ParamUtil.requireNonNull("slot", slot);
+  }
+
+  protected abstract void genKeypair() throws Exception;
+
+  protected String getDummyLabel() {
+    return "loadtest-" + idx.getAndIncrement();
+  }
+
+  protected P11NewKeyControl getControl() {
+    P11NewKeyControl control = new P11NewKeyControl();
+    control.setExtractable(true);
+    return control;
+  }
+
+  @Override
+  protected Runnable getTestor() throws Exception {
+    return new Testor();
+  }
 
 }

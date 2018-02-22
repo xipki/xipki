@@ -27,37 +27,38 @@ import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.p12.P12DSASignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-dsa-sign-p12",
-        description = "performance test of PKCS#12 DSA signature creation")
+    description = "performance test of PKCS#12 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP12DSASignCmd extends BSpeedP12SignAction {
 
-    private final Queue<DSAControl> queue = new LinkedList<>();
+  private final Queue<DSAControl> queue = new LinkedList<>();
 
-    public BSpeedP12DSASignCmd() {
-        queue.add(new DSAControl(1024, 160));
-        queue.add(new DSAControl(2048, 224));
-        queue.add(new DSAControl(2048, 256));
-        queue.add(new DSAControl(3072, 256));
+  public BSpeedP12DSASignCmd() {
+    queue.add(new DSAControl(1024, 160));
+    queue.add(new DSAControl(2048, 224));
+    queue.add(new DSAControl(2048, 256));
+    queue.add(new DSAControl(3072, 256));
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    DSAControl control = queue.poll();
+    if (control == null) {
+      return null;
+    }
+    if (control.plen() == 1024) {
+      sigAlgo = "SHA1withDSA";
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        DSAControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-        if (control.plen() == 1024) {
-            sigAlgo = "SHA1withDSA";
-        }
-
-        return new P12DSASignLoadTest(securityFactory, sigAlgo, control.plen(),
-                control.qlen());
-    }
+    return new P12DSASignLoadTest(securityFactory, sigAlgo, control.plen(),
+        control.qlen());
+  }
 
 }

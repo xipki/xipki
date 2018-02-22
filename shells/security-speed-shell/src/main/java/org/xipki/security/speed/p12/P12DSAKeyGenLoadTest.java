@@ -23,26 +23,27 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.KeyUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
-    private final int plength;
-    private final int qlength;
+  private final int plength;
+  private final int qlength;
 
-    public P12DSAKeyGenLoadTest(int plength, int qlength, SecurityFactory securityFactory)
-            throws Exception {
-        super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength,
-                securityFactory);
+  public P12DSAKeyGenLoadTest(int plength, int qlength, SecurityFactory securityFactory)
+      throws Exception {
+    super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength,
+        securityFactory);
 
-        this.plength = plength;
-        this.qlength = qlength;
-    }
+    this.plength = plength;
+    this.qlength = qlength;
+  }
 
-    @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
-        KeyUtil.generateDSAKeypair(plength, qlength, random);
-    }
+  @Override
+  protected void generateKeypair(SecureRandom random) throws Exception {
+    KeyUtil.generateDSAKeypair(plength, qlength, random);
+  }
 
 }

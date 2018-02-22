@@ -28,7 +28,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.BadAsn1ObjectException;
 
 /**
- *
+ * TODO.
  * <pre>
  * DigestSecretKeyTemplate ::= SEQUENCE {
  *     entityId       EntityIdentifier,
@@ -41,55 +41,55 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 
 public class Asn1DigestSecretKeyTemplate extends ASN1Object {
 
-    private final Asn1P11EntityIdentifier identityId;
+  private final Asn1P11EntityIdentifier identityId;
 
-    private final Asn1Mechanism mechanism;
+  private final Asn1Mechanism mechanism;
 
-    private Asn1DigestSecretKeyTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 2, 2);
-        int idx = 0;
-        this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
+  private Asn1DigestSecretKeyTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 2, 2);
+    int idx = 0;
+    this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
+    this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
+  }
+
+  public Asn1DigestSecretKeyTemplate(Asn1P11EntityIdentifier identityId, long mechanism) {
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.mechanism = new Asn1Mechanism(mechanism, null);
+  }
+
+  public static Asn1DigestSecretKeyTemplate getInstance(Object obj)
+      throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1DigestSecretKeyTemplate) {
+      return (Asn1DigestSecretKeyTemplate) obj;
     }
 
-    public Asn1DigestSecretKeyTemplate(Asn1P11EntityIdentifier identityId, long mechanism) {
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-        this.mechanism = new Asn1Mechanism(mechanism, null);
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1DigestSecretKeyTemplate((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1DigestSecretKeyTemplate getInstance(Object obj)
-            throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1DigestSecretKeyTemplate) {
-            return (Asn1DigestSecretKeyTemplate) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(identityId);
+    vector.add(mechanism);
+    return new DERSequence(vector);
+  }
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1DigestSecretKeyTemplate((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
-    }
+  public Asn1P11EntityIdentifier identityId() {
+    return identityId;
+  }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(identityId);
-        vector.add(mechanism);
-        return new DERSequence(vector);
-    }
-
-    public Asn1P11EntityIdentifier identityId() {
-        return identityId;
-    }
-
-    public Asn1Mechanism mechanism() {
-        return mechanism;
-    }
+  public Asn1Mechanism mechanism() {
+    return mechanism;
+  }
 }

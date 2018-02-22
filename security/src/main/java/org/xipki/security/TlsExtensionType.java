@@ -18,41 +18,42 @@
 package org.xipki.security;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class TlsExtensionType implements Comparable<TlsExtensionType> {
 
-    public static final TlsExtensionType SERVER_NAME = new TlsExtensionType(0, "server_name");
-    public static final TlsExtensionType MAX_FRAGMENT_LENGTH
-            = new TlsExtensionType(1, "max_fragment_length");
-    public static final TlsExtensionType CLIENT_CERTIFICATE_URL
-            = new TlsExtensionType(2, "client_certificate_url");
-    public static final TlsExtensionType TRUSTED_CA_KEYS
-            = new TlsExtensionType(3, "trusted_ca_keys");
-    public static final TlsExtensionType TRUCATED_HMAC = new TlsExtensionType(4, "truncated_hmac");
-    public static final TlsExtensionType STATUS_REQUEST = new TlsExtensionType(5, "status_request");
+  public static final TlsExtensionType SERVER_NAME = new TlsExtensionType(0, "server_name");
+  public static final TlsExtensionType MAX_FRAGMENT_LENGTH
+      = new TlsExtensionType(1, "max_fragment_length");
+  public static final TlsExtensionType CLIENT_CERTIFICATE_URL
+      = new TlsExtensionType(2, "client_certificate_url");
+  public static final TlsExtensionType TRUSTED_CA_KEYS
+      = new TlsExtensionType(3, "trusted_ca_keys");
+  public static final TlsExtensionType TRUCATED_HMAC = new TlsExtensionType(4, "truncated_hmac");
+  public static final TlsExtensionType STATUS_REQUEST = new TlsExtensionType(5, "status_request");
 
-    private final int code;
-    private final String name;
+  private final int code;
+  private final String name;
 
-    private TlsExtensionType(int code, String name) {
-        this.code = code;
-        this.name = name;
-    }
+  private TlsExtensionType(int code, String name) {
+    this.code = code;
+    this.name = name;
+  }
 
-    public int code() {
-        return code;
-    }
+  public int code() {
+    return code;
+  }
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    @Override
-    public int compareTo(TlsExtensionType obj) {
-        return Integer.valueOf(code).compareTo(obj.code);
-    }
+  @Override
+  public int compareTo(TlsExtensionType obj) {
+    return Integer.valueOf(code).compareTo(obj.code);
+  }
 
 }

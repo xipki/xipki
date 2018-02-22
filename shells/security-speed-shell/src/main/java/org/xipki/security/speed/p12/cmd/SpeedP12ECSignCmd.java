@@ -27,29 +27,30 @@ import org.xipki.security.speed.cmd.completer.ECDSASigAlgCompleter;
 import org.xipki.security.speed.p12.P12ECSignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-ec-sign-p12",
-        description = "performance test of PKCS#12 EC signature creation")
+    description = "performance test of PKCS#12 EC signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12ECSignCmd extends SpeedP12SignAction {
 
-    @Option(name = "--curve", required = true,
-            description = "EC curve name\n(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve", required = true,
+      description = "EC curve name\n(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(ECDSASigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(ECDSASigAlgCompleter.class)
+  private String sigAlgo;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P12ECSignLoadTest(securityFactory, sigAlgo, curveName);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P12ECSignLoadTest(securityFactory, sigAlgo, curveName);
+  }
 
 }

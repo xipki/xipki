@@ -18,30 +18,31 @@
 package org.xipki.common;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RequestResponsePair {
 
-    private byte[] request;
+  private byte[] request;
 
-    private byte[] response;
+  private byte[] response;
 
-    public byte[] request() {
-        return request;
-    }
+  public byte[] request() {
+    return request;
+  }
 
-    public void setRequest(byte[] request) {
-        this.request = request;
-    }
+  public void setRequest(byte[] request) {
+    this.request = request;
+  }
 
-    public byte[] response() {
-        return response;
-    }
+  public byte[] response() {
+    return response;
+  }
 
-    public void setResponse(byte[] response) {
-        this.response = response;
-    }
+  public void setResponse(byte[] response) {
+    this.response = response;
+  }
 
 }

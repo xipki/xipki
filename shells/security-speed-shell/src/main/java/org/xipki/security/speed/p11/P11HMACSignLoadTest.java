@@ -28,28 +28,29 @@ import org.xipki.security.speed.p12.P12HMACSignLoadTest;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 // CHECKSTYLE:SKIP
 public class P11HMACSignLoadTest extends P11SignLoadTest {
 
-    public P11HMACSignLoadTest(SecurityFactory securityFactory, P11Slot slot,
-            String signatureAlgorithm) throws Exception {
-        super(securityFactory, slot, signatureAlgorithm,
-                generateKey(slot, signatureAlgorithm),
-                "PKCS#11 HMAC signature creation");
-    }
+  public P11HMACSignLoadTest(SecurityFactory securityFactory, P11Slot slot,
+      String signatureAlgorithm) throws Exception {
+    super(securityFactory, slot, signatureAlgorithm,
+        generateKey(slot, signatureAlgorithm),
+        "PKCS#11 HMAC signature creation");
+  }
 
-    private static P11ObjectIdentifier generateKey(P11Slot slot, String signatureAlgorithm)
-            throws Exception {
-        ParamUtil.requireNonNull("slot", slot);
-        int keysize = P12HMACSignLoadTest.getKeysize(signatureAlgorithm);
-        byte[] keyBytes = new byte[keysize / 8];
-        new SecureRandom().nextBytes(keyBytes);
-        return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
-                "loadtest-" + System.currentTimeMillis(),
-                getNewKeyControl());
-    }
+  private static P11ObjectIdentifier generateKey(P11Slot slot, String signatureAlgorithm)
+      throws Exception {
+    ParamUtil.requireNonNull("slot", slot);
+    int keysize = P12HMACSignLoadTest.getKeysize(signatureAlgorithm);
+    byte[] keyBytes = new byte[keysize / 8];
+    new SecureRandom().nextBytes(keyBytes);
+    return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
+        "loadtest-" + System.currentTimeMillis(),
+        getNewKeyControl());
+  }
 
 }

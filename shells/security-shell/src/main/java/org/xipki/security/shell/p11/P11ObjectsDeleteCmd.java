@@ -27,44 +27,45 @@ import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "delete-objects-p11",
-        description = "delete objects in PKCS#11 device")
+    description = "delete objects in PKCS#11 device")
 @Service
 public class P11ObjectsDeleteCmd extends SecurityAction {
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    protected Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  protected Integer slotIndex;
 
-    @Option(name = "--id",
-            description = "id (hex) of the objects in the PKCS#11 device\n"
-                    + "at least one of id and label must be specified")
-    private String id;
+  @Option(name = "--id",
+      description = "id (hex) of the objects in the PKCS#11 device\n"
+          + "at least one of id and label must be specified")
+  private String id;
 
-    @Option(name = "--label",
-            description = "label of the objects in the PKCS#11 device\n"
-                    + "at least one of id and label must be specified")
-    private String label;
+  @Option(name = "--label",
+      description = "label of the objects in the PKCS#11 device\n"
+          + "at least one of id and label must be specified")
+  private String label;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module")
+  @Completion(P11ModuleNameCompleter.class)
+  protected String moduleName = DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot(moduleName, slotIndex);
-        byte[] idBytes = null;
-        if (id != null) {
-            idBytes = Hex.decode(id);
-        }
-        int num = slot.removeObjects(idBytes, label);
-        println("deleted " + num + " objects");
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot(moduleName, slotIndex);
+    byte[] idBytes = null;
+    if (id != null) {
+      idBytes = Hex.decode(id);
     }
+    int num = slot.removeObjects(idBytes, label);
+    println("deleted " + num + " objects");
+    return null;
+  }
 
 }

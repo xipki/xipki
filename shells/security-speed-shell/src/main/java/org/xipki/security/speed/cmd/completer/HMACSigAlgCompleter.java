@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
@@ -29,9 +30,9 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 //CHECKSTYLE:SKIP
 public class HMACSigAlgCompleter extends AbstractEnumCompleter {
 
-    public HMACSigAlgCompleter() {
-        setTokens("HMACSHA1,HMACSHA224,HMACSHA256,HMACSHA384,HMACSHA512,HMACSHA3-224,"
-                + ",HMACSHA3-256,,HMACSHA3-384,,HMACSHA3-512");
-    }
+  public HMACSigAlgCompleter() {
+    setTokens("HMACSHA1,HMACSHA224,HMACSHA256,HMACSHA384,HMACSHA512,HMACSHA3-224,"
+        + ",HMACSHA3-256,,HMACSHA3-384,,HMACSHA3-512");
+  }
 
 }

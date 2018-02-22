@@ -36,107 +36,108 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class HttpsHostnameVerifier implements HostnameVerifier {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
 
-    private boolean enabled;
+  private boolean enabled;
 
-    private boolean trustAll;
+  private boolean trustAll;
 
-    private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
+  private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
 
-    private HostnameVerifier oldHostnameVerifier;
+  private HostnameVerifier oldHostnameVerifier;
 
-    private boolean meAsDefaultHostnameVerifier;
+  private boolean meAsDefaultHostnameVerifier;
 
-    public void init() {
-        LOG.info("enabled: {}, trustAll: {}", enabled, trustAll);
-        if (enabled) {
-            oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-            LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
-                    oldHostnameVerifier);
-            HttpsURLConnection.setDefaultHostnameVerifier(this);
-            meAsDefaultHostnameVerifier = true;
-        }
+  public void init() {
+    LOG.info("enabled: {}, trustAll: {}", enabled, trustAll);
+    if (enabled) {
+      oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+      LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
+          oldHostnameVerifier);
+      HttpsURLConnection.setDefaultHostnameVerifier(this);
+      meAsDefaultHostnameVerifier = true;
+    }
+  }
+
+  public void shutdown() {
+    if (meAsDefaultHostnameVerifier
+        && HttpsURLConnection.getDefaultHostnameVerifier() == this) {
+      LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
+          oldHostnameVerifier);
+      HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
+      meAsDefaultHostnameVerifier = false;
+    }
+  }
+
+  /**
+   * Verify that the host name is an acceptable match with
+   * the server's authentication scheme.
+   *
+   * @param hostname the host name
+   * @param session SSLSession used on the connection to host
+   * @return true if the host name is acceptable
+   */
+  @Override
+  public boolean verify(String hostname, SSLSession session) {
+    ParamUtil.requireNonNull("hostname", hostname);
+    if (trustAll) {
+      return true;
     }
 
-    public void shutdown() {
-        if (meAsDefaultHostnameVerifier
-                && HttpsURLConnection.getDefaultHostnameVerifier() == this) {
-            LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
-                    oldHostnameVerifier);
-            HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
-            meAsDefaultHostnameVerifier = false;
-        }
+    LOG.info("hostname: {}", hostname);
+    String commonName = null;
+    try {
+      Principal peerPrincipal = session.getPeerPrincipal();
+      if (peerPrincipal == null) {
+        return false;
+      }
+      commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
+      LOG.info("commonName: {}", commonName);
+    } catch (Exception ex) {
+      LogUtil.error(LOG, ex);
+      return false;
     }
 
-    /**
-     * Verify that the host name is an acceptable match with
-     * the server's authentication scheme.
-     *
-     * @param hostname the host name
-     * @param session SSLSession used on the connection to host
-     * @return true if the host name is acceptable
-     */
-    @Override
-    public boolean verify(String hostname, SSLSession session) {
-        ParamUtil.requireNonNull("hostname", hostname);
-        if (trustAll) {
-            return true;
-        }
+    Set<String> hostnames = hostnameMap.get(commonName);
+    return (hostnames == null) ? false : hostnames.contains(hostname);
+  }
 
-        LOG.info("hostname: {}", hostname);
-        String commonName = null;
-        try {
-            Principal peerPrincipal = session.getPeerPrincipal();
-            if (peerPrincipal == null) {
-                return false;
-            }
-            commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
-            LOG.info("commonName: {}", commonName);
-        } catch (Exception ex) {
-            LogUtil.error(LOG, ex);
-            return false;
-        }
-
-        Set<String> hostnames = hostnameMap.get(commonName);
-        return (hostnames == null) ? false : hostnames.contains(hostname);
+  public void setCommonnameHostMap(String commonnameHostMap) {
+    hostnameMap.clear();
+    if (StringUtil.isBlank(commonnameHostMap)) {
+      return;
     }
 
-    public void setCommonnameHostMap(String commonnameHostMap) {
-        hostnameMap.clear();
-        if (StringUtil.isBlank(commonnameHostMap)) {
-            return;
-        }
-
-        ConfPairs pairs = new ConfPairs(commonnameHostMap);
-        Set<String> commonNames = pairs.names();
-        for (String commonName :commonNames) {
-            String str = pairs.value(commonName);
-            Set<String> hosts = StringUtil.splitAsSet(str, ",; \t");
-            hostnameMap.put(commonName, hosts);
-        }
+    ConfPairs pairs = new ConfPairs(commonnameHostMap);
+    Set<String> commonNames = pairs.names();
+    for (String commonName :commonNames) {
+      String str = pairs.value(commonName);
+      Set<String> hosts = StringUtil.splitAsSet(str, ",; \t");
+      hostnameMap.put(commonName, hosts);
     }
+  }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+  public boolean isEnabled() {
+    return enabled;
+  }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
 
-    public boolean isTrustAll() {
-        return trustAll;
-    }
+  public boolean isTrustAll() {
+    return trustAll;
+  }
 
-    public void setTrustAll(boolean trustAll) {
-        this.trustAll = trustAll;
-    }
+  public void setTrustAll(boolean trustAll) {
+    this.trustAll = trustAll;
+  }
 
 }

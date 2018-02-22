@@ -21,123 +21,125 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 class SimpleLruCache<K, V> {
 
-    private final LinkedHashMap<K, V> map;
+  private final LinkedHashMap<K, V> map;
 
-    /** Size of this cache in units. Not necessarily the number of elements. */
-    private int size;
+  /** Size of this cache in units. Not necessarily the number of elements. */
+  private int size;
 
-    private int maxSize;
+  private int maxSize;
 
-    private int putCount;
+  private int putCount;
 
-    private int evictionCount;
+  private int evictionCount;
 
-    private int hitCount;
+  private int hitCount;
 
-    private int missCount;
+  private int missCount;
 
-    /**
-     * @param maxSize for caches that do not override {@link #sizeOf}, this is
-     *     the maximum number of entries in the cache. For all other caches,
-     *     this is the maximum sum of the sizes of the entries in this cache.
-     */
-    SimpleLruCache(int maxSize) {
-        if (maxSize < 1) {
-            throw new IllegalArgumentException("maxSize must not be less than 1");
-        }
-        this.map = new LinkedHashMap<>(0, 0.75f, true);
+  /**
+   * TODO.
+   * @param maxSize for caches that do not override {@link #sizeOf}, this is
+   *     the maximum number of entries in the cache. For all other caches,
+   *     this is the maximum sum of the sizes of the entries in this cache.
+   */
+  SimpleLruCache(int maxSize) {
+    if (maxSize < 1) {
+      throw new IllegalArgumentException("maxSize must not be less than 1");
+    }
+    this.map = new LinkedHashMap<>(0, 0.75f, true);
+  }
+
+  /**
+   * Returns the value for {@code key} if it exists in the cache or can be
+   * created by {@code #create}. If a value was returned, it is moved to the
+   * head of the queue. This returns null if a value is not cached and could not
+   * be created.
+   */
+  final V get(K key) {
+    if (key == null) {
+      throw new NullPointerException("key == null");
     }
 
-    /**
-     * Returns the value for {@code key} if it exists in the cache or can be
-     * created by {@code #create}. If a value was returned, it is moved to the
-     * head of the queue. This returns null if a value is not cached and could not
-     * be created.
-     */
-    final V get(K key) {
-        if (key == null) {
-            throw new NullPointerException("key == null");
-        }
-
-        V mapValue;
-        synchronized (this) {
-            mapValue = map.get(key);
-            if (mapValue != null) {
-                hitCount++;
-                return mapValue;
-            }
-            missCount++;
-        }
-
-        return null;
+    V mapValue;
+    synchronized (this) {
+      mapValue = map.get(key);
+      if (mapValue != null) {
+        hitCount++;
+        return mapValue;
+      }
+      missCount++;
     }
 
-    /**
-     * Caches {@code value} for {@code key}. The value is moved to the head of
-     * the queue.
-     *
-     * @return the previous value mapped by {@code key}.
-     */
-    final V put(K key, V value) {
-        if (key == null || value == null) {
-            throw new NullPointerException("key == null || value == null");
-        }
+    return null;
+  }
 
-        V previous;
-        synchronized (this) {
-            putCount++;
-            size += 1;
-            previous = map.put(key, value);
-            if (previous != null) {
-                size -= 1;
-            }
-        }
-
-        trimToSize(maxSize);
-        return previous;
+  /**
+   * Caches {@code value} for {@code key}. The value is moved to the head of
+   * the queue.
+   *
+   * @return the previous value mapped by {@code key}.
+   */
+  final V put(K key, V value) {
+    if (key == null || value == null) {
+      throw new NullPointerException("key == null || value == null");
     }
 
-    /**
-     * Remove the eldest entries until the total of remaining entries is at or
-     * below the requested size.
-     *
-     * @param pMaxSize the maximum size of the cache before returning. Could be -1
-     *            to evict even 0-sized elements.
-     */
-    private void trimToSize(int maxSize) {
-        while (true) {
-            K key;
-            synchronized (this) {
-                if (size < 0 || (map.isEmpty() && size != 0)) {
-                    throw new IllegalStateException(getClass().getName()
-                            + ".sizeOf() is reporting inconsistent results!");
-                }
+    V previous;
+    synchronized (this) {
+      putCount++;
+      size += 1;
+      previous = map.put(key, value);
+      if (previous != null) {
+        size -= 1;
+      }
+    }
 
-                if (size <= maxSize || map.isEmpty()) {
-                    break;
-                }
+    trimToSize(maxSize);
+    return previous;
+  }
 
-                Map.Entry<K, V> toEvict = map.entrySet().iterator().next();
-                key = toEvict.getKey();
-                map.remove(key);
-                size -= 1;
-                evictionCount++;
-            }
+  /**
+   * Remove the eldest entries until the total of remaining entries is at or
+   * below the requested size.
+   *
+   * @param pMaxSize the maximum size of the cache before returning. Could be -1
+   *            to evict even 0-sized elements.
+   */
+  private void trimToSize(int maxSize) {
+    while (true) {
+      K key;
+      synchronized (this) {
+        if (size < 0 || (map.isEmpty() && size != 0)) {
+          throw new IllegalStateException(getClass().getName()
+              + ".sizeOf() is reporting inconsistent results!");
         }
-    }
 
-    @Override
-    public final synchronized String toString() {
-        int accesses = hitCount + missCount;
-        int hitPercent = (accesses == 0) ? 0 : (100 * hitCount / accesses);
-        return String.format("LruCache[maxSize=%d,hits=%d,misses=%d,hitRate=%d%%]",
-                maxSize, hitCount, missCount, hitPercent);
+        if (size <= maxSize || map.isEmpty()) {
+          break;
+        }
+
+        Map.Entry<K, V> toEvict = map.entrySet().iterator().next();
+        key = toEvict.getKey();
+        map.remove(key);
+        size -= 1;
+        evictionCount++;
+      }
     }
+  }
+
+  @Override
+  public final synchronized String toString() {
+    int accesses = hitCount + missCount;
+    int hitPercent = (accesses == 0) ? 0 : (100 * hitCount / accesses);
+    return String.format("LruCache[maxSize=%d,hits=%d,misses=%d,hitRate=%d%%]",
+        maxSize, hitCount, missCount, hitPercent);
+  }
 
 }

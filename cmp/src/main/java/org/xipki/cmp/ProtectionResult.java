@@ -18,16 +18,17 @@
 package org.xipki.cmp;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum ProtectionResult {
 
-    VALID,
-    INVALID,
-    SIGALGO_FORBIDDEN,
-    NOT_SIGNATURE_BASED,
-    SENDER_NOT_AUTHORIZED;
+  VALID,
+  INVALID,
+  SIGALGO_FORBIDDEN,
+  NOT_SIGNATURE_BASED,
+  SENDER_NOT_AUTHORIZED;
 
 }

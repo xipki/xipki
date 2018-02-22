@@ -20,39 +20,40 @@ package org.xipki.common.util;
 import java.math.BigInteger;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class BigIntegerRange {
-    private final BigInteger from;
-    private final BigInteger to;
-    private final BigInteger diff;
+  private final BigInteger from;
+  private final BigInteger to;
+  private final BigInteger diff;
 
-    public BigIntegerRange(BigInteger from, BigInteger to) {
-        if (from.compareTo(to) > 0) {
-            throw new IllegalArgumentException(
-                    "from (" + from + ") must not be larger than to (" + to + ")");
-        }
-        this.from = from;
-        this.to = to;
-        this.diff = to.subtract(from);
+  public BigIntegerRange(BigInteger from, BigInteger to) {
+    if (from.compareTo(to) > 0) {
+      throw new IllegalArgumentException(
+          "from (" + from + ") must not be larger than to (" + to + ")");
     }
+    this.from = from;
+    this.to = to;
+    this.diff = to.subtract(from);
+  }
 
-    public BigInteger from() {
-        return from;
-    }
+  public BigInteger from() {
+    return from;
+  }
 
-    public BigInteger to() {
-        return to;
-    }
+  public BigInteger to() {
+    return to;
+  }
 
-    public BigInteger diff() {
-        return diff;
-    }
+  public BigInteger diff() {
+    return diff;
+  }
 
-    public boolean isInRange(BigInteger num) {
-        return num.compareTo(from) >= 0 && num.compareTo(to) <= 0;
-    }
+  public boolean isInRange(BigInteger num) {
+    return num.compareTo(from) >= 0 && num.compareTo(to) <= 0;
+  }
 
 }

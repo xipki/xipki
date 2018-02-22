@@ -26,6 +26,7 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.ObjectIdentifiers;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -33,24 +34,24 @@ import org.xipki.security.ObjectIdentifiers;
 @Service
 public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
 
-    private static final Set<String> USAGES;
+  private static final Set<String> USAGES;
 
-    static {
-        Set<String> oids = new HashSet<>();
-        oids.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-        oids.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-        oids.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-        oids.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-        oids.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-        oids.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-        oids.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-        oids.add(ObjectIdentifiers.id_kp_timeStamping.getId());
-        USAGES = Collections.unmodifiableSet(oids);
-    }
+  static {
+    Set<String> oids = new HashSet<>();
+    oids.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+    oids.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+    oids.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+    oids.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+    oids.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+    oids.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+    oids.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+    oids.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+    USAGES = Collections.unmodifiableSet(oids);
+  }
 
-    @Override
-    protected Set<String> getEnums() {
-        return USAGES;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return USAGES;
+  }
 
 }

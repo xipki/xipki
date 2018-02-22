@@ -27,29 +27,30 @@ import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "refresh-p11",
-        description = "refresh PKCS#11 module")
+    description = "refresh PKCS#11 module")
 @Service
 public class P11RefreshSlotCmd extends SecurityAction {
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-        if (p11Service == null) {
-            throw new IllegalCmdParamException("undefined module " + moduleName);
-        }
-        p11Service.refresh();
-        println("refreshed module " + moduleName);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
+    if (p11Service == null) {
+      throw new IllegalCmdParamException("undefined module " + moduleName);
     }
+    p11Service.refresh();
+    println("refreshed module " + moduleName);
+    return null;
+  }
 
 }

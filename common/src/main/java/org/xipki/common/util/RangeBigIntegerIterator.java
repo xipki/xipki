@@ -22,57 +22,58 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class RangeBigIntegerIterator implements Iterator<BigInteger> {
 
-    private final List<BigIntegerRange> ranges;
+  private final List<BigIntegerRange> ranges;
 
-    private final int sizeRanges;
+  private final int sizeRanges;
 
-    private final boolean loop;
+  private final boolean loop;
 
-    private int currentIndex;
+  private int currentIndex;
 
-    private BigInteger currentNumber;
+  private BigInteger currentNumber;
 
-    public RangeBigIntegerIterator(List<BigIntegerRange> ranges, boolean loop) {
-        this.ranges = ParamUtil.requireNonEmpty("ranges", ranges);
-        this.sizeRanges = ranges.size();
-        this.loop = loop;
-        this.currentIndex = 0;
-        this.currentNumber = ranges.get(0).from();
+  public RangeBigIntegerIterator(List<BigIntegerRange> ranges, boolean loop) {
+    this.ranges = ParamUtil.requireNonEmpty("ranges", ranges);
+    this.sizeRanges = ranges.size();
+    this.loop = loop;
+    this.currentIndex = 0;
+    this.currentNumber = ranges.get(0).from();
+  }
+
+  @Override
+  public synchronized boolean hasNext() {
+    return currentNumber != null;
+  }
+
+  @Override
+  public synchronized BigInteger next() {
+    if (currentNumber == null) {
+      return null;
     }
 
-    @Override
-    public synchronized boolean hasNext() {
-        return currentNumber != null;
+    BigInteger ret = currentNumber;
+
+    BigInteger nextNumber = currentNumber.add(BigInteger.ONE);
+    BigIntegerRange range = ranges.get(currentIndex);
+    if (range.isInRange(nextNumber)) {
+      currentNumber = nextNumber;
+    } else {
+      currentIndex++;
+      if (loop && currentIndex >= sizeRanges) {
+        currentIndex = 0;
+      }
+
+      currentNumber = (currentIndex < sizeRanges) ? ranges.get(currentIndex).from() : null;
     }
 
-    @Override
-    public synchronized BigInteger next() {
-        if (currentNumber == null) {
-            return null;
-        }
-
-        BigInteger ret = currentNumber;
-
-        BigInteger nextNumber = currentNumber.add(BigInteger.ONE);
-        BigIntegerRange range = ranges.get(currentIndex);
-        if (range.isInRange(nextNumber)) {
-            currentNumber = nextNumber;
-        } else {
-            currentIndex++;
-            if (loop && currentIndex >= sizeRanges) {
-                currentIndex = 0;
-            }
-
-            currentNumber = (currentIndex < sizeRanges) ? ranges.get(currentIndex).from() : null;
-        }
-
-        return ret;
-    }
+    return ret;
+  }
 
 }

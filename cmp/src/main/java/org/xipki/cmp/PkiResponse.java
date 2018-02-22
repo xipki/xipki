@@ -21,35 +21,36 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class PkiResponse {
 
-    private final GeneralPKIMessage pkiMessage;
+  private final GeneralPKIMessage pkiMessage;
 
-    private ProtectionVerificationResult protectionVerificationResult;
+  private ProtectionVerificationResult protectionVerificationResult;
 
-    public PkiResponse(GeneralPKIMessage pkiMessage) {
-        this.pkiMessage = ParamUtil.requireNonNull("pkiMessage", pkiMessage);
-    }
+  public PkiResponse(GeneralPKIMessage pkiMessage) {
+    this.pkiMessage = ParamUtil.requireNonNull("pkiMessage", pkiMessage);
+  }
 
-    public boolean hasProtection() {
-        return pkiMessage.hasProtection();
-    }
+  public boolean hasProtection() {
+    return pkiMessage.hasProtection();
+  }
 
-    public GeneralPKIMessage pkiMessage() {
-        return pkiMessage;
-    }
+  public GeneralPKIMessage pkiMessage() {
+    return pkiMessage;
+  }
 
-    public ProtectionVerificationResult protectionVerificationResult() {
-        return protectionVerificationResult;
-    }
+  public ProtectionVerificationResult protectionVerificationResult() {
+    return protectionVerificationResult;
+  }
 
-    public void setProtectionVerificationResult(
-            ProtectionVerificationResult protectionVerificationResult) {
-        this.protectionVerificationResult = protectionVerificationResult;
-    }
+  public void setProtectionVerificationResult(
+      ProtectionVerificationResult protectionVerificationResult) {
+    this.protectionVerificationResult = protectionVerificationResult;
+  }
 
 }

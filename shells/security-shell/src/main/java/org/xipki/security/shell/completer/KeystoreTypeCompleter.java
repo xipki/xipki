@@ -26,6 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
@@ -33,12 +34,12 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 @Service
 public class KeystoreTypeCompleter extends AbstractDynamicEnumCompleter {
 
-    private static final Set<String> TYPES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("PKCS12", "JKS")));
+  private static final Set<String> TYPES = Collections.unmodifiableSet(
+      new HashSet<>(Arrays.asList("PKCS12", "JKS")));
 
-    @Override
-    protected Set<String> getEnums() {
-        return TYPES;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return TYPES;
+  }
 
 }

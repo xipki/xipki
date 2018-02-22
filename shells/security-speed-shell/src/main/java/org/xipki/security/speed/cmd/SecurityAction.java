@@ -22,13 +22,14 @@ import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class SecurityAction extends XiAction {
 
-    @Reference
-    protected SecurityFactory securityFactory;
+  @Reference
+  protected SecurityFactory securityFactory;
 
 }

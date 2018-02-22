@@ -31,95 +31,96 @@ import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 @Command(scope = "xi", name = "cert-info",
-        description = "print certificate information")
+    description = "print certificate information")
 @Service
 public class CertInfoCmd extends SecurityAction {
 
-    @Option(name = "--in",
-            description = "certificate file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String inFile;
+  @Option(name = "--in",
+      description = "certificate file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String inFile;
 
-    @Option(name = "--hex", aliases = "-h",
-            description = "print hex number")
-    private Boolean hex = Boolean.FALSE;
+  @Option(name = "--hex", aliases = "-h",
+      description = "print hex number")
+  private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--serial",
-            description = "print serial number")
-    private Boolean serial;
+  @Option(name = "--serial",
+      description = "print serial number")
+  private Boolean serial;
 
-    @Option(name = "--subject",
-            description = "print subject")
-    private Boolean subject;
+  @Option(name = "--subject",
+      description = "print subject")
+  private Boolean subject;
 
-    @Option(name = "--issuer",
-            description = "print issuer")
-    private Boolean issuer;
+  @Option(name = "--issuer",
+      description = "print issuer")
+  private Boolean issuer;
 
-    @Option(name = "--not-before",
-            description = "print notBefore")
-    private Boolean notBefore;
+  @Option(name = "--not-before",
+      description = "print notBefore")
+  private Boolean notBefore;
 
-    @Option(name = "--not-after",
-            description = "print notAfter")
-    private Boolean notAfter;
+  @Option(name = "--not-after",
+      description = "print notAfter")
+  private Boolean notAfter;
 
-    @Option(name = "--fingerprint",
-            description = "print fingerprint in hex")
-    private Boolean fingerprint;
+  @Option(name = "--fingerprint",
+      description = "print fingerprint in hex")
+  private Boolean fingerprint;
 
-    @Option(name = "--hash",
-            description = "hash algorithm name")
-    @Completion(HashAlgCompleter.class)
-    protected String hashAlgo = "SHA256";
+  @Option(name = "--hash",
+      description = "hash algorithm name")
+  @Completion(HashAlgCompleter.class)
+  protected String hashAlgo = "SHA256";
 
-    @Override
-    protected Object execute0() throws Exception {
-        Certificate cert = Certificate.getInstance(IoUtil.read(inFile));
+  @Override
+  protected Object execute0() throws Exception {
+    Certificate cert = Certificate.getInstance(IoUtil.read(inFile));
 
-        if (serial != null && serial) {
-            return getNumber(cert.getSerialNumber().getPositiveValue());
-        } else if (subject != null && subject) {
-            return cert.getSubject().toString();
-        } else if (issuer != null && issuer) {
-            return cert.getIssuer().toString();
-        } else if (notBefore != null && notBefore) {
-            return toUtcTimeyyyyMMddhhmmssZ(cert.getStartDate().getDate());
-        } else if (notAfter != null && notAfter) {
-            return toUtcTimeyyyyMMddhhmmssZ(cert.getEndDate().getDate());
-        } else if (fingerprint != null && fingerprint) {
-            byte[] encoded = cert.getEncoded();
-            return HashAlgoType.getHashAlgoType(hashAlgo).hexHash(encoded);
-        }
-
-        return null;
+    if (serial != null && serial) {
+      return getNumber(cert.getSerialNumber().getPositiveValue());
+    } else if (subject != null && subject) {
+      return cert.getSubject().toString();
+    } else if (issuer != null && issuer) {
+      return cert.getIssuer().toString();
+    } else if (notBefore != null && notBefore) {
+      return toUtcTimeyyyyMMddhhmmssZ(cert.getStartDate().getDate());
+    } else if (notAfter != null && notAfter) {
+      return toUtcTimeyyyyMMddhhmmssZ(cert.getEndDate().getDate());
+    } else if (fingerprint != null && fingerprint) {
+      byte[] encoded = cert.getEncoded();
+      return HashAlgoType.getHashAlgoType(hashAlgo).hexHash(encoded);
     }
 
-    private String getNumber(Number no) {
-        if (!hex) {
-            return no.toString();
-        }
+    return null;
+  }
 
-        if (no instanceof Byte) {
-            return "0X" + Hex.encode(new byte[]{(byte) no});
-        } else if (no instanceof Short) {
-            return "0X" + Integer.toHexString(Integer.valueOf((short) no));
-        } else if (no instanceof Integer) {
-            return "0X" + Integer.toHexString((int) no);
-        } else if (no instanceof Long) {
-            return "0X" + Long.toHexString((long) no);
-        } else if (no instanceof Long) {
-            return "0X" + Long.toHexString((long) no);
-        } else if (no instanceof BigInteger) {
-            return "0X" + ((BigInteger) no).toString(16);
-        } else {
-            return no.toString();
-        }
+  private String getNumber(Number no) {
+    if (!hex) {
+      return no.toString();
     }
+
+    if (no instanceof Byte) {
+      return "0X" + Hex.encode(new byte[]{(byte) no});
+    } else if (no instanceof Short) {
+      return "0X" + Integer.toHexString(Integer.valueOf((short) no));
+    } else if (no instanceof Integer) {
+      return "0X" + Integer.toHexString((int) no);
+    } else if (no instanceof Long) {
+      return "0X" + Long.toHexString((long) no);
+    } else if (no instanceof Long) {
+      return "0X" + Long.toHexString((long) no);
+    } else if (no instanceof BigInteger) {
+      return "0X" + ((BigInteger) no).toString(16);
+    } else {
+      return no.toString();
+    }
+  }
 
 }

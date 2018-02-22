@@ -31,7 +31,7 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 
 /**
- *
+ * TODO.
  * <pre>
  * P11ObjectIdentifier ::= SEQUENCE {
  *     id        OCTET STRING,
@@ -44,49 +44,49 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 
 public class Asn1P11ObjectIdentifier extends ASN1Object {
 
-    private final P11ObjectIdentifier objectId;
+  private final P11ObjectIdentifier objectId;
 
-    public Asn1P11ObjectIdentifier(P11ObjectIdentifier objectId) {
-        this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+  public Asn1P11ObjectIdentifier(P11ObjectIdentifier objectId) {
+    this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+  }
+
+  private Asn1P11ObjectIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 2, 2);
+    int idx = 0;
+    byte[] id = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
+    String label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+    this.objectId = new P11ObjectIdentifier(id, label);
+  }
+
+  public static Asn1P11ObjectIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1P11ObjectIdentifier) {
+      return (Asn1P11ObjectIdentifier) obj;
     }
 
-    private Asn1P11ObjectIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 2, 2);
-        int idx = 0;
-        byte[] id = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
-        String label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        this.objectId = new P11ObjectIdentifier(id, label);
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1P11ObjectIdentifier((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1P11ObjectIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1P11ObjectIdentifier) {
-            return (Asn1P11ObjectIdentifier) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    vec.add(new DEROctetString(objectId.id()));
+    vec.add(new DERUTF8String(objectId.label()));
+    return new DERSequence(vec);
+  }
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1P11ObjectIdentifier((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
-    }
-
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(new DEROctetString(objectId.id()));
-        vec.add(new DERUTF8String(objectId.label()));
-        return new DERSequence(vec);
-    }
-
-    public P11ObjectIdentifier objectId() {
-        return objectId;
-    }
+  public P11ObjectIdentifier objectId() {
+    return objectId;
+  }
 
 }

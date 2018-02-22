@@ -26,53 +26,54 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.XiSecurityException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class XiWrappedContentSigner implements XiContentSigner {
 
-    private byte[] encodedAlgorithmIdentifier;
-    private ContentSigner signer;
+  private byte[] encodedAlgorithmIdentifier;
+  private ContentSigner signer;
 
-    public XiWrappedContentSigner(ContentSigner signer, boolean fixedAlgorithmIdentifier)
-            throws XiSecurityException {
-        this.signer = ParamUtil.requireNonNull("signer",signer);
-        if (fixedAlgorithmIdentifier) {
-            try {
-                this.encodedAlgorithmIdentifier = signer.getAlgorithmIdentifier().getEncoded();
-            } catch (IOException ex) {
-                throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
-            }
-        }
+  public XiWrappedContentSigner(ContentSigner signer, boolean fixedAlgorithmIdentifier)
+      throws XiSecurityException {
+    this.signer = ParamUtil.requireNonNull("signer",signer);
+    if (fixedAlgorithmIdentifier) {
+      try {
+        this.encodedAlgorithmIdentifier = signer.getAlgorithmIdentifier().getEncoded();
+      } catch (IOException ex) {
+        throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+      }
+    }
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return signer.getAlgorithmIdentifier();
+  }
+
+  @Override
+  public byte[] getEncodedAlgorithmIdentifier() {
+    if (encodedAlgorithmIdentifier != null) {
+      return encodedAlgorithmIdentifier;
     }
 
-    @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return signer.getAlgorithmIdentifier();
+    try {
+      return signer.getAlgorithmIdentifier().getEncoded();
+    } catch (IOException ex) {
+      throw new RuntimeException("error encoding AlgorithmIdentifier", ex);
     }
+  }
 
-    @Override
-    public byte[] getEncodedAlgorithmIdentifier() {
-        if (encodedAlgorithmIdentifier != null) {
-            return encodedAlgorithmIdentifier;
-        }
+  @Override
+  public OutputStream getOutputStream() {
+    return signer.getOutputStream();
+  }
 
-        try {
-            return signer.getAlgorithmIdentifier().getEncoded();
-        } catch (IOException ex) {
-            throw new RuntimeException("error encoding AlgorithmIdentifier", ex);
-        }
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        return signer.getOutputStream();
-    }
-
-    @Override
-    public byte[] getSignature() {
-        return signer.getSignature();
-    }
+  @Override
+  public byte[] getSignature() {
+    return signer.getSignature();
+  }
 
 }

@@ -21,70 +21,71 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
 
-    private final P11SlotIdentifier slotId;
+  private final P11SlotIdentifier slotId;
 
-    private final P11ObjectIdentifier objectId;
+  private final P11ObjectIdentifier objectId;
 
-    /**
-     *
-     * @param slotId
-     *          Slot identifier. Must not be {@code null}.
-     * @param objectId
-     *          Object identifier. Must not be {@code null}.
-     */
-    public P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+  /**
+   * TODO.
+   * @param slotId
+   *          Slot identifier. Must not be {@code null}.
+   * @param objectId
+   *          Object identifier. Must not be {@code null}.
+   */
+  public P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+    this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+    this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+  }
+
+  public P11SlotIdentifier slotId() {
+    return slotId;
+  }
+
+  public P11ObjectIdentifier objectId() {
+    return objectId;
+  }
+
+  @Override
+  public int compareTo(P11EntityIdentifier obj) {
+    int ct = slotId.compareTo(obj.slotId);
+    if (ct != 0) {
+      return ct;
+    }
+    return objectId.compareTo(obj.objectId);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof P11EntityIdentifier)) {
+      return false;
     }
 
-    public P11SlotIdentifier slotId() {
-        return slotId;
-    }
+    P11EntityIdentifier ei = (P11EntityIdentifier) obj;
+    return this.slotId.equals(ei.slotId) && this.objectId.equals(ei.objectId);
+  }
 
-    public P11ObjectIdentifier objectId() {
-        return objectId;
-    }
+  public boolean match(P11SlotIdentifier slotId, String objectLabel) {
+    ParamUtil.requireNonNull("objectLabel", objectLabel);
+    return this.slotId.equals(slotId)
+        && objectLabel.equals(this.objectId.label());
+  }
 
-    @Override
-    public int compareTo(P11EntityIdentifier obj) {
-        int ct = slotId.compareTo(obj.slotId);
-        if (ct != 0) {
-            return ct;
-        }
-        return objectId.compareTo(obj.objectId);
-    }
+  @Override
+  public String toString() {
+    return StringUtil.concatObjects("slot ", slotId, ", object ", objectId);
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof P11EntityIdentifier)) {
-            return false;
-        }
-
-        P11EntityIdentifier ei = (P11EntityIdentifier) obj;
-        return this.slotId.equals(ei.slotId) && this.objectId.equals(ei.objectId);
-    }
-
-    public boolean match(P11SlotIdentifier slotId, String objectLabel) {
-        ParamUtil.requireNonNull("objectLabel", objectLabel);
-        return this.slotId.equals(slotId)
-                && objectLabel.equals(this.objectId.label());
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjects("slot ", slotId, ", object ", objectId);
-    }
-
-    @Override
-    public int hashCode() {
-        int hashCode = slotId.hashCode();
-        return hashCode + 31 * objectId.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    int hashCode = slotId.hashCode();
+    return hashCode + 31 * objectId.hashCode();
+  }
 
 }

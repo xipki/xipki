@@ -24,19 +24,20 @@ import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-sm2-gen-p12",
-        description = "performance test of PKCS#12 SM2 key generation")
+    description = "performance test of PKCS#12 SM2 key generation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12SM2KeyGenCmd extends SingleSpeedAction {
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P12ECKeyGenLoadTest("sm2p256v1", securityFactory);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P12ECKeyGenLoadTest("sm2p256v1", securityFactory);
+  }
 
 }

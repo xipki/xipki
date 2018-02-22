@@ -28,32 +28,33 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 // CHECKSTYLE:SKIP
 public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
-    private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
+  private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-    public XiRSAContentVerifierProviderBuilder(
-            DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
-        super(digestAlgorithmFinder);
-        this.digestAlgorithmFinder = digestAlgorithmFinder;
-    }
+  public XiRSAContentVerifierProviderBuilder(
+      DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+    super(digestAlgorithmFinder);
+    this.digestAlgorithmFinder = digestAlgorithmFinder;
+  }
 
-    @Override
-    protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
-        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-            try {
-                return SignerUtil.createPSSRSASigner(sigAlgId);
-            } catch (XiSecurityException ex) {
-                throw new OperatorCreationException(ex.getMessage(), ex);
-            }
-        } else {
-            AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-            return new RSADigestSigner(digestProvider.get(digAlg));
-        }
+  @Override
+  protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+      try {
+        return SignerUtil.createPSSRSASigner(sigAlgId);
+      } catch (XiSecurityException ex) {
+        throw new OperatorCreationException(ex.getMessage(), ex);
+      }
+    } else {
+      AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+      return new RSADigestSigner(digestProvider.get(digAlg));
     }
+  }
 
 }

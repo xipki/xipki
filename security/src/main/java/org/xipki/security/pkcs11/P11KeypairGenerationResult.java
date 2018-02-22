@@ -21,20 +21,21 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.KeypairGenerationResult;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult {
 
-    private final P11EntityIdentifier identityId;
+  private final P11EntityIdentifier identityId;
 
-    public P11KeypairGenerationResult(P11EntityIdentifier identityId) {
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-    }
+  public P11KeypairGenerationResult(P11EntityIdentifier identityId) {
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+  }
 
-    public P11EntityIdentifier idntityId() {
-        return identityId;
-    }
+  public P11EntityIdentifier idntityId() {
+    return identityId;
+  }
 
 }

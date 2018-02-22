@@ -25,49 +25,50 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "dsa-p11",
-        description = "generate DSA keypair in PKCS#11 device")
+    description = "generate DSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11DSAKeyGenCmd extends P11KeyGenAction {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer plen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer plen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qlen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qlen;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (plen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
-        }
-
-        if (qlen == null) {
-            if (plen <= 1024) {
-                qlen = 160;
-            } else if (plen <= 2048) {
-                qlen = 224;
-            } else {
-                qlen = 256;
-            }
-        }
-
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.generateDSAKeypair(plen, qlen, label, getControl());
-        finalize("DSA", objId);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (plen % 1024 != 0) {
+      throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
     }
 
-    @Override
-    protected boolean getDefaultExtractable() {
-        return true;
+    if (qlen == null) {
+      if (plen <= 1024) {
+        qlen = 160;
+      } else if (plen <= 2048) {
+        qlen = 224;
+      } else {
+        qlen = 256;
+      }
     }
+
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objId = slot.generateDSAKeypair(plen, qlen, label, getControl());
+    finalize("DSA", objId);
+    return null;
+  }
+
+  @Override
+  protected boolean getDefaultExtractable() {
+    return true;
+  }
 
 }

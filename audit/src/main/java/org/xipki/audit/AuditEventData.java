@@ -20,40 +20,41 @@ package org.xipki.audit;
 import java.util.Objects;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class AuditEventData {
 
-    private final String name;
+  private final String name;
 
-    private final String value;
+  private final String value;
 
-    public AuditEventData(String name, Object value) {
-        Objects.requireNonNull(name, "name must not be null");
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name must not be empty");
-        }
-        Objects.requireNonNull(value, "value must not be null");
-        this.name = name;
-        if (value instanceof String) {
-            this.value = (String) value;
-        } else {
-            this.value = value.toString();
-        }
+  public AuditEventData(String name, Object value) {
+    Objects.requireNonNull(name, "name must not be null");
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("name must not be empty");
     }
-
-    public String name() {
-        return name;
+    Objects.requireNonNull(value, "value must not be null");
+    this.name = name;
+    if (value instanceof String) {
+      this.value = (String) value;
+    } else {
+      this.value = value.toString();
     }
+  }
 
-    public String value() {
-        return value;
-    }
+  public String name() {
+    return name;
+  }
 
-    @Override
-    public String toString() {
-        return new StringBuilder(name).append(": ").append(value).toString();
-    }
+  public String value() {
+    return value;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(name).append(": ").append(value).toString();
+  }
 }

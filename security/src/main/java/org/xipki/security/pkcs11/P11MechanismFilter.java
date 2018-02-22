@@ -26,74 +26,75 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11MechanismFilter {
 
-    private static final class SingleFilter {
+  private static final class SingleFilter {
 
-        private final Set<P11SlotIdFilter> slots;
+    private final Set<P11SlotIdFilter> slots;
 
-        private final Collection<Long> mechanisms;
+    private final Collection<Long> mechanisms;
 
-        private SingleFilter(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
-            this.slots = slots;
-            this.mechanisms = CollectionUtil.isEmpty(mechanisms) ? null : mechanisms;
-        }
-
-        public boolean match(P11SlotIdentifier slot) {
-            if (slots == null) {
-                return true;
-            }
-            for (P11SlotIdFilter m : slots) {
-                if (m.match(slot)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public boolean isMechanismSupported(long mechanism) {
-            if (mechanisms == null) {
-                return true;
-            }
-
-            return mechanisms.contains(mechanism);
-        }
-
-    } // class SingleFilter
-
-    private final List<SingleFilter> singleFilters;
-
-    P11MechanismFilter() {
-        singleFilters = new LinkedList<>();
+    private SingleFilter(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
+      this.slots = slots;
+      this.mechanisms = CollectionUtil.isEmpty(mechanisms) ? null : mechanisms;
     }
 
-    void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
-        ParamUtil.requireNonNull("mechanismis", mechanisms);
-        singleFilters.add(new SingleFilter(slots, mechanisms));
-    }
-
-    void addAcceptAllEntry(Set<P11SlotIdFilter> slots) {
-        singleFilters.add(new SingleFilter(slots, null));
-    }
-
-    public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
-        ParamUtil.requireNonNull("slotId", slotId);
-        if (CollectionUtil.isEmpty(singleFilters)) {
-            return true;
-        }
-
-        for (SingleFilter sr : singleFilters) {
-            if (sr.match(slotId)) {
-                return sr.isMechanismSupported(mechanism);
-            }
-        }
-
+    public boolean match(P11SlotIdentifier slot) {
+      if (slots == null) {
         return true;
+      }
+      for (P11SlotIdFilter m : slots) {
+        if (m.match(slot)) {
+          return true;
+        }
+      }
+
+      return false;
     }
+
+    public boolean isMechanismSupported(long mechanism) {
+      if (mechanisms == null) {
+        return true;
+      }
+
+      return mechanisms.contains(mechanism);
+    }
+
+  } // class SingleFilter
+
+  private final List<SingleFilter> singleFilters;
+
+  P11MechanismFilter() {
+    singleFilters = new LinkedList<>();
+  }
+
+  void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
+    ParamUtil.requireNonNull("mechanismis", mechanisms);
+    singleFilters.add(new SingleFilter(slots, mechanisms));
+  }
+
+  void addAcceptAllEntry(Set<P11SlotIdFilter> slots) {
+    singleFilters.add(new SingleFilter(slots, null));
+  }
+
+  public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
+    ParamUtil.requireNonNull("slotId", slotId);
+    if (CollectionUtil.isEmpty(singleFilters)) {
+      return true;
+    }
+
+    for (SingleFilter sr : singleFilters) {
+      if (sr.match(slotId)) {
+        return sr.isMechanismSupported(mechanism);
+      }
+    }
+
+    return true;
+  }
 
 }

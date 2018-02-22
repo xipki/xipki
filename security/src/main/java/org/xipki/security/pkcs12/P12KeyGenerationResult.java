@@ -23,30 +23,31 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.KeypairGenerationResult;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P12KeyGenerationResult extends KeypairGenerationResult {
 
-    private final byte[] keystore;
+  private final byte[] keystore;
 
-    private KeyStore keystoreObject;
+  private KeyStore keystoreObject;
 
-    public P12KeyGenerationResult(byte[] keystore) {
-        this.keystore = ParamUtil.requireNonNull("keystore", keystore);
-    }
+  public P12KeyGenerationResult(byte[] keystore) {
+    this.keystore = ParamUtil.requireNonNull("keystore", keystore);
+  }
 
-    public byte[] keystore() {
-        return keystore;
-    }
+  public byte[] keystore() {
+    return keystore;
+  }
 
-    public KeyStore keystoreObject() {
-        return keystoreObject;
-    }
+  public KeyStore keystoreObject() {
+    return keystoreObject;
+  }
 
-    public void setKeystoreObject(KeyStore keystoreObject) {
-        this.keystoreObject = keystoreObject;
-    }
+  public void setKeystoreObject(KeyStore keystoreObject) {
+    this.keystoreObject = keystoreObject;
+  }
 
 }

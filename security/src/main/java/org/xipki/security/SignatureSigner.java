@@ -31,97 +31,98 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.XiSecurityException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class SignatureSigner implements XiContentSigner {
 
-    private class SignatureStream extends OutputStream {
+  private class SignatureStream extends OutputStream {
 
-        public byte[] getSignature() throws SignatureException {
-            return signer.sign();
-        }
-
-        @Override
-        public void write(int singleByte) throws IOException {
-            try {
-                signer.update((byte) singleByte);
-            } catch (SignatureException ex) {
-                throw new IOException(ex.getMessage(), ex);
-            }
-        }
-
-        @Override
-        public void write(byte[] bytes) throws IOException {
-            try {
-                signer.update(bytes);
-            } catch (SignatureException ex) {
-                throw new IOException(ex.getMessage(), ex);
-            }
-        }
-
-        @Override
-        public void write(byte[] bytes, int off, int len) throws IOException {
-            try {
-                signer.update(bytes, off, len);
-            } catch (SignatureException ex) {
-                throw new IOException(ex.getMessage(), ex);
-            }
-        }
-
-    } // class SignatureStream
-
-    private final AlgorithmIdentifier sigAlgId;
-
-    private final byte[] encodedSigAlgId;
-
-    private final Signature signer;
-
-    private final SignatureStream stream = new SignatureStream();
-
-    private final PrivateKey key;
-
-    public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
-            throws XiSecurityException {
-        this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
-        this.signer = ParamUtil.requireNonNull("signer", signer);
-        this.key = ParamUtil.requireNonNull("key", key);
-        try {
-            this.encodedSigAlgId = sigAlgId.getEncoded();
-        } catch (IOException ex) {
-            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
-        }
+    public byte[] getSignature() throws SignatureException {
+      return signer.sign();
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return sigAlgId;
+    public void write(int singleByte) throws IOException {
+      try {
+        signer.update((byte) singleByte);
+      } catch (SignatureException ex) {
+        throw new IOException(ex.getMessage(), ex);
+      }
     }
 
     @Override
-    public byte[] getEncodedAlgorithmIdentifier() {
-        return Arrays.copyOf(encodedSigAlgId, encodedSigAlgId.length);
+    public void write(byte[] bytes) throws IOException {
+      try {
+        signer.update(bytes);
+      } catch (SignatureException ex) {
+        throw new IOException(ex.getMessage(), ex);
+      }
     }
 
     @Override
-    public OutputStream getOutputStream() {
-        try {
-            signer.initSign(key);
-        } catch (InvalidKeyException ex) {
-            throw new RuntimeOperatorException("could not initSign", ex);
-        }
-        return stream;
+    public void write(byte[] bytes, int off, int len) throws IOException {
+      try {
+        signer.update(bytes, off, len);
+      } catch (SignatureException ex) {
+        throw new IOException(ex.getMessage(), ex);
+      }
     }
 
-    @Override
-    public byte[] getSignature() {
-        try {
-            return stream.getSignature();
-        } catch (SignatureException ex) {
-            throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(),
-                    ex);
-        }
+  } // class SignatureStream
+
+  private final AlgorithmIdentifier sigAlgId;
+
+  private final byte[] encodedSigAlgId;
+
+  private final Signature signer;
+
+  private final SignatureStream stream = new SignatureStream();
+
+  private final PrivateKey key;
+
+  public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
+      throws XiSecurityException {
+    this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
+    this.signer = ParamUtil.requireNonNull("signer", signer);
+    this.key = ParamUtil.requireNonNull("key", key);
+    try {
+      this.encodedSigAlgId = sigAlgId.getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return sigAlgId;
+  }
+
+  @Override
+  public byte[] getEncodedAlgorithmIdentifier() {
+    return Arrays.copyOf(encodedSigAlgId, encodedSigAlgId.length);
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    try {
+      signer.initSign(key);
+    } catch (InvalidKeyException ex) {
+      throw new RuntimeOperatorException("could not initSign", ex);
+    }
+    return stream;
+  }
+
+  @Override
+  public byte[] getSignature() {
+    try {
+      return stream.getSignature();
+    } catch (SignatureException ex) {
+      throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(),
+          ex);
+    }
+  }
 
 }

@@ -30,46 +30,47 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.shell.KeyGenAction;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P12KeyGenAction extends KeyGenAction {
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the key\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String keyOutFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the key\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  protected String keyOutFile;
 
-    @Option(name = "--password",
-            description = "password of the keystore file")
-    protected String password;
+  @Option(name = "--password",
+      description = "password of the keystore file")
+  protected String password;
 
-    protected void saveKey(P12KeyGenerationResult keyGenerationResult) throws IOException {
-        ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
-        File p12File = new File(keyOutFile);
-        saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.keystore());
+  protected void saveKey(P12KeyGenerationResult keyGenerationResult) throws IOException {
+    ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
+    File p12File = new File(keyOutFile);
+    saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.keystore());
+  }
+
+  protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {
+    KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+        getPassword());
+
+    SecureRandom random = securityFactory.getRandom4Key();
+    if (random != null) {
+      params.setRandom(random);
     }
 
-    protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {
-        KeystoreGenerationParameters params = new KeystoreGenerationParameters(
-                getPassword());
+    return params;
+  }
 
-        SecureRandom random = securityFactory.getRandom4Key();
-        if (random != null) {
-            params.setRandom(random);
-        }
-
-        return params;
+  private char[] getPassword() throws IOException {
+    char[] pwdInChar = readPasswordIfNotSet(password);
+    if (pwdInChar != null) {
+      password = new String(pwdInChar);
     }
-
-    private char[] getPassword() throws IOException {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
-    }
+    return pwdInChar;
+  }
 
 }

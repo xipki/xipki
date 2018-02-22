@@ -20,17 +20,17 @@ package org.xipki.common.util;
 import java.util.Random;
 
 /**
-*
-* @author Lijun Liao
-* @since 2.1.0
-*
-*/
+ * TODO.
+ * @author Lijun Liao
+ * @since 2.1.0
+ *
+ */
 
 public class RandomUtil {
-    private static final Random random = new Random();
+  private static final Random random = new Random();
 
-    public static String nextHexLong() {
-        return Long.toHexString(random.nextLong());
-    }
+  public static String nextHexLong() {
+    return Long.toHexString(random.nextLong());
+  }
 
 }

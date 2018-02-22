@@ -28,32 +28,33 @@ import org.xipki.security.speed.cmd.ECControl;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-ec-gen-p12",
-        description = "performance test of PKCS#12 EC key generation (batch)")
+    description = "performance test of PKCS#12 EC key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP12ECKeyGenCmd extends BatchSpeedAction {
 
-    private final Queue<ECControl> queue = new LinkedList<>();
+  private final Queue<ECControl> queue = new LinkedList<>();
 
-    public BSpeedP12ECKeyGenCmd() {
-        for (String curveName : getECCurveNames()) {
-            queue.add(new ECControl(curveName));
-        }
+  public BSpeedP12ECKeyGenCmd() {
+    for (String curveName : getECCurveNames()) {
+      queue.add(new ECControl(curveName));
+    }
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    ECControl control = queue.poll();
+    if (control == null) {
+      return null;
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        ECControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-
-        return new P12ECKeyGenLoadTest(control.curveName(), securityFactory);
-    }
+    return new P12ECKeyGenLoadTest(control.curveName(), securityFactory);
+  }
 
 }

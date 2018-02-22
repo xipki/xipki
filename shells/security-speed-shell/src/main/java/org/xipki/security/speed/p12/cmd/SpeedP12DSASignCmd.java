@@ -26,35 +26,36 @@ import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.security.speed.p12.P12DSASignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-dsa-sign-p12",
-        description = "performance test of PKCS#12 DSA signature creation")
+    description = "performance test of PKCS#12 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12DSASignCmd extends SpeedP12SignAction {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer plen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer plen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qlen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qlen;
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(DSASigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(DSASigAlgCompleter.class)
+  private String sigAlgo;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        if (qlen == null) {
-            qlen = (plen >= 2048) ? 256 : 160;
-        }
-        return new P12DSASignLoadTest(securityFactory, sigAlgo, plen, qlen);
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    if (qlen == null) {
+      qlen = (plen >= 2048) ? 256 : 160;
     }
+    return new P12DSASignLoadTest(securityFactory, sigAlgo, plen, qlen);
+  }
 
 }

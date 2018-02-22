@@ -88,873 +88,873 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class EmulatorP11Slot extends AbstractP11Slot {
 
-    private static class InfoFilenameFilter implements FilenameFilter {
-
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.endsWith(INFO_FILE_SUFFIX);
-        }
-
-    }
-
-    // slotinfo
-    private static final String FILE_SLOTINFO = "slot.info";
-    private static final String PROP_NAMED_CURVE_SUPPORTED = "namedCurveSupported";
-
-    private static final String DIR_PRIV_KEY = "privkey";
-    private static final String DIR_PUB_KEY = "pubkey";
-    private static final String DIR_SEC_KEY = "seckey";
-    private static final String DIR_CERT = "cert";
-
-    private static final String INFO_FILE_SUFFIX = ".info";
-    private static final String VALUE_FILE_SUFFIX = ".value";
-
-    private static final String PROP_ID = "id";
-    private static final String PROP_LABEL = "label";
-    private static final String PROP_SHA1SUM = "sha1";
-
-    private static final String PROP_ALGORITHM = "algorithm";
-
-    // RSA
-    private static final String PROP_RSA_MODUS = "modus";
-    private static final String PROP_RSA_PUBLIC_EXPONENT = "publicExponent";
-
-    // DSA
-    private static final String PROP_DSA_PRIME = "prime"; // p
-    private static final String PROP_DSA_SUBPRIME = "subprime"; // q
-    private static final String PROP_DSA_BASE = "base"; // g
-    private static final String PROP_DSA_VALUE = "value"; // y
-
-    // EC
-    private static final String PROP_EC_ECDSA_PARAMS = "ecdsaParams";
-    private static final String PROP_EC_EC_POINT = "ecPoint";
-
-    private static final long[] supportedMechs = new long[]{
-        PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
-        PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
-        PKCS11Constants.CKM_EC_KEY_PAIR_GEN,
-        PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN,
-
-        // Digest
-        PKCS11Constants.CKM_SHA_1,
-        PKCS11Constants.CKM_SHA224,
-        PKCS11Constants.CKM_SHA256,
-        PKCS11Constants.CKM_SHA384,
-        PKCS11Constants.CKM_SHA512,
-        PKCS11Constants.CKM_SHA3_224,
-        PKCS11Constants.CKM_SHA3_256,
-        PKCS11Constants.CKM_SHA3_384,
-        PKCS11Constants.CKM_SHA3_512,
-
-        // HMAC
-        PKCS11Constants.CKM_SHA_1_HMAC,
-        PKCS11Constants.CKM_SHA224_HMAC,
-        PKCS11Constants.CKM_SHA256_HMAC,
-        PKCS11Constants.CKM_SHA384_HMAC,
-        PKCS11Constants.CKM_SHA512_HMAC,
-        PKCS11Constants.CKM_SHA3_224_HMAC,
-        PKCS11Constants.CKM_SHA3_256_HMAC,
-        PKCS11Constants.CKM_SHA3_384_HMAC,
-        PKCS11Constants.CKM_SHA3_512_HMAC,
-
-        PKCS11Constants.CKM_RSA_X_509,
-
-        PKCS11Constants.CKM_RSA_PKCS,
-        PKCS11Constants.CKM_SHA1_RSA_PKCS,
-        PKCS11Constants.CKM_SHA224_RSA_PKCS,
-        PKCS11Constants.CKM_SHA256_RSA_PKCS,
-        PKCS11Constants.CKM_SHA384_RSA_PKCS,
-        PKCS11Constants.CKM_SHA512_RSA_PKCS,
-        PKCS11Constants.CKM_SHA3_224_RSA_PKCS,
-        PKCS11Constants.CKM_SHA3_256_RSA_PKCS,
-        PKCS11Constants.CKM_SHA3_384_RSA_PKCS,
-        PKCS11Constants.CKM_SHA3_512_RSA_PKCS,
-
-        PKCS11Constants.CKM_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS,
-        PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS,
-
-        PKCS11Constants.CKM_DSA,
-        PKCS11Constants.CKM_DSA_SHA1,
-        PKCS11Constants.CKM_DSA_SHA224,
-        PKCS11Constants.CKM_DSA_SHA256,
-        PKCS11Constants.CKM_DSA_SHA384,
-        PKCS11Constants.CKM_DSA_SHA512,
-        PKCS11Constants.CKM_DSA_SHA3_224,
-        PKCS11Constants.CKM_DSA_SHA3_256,
-        PKCS11Constants.CKM_DSA_SHA3_384,
-        PKCS11Constants.CKM_DSA_SHA3_512,
-
-        PKCS11Constants.CKM_ECDSA,
-        PKCS11Constants.CKM_ECDSA_SHA1,
-        PKCS11Constants.CKM_ECDSA_SHA224,
-        PKCS11Constants.CKM_ECDSA_SHA256,
-        PKCS11Constants.CKM_ECDSA_SHA384,
-        PKCS11Constants.CKM_ECDSA_SHA512,
-        PKCS11Constants.CKM_ECDSA_SHA3_224,
-        PKCS11Constants.CKM_ECDSA_SHA3_256,
-        PKCS11Constants.CKM_ECDSA_SHA3_384,
-        PKCS11Constants.CKM_ECDSA_SHA3_512,
-
-        // SM2
-        PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
-        PKCS11VendorConstants.CKM_VENDOR_SM2_SM3,
-        PKCS11VendorConstants.CKM_VENDOR_SM2};
-
-    private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
-
-    private final boolean namedCurveSupported;
-
-    private final File slotDir;
-
-    private final File privKeyDir;
-
-    private final File pubKeyDir;
-
-    private final File secKeyDir;
-
-    private final File certDir;
-
-    private final char[] password;
-
-    private final PrivateKeyCryptor privateKeyCryptor;
-
-    private final SecureRandom random = new SecureRandom();
-    //private final SecurityFactory securityFactory;
-
-    private final int maxSessions;
-
-    private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
-
-    EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
-            char[] password, PrivateKeyCryptor privateKeyCryptor,
-            P11MechanismFilter mechanismFilter, int maxSessions) throws P11TokenException {
-        super(moduleName, slotId, readOnly, mechanismFilter);
-
-        this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
-        this.password = ParamUtil.requireNonNull("password", password);
-        this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
-        this.maxSessions = ParamUtil.requireMin("maxSessions", maxSessions, 1);
-
-        this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
-        if (!this.privKeyDir.exists()) {
-            this.privKeyDir.mkdirs();
-        }
-
-        this.pubKeyDir = new File(slotDir, DIR_PUB_KEY);
-        if (!this.pubKeyDir.exists()) {
-            this.pubKeyDir.mkdirs();
-        }
-
-        this.secKeyDir = new File(slotDir, DIR_SEC_KEY);
-        if (!this.secKeyDir.exists()) {
-            this.secKeyDir.mkdirs();
-        }
-
-        this.certDir = new File(slotDir, DIR_CERT);
-        if (!this.certDir.exists()) {
-            this.certDir.mkdirs();
-        }
-
-        File slotInfoFile = new File(slotDir, FILE_SLOTINFO);
-        if (slotInfoFile.exists()) {
-            Properties props = loadProperties(slotInfoFile);
-            this.namedCurveSupported = Boolean.parseBoolean(
-                    props.getProperty(PROP_NAMED_CURVE_SUPPORTED, "true"));
-        } else {
-            this.namedCurveSupported = true;
-        }
-
-        refresh();
-    }
+  private static class InfoFilenameFilter implements FilenameFilter {
 
     @Override
-    protected P11SlotRefreshResult refresh0() throws P11TokenException {
-        P11SlotRefreshResult ret = new P11SlotRefreshResult();
-        for (long mech : supportedMechs) {
-            ret.addMechanism(mech);
-        }
-
-        // Secret Keys
-        File[] secKeyInfoFiles = secKeyDir.listFiles(INFO_FILENAME_FILTER);
-
-        if (secKeyInfoFiles != null && secKeyInfoFiles.length != 0) {
-            for (File secKeyInfoFile : secKeyInfoFiles) {
-                byte[] id = getKeyIdFromInfoFilename(secKeyInfoFile.getName());
-                String hexId = hex(id);
-
-                try {
-                    Properties props = loadProperties(secKeyInfoFile);
-                    String label = props.getProperty(PROP_LABEL);
-
-                    P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
-                    byte[] encodedValue = IoUtil.read(
-                            new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
-
-                    KeyStore ks = KeyStore.getInstance("JCEKS");
-                    ks.load(new ByteArrayInputStream(encodedValue), password);
-                    SecretKey key = null;
-                    Enumeration<String> aliases = ks.aliases();
-                    while (aliases.hasMoreElements()) {
-                        String alias = aliases.nextElement();
-                        if (ks.isKeyEntry(alias)) {
-                            key = (SecretKey) ks.getKey(alias, password);
-                            break;
-                        }
-                    }
-
-                    EmulatorP11Identity identity = new EmulatorP11Identity(this,
-                            new P11EntityIdentifier(slotId, p11ObjId), key,
-                            maxSessions, random);
-                    LOG.info("added PKCS#11 secret key {}", p11ObjId);
-                    ret.addIdentity(identity);
-                } catch (ClassCastException ex) {
-                    LogUtil.warn(LOG, ex,
-                            "InvalidKeyException while initializing key with key-id " + hexId);
-                    continue;
-                } catch (Throwable th) {
-                    LOG.error("unexpected exception while initializing key with key-id " + hexId,
-                            th);
-                    continue;
-                }
-            }
-        }
-
-        // Certificates
-        File[] certInfoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
-        if (certInfoFiles != null) {
-            for (File infoFile : certInfoFiles) {
-                byte[] id = getKeyIdFromInfoFilename(infoFile.getName());
-                Properties props = loadProperties(infoFile);
-                String label = props.getProperty(PROP_LABEL);
-                P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
-                try {
-                    X509Cert cert = readCertificate(id);
-                    ret.addCertificate(objId, cert);
-                } catch (CertificateException | IOException ex) {
-                    LOG.warn("could not parse certificate " + objId);
-                }
-            }
-        }
-
-        // Private / Public keys
-        File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
-
-        if (privKeyInfoFiles != null && privKeyInfoFiles.length != 0) {
-            for (File privKeyInfoFile : privKeyInfoFiles) {
-                byte[] id = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
-                String hexId = hex(id);
-
-                try {
-                    Properties props = loadProperties(privKeyInfoFile);
-                    String label = props.getProperty(PROP_LABEL);
-
-                    P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
-                    X509Cert cert = ret.getCertForId(id);
-                    java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
-                            : cert.cert().getPublicKey();
-
-                    if (publicKey == null) {
-                        LOG.warn(
-                            "Neither public key nor certificate is associated with private key {}",
-                            p11ObjId);
-                        continue;
-                    }
-
-                    byte[] encodedValue = IoUtil.read(
-                            new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
-
-                    PKCS8EncryptedPrivateKeyInfo epki =
-                            new PKCS8EncryptedPrivateKeyInfo(encodedValue);
-                    PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
-
-                    X509Certificate[] certs = (cert == null) ? null
-                            : new X509Certificate[]{cert.cert()};
-
-                    EmulatorP11Identity identity = new EmulatorP11Identity(this,
-                            new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
-                            maxSessions, random);
-                    LOG.info("added PKCS#11 key {}", p11ObjId);
-                    ret.addIdentity(identity);
-                } catch (InvalidKeyException ex) {
-                    LogUtil.warn(LOG, ex,
-                            "InvalidKeyException while initializing key with key-id " + hexId);
-                    continue;
-                } catch (Throwable th) {
-                    LOG.error("unexpected exception while initializing key with key-id " + hexId,
-                            th);
-                    continue;
-                }
-            }
-        }
-
-        return ret;
-    } // method refresh
-
-    File slotDir() {
-        return slotDir;
+    public boolean accept(File dir, String name) {
+      return name.endsWith(INFO_FILE_SUFFIX);
     }
 
-    private PublicKey readPublicKey(byte[] keyId) throws P11TokenException {
-        String hexKeyId = hex(keyId);
-        File pubKeyFile = new File(pubKeyDir, hexKeyId + INFO_FILE_SUFFIX);
-        Properties props = loadProperties(pubKeyFile);
+  }
 
-        String algorithm = props.getProperty(PROP_ALGORITHM);
-        if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(algorithm)) {
-            BigInteger exp = new BigInteger(1,
-                    decodeHex(props.getProperty(PROP_RSA_PUBLIC_EXPONENT)));
-            BigInteger mod = new BigInteger(1, decodeHex(props.getProperty(PROP_RSA_MODUS)));
+  // slotinfo
+  private static final String FILE_SLOTINFO = "slot.info";
+  private static final String PROP_NAMED_CURVE_SUPPORTED = "namedCurveSupported";
 
-            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
-            try {
-                return KeyUtil.generateRSAPublicKey(keySpec);
-            } catch (InvalidKeySpecException ex) {
-                throw new P11TokenException(ex.getMessage(), ex);
-            }
-        } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
-            BigInteger prime = new BigInteger(1,
-                    decodeHex(props.getProperty(PROP_DSA_PRIME))); // p
-            BigInteger subPrime = new BigInteger(1,
-                    decodeHex(props.getProperty(PROP_DSA_SUBPRIME))); // q
-            BigInteger base = new BigInteger(1,
-                    decodeHex(props.getProperty(PROP_DSA_BASE))); // g
-            BigInteger value = new BigInteger(1,
-                    decodeHex(props.getProperty(PROP_DSA_VALUE))); // y
+  private static final String DIR_PRIV_KEY = "privkey";
+  private static final String DIR_PUB_KEY = "pubkey";
+  private static final String DIR_SEC_KEY = "seckey";
+  private static final String DIR_CERT = "cert";
 
-            DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
-            try {
-                return KeyUtil.generateDSAPublicKey(keySpec);
-            } catch (InvalidKeySpecException ex) {
-                throw new P11TokenException(ex.getMessage(), ex);
-            }
-        } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
-            byte[] ecdsaParams = decodeHex(props.getProperty(PROP_EC_ECDSA_PARAMS));
-            byte[] asn1EncodedPoint = decodeHex(props.getProperty(PROP_EC_EC_POINT));
-            byte[] ecPoint = DEROctetString.getInstance(asn1EncodedPoint).getOctets();
-            try {
-                return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
-            } catch (InvalidKeySpecException ex) {
-                throw new P11TokenException(ex.getMessage(), ex);
-            }
-        } else {
-            throw new P11TokenException("unknown key algorithm " + algorithm);
-        }
+  private static final String INFO_FILE_SUFFIX = ".info";
+  private static final String VALUE_FILE_SUFFIX = ".value";
+
+  private static final String PROP_ID = "id";
+  private static final String PROP_LABEL = "label";
+  private static final String PROP_SHA1SUM = "sha1";
+
+  private static final String PROP_ALGORITHM = "algorithm";
+
+  // RSA
+  private static final String PROP_RSA_MODUS = "modus";
+  private static final String PROP_RSA_PUBLIC_EXPONENT = "publicExponent";
+
+  // DSA
+  private static final String PROP_DSA_PRIME = "prime"; // p
+  private static final String PROP_DSA_SUBPRIME = "subprime"; // q
+  private static final String PROP_DSA_BASE = "base"; // g
+  private static final String PROP_DSA_VALUE = "value"; // y
+
+  // EC
+  private static final String PROP_EC_ECDSA_PARAMS = "ecdsaParams";
+  private static final String PROP_EC_EC_POINT = "ecPoint";
+
+  private static final long[] supportedMechs = new long[]{
+    PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
+    PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
+    PKCS11Constants.CKM_EC_KEY_PAIR_GEN,
+    PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN,
+
+    // Digest
+    PKCS11Constants.CKM_SHA_1,
+    PKCS11Constants.CKM_SHA224,
+    PKCS11Constants.CKM_SHA256,
+    PKCS11Constants.CKM_SHA384,
+    PKCS11Constants.CKM_SHA512,
+    PKCS11Constants.CKM_SHA3_224,
+    PKCS11Constants.CKM_SHA3_256,
+    PKCS11Constants.CKM_SHA3_384,
+    PKCS11Constants.CKM_SHA3_512,
+
+    // HMAC
+    PKCS11Constants.CKM_SHA_1_HMAC,
+    PKCS11Constants.CKM_SHA224_HMAC,
+    PKCS11Constants.CKM_SHA256_HMAC,
+    PKCS11Constants.CKM_SHA384_HMAC,
+    PKCS11Constants.CKM_SHA512_HMAC,
+    PKCS11Constants.CKM_SHA3_224_HMAC,
+    PKCS11Constants.CKM_SHA3_256_HMAC,
+    PKCS11Constants.CKM_SHA3_384_HMAC,
+    PKCS11Constants.CKM_SHA3_512_HMAC,
+
+    PKCS11Constants.CKM_RSA_X_509,
+
+    PKCS11Constants.CKM_RSA_PKCS,
+    PKCS11Constants.CKM_SHA1_RSA_PKCS,
+    PKCS11Constants.CKM_SHA224_RSA_PKCS,
+    PKCS11Constants.CKM_SHA256_RSA_PKCS,
+    PKCS11Constants.CKM_SHA384_RSA_PKCS,
+    PKCS11Constants.CKM_SHA512_RSA_PKCS,
+    PKCS11Constants.CKM_SHA3_224_RSA_PKCS,
+    PKCS11Constants.CKM_SHA3_256_RSA_PKCS,
+    PKCS11Constants.CKM_SHA3_384_RSA_PKCS,
+    PKCS11Constants.CKM_SHA3_512_RSA_PKCS,
+
+    PKCS11Constants.CKM_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS,
+    PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS,
+
+    PKCS11Constants.CKM_DSA,
+    PKCS11Constants.CKM_DSA_SHA1,
+    PKCS11Constants.CKM_DSA_SHA224,
+    PKCS11Constants.CKM_DSA_SHA256,
+    PKCS11Constants.CKM_DSA_SHA384,
+    PKCS11Constants.CKM_DSA_SHA512,
+    PKCS11Constants.CKM_DSA_SHA3_224,
+    PKCS11Constants.CKM_DSA_SHA3_256,
+    PKCS11Constants.CKM_DSA_SHA3_384,
+    PKCS11Constants.CKM_DSA_SHA3_512,
+
+    PKCS11Constants.CKM_ECDSA,
+    PKCS11Constants.CKM_ECDSA_SHA1,
+    PKCS11Constants.CKM_ECDSA_SHA224,
+    PKCS11Constants.CKM_ECDSA_SHA256,
+    PKCS11Constants.CKM_ECDSA_SHA384,
+    PKCS11Constants.CKM_ECDSA_SHA512,
+    PKCS11Constants.CKM_ECDSA_SHA3_224,
+    PKCS11Constants.CKM_ECDSA_SHA3_256,
+    PKCS11Constants.CKM_ECDSA_SHA3_384,
+    PKCS11Constants.CKM_ECDSA_SHA3_512,
+
+    // SM2
+    PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
+    PKCS11VendorConstants.CKM_VENDOR_SM2_SM3,
+    PKCS11VendorConstants.CKM_VENDOR_SM2};
+
+  private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
+
+  private final boolean namedCurveSupported;
+
+  private final File slotDir;
+
+  private final File privKeyDir;
+
+  private final File pubKeyDir;
+
+  private final File secKeyDir;
+
+  private final File certDir;
+
+  private final char[] password;
+
+  private final PrivateKeyCryptor privateKeyCryptor;
+
+  private final SecureRandom random = new SecureRandom();
+  //private final SecurityFactory securityFactory;
+
+  private final int maxSessions;
+
+  private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
+
+  EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
+      char[] password, PrivateKeyCryptor privateKeyCryptor,
+      P11MechanismFilter mechanismFilter, int maxSessions) throws P11TokenException {
+    super(moduleName, slotId, readOnly, mechanismFilter);
+
+    this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
+    this.password = ParamUtil.requireNonNull("password", password);
+    this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
+    this.maxSessions = ParamUtil.requireMin("maxSessions", maxSessions, 1);
+
+    this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
+    if (!this.privKeyDir.exists()) {
+      this.privKeyDir.mkdirs();
     }
 
-    private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
-        byte[] encoded = IoUtil.read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
-        X509Certificate cert = X509Util.parseCert(encoded);
-        return new X509Cert(cert, encoded);
+    this.pubKeyDir = new File(slotDir, DIR_PUB_KEY);
+    if (!this.pubKeyDir.exists()) {
+      this.pubKeyDir.mkdirs();
     }
 
-    private Properties loadProperties(File file) throws P11TokenException {
-        try {
-            try (InputStream stream = new FileInputStream(file)) {
-                Properties props = new Properties();
-                props.load(stream);
-                return props;
-            }
-        } catch (IOException ex) {
-            throw new P11TokenException("could not load properties from the file " + file.getPath(),
-                    ex);
-        }
+    this.secKeyDir = new File(slotDir, DIR_SEC_KEY);
+    if (!this.secKeyDir.exists()) {
+      this.secKeyDir.mkdirs();
     }
 
-    private static byte[] getKeyIdFromInfoFilename(String fileName) {
-        return decodeHex(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
+    this.certDir = new File(slotDir, DIR_CERT);
+    if (!this.certDir.exists()) {
+      this.certDir.mkdirs();
     }
 
-    @Override
-    public void close() {
-        LOG.info("close slot " + slotId);
+    File slotInfoFile = new File(slotDir, FILE_SLOTINFO);
+    if (slotInfoFile.exists()) {
+      Properties props = loadProperties(slotInfoFile);
+      this.namedCurveSupported = Boolean.parseBoolean(
+          props.getProperty(PROP_NAMED_CURVE_SUPPORTED, "true"));
+    } else {
+      this.namedCurveSupported = true;
     }
 
-    private boolean removePkcs11Cert(P11ObjectIdentifier objectId) throws P11TokenException {
-        return removePkcs11Entry(certDir, objectId);
+    refresh();
+  }
+
+  @Override
+  protected P11SlotRefreshResult refresh0() throws P11TokenException {
+    P11SlotRefreshResult ret = new P11SlotRefreshResult();
+    for (long mech : supportedMechs) {
+      ret.addMechanism(mech);
     }
 
-    private boolean removePkcs11Entry(File dir, P11ObjectIdentifier objectId)
-            throws P11TokenException {
-        byte[] id = objectId.id();
-        String label = objectId.label();
-        if (id != null) {
-            String hextId = hex(id);
-            File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
-            if (!infoFile.exists()) {
-                return false;
-            }
+    // Secret Keys
+    File[] secKeyInfoFiles = secKeyDir.listFiles(INFO_FILENAME_FILTER);
 
-            if (StringUtil.isBlank(label)) {
-                return deletePkcs11Entry(dir, id);
-            } else {
-                Properties props = loadProperties(infoFile);
-
-                return label.equals(props.getProperty("label")) ? deletePkcs11Entry(dir, id)
-                        : false;
-            }
-        }
-
-        // id is null, delete all entries with the specified label
-        boolean deleted = false;
-        File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
-        if (infoFiles != null) {
-            for (File infoFile : infoFiles) {
-                if (!infoFile.isFile()) {
-                    continue;
-                }
-
-                Properties props = loadProperties(infoFile);
-                if (label.equals(props.getProperty("label"))) {
-                    if (deletePkcs11Entry(dir, getKeyIdFromInfoFilename(infoFile.getName()))) {
-                        deleted = true;
-                    }
-                }
-            }
-        }
-
-        return deleted;
-    }
-
-    private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
-        String hextId = hex(objectId);
-        File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
-        boolean b1 = true;
-        if (infoFile.exists()) {
-            b1 = infoFile.delete();
-        }
-
-        File valueFile = new File(dir, hextId + VALUE_FILE_SUFFIX);
-        boolean b2 = true;
-        if (valueFile.exists()) {
-            b2 = valueFile.delete();
-        }
-
-        return b1 || b2;
-    }
-
-    private int deletePkcs11Entry(File dir, byte[] id, String label) throws P11TokenException {
-        if (StringUtil.isBlank(label)) {
-            return deletePkcs11Entry(dir, id) ? 1 : 0;
-        }
-
-        if (id != null && id.length > 0) {
-            String hextId = hex(id);
-            File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
-            if (!infoFile.exists()) {
-                return 0;
-            }
-
-            Properties props = loadProperties(infoFile);
-            if (!label.equals(props.get(PROP_LABEL))) {
-                return 0;
-            }
-
-            return deletePkcs11Entry(dir, id) ? 1 : 0;
-        }
-
-        File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
-        if (infoFiles == null || infoFiles.length == 0) {
-            return 0;
-        }
-
-        List<byte[]> ids = new LinkedList<>();
-
-        for (File infoFile : infoFiles) {
-            Properties props = loadProperties(infoFile);
-            if (label.equals(props.getProperty(PROP_LABEL))) {
-                ids.add(getKeyIdFromInfoFilename(infoFile.getName()));
-            }
-        }
-
-        if (ids.isEmpty()) {
-            return 0;
-        }
-
-        for (byte[] m : ids) {
-            deletePkcs11Entry(dir, m);
-        }
-        return ids.size();
-    }
-
-    private void savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
-            throws P11TokenException {
-        byte[] encrytedValue;
-        try {
-            KeyStore ks = KeyStore.getInstance("JCEKS");
-            ks.load(null, password);
-            ks.setKeyEntry("main", secretKey, password, null);
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            ks.store(outStream, password);
-            outStream.flush();
-            encrytedValue = outStream.toByteArray();
-        } catch (NoSuchAlgorithmException | KeyStoreException
-                | CertificateException | IOException ex) {
-            throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-        }
-
-        savePkcs11Entry(secKeyDir, id, label, encrytedValue);
-    }
-
-    private void savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
-            throws P11TokenException {
-        PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
-        byte[] encoded;
-        try {
-            encoded = encryptedPrivKeyInfo.getEncoded();
-        } catch (IOException ex) {
-            LogUtil.error(LOG, ex);
-            throw new P11TokenException("could not encode PrivateKey");
-        }
-        savePkcs11Entry(privKeyDir, id, label, encoded);
-    }
-
-    private void savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
-            throws P11TokenException {
+    if (secKeyInfoFiles != null && secKeyInfoFiles.length != 0) {
+      for (File secKeyInfoFile : secKeyInfoFiles) {
+        byte[] id = getKeyIdFromInfoFilename(secKeyInfoFile.getName());
         String hexId = hex(id);
 
-        StringBuilder sb = new StringBuilder(100);
-        sb.append(PROP_ID).append('=').append(hexId).append('\n');
-        sb.append(PROP_LABEL).append('=').append(label).append('\n');
-
-        if (publicKey instanceof RSAPublicKey) {
-            sb.append(PROP_ALGORITHM).append('=');
-            sb.append(PKCSObjectIdentifiers.rsaEncryption.getId());
-            sb.append('\n');
-
-            sb.append(PROP_RSA_MODUS).append('=');
-
-            RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
-            sb.append(hex(rsaKey.getModulus().toByteArray()));
-            sb.append('\n');
-
-            sb.append(PROP_RSA_PUBLIC_EXPONENT).append('=');
-            sb.append(hex(rsaKey.getPublicExponent().toByteArray()));
-            sb.append('\n');
-        } else if (publicKey instanceof DSAPublicKey) {
-            sb.append(PROP_ALGORITHM).append('=');
-            sb.append(X9ObjectIdentifiers.id_dsa.getId());
-            sb.append('\n');
-
-            sb.append(PROP_DSA_PRIME).append('=');
-            DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
-            sb.append(hex(dsaKey.getParams().getP().toByteArray()));
-            sb.append('\n');
-
-            sb.append(PROP_DSA_SUBPRIME).append('=');
-            sb.append(hex(dsaKey.getParams().getQ().toByteArray()));
-            sb.append('\n');
-
-            sb.append(PROP_DSA_BASE).append('=');
-            sb.append(hex(dsaKey.getParams().getG().toByteArray()));
-            sb.append('\n');
-
-            sb.append(PROP_DSA_VALUE).append('=');
-            sb.append(hex(dsaKey.getY().toByteArray()));
-            sb.append('\n');
-        } else if (publicKey instanceof ECPublicKey) {
-            sb.append(PROP_ALGORITHM).append('=');
-            sb.append(X9ObjectIdentifiers.id_ecPublicKey.getId());
-            sb.append('\n');
-
-            ECPublicKey ecKey = (ECPublicKey) publicKey;
-            ECParameterSpec paramSpec = ecKey.getParams();
-
-            // ecdsaParams
-            org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec =
-                    EC5Util.convertSpec(paramSpec, false);
-            ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
-            if (curveOid == null) {
-                throw new P11TokenException("EC public key is not of namedCurve");
-            }
-
-            byte[] encodedParams;
-            try {
-                if (namedCurveSupported) {
-                    encodedParams = curveOid.getEncoded();
-                } else {
-                    encodedParams = ECNamedCurveTable.getByOID(curveOid).getEncoded();
-                }
-            } catch (IOException | NullPointerException ex) {
-                throw new P11TokenException(ex.getMessage(), ex);
-            }
-
-            sb.append(PROP_EC_ECDSA_PARAMS).append('=');
-            sb.append(hex(encodedParams));
-            sb.append('\n');
-
-            // EC point
-            java.security.spec.ECPoint pointW = ecKey.getW();
-            int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
-            byte[] ecPoint = new byte[1 + keysize * 2];
-            ecPoint[0] = 4; // uncompressed
-            bigIntToBytes("Wx", pointW.getAffineX(), ecPoint, 1, keysize);
-            bigIntToBytes("Wy", pointW.getAffineY(), ecPoint, 1 + keysize, keysize);
-
-            byte[] encodedEcPoint;
-            try {
-                encodedEcPoint = new DEROctetString(ecPoint).getEncoded();
-            } catch (IOException ex) {
-                throw new P11TokenException("could not ASN.1 encode the ECPoint");
-            }
-            sb.append(PROP_EC_EC_POINT).append('=');
-            sb.append(hex(encodedEcPoint));
-            sb.append('\n');
-        } else {
-            throw new IllegalArgumentException(
-                    "unsupported public key " + publicKey.getClass().getName());
-        }
-
         try {
-            IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
-        } catch (IOException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
+          Properties props = loadProperties(secKeyInfoFile);
+          String label = props.getProperty(PROP_LABEL);
+
+          P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
+          byte[] encodedValue = IoUtil.read(
+              new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
+
+          KeyStore ks = KeyStore.getInstance("JCEKS");
+          ks.load(new ByteArrayInputStream(encodedValue), password);
+          SecretKey key = null;
+          Enumeration<String> aliases = ks.aliases();
+          while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            if (ks.isKeyEntry(alias)) {
+              key = (SecretKey) ks.getKey(alias, password);
+              break;
+            }
+          }
+
+          EmulatorP11Identity identity = new EmulatorP11Identity(this,
+              new P11EntityIdentifier(slotId, p11ObjId), key,
+              maxSessions, random);
+          LOG.info("added PKCS#11 secret key {}", p11ObjId);
+          ret.addIdentity(identity);
+        } catch (ClassCastException ex) {
+          LogUtil.warn(LOG, ex,
+              "InvalidKeyException while initializing key with key-id " + hexId);
+          continue;
+        } catch (Throwable th) {
+          LOG.error("unexpected exception while initializing key with key-id " + hexId,
+              th);
+          continue;
         }
+      }
     }
 
-    private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos,
-            int length) throws P11TokenException {
-        if (num.signum() != 1) {
-            throw new P11TokenException(numName + " is not positive");
+    // Certificates
+    File[] certInfoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
+    if (certInfoFiles != null) {
+      for (File infoFile : certInfoFiles) {
+        byte[] id = getKeyIdFromInfoFilename(infoFile.getName());
+        Properties props = loadProperties(infoFile);
+        String label = props.getProperty(PROP_LABEL);
+        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+        try {
+          X509Cert cert = readCertificate(id);
+          ret.addCertificate(objId, cert);
+        } catch (CertificateException | IOException ex) {
+          LOG.warn("could not parse certificate " + objId);
         }
-        byte[] bytes = num.toByteArray();
-        if (bytes.length == length) {
-            System.arraycopy(bytes, 0, dest, destPos, length);
-        } else if (bytes.length < length) {
-            System.arraycopy(bytes, 0, dest, destPos + length - bytes.length, bytes.length);
-        } else {
-            System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
-        }
+      }
     }
 
-    private void savePkcs11Cert(byte[] id, String label, X509Certificate cert)
-            throws P11TokenException, CertificateException {
-        savePkcs11Entry(certDir, id, label, cert.getEncoded());
-    }
+    // Private / Public keys
+    File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
 
-    private static void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
-            throws P11TokenException {
-        ParamUtil.requireNonNull("dir", dir);
-        ParamUtil.requireNonNull("id", id);
-        ParamUtil.requireNonBlank("label", label);
-        ParamUtil.requireNonNull("value", value);
-
+    if (privKeyInfoFiles != null && privKeyInfoFiles.length != 0) {
+      for (File privKeyInfoFile : privKeyInfoFiles) {
+        byte[] id = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
         String hexId = hex(id);
 
-        String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n",
-                PROP_SHA1SUM, "=", HashAlgoType.SHA1.hexHash(value), "\n");
-
         try {
-            IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), str.getBytes());
-            IoUtil.save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
-        } catch (IOException ex) {
-            throw new P11TokenException("could not save certificate");
+          Properties props = loadProperties(privKeyInfoFile);
+          String label = props.getProperty(PROP_LABEL);
+
+          P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
+          X509Cert cert = ret.getCertForId(id);
+          java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
+              : cert.cert().getPublicKey();
+
+          if (publicKey == null) {
+            LOG.warn("Neither public key nor certificate is associated with private key {}",
+                p11ObjId);
+            continue;
+          }
+
+          byte[] encodedValue = IoUtil.read(
+              new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
+
+          PKCS8EncryptedPrivateKeyInfo epki =
+              new PKCS8EncryptedPrivateKeyInfo(encodedValue);
+          PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
+
+          X509Certificate[] certs = (cert == null) ? null
+              : new X509Certificate[]{cert.cert()};
+
+          EmulatorP11Identity identity = new EmulatorP11Identity(this,
+              new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
+              maxSessions, random);
+          LOG.info("added PKCS#11 key {}", p11ObjId);
+          ret.addIdentity(identity);
+        } catch (InvalidKeyException ex) {
+          LogUtil.warn(LOG, ex,
+              "InvalidKeyException while initializing key with key-id " + hexId);
+          continue;
+        } catch (Throwable th) {
+          LOG.error("unexpected exception while initializing key with key-id " + hexId,
+              th);
+          continue;
         }
+      }
     }
 
-    @Override
-    public int removeObjects(byte[] id, String label) throws P11TokenException {
-        if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
-            throw new IllegalArgumentException("at least one of id and label must not be null");
+    return ret;
+  } // method refresh
+
+  File slotDir() {
+    return slotDir;
+  }
+
+  private PublicKey readPublicKey(byte[] keyId) throws P11TokenException {
+    String hexKeyId = hex(keyId);
+    File pubKeyFile = new File(pubKeyDir, hexKeyId + INFO_FILE_SUFFIX);
+    Properties props = loadProperties(pubKeyFile);
+
+    String algorithm = props.getProperty(PROP_ALGORITHM);
+    if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(algorithm)) {
+      BigInteger exp = new BigInteger(1,
+          decodeHex(props.getProperty(PROP_RSA_PUBLIC_EXPONENT)));
+      BigInteger mod = new BigInteger(1, decodeHex(props.getProperty(PROP_RSA_MODUS)));
+
+      RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
+      try {
+        return KeyUtil.generateRSAPublicKey(keySpec);
+      } catch (InvalidKeySpecException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
+    } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
+      BigInteger prime = new BigInteger(1,
+          decodeHex(props.getProperty(PROP_DSA_PRIME))); // p
+      BigInteger subPrime = new BigInteger(1,
+          decodeHex(props.getProperty(PROP_DSA_SUBPRIME))); // q
+      BigInteger base = new BigInteger(1,
+          decodeHex(props.getProperty(PROP_DSA_BASE))); // g
+      BigInteger value = new BigInteger(1,
+          decodeHex(props.getProperty(PROP_DSA_VALUE))); // y
+
+      DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
+      try {
+        return KeyUtil.generateDSAPublicKey(keySpec);
+      } catch (InvalidKeySpecException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
+    } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
+      byte[] ecdsaParams = decodeHex(props.getProperty(PROP_EC_ECDSA_PARAMS));
+      byte[] asn1EncodedPoint = decodeHex(props.getProperty(PROP_EC_EC_POINT));
+      byte[] ecPoint = DEROctetString.getInstance(asn1EncodedPoint).getOctets();
+      try {
+        return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
+      } catch (InvalidKeySpecException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
+    } else {
+      throw new P11TokenException("unknown key algorithm " + algorithm);
+    }
+  }
+
+  private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
+    byte[] encoded = IoUtil.read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
+    X509Certificate cert = X509Util.parseCert(encoded);
+    return new X509Cert(cert, encoded);
+  }
+
+  private Properties loadProperties(File file) throws P11TokenException {
+    try {
+      try (InputStream stream = new FileInputStream(file)) {
+        Properties props = new Properties();
+        props.load(stream);
+        return props;
+      }
+    } catch (IOException ex) {
+      throw new P11TokenException("could not load properties from the file " + file.getPath(),
+          ex);
+    }
+  }
+
+  private static byte[] getKeyIdFromInfoFilename(String fileName) {
+    return decodeHex(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
+  }
+
+  @Override
+  public void close() {
+    LOG.info("close slot " + slotId);
+  }
+
+  private boolean removePkcs11Cert(P11ObjectIdentifier objectId) throws P11TokenException {
+    return removePkcs11Entry(certDir, objectId);
+  }
+
+  private boolean removePkcs11Entry(File dir, P11ObjectIdentifier objectId)
+      throws P11TokenException {
+    byte[] id = objectId.id();
+    String label = objectId.label();
+    if (id != null) {
+      String hextId = hex(id);
+      File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
+      if (!infoFile.exists()) {
+        return false;
+      }
+
+      if (StringUtil.isBlank(label)) {
+        return deletePkcs11Entry(dir, id);
+      } else {
+        Properties props = loadProperties(infoFile);
+
+        return label.equals(props.getProperty("label")) ? deletePkcs11Entry(dir, id)
+            : false;
+      }
+    }
+
+    // id is null, delete all entries with the specified label
+    boolean deleted = false;
+    File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
+    if (infoFiles != null) {
+      for (File infoFile : infoFiles) {
+        if (!infoFile.isFile()) {
+          continue;
         }
 
-        int num = deletePkcs11Entry(privKeyDir, id, label);
-        num += deletePkcs11Entry(pubKeyDir, id, label);
-        num += deletePkcs11Entry(certDir, id, label);
-        num += deletePkcs11Entry(secKeyDir, id, label);
-        return num;
-    }
-
-    @Override
-    protected void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException {
-        boolean b1 = removePkcs11Entry(certDir, objectId);
-        boolean b2 = removePkcs11Entry(privKeyDir, objectId);
-        boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
-        boolean b4 = removePkcs11Entry(secKeyDir, objectId);
-        if (! (b1 || b2 || b3 || b4)) {
-            throw new P11UnknownEntityException(slotId, objectId);
+        Properties props = loadProperties(infoFile);
+        if (label.equals(props.getProperty("label"))) {
+          if (deletePkcs11Entry(dir, getKeyIdFromInfoFilename(infoFile.getName()))) {
+            deleted = true;
+          }
         }
+      }
     }
 
-    @Override
-    protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
-        deletePkcs11Entry(certDir, objectId.id());
+    return deleted;
+  }
+
+  private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
+    String hextId = hex(objectId);
+    File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
+    boolean b1 = true;
+    if (infoFile.exists()) {
+      b1 = infoFile.delete();
     }
 
-    @Override
-    protected void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
-            throws P11TokenException, CertificateException {
-        savePkcs11Cert(objectId.id(), objectId.label(), cert);
+    File valueFile = new File(dir, hextId + VALUE_FILE_SUFFIX);
+    boolean b2 = true;
+    if (valueFile.exists()) {
+      b2 = valueFile.delete();
     }
 
-    @Override
-    protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
-            P11NewKeyControl control) throws P11TokenException {
-        if (keysize % 8 != 0) {
-            throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
-        }
+    return b1 || b2;
+  }
 
-        long mech;
-        if (PKCS11Constants.CKK_AES == keyType) {
-            mech = PKCS11Constants.CKM_AES_KEY_GEN;
-        } else if (PKCS11Constants.CKK_DES3 == keyType) {
-            mech = PKCS11Constants.CKM_DES3_KEY_GEN;
-        } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
-            mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
-        } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
-                || PKCS11Constants.CKK_SHA224_HMAC == keyType
-                || PKCS11Constants.CKK_SHA256_HMAC == keyType
-                || PKCS11Constants.CKK_SHA384_HMAC == keyType
-                || PKCS11Constants.CKK_SHA512_HMAC == keyType
-                || PKCS11Constants.CKK_SHA3_224_HMAC == keyType
-                || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
-                || PKCS11Constants.CKK_SHA3_384_HMAC == keyType
-                || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
-            mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+  private int deletePkcs11Entry(File dir, byte[] id, String label) throws P11TokenException {
+    if (StringUtil.isBlank(label)) {
+      return deletePkcs11Entry(dir, id) ? 1 : 0;
+    }
+
+    if (id != null && id.length > 0) {
+      String hextId = hex(id);
+      File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
+      if (!infoFile.exists()) {
+        return 0;
+      }
+
+      Properties props = loadProperties(infoFile);
+      if (!label.equals(props.get(PROP_LABEL))) {
+        return 0;
+      }
+
+      return deletePkcs11Entry(dir, id) ? 1 : 0;
+    }
+
+    File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
+    if (infoFiles == null || infoFiles.length == 0) {
+      return 0;
+    }
+
+    List<byte[]> ids = new LinkedList<>();
+
+    for (File infoFile : infoFiles) {
+      Properties props = loadProperties(infoFile);
+      if (label.equals(props.getProperty(PROP_LABEL))) {
+        ids.add(getKeyIdFromInfoFilename(infoFile.getName()));
+      }
+    }
+
+    if (ids.isEmpty()) {
+      return 0;
+    }
+
+    for (byte[] m : ids) {
+      deletePkcs11Entry(dir, m);
+    }
+    return ids.size();
+  }
+
+  private void savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
+      throws P11TokenException {
+    byte[] encrytedValue;
+    try {
+      KeyStore ks = KeyStore.getInstance("JCEKS");
+      ks.load(null, password);
+      ks.setKeyEntry("main", secretKey, password, null);
+      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+      ks.store(outStream, password);
+      outStream.flush();
+      encrytedValue = outStream.toByteArray();
+    } catch (NoSuchAlgorithmException | KeyStoreException
+        | CertificateException | IOException ex) {
+      throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+    }
+
+    savePkcs11Entry(secKeyDir, id, label, encrytedValue);
+  }
+
+  private void savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
+      throws P11TokenException {
+    PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
+    byte[] encoded;
+    try {
+      encoded = encryptedPrivKeyInfo.getEncoded();
+    } catch (IOException ex) {
+      LogUtil.error(LOG, ex);
+      throw new P11TokenException("could not encode PrivateKey");
+    }
+    savePkcs11Entry(privKeyDir, id, label, encoded);
+  }
+
+  private void savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
+      throws P11TokenException {
+    String hexId = hex(id);
+
+    StringBuilder sb = new StringBuilder(100);
+    sb.append(PROP_ID).append('=').append(hexId).append('\n');
+    sb.append(PROP_LABEL).append('=').append(label).append('\n');
+
+    if (publicKey instanceof RSAPublicKey) {
+      sb.append(PROP_ALGORITHM).append('=');
+      sb.append(PKCSObjectIdentifiers.rsaEncryption.getId());
+      sb.append('\n');
+
+      sb.append(PROP_RSA_MODUS).append('=');
+
+      RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
+      sb.append(hex(rsaKey.getModulus().toByteArray()));
+      sb.append('\n');
+
+      sb.append(PROP_RSA_PUBLIC_EXPONENT).append('=');
+      sb.append(hex(rsaKey.getPublicExponent().toByteArray()));
+      sb.append('\n');
+    } else if (publicKey instanceof DSAPublicKey) {
+      sb.append(PROP_ALGORITHM).append('=');
+      sb.append(X9ObjectIdentifiers.id_dsa.getId());
+      sb.append('\n');
+
+      sb.append(PROP_DSA_PRIME).append('=');
+      DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
+      sb.append(hex(dsaKey.getParams().getP().toByteArray()));
+      sb.append('\n');
+
+      sb.append(PROP_DSA_SUBPRIME).append('=');
+      sb.append(hex(dsaKey.getParams().getQ().toByteArray()));
+      sb.append('\n');
+
+      sb.append(PROP_DSA_BASE).append('=');
+      sb.append(hex(dsaKey.getParams().getG().toByteArray()));
+      sb.append('\n');
+
+      sb.append(PROP_DSA_VALUE).append('=');
+      sb.append(hex(dsaKey.getY().toByteArray()));
+      sb.append('\n');
+    } else if (publicKey instanceof ECPublicKey) {
+      sb.append(PROP_ALGORITHM).append('=');
+      sb.append(X9ObjectIdentifiers.id_ecPublicKey.getId());
+      sb.append('\n');
+
+      ECPublicKey ecKey = (ECPublicKey) publicKey;
+      ECParameterSpec paramSpec = ecKey.getParams();
+
+      // ecdsaParams
+      org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec =
+          EC5Util.convertSpec(paramSpec, false);
+      ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
+      if (curveOid == null) {
+        throw new P11TokenException("EC public key is not of namedCurve");
+      }
+
+      byte[] encodedParams;
+      try {
+        if (namedCurveSupported) {
+          encodedParams = curveOid.getEncoded();
         } else {
-            throw new IllegalArgumentException("unsupported key type 0x"
-                    + Util.toFullHex((int)keyType));
+          encodedParams = ECNamedCurveTable.getByOID(curveOid).getEncoded();
         }
-        assertMechanismSupported(mech);
+      } catch (IOException | NullPointerException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
 
-        byte[] keyBytes = new byte[keysize / 8];
-        random.nextBytes(keyBytes);
-        SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
-        return saveP11Entity(key, label);
+      sb.append(PROP_EC_ECDSA_PARAMS).append('=');
+      sb.append(hex(encodedParams));
+      sb.append('\n');
+
+      // EC point
+      java.security.spec.ECPoint pointW = ecKey.getW();
+      int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
+      byte[] ecPoint = new byte[1 + keysize * 2];
+      ecPoint[0] = 4; // uncompressed
+      bigIntToBytes("Wx", pointW.getAffineX(), ecPoint, 1, keysize);
+      bigIntToBytes("Wy", pointW.getAffineY(), ecPoint, 1 + keysize, keysize);
+
+      byte[] encodedEcPoint;
+      try {
+        encodedEcPoint = new DEROctetString(ecPoint).getEncoded();
+      } catch (IOException ex) {
+        throw new P11TokenException("could not ASN.1 encode the ECPoint");
+      }
+      sb.append(PROP_EC_EC_POINT).append('=');
+      sb.append(hex(encodedEcPoint));
+      sb.append('\n');
+    } else {
+      throw new IllegalArgumentException(
+          "unsupported public key " + publicKey.getClass().getName());
     }
 
-    @Override
-    protected P11Identity importSecretKey0(long keyType, byte[] keyValue, String label,
-            P11NewKeyControl control) throws P11TokenException {
-        SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
-        return saveP11Entity(key, label);
+    try {
+      IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
+    } catch (IOException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+  }
+
+  private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos,
+      int length) throws P11TokenException {
+    if (num.signum() != 1) {
+      throw new P11TokenException(numName + " is not positive");
+    }
+    byte[] bytes = num.toByteArray();
+    if (bytes.length == length) {
+      System.arraycopy(bytes, 0, dest, destPos, length);
+    } else if (bytes.length < length) {
+      System.arraycopy(bytes, 0, dest, destPos + length - bytes.length, bytes.length);
+    } else {
+      System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
+    }
+  }
+
+  private void savePkcs11Cert(byte[] id, String label, X509Certificate cert)
+      throws P11TokenException, CertificateException {
+    savePkcs11Entry(certDir, id, label, cert.getEncoded());
+  }
+
+  private static void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
+      throws P11TokenException {
+    ParamUtil.requireNonNull("dir", dir);
+    ParamUtil.requireNonNull("id", id);
+    ParamUtil.requireNonBlank("label", label);
+    ParamUtil.requireNonNull("value", value);
+
+    String hexId = hex(id);
+
+    String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n",
+        PROP_SHA1SUM, "=", HashAlgoType.SHA1.hexHash(value), "\n");
+
+    try {
+      IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), str.getBytes());
+      IoUtil.save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
+    } catch (IOException ex) {
+      throw new P11TokenException("could not save certificate");
+    }
+  }
+
+  @Override
+  public int removeObjects(byte[] id, String label) throws P11TokenException {
+    if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
+      throw new IllegalArgumentException("at least one of id and label must not be null");
     }
 
-    private static String getSecretKeyAlgorithm(long keyType) {
-        String algorithm;
-        if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
-            algorithm = "generic";
-        } else if (PKCS11Constants.CKK_AES == keyType) {
-            algorithm = "AES";
-        } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType) {
-            algorithm = "HMACSHA1";
-        } else if (PKCS11Constants.CKK_SHA224_HMAC == keyType) {
-            algorithm = "HMACSHA224";
-        } else if (PKCS11Constants.CKK_SHA256_HMAC == keyType) {
-            algorithm = "HMACSHA256";
-        } else if (PKCS11Constants.CKK_SHA384_HMAC == keyType) {
-            algorithm = "HMACSHA384";
-        } else if (PKCS11Constants.CKK_SHA512_HMAC == keyType) {
-            algorithm = "HMACSHA512";
-        } else if (PKCS11Constants.CKK_SHA3_224_HMAC == keyType) {
-            algorithm = "HMACSHA3-224";
-        } else if (PKCS11Constants.CKK_SHA3_256_HMAC == keyType) {
-            algorithm = "HMACSHA3-256";
-        } else if (PKCS11Constants.CKK_SHA3_384_HMAC == keyType) {
-            algorithm = "HMACSHA3-384";
-        } else if (PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
-            algorithm = "HMACSHA3-512";
-        } else {
-            throw new IllegalArgumentException("unsupported keyType " + keyType);
-        }
-        return algorithm;
+    int num = deletePkcs11Entry(privKeyDir, id, label);
+    num += deletePkcs11Entry(pubKeyDir, id, label);
+    num += deletePkcs11Entry(certDir, id, label);
+    num += deletePkcs11Entry(secKeyDir, id, label);
+    return num;
+  }
+
+  @Override
+  protected void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException {
+    boolean b1 = removePkcs11Entry(certDir, objectId);
+    boolean b2 = removePkcs11Entry(privKeyDir, objectId);
+    boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
+    boolean b4 = removePkcs11Entry(secKeyDir, objectId);
+    if (! (b1 || b2 || b3 || b4)) {
+      throw new P11UnknownEntityException(slotId, objectId);
+    }
+  }
+
+  @Override
+  protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
+    deletePkcs11Entry(certDir, objectId.id());
+  }
+
+  @Override
+  protected void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
+      throws P11TokenException, CertificateException {
+    savePkcs11Cert(objectId.id(), objectId.label(), cert);
+  }
+
+  @Override
+  protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
+      P11NewKeyControl control) throws P11TokenException {
+    if (keysize % 8 != 0) {
+      throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
     }
 
-    @Override
-    protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
-            String label, P11NewKeyControl control) throws P11TokenException {
-        assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-
-        KeyPair keypair;
-        try {
-            keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidAlgorithmParameterException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-        return saveP11Entity(keypair, label);
+    long mech;
+    if (PKCS11Constants.CKK_AES == keyType) {
+      mech = PKCS11Constants.CKM_AES_KEY_GEN;
+    } else if (PKCS11Constants.CKK_DES3 == keyType) {
+      mech = PKCS11Constants.CKM_DES3_KEY_GEN;
+    } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
+      mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+    } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
+        || PKCS11Constants.CKK_SHA224_HMAC == keyType
+        || PKCS11Constants.CKK_SHA256_HMAC == keyType
+        || PKCS11Constants.CKK_SHA384_HMAC == keyType
+        || PKCS11Constants.CKK_SHA512_HMAC == keyType
+        || PKCS11Constants.CKK_SHA3_224_HMAC == keyType
+        || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
+        || PKCS11Constants.CKK_SHA3_384_HMAC == keyType
+        || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
+      mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+    } else {
+      throw new IllegalArgumentException("unsupported key type 0x"
+          + Util.toFullHex((int)keyType));
     }
+    assertMechanismSupported(mech);
 
-    @Override
-    // CHECKSTYLE:OFF
-    protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
-            String label, P11NewKeyControl control) throws P11TokenException {
-    // CHECKSTYLE:ON
-        assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-        DSAParameters dsaParams = new DSAParameters(p, q, g);
-        KeyPair keypair;
-        try {
-            keypair = KeyUtil.generateDSAKeypair(dsaParams, random);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidAlgorithmParameterException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-        return saveP11Entity(keypair, label);
+    byte[] keyBytes = new byte[keysize / 8];
+    random.nextBytes(keyBytes);
+    SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
+    return saveP11Entity(key, label);
+  }
+
+  @Override
+  protected P11Identity importSecretKey0(long keyType, byte[] keyValue, String label,
+      P11NewKeyControl control) throws P11TokenException {
+    SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
+    return saveP11Entity(key, label);
+  }
+
+  private static String getSecretKeyAlgorithm(long keyType) {
+    String algorithm;
+    if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
+      algorithm = "generic";
+    } else if (PKCS11Constants.CKK_AES == keyType) {
+      algorithm = "AES";
+    } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType) {
+      algorithm = "HMACSHA1";
+    } else if (PKCS11Constants.CKK_SHA224_HMAC == keyType) {
+      algorithm = "HMACSHA224";
+    } else if (PKCS11Constants.CKK_SHA256_HMAC == keyType) {
+      algorithm = "HMACSHA256";
+    } else if (PKCS11Constants.CKK_SHA384_HMAC == keyType) {
+      algorithm = "HMACSHA384";
+    } else if (PKCS11Constants.CKK_SHA512_HMAC == keyType) {
+      algorithm = "HMACSHA512";
+    } else if (PKCS11Constants.CKK_SHA3_224_HMAC == keyType) {
+      algorithm = "HMACSHA3-224";
+    } else if (PKCS11Constants.CKK_SHA3_256_HMAC == keyType) {
+      algorithm = "HMACSHA3-256";
+    } else if (PKCS11Constants.CKK_SHA3_384_HMAC == keyType) {
+      algorithm = "HMACSHA3-384";
+    } else if (PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
+      algorithm = "HMACSHA3-512";
+    } else {
+      throw new IllegalArgumentException("unsupported keyType " + keyType);
     }
+    return algorithm;
+  }
 
-    @Override
-    protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
-            throws P11TokenException {
-        assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
-        return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
+  @Override
+  protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
+      String label, P11NewKeyControl control) throws P11TokenException {
+    assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+
+    KeyPair keypair;
+    try {
+      keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     }
+    return saveP11Entity(keypair, label);
+  }
 
-    @Override
-    protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
-            String label, P11NewKeyControl control) throws P11TokenException {
-        assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
-
-        KeyPair keypair;
-        try {
-            keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(), random);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidAlgorithmParameterException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-        return saveP11Entity(keypair, label);
+  @Override
+  // CHECKSTYLE:OFF
+  protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
+      String label, P11NewKeyControl control) throws P11TokenException {
+  // CHECKSTYLE:ON
+    assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
+    DSAParameters dsaParams = new DSAParameters(p, q, g);
+    KeyPair keypair;
+    try {
+      keypair = KeyUtil.generateDSAKeypair(dsaParams, random);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     }
+    return saveP11Entity(keypair, label);
+  }
 
-    private P11Identity saveP11Entity(KeyPair keypair, String label) throws P11TokenException {
-        byte[] id = generateId();
-        savePkcs11PrivateKey(id, label, keypair.getPrivate());
-        savePkcs11PublicKey(id, label, keypair.getPublic());
-        P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
-                new P11ObjectIdentifier(id, label));
-        try {
-            return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
-                    keypair.getPublic(), null, maxSessions, random);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
-            throw new P11TokenException(
-                    "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
-        }
-    }
+  @Override
+  protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
+      throws P11TokenException {
+    assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
+    return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
+  }
 
-    private P11Identity saveP11Entity(SecretKey key, String label) throws P11TokenException {
-        byte[] id = generateId();
-        savePkcs11SecretKey(id, label, key);
-        P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
-                new P11ObjectIdentifier(id, label));
-        return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
-    }
+  @Override
+  protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
+      String label, P11NewKeyControl control) throws P11TokenException {
+    assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
 
-    @Override
-    protected void updateCertificate0(P11ObjectIdentifier objectId,
-            X509Certificate newCert) throws P11TokenException, CertificateException {
-        removePkcs11Cert(objectId);
-        addCert0(objectId, newCert);
+    KeyPair keypair;
+    try {
+      keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(), random);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     }
+    return saveP11Entity(keypair, label);
+  }
+
+  private P11Identity saveP11Entity(KeyPair keypair, String label) throws P11TokenException {
+    byte[] id = generateId();
+    savePkcs11PrivateKey(id, label, keypair.getPrivate());
+    savePkcs11PublicKey(id, label, keypair.getPublic());
+    P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
+        new P11ObjectIdentifier(id, label));
+    try {
+      return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
+          keypair.getPublic(), null, maxSessions, random);
+    } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
+      throw new P11TokenException(
+          "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
+    }
+  }
+
+  private P11Identity saveP11Entity(SecretKey key, String label) throws P11TokenException {
+    byte[] id = generateId();
+    savePkcs11SecretKey(id, label, key);
+    P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
+        new P11ObjectIdentifier(id, label));
+    return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
+  }
+
+  @Override
+  protected void updateCertificate0(P11ObjectIdentifier objectId,
+      X509Certificate newCert) throws P11TokenException, CertificateException {
+    removePkcs11Cert(objectId);
+    addCert0(objectId, newCert);
+  }
 
 }

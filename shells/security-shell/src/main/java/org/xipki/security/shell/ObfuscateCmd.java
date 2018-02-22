@@ -29,47 +29,48 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.OBFPasswordService;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "obfuscate",
-        description = "obfuscate password")
+    description = "obfuscate password")
 @Service
 public class ObfuscateCmd extends SecurityAction {
 
-    @Option(name = "--out",
-            description = "where to save the encrypted password")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out",
+      description = "where to save the encrypted password")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Option(name = "-k",
-            description = "quorum of the password parts")
-    private Integer quorum = 1;
+  @Option(name = "-k",
+      description = "quorum of the password parts")
+  private Integer quorum = 1;
 
-    @Override
-    protected Object execute0() throws Exception {
-        ParamUtil.requireRange("k", quorum, 1, 10);
+  @Override
+  protected Object execute0() throws Exception {
+    ParamUtil.requireRange("k", quorum, 1, 10);
 
-        char[] password;
-        if (quorum == 1) {
-            password = readPassword("Password");
-        } else {
-            char[][] parts = new char[quorum][];
-            for (int i = 0; i < quorum; i++) {
-                parts[i] = readPassword("Password " + (i + 1) + "/" + quorum);
-            }
-            password = StringUtil.merge(parts);
-        }
-
-        String passwordHint = OBFPasswordService.obfuscate(new String(password));
-        if (outFile != null) {
-            saveVerbose("saved the obfuscated password to file", new File(outFile),
-                    passwordHint.getBytes());
-        } else {
-            println("the obfuscated password is: '" + passwordHint + "'");
-        }
-        return null;
+    char[] password;
+    if (quorum == 1) {
+      password = readPassword("Password");
+    } else {
+      char[][] parts = new char[quorum][];
+      for (int i = 0; i < quorum; i++) {
+        parts[i] = readPassword("Password " + (i + 1) + "/" + quorum);
+      }
+      password = StringUtil.merge(parts);
     }
+
+    String passwordHint = OBFPasswordService.obfuscate(new String(password));
+    if (outFile != null) {
+      saveVerbose("saved the obfuscated password to file", new File(outFile),
+          passwordHint.getBytes());
+    } else {
+      println("the obfuscated password is: '" + passwordHint + "'");
+    }
+    return null;
+  }
 
 }

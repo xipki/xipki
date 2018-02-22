@@ -30,110 +30,111 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509Cert {
 
-    private final X509Certificate cert;
+  private final X509Certificate cert;
 
-    private final String subject;
+  private final String subject;
 
-    private final byte[] encodedCert;
+  private final byte[] encodedCert;
 
-    private final byte[] subjectKeyIdentifer;
+  private final byte[] subjectKeyIdentifer;
 
-    private final X500Name subjectAsX500Name;
+  private final X500Name subjectAsX500Name;
 
-    private X509CertificateHolder certHolder;
+  private X509CertificateHolder certHolder;
 
-    public X509Cert(X509Certificate cert) {
-        this(cert, null);
+  public X509Cert(X509Certificate cert) {
+    this(cert, null);
+  }
+
+  public X509Cert(X509Certificate cert, byte[] encodedCert) {
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+
+    X500Principal x500Subject = cert.getSubjectX500Principal();
+    this.subject = X509Util.getRfc4519Name(x500Subject);
+    this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
+    try {
+      this.subjectKeyIdentifer = X509Util.extractSki(cert);
+    } catch (CertificateEncodingException ex) {
+      throw new RuntimeException(String.format(
+          "CertificateEncodingException: %s", ex.getMessage()));
     }
 
-    public X509Cert(X509Certificate cert, byte[] encodedCert) {
-        this.cert = ParamUtil.requireNonNull("cert", cert);
+    if (encodedCert != null) {
+      this.encodedCert = encodedCert;
+    } else {
+      try {
+        this.encodedCert = cert.getEncoded();
+      } catch (CertificateEncodingException ex) {
+        throw new RuntimeException(
+            String.format("CertificateEncodingException: %s", ex.getMessage()));
+      }
+    }
+  }
 
-        X500Principal x500Subject = cert.getSubjectX500Principal();
-        this.subject = X509Util.getRfc4519Name(x500Subject);
-        this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
-        try {
-            this.subjectKeyIdentifer = X509Util.extractSki(cert);
-        } catch (CertificateEncodingException ex) {
-            throw new RuntimeException(String.format(
-                    "CertificateEncodingException: %s", ex.getMessage()));
-        }
+  public X509Certificate cert() {
+    return cert;
+  }
 
-        if (encodedCert != null) {
-            this.encodedCert = encodedCert;
-        } else {
-            try {
-                this.encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException ex) {
-                throw new RuntimeException(
-                        String.format("CertificateEncodingException: %s", ex.getMessage()));
-            }
-        }
+  public byte[] encodedCert() {
+    return encodedCert;
+  }
+
+  public String subject() {
+    return subject;
+  }
+
+  public X500Name subjectAsX500Name() {
+    return subjectAsX500Name;
+  }
+
+  public byte[] subjectKeyIdentifier() {
+    return Arrays.copyOf(subjectKeyIdentifer, subjectKeyIdentifer.length);
+  }
+
+  public X509CertificateHolder certHolder() {
+    if (certHolder != null) {
+      return certHolder;
     }
 
-    public X509Certificate cert() {
-        return cert;
+    synchronized (cert) {
+      try {
+        certHolder = new X509CertificateHolder(encodedCert);
+      } catch (IOException ex) {
+        throw new RuntimeException("should not happen, could not decode certificate: "
+            + ex.getMessage());
+      }
+      return certHolder;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return cert.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return cert.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
     }
 
-    public byte[] encodedCert() {
-        return encodedCert;
+    if (!(obj instanceof X509Cert)) {
+      return false;
     }
 
-    public String subject() {
-        return subject;
-    }
-
-    public X500Name subjectAsX500Name() {
-        return subjectAsX500Name;
-    }
-
-    public byte[] subjectKeyIdentifier() {
-        return Arrays.copyOf(subjectKeyIdentifer, subjectKeyIdentifer.length);
-    }
-
-    public X509CertificateHolder certHolder() {
-        if (certHolder != null) {
-            return certHolder;
-        }
-
-        synchronized (cert) {
-            try {
-                certHolder = new X509CertificateHolder(encodedCert);
-            } catch (IOException ex) {
-                throw new RuntimeException("should not happen, could not decode certificate: "
-                        + ex.getMessage());
-            }
-            return certHolder;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return cert.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        return cert.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof X509Cert)) {
-            return false;
-        }
-
-        return Arrays.equals(encodedCert, ((X509Cert) obj).encodedCert);
-    }
+    return Arrays.equals(encodedCert, ((X509Cert) obj).encodedCert);
+  }
 
 }

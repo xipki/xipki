@@ -32,7 +32,7 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
- *
+ * TODO.
  * <pre>
  * GenECKeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
@@ -48,73 +48,73 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 // CHECKSTYLE:SKIP
 public class Asn1GenECKeypairParams extends ASN1Object {
 
-    private final P11SlotIdentifier slotId;
+  private final P11SlotIdentifier slotId;
 
-    private final String label;
+  private final String label;
 
-    private final P11NewKeyControl control;
+  private final P11NewKeyControl control;
 
-    private final ASN1ObjectIdentifier curveId;
+  private final ASN1ObjectIdentifier curveId;
 
-    public Asn1GenECKeypairParams(P11SlotIdentifier slotId, String label,
-            P11NewKeyControl control, ASN1ObjectIdentifier curveId) {
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.label = ParamUtil.requireNonBlank("label", label);
-        this.control = ParamUtil.requireNonNull("control", control);
-        this.curveId = ParamUtil.requireNonNull("curveId", curveId);
+  public Asn1GenECKeypairParams(P11SlotIdentifier slotId, String label,
+      P11NewKeyControl control, ASN1ObjectIdentifier curveId) {
+    this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+    this.label = ParamUtil.requireNonBlank("label", label);
+    this.control = ParamUtil.requireNonNull("control", control);
+    this.curveId = ParamUtil.requireNonNull("curveId", curveId);
+  }
+
+  private Asn1GenECKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 4, 4);
+    int idx = 0;
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+    curveId = Asn1Util.getObjectIdentifier(seq.getObjectAt(idx++));
+  }
+
+  public static Asn1GenECKeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1GenECKeypairParams) {
+      return (Asn1GenECKeypairParams) obj;
     }
 
-    private Asn1GenECKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 4, 4);
-        int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
-        label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
-        curveId = Asn1Util.getObjectIdentifier(seq.getObjectAt(idx++));
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1GenECKeypairParams((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1GenECKeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1GenECKeypairParams) {
-            return (Asn1GenECKeypairParams) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(new Asn1P11SlotIdentifier(slotId));
+    vector.add(new DERUTF8String(label));
+    vector.add(curveId);
+    return new DERSequence(vector);
+  }
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1GenECKeypairParams((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
-    }
+  public P11SlotIdentifier slotId() {
+    return slotId;
+  }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new Asn1P11SlotIdentifier(slotId));
-        vector.add(new DERUTF8String(label));
-        vector.add(curveId);
-        return new DERSequence(vector);
-    }
+  public String label() {
+    return label;
+  }
 
-    public P11SlotIdentifier slotId() {
-        return slotId;
-    }
+  public P11NewKeyControl control() {
+    return control;
+  }
 
-    public String label() {
-        return label;
-    }
-
-    public P11NewKeyControl control() {
-        return control;
-    }
-
-    public ASN1ObjectIdentifier curveId() {
-        return curveId;
-    }
+  public ASN1ObjectIdentifier curveId() {
+    return curveId;
+  }
 
 }

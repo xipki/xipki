@@ -33,6 +33,7 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 
 /**
+ * TODO.
  * <pre>
  * NewKeyControl ::= SEQUENCE {
  *     extractable        [0] EXPLICIT BOOLEAN OPTIONAL }
@@ -44,58 +45,58 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 
 public class Asn1NewKeyControl extends ASN1Object {
 
-    private final P11NewKeyControl control;
+  private final P11NewKeyControl control;
 
-    public Asn1NewKeyControl(P11NewKeyControl control) {
-        this.control = ParamUtil.requireNonNull("control", control);
+  public Asn1NewKeyControl(P11NewKeyControl control) {
+    this.control = ParamUtil.requireNonNull("control", control);
+  }
+
+  private Asn1NewKeyControl(ASN1Sequence seq) throws BadAsn1ObjectException {
+    control = new P11NewKeyControl();
+    final int size = seq.size();
+    for (int i = 0; i < size; i++) {
+      ASN1Encodable obj = seq.getObjectAt(i);
+      if (obj instanceof ASN1TaggedObject) {
+        continue;
+      }
+
+      ASN1TaggedObject tagObj = (ASN1TaggedObject) obj;
+      int tagNo = tagObj.getTagNo();
+      if (tagNo == 0) {
+        boolean bv = ((ASN1Boolean) tagObj.getObject()).isTrue();
+        control.setExtractable(bv);
+      }
+    }
+  }
+
+  public static Asn1NewKeyControl getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1NewKeyControl) {
+      return (Asn1NewKeyControl) obj;
     }
 
-    private Asn1NewKeyControl(ASN1Sequence seq) throws BadAsn1ObjectException {
-        control = new P11NewKeyControl();
-        final int size = seq.size();
-        for (int i = 0; i < size; i++) {
-            ASN1Encodable obj = seq.getObjectAt(i);
-            if (obj instanceof ASN1TaggedObject) {
-                continue;
-            }
-
-            ASN1TaggedObject tagObj = (ASN1TaggedObject) obj;
-            int tagNo = tagObj.getTagNo();
-            if (tagNo == 0) {
-                boolean bv = ((ASN1Boolean) tagObj.getObject()).isTrue();
-                control.setExtractable(bv);
-            }
-        }
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1NewKeyControl((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse object: " + ex.getMessage(), ex);
     }
+  }
 
-    public static Asn1NewKeyControl getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1NewKeyControl) {
-            return (Asn1NewKeyControl) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(new DERTaggedObject(0,
+        ASN1Boolean.getInstance(control.isExtractable())));
+    return new DERSequence(vector);
+  }
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1NewKeyControl((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse object: " + ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new DERTaggedObject(0,
-                ASN1Boolean.getInstance(control.isExtractable())));
-        return new DERSequence(vector);
-    }
-
-    public P11NewKeyControl control() {
-        return control;
-    }
+  public P11NewKeyControl control() {
+    return control;
+  }
 
 }

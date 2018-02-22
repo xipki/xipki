@@ -25,39 +25,40 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "rsa-p12",
-        description = "generate RSA keypair in PKCS#12 keystore")
+    description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12RSAKeyGenCmd extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject of the self-signed certificate")
-    private String subject;
+  @Option(name = "--subject", aliases = "-s",
+      description = "subject of the self-signed certificate")
+  private String subject;
 
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
+  @Option(name = "--key-size",
+      description = "keysize in bit")
+  private Integer keysize = 2048;
 
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
+  @Option(name = "-e",
+      description = "public exponent")
+  private String publicExponent = "0x10001";
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (keysize % 1024 != 0) {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
-
-        P12KeyGenerationResult keypair = new P12KeyGenerator().generateRSAKeypair(keysize,
-                toBigInt(publicExponent), getKeyGenParameters(), subject);
-        saveKey(keypair);
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (keysize % 1024 != 0) {
+      throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
     }
+
+    P12KeyGenerationResult keypair = new P12KeyGenerator().generateRSAKeypair(keysize,
+        toBigInt(publicExponent), getKeyGenParameters(), subject);
+    saveKey(keypair);
+
+    return null;
+  }
 
 }

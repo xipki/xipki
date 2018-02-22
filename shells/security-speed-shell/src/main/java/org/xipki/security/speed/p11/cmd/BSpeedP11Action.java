@@ -31,33 +31,34 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.speed.cmd.BatchSpeedAction;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class BSpeedP11Action extends BatchSpeedAction {
 
-    @Reference (optional = true)
-    protected P11CryptServiceFactory p11CryptServiceFactory;
+  @Reference (optional = true)
+  protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    protected Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  protected Integer slotIndex;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  protected String moduleName = DEFAULT_P11MODULE_NAME;
 
-    protected P11Slot getSlot()
-            throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-        P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-        if (p11Service == null) {
-            throw new IllegalCmdParamException("undefined module " + moduleName);
-        }
-        P11Module module = p11Service.module();
-        P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
-        return module.getSlot(slotId);
+  protected P11Slot getSlot()
+      throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
+    if (p11Service == null) {
+      throw new IllegalCmdParamException("undefined module " + moduleName);
     }
+    P11Module module = p11Service.module();
+    P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+    return module.getSlot(slotId);
+  }
 
 }

@@ -31,40 +31,40 @@ import liquibase.logging.Logger;
 
 public class MyLoggerFactory extends LogFactory {
 
-    private final Map<String, MyLogger> loggers = new HashMap<String, MyLogger>();
-    private MyLogger defaultLogger ;
+  private final Map<String, MyLogger> loggers = new HashMap<String, MyLogger>();
+  private MyLogger defaultLogger;
 
-    public MyLoggerFactory() {
+  public MyLoggerFactory() {
+  }
+
+  @Override
+  public Logger getLog(String name) {
+    MyLogger mylogger = loggers.get(name);
+    if (mylogger == null) {
+      Logger logger = super.getLog(name);
+      if (logger instanceof MyLogger) {
+        mylogger = (MyLogger) logger;
+      } else {
+        mylogger = new MyLogger(logger);
+      }
+      loggers.put(name, mylogger);
     }
 
-    @Override
-    public Logger getLog(String name) {
-        MyLogger mylogger = loggers.get(name);
-        if (mylogger == null) {
-            Logger logger = super.getLog(name);
-            if (logger instanceof MyLogger) {
-                mylogger = (MyLogger) logger;
-            } else {
-                mylogger = new MyLogger(logger);
-            }
-            loggers.put(name, mylogger);
-        }
+    return mylogger;
+  }
 
-        return mylogger;
+  @Override
+  public Logger getLog() {
+    if (defaultLogger == null) {
+      Logger logger = super.getLog();
+      if (logger instanceof MyLogger) {
+        defaultLogger = (MyLogger) logger;
+      } else {
+        defaultLogger = new MyLogger(logger);
+      }
     }
 
-    @Override
-    public Logger getLog() {
-        if (defaultLogger == null) {
-            Logger logger = super.getLog();
-            if (logger instanceof MyLogger) {
-                defaultLogger = (MyLogger) logger;
-            } else {
-                defaultLogger = new MyLogger(logger);
-            }
-        }
-
-        return defaultLogger;
-    }
+    return defaultLogger;
+  }
 
 }

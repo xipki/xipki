@@ -29,7 +29,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.BadAsn1ObjectException;
 
 /**
- *
+ * TODO.
  * <pre>
  * SignTemplate ::= SEQUENCE {
  *     entityId       EntityIdentifier,
@@ -43,64 +43,64 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 
 public class Asn1SignTemplate extends ASN1Object {
 
-    private final Asn1P11EntityIdentifier identityId;
+  private final Asn1P11EntityIdentifier identityId;
 
-    private final Asn1Mechanism mechanism;
+  private final Asn1Mechanism mechanism;
 
-    private final byte[] message;
+  private final byte[] message;
 
-    private Asn1SignTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 3, 3);
-        int idx = 0;
-        this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
-        this.message = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
+  private Asn1SignTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 3, 3);
+    int idx = 0;
+    this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
+    this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
+    this.message = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
+  }
+
+  public Asn1SignTemplate(Asn1P11EntityIdentifier identityId, long mechanism,
+      Asn1P11Params parameter, byte[] message) {
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.message = ParamUtil.requireNonNull("message", message);
+    this.mechanism = new Asn1Mechanism(mechanism, parameter);
+  }
+
+  public static Asn1SignTemplate getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1SignTemplate) {
+      return (Asn1SignTemplate) obj;
     }
 
-    public Asn1SignTemplate(Asn1P11EntityIdentifier identityId, long mechanism,
-            Asn1P11Params parameter, byte[] message) {
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-        this.message = ParamUtil.requireNonNull("message", message);
-        this.mechanism = new Asn1Mechanism(mechanism, parameter);
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1SignTemplate((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1SignTemplate getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1SignTemplate) {
-            return (Asn1SignTemplate) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(identityId);
+    vector.add(mechanism);
+    vector.add(new DEROctetString(message));
+    return new DERSequence(vector);
+  }
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1SignTemplate((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
-    }
+  public byte[] message() {
+    return message;
+  }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(identityId);
-        vector.add(mechanism);
-        vector.add(new DEROctetString(message));
-        return new DERSequence(vector);
-    }
+  public Asn1P11EntityIdentifier identityId() {
+    return identityId;
+  }
 
-    public byte[] message() {
-        return message;
-    }
-
-    public Asn1P11EntityIdentifier identityId() {
-        return identityId;
-    }
-
-    public Asn1Mechanism mechanism() {
-        return mechanism;
-    }
+  public Asn1Mechanism mechanism() {
+    return mechanism;
+  }
 }

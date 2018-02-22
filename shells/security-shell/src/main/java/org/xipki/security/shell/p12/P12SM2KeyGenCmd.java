@@ -25,27 +25,28 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "sm2-p12",
-        description = "generate SM2 (curve sm2p256v1) keypair in PKCS#12 keystore")
+    description = "generate SM2 (curve sm2p256v1) keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12SM2KeyGenCmd extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject of the self-signed certificate")
-    protected String subject;
+  @Option(name = "--subject", aliases = "-s",
+      description = "subject of the self-signed certificate")
+  protected String subject;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(
-                GMObjectIdentifiers.sm2p256v1.getId(), getKeyGenParameters(), subject);
-        saveKey(keypair);
+  @Override
+  protected Object execute0() throws Exception {
+    P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(
+        GMObjectIdentifiers.sm2p256v1.getId(), getKeyGenParameters(), subject);
+    saveKey(keypair);
 
-        return null;
-    }
+    return null;
+  }
 
 }

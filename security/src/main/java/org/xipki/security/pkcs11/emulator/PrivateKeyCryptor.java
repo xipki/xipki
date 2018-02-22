@@ -43,77 +43,78 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.P11TokenException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class PrivateKeyCryptor {
-    private static final ASN1ObjectIdentifier ALGO =
-            PKCSObjectIdentifiers.pbeWithSHAAnd2_KeyTripleDES_CBC;
-    private static final int ITERATION_COUNT = 2048;
+  private static final ASN1ObjectIdentifier ALGO =
+      PKCSObjectIdentifiers.pbeWithSHAAnd2_KeyTripleDES_CBC;
+  private static final int ITERATION_COUNT = 2048;
 
-    private OutputEncryptor encryptor;
-    private InputDecryptorProvider decryptorProvider;
+  private OutputEncryptor encryptor;
+  private InputDecryptorProvider decryptorProvider;
 
-    PrivateKeyCryptor(char[] password) throws P11TokenException {
-        ParamUtil.requireNonNull("password", password);
-        JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
-        eb.setProvider("BC");
-        eb.setIterationCount(ITERATION_COUNT);
-        try {
-            encryptor = eb.build(password);
-        } catch (OperatorCreationException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-
-        JcePKCSPBEInputDecryptorProviderBuilder db = new JcePKCSPBEInputDecryptorProviderBuilder();
-        decryptorProvider = db.build(password);
+  PrivateKeyCryptor(char[] password) throws P11TokenException {
+    ParamUtil.requireNonNull("password", password);
+    JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
+    eb.setProvider("BC");
+    eb.setIterationCount(ITERATION_COUNT);
+    try {
+      encryptor = eb.build(password);
+    } catch (OperatorCreationException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     }
 
-    PrivateKey decrypt(PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
-            throws P11TokenException {
-        ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
-        PrivateKeyInfo privateKeyInfo;
-        synchronized (decryptorProvider) {
-            try {
-                privateKeyInfo = encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptorProvider);
-            } catch (PKCSException ex) {
-                throw new P11TokenException(ex.getMessage(), ex);
-            }
-        }
+    JcePKCSPBEInputDecryptorProviderBuilder db = new JcePKCSPBEInputDecryptorProviderBuilder();
+    decryptorProvider = db.build(password);
+  }
 
-        AlgorithmIdentifier keyAlg = privateKeyInfo.getPrivateKeyAlgorithm();
-        ASN1ObjectIdentifier keyAlgOid = keyAlg.getAlgorithm();
-
-        String algoName;
-        if (PKCSObjectIdentifiers.rsaEncryption.equals(keyAlgOid)) {
-            algoName = "RSA";
-        } else if (X9ObjectIdentifiers.id_dsa.equals(keyAlgOid)) {
-            algoName = "DSA";
-        } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(keyAlgOid)) {
-            algoName = "EC";
-        } else {
-            throw new P11TokenException("unknown private key algorithm " + keyAlgOid.getId());
-        }
-
-        try {
-            KeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyInfo.getEncoded());
-            KeyFactory keyFactory = KeyFactory.getInstance(algoName, "BC");
-            return keyFactory.generatePrivate(keySpec);
-        } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidKeySpecException ex) {
-            throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-        }
+  PrivateKey decrypt(PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
+      throws P11TokenException {
+    ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
+    PrivateKeyInfo privateKeyInfo;
+    synchronized (decryptorProvider) {
+      try {
+        privateKeyInfo = encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptorProvider);
+      } catch (PKCSException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
     }
 
-    PKCS8EncryptedPrivateKeyInfo encrypt(PrivateKey privateKey) {
-        ParamUtil.requireNonNull("privateKey", privateKey);
-        PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
-        PKCS8EncryptedPrivateKeyInfoBuilder builder = new PKCS8EncryptedPrivateKeyInfoBuilder(
-                privateKeyInfo);
-        synchronized (encryptor) {
-            return builder.build(encryptor);
-        }
+    AlgorithmIdentifier keyAlg = privateKeyInfo.getPrivateKeyAlgorithm();
+    ASN1ObjectIdentifier keyAlgOid = keyAlg.getAlgorithm();
+
+    String algoName;
+    if (PKCSObjectIdentifiers.rsaEncryption.equals(keyAlgOid)) {
+      algoName = "RSA";
+    } else if (X9ObjectIdentifiers.id_dsa.equals(keyAlgOid)) {
+      algoName = "DSA";
+    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(keyAlgOid)) {
+      algoName = "EC";
+    } else {
+      throw new P11TokenException("unknown private key algorithm " + keyAlgOid.getId());
     }
+
+    try {
+      KeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyInfo.getEncoded());
+      KeyFactory keyFactory = KeyFactory.getInstance(algoName, "BC");
+      return keyFactory.generatePrivate(keySpec);
+    } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidKeySpecException ex) {
+      throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+    }
+  }
+
+  PKCS8EncryptedPrivateKeyInfo encrypt(PrivateKey privateKey) {
+    ParamUtil.requireNonNull("privateKey", privateKey);
+    PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
+    PKCS8EncryptedPrivateKeyInfoBuilder builder = new PKCS8EncryptedPrivateKeyInfoBuilder(
+        privateKeyInfo);
+    synchronized (encryptor) {
+      return builder.build(encryptor);
+    }
+  }
 
 }

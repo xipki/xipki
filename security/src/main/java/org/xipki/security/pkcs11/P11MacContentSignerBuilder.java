@@ -35,52 +35,53 @@ import org.xipki.security.exception.XiSecurityException;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class P11MacContentSignerBuilder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11MacContentSignerBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11MacContentSignerBuilder.class);
 
-    private final P11CryptService cryptService;
+  private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier identityId;
+  private final P11EntityIdentifier identityId;
 
-    public P11MacContentSignerBuilder(P11CryptService cryptService, P11EntityIdentifier identityId)
-            throws XiSecurityException, P11TokenException {
-        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-    } // constructor
+  public P11MacContentSignerBuilder(P11CryptService cryptService, P11EntityIdentifier identityId)
+      throws XiSecurityException, P11TokenException {
+    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+  } // constructor
 
-    public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
-            int parallelism) throws XiSecurityException, P11TokenException {
-        ParamUtil.requireMin("parallelism", parallelism, 1);
+  public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
+      int parallelism) throws XiSecurityException, P11TokenException {
+    ParamUtil.requireMin("parallelism", parallelism, 1);
 
-        List<XiContentSigner> signers = new ArrayList<>(parallelism);
-        for (int i = 0; i < parallelism; i++) {
-            XiContentSigner signer = new P11MacContentSigner(
-                    cryptService, identityId, signatureAlgId);
-            signers.add(signer);
-        } // end for
+    List<XiContentSigner> signers = new ArrayList<>(parallelism);
+    for (int i = 0; i < parallelism; i++) {
+      XiContentSigner signer = new P11MacContentSigner(
+          cryptService, identityId, signatureAlgId);
+      signers.add(signer);
+    } // end for
 
-        final boolean mac = true;
-        DfltConcurrentContentSigner concurrentSigner;
-        try {
-            concurrentSigner = new DfltConcurrentContentSigner(mac, signers, null);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
-        }
+    final boolean mac = true;
+    DfltConcurrentContentSigner concurrentSigner;
+    try {
+      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, null);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
+    }
 
-        try {
-            byte[] sha1HashOfKey = cryptService.getIdentity(identityId).digestSecretKey(
-                    PKCS11Constants.CKM_SHA_1);
-            concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
-        } catch (P11TokenException | XiSecurityException ex) {
-            LogUtil.warn(LOG, ex, "could not compute the digest of secret key " + identityId);
-        }
+    try {
+      byte[] sha1HashOfKey = cryptService.getIdentity(identityId).digestSecretKey(
+          PKCS11Constants.CKM_SHA_1);
+      concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
+    } catch (P11TokenException | XiSecurityException ex) {
+      LogUtil.warn(LOG, ex, "could not compute the digest of secret key " + identityId);
+    }
 
-        return concurrentSigner;
-    } // method createSigner
+    return concurrentSigner;
+  } // method createSigner
 
 }

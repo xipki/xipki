@@ -18,20 +18,21 @@
 package org.xipki.security.pkcs11;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class P11NewKeyControl {
 
-    private boolean extractable;
+  private boolean extractable;
 
-    public boolean isExtractable() {
-        return extractable;
-    }
+  public boolean isExtractable() {
+    return extractable;
+  }
 
-    public void setExtractable(boolean extractable) {
-        this.extractable = extractable;
-    }
+  public void setExtractable(boolean extractable) {
+    this.extractable = extractable;
+  }
 
 }

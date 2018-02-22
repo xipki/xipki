@@ -25,53 +25,54 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ValidationResult {
 
-    private final List<ValidationIssue> validationIssues;
+  private final List<ValidationIssue> validationIssues;
 
-    private final List<ValidationIssue> failedValidationIssues;
+  private final List<ValidationIssue> failedValidationIssues;
 
-    private final List<ValidationIssue> successfulValidationIssues;
+  private final List<ValidationIssue> successfulValidationIssues;
 
-    public ValidationResult(ValidationIssue validationIssues) {
-        this(Arrays.asList(validationIssues));
+  public ValidationResult(ValidationIssue validationIssues) {
+    this(Arrays.asList(validationIssues));
+  }
+
+  public ValidationResult(List<ValidationIssue> validationIssues) {
+    this.validationIssues = ParamUtil.requireNonEmpty("validationIssues", validationIssues);
+
+    List<ValidationIssue> failedIssues = new LinkedList<>();
+    List<ValidationIssue> successfulIssues = new LinkedList<>();
+    for (ValidationIssue issue : validationIssues) {
+      if (issue.isFailed()) {
+        failedIssues.add(issue);
+      } else {
+        successfulIssues.add(issue);
+      }
     }
 
-    public ValidationResult(List<ValidationIssue> validationIssues) {
-        this.validationIssues = ParamUtil.requireNonEmpty("validationIssues", validationIssues);
+    this.failedValidationIssues = failedIssues;
+    this.successfulValidationIssues = successfulIssues;
+  }
 
-        List<ValidationIssue> failedIssues = new LinkedList<>();
-        List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for (ValidationIssue issue : validationIssues) {
-            if (issue.isFailed()) {
-                failedIssues.add(issue);
-            } else {
-                successfulIssues.add(issue);
-            }
-        }
+  public boolean isAllSuccessful() {
+    return CollectionUtil.isEmpty(failedValidationIssues);
+  }
 
-        this.failedValidationIssues = failedIssues;
-        this.successfulValidationIssues = successfulIssues;
-    }
+  public List<ValidationIssue> validationIssues() {
+    return validationIssues;
+  }
 
-    public boolean isAllSuccessful() {
-        return CollectionUtil.isEmpty(failedValidationIssues);
-    }
+  public List<ValidationIssue> failedValidationIssues() {
+    return failedValidationIssues;
+  }
 
-    public List<ValidationIssue> validationIssues() {
-        return validationIssues;
-    }
-
-    public List<ValidationIssue> failedValidationIssues() {
-        return failedValidationIssues;
-    }
-
-    public List<ValidationIssue> successfulValidationIssues() {
-        return successfulValidationIssues;
-    }
+  public List<ValidationIssue> successfulValidationIssues() {
+    return successfulValidationIssues;
+  }
 
 }

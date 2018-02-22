@@ -25,32 +25,33 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P12DSASignLoadTest extends P12SignLoadTest {
 
-    public P12DSASignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
-            int plength, int qlength) throws Exception {
-        super(securityFactory, signatureAlgorithm,
-                generateKeystore(plength, qlength),
-                "PKCS#12 DSA signature creation\n"
-                    + "plength: " + plength + "\n"
-                    + "qlength: " + qlength);
-    }
+  public P12DSASignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
+      int plength, int qlength) throws Exception {
+    super(securityFactory, signatureAlgorithm,
+        generateKeystore(plength, qlength),
+        "PKCS#12 DSA signature creation\n"
+          + "plength: " + plength + "\n"
+          + "qlength: " + qlength);
+  }
 
-    private static byte[] generateKeystore(int plength, int qlength) throws Exception {
-        byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
-        if (keystoreBytes == null) {
-            KeystoreGenerationParameters params = new KeystoreGenerationParameters(
-                    PASSWORD.toCharArray());
-            params.setRandom(new SecureRandom());
-            P12KeyGenerationResult identity = new P12KeyGenerator().generateDSAKeypair(
-                    plength, qlength, params, null);
-            keystoreBytes = identity.keystore();
-        }
-        return keystoreBytes;
+  private static byte[] generateKeystore(int plength, int qlength) throws Exception {
+    byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
+    if (keystoreBytes == null) {
+      KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+          PASSWORD.toCharArray());
+      params.setRandom(new SecureRandom());
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateDSAKeypair(
+          plength, qlength, params, null);
+      keystoreBytes = identity.keystore();
     }
+    return keystoreBytes;
+  }
 
 }

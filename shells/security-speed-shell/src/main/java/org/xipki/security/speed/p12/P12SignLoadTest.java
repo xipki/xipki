@@ -34,86 +34,87 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P12SignLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
+  class Testor implements Runnable {
 
-        private final byte[] data = new byte[1024];
+    private final byte[] data = new byte[1024];
 
-        public Testor() {
-            new SecureRandom().nextBytes(data);
-        }
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    signer.sign(data);
-                    account(1, 0);
-                } catch (Exception ex) {
-                    account(1, 1);
-                }
-            }
-        }
-
-    } // class Testor
-
-    protected static final String PASSWORD = "1234";
-
-    private final ConcurrentContentSigner signer;
-
-    public P12SignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
-            byte[] keystore, String description) throws Exception {
-        this("PKCS12", securityFactory, signatureAlgorithm, keystore, description);
-    }
-
-    public P12SignLoadTest(String tokenType, SecurityFactory securityFactory,
-            String signatureAlgorithm, byte[] keystore, String description) throws Exception {
-        super(description);
-
-        ParamUtil.requireNonNull("securityFactory", securityFactory);
-        ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.requireNonNull("keystore", keystore);
-
-        SignerConf signerConf = SignerConf.getKeystoreSignerConf(
-                new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
-        this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Certificate) null);
+    public Testor() {
+      new SecureRandom().nextBytes(data);
     }
 
     @Override
-    protected Runnable getTestor() throws Exception {
-        return new Testor();
-    }
-
-    // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent)
-            throws IOException {
-        return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
-            + ".p12");
-    }
-
-    // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedDSAKeystore(int plength, int qlength) throws IOException {
-        return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
-    }
-
-    // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedECKeystore(String curveNamOrOid) throws IOException {
-        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
-        if (oid == null) {
-            return null;
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        try {
+          signer.sign(data);
+          account(1, 0);
+        } catch (Exception ex) {
+          account(1, 1);
         }
-
-        return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
+      }
     }
 
-    private static byte[] getPrecomputedKeystore(String filename) throws IOException {
-        InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
-        return (in == null) ? null : IoUtil.read(in);
+  } // class Testor
+
+  protected static final String PASSWORD = "1234";
+
+  private final ConcurrentContentSigner signer;
+
+  public P12SignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
+      byte[] keystore, String description) throws Exception {
+    this("PKCS12", securityFactory, signatureAlgorithm, keystore, description);
+  }
+
+  public P12SignLoadTest(String tokenType, SecurityFactory securityFactory,
+      String signatureAlgorithm, byte[] keystore, String description) throws Exception {
+    super(description);
+
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
+    ParamUtil.requireNonNull("keystore", keystore);
+
+    SignerConf signerConf = SignerConf.getKeystoreSignerConf(
+        new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
+    this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Certificate) null);
+  }
+
+  @Override
+  protected Runnable getTestor() throws Exception {
+    return new Testor();
+  }
+
+  // CHECKSTYLE:SKIP
+  protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent)
+      throws IOException {
+    return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
+      + ".p12");
+  }
+
+  // CHECKSTYLE:SKIP
+  protected static byte[] getPrecomputedDSAKeystore(int plength, int qlength) throws IOException {
+    return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
+  }
+
+  // CHECKSTYLE:SKIP
+  protected static byte[] getPrecomputedECKeystore(String curveNamOrOid) throws IOException {
+    ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
+    if (oid == null) {
+      return null;
     }
+
+    return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
+  }
+
+  private static byte[] getPrecomputedKeystore(String filename) throws IOException {
+    InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
+    return (in == null) ? null : IoUtil.read(in);
+  }
 
 }

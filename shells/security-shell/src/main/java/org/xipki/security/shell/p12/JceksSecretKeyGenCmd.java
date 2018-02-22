@@ -27,36 +27,37 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 @Command(scope = "xi", name = "secretkey-p12",
-        description = "generate secret key in JCEKS (not PKCS#12) keystore")
+    description = "generate secret key in JCEKS (not PKCS#12) keystore")
 @Service
 public class JceksSecretKeyGenCmd extends P12KeyGenAction {
 
-    @Option(name = "--key-type", required = true,
-            description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
-    @Completion(SecretKeyTypeCompleter.class)
+  @Option(name = "--key-type", required = true,
+      description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
+  @Completion(SecretKeyTypeCompleter.class)
    private String keyType;
 
-    @Option(name = "--key-size", required = true,
-            description = "keysize in bit\n(required)")
-    private Integer keysize;
+  @Option(name = "--key-size", required = true,
+      description = "keysize in bit\n(required)")
+  private Integer keysize;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (!("AES".equalsIgnoreCase(keyType)
-                || "DES3".equalsIgnoreCase(keyType)
-                || "GENERIC".equalsIgnoreCase(keyType))) {
-            throw new IllegalCmdParamException("invalid keyType " + keyType);
-        }
-
-        P12KeyGenerationResult key = new P12KeyGenerator().generateSecretKey(
-                keyType.toUpperCase(), keysize, getKeyGenParameters());
-        saveKey(key);
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (!("AES".equalsIgnoreCase(keyType)
+        || "DES3".equalsIgnoreCase(keyType)
+        || "GENERIC".equalsIgnoreCase(keyType))) {
+      throw new IllegalCmdParamException("invalid keyType " + keyType);
     }
+
+    P12KeyGenerationResult key = new P12KeyGenerator().generateSecretKey(
+        keyType.toUpperCase(), keysize, getKeyGenParameters());
+    saveKey(key);
+
+    return null;
+  }
 
 }

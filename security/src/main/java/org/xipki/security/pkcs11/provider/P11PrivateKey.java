@@ -31,101 +31,102 @@ import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Params;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11PrivateKey implements PrivateKey {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final P11CryptService p11CryptService;
+  private final P11CryptService p11CryptService;
 
-    private final P11EntityIdentifier identityId;
+  private final P11EntityIdentifier identityId;
 
-    private final String algorithm;
+  private final String algorithm;
 
-    private final int keysize;
+  private final int keysize;
 
-    private final PublicKey publicKey;
+  private final PublicKey publicKey;
 
-    public P11PrivateKey(P11CryptService p11CryptService, P11EntityIdentifier identityId)
-            throws P11TokenException {
-        this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
-        this.identityId = ParamUtil.requireNonNull("entityId", identityId);
+  public P11PrivateKey(P11CryptService p11CryptService, P11EntityIdentifier identityId)
+      throws P11TokenException {
+    this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
+    this.identityId = ParamUtil.requireNonNull("entityId", identityId);
 
-        this.publicKey = p11CryptService.getIdentity(identityId).publicKey();
+    this.publicKey = p11CryptService.getIdentity(identityId).publicKey();
 
-        if (this.publicKey instanceof RSAPublicKey) {
-            algorithm = "RSA";
-            keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
-        } else if (this.publicKey instanceof DSAPublicKey) {
-            algorithm = "DSA";
-            keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
-        } else if (this.publicKey instanceof ECPublicKey) {
-            algorithm = "EC";
-            keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
-        } else {
-            throw new P11TokenException("unknown public key: " + publicKey);
-        }
+    if (this.publicKey instanceof RSAPublicKey) {
+      algorithm = "RSA";
+      keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
+    } else if (this.publicKey instanceof DSAPublicKey) {
+      algorithm = "DSA";
+      keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
+    } else if (this.publicKey instanceof ECPublicKey) {
+      algorithm = "EC";
+      keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
+    } else {
+      throw new P11TokenException("unknown public key: " + publicKey);
     }
+  }
 
-    boolean supportsMechanism(long mechanism) {
-        try {
-            return p11CryptService.getSlot(identityId.slotId()).supportsMechanism(mechanism);
-        } catch (P11TokenException ex) {
-            return false;
-        }
+  boolean supportsMechanism(long mechanism) {
+    try {
+      return p11CryptService.getSlot(identityId.slotId()).supportsMechanism(mechanism);
+    } catch (P11TokenException ex) {
+      return false;
     }
+  }
 
-    @Override
-    public String getFormat() {
-        return null;
-    }
+  @Override
+  public String getFormat() {
+    return null;
+  }
 
-    @Override
-    public byte[] getEncoded() {
-        return null;
-    }
+  @Override
+  public byte[] getEncoded() {
+    return null;
+  }
 
-    @Override
-    public String getAlgorithm() {
-        return algorithm;
-    }
+  @Override
+  public String getAlgorithm() {
+    return algorithm;
+  }
 
-    public int keysize() {
-        return keysize;
-    }
+  public int keysize() {
+    return keysize;
+  }
 
-    public PublicKey publicKey() {
-        return publicKey;
-    }
+  public PublicKey publicKey() {
+    return publicKey;
+  }
 
-    /**
-     * Signs the content.
-     * @param mechanism
-     *          the mechanism
-     * @param parameters
-     *          the parameters. Could be {@code null}.
-     * @param content
-     *          the content to be signed.
-     * @return the signature.
-     * @throws XiSecurityException
-     *           if security error happens
-     * @throws P11TokenException
-     *           if token error happens.
-     */
-    public byte[] sign(long mechanism, P11Params parameters, byte[] content)
-            throws XiSecurityException, P11TokenException {
-        return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
-    }
+  /**
+   * Signs the content.
+   * @param mechanism
+   *          the mechanism
+   * @param parameters
+   *          the parameters. Could be {@code null}.
+   * @param content
+   *          the content to be signed.
+   * @return the signature.
+   * @throws XiSecurityException
+   *           if security error happens
+   * @throws P11TokenException
+   *           if token error happens.
+   */
+  public byte[] sign(long mechanism, P11Params parameters, byte[] content)
+      throws XiSecurityException, P11TokenException {
+    return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
+  }
 
-    P11CryptService p11CryptService() {
-        return p11CryptService;
-    }
+  P11CryptService p11CryptService() {
+    return p11CryptService;
+  }
 
-    P11EntityIdentifier identityId() {
-        return identityId;
-    }
+  P11EntityIdentifier identityId() {
+    return identityId;
+  }
 
 }

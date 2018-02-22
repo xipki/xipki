@@ -28,33 +28,34 @@ import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-dsa-gen-p12",
-        description = "performance test of PKCS#12 DSA key generation (batch)")
+    description = "performance test of PKCS#12 DSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP12DSAKeyGenCmd extends BatchSpeedAction {
 
-    private final Queue<DSAControl> queue = new LinkedList<>();
+  private final Queue<DSAControl> queue = new LinkedList<>();
 
-    public BSpeedP12DSAKeyGenCmd() {
-        queue.add(new DSAControl(1024, 160));
-        queue.add(new DSAControl(2048, 224));
-        queue.add(new DSAControl(2048, 256));
-        queue.add(new DSAControl(3072, 256));
+  public BSpeedP12DSAKeyGenCmd() {
+    queue.add(new DSAControl(1024, 160));
+    queue.add(new DSAControl(2048, 224));
+    queue.add(new DSAControl(2048, 256));
+    queue.add(new DSAControl(3072, 256));
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    DSAControl control = queue.poll();
+    if (control == null) {
+      return null;
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        DSAControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-
-        return new P12DSAKeyGenLoadTest(control.plen(), control.qlen(), securityFactory);
-    }
+    return new P12DSAKeyGenLoadTest(control.plen(), control.qlen(), securityFactory);
+  }
 
 }

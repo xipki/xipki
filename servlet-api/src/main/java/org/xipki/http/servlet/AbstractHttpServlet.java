@@ -32,64 +32,65 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public abstract class AbstractHttpServlet implements HttpServlet {
 
-    @Override
-    public boolean needsTlsSessionInfo() {
-        return false;
+  @Override
+  public boolean needsTlsSessionInfo() {
+    return false;
+  }
+
+  protected static byte[] readContent(FullHttpRequest request) {
+    ByteBuf buf = request.content();
+    if (buf == null) {
+      return null;
     }
+    byte[] bytes = new byte[buf.readableBytes()];
+    buf.getBytes(buf.readerIndex(), bytes);
+    return bytes;
+  }
 
-    protected static byte[] readContent(FullHttpRequest request) {
-        ByteBuf buf = request.content();
-        if (buf == null) {
-            return null;
-        }
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.getBytes(buf.readerIndex(), bytes);
-        return bytes;
+  // CHECKSTYLE:SKIP
+  protected static FullHttpResponse createOKResponse(HttpVersion version,
+      String contentType, byte[] content) {
+    return createResponse(version, HttpResponseStatus.OK, contentType, content);
+  }
+
+  protected static FullHttpResponse createResponse(HttpVersion version,
+      HttpResponseStatus status, String contentType, byte[] content) {
+    FullHttpResponse resp;
+    ByteBuf buf = null;
+    int contentLen = (content == null) ? 0 : content.length;
+
+    if (contentLen != 0) {
+      buf = Unpooled.wrappedBuffer(content);
+      resp = new DefaultFullHttpResponse(version, status, buf);
+    } else {
+      resp = new DefaultFullHttpResponse(version, status);
     }
+    resp.headers().addInt("Content-Length", contentLen);
 
-    // CHECKSTYLE:SKIP
-    protected static FullHttpResponse createOKResponse(HttpVersion version,
-            String contentType, byte[] content) {
-        return createResponse(version, HttpResponseStatus.OK, contentType, content);
+    if (contentType != null && !contentType.isEmpty()) {
+      resp.headers().add("Content-Type", contentType);
     }
+    return resp;
+  }
 
-    protected static FullHttpResponse createResponse(HttpVersion version,
-            HttpResponseStatus status, String contentType, byte[] content) {
-        FullHttpResponse resp;
-        ByteBuf buf = null;
-        int contentLen = (content == null) ? 0 : content.length;
+  protected static FullHttpResponse createErrorResponse(HttpVersion version,
+      HttpResponseStatus status) {
+    FullHttpResponse resp = new DefaultFullHttpResponse(version, status);
+    resp.headers().addInt("Content-Length", 0);
+    return resp;
+  }
 
-        if (contentLen != 0) {
-            buf = Unpooled.wrappedBuffer(content);
-            resp = new DefaultFullHttpResponse(version, status, buf);
-        } else {
-            resp = new DefaultFullHttpResponse(version, status);
-        }
-        resp.headers().addInt("Content-Length", contentLen);
-
-        if (contentType != null && !contentType.isEmpty()) {
-            resp.headers().add("Content-Type", contentType);
-        }
-        return resp;
-    }
-
-    protected static FullHttpResponse createErrorResponse(HttpVersion version,
-            HttpResponseStatus status) {
-        FullHttpResponse resp = new DefaultFullHttpResponse(version, status);
-        resp.headers().addInt("Content-Length", 0);
-        return resp;
-    }
-
-    protected X509Certificate getClientCert(HttpRequest request, SSLSession sslSession,
-            SslReverseProxyMode sslReverseProxyMode)
-            throws IOException {
-        return ClientCertCache.getTlsClientCert(request, sslSession, sslReverseProxyMode);
-    }
+  protected X509Certificate getClientCert(HttpRequest request, SSLSession sslSession,
+      SslReverseProxyMode sslReverseProxyMode)
+      throws IOException {
+    return ClientCertCache.getTlsClientCert(request, sslSession, sslReverseProxyMode);
+  }
 
 }

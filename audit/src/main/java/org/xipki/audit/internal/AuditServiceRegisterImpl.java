@@ -25,50 +25,51 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<AuditService> services =
-            new ConcurrentLinkedDeque<AuditService>();
+  private ConcurrentLinkedDeque<AuditService> services =
+      new ConcurrentLinkedDeque<AuditService>();
 
-    private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
+  private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
-    @Override
-    public AuditService getAuditService() {
-        return services.isEmpty() ? defaultAuditService : services.getLast();
+  @Override
+  public AuditService getAuditService() {
+    return services.isEmpty() ? defaultAuditService : services.getLast();
+  }
+
+  public void bindService(AuditService service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.info("bindService invoked with null.");
+      return;
     }
 
-    public void bindService(AuditService service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.info("bindService invoked with null.");
-            return;
-        }
+    boolean replaced = services.remove(service);
+    services.add(service);
 
-        boolean replaced = services.remove(service);
-        services.add(service);
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} AuditService binding for {}", action, service);
+  }
 
-        String action = replaced ? "replaced" : "added";
-        LOG.info("{} AuditService binding for {}", action, service);
+  public void unbindService(AuditService service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.debug("unbindService invoked with null.");
+      return;
     }
 
-    public void unbindService(AuditService service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.debug("unbindService invoked with null.");
-            return;
-        }
-
-        if (services.remove(service)) {
-            LOG.info("removed AuditService binding for {}", service);
-        } else {
-            LOG.info("no AuditService binding found to remove for '{}'", service);
-        }
+    if (services.remove(service)) {
+      LOG.info("removed AuditService binding for {}", service);
+    } else {
+      LOG.info("no AuditService binding found to remove for '{}'", service);
     }
+  }
 
 }

@@ -25,14 +25,14 @@ package org.xipki.security.pkcs11;
 // CHECKSTYLE:SKIP
 public class P11ByteArrayParams implements P11Params {
 
-    private final byte[] bytes;
+  private final byte[] bytes;
 
-    public P11ByteArrayParams(byte[] bytes) {
-        this.bytes = bytes;
-    }
+  public P11ByteArrayParams(byte[] bytes) {
+    this.bytes = bytes;
+  }
 
-    public byte[] getBytes() {
-        return bytes;
-    }
+  public byte[] getBytes() {
+    return bytes;
+  }
 
 }

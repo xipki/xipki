@@ -29,49 +29,50 @@ import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P11SecurityAction extends SecurityAction {
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    protected Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  protected Integer slotIndex;
 
-    @Option(name = "--id",
-            description = "id of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    protected String id;
+  @Option(name = "--id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String id;
 
-    @Option(name = "--label",
-            description = "label of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    protected String label;
+  @Option(name = "--label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String label;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module")
+  @Completion(P11ModuleNameCompleter.class)
+  protected String moduleName = DEFAULT_P11MODULE_NAME;
 
-    public P11ObjectIdentifier getObjectIdentifier()
-            throws IllegalCmdParamException, XiSecurityException, P11TokenException {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objIdentifier;
-        if (id != null && label == null) {
-            objIdentifier = slot.getObjectIdForId(Hex.decode(id));
-        } else if (id == null && label != null) {
-            objIdentifier = slot.getObjectIdForLabel(label);
-        } else {
-            throw new IllegalCmdParamException(
-                    "exactly one of keyId or keyLabel should be specified");
-        }
-        return objIdentifier;
+  public P11ObjectIdentifier getObjectIdentifier()
+      throws IllegalCmdParamException, XiSecurityException, P11TokenException {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objIdentifier;
+    if (id != null && label == null) {
+      objIdentifier = slot.getObjectIdForId(Hex.decode(id));
+    } else if (id == null && label != null) {
+      objIdentifier = slot.getObjectIdForLabel(label);
+    } else {
+      throw new IllegalCmdParamException(
+          "exactly one of keyId or keyLabel should be specified");
     }
+    return objIdentifier;
+  }
 
-    protected P11Slot getSlot()
-            throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-        return getSlot(moduleName, slotIndex);
-    }
+  protected P11Slot getSlot()
+      throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    return getSlot(moduleName, slotIndex);
+  }
 
 }

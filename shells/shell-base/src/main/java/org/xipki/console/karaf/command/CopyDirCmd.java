@@ -28,51 +28,52 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
 import org.xipki.console.karaf.intern.FileUtils;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "copy-dir",
-        description = "copy content of the directory to destination")
+    description = "copy content of the directory to destination")
 @Service
 public class CopyDirCmd extends XiAction {
 
-    @Argument(index = 0, name = "source directory", required = true,
-            description = "content of this directory will be copied\n(required)")
-    @Completion(DirPathCompleter.class)
-    private String source;
+  @Argument(index = 0, name = "source directory", required = true,
+      description = "content of this directory will be copied\n(required)")
+  @Completion(DirPathCompleter.class)
+  private String source;
 
-    @Argument(index = 1, name = "destination", required = true,
-            description = "destination directory\n(required)")
-    @Completion(DirPathCompleter.class)
-    private String dest;
+  @Argument(index = 1, name = "destination", required = true,
+      description = "destination directory\n(required)")
+  @Completion(DirPathCompleter.class)
+  private String dest;
 
-    @Override
-    protected Object execute0() throws Exception {
-        File sourceDir = new File(expandFilepath(source));
-        if (!sourceDir.exists()) {
-            System.err.println(source + " does not exist");
-            return null;
-        }
-
-        if (!sourceDir.isDirectory()) {
-            System.err.println(source + " is not a directory");
-            return null;
-        }
-
-        File destDir = new File(dest);
-        if (destDir.exists()) {
-            if (destDir.isFile()) {
-                System.err.println(dest + " is not a directory");
-                return null;
-            }
-        } else {
-            destDir.mkdirs();
-        }
-
-        FileUtils.copyDirectory(sourceDir, destDir);
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    File sourceDir = new File(expandFilepath(source));
+    if (!sourceDir.exists()) {
+      System.err.println(source + " does not exist");
+      return null;
     }
+
+    if (!sourceDir.isDirectory()) {
+      System.err.println(source + " is not a directory");
+      return null;
+    }
+
+    File destDir = new File(dest);
+    if (destDir.exists()) {
+      if (destDir.isFile()) {
+        System.err.println(dest + " is not a directory");
+        return null;
+      }
+    } else {
+      destDir.mkdirs();
+    }
+
+    FileUtils.copyDirectory(sourceDir, destDir);
+
+    return null;
+  }
 
 }

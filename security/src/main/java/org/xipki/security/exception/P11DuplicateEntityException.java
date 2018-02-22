@@ -22,24 +22,25 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11DuplicateEntityException extends P11TokenException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public P11DuplicateEntityException(P11EntityIdentifier entityId) {
-        super("duplicate entity '" + entityId + "'");
-    }
+  public P11DuplicateEntityException(P11EntityIdentifier entityId) {
+    super("duplicate entity '" + entityId + "'");
+  }
 
-    public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
-        super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
-    }
+  public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+    super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
+  }
 
-    public P11DuplicateEntityException(String message) {
-        super(message);
-    }
+  public P11DuplicateEntityException(String message) {
+    super(message);
+  }
 
 }

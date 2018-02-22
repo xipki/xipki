@@ -28,7 +28,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.BadAsn1ObjectException;
 
 /**
- *
+ * TODO.
  * <pre>
  * ASN1P11Params ::= CHOICE {
  *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters,
@@ -42,55 +42,55 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 
 public class Asn1P11Params extends ASN1Object {
 
-    public static final int TAG_RSA_PKCS_PSS = 0;
+  public static final int TAG_RSA_PKCS_PSS = 0;
 
-    public static final int TAG_OPAQUE = 1;
+  public static final int TAG_OPAQUE = 1;
 
-    public static final int TAG_IV = 2;
+  public static final int TAG_IV = 2;
 
-    private final int tagNo;
-    private final ASN1Encodable p11Params;
+  private final int tagNo;
+  private final ASN1Encodable p11Params;
 
-    public Asn1P11Params(int tagNo, ASN1Encodable p11Params) {
-        this.tagNo = tagNo;
-        this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
+  public Asn1P11Params(int tagNo, ASN1Encodable p11Params) {
+    this.tagNo = tagNo;
+    this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
+  }
+
+  private Asn1P11Params(ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
+    this.tagNo = taggedObject.getTagNo();
+    this.p11Params = taggedObject.getObject();
+  }
+
+  public static Asn1P11Params getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1P11Params) {
+      return (Asn1P11Params) obj;
     }
 
-    private Asn1P11Params(ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
-        this.tagNo = taggedObject.getTagNo();
-        this.p11Params = taggedObject.getObject();
+    try {
+      if (obj instanceof ASN1TaggedObject) {
+        return new Asn1P11Params((ASN1TaggedObject) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1P11Params getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1P11Params) {
-            return (Asn1P11Params) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    return new DERTaggedObject(tagNo, p11Params);
+  }
 
-        try {
-            if (obj instanceof ASN1TaggedObject) {
-                return new Asn1P11Params((ASN1TaggedObject) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
-    }
+  public int tagNo() {
+    return tagNo;
+  }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        return new DERTaggedObject(tagNo, p11Params);
-    }
-
-    public int tagNo() {
-        return tagNo;
-    }
-
-    public ASN1Encodable p11Params() {
-        return p11Params;
-    }
+  public ASN1Encodable p11Params() {
+    return p11Params;
+  }
 
 }

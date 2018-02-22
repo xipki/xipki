@@ -22,24 +22,25 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
 
-    private final String curveNameOrOid;
+  private final String curveNameOrOid;
 
-    public P11ECKeyGenLoadTest(P11Slot slot, String curveNameOrOid) throws Exception {
-        super(slot, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
-        this.curveNameOrOid = ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
-    }
+  public P11ECKeyGenLoadTest(P11Slot slot, String curveNameOrOid) throws Exception {
+    super(slot, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
+    this.curveNameOrOid = ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
+  }
 
-    @Override
-    protected void genKeypair() throws Exception {
-        P11ObjectIdentifier objId = slot.generateECKeypair(curveNameOrOid, getDummyLabel(),
-                getControl());
-        slot.removeIdentity(objId);
-    }
+  @Override
+  protected void genKeypair() throws Exception {
+    P11ObjectIdentifier objId = slot.generateECKeypair(curveNameOrOid, getDummyLabel(),
+        getControl());
+    slot.removeIdentity(objId);
+  }
 
 }

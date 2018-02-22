@@ -22,30 +22,31 @@ import java.security.SecureRandom;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class KeystoreGenerationParameters {
 
-    private final char[] password;
+  private final char[] password;
 
-    private SecureRandom random;
+  private SecureRandom random;
 
-    public KeystoreGenerationParameters(char[] password) {
-        this.password = ParamUtil.requireNonNull("password", password);
-    }
+  public KeystoreGenerationParameters(char[] password) {
+    this.password = ParamUtil.requireNonNull("password", password);
+  }
 
-    public SecureRandom random() {
-        return random;
-    }
+  public SecureRandom random() {
+    return random;
+  }
 
-    public void setRandom(SecureRandom random) {
-        this.random = random;
-    }
+  public void setRandom(SecureRandom random) {
+    this.random = random;
+  }
 
-    public char[] password() {
-        return password;
-    }
+  public char[] password() {
+    return password;
+  }
 
 }

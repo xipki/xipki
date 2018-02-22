@@ -25,30 +25,31 @@ import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-dsa-gen-p12",
-        description = "performance test of PKCS#12 DSA key generation")
+    description = "performance test of PKCS#12 DSA key generation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12DSAKeyGenCmd extends SingleSpeedAction {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer plen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer plen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qlen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qlen;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        if (qlen == null) {
-            qlen = (plen >= 2048) ? 256 : 160;
-        }
-        return new P12DSAKeyGenLoadTest(plen, qlen, securityFactory);
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    if (qlen == null) {
+      qlen = (plen >= 2048) ? 256 : 160;
     }
+    return new P12DSAKeyGenLoadTest(plen, qlen, securityFactory);
+  }
 
 }

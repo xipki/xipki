@@ -20,45 +20,46 @@ package org.xipki.common.qa;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ValidationIssue {
 
-    private final String code;
+  private final String code;
 
-    private final String description;
+  private final String description;
 
-    private boolean failed;
+  private boolean failed;
 
-    private String failureMessage;
+  private String failureMessage;
 
-    public ValidationIssue(String code, String description) {
-        this.code = ParamUtil.requireNonBlank("code", code);
-        this.description = ParamUtil.requireNonBlank("description", description);
-        this.failed = false;
-    }
+  public ValidationIssue(String code, String description) {
+    this.code = ParamUtil.requireNonBlank("code", code);
+    this.description = ParamUtil.requireNonBlank("description", description);
+    this.failed = false;
+  }
 
-    public boolean isFailed() {
-        return failed;
-    }
+  public boolean isFailed() {
+    return failed;
+  }
 
-    public String failureMessage() {
-        return failureMessage;
-    }
+  public String failureMessage() {
+    return failureMessage;
+  }
 
-    public void setFailureMessage(String failureMessage) {
-        this.failureMessage = ParamUtil.requireNonNull("failureMessage", failureMessage);
-        this.failed = true;
-    }
+  public void setFailureMessage(String failureMessage) {
+    this.failureMessage = ParamUtil.requireNonNull("failureMessage", failureMessage);
+    this.failed = true;
+  }
 
-    public String code() {
-        return code;
-    }
+  public String code() {
+    return code;
+  }
 
-    public String description() {
-        return description;
-    }
+  public String description() {
+    return description;
+  }
 
 }

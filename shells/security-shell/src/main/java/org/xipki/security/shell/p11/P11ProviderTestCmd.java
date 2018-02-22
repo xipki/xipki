@@ -38,100 +38,101 @@ import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "p11prov-test",
-        description = "test the Xipki PKCS#11 JCA/JCE provider")
+    description = "test the Xipki PKCS#11 JCA/JCE provider")
 @Service
 public class P11ProviderTestCmd extends P11SecurityAction {
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show object information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show object information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Option(name = "--hash",
-            description = "hash algorithm name")
-    @Completion(HashAlgCompleter.class)
-    protected String hashAlgo = "SHA256";
+  @Option(name = "--hash",
+      description = "hash algorithm name")
+  @Completion(HashAlgCompleter.class)
+  protected String hashAlgo = "SHA256";
 
-    @Option(name = "--rsa-mgf1",
-            description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
-                    + "(only applied to RSA key)")
-    private Boolean rsaMgf1 = Boolean.FALSE;
+  @Option(name = "--rsa-mgf1",
+      description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
+          + "(only applied to RSA key)")
+  private Boolean rsaMgf1 = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain",
-            description = "whether to use the Plain DSA for the POPO computation\n"
-                    + "(only applied to ECDSA key)")
-    private Boolean dsaPlain = Boolean.FALSE;
+  @Option(name = "--dsa-plain",
+      description = "whether to use the Plain DSA for the POPO computation\n"
+          + "(only applied to ECDSA key)")
+  private Boolean dsaPlain = Boolean.FALSE;
 
-    @Option(name = "--gm",
-            description = "whether to use the chinese GM algorithm for the POPO computation\n"
-                    + "(only applied to EC key with GM curves)")
-    private Boolean gm = Boolean.FALSE;
+  @Option(name = "--gm",
+      description = "whether to use the chinese GM algorithm for the POPO computation\n"
+          + "(only applied to EC key with GM curves)")
+  private Boolean gm = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
-        ks.load(null, null);
-        if (verbose.booleanValue()) {
-            println("available aliases:");
-            Enumeration<?> aliases = ks.aliases();
-            while (aliases.hasMoreElements()) {
-                String alias2 = (String) aliases.nextElement();
-                println("    " + alias2);
-            }
-        }
-
-        String alias = getAlias();
-        println("alias: " + alias);
-        PrivateKey key = (PrivateKey) ks.getKey(alias, null);
-        if (key == null) {
-            println("could not find key with alias '" + alias + "'");
-            return null;
-        }
-
-        Certificate cert = ks.getCertificate(alias);
-        if (cert == null) {
-            println("could not find certificate to verify signature");
-            return null;
-        }
-        PublicKey pubKey = cert.getPublicKey();
-
-        String sigAlgo = getSignatureAlgo(pubKey);
-        println("signature algorithm: " + sigAlgo);
-        Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
-        sig.initSign(key);
-
-        byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        sig.update(data);
-        byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
-        println("signature created successfully");
-
-        Signature ver = Signature.getInstance(sigAlgo, "BC");
-        ver.initVerify(pubKey);
-        ver.update(data);
-        boolean valid = ver.verify(signature);
-        println("signature valid: " + valid);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
+    ks.load(null, null);
+    if (verbose.booleanValue()) {
+      println("available aliases:");
+      Enumeration<?> aliases = ks.aliases();
+      while (aliases.hasMoreElements()) {
+        String alias2 = (String) aliases.nextElement();
+        println("    " + alias2);
+      }
     }
 
-    private String getAlias() {
-        if (label != null) {
-            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-                    "#keylabel-", label);
-        } else {
-            return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-                    "#keyid-", id.toLowerCase());
-        }
+    String alias = getAlias();
+    println("alias: " + alias);
+    PrivateKey key = (PrivateKey) ks.getKey(alias, null);
+    if (key == null) {
+      println("could not find key with alias '" + alias + "'");
+      return null;
     }
 
-    private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {
-        SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
-        AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
-                HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);
-        return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+    Certificate cert = ks.getCertificate(alias);
+    if (cert == null) {
+      println("could not find certificate to verify signature");
+      return null;
     }
+    PublicKey pubKey = cert.getPublicKey();
+
+    String sigAlgo = getSignatureAlgo(pubKey);
+    println("signature algorithm: " + sigAlgo);
+    Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
+    sig.initSign(key);
+
+    byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    sig.update(data);
+    byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
+    println("signature created successfully");
+
+    Signature ver = Signature.getInstance(sigAlgo, "BC");
+    ver.initVerify(pubKey);
+    ver.update(data);
+    boolean valid = ver.verify(signature);
+    println("signature valid: " + valid);
+    return null;
+  }
+
+  private String getAlias() {
+    if (label != null) {
+      return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+          "#keylabel-", label);
+    } else {
+      return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+          "#keyid-", id.toLowerCase());
+    }
+  }
+
+  private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {
+    SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
+    AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
+        HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);
+    return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+  }
 
 }

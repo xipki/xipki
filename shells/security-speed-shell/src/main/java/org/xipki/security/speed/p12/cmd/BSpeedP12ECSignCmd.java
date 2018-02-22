@@ -27,32 +27,33 @@ import org.xipki.security.speed.cmd.ECControl;
 import org.xipki.security.speed.p12.P12ECSignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-ec-sign-p12",
-        description = "performance test of PKCS#12 EC signature creation (batch)")
+    description = "performance test of PKCS#12 EC signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP12ECSignCmd extends BSpeedP12SignAction {
 
-    private final Queue<ECControl> queue = new LinkedList<>();
+  private final Queue<ECControl> queue = new LinkedList<>();
 
-    public BSpeedP12ECSignCmd() {
-        for (String curveName : getECCurveNames()) {
-            queue.add(new ECControl(curveName));
-        }
+  public BSpeedP12ECSignCmd() {
+    for (String curveName : getECCurveNames()) {
+      queue.add(new ECControl(curveName));
+    }
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    ECControl control = queue.poll();
+    if (control == null) {
+      return null;
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        ECControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-
-        return new P12ECSignLoadTest(securityFactory, sigAlgo, control.curveName());
-    }
+    return new P12ECSignLoadTest(securityFactory, sigAlgo, control.curveName());
+  }
 
 }

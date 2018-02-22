@@ -28,6 +28,7 @@ import org.xipki.security.HashAlgoType;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -35,117 +36,117 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11RSAPkcsPssParams implements P11Params {
 
-    private final long hashAlgorithm;
+  private final long hashAlgorithm;
 
-    private final long maskGenerationFunction;
+  private final long maskGenerationFunction;
 
-    private final long saltLength;
+  private final long saltLength;
 
-    public P11RSAPkcsPssParams(long hashAlgorithm, long maskGenerationFunction, long saltLength) {
-        this.hashAlgorithm = hashAlgorithm;
-        this.maskGenerationFunction = maskGenerationFunction;
-        this.saltLength = saltLength;
+  public P11RSAPkcsPssParams(long hashAlgorithm, long maskGenerationFunction, long saltLength) {
+    this.hashAlgorithm = hashAlgorithm;
+    this.maskGenerationFunction = maskGenerationFunction;
+    this.saltLength = saltLength;
+  }
+
+  public P11RSAPkcsPssParams(RSASSAPSSparams asn1Params) {
+    ASN1ObjectIdentifier asn1Oid = asn1Params.getHashAlgorithm().getAlgorithm();
+    HashAlgoType contentHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
+    if (contentHashAlgo == null) {
+      throw new IllegalArgumentException("unsupported hash algorithm " + asn1Oid.getId());
     }
 
-    public P11RSAPkcsPssParams(RSASSAPSSparams asn1Params) {
-        ASN1ObjectIdentifier asn1Oid = asn1Params.getHashAlgorithm().getAlgorithm();
-        HashAlgoType contentHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
-        if (contentHashAlgo == null) {
-            throw new IllegalArgumentException("unsupported hash algorithm " + asn1Oid.getId());
-        }
-
-        AlgorithmIdentifier mga = asn1Params.getMaskGenAlgorithm();
-        asn1Oid = mga.getAlgorithm();
-        if (!PKCSObjectIdentifiers.id_mgf1.equals(asn1Oid)) {
-            throw new IllegalArgumentException("unsupported MGF algorithm " + asn1Oid.getId());
-        }
-
-        asn1Oid = AlgorithmIdentifier.getInstance(mga.getParameters()).getAlgorithm();
-        HashAlgoType mgfHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
-        if (mgfHashAlgo == null) {
-            throw new IllegalArgumentException("unsupported MGF hash algorithm " + asn1Oid.getId());
-        }
-        this.saltLength = asn1Params.getSaltLength().longValue();
-        BigInteger trailerField = asn1Params.getTrailerField();
-        if (!RSASSAPSSparams.DEFAULT_TRAILER_FIELD.getValue().equals(trailerField)) {
-            throw new IllegalArgumentException("unsupported trailerField " + trailerField);
-        }
-
-        switch (contentHashAlgo) {
-        case SHA1:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA_1;
-            break;
-        case SHA224:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA224;
-            break;
-        case SHA256:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA256;
-            break;
-        case SHA384:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA384;
-            break;
-        case SHA512:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA512;
-            break;
-        case SHA3_224:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_224;
-            break;
-        case SHA3_256:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_256;
-            break;
-        case SHA3_384:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_384;
-            break;
-        case SHA3_512:
-            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_512;
-            break;
-        default:
-            throw new RuntimeException("should not reach here");
-        }
-
-        switch (mgfHashAlgo) {
-        case SHA1:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA1;
-            break;
-        case SHA224:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA224;
-            break;
-        case SHA256:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA256;
-            break;
-        case SHA384:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA384;
-            break;
-        case SHA512:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA512;
-            break;
-        case SHA3_224:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_224;
-            break;
-        case SHA3_256:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_256;
-            break;
-        case SHA3_384:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_384;
-            break;
-        case SHA3_512:
-            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_512;
-            break;
-        default:
-            throw new RuntimeException("should not reach here");
-        }
+    AlgorithmIdentifier mga = asn1Params.getMaskGenAlgorithm();
+    asn1Oid = mga.getAlgorithm();
+    if (!PKCSObjectIdentifiers.id_mgf1.equals(asn1Oid)) {
+      throw new IllegalArgumentException("unsupported MGF algorithm " + asn1Oid.getId());
     }
 
-    public long hashAlgorithm() {
-        return hashAlgorithm;
+    asn1Oid = AlgorithmIdentifier.getInstance(mga.getParameters()).getAlgorithm();
+    HashAlgoType mgfHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
+    if (mgfHashAlgo == null) {
+      throw new IllegalArgumentException("unsupported MGF hash algorithm " + asn1Oid.getId());
+    }
+    this.saltLength = asn1Params.getSaltLength().longValue();
+    BigInteger trailerField = asn1Params.getTrailerField();
+    if (!RSASSAPSSparams.DEFAULT_TRAILER_FIELD.getValue().equals(trailerField)) {
+      throw new IllegalArgumentException("unsupported trailerField " + trailerField);
     }
 
-    public long maskGenerationFunction() {
-        return maskGenerationFunction;
+    switch (contentHashAlgo) {
+      case SHA1:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA_1;
+        break;
+      case SHA224:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA224;
+        break;
+      case SHA256:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA256;
+        break;
+      case SHA384:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA384;
+        break;
+      case SHA512:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA512;
+        break;
+      case SHA3_224:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA3_224;
+        break;
+      case SHA3_256:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA3_256;
+        break;
+      case SHA3_384:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA3_384;
+        break;
+      case SHA3_512:
+        this.hashAlgorithm = PKCS11Constants.CKM_SHA3_512;
+        break;
+      default:
+        throw new RuntimeException("should not reach here");
     }
 
-    public long saltLength() {
-        return saltLength;
+    switch (mgfHashAlgo) {
+      case SHA1:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA1;
+        break;
+      case SHA224:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA224;
+        break;
+      case SHA256:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA256;
+        break;
+      case SHA384:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA384;
+        break;
+      case SHA512:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA512;
+        break;
+      case SHA3_224:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_224;
+        break;
+      case SHA3_256:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_256;
+        break;
+      case SHA3_384:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_384;
+        break;
+      case SHA3_512:
+        this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_512;
+        break;
+      default:
+        throw new RuntimeException("should not reach here");
     }
+  }
+
+  public long hashAlgorithm() {
+    return hashAlgorithm;
+  }
+
+  public long maskGenerationFunction() {
+    return maskGenerationFunction;
+  }
+
+  public long saltLength() {
+    return saltLength;
+  }
 
 }

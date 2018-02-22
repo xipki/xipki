@@ -36,197 +36,198 @@ import org.xipki.security.HashAlgoType;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11RSADigestSignatureSpi extends SignatureSpi {
 
-    // CHECKSTYLE:SKIP
-    public static class SHA1 extends P11RSADigestSignatureSpi {
+  // CHECKSTYLE:SKIP
+  public static class SHA1 extends P11RSADigestSignatureSpi {
 
-        public SHA1() {
-            super(HashAlgoType.SHA1);
-        }
-
-    } // class SHA1
-
-    // CHECKSTYLE:SKIP
-    public static class SHA224 extends P11RSADigestSignatureSpi {
-
-        public SHA224() {
-            super(HashAlgoType.SHA224);
-        }
-
-    } // class SHA224
-
-    // CHECKSTYLE:SKIP
-    public static class SHA256 extends P11RSADigestSignatureSpi {
-
-        public SHA256() {
-            super(HashAlgoType.SHA256);
-        }
-
-    } // class SHA256
-
-    // CHECKSTYLE:SKIP
-    public static class SHA384 extends P11RSADigestSignatureSpi {
-
-        public SHA384() {
-            super(HashAlgoType.SHA384);
-        }
-
-    } // class SHA384
-
-    // CHECKSTYLE:SKIP
-    public static class SHA512 extends P11RSADigestSignatureSpi {
-
-        public SHA512() {
-            super(HashAlgoType.SHA512);
-        }
-
-    } // class SHA512
-
-    // CHECKSTYLE:SKIP
-    public static class SHA3_224 extends P11RSADigestSignatureSpi {
-
-        public SHA3_224() {
-            super(HashAlgoType.SHA3_224);
-        }
-
-    } // class SHA3-224
-
-    // CHECKSTYLE:SKIP
-    public static class SHA3_256 extends P11RSADigestSignatureSpi {
-
-        public SHA3_256() {
-            super(HashAlgoType.SHA3_256);
-        }
-
-    } // class SHA3-256
-
-    // CHECKSTYLE:SKIP
-    public static class SHA3_384 extends P11RSADigestSignatureSpi {
-
-        public SHA3_384() {
-            super(HashAlgoType.SHA3_384);
-        }
-
-    } // class SHA3-384
-
-    // CHECKSTYLE:SKIP
-    public static class SHA3_512 extends P11RSADigestSignatureSpi {
-
-        public SHA3_512() {
-            super(HashAlgoType.SHA3_512);
-        }
-
-    } // class SHA3-512
-
-    // CHECKSTYLE:SKIP
-    public static class NoneRSA extends P11RSADigestSignatureSpi {
-
-        public NoneRSA() {
-            super(new NullDigest());
-        }
-
-    } // class NoneRSA
-
-    private Digest digest;
-
-    private AlgorithmIdentifier digestAlgId;
-
-    private P11PrivateKey signingKey;
-
-    protected P11RSADigestSignatureSpi(Digest digest) {
-        this.digest = digest;
-        this.digestAlgId = null;
+    public SHA1() {
+      super(HashAlgoType.SHA1);
     }
 
-    protected P11RSADigestSignatureSpi(HashAlgoType digestAlg) {
-        this.digestAlgId = digestAlg.algorithmIdentifier();
-        this.digest = digestAlg.createDigest();
+  } // class SHA1
+
+  // CHECKSTYLE:SKIP
+  public static class SHA224 extends P11RSADigestSignatureSpi {
+
+    public SHA224() {
+      super(HashAlgoType.SHA224);
     }
 
-    @Override
-    protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
+  } // class SHA224
+
+  // CHECKSTYLE:SKIP
+  public static class SHA256 extends P11RSADigestSignatureSpi {
+
+    public SHA256() {
+      super(HashAlgoType.SHA256);
     }
 
-    @Override
-    protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
-        if (!(privateKey instanceof P11PrivateKey)) {
-            throw new InvalidKeyException("privateKey is not instanceof "
-                    + P11PrivateKey.class.getName());
-        }
+  } // class SHA256
 
-        String algo = privateKey.getAlgorithm();
-        if (!"RSA".equals(algo)) {
-            throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
-        }
+  // CHECKSTYLE:SKIP
+  public static class SHA384 extends P11RSADigestSignatureSpi {
 
-        digest.reset();
-        this.signingKey = (P11PrivateKey) privateKey;
+    public SHA384() {
+      super(HashAlgoType.SHA384);
     }
 
-    @Override
-    protected void engineUpdate(byte input) throws SignatureException {
-        digest.update(input);
+  } // class SHA384
+
+  // CHECKSTYLE:SKIP
+  public static class SHA512 extends P11RSADigestSignatureSpi {
+
+    public SHA512() {
+      super(HashAlgoType.SHA512);
     }
 
-    @Override
-    protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
-        digest.update(input, off, len);
+  } // class SHA512
+
+  // CHECKSTYLE:SKIP
+  public static class SHA3_224 extends P11RSADigestSignatureSpi {
+
+    public SHA3_224() {
+      super(HashAlgoType.SHA3_224);
     }
 
-    @Override
-    protected byte[] engineSign() throws SignatureException {
-        byte[] hash = new byte[digest.getDigestSize()];
-        digest.doFinal(hash, 0);
+  } // class SHA3-224
 
-        try {
-            byte[] bytes = derEncode(hash);
-            return signingKey.sign(PKCS11Constants.CKM_RSA_PKCS, null, bytes);
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new SignatureException("key too small for signature type");
-        } catch (Exception ex) {
-            throw new SignatureException(ex.getMessage(), ex);
-        }
+  // CHECKSTYLE:SKIP
+  public static class SHA3_256 extends P11RSADigestSignatureSpi {
+
+    public SHA3_256() {
+      super(HashAlgoType.SHA3_256);
     }
 
-    @Override
-    protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
+  } // class SHA3-256
+
+  // CHECKSTYLE:SKIP
+  public static class SHA3_384 extends P11RSADigestSignatureSpi {
+
+    public SHA3_384() {
+      super(HashAlgoType.SHA3_384);
     }
 
-    @Override
-    protected void engineSetParameter(AlgorithmParameterSpec params) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
+  } // class SHA3-384
+
+  // CHECKSTYLE:SKIP
+  public static class SHA3_512 extends P11RSADigestSignatureSpi {
+
+    public SHA3_512() {
+      super(HashAlgoType.SHA3_512);
     }
 
-    @Override
-    protected void engineSetParameter(String param, Object value) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
+  } // class SHA3-512
+
+  // CHECKSTYLE:SKIP
+  public static class NoneRSA extends P11RSADigestSignatureSpi {
+
+    public NoneRSA() {
+      super(new NullDigest());
     }
 
-    @Override
-    protected Object engineGetParameter(String param) {
-        return null;
+  } // class NoneRSA
+
+  private Digest digest;
+
+  private AlgorithmIdentifier digestAlgId;
+
+  private P11PrivateKey signingKey;
+
+  protected P11RSADigestSignatureSpi(Digest digest) {
+    this.digest = digest;
+    this.digestAlgId = null;
+  }
+
+  protected P11RSADigestSignatureSpi(HashAlgoType digestAlg) {
+    this.digestAlgId = digestAlg.algorithmIdentifier();
+    this.digest = digestAlg.createDigest();
+  }
+
+  @Override
+  protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
+    throw new UnsupportedOperationException("engineVerify unsupported");
+  }
+
+  @Override
+  protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
+    if (!(privateKey instanceof P11PrivateKey)) {
+      throw new InvalidKeyException("privateKey is not instanceof "
+          + P11PrivateKey.class.getName());
     }
 
-    @Override
-    protected AlgorithmParameters engineGetParameters() {
-        return null;
+    String algo = privateKey.getAlgorithm();
+    if (!"RSA".equals(algo)) {
+      throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
     }
 
-    private byte[] derEncode(byte[] hash) throws IOException {
-        if (digestAlgId == null) {
-            // For raw RSA, the DigestInfo must be prepared externally
-            return hash;
-        }
+    digest.reset();
+    this.signingKey = (P11PrivateKey) privateKey;
+  }
 
-        DigestInfo digestInfo = new DigestInfo(digestAlgId, hash);
-        return digestInfo.getEncoded(ASN1Encoding.DER);
+  @Override
+  protected void engineUpdate(byte input) throws SignatureException {
+    digest.update(input);
+  }
+
+  @Override
+  protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
+    digest.update(input, off, len);
+  }
+
+  @Override
+  protected byte[] engineSign() throws SignatureException {
+    byte[] hash = new byte[digest.getDigestSize()];
+    digest.doFinal(hash, 0);
+
+    try {
+      byte[] bytes = derEncode(hash);
+      return signingKey.sign(PKCS11Constants.CKM_RSA_PKCS, null, bytes);
+    } catch (ArrayIndexOutOfBoundsException ex) {
+      throw new SignatureException("key too small for signature type");
+    } catch (Exception ex) {
+      throw new SignatureException(ex.getMessage(), ex);
     }
+  }
+
+  @Override
+  protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
+    throw new UnsupportedOperationException("engineVerify unsupported");
+  }
+
+  @Override
+  protected void engineSetParameter(AlgorithmParameterSpec params) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
+
+  @Override
+  protected void engineSetParameter(String param, Object value) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
+
+  @Override
+  protected Object engineGetParameter(String param) {
+    return null;
+  }
+
+  @Override
+  protected AlgorithmParameters engineGetParameters() {
+    return null;
+  }
+
+  private byte[] derEncode(byte[] hash) throws IOException {
+    if (digestAlgId == null) {
+      // For raw RSA, the DigestInfo must be prepared externally
+      return hash;
+    }
+
+    DigestInfo digestInfo = new DigestInfo(digestAlgId, hash);
+    return digestInfo.getEncoded(ASN1Encoding.DER);
+  }
 
 }

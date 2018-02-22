@@ -24,33 +24,34 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "delete-key-p11",
-        description = "delete key and cert in PKCS#11 device")
+    description = "delete key and cert in PKCS#11 device")
 @Service
 public class P11IdentityDeleteCmd extends P11SecurityAction {
 
-    @Option(name = "--force", aliases = "-f",
-            description = "remove identifies without prompt")
-    private Boolean force = Boolean.FALSE;
+  @Option(name = "--force", aliases = "-f",
+      description = "remove identifies without prompt")
+  private Boolean force = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
-        if (objIdentifier == null) {
-            println("identity to be deleted does not exist");
-            return null;
-        }
-
-        if (force || confirm("Do you want to remove the identity " + objIdentifier, 3)) {
-            slot.removeIdentity(objIdentifier);
-            println("deleted identity " + objIdentifier);
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+    if (objIdentifier == null) {
+      println("identity to be deleted does not exist");
+      return null;
     }
+
+    if (force || confirm("Do you want to remove the identity " + objIdentifier, 3)) {
+      slot.removeIdentity(objIdentifier);
+      println("deleted identity " + objIdentifier);
+    }
+    return null;
+  }
 
 }

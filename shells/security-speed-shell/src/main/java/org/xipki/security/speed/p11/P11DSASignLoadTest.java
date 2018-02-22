@@ -22,22 +22,23 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P11DSASignLoadTest extends P11SignLoadTest {
 
-    public P11DSASignLoadTest(SecurityFactory securityFactory, P11Slot slot,
-            String signatureAlgorithm, int plength, int qlength) throws Exception {
-        super(securityFactory, slot, signatureAlgorithm, generateKey(slot, plength, qlength),
-                "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength);
-    }
+  public P11DSASignLoadTest(SecurityFactory securityFactory, P11Slot slot,
+      String signatureAlgorithm, int plength, int qlength) throws Exception {
+    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, plength, qlength),
+        "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength);
+  }
 
-    private static P11ObjectIdentifier generateKey(P11Slot slot, int plength, int qlength)
-            throws Exception {
-        return slot.generateDSAKeypair(plength, qlength, "loadtest-" + System.currentTimeMillis(),
-                getNewKeyControl());
-    }
+  private static P11ObjectIdentifier generateKey(P11Slot slot, int plength, int qlength)
+      throws Exception {
+    return slot.generateDSAKeypair(plength, qlength, "loadtest-" + System.currentTimeMillis(),
+        getNewKeyControl());
+  }
 
 }

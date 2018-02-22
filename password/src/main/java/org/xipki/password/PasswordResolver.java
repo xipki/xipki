@@ -18,20 +18,21 @@
 package org.xipki.password;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface PasswordResolver {
 
-    /**
-     * Resolve the password.
-     * @param passwordHint
-     *          Hint of the password. Must not be {@code null}.
-     * @return the resolved password
-     * @throws PasswordResolverException
-     *         if cannot resolve the password
-     */
-    char[] resolvePassword(String passwordHint) throws PasswordResolverException;
+  /**
+   * Resolve the password.
+   * @param passwordHint
+   *          Hint of the password. Must not be {@code null}.
+   * @return the resolved password
+   * @throws PasswordResolverException
+   *         if cannot resolve the password
+   */
+  char[] resolvePassword(String passwordHint) throws PasswordResolverException;
 
 }

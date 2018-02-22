@@ -18,13 +18,14 @@
 package org.xipki.security;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum CertpathValidationModel {
 
-    PKIX,
-    CHAIN
+  PKIX,
+  CHAIN
 
 }

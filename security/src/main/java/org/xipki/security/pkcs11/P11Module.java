@@ -23,37 +23,38 @@ import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.P11UnknownEntityException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface P11Module {
 
-    String getName();
+  String getName();
 
-    String getDescription();
+  String getDescription();
 
-    P11ModuleConf getConf();
+  P11ModuleConf getConf();
 
-    boolean isReadOnly();
+  boolean isReadOnly();
 
-    List<P11SlotIdentifier> slotIdentifiers();
+  List<P11SlotIdentifier> slotIdentifiers();
 
-    /**
-     * Returns slot for the given {@code slotId}.
-     *
-     * @param slotId
-     *          slot identifier. Must not be {@code null}.
-     * @return the slot
-     * @throws P11TokenException
-     *         if PKCS#11 token error occurs
-     */
-    P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException;
+  /**
+   * Returns slot for the given {@code slotId}.
+   *
+   * @param slotId
+   *          slot identifier. Must not be {@code null}.
+   * @return the slot
+   * @throws P11TokenException
+   *         if PKCS#11 token error occurs
+   */
+  P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException;
 
-    P11SlotIdentifier getSlotIdForIndex(int index) throws P11UnknownEntityException;
+  P11SlotIdentifier getSlotIdForIndex(int index) throws P11UnknownEntityException;
 
-    P11SlotIdentifier getSlotIdForId(long id) throws P11UnknownEntityException;
+  P11SlotIdentifier getSlotIdForId(long id) throws P11UnknownEntityException;
 
-    void close();
+  void close();
 
 }

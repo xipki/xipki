@@ -20,16 +20,17 @@ package org.xipki.security;
 import org.bouncycastle.operator.ContentSigner;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public interface XiContentSigner extends ContentSigner {
 
-    /**
-     * returns the encoded algorithm identifier.
-     * @return the encoded algorithm identifier.
-     */
-    byte[] getEncodedAlgorithmIdentifier();
+  /**
+   * returns the encoded algorithm identifier.
+   * @return the encoded algorithm identifier.
+   */
+  byte[] getEncodedAlgorithmIdentifier();
 
 }

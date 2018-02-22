@@ -25,29 +25,30 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
-    public P12ECSignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
-            String curveNameOrOid) throws Exception {
-        super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
-                "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid);
-    }
+  public P12ECSignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm,
+      String curveNameOrOid) throws Exception {
+    super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
+        "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid);
+  }
 
-    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
-        byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
-        if (keystoreBytes == null) {
-            KeystoreGenerationParameters params = new KeystoreGenerationParameters(
-                    PASSWORD.toCharArray());
-            params.setRandom(new SecureRandom());
-            P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
-                    curveNameOrOid, params, null);
-            keystoreBytes = identity.keystore();
-        }
-        return keystoreBytes;
+  private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
+    byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+    if (keystoreBytes == null) {
+      KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+          PASSWORD.toCharArray());
+      params.setRandom(new SecureRandom());
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
+          curveNameOrOid, params, null);
+      keystoreBytes = identity.keystore();
     }
+    return keystoreBytes;
+  }
 
 }

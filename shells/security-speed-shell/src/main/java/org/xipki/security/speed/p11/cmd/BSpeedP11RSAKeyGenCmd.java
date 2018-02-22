@@ -28,34 +28,35 @@ import org.xipki.security.speed.cmd.RSAControl;
 import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-rsa-gen-p11",
-        description = "performance test of PKCS#11 RSA key generation (batch)")
+    description = "performance test of PKCS#11 RSA key generation (batch)")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Action {
 
-    private final Queue<RSAControl> queue = new LinkedList<>();
+  private final Queue<RSAControl> queue = new LinkedList<>();
 
-    public BSpeedP11RSAKeyGenCmd() {
-        queue.add(new RSAControl(1024));
-        queue.add(new RSAControl(2048));
-        queue.add(new RSAControl(3072));
-        queue.add(new RSAControl(4096));
+  public BSpeedP11RSAKeyGenCmd() {
+    queue.add(new RSAControl(1024));
+    queue.add(new RSAControl(2048));
+    queue.add(new RSAControl(3072));
+    queue.add(new RSAControl(4096));
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    RSAControl control = queue.poll();
+    if (control == null) {
+      return null;
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        RSAControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-
-        P11Slot slot = getSlot();
-        return new P11RSAKeyGenLoadTest(slot, control.modulusLen(), toBigInt("0x10001"));
-    }
+    P11Slot slot = getSlot();
+    return new P11RSAKeyGenLoadTest(slot, control.modulusLen(), toBigInt("0x10001"));
+  }
 
 }

@@ -20,35 +20,36 @@ package org.xipki.common;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum TripleState {
 
-    REQUIRED("required"),
-    OPTIONAL("optional"),
-    FORBIDDEN("forbidden");
+  REQUIRED("required"),
+  OPTIONAL("optional"),
+  FORBIDDEN("forbidden");
 
-    private final String value;
+  private final String value;
 
-    TripleState(String value) {
-        this.value = value;
+  TripleState(String value) {
+    this.value = value;
+  }
+
+  public String value() {
+    return value;
+  }
+
+  public static TripleState forValue(String textValue) {
+    ParamUtil.requireNonNull("textValue", textValue);
+
+    for (TripleState ts : TripleState.values()) {
+      if (ts.value.equalsIgnoreCase(textValue)) {
+        return ts;
+      }
     }
-
-    public String value() {
-        return value;
-    }
-
-    public static TripleState forValue(String textValue) {
-        ParamUtil.requireNonNull("textValue", textValue);
-
-        for (TripleState ts : TripleState.values()) {
-            if (ts.value.equalsIgnoreCase(textValue)) {
-                return ts;
-            }
-        }
-        throw new IllegalArgumentException("invalid TripleState " + textValue);
-    }
+    throw new IllegalArgumentException("invalid TripleState " + textValue);
+  }
 
 }

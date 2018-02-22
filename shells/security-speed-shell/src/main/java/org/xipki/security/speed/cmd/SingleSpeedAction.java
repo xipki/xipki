@@ -21,30 +21,31 @@ import org.apache.karaf.shell.api.action.Option;
 import org.xipki.common.LoadExecutor;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class SingleSpeedAction extends SecurityAction {
 
-    @Option(name = "--duration",
-            description = "duration")
-    private String duration = "30s";
+  @Option(name = "--duration",
+      description = "duration")
+  private String duration = "30s";
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    protected abstract LoadExecutor getTester() throws Exception;
+  protected abstract LoadExecutor getTester() throws Exception;
 
-    @Override
-    protected Object execute0() throws Exception {
-        LoadExecutor tester = getTester();
-        tester.setDuration(duration);
-        tester.setThreads(Math.min(20, numThreads));
+  @Override
+  protected Object execute0() throws Exception {
+    LoadExecutor tester = getTester();
+    tester.setDuration(duration);
+    tester.setThreads(Math.min(20, numThreads));
 
-        tester.test();
-        return null;
-    }
+    tester.test();
+    return null;
+  }
 
 }

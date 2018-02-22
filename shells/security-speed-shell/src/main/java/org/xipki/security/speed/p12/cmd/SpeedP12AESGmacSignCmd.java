@@ -26,24 +26,25 @@ import org.xipki.security.speed.cmd.completer.GMACSigAlgCompleter;
 import org.xipki.security.speed.p12.P12AESGmacSignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 @Command(scope = "xi", name = "speed-gmac-sign-p12",
-        description = "performance test of PKCS#12 AES GMAC signature creation")
+    description = "performance test of PKCS#12 AES GMAC signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12AESGmacSignCmd extends SpeedP12SignAction {
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(GMACSigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(GMACSigAlgCompleter.class)
+  private String sigAlgo;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P12AESGmacSignLoadTest(securityFactory, sigAlgo);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P12AESGmacSignLoadTest(securityFactory, sigAlgo);
+  }
 
 }

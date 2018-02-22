@@ -22,55 +22,56 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.CmpFailureUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class PkiStatusInfo {
 
-    private final int status;
+  private final int status;
 
-    private final int pkiFailureInfo;
+  private final int pkiFailureInfo;
 
-    private final String statusMessage;
+  private final String statusMessage;
 
-    public PkiStatusInfo(int status, int pkiFailureInfo, String statusMessage) {
-        this.status = status;
-        this.pkiFailureInfo = pkiFailureInfo;
-        this.statusMessage = statusMessage;
-    }
+  public PkiStatusInfo(int status, int pkiFailureInfo, String statusMessage) {
+    this.status = status;
+    this.pkiFailureInfo = pkiFailureInfo;
+    this.statusMessage = statusMessage;
+  }
 
-    public PkiStatusInfo(int status) {
-        this.status = status;
-        this.pkiFailureInfo = 0;
-        this.statusMessage = null;
-    }
+  public PkiStatusInfo(int status) {
+    this.status = status;
+    this.pkiFailureInfo = 0;
+    this.statusMessage = null;
+  }
 
-    public PkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
-        ParamUtil.requireNonNull("bcPkiStatusInfo", bcPkiStatusInfo);
+  public PkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
+    ParamUtil.requireNonNull("bcPkiStatusInfo", bcPkiStatusInfo);
 
-        this.status = bcPkiStatusInfo.getStatus().intValue();
-        this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null)
-                ? 0 : bcPkiStatusInfo.getFailInfo().intValue();
-        PKIFreeText text = bcPkiStatusInfo.getStatusString();
-        this.statusMessage = (text == null) ? null : text.getStringAt(0).getString();
-    }
+    this.status = bcPkiStatusInfo.getStatus().intValue();
+    this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null)
+        ? 0 : bcPkiStatusInfo.getFailInfo().intValue();
+    PKIFreeText text = bcPkiStatusInfo.getStatusString();
+    this.statusMessage = (text == null) ? null : text.getStringAt(0).getString();
+  }
 
-    public int status() {
-        return status;
-    }
+  public int status() {
+    return status;
+  }
 
-    public int pkiFailureInfo() {
-        return pkiFailureInfo;
-    }
+  public int pkiFailureInfo() {
+    return pkiFailureInfo;
+  }
 
-    public String statusMessage() {
-        return statusMessage;
-    }
+  public String statusMessage() {
+    return statusMessage;
+  }
 
-    @Override
-    public String toString() {
-        return CmpFailureUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage);
-    }
+  @Override
+  public String toString() {
+    return CmpFailureUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage);
+  }
 
 }

@@ -28,236 +28,237 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class SignerConf {
 
-    private final ConfPairs confPairs;
+  private final ConfPairs confPairs;
 
-    private final HashAlgoType hashAlgo;
+  private final HashAlgoType hashAlgo;
 
-    private final SignatureAlgoControl signatureAlgoControl;
+  private final SignatureAlgoControl signatureAlgoControl;
 
-    public SignerConf(String conf) {
-        this.hashAlgo = null;
-        this.signatureAlgoControl = null;
-        ParamUtil.requireNonBlank("conf", conf);
-        this.confPairs = new ConfPairs(conf);
-        if (getConfValue("algo") == null) {
-            throw new IllegalArgumentException("conf must contain the entry 'algo'");
-        }
+  public SignerConf(String conf) {
+    this.hashAlgo = null;
+    this.signatureAlgoControl = null;
+    ParamUtil.requireNonBlank("conf", conf);
+    this.confPairs = new ConfPairs(conf);
+    if (getConfValue("algo") == null) {
+      throw new IllegalArgumentException("conf must contain the entry 'algo'");
+    }
+  }
+
+  public SignerConf(String confWithoutAlgo, HashAlgoType hashAlgo,
+      SignatureAlgoControl signatureAlgoControl) {
+    ParamUtil.requireNonBlank("confWithoutAlgo", confWithoutAlgo);
+    this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+    this.signatureAlgoControl = signatureAlgoControl;
+    this.confPairs = new ConfPairs(confWithoutAlgo);
+    if (getConfValue("algo") != null) {
+      throw new IllegalArgumentException("confWithoutAlgo must not contain the entry 'algo'");
+    }
+  }
+
+  public HashAlgoType hashAlgo() {
+    return hashAlgo;
+  }
+
+  public SignatureAlgoControl signatureAlgoControl() {
+    return signatureAlgoControl;
+  }
+
+  public void putConfEntry(String name, String value) {
+    confPairs.putPair(name, value);
+  }
+
+  public void removeConfEntry(String name) {
+    confPairs.removePair(name);
+  }
+
+  public String getConfValue(String name) {
+    return confPairs.value(name);
+  }
+
+  public String getConf() {
+    return confPairs.getEncoded();
+  }
+
+  @Override
+  public String toString() {
+    return toString(true, true);
+  }
+
+  public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
+    String conf = getConf();
+    if (ignoreSensitiveInfo) {
+      conf = eraseSensitiveData(conf);
     }
 
-    public SignerConf(String confWithoutAlgo, HashAlgoType hashAlgo,
-            SignatureAlgoControl signatureAlgoControl) {
-        ParamUtil.requireNonBlank("confWithoutAlgo", confWithoutAlgo);
-        this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-        this.signatureAlgoControl = signatureAlgoControl;
-        this.confPairs = new ConfPairs(confWithoutAlgo);
-        if (getConfValue("algo") != null) {
-            throw new IllegalArgumentException("confWithoutAlgo must not contain the entry 'algo'");
-        }
+    StringBuilder sb = new StringBuilder(conf.length() + 50);
+    sb.append("conf: ");
+    sb.append(conf);
+    if (hashAlgo != null) {
+      sb.append("\nhash algo: ").append(hashAlgo.getName());
     }
 
-    public HashAlgoType hashAlgo() {
-        return hashAlgo;
+    if (signatureAlgoControl != null) {
+      sb.append("\nsiganture algo control: ").append(signatureAlgoControl);
     }
 
-    public SignatureAlgoControl signatureAlgoControl() {
-        return signatureAlgoControl;
+    return sb.toString();
+  }
+
+  public static String toString(String signerConf, boolean verbose, boolean ignoreSensitiveInfo) {
+    String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+    if (ignoreSensitiveInfo) {
+      tmpSignerConf = eraseSensitiveData(tmpSignerConf);
     }
 
-    public void putConfEntry(String name, String value) {
-        confPairs.putPair(name, value);
+    if (verbose || tmpSignerConf.length() < 101) {
+      return tmpSignerConf;
+    } else {
+      return StringUtil.concat(tmpSignerConf.substring(0, 97), "...");
+    }
+  }
+
+  public static SignerConf getKeystoreSignerConf(InputStream keystoreStream,
+      String password, String signatureAlgorithm, int parallelism) throws IOException {
+    ParamUtil.requireNonNull("keystoreStream", keystoreStream);
+    ParamUtil.requireNonBlank("password", password);
+    ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
+    ParamUtil.requireMin("parallelism", parallelism, 1);
+
+    ConfPairs conf = new ConfPairs("password", password);
+    conf.putPair("algo", signatureAlgorithm);
+    conf.putPair("parallelism", Integer.toString(parallelism));
+    conf.putPair("keystore", "base64:" + Base64.encodeToString(IoUtil.read(keystoreStream)));
+    return new SignerConf(conf.getEncoded());
+  }
+
+  public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
+      int parallelism, HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
+    ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+    ParamUtil.requireNonBlank("password", password);
+    ParamUtil.requireMin("parallelism", parallelism, 1);
+    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+
+    ConfPairs conf = new ConfPairs("password", password);
+    conf.putPair("parallelism", Integer.toString(parallelism));
+    conf.putPair("keystore", "file:" + keystoreFile);
+    return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+  }
+
+  public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
+      HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
+    ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+    ParamUtil.requireNonBlank("password", password);
+    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+
+    ConfPairs conf = new ConfPairs("password", password);
+    conf.putPair("parallelism", "1");
+    conf.putPair("keystore", "file:" + keystoreFile);
+    return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+  }
+
+  public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+      Long slotId, String keyLabel, byte[] keyId, int parallelism, HashAlgoType hashAlgo,
+      SignatureAlgoControl signatureAlgoControl) {
+    ParamUtil.requireMin("parallelism", parallelism, 1);
+    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+
+    if (slotIndex == null && slotId == null) {
+      throw new IllegalArgumentException(
+          "at least one of slotIndex and slotId must not be null");
+    }
+    if (keyId == null && keyLabel == null) {
+      throw new IllegalArgumentException(
+          "at least one of keyId and keyLabel must not be null");
     }
 
-    public void removeConfEntry(String name) {
-        confPairs.removePair(name);
+    ConfPairs conf = new ConfPairs();
+    conf.putPair("parallelism", Integer.toString(parallelism));
+
+    if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+      conf.putPair("module", pkcs11ModuleName);
     }
 
-    public String getConfValue(String name) {
-        return confPairs.value(name);
+    if (slotId != null) {
+      conf.putPair("slot-id", slotId.toString());
     }
 
-    public String getConf() {
-        return confPairs.getEncoded();
+    if (slotIndex != null) {
+      conf.putPair("slot", slotIndex.toString());
     }
 
-    @Override
-    public String toString() {
-        return toString(true, true);
+    if (keyId != null) {
+      conf.putPair("key-id", Hex.encode(keyId));
     }
 
-    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-        String conf = getConf();
-        if (ignoreSensitiveInfo) {
-            conf = eraseSensitiveData(conf);
-        }
-
-        StringBuilder sb = new StringBuilder(conf.length() + 50);
-        sb.append("conf: ");
-        sb.append(conf);
-        if (hashAlgo != null) {
-            sb.append("\nhash algo: ").append(hashAlgo.getName());
-        }
-
-        if (signatureAlgoControl != null) {
-            sb.append("\nsiganture algo control: ").append(signatureAlgoControl);
-        }
-
-        return sb.toString();
+    if (keyLabel != null) {
+      conf.putPair("key-label", keyLabel);
     }
 
-    public static String toString(String signerConf, boolean verbose, boolean ignoreSensitiveInfo) {
-        String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
-        if (ignoreSensitiveInfo) {
-            tmpSignerConf = eraseSensitiveData(tmpSignerConf);
-        }
+    return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+  }
 
-        if (verbose || tmpSignerConf.length() < 101) {
-            return tmpSignerConf;
-        } else {
-            return StringUtil.concat(tmpSignerConf.substring(0, 97), "...");
-        }
+  public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+      Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm,
+      int parallelism) {
+    ParamUtil.requireMin("parallelism", parallelism, 1);
+    ParamUtil.requireNonNull("algo", signatureAlgorithm);
+    if (slotIndex == null && slotId == null) {
+      throw new IllegalArgumentException(
+          "at least one of slotIndex and slotId must not be null");
+    }
+    if (keyId == null && keyLabel == null) {
+      throw new IllegalArgumentException(
+          "at least one of keyId and keyLabel must not be null");
     }
 
-    public static SignerConf getKeystoreSignerConf(InputStream keystoreStream,
-            String password, String signatureAlgorithm, int parallelism) throws IOException {
-        ParamUtil.requireNonNull("keystoreStream", keystoreStream);
-        ParamUtil.requireNonBlank("password", password);
-        ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.requireMin("parallelism", parallelism, 1);
+    ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
+    conf.putPair("parallelism", Integer.toString(parallelism));
 
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("algo", signatureAlgorithm);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-        conf.putPair("keystore", "base64:" + Base64.encodeToString(IoUtil.read(keystoreStream)));
-        return new SignerConf(conf.getEncoded());
+    if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+      conf.putPair("module", pkcs11ModuleName);
     }
 
-    public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-            int parallelism, HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
-        ParamUtil.requireNonBlank("password", password);
-        ParamUtil.requireMin("parallelism", parallelism, 1);
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-        conf.putPair("keystore", "file:" + keystoreFile);
-        return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+    if (slotId != null) {
+      conf.putPair("slot-id", slotId.toString());
     }
 
-    public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-            HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
-        ParamUtil.requireNonBlank("password", password);
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", "1");
-        conf.putPair("keystore", "file:" + keystoreFile);
-        return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+    if (slotIndex != null) {
+      conf.putPair("slot", slotIndex.toString());
     }
 
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-            Long slotId, String keyLabel, byte[] keyId, int parallelism, HashAlgoType hashAlgo,
-            SignatureAlgoControl signatureAlgoControl) {
-        ParamUtil.requireMin("parallelism", parallelism, 1);
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-
-        if (slotIndex == null && slotId == null) {
-            throw new IllegalArgumentException(
-                    "at least one of slotIndex and slotId must not be null");
-        }
-        if (keyId == null && keyLabel == null) {
-            throw new IllegalArgumentException(
-                    "at least one of keyId and keyLabel must not be null");
-        }
-
-        ConfPairs conf = new ConfPairs();
-        conf.putPair("parallelism", Integer.toString(parallelism));
-
-        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-            conf.putPair("module", pkcs11ModuleName);
-        }
-
-        if (slotId != null) {
-            conf.putPair("slot-id", slotId.toString());
-        }
-
-        if (slotIndex != null) {
-            conf.putPair("slot", slotIndex.toString());
-        }
-
-        if (keyId != null) {
-            conf.putPair("key-id", Hex.encode(keyId));
-        }
-
-        if (keyLabel != null) {
-            conf.putPair("key-label", keyLabel);
-        }
-
-        return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+    if (keyId != null) {
+      conf.putPair("key-id", Hex.encode(keyId));
     }
 
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-            Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm,
-            int parallelism) {
-        ParamUtil.requireMin("parallelism", parallelism, 1);
-        ParamUtil.requireNonNull("algo", signatureAlgorithm);
-        if (slotIndex == null && slotId == null) {
-            throw new IllegalArgumentException(
-                    "at least one of slotIndex and slotId must not be null");
-        }
-        if (keyId == null && keyLabel == null) {
-            throw new IllegalArgumentException(
-                    "at least one of keyId and keyLabel must not be null");
-        }
-
-        ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-
-        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-            conf.putPair("module", pkcs11ModuleName);
-        }
-
-        if (slotId != null) {
-            conf.putPair("slot-id", slotId.toString());
-        }
-
-        if (slotIndex != null) {
-            conf.putPair("slot", slotIndex.toString());
-        }
-
-        if (keyId != null) {
-            conf.putPair("key-id", Hex.encode(keyId));
-        }
-
-        if (keyLabel != null) {
-            conf.putPair("key-label", keyLabel);
-        }
-
-        return new SignerConf(conf.getEncoded());
+    if (keyLabel != null) {
+      conf.putPair("key-label", keyLabel);
     }
 
-    private static String eraseSensitiveData(String conf) {
-        if (conf == null || !conf.contains("password?")) {
-            return conf;
-        }
+    return new SignerConf(conf.getEncoded());
+  }
 
-        try {
-            ConfPairs pairs = new ConfPairs(conf);
-            String value = pairs.value("password");
-            if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
-                pairs.putPair("password", "<sensitive>");
-            }
-            return pairs.getEncoded();
-        } catch (Exception ex) {
-            return conf;
-        }
+  private static String eraseSensitiveData(String conf) {
+    if (conf == null || !conf.contains("password?")) {
+      return conf;
     }
+
+    try {
+      ConfPairs pairs = new ConfPairs(conf);
+      String value = pairs.value("password");
+      if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
+        pairs.putPair("password", "<sensitive>");
+      }
+      return pairs.getEncoded();
+    } catch (Exception ex) {
+      return conf;
+    }
+  }
 
 }

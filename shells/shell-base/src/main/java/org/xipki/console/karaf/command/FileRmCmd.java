@@ -29,54 +29,55 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.intern.FileUtils;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "rm",
-        description = "remove file or directory")
+    description = "remove file or directory")
 @Service
 public class FileRmCmd extends XiAction {
 
-    @Argument(index = 0, name = "file", required = true,
-            description = "file or directory to be deleted\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String targetPath;
+  @Argument(index = 0, name = "file", required = true,
+      description = "file or directory to be deleted\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String targetPath;
 
-    @Option(name = "--recursive", aliases = "-r",
-            description = "remove directories and their contents recursively")
-    private Boolean recursive = Boolean.FALSE;
+  @Option(name = "--recursive", aliases = "-r",
+      description = "remove directories and their contents recursively")
+  private Boolean recursive = Boolean.FALSE;
 
-    @Option(name = "--force", aliases = "-f",
-            description = "remove files without prompt")
-    private Boolean force = Boolean.FALSE;
+  @Option(name = "--force", aliases = "-f",
+      description = "remove files without prompt")
+  private Boolean force = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        File target = new File(expandFilepath(targetPath));
-        if (!target.exists()) {
-            return null;
-        }
-
-        if (target.isDirectory()) {
-            if (!recursive) {
-                println("Please use option --recursive to delete directory");
-                return null;
-            }
-
-            if (force
-                    || confirm("Do you want to remove directory " + targetPath, 3)) {
-                FileUtils.deleteDirectory(target);
-                println("removed directory " + targetPath);
-            }
-        } else {
-            if (force || confirm("Do you want to remove file " + targetPath, 3)) {
-                target.delete();
-                println("removed file " + targetPath);
-            }
-        }
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    File target = new File(expandFilepath(targetPath));
+    if (!target.exists()) {
+      return null;
     }
+
+    if (target.isDirectory()) {
+      if (!recursive) {
+        println("Please use option --recursive to delete directory");
+        return null;
+      }
+
+      if (force
+          || confirm("Do you want to remove directory " + targetPath, 3)) {
+        FileUtils.deleteDirectory(target);
+        println("removed directory " + targetPath);
+      }
+    } else {
+      if (force || confirm("Do you want to remove file " + targetPath, 3)) {
+        target.delete();
+        println("removed file " + targetPath);
+      }
+    }
+
+    return null;
+  }
 
 }

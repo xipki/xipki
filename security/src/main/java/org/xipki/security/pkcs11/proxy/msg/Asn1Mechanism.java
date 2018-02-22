@@ -28,7 +28,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.xipki.security.exception.BadAsn1ObjectException;
 
 /**
- *
+ * TODO.
  * <pre>
  * Mechanism ::= SEQUENCE {
  *     mechanism     INTEGER,
@@ -41,58 +41,58 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 
 public class Asn1Mechanism extends ASN1Object {
 
-    private final long mechanism;
+  private final long mechanism;
 
-    private final Asn1P11Params params;
+  private final Asn1P11Params params;
 
-    public Asn1Mechanism(long mechanism, Asn1P11Params params) {
-        this.mechanism = mechanism;
-        this.params = params;
+  public Asn1Mechanism(long mechanism, Asn1P11Params params) {
+    this.mechanism = mechanism;
+    this.params = params;
+  }
+
+  private Asn1Mechanism(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 1, 2);
+    int size = seq.size();
+    int idx = 0;
+    this.mechanism = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
+    this.params = (size > 1)  ? Asn1P11Params.getInstance(seq.getObjectAt(idx++)) : null;
+  }
+
+  public static Asn1Mechanism getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1Mechanism) {
+      return (Asn1Mechanism) obj;
     }
 
-    private Asn1Mechanism(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 1, 2);
-        int size = seq.size();
-        int idx = 0;
-        this.mechanism = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
-        this.params = (size > 1)  ? Asn1P11Params.getInstance(seq.getObjectAt(idx++)) : null;
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1Mechanism((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1Mechanism getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1Mechanism) {
-            return (Asn1Mechanism) obj;
-        }
-
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1Mechanism((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(new ASN1Integer(mechanism));
+    if (params != null) {
+      vector.add(params);
     }
+    return new DERSequence(vector);
+  }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new ASN1Integer(mechanism));
-        if (params != null) {
-            vector.add(params);
-        }
-        return new DERSequence(vector);
-    }
+  public long mechanism() {
+    return mechanism;
+  }
 
-    public long mechanism() {
-        return mechanism;
-    }
-
-    public Asn1P11Params params() {
-        return params;
-    }
+  public Asn1P11Params params() {
+    return params;
+  }
 
 }

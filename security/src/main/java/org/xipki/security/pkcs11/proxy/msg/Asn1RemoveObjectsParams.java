@@ -34,7 +34,7 @@ import org.xipki.security.exception.BadAsn1ObjectException;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
- *
+ * TODO.
  * <pre>
  * RemoveObjectsParams ::= SEQUENCE {
  *     slotId     SlotIdentifier,
@@ -48,89 +48,89 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 public class Asn1RemoveObjectsParams extends ASN1Object {
 
-    private final P11SlotIdentifier slotId;
+  private final P11SlotIdentifier slotId;
 
-    private final byte[] objectId;
+  private final byte[] objectId;
 
-    private final String objectLabel;
+  private final String objectLabel;
 
-    public Asn1RemoveObjectsParams(P11SlotIdentifier slotId, byte[] objectId, String objectLabel) {
-        ParamUtil.requireNonNull("slotId", slotId);
-        if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
-            throw new IllegalArgumentException(
-                    "at least one of objectId and objectLabel must not be null");
-        }
-
-        this.objectId = objectId;
-        this.objectLabel = objectLabel;
-        this.slotId = slotId;
+  public Asn1RemoveObjectsParams(P11SlotIdentifier slotId, byte[] objectId, String objectLabel) {
+    ParamUtil.requireNonNull("slotId", slotId);
+    if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
+      throw new IllegalArgumentException(
+          "at least one of objectId and objectLabel must not be null");
     }
 
-    private Asn1RemoveObjectsParams(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 2, 3);
-        int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
-        final int size = seq.size();
-        ASN1Encodable asn1Id = null;
-        ASN1Encodable asn1Label = null;
-        if (size == 2) {
-            ASN1Encodable asn1 = seq.getObjectAt(1);
-            if (asn1 instanceof ASN1String) {
-                asn1Label = asn1;
-            } else {
-                asn1Id = asn1;
-            }
-        } else {
-            asn1Id = seq.getObjectAt(idx++);
-            asn1Label = seq.getObjectAt(idx++);
-        }
+    this.objectId = objectId;
+    this.objectLabel = objectLabel;
+    this.slotId = slotId;
+  }
 
-        objectId = (asn1Id == null) ? null : Asn1Util.getOctetStringBytes(asn1Id);
-        objectLabel = (asn1Label == null) ? null : Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-
-        if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
-            throw new BadAsn1ObjectException("invalid object Asn1RemoveObjectsParams: "
-                    + "at least one of id and label must not be null");
-        }
+  private Asn1RemoveObjectsParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 2, 3);
+    int idx = 0;
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    final int size = seq.size();
+    ASN1Encodable asn1Id = null;
+    ASN1Encodable asn1Label = null;
+    if (size == 2) {
+      ASN1Encodable asn1 = seq.getObjectAt(1);
+      if (asn1 instanceof ASN1String) {
+        asn1Label = asn1;
+      } else {
+        asn1Id = asn1;
+      }
+    } else {
+      asn1Id = seq.getObjectAt(idx++);
+      asn1Label = seq.getObjectAt(idx++);
     }
 
-    public static Asn1RemoveObjectsParams getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1RemoveObjectsParams) {
-            return (Asn1RemoveObjectsParams) obj;
-        }
+    objectId = (asn1Id == null) ? null : Asn1Util.getOctetStringBytes(asn1Id);
+    objectLabel = (asn1Label == null) ? null : Asn1Util.getUtf8String(seq.getObjectAt(idx++));
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1RemoveObjectsParams((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
+    if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
+      throw new BadAsn1ObjectException("invalid object Asn1RemoveObjectsParams: "
+          + "at least one of id and label must not be null");
+    }
+  }
+
+  public static Asn1RemoveObjectsParams getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1RemoveObjectsParams) {
+      return (Asn1RemoveObjectsParams) obj;
     }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new Asn1P11SlotIdentifier(slotId));
-        vector.add(new DERUTF8String(objectLabel));
-        return new DERSequence(vector);
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1RemoveObjectsParams((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public P11SlotIdentifier slotId() {
-        return slotId;
-    }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(new Asn1P11SlotIdentifier(slotId));
+    vector.add(new DERUTF8String(objectLabel));
+    return new DERSequence(vector);
+  }
 
-    public byte[] ojectId() {
-        return Arrays.copyOf(objectId, objectId.length);
-    }
+  public P11SlotIdentifier slotId() {
+    return slotId;
+  }
 
-    public String objectLabel() {
-        return objectLabel;
-    }
+  public byte[] ojectId() {
+    return Arrays.copyOf(objectId, objectId.length);
+  }
+
+  public String objectLabel() {
+    return objectLabel;
+  }
 
 }

@@ -25,17 +25,18 @@ import org.xipki.common.util.DateUtil;
 import junit.framework.Assert;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DateUtilTest {
 
-    @Test
-    public void test1() {
-        Date utcDate = DateUtil.parseUtcTimeyyyyMMddhhmmss("20150223134459");
-        long expTimeMs = 1424699099L;
+  @Test
+  public void test1() {
+    Date utcDate = DateUtil.parseUtcTimeyyyyMMddhhmmss("20150223134459");
+    long expTimeMs = 1424699099L;
 
-        Assert.assertEquals("DateTime parsing", expTimeMs, utcDate.getTime() / 1000);
-    }
+    Assert.assertEquals("DateTime parsing", expTimeMs, utcDate.getTime() / 1000);
+  }
 }

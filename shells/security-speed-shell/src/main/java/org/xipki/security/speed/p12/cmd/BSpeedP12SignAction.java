@@ -21,14 +21,15 @@ import org.apache.karaf.shell.api.action.Option;
 import org.xipki.security.speed.cmd.BatchSpeedAction;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class BSpeedP12SignAction extends BatchSpeedAction {
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    protected String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  protected String sigAlgo;
 
 }

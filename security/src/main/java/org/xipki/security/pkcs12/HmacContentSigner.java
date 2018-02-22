@@ -33,88 +33,89 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class HmacContentSigner implements XiContentSigner {
 
-    private class HmacOutputStream extends OutputStream {
+  private class HmacOutputStream extends OutputStream {
 
-        @Override
-        public void write(int bb) throws IOException {
-            hmac.update((byte) bb);
-        }
-
-        @Override
-        public void write(byte[] bytes) throws IOException {
-            hmac.update(bytes, 0, bytes.length);
-        }
-
-        @Override
-        public void write(byte[] bytes, int off, int len) throws IOException {
-            hmac.update(bytes, off, len);
-        }
-
-    }
-
-    private final AlgorithmIdentifier algorithmIdentifier;
-
-    private final byte[] encodedAlgorithmIdentifier;
-
-    private final HmacOutputStream outputStream;
-
-    private final HMac hmac;
-
-    private final int outLen;
-
-    public HmacContentSigner(AlgorithmIdentifier algorithmIdentifier, SecretKey signingKey)
-            throws XiSecurityException {
-        this(null, algorithmIdentifier, signingKey);
-    }
-
-    public HmacContentSigner(HashAlgoType hashAlgo, AlgorithmIdentifier algorithmIdentifier,
-            SecretKey signingKey) throws XiSecurityException {
-        this.algorithmIdentifier = ParamUtil.requireNonNull("algorithmIdentifier",
-                algorithmIdentifier);
-        try {
-            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
-        } catch (IOException ex) {
-            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
-        }
-        ParamUtil.requireNonNull("signingKey", signingKey);
-        if (hashAlgo == null) {
-            hashAlgo = AlgorithmUtil.extractHashAlgoFromMacAlg(algorithmIdentifier);
-        }
-
-        this.hmac = new HMac(hashAlgo.createDigest());
-        byte[] keyBytes = signingKey.getEncoded();
-        this.hmac.init(new KeyParameter(keyBytes, 0, keyBytes.length));
-        this.outLen = hmac.getMacSize();
-        this.outputStream = new HmacOutputStream();
+    @Override
+    public void write(int bb) throws IOException {
+      hmac.update((byte) bb);
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return algorithmIdentifier;
+    public void write(byte[] bytes) throws IOException {
+      hmac.update(bytes, 0, bytes.length);
     }
 
     @Override
-    public byte[] getEncodedAlgorithmIdentifier() {
-        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+    public void write(byte[] bytes, int off, int len) throws IOException {
+      hmac.update(bytes, off, len);
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        hmac.reset();
-        return outputStream;
+  }
+
+  private final AlgorithmIdentifier algorithmIdentifier;
+
+  private final byte[] encodedAlgorithmIdentifier;
+
+  private final HmacOutputStream outputStream;
+
+  private final HMac hmac;
+
+  private final int outLen;
+
+  public HmacContentSigner(AlgorithmIdentifier algorithmIdentifier, SecretKey signingKey)
+      throws XiSecurityException {
+    this(null, algorithmIdentifier, signingKey);
+  }
+
+  public HmacContentSigner(HashAlgoType hashAlgo, AlgorithmIdentifier algorithmIdentifier,
+      SecretKey signingKey) throws XiSecurityException {
+    this.algorithmIdentifier = ParamUtil.requireNonNull("algorithmIdentifier",
+        algorithmIdentifier);
+    try {
+      this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+    }
+    ParamUtil.requireNonNull("signingKey", signingKey);
+    if (hashAlgo == null) {
+      hashAlgo = AlgorithmUtil.extractHashAlgoFromMacAlg(algorithmIdentifier);
     }
 
-    @Override
-    public byte[] getSignature() {
-        byte[] signature = new byte[outLen];
-        hmac.doFinal(signature, 0);
-        return signature;
-    }
+    this.hmac = new HMac(hashAlgo.createDigest());
+    byte[] keyBytes = signingKey.getEncoded();
+    this.hmac.init(new KeyParameter(keyBytes, 0, keyBytes.length));
+    this.outLen = hmac.getMacSize();
+    this.outputStream = new HmacOutputStream();
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return algorithmIdentifier;
+  }
+
+  @Override
+  public byte[] getEncodedAlgorithmIdentifier() {
+    return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    hmac.reset();
+    return outputStream;
+  }
+
+  @Override
+  public byte[] getSignature() {
+    byte[] signature = new byte[outLen];
+    hmac.doFinal(signature, 0);
+    return signature;
+  }
 
 }

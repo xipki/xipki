@@ -31,7 +31,7 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
- *
+ * TODO.
  * <pre>
  * GenSM2KeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
@@ -46,64 +46,64 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 // CHECKSTYLE:SKIP
 public class Asn1GenSM2KeypairParams extends ASN1Object {
 
-    private final P11SlotIdentifier slotId;
+  private final P11SlotIdentifier slotId;
 
-    private final String label;
+  private final String label;
 
-    private final P11NewKeyControl control;
+  private final P11NewKeyControl control;
 
-    public Asn1GenSM2KeypairParams(P11SlotIdentifier slotId, String label,
-            P11NewKeyControl control) {
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.label = ParamUtil.requireNonBlank("label", label);
-        this.control = ParamUtil.requireNonNull("control", control);
+  public Asn1GenSM2KeypairParams(P11SlotIdentifier slotId, String label,
+      P11NewKeyControl control) {
+    this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+    this.label = ParamUtil.requireNonBlank("label", label);
+    this.control = ParamUtil.requireNonNull("control", control);
+  }
+
+  private Asn1GenSM2KeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    Asn1Util.requireRange(seq, 3, 3);
+    int idx = 0;
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+  }
+
+  public static Asn1GenSM2KeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
+    if (obj == null || obj instanceof Asn1GenSM2KeypairParams) {
+      return (Asn1GenSM2KeypairParams) obj;
     }
 
-    private Asn1GenSM2KeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 3, 3);
-        int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
-        label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+    try {
+      if (obj instanceof ASN1Sequence) {
+        return new Asn1GenSM2KeypairParams((ASN1Sequence) obj);
+      } else if (obj instanceof byte[]) {
+        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+      } else {
+        throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+      }
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+          ex);
     }
+  }
 
-    public static Asn1GenSM2KeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1GenSM2KeypairParams) {
-            return (Asn1GenSM2KeypairParams) obj;
-        }
+  @Override
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    vector.add(new Asn1P11SlotIdentifier(slotId));
+    vector.add(new DERUTF8String(label));
+    return new DERSequence(vector);
+  }
 
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new Asn1GenSM2KeypairParams((ASN1Sequence) obj);
-            } else if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } else {
-                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
-        }
-    }
+  public P11SlotIdentifier slotId() {
+    return slotId;
+  }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new Asn1P11SlotIdentifier(slotId));
-        vector.add(new DERUTF8String(label));
-        return new DERSequence(vector);
-    }
+  public String label() {
+    return label;
+  }
 
-    public P11SlotIdentifier slotId() {
-        return slotId;
-    }
-
-    public String label() {
-        return label;
-    }
-
-    public P11NewKeyControl control() {
-        return control;
-    }
+  public P11NewKeyControl control() {
+    return control;
+  }
 
 }

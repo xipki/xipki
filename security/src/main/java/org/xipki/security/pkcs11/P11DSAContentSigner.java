@@ -42,138 +42,139 @@ import org.xipki.security.util.SignerUtil;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 class P11DSAContentSigner implements XiContentSigner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11DSAContentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11DSAContentSigner.class);
 
-    private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
+  private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
 
-    private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
+  private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
 
-    private final P11CryptService cryptService;
+  private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier identityId;
+  private final P11EntityIdentifier identityId;
 
-    private final AlgorithmIdentifier algorithmIdentifier;
+  private final AlgorithmIdentifier algorithmIdentifier;
 
-    private final byte[] encodedAlgorithmIdentifier;
+  private final byte[] encodedAlgorithmIdentifier;
 
-    private final long mechanism;
+  private final long mechanism;
 
-    private final OutputStream outputStream;
+  private final OutputStream outputStream;
 
-    private final boolean plain;
+  private final boolean plain;
 
-    static {
-        sigAlgHashMap.put(X9ObjectIdentifiers.id_dsa_with_sha1.getId(), HashAlgoType.SHA1);
-        sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha224.getId(), HashAlgoType.SHA224);
-        sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha256.getId(), HashAlgoType.SHA256);
-        sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha384.getId(), HashAlgoType.SHA384);
-        sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha512.getId(), HashAlgoType.SHA512);
-        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_224.getId(),
-                HashAlgoType.SHA3_224);
-        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_256.getId(),
-                HashAlgoType.SHA3_256);
-        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_384.getId(),
-                HashAlgoType.SHA3_384);
-        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_512.getId(),
-                HashAlgoType.SHA3_512);
+  static {
+    sigAlgHashMap.put(X9ObjectIdentifiers.id_dsa_with_sha1.getId(), HashAlgoType.SHA1);
+    sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha224.getId(), HashAlgoType.SHA224);
+    sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha256.getId(), HashAlgoType.SHA256);
+    sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha384.getId(), HashAlgoType.SHA384);
+    sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha512.getId(), HashAlgoType.SHA512);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_224.getId(),
+        HashAlgoType.SHA3_224);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_256.getId(),
+        HashAlgoType.SHA3_256);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_384.getId(),
+        HashAlgoType.SHA3_384);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_512.getId(),
+        HashAlgoType.SHA3_512);
 
-        hashMechMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_DSA_SHA1);
-        hashMechMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_DSA_SHA224);
-        hashMechMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_DSA_SHA256);
-        hashMechMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_DSA_SHA384);
-        hashMechMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_DSA_SHA512);
-        hashMechMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_DSA_SHA3_224);
-        hashMechMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_DSA_SHA3_256);
-        hashMechMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_DSA_SHA3_384);
-        hashMechMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_DSA_SHA3_512);
+    hashMechMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_DSA_SHA1);
+    hashMechMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_DSA_SHA224);
+    hashMechMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_DSA_SHA256);
+    hashMechMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_DSA_SHA384);
+    hashMechMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_DSA_SHA512);
+    hashMechMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_DSA_SHA3_224);
+    hashMechMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_DSA_SHA3_256);
+    hashMechMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_DSA_SHA3_384);
+    hashMechMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_DSA_SHA3_512);
+  }
+
+  P11DSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+      AlgorithmIdentifier signatureAlgId, boolean plain)
+      throws XiSecurityException, P11TokenException {
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+    this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+    try {
+      this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+    }
+    this.plain = plain;
+
+    String algOid = signatureAlgId.getAlgorithm().getId();
+    HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
+    if (hashAlgo == null) {
+      throw new XiSecurityException("unsupported signature algorithm " + algOid);
     }
 
-    P11DSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
-            AlgorithmIdentifier signatureAlgId, boolean plain)
-            throws XiSecurityException, P11TokenException {
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-        this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
-        try {
-            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
-        } catch (IOException ex) {
-            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
-        }
-        this.plain = plain;
+    P11SlotIdentifier slotId = identityId.slotId();
+    P11Slot slot = cryptService.getSlot(slotId);
+    if (slot.supportsMechanism(PKCS11Constants.CKM_DSA)) {
+      this.mechanism = PKCS11Constants.CKM_DSA;
+      Digest digest = hashAlgo.createDigest();
+      this.outputStream = new DigestOutputStream(digest);
+    } else {
+      this.mechanism = hashMechMap.get(hashAlgo).longValue();
+      if (!slot.supportsMechanism(this.mechanism)) {
+        throw new XiSecurityException("unsupported signature algorithm " + algOid);
+      }
 
-        String algOid = signatureAlgId.getAlgorithm().getId();
-        HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
-        if (hashAlgo == null) {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid);
-        }
+      this.outputStream = new ByteArrayOutputStream();
+    }
+  }
 
-        P11SlotIdentifier slotId = identityId.slotId();
-        P11Slot slot = cryptService.getSlot(slotId);
-        if (slot.supportsMechanism(PKCS11Constants.CKM_DSA)) {
-            this.mechanism = PKCS11Constants.CKM_DSA;
-            Digest digest = hashAlgo.createDigest();
-            this.outputStream = new DigestOutputStream(digest);
-        } else {
-            this.mechanism = hashMechMap.get(hashAlgo).longValue();
-            if (!slot.supportsMechanism(this.mechanism)) {
-                throw new XiSecurityException("unsupported signature algorithm " + algOid);
-            }
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return algorithmIdentifier;
+  }
 
-            this.outputStream = new ByteArrayOutputStream();
-        }
+  @Override
+  public byte[] getEncodedAlgorithmIdentifier() {
+    return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    if (outputStream instanceof ByteArrayOutputStream) {
+      ((ByteArrayOutputStream) outputStream).reset();
+    } else {
+      ((DigestOutputStream) outputStream).reset();
+    }
+    return outputStream;
+  }
+
+  @Override
+  public byte[] getSignature() {
+    try {
+      byte[] plainSignature = getPlainSignature();
+      return plain ? plainSignature : SignerUtil.dsaSigPlainToX962(plainSignature);
+    } catch (XiSecurityException ex) {
+      LogUtil.warn(LOG, ex);
+      throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
+    } catch (Throwable th) {
+      LogUtil.warn(LOG, th);
+      throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+    }
+  }
+
+  private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    byte[] dataToSign;
+    if (outputStream instanceof ByteArrayOutputStream) {
+      dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+      ((ByteArrayOutputStream) outputStream).reset();
+    } else {
+      dataToSign = ((DigestOutputStream) outputStream).digest();
+      ((DigestOutputStream) outputStream).reset();
     }
 
-    @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return algorithmIdentifier;
-    }
-
-    @Override
-    public byte[] getEncodedAlgorithmIdentifier() {
-        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        if (outputStream instanceof ByteArrayOutputStream) {
-            ((ByteArrayOutputStream) outputStream).reset();
-        } else {
-            ((DigestOutputStream) outputStream).reset();
-        }
-        return outputStream;
-    }
-
-    @Override
-    public byte[] getSignature() {
-        try {
-            byte[] plainSignature = getPlainSignature();
-            return plain ? plainSignature : SignerUtil.dsaSigPlainToX962(plainSignature);
-        } catch (XiSecurityException ex) {
-            LogUtil.warn(LOG, ex);
-            throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
-        } catch (Throwable th) {
-            LogUtil.warn(LOG, th);
-            throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
-        }
-    }
-
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
-        byte[] dataToSign;
-        if (outputStream instanceof ByteArrayOutputStream) {
-            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
-            ((ByteArrayOutputStream) outputStream).reset();
-        } else {
-            dataToSign = ((DigestOutputStream) outputStream).digest();
-            ((DigestOutputStream) outputStream).reset();
-        }
-
-        return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
-    }
+    return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
+  }
 
 }

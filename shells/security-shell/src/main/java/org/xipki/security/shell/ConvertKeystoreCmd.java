@@ -36,82 +36,83 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 @Command(scope = "xi", name = "convert-keystore",
-        description = "Convert keystore")
+    description = "Convert keystore")
 @Service
 public class ConvertKeystoreCmd extends SecurityAction {
 
-    @Option(name = "--in", required = true,
-            description = "Source keystore file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String inFile;
+  @Option(name = "--in", required = true,
+      description = "Source keystore file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String inFile;
 
-    @Option(name = "--intype", required = true,
-            description = "Type of the source keystore\n(required)")
-    @Completion(KeystoreTypeCompleter.class)
-    private String inType;
+  @Option(name = "--intype", required = true,
+      description = "Type of the source keystore\n(required)")
+  @Completion(KeystoreTypeCompleter.class)
+  private String inType;
 
-    @Option(name = "--inpwd",
-            description = "password of the source keystore")
-    private String inPwd;
+  @Option(name = "--inpwd",
+      description = "password of the source keystore")
+  private String inPwd;
 
-    @Option(name = "--out", required = true,
-            description = "Destination keystore file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out", required = true,
+      description = "Destination keystore file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Option(name = "--outtype", required = true,
-            description = "Type of the destination keystore\n(required)")
-    @Completion(KeystoreTypeCompleter.class)
-    private String outType;
+  @Option(name = "--outtype", required = true,
+      description = "Type of the destination keystore\n(required)")
+  @Completion(KeystoreTypeCompleter.class)
+  private String outType;
 
-    @Option(name = "--outpwd",
-            description = "password of the destination keystore")
-    private String outPwd;
+  @Option(name = "--outpwd",
+      description = "password of the destination keystore")
+  private String outPwd;
 
-    @Override
-    protected Object execute0() throws Exception {
-        File realInFile = new File(IoUtil.expandFilepath(inFile));
-        File realOutFile = new File(IoUtil.expandFilepath(outFile));
+  @Override
+  protected Object execute0() throws Exception {
+    File realInFile = new File(IoUtil.expandFilepath(inFile));
+    File realOutFile = new File(IoUtil.expandFilepath(outFile));
 
-        if (CompareUtil.equalsObject(realInFile, realOutFile)) {
-            throw new IllegalCmdParamException("in and out cannot be the same");
-        }
-
-        KeyStore inKs = KeyStore.getInstance(inType);
-        KeyStore outKs = KeyStore.getInstance(outType);
-        outKs.load(null);
-
-        char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwd);
-        FileInputStream inStream = new FileInputStream(realInFile);
-        try {
-            inKs.load(inStream, inPassword);
-        } finally {
-            inStream.close();
-        }
-
-        char[] outPassword = readPasswordIfNotSet("password of the destination keystore", outPwd);
-        Enumeration<String> aliases = inKs.aliases();
-        while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            if (inKs.isKeyEntry(alias)) {
-                Certificate[] certs = inKs.getCertificateChain(alias);
-                Key key = inKs.getKey(alias, inPassword);
-                outKs.setKeyEntry(alias, key, outPassword, certs);
-            } else {
-                Certificate cert = inKs.getCertificate(alias);
-                outKs.setCertificateEntry(alias, cert);
-            }
-        }
-
-        ByteArrayOutputStream bout = new ByteArrayOutputStream(4096);
-        outKs.store(bout, outPassword);
-        saveVerbose("saved destination keystore to file", realOutFile, bout.toByteArray());
-        return null;
+    if (CompareUtil.equalsObject(realInFile, realOutFile)) {
+      throw new IllegalCmdParamException("in and out cannot be the same");
     }
+
+    KeyStore inKs = KeyStore.getInstance(inType);
+    KeyStore outKs = KeyStore.getInstance(outType);
+    outKs.load(null);
+
+    char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwd);
+    FileInputStream inStream = new FileInputStream(realInFile);
+    try {
+      inKs.load(inStream, inPassword);
+    } finally {
+      inStream.close();
+    }
+
+    char[] outPassword = readPasswordIfNotSet("password of the destination keystore", outPwd);
+    Enumeration<String> aliases = inKs.aliases();
+    while (aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      if (inKs.isKeyEntry(alias)) {
+        Certificate[] certs = inKs.getCertificateChain(alias);
+        Key key = inKs.getKey(alias, inPassword);
+        outKs.setKeyEntry(alias, key, outPassword, certs);
+      } else {
+        Certificate cert = inKs.getCertificate(alias);
+        outKs.setCertificateEntry(alias, cert);
+      }
+    }
+
+    ByteArrayOutputStream bout = new ByteArrayOutputStream(4096);
+    outKs.store(bout, outPassword);
+    saveVerbose("saved destination keystore to file", realOutFile, bout.toByteArray());
+    return null;
+  }
 
 }

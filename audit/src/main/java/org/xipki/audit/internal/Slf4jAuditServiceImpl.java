@@ -27,49 +27,50 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.PciAuditEvent;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class Slf4jAuditServiceImpl extends AuditService {
 
-    private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
+  private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
 
-    public Slf4jAuditServiceImpl() {
-    }
+  public Slf4jAuditServiceImpl() {
+  }
 
-    @Override
-    protected void logEvent0(AuditEvent event) {
-        switch (event.level()) {
-        case DEBUG:
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("{}", createMessage(event));
-            }
-            break;
-        default:
-            if (LOG.isInfoEnabled()) {
-                LOG.info("{}", createMessage(event));
-            }
-            break;
-        } // end switch
-    }
+  @Override
+  protected void logEvent0(AuditEvent event) {
+    switch (event.level()) {
+      case DEBUG:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("{}", createMessage(event));
+        }
+        break;
+      default:
+        if (LOG.isInfoEnabled()) {
+          LOG.info("{}", createMessage(event));
+        }
+        break;
+    } // end switch
+  }
 
-    @Override
-    protected void logEvent0(PciAuditEvent event) {
-        CharArrayWriter msg = event.toCharArrayWriter("");
-        AuditLevel al = event.level();
-        switch (al) {
-        case DEBUG:
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("{} | {}", al.alignedText(), msg);
-            }
-            break;
-        default:
-            if (LOG.isInfoEnabled()) {
-                LOG.info("{} | {}", al.alignedText(), msg);
-            }
-            break;
-        } // end switch
-    }
+  @Override
+  protected void logEvent0(PciAuditEvent event) {
+    CharArrayWriter msg = event.toCharArrayWriter("");
+    AuditLevel al = event.level();
+    switch (al) {
+      case DEBUG:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("{} | {}", al.alignedText(), msg);
+        }
+        break;
+      default:
+        if (LOG.isInfoEnabled()) {
+          LOG.info("{} | {}", al.alignedText(), msg);
+        }
+        break;
+    } // end switch
+  }
 
 }

@@ -22,6 +22,7 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.CrlReason;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -29,14 +30,14 @@ import org.xipki.security.CrlReason;
 @Service
 public class ClientCrlReasonCompleter extends AbstractEnumCompleter {
 
-    public ClientCrlReasonCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public ClientCrlReasonCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (CrlReason reason : CrlReason.PERMITTED_CLIENT_CRLREASONS) {
-            enums.append(reason.description()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (CrlReason reason : CrlReason.PERMITTED_CLIENT_CRLREASONS) {
+      enums.append(reason.description()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

@@ -20,37 +20,38 @@ package org.xipki.security.pkcs11;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class Pkcs11Functions {
-    public static String mechanismCodeToString(long mechanism) {
-        return Functions.mechanismCodeToString(mechanism);
-    }
+  public static String mechanismCodeToString(long mechanism) {
+    return Functions.mechanismCodeToString(mechanism);
+  }
 
-    /**
-     * get the code of the given mechanism name.
-     * @param mechanismName
-     *          Mechanism name. Must not be {@code null}.
-     * @return the code if could be found, -1 otherwise.
-     */
-    public static long mechanismStringToCode(String mechanismName) {
-        Long mech = Functions.mechanismStringToCode(mechanismName);
-        return mech == null ? -1 : mech.longValue();
-    }
+  /**
+   * get the code of the given mechanism name.
+   * @param mechanismName
+   *          Mechanism name. Must not be {@code null}.
+   * @return the code if could be found, -1 otherwise.
+   */
+  public static long mechanismStringToCode(String mechanismName) {
+    Long mech = Functions.mechanismStringToCode(mechanismName);
+    return mech == null ? -1 : mech.longValue();
+  }
 
-    public static String getMechanismDesc(long mechanism) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%#010x", mechanism));
-        String name = Functions.mechanismCodeToString(mechanism);
-        if (name != null) {
-            sb.append(" (").append(name).append(")");
-        }
-        return sb.toString();
+  public static String getMechanismDesc(long mechanism) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("%#010x", mechanism));
+    String name = Functions.mechanismCodeToString(mechanism);
+    if (name != null) {
+      sb.append(" (").append(name).append(")");
     }
+    return sb.toString();
+  }
 
-    private Pkcs11Functions() {
-    }
+  private Pkcs11Functions() {
+  }
 
 }

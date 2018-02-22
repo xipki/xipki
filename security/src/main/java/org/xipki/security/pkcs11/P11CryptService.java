@@ -26,58 +26,59 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.P11TokenException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11CryptService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11CryptService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11CryptService.class);
 
-    private P11Module module;
+  private P11Module module;
 
-    public P11CryptService(P11Module module) throws P11TokenException {
-        this.module = ParamUtil.requireNonNull("module", module);
+  public P11CryptService(P11Module module) throws P11TokenException {
+    this.module = ParamUtil.requireNonNull("module", module);
+  }
+
+  public synchronized void refresh() throws P11TokenException {
+    LOG.info("refreshing PKCS#11 module {}", module.getName());
+
+    List<P11SlotIdentifier> slotIds = module.slotIdentifiers();
+    for (P11SlotIdentifier slotId : slotIds) {
+      P11Slot slot;
+      try {
+        slot = module.getSlot(slotId);
+      } catch (P11TokenException ex) {
+        LogUtil.warn(LOG, ex, "P11TokenException while initializing slot " + slotId);
+        continue;
+      } catch (Throwable th) {
+        LOG.error("unexpected error while initializing slot " + slotId, th);
+        continue;
+      }
+
+      slot.refresh();
     }
 
-    public synchronized void refresh() throws P11TokenException {
-        LOG.info("refreshing PKCS#11 module {}", module.getName());
+    LOG.info("refreshed PKCS#11 module {}", module.getName());
+  } // method refresh
 
-        List<P11SlotIdentifier> slotIds = module.slotIdentifiers();
-        for (P11SlotIdentifier slotId : slotIds) {
-            P11Slot slot;
-            try {
-                slot = module.getSlot(slotId);
-            } catch (P11TokenException ex) {
-                LogUtil.warn(LOG, ex, "P11TokenException while initializing slot " + slotId);
-                continue;
-            } catch (Throwable th) {
-                LOG.error("unexpected error while initializing slot " + slotId, th);
-                continue;
-            }
+  public P11Module module() throws P11TokenException {
+    return module;
+  }
 
-            slot.refresh();
-        }
+  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
+    return module.getSlot(slotId);
+  }
 
-        LOG.info("refreshed PKCS#11 module {}", module.getName());
-    } // method refresh
+  public P11Identity getIdentity(P11EntityIdentifier identityId) throws P11TokenException {
+    ParamUtil.requireNonNull("identityId", identityId);
+    return module.getSlot(identityId.slotId()).getIdentity(identityId.objectId());
+  }
 
-    public P11Module module() throws P11TokenException {
-        return module;
-    }
-
-    public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
-        return module.getSlot(slotId);
-    }
-
-    public P11Identity getIdentity(P11EntityIdentifier identityId) throws P11TokenException {
-        ParamUtil.requireNonNull("identityId", identityId);
-        return module.getSlot(identityId.slotId()).getIdentity(identityId.objectId());
-    }
-
-    @Override
-    public String toString() {
-        return module.toString();
-    }
+  @Override
+  public String toString() {
+    return module.toString();
+  }
 
 }

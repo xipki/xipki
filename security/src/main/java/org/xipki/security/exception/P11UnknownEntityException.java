@@ -22,28 +22,29 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11UnknownEntityException extends P11TokenException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public P11UnknownEntityException(P11EntityIdentifier entityId) {
-        super("unknown entity '" + entityId + "'");
-    }
+  public P11UnknownEntityException(P11EntityIdentifier entityId) {
+    super("unknown entity '" + entityId + "'");
+  }
 
-    public P11UnknownEntityException(P11SlotIdentifier slotId) {
-        super("unknown slot '" + slotId + "'");
-    }
+  public P11UnknownEntityException(P11SlotIdentifier slotId) {
+    super("unknown slot '" + slotId + "'");
+  }
 
-    public P11UnknownEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
-        super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
-    }
+  public P11UnknownEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+    super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
+  }
 
-    public P11UnknownEntityException(String message) {
-        super(message);
-    }
+  public P11UnknownEntityException(String message) {
+    super(message);
+  }
 
 }

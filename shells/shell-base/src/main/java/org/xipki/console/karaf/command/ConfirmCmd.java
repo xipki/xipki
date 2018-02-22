@@ -24,28 +24,29 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.XiAction;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "confirm",
-        description = "confirm an action")
+    description = "confirm an action")
 @Service
 public class ConfirmCmd extends XiAction {
 
-    @Argument(index = 0, name = "message", required = true,
-            description = "prompt message\n(required)")
-    private String prompt;
+  @Argument(index = 0, name = "message", required = true,
+      description = "prompt message\n(required)")
+  private String prompt;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean toContinue = confirm(
-                prompt + "\nDo you want to continue", 3);
-        if (!toContinue) {
-            throw new CmdFailure("User cancelled");
-        }
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    boolean toContinue = confirm(
+        prompt + "\nDo you want to continue", 3);
+    if (!toContinue) {
+      throw new CmdFailure("User cancelled");
     }
+
+    return null;
+  }
 
 }

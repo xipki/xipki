@@ -18,27 +18,28 @@
 package org.xipki.common.qa;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class MeasurePoint {
 
-    private final long measureTime;
+  private final long measureTime;
 
-    private final long measureAccount;
+  private final long measureAccount;
 
-    public MeasurePoint(long measureTime, long measureAccount) {
-        this.measureTime = measureTime;
-        this.measureAccount = measureAccount;
-    }
+  public MeasurePoint(long measureTime, long measureAccount) {
+    this.measureTime = measureTime;
+    this.measureAccount = measureAccount;
+  }
 
-    public long measureTime() {
-        return measureTime;
-    }
+  public long measureTime() {
+    return measureTime;
+  }
 
-    public long measureAccount() {
-        return measureAccount;
-    }
+  public long measureAccount() {
+    return measureAccount;
+  }
 
 }

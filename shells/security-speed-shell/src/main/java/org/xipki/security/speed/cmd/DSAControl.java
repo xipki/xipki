@@ -18,27 +18,28 @@
 package org.xipki.security.speed.cmd;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 // CHECKSTYLE:SKIP
 public class DSAControl {
-    private final int plen;
-    private final int qlen;
+  private final int plen;
+  private final int qlen;
 
-    public DSAControl(int plen, int qlen) {
-        this.plen = plen;
-        this.qlen = qlen;
-    }
+  public DSAControl(int plen, int qlen) {
+    this.plen = plen;
+    this.qlen = qlen;
+  }
 
-    public int plen() {
-        return plen;
-    }
+  public int plen() {
+    return plen;
+  }
 
-    public int qlen() {
-        return qlen;
-    }
+  public int qlen() {
+    return qlen;
+  }
 
 }
 

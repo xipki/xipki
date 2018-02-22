@@ -22,72 +22,73 @@ import java.nio.charset.StandardCharsets;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class OBFPasswordService {
 
-    public static final String OBFUSCATE = "OBF:";
+  public static final String OBFUSCATE = "OBF:";
 
-    public static String obfuscate(String str) {
-        ParamUtil.requireNonNull("str", str);
-        StringBuilder buf = new StringBuilder();
-        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+  public static String obfuscate(String str) {
+    ParamUtil.requireNonNull("str", str);
+    StringBuilder buf = new StringBuilder();
+    byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
-        buf.append(OBFUSCATE);
-        for (int i = 0; i < bytes.length; i++) {
-            byte b1 = bytes[i];
-            byte b2 = bytes[bytes.length - (i + 1)];
-            if (b1 < 0 || b2 < 0) {
-                int i0 = (0xff & b1) * 256 + (0xff & b2);
-                String sx = Integer.toString(i0, 36).toLowerCase();
-                buf.append("U0000", 0, 5 - sx.length());
-                buf.append(sx);
-            } else {
-                int i1 = 127 + b1 + b2;
-                int i2 = 127 + b1 - b2;
-                int i0 = i1 * 256 + i2;
-                String sx = Integer.toString(i0, 36).toLowerCase();
+    buf.append(OBFUSCATE);
+    for (int i = 0; i < bytes.length; i++) {
+      byte b1 = bytes[i];
+      byte b2 = bytes[bytes.length - (i + 1)];
+      if (b1 < 0 || b2 < 0) {
+        int i0 = (0xff & b1) * 256 + (0xff & b2);
+        String sx = Integer.toString(i0, 36).toLowerCase();
+        buf.append("U0000", 0, 5 - sx.length());
+        buf.append(sx);
+      } else {
+        int i1 = 127 + b1 + b2;
+        int i2 = 127 + b1 - b2;
+        int i0 = i1 * 256 + i2;
+        String sx = Integer.toString(i0, 36).toLowerCase();
 
-                buf.append("000", 0, 4 - sx.length());
-                buf.append(sx);
-            }
-        } // end for
-        return buf.toString();
+        buf.append("000", 0, 4 - sx.length());
+        buf.append(sx);
+      }
+    } // end for
+    return buf.toString();
+  }
+
+  public static String deobfuscate(String str) {
+    ParamUtil.requireNonNull("str", str);
+
+    if (startsWithIgnoreCase(str, OBFUSCATE)) {
+      str = str.substring(4);
     }
 
-    public static String deobfuscate(String str) {
-        ParamUtil.requireNonNull("str", str);
+    byte[] bytes = new byte[str.length() / 2];
+    int idx = 0;
+    for (int i = 0; i < str.length(); i += 4) {
+      if (str.charAt(i) == 'U') {
+        i++;
+        String sx = str.substring(i, i + 4);
+        int i0 = Integer.parseInt(sx, 36);
+        byte bx = (byte) (i0 >> 8);
+        bytes[idx++] = bx;
+      } else {
+        String sx = str.substring(i, i + 4);
+        int i0 = Integer.parseInt(sx, 36);
+        int i1 = (i0 / 256);
+        int i2 = (i0 % 256);
+        byte bx = (byte) ((i1 + i2 - 254) / 2);
+        bytes[idx++] = bx;
+      }
+    } // end for
 
-        if (startsWithIgnoreCase(str, OBFUSCATE)) {
-            str = str.substring(4);
-        }
+    return new String(bytes, 0, idx, StandardCharsets.UTF_8);
+  }
 
-        byte[] bytes = new byte[str.length() / 2];
-        int idx = 0;
-        for (int i = 0; i < str.length(); i += 4) {
-            if (str.charAt(i) == 'U') {
-                i++;
-                String sx = str.substring(i, i + 4);
-                int i0 = Integer.parseInt(sx, 36);
-                byte bx = (byte) (i0 >> 8);
-                bytes[idx++] = bx;
-            } else {
-                String sx = str.substring(i, i + 4);
-                int i0 = Integer.parseInt(sx, 36);
-                int i1 = (i0 / 256);
-                int i2 = (i0 % 256);
-                byte bx = (byte) ((i1 + i2 - 254) / 2);
-                bytes[idx++] = bx;
-            }
-        } // end for
-
-        return new String(bytes, 0, idx, StandardCharsets.UTF_8);
-    }
-
-    private static boolean startsWithIgnoreCase(String str, String prefix) {
-        return (str.length() < prefix.length()) ? false
-                : prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
-    }
+  private static boolean startsWithIgnoreCase(String str, String prefix) {
+    return (str.length() < prefix.length()) ? false
+        : prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
+  }
 }

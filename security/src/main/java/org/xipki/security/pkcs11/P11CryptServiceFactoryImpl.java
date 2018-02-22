@@ -36,102 +36,103 @@ import org.xipki.security.pkcs11.iaik.IaikP11Module;
 import org.xipki.security.pkcs11.proxy.ProxyP11Module;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11CryptServiceFactoryImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11CryptServiceFactoryImpl.class);
 
-    private static final Map<String, P11CryptService> services = new HashMap<>();
+  private static final Map<String, P11CryptService> services = new HashMap<>();
 
-    private static final Map<String, P11Module> modules = new HashMap<>();
+  private static final Map<String, P11Module> modules = new HashMap<>();
 
-    private PasswordResolver passwordResolver;
+  private PasswordResolver passwordResolver;
 
-    private P11Conf p11Conf;
+  private P11Conf p11Conf;
 
-    private String pkcs11ConfFile;
+  private String pkcs11ConfFile;
 
-    public synchronized void init() throws InvalidConfException, IOException {
-        if (p11Conf != null) {
-            return;
-        }
-        if (StringUtil.isBlank(pkcs11ConfFile)) {
-            LOG.error("no pkcs11ConfFile is configured, could not initialize");
-            return;
-        }
-
-        this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), passwordResolver);
+  public synchronized void init() throws InvalidConfException, IOException {
+    if (p11Conf != null) {
+      return;
+    }
+    if (StringUtil.isBlank(pkcs11ConfFile)) {
+      LOG.error("no pkcs11ConfFile is configured, could not initialize");
+      return;
     }
 
-    public synchronized P11CryptService getP11CryptService(String moduleName)
-            throws XiSecurityException, P11TokenException {
-        if (p11Conf == null) {
-            throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
-        }
+    this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), passwordResolver);
+  }
 
-        final String name = getModuleName(moduleName);
-        P11ModuleConf conf = p11Conf.moduleConf(name);
-        if (conf == null) {
-            throw new XiSecurityException("PKCS#11 module " + name + " is not defined");
-        }
-
-        P11CryptService instance = services.get(moduleName);
-        if (instance != null) {
-            return instance;
-        }
-
-        String nativeLib = conf.nativeLibrary();
-        P11Module p11Module = modules.get(nativeLib);
-        if (p11Module == null) {
-            if (StringUtil.startsWithIgnoreCase(nativeLib, ProxyP11Module.PREFIX)) {
-                p11Module = ProxyP11Module.getInstance(conf);
-            } else if (StringUtil.startsWithIgnoreCase(nativeLib, EmulatorP11Module.PREFIX)) {
-                p11Module = EmulatorP11Module.getInstance(conf);
-            } else {
-                p11Module = IaikP11Module.getInstance(conf);
-            }
-        }
-
-        modules.put(nativeLib, p11Module);
-        instance = new P11CryptService(p11Module);
-        services.put(moduleName, instance);
-
-        return instance;
+  public synchronized P11CryptService getP11CryptService(String moduleName)
+      throws XiSecurityException, P11TokenException {
+    if (p11Conf == null) {
+      throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
     }
 
-    private String getModuleName(String moduleName) {
-        return (moduleName == null) ? DEFAULT_P11MODULE_NAME : moduleName;
+    final String name = getModuleName(moduleName);
+    P11ModuleConf conf = p11Conf.moduleConf(name);
+    if (conf == null) {
+      throw new XiSecurityException("PKCS#11 module " + name + " is not defined");
     }
 
-    public void setPkcs11ConfFile(String confFile) {
-        this.pkcs11ConfFile = StringUtil.isBlank(confFile) ? null : confFile;
+    P11CryptService instance = services.get(moduleName);
+    if (instance != null) {
+      return instance;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
+    String nativeLib = conf.nativeLibrary();
+    P11Module p11Module = modules.get(nativeLib);
+    if (p11Module == null) {
+      if (StringUtil.startsWithIgnoreCase(nativeLib, ProxyP11Module.PREFIX)) {
+        p11Module = ProxyP11Module.getInstance(conf);
+      } else if (StringUtil.startsWithIgnoreCase(nativeLib, EmulatorP11Module.PREFIX)) {
+        p11Module = EmulatorP11Module.getInstance(conf);
+      } else {
+        p11Module = IaikP11Module.getInstance(conf);
+      }
     }
 
-    public void shutdown() {
-        for (String pk11Lib : modules.keySet()) {
-            try {
-                modules.get(pk11Lib).close();
-            } catch (Throwable th) {
-                LogUtil.error(LOG, th, "could not close PKCS11 Module " + pk11Lib);
-            }
-        }
-        modules.clear();
-        services.clear();
-    }
+    modules.put(nativeLib, p11Module);
+    instance = new P11CryptService(p11Module);
+    services.put(moduleName, instance);
 
-    @Override
-    public Set<String> moduleNames() {
-        if (p11Conf == null) {
-            throw new IllegalStateException("pkcs11ConfFile is not set");
-        }
-        return p11Conf.moduleNames();
+    return instance;
+  }
+
+  private String getModuleName(String moduleName) {
+    return (moduleName == null) ? DEFAULT_P11MODULE_NAME : moduleName;
+  }
+
+  public void setPkcs11ConfFile(String confFile) {
+    this.pkcs11ConfFile = StringUtil.isBlank(confFile) ? null : confFile;
+  }
+
+  public void setPasswordResolver(PasswordResolver passwordResolver) {
+    this.passwordResolver = passwordResolver;
+  }
+
+  public void shutdown() {
+    for (String pk11Lib : modules.keySet()) {
+      try {
+        modules.get(pk11Lib).close();
+      } catch (Throwable th) {
+        LogUtil.error(LOG, th, "could not close PKCS11 Module " + pk11Lib);
+      }
     }
+    modules.clear();
+    services.clear();
+  }
+
+  @Override
+  public Set<String> moduleNames() {
+    if (p11Conf == null) {
+      throw new IllegalStateException("pkcs11ConfFile is not set");
+    }
+    return p11Conf.moduleNames();
+  }
 
 }

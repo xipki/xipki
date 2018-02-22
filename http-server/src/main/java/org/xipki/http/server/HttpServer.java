@@ -58,251 +58,252 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public final class HttpServer {
 
-    private class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel> {
+  private class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
-        public NettyHttpServerInitializer() {
-        }
-
-        @Override
-        public void initChannel(SocketChannel ch) {
-            ChannelPipeline pipeline = ch.pipeline();
-            if (sslContext != null) {
-                pipeline.addLast("ssl", sslContext.newHandler(ch.alloc()));
-            }
-            pipeline.addLast(new HttpServerCodec())
-                .addLast(new HttpObjectAggregator(65536))
-                .addLast(new ChunkedWriteHandler())
-                .addLast(new NettyHttpServerHandler());
-        }
+    public NettyHttpServerInitializer() {
     }
 
-    private class NettyHttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+    @Override
+    public void initChannel(SocketChannel ch) {
+      ChannelPipeline pipeline = ch.pipeline();
+      if (sslContext != null) {
+        pipeline.addLast("ssl", sslContext.newHandler(ch.alloc()));
+      }
+      pipeline.addLast(new HttpServerCodec())
+        .addLast(new HttpObjectAggregator(65536))
+        .addLast(new ChunkedWriteHandler())
+        .addLast(new NettyHttpServerHandler());
+    }
+  }
 
-        private NettyHttpServerHandler() {
-            super(true);
-        }
+  private class NettyHttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-        @Override
-        public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request)
-                throws Exception {
-            if (!request.decoderResult().isSuccess()) {
-                sendError(ctx, HttpResponseStatus.BAD_REQUEST);
-                return;
-            }
-
-            Object[] objs = servletListener.getServlet(request.uri());
-            if (objs == null) {
-                sendError(ctx, HttpResponseStatus.NOT_FOUND);
-                return;
-            }
-
-            ServletURI servletUri = (ServletURI) objs[0];
-            HttpServlet servlet = (HttpServlet) objs[1];
-
-            SSLSession sslSession = null;
-
-            if (servlet.needsTlsSessionInfo() && sslContext != null) {
-                SslHandler handler = (SslHandler) ctx.channel().pipeline().get("ssl");
-                if (handler != null) {
-                    sslSession = handler.engine().getSession();
-                }
-            }
-
-            FullHttpResponse response;
-            try {
-                response = servlet.service(request, servletUri, sslSession, sslReverseProxyMode);
-            } catch (Exception ex) {
-                logException("exception raised while processing request", ex);
-                sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-                return;
-            }
-
-            boolean keepAlive = true;
-            int status = response.status().code();
-            if (status < 200 | status > 299) {
-                keepAlive = false;
-            }
-
-            ChannelFuture cf = ctx.writeAndFlush(response);
-            if (!keepAlive) {
-                cf.addListener(ChannelFutureListener.CLOSE);
-            }
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            if (ctx.channel().isActive()) {
-                sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
-            ByteBuf content = Unpooled.copiedBuffer("Failure: " + status + "\r\n",
-                    CharsetUtil.UTF_8);
-            FullHttpResponse response = new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1, status, content);
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
-
-            // Close the connection as soon as the error message is sent.
-            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-        }
-
-        private void logException(String msg, Exception ex) {
-            LOG.warn("{} - {}: {}", msg, ex.getClass().getName(), ex.getMessage());
-            LOG.debug(msg, ex);
-            return;
-        }
+    private NettyHttpServerHandler() {
+      super(true);
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
+    @Override
+    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request)
+            throws Exception {
+      if (!request.decoderResult().isSuccess()) {
+        sendError(ctx, HttpResponseStatus.BAD_REQUEST);
+        return;
+      }
 
-    private static Boolean epollAvailable;
+      Object[] objs = servletListener.getServlet(request.uri());
+      if (objs == null) {
+        sendError(ctx, HttpResponseStatus.NOT_FOUND);
+        return;
+      }
 
-    private static Boolean kqueueAvailable;
+      ServletURI servletUri = (ServletURI) objs[0];
+      HttpServlet servlet = (HttpServlet) objs[1];
 
-    private final int port;
+      SSLSession sslSession = null;
 
-    private final SslContext sslContext;
-
-    private final int numThreads;
-
-    private ServletListener servletListener;
-
-    private EventLoopGroup bossGroup;
-
-    private EventLoopGroup workerGroup;
-
-    private SslReverseProxyMode sslReverseProxyMode = SslReverseProxyMode.NONE;
-
-    public void setSslReverseProxyMode(SslReverseProxyMode mode) {
-        this.sslReverseProxyMode = (mode == null) ? SslReverseProxyMode.NONE : mode;
-    }
-
-    public HttpServer(SslContext sslContext, int port, int numThreads) {
-        this.sslContext = sslContext;
-        this.port = port;
-        this.numThreads = (numThreads > 0)
-                ? numThreads : Runtime.getRuntime().availableProcessors();
-    }
-
-    public void setServletListener(ServletListener servletListener) {
-        this.servletListener = servletListener;
-    }
-
-    static {
-        String os = System.getProperty("os.name").toLowerCase();
-        ClassLoader loader = HttpServer.class.getClassLoader();
-        if (os.contains("linux")) {
-            try {
-                Class<?> checkClazz = clazz("io.netty.channel.epoll.Epoll", false, loader);
-                Method mt = checkClazz.getMethod("isAvailable");
-                Object obj = mt.invoke(null);
-
-                if (obj instanceof Boolean) {
-                    epollAvailable = (Boolean) obj;
-                }
-            } catch (Throwable th) {
-                if (th instanceof ClassNotFoundException) {
-                    LOG.info("epoll linux is not in classpath");
-                } else {
-                    LOG.warn("could not use Epoll transport: {}", th.getMessage());
-                    LOG.debug("could not use Epoll transport", th);
-                }
-            }
-        } else if (os.contains("mac os") || os.contains("os x")) {
-            try {
-                Class<?> checkClazz = clazz("io.netty.channel.epoll.kqueue.KQueue", false, loader);
-                Method mt = checkClazz.getMethod("isAvailable");
-                Object obj = mt.invoke(null);
-                if (obj instanceof Boolean) {
-                    kqueueAvailable = (Boolean) obj;
-                }
-            } catch (Exception ex) {
-                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
-                LOG.debug("could not use KQueue transport", ex);
-            }
+      if (servlet.needsTlsSessionInfo() && sslContext != null) {
+        SslHandler handler = (SslHandler) ctx.channel().pipeline().get("ssl");
+        if (handler != null) {
+          sslSession = handler.engine().getSession();
         }
+      }
+
+      FullHttpResponse response;
+      try {
+        response = servlet.service(request, servletUri, sslSession, sslReverseProxyMode);
+      } catch (Exception ex) {
+        logException("exception raised while processing request", ex);
+        sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        return;
+      }
+
+      boolean keepAlive = true;
+      int status = response.status().code();
+      if (status < 200 | status > 299) {
+        keepAlive = false;
+      }
+
+      ChannelFuture cf = ctx.writeAndFlush(response);
+      if (!keepAlive) {
+        cf.addListener(ChannelFutureListener.CLOSE);
+      }
     }
 
-    @SuppressWarnings("unchecked")
-    public void start() {
-        int numProcessors = Runtime.getRuntime().availableProcessors();
-        Class<? extends ServerSocketChannel> channelClass = null;
-        int bossGroupThreads = numProcessors == 1 ? 1  : (numProcessors + 1) / 2;
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+      if (ctx.channel().isActive()) {
+        sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
 
-        ClassLoader loader = getClass().getClassLoader();
-        if (epollAvailable != null && epollAvailable.booleanValue()) {
-            try {
-                channelClass = (Class<? extends ServerSocketChannel>)
-                        clazz("io.netty.channel.epoll.EpollServerSocketChannel", false, loader);
+    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
+      ByteBuf content = Unpooled.copiedBuffer("Failure: " + status + "\r\n",
+          CharsetUtil.UTF_8);
+      FullHttpResponse response = new DefaultFullHttpResponse(
+          HttpVersion.HTTP_1_1, status, content);
+      response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
 
-                Class<?> clazz = clazz("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
-                Constructor<?> constructor = clazz.getConstructor(int.class);
-                this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
-                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
-                LOG.info("use Epoll Transport");
-            } catch (Throwable th) {
-                if (th instanceof ClassNotFoundException) {
-                    LOG.info("epoll linux is not in classpath");
-                } else {
-                    LogUtil.warn(LOG, th, "could not use Epoll transport");
-                }
-                channelClass = null;
-                this.bossGroup = null;
-                this.workerGroup = null;
-            }
-        } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
-            try {
-                channelClass = (Class<? extends ServerSocketChannel>)
-                        clazz("io.netty.channel.kqueue.KQueueServerSocketChannel", false, loader);
+      // Close the connection as soon as the error message is sent.
+      ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+    }
 
-                Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup",
-                        true, loader);
-                Constructor<?> constructor = clazz.getConstructor(int.class);
-                this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
-                this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
-                LOG.info("Use KQueue Transport");
-            } catch (Exception ex) {
-                LOG.warn("could not use KQueue transport: {}", ex.getMessage());
-                LOG.debug("could not use KQueue transport", ex);
-                channelClass = null;
-                this.bossGroup = null;
-                this.workerGroup = null;
-            }
+    private void logException(String msg, Exception ex) {
+      LOG.warn("{} - {}: {}", msg, ex.getClass().getName(), ex.getMessage());
+      LOG.debug(msg, ex);
+      return;
+    }
+  }
+
+  private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
+
+  private static Boolean epollAvailable;
+
+  private static Boolean kqueueAvailable;
+
+  private final int port;
+
+  private final SslContext sslContext;
+
+  private final int numThreads;
+
+  private ServletListener servletListener;
+
+  private EventLoopGroup bossGroup;
+
+  private EventLoopGroup workerGroup;
+
+  private SslReverseProxyMode sslReverseProxyMode = SslReverseProxyMode.NONE;
+
+  public void setSslReverseProxyMode(SslReverseProxyMode mode) {
+    this.sslReverseProxyMode = (mode == null) ? SslReverseProxyMode.NONE : mode;
+  }
+
+  public HttpServer(SslContext sslContext, int port, int numThreads) {
+    this.sslContext = sslContext;
+    this.port = port;
+    this.numThreads = (numThreads > 0)
+        ? numThreads : Runtime.getRuntime().availableProcessors();
+  }
+
+  public void setServletListener(ServletListener servletListener) {
+    this.servletListener = servletListener;
+  }
+
+  static {
+    String os = System.getProperty("os.name").toLowerCase();
+    ClassLoader loader = HttpServer.class.getClassLoader();
+    if (os.contains("linux")) {
+      try {
+        Class<?> checkClazz = clazz("io.netty.channel.epoll.Epoll", false, loader);
+        Method mt = checkClazz.getMethod("isAvailable");
+        Object obj = mt.invoke(null);
+
+        if (obj instanceof Boolean) {
+          epollAvailable = (Boolean) obj;
         }
-
-        if (this.bossGroup == null) {
-            channelClass = NioServerSocketChannel.class;
-            this.bossGroup = new NioEventLoopGroup(bossGroupThreads);
-            this.workerGroup = new NioEventLoopGroup(numThreads);
+      } catch (Throwable th) {
+        if (th instanceof ClassNotFoundException) {
+          LOG.info("epoll linux is not in classpath");
+        } else {
+          LOG.warn("could not use Epoll transport: {}", th.getMessage());
+          LOG.debug("could not use Epoll transport", th);
         }
+      }
+    } else if (os.contains("mac os") || os.contains("os x")) {
+      try {
+        Class<?> checkClazz = clazz("io.netty.channel.epoll.kqueue.KQueue", false, loader);
+        Method mt = checkClazz.getMethod("isAvailable");
+        Object obj = mt.invoke(null);
+        if (obj instanceof Boolean) {
+          kqueueAvailable = (Boolean) obj;
+        }
+      } catch (Exception ex) {
+        LOG.warn("could not use KQueue transport: {}", ex.getMessage());
+        LOG.debug("could not use KQueue transport", ex);
+      }
+    }
+  }
 
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup)
-            .channel(channelClass)
-            .handler(new LoggingHandler())
-            .childHandler(new NettyHttpServerInitializer());
+  @SuppressWarnings("unchecked")
+  public void start() {
+    int numProcessors = Runtime.getRuntime().availableProcessors();
+    Class<? extends ServerSocketChannel> channelClass = null;
+    int bossGroupThreads = numProcessors == 1 ? 1  : (numProcessors + 1) / 2;
 
-        bootstrap.bind(port).syncUninterruptibly();
-        LOG.info("HTTP server is listening on port {}", port);
+    ClassLoader loader = getClass().getClassLoader();
+    if (epollAvailable != null && epollAvailable.booleanValue()) {
+      try {
+        channelClass = (Class<? extends ServerSocketChannel>)
+            clazz("io.netty.channel.epoll.EpollServerSocketChannel", false, loader);
+
+        Class<?> clazz = clazz("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
+        Constructor<?> constructor = clazz.getConstructor(int.class);
+        this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
+        this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+        LOG.info("use Epoll Transport");
+      } catch (Throwable th) {
+        if (th instanceof ClassNotFoundException) {
+          LOG.info("epoll linux is not in classpath");
+        } else {
+          LogUtil.warn(LOG, th, "could not use Epoll transport");
+        }
+        channelClass = null;
+        this.bossGroup = null;
+        this.workerGroup = null;
+      }
+    } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
+      try {
+        channelClass = (Class<? extends ServerSocketChannel>)
+            clazz("io.netty.channel.kqueue.KQueueServerSocketChannel", false, loader);
+
+        Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup",
+            true, loader);
+        Constructor<?> constructor = clazz.getConstructor(int.class);
+        this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
+        this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
+        LOG.info("Use KQueue Transport");
+      } catch (Exception ex) {
+        LOG.warn("could not use KQueue transport: {}", ex.getMessage());
+        LOG.debug("could not use KQueue transport", ex);
+        channelClass = null;
+        this.bossGroup = null;
+        this.workerGroup = null;
+      }
     }
 
-    public void shutdown() {
-        bossGroup.shutdownGracefully();
-        bossGroup = null;
-        workerGroup.shutdownGracefully();
-        workerGroup = null;
+    if (this.bossGroup == null) {
+      channelClass = NioServerSocketChannel.class;
+      this.bossGroup = new NioEventLoopGroup(bossGroupThreads);
+      this.workerGroup = new NioEventLoopGroup(numThreads);
     }
 
-    private static Class<?> clazz(String clazzName, boolean initialize, ClassLoader clazzLoader)
-            throws ClassNotFoundException {
-        return Class.forName("io.netty.channel.epoll.EpollServerSocketChannel",
-                initialize, clazzLoader);
-    }
+    ServerBootstrap bootstrap = new ServerBootstrap();
+    bootstrap.group(bossGroup, workerGroup)
+      .channel(channelClass)
+      .handler(new LoggingHandler())
+      .childHandler(new NettyHttpServerInitializer());
+
+    bootstrap.bind(port).syncUninterruptibly();
+    LOG.info("HTTP server is listening on port {}", port);
+  }
+
+  public void shutdown() {
+    bossGroup.shutdownGracefully();
+    bossGroup = null;
+    workerGroup.shutdownGracefully();
+    workerGroup = null;
+  }
+
+  private static Class<?> clazz(String clazzName, boolean initialize, ClassLoader clazzLoader)
+      throws ClassNotFoundException {
+    return Class.forName("io.netty.channel.epoll.EpollServerSocketChannel",
+        initialize, clazzLoader);
+  }
 }

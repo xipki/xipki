@@ -20,73 +20,74 @@ package org.xipki.datasource;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum DatabaseType {
 
-    H2,
-    DB2,
-    HSQL,
-    MYSQL,
-    MARIADB,
-    ORACLE,
-    POSTGRES,
-    UNKNOWN;
+  H2,
+  DB2,
+  HSQL,
+  MYSQL,
+  MARIADB,
+  ORACLE,
+  POSTGRES,
+  UNKNOWN;
 
-    public static DatabaseType forDriver(String driverClass) {
-        ParamUtil.requireNonNull("driverClass", driverClass);
-        return getDatabaseType(driverClass);
-    }
+  public static DatabaseType forDriver(String driverClass) {
+    ParamUtil.requireNonNull("driverClass", driverClass);
+    return getDatabaseType(driverClass);
+  }
 
-    public static DatabaseType forDataSourceClass(String datasourceClass) {
-        ParamUtil.requireNonNull("datasourceClass", datasourceClass);
-        return getDatabaseType(datasourceClass);
-    }
+  public static DatabaseType forDataSourceClass(String datasourceClass) {
+    ParamUtil.requireNonNull("datasourceClass", datasourceClass);
+    return getDatabaseType(datasourceClass);
+  }
 
-    public static DatabaseType forJdbcUrl(String url) {
-        ParamUtil.requireNonNull("url", url);
-        url = url.toLowerCase();
-        if (url.startsWith("jdbc:db2")) {
-            return DB2;
-        } else if (url.startsWith("jdbc:h2")) {
-            return H2;
-        } else if (url.startsWith("jdbc:hsqldb")) {
-            return HSQL;
-        } else if (url.startsWith("jdbc:mysql")) {
-            return MYSQL;
-        } else if (url.startsWith("jdbc:mariadb")) {
-            return MARIADB;
-        } else if (url.startsWith("jdbc:oracle")) {
-            return ORACLE;
-        } else if (url.startsWith("jdbc:pgsql")
-                || url.startsWith("jdbc:postgres")
-                || url.startsWith("jdbc:postgresql")) {
-            return POSTGRES;
-        } else {
-            return UNKNOWN;
-        }
+  public static DatabaseType forJdbcUrl(String url) {
+    ParamUtil.requireNonNull("url", url);
+    url = url.toLowerCase();
+    if (url.startsWith("jdbc:db2")) {
+      return DB2;
+    } else if (url.startsWith("jdbc:h2")) {
+      return H2;
+    } else if (url.startsWith("jdbc:hsqldb")) {
+      return HSQL;
+    } else if (url.startsWith("jdbc:mysql")) {
+      return MYSQL;
+    } else if (url.startsWith("jdbc:mariadb")) {
+      return MARIADB;
+    } else if (url.startsWith("jdbc:oracle")) {
+      return ORACLE;
+    } else if (url.startsWith("jdbc:pgsql")
+        || url.startsWith("jdbc:postgres")
+        || url.startsWith("jdbc:postgresql")) {
+      return POSTGRES;
+    } else {
+      return UNKNOWN;
     }
+  }
 
-    private static DatabaseType getDatabaseType(String className) {
-        if (className.contains("db2.")) {
-            return DatabaseType.DB2;
-        } else if (className.contains("h2.")) {
-            return DatabaseType.H2;
-        } else if (className.contains("hsqldb.")) {
-            return DatabaseType.HSQL;
-        } else if (className.contains("mysql.")) {
-            return DatabaseType.MYSQL;
-        } else if (className.contains("mariadb.")) {
-            return DatabaseType.MARIADB;
-        } else if (className.contains("oracle.")) {
-            return DatabaseType.ORACLE;
-        } else if (className.contains("postgres.") || className.contains("postgresql.")) {
-            return DatabaseType.POSTGRES;
-        } else {
-            return DatabaseType.UNKNOWN;
-        }
+  private static DatabaseType getDatabaseType(String className) {
+    if (className.contains("db2.")) {
+      return DatabaseType.DB2;
+    } else if (className.contains("h2.")) {
+      return DatabaseType.H2;
+    } else if (className.contains("hsqldb.")) {
+      return DatabaseType.HSQL;
+    } else if (className.contains("mysql.")) {
+      return DatabaseType.MYSQL;
+    } else if (className.contains("mariadb.")) {
+      return DatabaseType.MARIADB;
+    } else if (className.contains("oracle.")) {
+      return DatabaseType.ORACLE;
+    } else if (className.contains("postgres.") || className.contains("postgresql.")) {
+      return DatabaseType.POSTGRES;
+    } else {
+      return DatabaseType.UNKNOWN;
     }
+  }
 
 }

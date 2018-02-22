@@ -26,60 +26,61 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class P11SlotRefreshResult {
 
-    private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
+  private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
 
-    private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
+  private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
 
-    private final Set<Long> mechanisms = new HashSet<>();
+  private final Set<Long> mechanisms = new HashSet<>();
 
-    public P11SlotRefreshResult() {
+  public P11SlotRefreshResult() {
+  }
+
+  public Map<P11ObjectIdentifier, P11Identity> identities() {
+    return identities;
+  }
+
+  public Map<P11ObjectIdentifier, X509Cert> certificates() {
+    return certificates;
+  }
+
+  public Set<Long> mechanisms() {
+    return mechanisms;
+  }
+
+  public void addIdentity(P11Identity identity) {
+    ParamUtil.requireNonNull("identity", identity);
+    this.identities.put(identity.identityId().objectId(), identity);
+  }
+
+  public void addMechanism(long mechanism) {
+    this.mechanisms.add(mechanism);
+  }
+
+  public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
+    ParamUtil.requireNonNull("objectId", objectId);
+    ParamUtil.requireNonNull("certificate", certificate);
+    this.certificates.put(objectId, certificate);
+  }
+
+  /**
+   * Returns the certificate of the given identifier {@code id}.
+   * @param id
+   *          Identifier. Must not be {@code null}.
+   * @return the certificate of the given identifier.
+   */
+  public X509Cert getCertForId(byte[] id) {
+    for (P11ObjectIdentifier objId : certificates.keySet()) {
+      if (objId.matchesId(id)) {
+        return certificates.get(objId);
+      }
     }
-
-    public Map<P11ObjectIdentifier, P11Identity> identities() {
-        return identities;
-    }
-
-    public Map<P11ObjectIdentifier, X509Cert> certificates() {
-        return certificates;
-    }
-
-    public Set<Long> mechanisms() {
-        return mechanisms;
-    }
-
-    public void addIdentity(P11Identity identity) {
-        ParamUtil.requireNonNull("identity", identity);
-        this.identities.put(identity.identityId().objectId(), identity);
-    }
-
-    public void addMechanism(long mechanism) {
-        this.mechanisms.add(mechanism);
-    }
-
-    public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
-        ParamUtil.requireNonNull("objectId", objectId);
-        ParamUtil.requireNonNull("certificate", certificate);
-        this.certificates.put(objectId, certificate);
-    }
-
-    /**
-     * Returns the certificate of the given identifier {@code id}.
-     * @param id
-     *          Identifier. Must not be {@code null}.
-     * @return the certificate of the given identifier.
-     */
-    public X509Cert getCertForId(byte[] id) {
-        for (P11ObjectIdentifier objId : certificates.keySet()) {
-            if (objId.matchesId(id)) {
-                return certificates.get(objId);
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 }

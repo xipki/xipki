@@ -32,38 +32,39 @@ import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.util.KeyUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class P12SecurityAction extends SecurityAction {
 
-    @Option(name = "--p12", required = true,
-            description = "PKCS#12 keystore file\n(required)")
-    @Completion(FilePathCompleter.class)
-    protected String p12File;
+  @Option(name = "--p12", required = true,
+      description = "PKCS#12 keystore file\n(required)")
+  @Completion(FilePathCompleter.class)
+  protected String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    protected String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  protected String password;
 
-    protected char[] getPassword() throws IOException {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
+  protected char[] getPassword() throws IOException {
+    char[] pwdInChar = readPasswordIfNotSet(password);
+    if (pwdInChar != null) {
+      password = new String(pwdInChar);
     }
+    return pwdInChar;
+  }
 
-    protected KeyStore getKeyStore()
-            throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
-                NoSuchProviderException {
-        KeyStore ks;
-        try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
-            ks = KeyUtil.getKeyStore("PKCS12");
-            ks.load(in, getPassword());
-        }
-        return ks;
+  protected KeyStore getKeyStore()
+      throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
+        NoSuchProviderException {
+    KeyStore ks;
+    try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
+      ks = KeyUtil.getKeyStore("PKCS12");
+      ks.load(in, getPassword());
     }
+    return ks;
+  }
 
 }

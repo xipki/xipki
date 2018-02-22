@@ -28,258 +28,259 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class StringUtil {
 
-    private StringUtil() {
+  private StringUtil() {
+  }
+
+  public static List<String> splitByComma(String str) {
+    return split(str, ",");
+  }
+
+  public static List<String> split(String str, String delim) {
+    if (str == null) {
+      return null;
     }
 
-    public static List<String> splitByComma(String str) {
-        return split(str, ",");
+    if (str.isEmpty()) {
+      return Collections.emptyList();
     }
 
-    public static List<String> split(String str, String delim) {
-        if (str == null) {
-            return null;
-        }
+    StringTokenizer st = new StringTokenizer(str, delim);
+    List<String> ret = new ArrayList<String>(st.countTokens());
 
-        if (str.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        StringTokenizer st = new StringTokenizer(str, delim);
-        List<String> ret = new ArrayList<String>(st.countTokens());
-
-        while (st.hasMoreTokens()) {
-            ret.add(st.nextToken());
-        }
-
-        return ret;
+    while (st.hasMoreTokens()) {
+      ret.add(st.nextToken());
     }
 
-    public static boolean isBlank(String str) {
-        return str == null || str.isEmpty();
+    return ret;
+  }
+
+  public static boolean isBlank(String str) {
+    return str == null || str.isEmpty();
+  }
+
+  public static boolean isNotBlank(String str) {
+    return str != null && !str.isEmpty();
+  }
+
+  public static Set<String> splitByCommaAsSet(String str) {
+    return splitAsSet(str, ",");
+  }
+
+  public static Set<String> splitAsSet(String str, String delim) {
+    if (str == null) {
+      return null;
     }
 
-    public static boolean isNotBlank(String str) {
-        return str != null && !str.isEmpty();
+    if (str.isEmpty()) {
+      return Collections.emptySet();
     }
 
-    public static Set<String> splitByCommaAsSet(String str) {
-        return splitAsSet(str, ",");
+    StringTokenizer st = new StringTokenizer(str, delim);
+    Set<String> ret = new HashSet<String>(st.countTokens());
+
+    while (st.hasMoreTokens()) {
+      ret.add(st.nextToken());
     }
 
-    public static Set<String> splitAsSet(String str, String delim) {
-        if (str == null) {
-            return null;
-        }
+    return ret;
+  }
 
-        if (str.isEmpty()) {
-            return Collections.emptySet();
-        }
+  public static String collectionAsStringByComma(Collection<String> set) {
+    return collectionAsString(set, ",");
+  }
 
-        StringTokenizer st = new StringTokenizer(str, delim);
-        Set<String> ret = new HashSet<String>(st.countTokens());
-
-        while (st.hasMoreTokens()) {
-            ret.add(st.nextToken());
-        }
-
-        return ret;
+  public static String collectionAsString(Collection<String> set, String delim) {
+    if (set == null) {
+      return null;
     }
 
-    public static String collectionAsStringByComma(Collection<String> set) {
-        return collectionAsString(set, ",");
+    StringBuilder sb = new StringBuilder();
+    for (String m : set) {
+      sb.append(m).append(delim);
+    }
+    int len = sb.length();
+    if (len > 0) {
+      sb.delete(len - delim.length(), len);
+    }
+    return sb.toString();
+  }
+
+  public static boolean startsWithIgnoreCase(String str, String prefix) {
+    if (str.length() < prefix.length()) {
+      return false;
     }
 
-    public static String collectionAsString(Collection<String> set, String delim) {
-        if (set == null) {
-            return null;
-        }
+    return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
+  }
 
-        StringBuilder sb = new StringBuilder();
-        for (String m : set) {
-            sb.append(m).append(delim);
-        }
-        int len = sb.length();
-        if (len > 0) {
-            sb.delete(len - delim.length(), len);
-        }
-        return sb.toString();
+  public static boolean isNumber(String str) {
+    return isNumber(str, 10);
+  }
+
+  public static boolean isNumber(String str, int radix) {
+    ParamUtil.requireNonNull("str", str);
+    try {
+      Integer.parseInt(str, radix);
+      return true;
+    } catch (NumberFormatException ex) {
+      return false;
+    }
+  }
+
+  public static String formatText(String text, int minLen) {
+    ParamUtil.requireNonNull("text", text);
+    int len = text.length();
+    if (len >= minLen) {
+      return text;
     }
 
-    public static boolean startsWithIgnoreCase(String str, String prefix) {
-        if (str.length() < prefix.length()) {
-            return false;
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < minLen - len; i++) {
+      sb.append(" ");
+    }
+    sb.append(text);
+    return sb.toString();
+  }
+
+  public static String formatAccount(long account, boolean withPrefix) {
+    int minLen = withPrefix ? 12 : 0;
+    return formatAccount(account, minLen);
+  }
+
+  public static String formatAccount(long account, int minLen) {
+    String accountS = Long.toString(account);
+
+    final int n = accountS.length();
+    if (n > 3) {
+      StringBuilder sb = new StringBuilder(n + 3);
+      int firstBlockLen = n % 3;
+      if (firstBlockLen != 0) {
+        sb.append(accountS.substring(0, firstBlockLen));
+        sb.append(',');
+      }
+
+      for (int i = 0;; i++) {
+        int offset = firstBlockLen + i * 3;
+        if (offset >= n) {
+          break;
         }
 
-        return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
+        sb.append(accountS.substring(offset, offset + 3));
+        if (offset + 3 < n) {
+          sb.append(',');
+        }
+      }
+      accountS = sb.toString();
     }
 
-    public static boolean isNumber(String str) {
-        return isNumber(str, 10);
+    return formatText(accountS, minLen);
+  }
+
+  public static String formatTime(long seconds, boolean withPrefix) {
+    int minLen = withPrefix ? 12 : 0;
+    return formatTime(seconds, minLen);
+  }
+
+  private static String formatTime(long seconds, int minLen) {
+    long minutes = seconds / 60;
+
+    StringBuilder sb = new StringBuilder();
+    long hour = minutes / 60;
+    // hours
+    if (hour > 0) {
+      sb.append(hour).append(':');
     }
 
-    public static boolean isNumber(String str, int radix) {
-        ParamUtil.requireNonNull("str", str);
-        try {
-            Integer.parseInt(str, radix);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
+    long modMinute = minutes % 60;
+    // minutes
+    if (modMinute < 10) {
+      sb.append('0');
+    }
+    sb.append(modMinute).append(':');
+
+    long modSec = seconds % 60;
+    // seconds
+    if (modSec < 10) {
+      sb.append('0');
+    }
+    sb.append(modSec);
+
+    return formatText(sb.toString(), minLen);
+  }
+
+  public static char[] merge(char[][] parts) {
+    int sum = 0;
+    for (int i = 0; i < parts.length; i++) {
+      sum += parts[i].length;
     }
 
-    public static String formatText(String text, int minLen) {
-        ParamUtil.requireNonNull("text", text);
-        int len = text.length();
-        if (len >= minLen) {
-            return text;
-        }
+    char[] ret = new char[sum];
+    int destPos = 0;
+    for (int i = 0; i < parts.length; i++) {
+      char[] part = parts[i];
+      System.arraycopy(part, 0, ret, destPos, part.length);
+      destPos += part.length;
+    }
+    return ret;
+  }
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < minLen - len; i++) {
-            sb.append(" ");
-        }
-        sb.append(text);
-        return sb.toString();
+  @SuppressWarnings("deprecation")
+  public static String getRelativeRequestUri(String servletPath, String requestUri) {
+    String path = "";
+    int len = servletPath.length();
+    if (requestUri.length() > len + 1) {
+      path = requestUri.substring(len + 1);
     }
 
-    public static String formatAccount(long account, boolean withPrefix) {
-        int minLen = withPrefix ? 12 : 0;
-        return formatAccount(account, minLen);
+    if (path.isEmpty()) {
+      path = "/";
+    } else if (path.charAt(0) != '/') {
+      path = "/" + path;
     }
 
-    public static String formatAccount(long account, int minLen) {
-        String accountS = Long.toString(account);
-
-        final int n = accountS.length();
-        if (n > 3) {
-            StringBuilder sb = new StringBuilder(n + 3);
-            int firstBlockLen = n % 3;
-            if (firstBlockLen != 0) {
-                sb.append(accountS.substring(0, firstBlockLen));
-                sb.append(',');
-            }
-
-            for (int i = 0;; i++) {
-                int offset = firstBlockLen + i * 3;
-                if (offset >= n) {
-                    break;
-                }
-
-                sb.append(accountS.substring(offset, offset + 3));
-                if (offset + 3 < n) {
-                    sb.append(',');
-                }
-            }
-            accountS = sb.toString();
-        }
-
-        return formatText(accountS, minLen);
+    try {
+      return URLDecoder.decode(path, "UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      return URLDecoder.decode(path);
     }
+  }
 
-    public static String formatTime(long seconds, boolean withPrefix) {
-        int minLen = withPrefix ? 12 : 0;
-        return formatTime(seconds, minLen);
+  public static String concat(String s1, String... strs) {
+    int len = (s1 == null) ? 4 : s1.length();
+    for (String str : strs) {
+      len += (str == null) ? 4 : str.length();
     }
-
-    private static String formatTime(long seconds, int minLen) {
-        long minutes = seconds / 60;
-
-        StringBuilder sb = new StringBuilder();
-        long hour = minutes / 60;
-        // hours
-        if (hour > 0) {
-            sb.append(hour).append(':');
-        }
-
-        long modMinute = minutes % 60;
-        // minutes
-        if (modMinute < 10) {
-            sb.append('0');
-        }
-        sb.append(modMinute).append(':');
-
-        long modSec = seconds % 60;
-        // seconds
-        if (modSec < 10) {
-            sb.append('0');
-        }
-        sb.append(modSec);
-
-        return formatText(sb.toString(), minLen);
+    StringBuilder sb = new StringBuilder(len);
+    sb.append(s1);
+    for (String str : strs) {
+      sb.append(str);
     }
+    return sb.toString();
+  }
 
-    public static char[] merge(char[][] parts) {
-        int sum = 0;
-        for (int i = 0; i < parts.length; i++) {
-            sum += parts[i].length;
-        }
-
-        char[] ret = new char[sum];
-        int destPos = 0;
-        for (int i = 0; i < parts.length; i++) {
-            char[] part = parts[i];
-            System.arraycopy(part, 0, ret, destPos, part.length);
-            destPos += part.length;
-        }
-        return ret;
+  public static String concatObjects(Object o1, Object... objs) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(o1);
+    for (Object obj : objs) {
+      sb.append(obj);
     }
+    return sb.toString();
+  }
 
-    @SuppressWarnings("deprecation")
-    public static String getRelativeRequestUri(String servletPath, String requestUri) {
-        String path = "";
-        int len = servletPath.length();
-        if (requestUri.length() > len + 1) {
-            path = requestUri.substring(len + 1);
-        }
-
-        if (path.isEmpty()) {
-            path = "/";
-        } else if (path.charAt(0) != '/') {
-            path = "/" + path;
-        }
-
-        try {
-            return URLDecoder.decode(path, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            return URLDecoder.decode(path);
-        }
+  public static String concatObjectsCap(int cap, Object o1, Object... objs) {
+    StringBuilder sb = new StringBuilder(cap);
+    sb.append(o1);
+    for (Object obj : objs) {
+      sb.append(obj);
     }
-
-    public static String concat(String s1, String... strs) {
-        int len = (s1 == null) ? 4 : s1.length();
-        for (String str : strs) {
-            len += (str == null) ? 4 : str.length();
-        }
-        StringBuilder sb = new StringBuilder(len);
-        sb.append(s1);
-        for (String str : strs) {
-            sb.append(str);
-        }
-        return sb.toString();
-    }
-
-    public static String concatObjects(Object o1, Object... objs) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(o1);
-        for (Object obj : objs) {
-            sb.append(obj);
-        }
-        return sb.toString();
-    }
-
-    public static String concatObjectsCap(int cap, Object o1, Object... objs) {
-        StringBuilder sb = new StringBuilder(cap);
-        sb.append(o1);
-        for (Object obj : objs) {
-            sb.append(obj);
-        }
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 
 }

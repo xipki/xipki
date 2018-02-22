@@ -23,28 +23,30 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public interface HttpServlet {
 
-    boolean needsTlsSessionInfo();
+  boolean needsTlsSessionInfo();
 
-    /**
-     * @param request
-     *          The request. Must not be {@code null}.
+  /**
+   * TODO.
+   * @param request
+   *          The request. Must not be {@code null}.
 .     * @param servletUri
-     *          The servlet URI (URI part after the servlet alias). Must not be {@code null}.
-     * @param sslSession
-     *          SSLSession associated with this connection. Could be {@code null}.
-     * @param sslReverseProxyMode
-     *          Mode of the SSL reverse proxy. Must not be {@code null}.
-     * @return the HTTP response
-     * @throws Exception
-     *          If error occurs
-     */
-    FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception;
+   *          The servlet URI (URI part after the servlet alias). Must not be {@code null}.
+   * @param sslSession
+   *          SSLSession associated with this connection. Could be {@code null}.
+   * @param sslReverseProxyMode
+   *          Mode of the SSL reverse proxy. Must not be {@code null}.
+   * @return the HTTP response
+   * @throws Exception
+   *          If error occurs
+   */
+  FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+      SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception;
 
 }

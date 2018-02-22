@@ -28,102 +28,103 @@ import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface ConcurrentContentSigner {
 
-    String getName();
+  String getName();
 
-    String getAlgorithmName();
+  String getAlgorithmName();
 
-    /**
-     * Returns the algorithm code in XiPKI context.
-     * @return algorithm code
-     */
-    AlgorithmCode algorithmCode();
+  /**
+   * Returns the algorithm code in XiPKI context.
+   * @return algorithm code
+   */
+  AlgorithmCode algorithmCode();
 
-    boolean isMac();
+  boolean isMac();
 
-    byte[] getSha1OfMacKey();
+  byte[] getSha1OfMacKey();
 
-    /**
-     * Get the signing key.
-     * @return the signing key if possible. {@code null} may be returned.
-     */
-    Key getSigningKey();
+  /**
+   * Get the signing key.
+   * @return the signing key if possible. {@code null} may be returned.
+   */
+  Key getSigningKey();
 
-    /**
-     * Sets the public key.
-     * @param publicKey
-     *          Public key of this signer. Must not be {@code null}.
-     */
-    void setPublicKey(PublicKey publicKey);
+  /**
+   * Sets the public key.
+   * @param publicKey
+   *          Public key of this signer. Must not be {@code null}.
+   */
+  void setPublicKey(PublicKey publicKey);
 
-    PublicKey getPublicKey();
+  PublicKey getPublicKey();
 
-    X509Certificate getCertificate();
+  X509Certificate getCertificate();
 
-    X509CertificateHolder getBcCertificate();
+  X509CertificateHolder getBcCertificate();
 
-    /**
-     *
-     * @param certchain
-     *          Certificate chain of this signer. Could be {@code null}.
-     */
-    void setCertificateChain(X509Certificate[] certchain);
+  /**
+   * TODO.
+   * @param certchain
+   *          Certificate chain of this signer. Could be {@code null}.
+   */
+  void setCertificateChain(X509Certificate[] certchain);
 
-    X509Certificate[] getCertificateChain();
+  X509Certificate[] getCertificateChain();
 
-    X509CertificateHolder[] getBcCertificateChain();
+  X509CertificateHolder[] getBcCertificateChain();
 
-    /**
-     * Initializes me.
-     * @param conf
-     *          Configuration. Could be {@code null}.
-     * @param passwordResolver
-     *          Password resolver. Could be {@code null}.
-     * @throws XiSecurityException
-     *         if error during the initialization occurs.
-     */
-    void initialize(String conf, PasswordResolver passwordResolver)
-            throws XiSecurityException;
+  /**
+   * Initializes me.
+   * @param conf
+   *          Configuration. Could be {@code null}.
+   * @param passwordResolver
+   *          Password resolver. Could be {@code null}.
+   * @throws XiSecurityException
+   *         if error during the initialization occurs.
+   */
+  void initialize(String conf, PasswordResolver passwordResolver)
+      throws XiSecurityException;
 
-    /**
-     * Sign the data.
-     * @param data
-     *          Data to be signed. Must not be {@code null}.
-     * @return the signature
-     * @throws NoIdleSignerException
-     *         If no idle signer is available
-     * @throws SignatureException
-     *         if could not sign the data.
-     */
-    byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
+  /**
+   * Sign the data.
+   * @param data
+   *          Data to be signed. Must not be {@code null}.
+   * @return the signature
+   * @throws NoIdleSignerException
+   *         If no idle signer is available
+   * @throws SignatureException
+   *         if could not sign the data.
+   */
+  byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
 
-    /**
-     * Borrows a signer with implementation-dependent default timeout.
-     * @return the signer
-     * @throws NoIdleSignerException
-     *         If no idle signer is available
-     */
-    ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException;
+  /**
+   * Borrows a signer with implementation-dependent default timeout.
+   * @return the signer
+   * @throws NoIdleSignerException
+   *         If no idle signer is available
+   */
+  ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException;
 
-    /**
-     * Borrows a signer with the given {@code soTimeout}.
-     * @param soTimeout timeout in milliseconds, 0 for infinitely.
-     * @return the signer
-     * @throws NoIdleSignerException
-     *         If no idle signer is available
-     */
-    ConcurrentBagEntrySigner borrowSigner(int soTimeout)
-            throws NoIdleSignerException;
+  /**
+   * Borrows a signer with the given {@code soTimeout}.
+   * @param soTimeout timeout in milliseconds, 0 for infinitely.
+   * @return the signer
+   * @throws NoIdleSignerException
+   *         If no idle signer is available
+   */
+  ConcurrentBagEntrySigner borrowSigner(int soTimeout)
+      throws NoIdleSignerException;
 
-    void requiteSigner(ConcurrentBagEntrySigner signer);
+  void requiteSigner(ConcurrentBagEntrySigner signer);
 
-    boolean isHealthy();
+  boolean isHealthy();
 
-    void shutdown();
+  void shutdown();
 
 }

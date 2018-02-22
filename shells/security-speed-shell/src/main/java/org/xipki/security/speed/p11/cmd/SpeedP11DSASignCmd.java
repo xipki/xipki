@@ -27,43 +27,44 @@ import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.security.speed.p11.P11DSASignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-dsa-sign-p11",
-        description = "performance test of PKCS#11 DSA signature creation")
+    description = "performance test of PKCS#11 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP11DSASignCmd extends SpeedP11Action {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer plen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer plen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qlen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qlen;
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(DSASigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(DSASigAlgCompleter.class)
+  private String sigAlgo;
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        if (qlen == null) {
-            qlen = (plen >= 2048) ? 256 : 160;
-        }
-
-        if (plen == 1024) {
-            if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
-                throw new IllegalCmdParamException(
-                        "only SHA1withDSA is permitted for DSA with 1024 bit");
-            }
-        }
-
-        return new P11DSASignLoadTest(securityFactory, getSlot(), sigAlgo, plen, qlen);
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    if (qlen == null) {
+      qlen = (plen >= 2048) ? 256 : 160;
     }
+
+    if (plen == 1024) {
+      if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
+        throw new IllegalCmdParamException(
+            "only SHA1withDSA is permitted for DSA with 1024 bit");
+      }
+    }
+
+    return new P11DSASignLoadTest(securityFactory, getSlot(), sigAlgo, plen, qlen);
+  }
 
 }

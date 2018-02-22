@@ -31,36 +31,37 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "add-cert-p11",
-        description = "add certificate to PKCS#11 device")
+    description = "add certificate to PKCS#11 device")
 @Service
 public class P11CertAddCmd extends SecurityAction {
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--cert", required = true,
-            description = "certificate file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert", required = true,
+      description = "certificate file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected Object execute0() throws Exception {
-        X509Certificate cert = X509Util.parseCert(certFile);
-        P11Slot slot = getSlot(moduleName, slotIndex);
-        P11ObjectIdentifier objectId = slot.addCert(cert);
-        println("added certificate under " + objectId);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    X509Certificate cert = X509Util.parseCert(certFile);
+    P11Slot slot = getSlot(moduleName, slotIndex);
+    P11ObjectIdentifier objectId = slot.addCert(cert);
+    println("added certificate under " + objectId);
+    return null;
+  }
 
 }

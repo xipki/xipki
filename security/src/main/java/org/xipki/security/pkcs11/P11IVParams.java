@@ -25,15 +25,15 @@ package org.xipki.security.pkcs11;
 // CHECKSTYLE:SKIP
 public class P11IVParams implements P11Params {
 
-    private final byte[] iv;
+  private final byte[] iv;
 
-    public P11IVParams(byte[] iv) {
-        this.iv = iv;
-    }
+  public P11IVParams(byte[] iv) {
+    this.iv = iv;
+  }
 
-    // CHECKSTYLE:SKIP
-    public byte[] getIV() {
-        return iv;
-    }
+  // CHECKSTYLE:SKIP
+  public byte[] getIV() {
+    return iv;
+  }
 
 }

@@ -28,35 +28,36 @@ import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "rm-cert-p11",
-        description = "remove certificate from PKCS#11 device")
+    description = "remove certificate from PKCS#11 device")
 @Service
 public class P11CertDeleteCmd extends SecurityAction {
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--id", required = true,
-            description = "id of the certificate in the PKCS#11 device\n(required)")
-    private String id;
+  @Option(name = "--id", required = true,
+      description = "id of the certificate in the PKCS#11 device\n(required)")
+  private String id;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot(moduleName, slotIndex);
-        P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
-        slot.removeCerts(objectId);
-        println("deleted certificates");
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot(moduleName, slotIndex);
+    P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
+    slot.removeCerts(objectId);
+    println("deleted certificates");
+    return null;
+  }
 
 }

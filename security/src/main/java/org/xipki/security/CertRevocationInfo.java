@@ -23,77 +23,78 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertRevocationInfo {
 
-    private CrlReason reason;
+  private CrlReason reason;
 
-    private Date revocationTime;
+  private Date revocationTime;
 
-    private Date invalidityTime;
+  private Date invalidityTime;
 
-    public CertRevocationInfo(CrlReason reason) {
-        this(reason, new Date(), null);
+  public CertRevocationInfo(CrlReason reason) {
+    this(reason, new Date(), null);
+  }
+
+  public CertRevocationInfo(int reasonCode) {
+    this(reasonCode, new Date(), null);
+  }
+
+  public CertRevocationInfo(CrlReason reason, Date revocationTime, Date invalidityTime) {
+    this.reason = ParamUtil.requireNonNull("reason", reason);
+    this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
+    this.invalidityTime = invalidityTime;
+  }
+
+  public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime) {
+    this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
+    this.reason = CrlReason.forReasonCode(reasonCode);
+    this.invalidityTime = invalidityTime;
+  }
+
+  public void setReason(CrlReason reason) {
+    this.reason = ParamUtil.requireNonNull("reason", reason);
+  }
+
+  public CrlReason reason() {
+    return reason;
+  }
+
+  public void setRevocationTime(Date revocationTime) {
+    this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
+  }
+
+  /**
+   * Gets the revocation time.
+   * @return revocation time, never be null
+   */
+  public Date revocationTime() {
+    if (revocationTime == null) {
+      revocationTime = new Date();
     }
+    return revocationTime;
+  }
 
-    public CertRevocationInfo(int reasonCode) {
-        this(reasonCode, new Date(), null);
-    }
+  /**
+   * Get the invalidity time.
+   * @return invalidity time, may be null
+   */
+  public Date invalidityTime() {
+    return invalidityTime;
+  }
 
-    public CertRevocationInfo(CrlReason reason, Date revocationTime, Date invalidityTime) {
-        this.reason = ParamUtil.requireNonNull("reason", reason);
-        this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
-        this.invalidityTime = invalidityTime;
-    }
+  public void setInvalidityTime(Date invalidityTime) {
+    this.invalidityTime = invalidityTime;
+  }
 
-    public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime) {
-        this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
-        this.reason = CrlReason.forReasonCode(reasonCode);
-        this.invalidityTime = invalidityTime;
-    }
-
-    public void setReason(CrlReason reason) {
-        this.reason = ParamUtil.requireNonNull("reason", reason);
-    }
-
-    public CrlReason reason() {
-        return reason;
-    }
-
-    public void setRevocationTime(Date revocationTime) {
-        this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
-    }
-
-    /**
-     * Gets the revocation time.
-     * @return revocation time, never be null
-     */
-    public Date revocationTime() {
-        if (revocationTime == null) {
-            revocationTime = new Date();
-        }
-        return revocationTime;
-    }
-
-    /**
-     * Get the invalidity time.
-     * @return invalidity time, may be null
-     */
-    public Date invalidityTime() {
-        return invalidityTime;
-    }
-
-    public void setInvalidityTime(Date invalidityTime) {
-        this.invalidityTime = invalidityTime;
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime,
-                "\ninvalidityTime: ", invalidityTime);
-    }
+  @Override
+  public String toString() {
+    return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime,
+        "\ninvalidityTime: ", invalidityTime);
+  }
 
 }

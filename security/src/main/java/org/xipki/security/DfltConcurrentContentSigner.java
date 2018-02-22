@@ -44,242 +44,244 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DfltConcurrentContentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DfltConcurrentContentSigner.class);
 
-    private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
+  private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
 
-    private static int defaultSignServiceTimeout = 10000; // 10 seconds
+  private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
-    private final ConcurrentBag<ConcurrentBagEntrySigner> signers = new ConcurrentBag<>();
+  private final ConcurrentBag<ConcurrentBagEntrySigner> signers = new ConcurrentBag<>();
 
-    private final String name;
+  private final String name;
 
-    private final String algorithmName;
+  private final String algorithmName;
 
-    private final boolean mac;
+  private final boolean mac;
 
-    private byte[] sha1OfMacKey;
+  private byte[] sha1OfMacKey;
 
-    private final Key signingKey;
+  private final Key signingKey;
 
-    private final AlgorithmCode algorithmCode;
+  private final AlgorithmCode algorithmCode;
 
-    private PublicKey publicKey;
+  private PublicKey publicKey;
 
-    private X509Certificate[] certificateChain;
+  private X509Certificate[] certificateChain;
 
-    private X509CertificateHolder[] bcCertificateChain;
+  private X509CertificateHolder[] bcCertificateChain;
 
-    static {
-        final String propKey = "org.xipki.security.signservice.timeout";
-        String str = System.getProperty(propKey);
-        if (str != null) {
-            int vi = Integer.parseInt(str);
-            // valid value is between 0 and 60 seconds
-            if (vi < 0 || vi > 60 * 1000) {
-                LOG.error("invalid {}: {}", propKey, vi);
-            } else {
-                LOG.info("use {}: {}", propKey, vi);
-                defaultSignServiceTimeout = vi;
-            }
-        }
+  static {
+    final String propKey = "org.xipki.security.signservice.timeout";
+    String str = System.getProperty(propKey);
+    if (str != null) {
+      int vi = Integer.parseInt(str);
+      // valid value is between 0 and 60 seconds
+      if (vi < 0 || vi > 60 * 1000) {
+        LOG.error("invalid {}: {}", propKey, vi);
+      } else {
+        LOG.info("use {}: {}", propKey, vi);
+        defaultSignServiceTimeout = vi;
+      }
+    }
+  }
+
+  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers)
+      throws NoSuchAlgorithmException {
+    this(mac, signers, null);
+  }
+
+  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers,
+      Key signingKey) throws NoSuchAlgorithmException {
+    ParamUtil.requireNonEmpty("signers", signers);
+
+    this.mac = mac;
+    AlgorithmIdentifier algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
+    this.algorithmName = AlgorithmUtil.getSigOrMacAlgoName(algorithmIdentifier);
+    this.algorithmCode = AlgorithmUtil.getSigOrMacAlgoCode(algorithmIdentifier);
+
+    for (XiContentSigner signer : signers) {
+      this.signers.add(new ConcurrentBagEntrySigner(signer));
     }
 
-    public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers)
-            throws NoSuchAlgorithmException {
-        this(mac, signers, null);
+    this.signingKey = signingKey;
+    this.name = "defaultSigner-" + NAME_INDEX.getAndIncrement();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public boolean isMac() {
+    return mac;
+  }
+
+  public void setSha1DigestOfMacKey(byte[] sha1Digest) {
+    if (sha1Digest == null) {
+      this.sha1OfMacKey = null;
+    } else if (sha1Digest.length == 20) {
+      this.sha1OfMacKey = Arrays.copyOf(sha1Digest, 20);
+    } else {
+      throw new IllegalArgumentException("invalid sha1Digest.length ("
+          + sha1Digest.length + " != 20)");
+    }
+  }
+
+  @Override
+  public byte[] getSha1OfMacKey() {
+    return (sha1OfMacKey == null) ? null : Arrays.copyOf(sha1OfMacKey, 20);
+  }
+
+  @Override
+  public AlgorithmCode algorithmCode() {
+    return algorithmCode;
+  }
+
+  @Override
+  public ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException {
+    return borrowSigner(defaultSignServiceTimeout);
+  }
+
+  /**
+   * TODO.
+   * @param soTimeout timeout in milliseconds, 0 for infinitely.
+   */
+  @Override
+  public ConcurrentBagEntrySigner borrowSigner(int soTimeout) throws NoIdleSignerException {
+    ConcurrentBagEntrySigner signer = null;
+    try {
+      signer = signers.borrow(soTimeout, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
     }
 
-    public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers,
-            Key signingKey) throws NoSuchAlgorithmException {
-        ParamUtil.requireNonEmpty("signers", signers);
-
-        this.mac = mac;
-        AlgorithmIdentifier algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
-        this.algorithmName = AlgorithmUtil.getSigOrMacAlgoName(algorithmIdentifier);
-        this.algorithmCode = AlgorithmUtil.getSigOrMacAlgoCode(algorithmIdentifier);
-
-        for (XiContentSigner signer : signers) {
-            this.signers.add(new ConcurrentBagEntrySigner(signer));
-        }
-
-        this.signingKey = signingKey;
-        this.name = "defaultSigner-" + NAME_INDEX.getAndIncrement();
+    if (signer == null) {
+      throw new NoIdleSignerException("no idle signer available");
     }
 
-    @Override
-    public String getName() {
-        return name;
+    return signer;
+  }
+
+  @Override
+  public void requiteSigner(ConcurrentBagEntrySigner signer) {
+    signers.requite(signer);
+  }
+
+  @Override
+  public void initialize(String conf, PasswordResolver passwordResolver)
+      throws XiSecurityException {
+  }
+
+  @Override
+  public Key getSigningKey() {
+    return signingKey;
+  }
+
+  @Override
+  public void setCertificateChain(X509Certificate[] certificateChain) {
+    if (CollectionUtil.isEmpty(certificateChain)) {
+      this.certificateChain = null;
+      this.bcCertificateChain = null;
+      return;
     }
 
-    @Override
-    public boolean isMac() {
-        return mac;
+    this.certificateChain = certificateChain;
+    setPublicKey(certificateChain[0].getPublicKey());
+    final int n = certificateChain.length;
+
+    this.bcCertificateChain = new X509CertificateHolder[n];
+    for (int i = 0; i < n; i++) {
+      X509Certificate cert = this.certificateChain[i];
+      try {
+        this.bcCertificateChain[i] = new X509CertificateHolder(cert.getEncoded());
+      } catch (CertificateEncodingException | IOException ex) {
+        throw new IllegalArgumentException(
+            String.format("%s occurred while parsing certificate at index %d: %s",
+                ex.getClass().getName(), i, ex.getMessage()), ex);
+      }
     }
+  }
 
-    public void setSha1DigestOfMacKey(byte[] sha1Digest) {
-        if (sha1Digest == null) {
-            this.sha1OfMacKey = null;
-        } else if (sha1Digest.length == 20) {
-            this.sha1OfMacKey = Arrays.copyOf(sha1Digest, 20);
-        } else {
-            throw new IllegalArgumentException("invalid sha1Digest.length ("
-                    + sha1Digest.length + " != 20)");
-        }
+  @Override
+  public PublicKey getPublicKey() {
+    return publicKey;
+  }
+
+  @Override
+  public void setPublicKey(PublicKey publicKey) {
+    this.publicKey = publicKey;
+  }
+
+  @Override
+  public X509Certificate getCertificate() {
+    return CollectionUtil.isEmpty(certificateChain) ? null : certificateChain[0];
+  }
+
+  @Override
+  public X509CertificateHolder getBcCertificate() {
+    return CollectionUtil.isEmpty(bcCertificateChain) ? null : bcCertificateChain[0];
+  }
+
+  @Override
+  public X509Certificate[] getCertificateChain() {
+    return certificateChain;
+  }
+
+  @Override
+  public X509CertificateHolder[] getBcCertificateChain() {
+    return bcCertificateChain;
+  }
+
+  @Override
+  public boolean isHealthy() {
+    ConcurrentBagEntrySigner signer = null;
+    try {
+      signer = borrowSigner();
+      OutputStream stream = signer.value().getOutputStream();
+      stream.write(new byte[]{1, 2, 3, 4});
+      byte[] signature = signer.value().getSignature();
+      return signature != null && signature.length > 0;
+    } catch (Exception ex) {
+      LogUtil.error(LOG, ex);
+      return false;
+    } finally {
+      if (signer != null) {
+        requiteSigner(signer);
+      }
     }
+  }
 
-    @Override
-    public byte[] getSha1OfMacKey() {
-        return (sha1OfMacKey == null) ? null : Arrays.copyOf(sha1OfMacKey, 20);
+  @Override
+  public String getAlgorithmName() {
+    return algorithmName;
+  }
+
+  @Override
+  public void shutdown() {
+  }
+
+  @Override
+  public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
+    ConcurrentBagEntrySigner signer = borrowSigner();
+    try {
+      OutputStream signatureStream = signer.value().getOutputStream();
+      try {
+        signatureStream.write(data);
+      } catch (IOException ex) {
+        throw new SignatureException(
+            "could not write data to SignatureStream: " + ex.getMessage(), ex);
+      }
+      return signer.value().getSignature();
+    } finally {
+      requiteSigner(signer);
     }
-
-    @Override
-    public AlgorithmCode algorithmCode() {
-        return algorithmCode;
-    }
-
-    @Override
-    public ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException {
-        return borrowSigner(defaultSignServiceTimeout);
-    }
-
-    /**
-     * @param soTimeout timeout in milliseconds, 0 for infinitely.
-     */
-    @Override
-    public ConcurrentBagEntrySigner borrowSigner(int soTimeout) throws NoIdleSignerException {
-        ConcurrentBagEntrySigner signer = null;
-        try {
-            signer = signers.borrow(soTimeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-        }
-
-        if (signer == null) {
-            throw new NoIdleSignerException("no idle signer available");
-        }
-
-        return signer;
-    }
-
-    @Override
-    public void requiteSigner(ConcurrentBagEntrySigner signer) {
-        signers.requite(signer);
-    }
-
-    @Override
-    public void initialize(String conf, PasswordResolver passwordResolver)
-            throws XiSecurityException {
-    }
-
-    @Override
-    public Key getSigningKey() {
-        return signingKey;
-    }
-
-    @Override
-    public void setCertificateChain(X509Certificate[] certificateChain) {
-        if (CollectionUtil.isEmpty(certificateChain)) {
-            this.certificateChain = null;
-            this.bcCertificateChain = null;
-            return;
-        }
-
-        this.certificateChain = certificateChain;
-        setPublicKey(certificateChain[0].getPublicKey());
-        final int n = certificateChain.length;
-
-        this.bcCertificateChain = new X509CertificateHolder[n];
-        for (int i = 0; i < n; i++) {
-            X509Certificate cert = this.certificateChain[i];
-            try {
-                this.bcCertificateChain[i] = new X509CertificateHolder(cert.getEncoded());
-            } catch (CertificateEncodingException | IOException ex) {
-                throw new IllegalArgumentException(
-                        String.format("%s occurred while parsing certificate at index %d: %s",
-                                ex.getClass().getName(), i, ex.getMessage()), ex);
-            }
-        }
-    }
-
-    @Override
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    @Override
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    @Override
-    public X509Certificate getCertificate() {
-        return CollectionUtil.isEmpty(certificateChain) ? null : certificateChain[0];
-    }
-
-    @Override
-    public X509CertificateHolder getBcCertificate() {
-        return CollectionUtil.isEmpty(bcCertificateChain) ? null : bcCertificateChain[0];
-    }
-
-    @Override
-    public X509Certificate[] getCertificateChain() {
-        return certificateChain;
-    }
-
-    @Override
-    public X509CertificateHolder[] getBcCertificateChain() {
-        return bcCertificateChain;
-    }
-
-    @Override
-    public boolean isHealthy() {
-        ConcurrentBagEntrySigner signer = null;
-        try {
-            signer = borrowSigner();
-            OutputStream stream = signer.value().getOutputStream();
-            stream.write(new byte[]{1, 2, 3, 4});
-            byte[] signature = signer.value().getSignature();
-            return signature != null && signature.length > 0;
-        } catch (Exception ex) {
-            LogUtil.error(LOG, ex);
-            return false;
-        } finally {
-            if (signer != null) {
-                requiteSigner(signer);
-            }
-        }
-    }
-
-    @Override
-    public String getAlgorithmName() {
-        return algorithmName;
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
-    @Override
-    public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
-        ConcurrentBagEntrySigner signer = borrowSigner();
-        try {
-            OutputStream signatureStream = signer.value().getOutputStream();
-            try {
-                signatureStream.write(data);
-            } catch (IOException ex) {
-                throw new SignatureException(
-                        "could not write data to SignatureStream: " + ex.getMessage(), ex);
-            }
-            return signer.value().getSignature();
-        } finally {
-            requiteSigner(signer);
-        }
-    }
+  }
 
 }

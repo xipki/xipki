@@ -27,90 +27,91 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class FileBigIntegerIterator implements Iterator<BigInteger> {
 
-    private final boolean hex;
+  private final boolean hex;
 
-    private final boolean loop;
+  private final boolean loop;
 
-    private final String fileName;
+  private final String fileName;
 
-    private BufferedReader reader;
+  private BufferedReader reader;
 
-    private ConcurrentLinkedQueue<BigInteger> nextNumbers = new ConcurrentLinkedQueue<>();
+  private ConcurrentLinkedQueue<BigInteger> nextNumbers = new ConcurrentLinkedQueue<>();
 
-    private BigInteger currentNumber;
+  private BigInteger currentNumber;
 
-    public FileBigIntegerIterator(String fileName, boolean hex, boolean loop)
-            throws IOException {
-        this.fileName = ParamUtil.requireNonBlank("fileName", fileName);
-        this.hex = hex;
-        this.loop = loop;
-        this.reader = new BufferedReader(new FileReader(fileName));
-        this.currentNumber = readNextNumber();
+  public FileBigIntegerIterator(String fileName, boolean hex, boolean loop)
+      throws IOException {
+    this.fileName = ParamUtil.requireNonBlank("fileName", fileName);
+    this.hex = hex;
+    this.loop = loop;
+    this.reader = new BufferedReader(new FileReader(fileName));
+    this.currentNumber = readNextNumber();
+  }
+
+  @Override
+  public synchronized boolean hasNext() {
+    return currentNumber != null;
+  }
+
+  @Override
+  public synchronized BigInteger next() {
+    if (currentNumber == null) {
+      return null;
     }
 
-    @Override
-    public synchronized boolean hasNext() {
-        return currentNumber != null;
+    BigInteger ret = currentNumber;
+    this.currentNumber = readNextNumber();
+    return ret;
+  }
+
+  private BigInteger readNextNumber() {
+    BigInteger number = nextNumbers.poll();
+    if (number != null) {
+      return number;
     }
 
-    @Override
-    public synchronized BigInteger next() {
-        if (currentNumber == null) {
-            return null;
-        }
+    String line;
+    try {
+      line = reader.readLine();
+      if (loop && line == null) {
+        reader.close();
+        reader = new BufferedReader(new FileReader(fileName));
+        line = reader.readLine();
+      }
 
-        BigInteger ret = currentNumber;
-        this.currentNumber = readNextNumber();
-        return ret;
+      if (line == null) {
+        reader.close();
+        return null;
+      }
+    } catch (IOException ex) {
+      throw new NoSuchElementException("could not read next number from file " + fileName);
     }
 
-    private BigInteger readNextNumber() {
-        BigInteger number = nextNumbers.poll();
-        if (number != null) {
-            return number;
-        }
-
-        String line;
-        try {
-            line = reader.readLine();
-            if (loop && line == null) {
-                reader.close();
-                reader = new BufferedReader(new FileReader(fileName));
-                line = reader.readLine();
-            }
-
-            if (line == null) {
-                reader.close();
-                return null;
-            }
-        } catch (IOException ex) {
-            throw new NoSuchElementException("could not read next number from file " + fileName);
-        }
-
-        if (line.indexOf(',') == -1) {
-            nextNumbers.add(new BigInteger(line.trim(), hex ? 16 : 10));
-        } else {
-            StringTokenizer st = new StringTokenizer(line.trim(), ", ");
-            while (st.hasMoreTokens()) {
-                nextNumbers.add(new BigInteger(st.nextToken(), hex ? 16 : 10));
-            }
-        }
-
-        return nextNumbers.poll();
+    if (line.indexOf(',') == -1) {
+      nextNumbers.add(new BigInteger(line.trim(), hex ? 16 : 10));
+    } else {
+      StringTokenizer st = new StringTokenizer(line.trim(), ", ");
+      while (st.hasMoreTokens()) {
+        nextNumbers.add(new BigInteger(st.nextToken(), hex ? 16 : 10));
+      }
     }
 
-    public void close() {
-        try {
-            reader.close();
-        } catch (Throwable th) {
-            // STYLECHECK: SKIPTEST
-        }
+    return nextNumbers.poll();
+  }
+
+  public void close() {
+    try {
+      reader.close();
+    } catch (Throwable th) {
+      // STYLECHECK: SKIPTEST
     }
+  }
 
 }

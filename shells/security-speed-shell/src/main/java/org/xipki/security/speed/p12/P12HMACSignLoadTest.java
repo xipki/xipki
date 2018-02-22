@@ -23,45 +23,46 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 // CHECKSTYLE:SKIP
 public class P12HMACSignLoadTest extends P12SignLoadTest {
 
-    public P12HMACSignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm)
-            throws Exception {
-        super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
-                "JCEKS HMAC signature creation");
-    }
+  public P12HMACSignLoadTest(SecurityFactory securityFactory, String signatureAlgorithm)
+      throws Exception {
+    super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
+        "JCEKS HMAC signature creation");
+  }
 
-    private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {
-        int keysize = getKeysize(signatureAlgorithm);
-        P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
-                "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
-        return identity.keystore();
-    }
+  private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {
+    int keysize = getKeysize(signatureAlgorithm);
+    P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
+        "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
+    return identity.keystore();
+  }
 
-    public static int getKeysize(String hmacAlgorithm) {
-        int keysize;
-        if ("HMACSHA1".equalsIgnoreCase(hmacAlgorithm)) {
-            keysize = 160;
-        } else if ("HMACSHA224".equalsIgnoreCase(hmacAlgorithm)
-                || "HMACSHA3-224".equalsIgnoreCase(hmacAlgorithm)) {
-            keysize = 224;
-        } else if ("HMACSHA256".equalsIgnoreCase(hmacAlgorithm)
-                || "HMACSHA3-256".equalsIgnoreCase(hmacAlgorithm)) {
-            keysize = 256;
-        } else if ("HMACSHA384".equalsIgnoreCase(hmacAlgorithm)
-                || "HMACSHA3-384".equalsIgnoreCase(hmacAlgorithm)) {
-            keysize = 384;
-        } else if ("HMACSHA512".equalsIgnoreCase(hmacAlgorithm)
-                || "HMACSHA3-512".equalsIgnoreCase(hmacAlgorithm)) {
-            keysize = 512;
-        } else {
-            throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
-        }
-        return keysize;
+  public static int getKeysize(String hmacAlgorithm) {
+    int keysize;
+    if ("HMACSHA1".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 160;
+    } else if ("HMACSHA224".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-224".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 224;
+    } else if ("HMACSHA256".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-256".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 256;
+    } else if ("HMACSHA384".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-384".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 384;
+    } else if ("HMACSHA512".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-512".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 512;
+    } else {
+      throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
     }
+    return keysize;
+  }
 
 }

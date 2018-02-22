@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
@@ -29,8 +30,8 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 //CHECKSTYLE:SKIP
 public class GMACSigAlgCompleter extends AbstractEnumCompleter {
 
-    public GMACSigAlgCompleter() {
-        setTokens("AES128-GMAC,AES192-GMAC,AES256-GMAC");
-    }
+  public GMACSigAlgCompleter() {
+    setTokens("AES128-GMAC,AES192-GMAC,AES256-GMAC");
+  }
 
 }

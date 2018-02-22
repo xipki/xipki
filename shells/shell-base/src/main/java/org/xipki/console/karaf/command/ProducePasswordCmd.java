@@ -28,58 +28,59 @@ import org.xipki.console.karaf.completer.PasswordNameCompleter;
 import org.xipki.password.PasswordProducer;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "produce-password",
-        description = "produce password")
+    description = "produce password")
 @Service
 public class ProducePasswordCmd extends XiAction {
 
-    @Option(name = "--name", required = true,
-            description = "name of the password")
-    @Completion(PasswordNameCompleter.class)
-    private String name;
+  @Option(name = "--name", required = true,
+      description = "name of the password")
+  @Completion(PasswordNameCompleter.class)
+  private String name;
 
-    @Option(name = "-k",
-            description = "quorum of the password parts")
-    private Integer quorum = 1;
+  @Option(name = "-k",
+      description = "quorum of the password parts")
+  private Integer quorum = 1;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (!PasswordProducer.needsPassword(name)) {
-            throw new IllegalCmdParamException("password named '" + name
-                    + "' will not be requested");
-        }
-
-        while (PasswordProducer.needsPassword(name)) {
-            char[] password;
-            if (quorum == 1) {
-                password = readPassword("Password");
-            } else {
-                char[][] parts = new char[quorum][];
-                for (int i = 0; i < quorum; i++) {
-                    parts[i] = readPassword("Password (part " + (i + 1) + "/" + quorum + ")");
-                }
-                password = StringUtil.merge(parts);
-            }
-            PasswordProducer.putPassword(name, password);
-
-            final int n = 10;
-            for (int i = 0; i < n; i++) {
-                Thread.sleep(500);
-                Boolean correct = PasswordProducer.removePasswordCorrect(name);
-                if (correct != null) {
-                    println("\rthe given password is "
-                            + (correct ? "correct            " : "not correct        "));
-                    break;
-                } else {
-                    println("\rthe given password is still under process");
-                }
-            }
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (!PasswordProducer.needsPassword(name)) {
+      throw new IllegalCmdParamException("password named '" + name
+          + "' will not be requested");
     }
+
+    while (PasswordProducer.needsPassword(name)) {
+      char[] password;
+      if (quorum == 1) {
+        password = readPassword("Password");
+      } else {
+        char[][] parts = new char[quorum][];
+        for (int i = 0; i < quorum; i++) {
+          parts[i] = readPassword("Password (part " + (i + 1) + "/" + quorum + ")");
+        }
+        password = StringUtil.merge(parts);
+      }
+      PasswordProducer.putPassword(name, password);
+
+      final int n = 10;
+      for (int i = 0; i < n; i++) {
+        Thread.sleep(500);
+        Boolean correct = PasswordProducer.removePasswordCorrect(name);
+        if (correct != null) {
+          println("\rthe given password is "
+              + (correct ? "correct            " : "not correct        "));
+          break;
+        } else {
+          println("\rthe given password is still under process");
+        }
+      }
+    }
+    return null;
+  }
 
 }

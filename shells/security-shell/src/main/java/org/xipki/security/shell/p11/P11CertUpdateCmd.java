@@ -29,27 +29,28 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 @Command(scope = "xi", name = "update-cert-p11",
-        description = "update certificate in PKCS#11 device")
+    description = "update certificate in PKCS#11 device")
 @Service
 public class P11CertUpdateCmd extends P11SecurityAction {
 
-    @Option(name = "--cert", required = true,
-            description = "certificate file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert", required = true,
+      description = "certificate file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
-        X509Certificate newCert = X509Util.parseCert(certFile);
-        slot.updateCertificate(objIdentifier, newCert);
-        println("updated certificate");
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+    X509Certificate newCert = X509Util.parseCert(certFile);
+    slot.updateCertificate(objIdentifier, newCert);
+    println("updated certificate");
+    return null;
+  }
 
 }

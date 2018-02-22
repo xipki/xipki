@@ -25,49 +25,50 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "dsa-p12",
-        description = "generate RSA keypair in PKCS#12 keystore")
+    description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12DSAKeyGenCmd extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject of the self-signed certificate")
-    private String subject;
+  @Option(name = "--subject", aliases = "-s",
+      description = "subject of the self-signed certificate")
+  private String subject;
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer plen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer plen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qlen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qlen;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (plen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
-        }
-
-        if (qlen == null) {
-            if (plen <= 1024) {
-                qlen = 160;
-            } else if (plen <= 2048) {
-                qlen = 224;
-            } else {
-                qlen = 256;
-            }
-        }
-
-        P12KeyGenerationResult keypair = new P12KeyGenerator().generateDSAKeypair(plen,
-                qlen, getKeyGenParameters(), subject);
-        saveKey(keypair);
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (plen % 1024 != 0) {
+      throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
     }
+
+    if (qlen == null) {
+      if (plen <= 1024) {
+        qlen = 160;
+      } else if (plen <= 2048) {
+        qlen = 224;
+      } else {
+        qlen = 256;
+      }
+    }
+
+    P12KeyGenerationResult keypair = new P12KeyGenerator().generateDSAKeypair(plen,
+        qlen, getKeyGenParameters(), subject);
+    saveKey(keypair);
+
+    return null;
+  }
 
 }

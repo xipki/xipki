@@ -33,47 +33,48 @@ import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "csr-p11",
-        description = "generate CSR request with PKCS#11 device")
+    description = "generate CSR request with PKCS#11 device")
 @Service
 public class P11CsrGenCmd extends CsrGenAction {
 
-    @Option(name = "--slot", required = true,
-            description = "slot index\n(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot", required = true,
+      description = "slot index\n(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--id",
-            description = "id of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    private String id;
+  @Option(name = "--id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  private String id;
 
-    @Option(name = "--label",
-            description = "label of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    private String label;
+  @Option(name = "--label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  private String label;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
-            throws Exception {
-        ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
+  @Override
+  protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
+      throws Exception {
+    ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
 
-        byte[] idBytes = null;
-        if (id != null) {
-            idBytes = Hex.decode(id);
-        }
-
-        SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, label,
-                idBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
-        return securityFactory.createSigner("PKCS11", conf, (X509Certificate[]) null);
+    byte[] idBytes = null;
+    if (id != null) {
+      idBytes = Hex.decode(id);
     }
+
+    SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, label,
+        idBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+    return securityFactory.createSigner("PKCS11", conf, (X509Certificate[]) null);
+  }
 
 }

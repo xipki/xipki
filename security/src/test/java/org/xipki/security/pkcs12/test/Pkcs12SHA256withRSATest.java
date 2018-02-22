@@ -22,16 +22,17 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class Pkcs12SHA256withRSATest extends Pkcs12RSATest {
 
-    @Override
-    protected AlgorithmIdentifier getSignatureAlgorithm() {
-        return new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption,
-                DERNull.INSTANCE);
-    }
+  @Override
+  protected AlgorithmIdentifier getSignatureAlgorithm() {
+    return new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption,
+        DERNull.INSTANCE);
+  }
 
 }

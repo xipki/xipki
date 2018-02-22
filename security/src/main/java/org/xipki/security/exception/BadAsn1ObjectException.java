@@ -18,32 +18,33 @@
 package org.xipki.security.exception;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class BadAsn1ObjectException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public BadAsn1ObjectException() {
-    }
+  public BadAsn1ObjectException() {
+  }
 
-    public BadAsn1ObjectException(String message) {
-        super(message);
-    }
+  public BadAsn1ObjectException(String message) {
+    super(message);
+  }
 
-    public BadAsn1ObjectException(Throwable cause) {
-        super(cause);
-    }
+  public BadAsn1ObjectException(Throwable cause) {
+    super(cause);
+  }
 
-    public BadAsn1ObjectException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public BadAsn1ObjectException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public BadAsn1ObjectException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+  public BadAsn1ObjectException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 
 }

@@ -25,27 +25,28 @@ import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-rsa-gen-p12",
-        description = "performance test of PKCS#12 RSA key generation")
+    description = "performance test of PKCS#12 RSA key generation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP12RSAKeyGenCmd extends SingleSpeedAction {
 
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
+  @Option(name = "--key-size",
+      description = "keysize in bit")
+  private Integer keysize = 2048;
 
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
+  @Option(name = "-e",
+      description = "public exponent")
+  private String publicExponent = "0x10001";
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent), securityFactory);
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent), securityFactory);
+  }
 
 }

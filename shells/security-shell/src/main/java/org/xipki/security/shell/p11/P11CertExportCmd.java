@@ -30,30 +30,31 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "export-cert-p11",
-        description = "export certificate from PKCS#11 device")
+    description = "export certificate from PKCS#11 device")
 @Service
 public class P11CertExportCmd extends P11SecurityAction {
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
-        X509Certificate cert = slot.exportCert(objIdentifier);
-        if (cert == null) {
-            throw new CmdFailure("could not export certificate " + objIdentifier);
-        }
-        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+    X509Certificate cert = slot.exportCert(objIdentifier);
+    if (cert == null) {
+      throw new CmdFailure("could not export certificate " + objIdentifier);
     }
+    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+    return null;
+  }
 
 }

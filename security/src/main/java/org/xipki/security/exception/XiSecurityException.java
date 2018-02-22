@@ -18,28 +18,29 @@
 package org.xipki.security.exception;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class XiSecurityException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public XiSecurityException() {
-        super();
-    }
+  public XiSecurityException() {
+    super();
+  }
 
-    public XiSecurityException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public XiSecurityException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public XiSecurityException(String message) {
-        super(message);
-    }
+  public XiSecurityException(String message) {
+    super(message);
+  }
 
-    public XiSecurityException(Throwable cause) {
-        super(cause);
-    }
+  public XiSecurityException(Throwable cause) {
+    super(cause);
+  }
 
 }

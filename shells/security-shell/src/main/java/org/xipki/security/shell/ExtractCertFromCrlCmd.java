@@ -41,77 +41,78 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "extract-cert",
-        description = "extract certificates from CRL")
+    description = "extract certificates from CRL")
 @Service
 public class ExtractCertFromCrlCmd extends SecurityAction {
 
-    @Option(name = "--crl", required = true,
-            description = "CRL file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String crlFile;
+  @Option(name = "--crl", required = true,
+      description = "CRL file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String crlFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "ZIP file to save the extracted certificates\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "ZIP file to save the extracted certificates\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        X509CRL crl = X509Util.parseCrl(crlFile);
-        String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();
-        byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
-        if (extnValue == null) {
-            throw new IllegalCmdParamException("no certificate is contained in " + crlFile);
-        }
-
-        extnValue = removingTagAndLenFromExtensionValue(extnValue);
-        ASN1Set asn1Set = DERSet.getInstance(extnValue);
-        final int n = asn1Set.size();
-        if (n == 0) {
-            throw new CmdFailure("no certificate is contained in " + crlFile);
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(out);
-
-        for (int i = 0; i < n; i++) {
-            ASN1Encodable asn1 = asn1Set.getObjectAt(i);
-            Certificate cert;
-            try {
-                ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                cert = Certificate.getInstance(seq.getObjectAt(0));
-            } catch (IllegalArgumentException ex) {
-                // backwards compatibility
-                cert = Certificate.getInstance(asn1);
-            }
-
-            byte[] certBytes = cert.getEncoded();
-            String sha1FpCert = HashAlgoType.SHA1.hexHash(certBytes);
-            ZipEntry certZipEntry = new ZipEntry(sha1FpCert + ".der");
-            zip.putNextEntry(certZipEntry);
-            try {
-                zip.write(certBytes);
-            } finally {
-                zip.closeEntry();
-            }
-        }
-
-        zip.flush();
-        zip.close();
-
-        saveVerbose("extracted " + n + " certificates to", new File(outFile), out.toByteArray());
-        return null;
-    } // method execute0
-
-    private static byte[] removingTagAndLenFromExtensionValue(byte[] encodedExtensionValue) {
-        DEROctetString derOctet = (DEROctetString) DEROctetString.getInstance(
-                encodedExtensionValue);
-        return derOctet.getOctets();
+  @Override
+  protected Object execute0() throws Exception {
+    X509CRL crl = X509Util.parseCrl(crlFile);
+    String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();
+    byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
+    if (extnValue == null) {
+      throw new IllegalCmdParamException("no certificate is contained in " + crlFile);
     }
+
+    extnValue = removingTagAndLenFromExtensionValue(extnValue);
+    ASN1Set asn1Set = DERSet.getInstance(extnValue);
+    final int n = asn1Set.size();
+    if (n == 0) {
+      throw new CmdFailure("no certificate is contained in " + crlFile);
+    }
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ZipOutputStream zip = new ZipOutputStream(out);
+
+    for (int i = 0; i < n; i++) {
+      ASN1Encodable asn1 = asn1Set.getObjectAt(i);
+      Certificate cert;
+      try {
+        ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+        cert = Certificate.getInstance(seq.getObjectAt(0));
+      } catch (IllegalArgumentException ex) {
+        // backwards compatibility
+        cert = Certificate.getInstance(asn1);
+      }
+
+      byte[] certBytes = cert.getEncoded();
+      String sha1FpCert = HashAlgoType.SHA1.hexHash(certBytes);
+      ZipEntry certZipEntry = new ZipEntry(sha1FpCert + ".der");
+      zip.putNextEntry(certZipEntry);
+      try {
+        zip.write(certBytes);
+      } finally {
+        zip.closeEntry();
+      }
+    }
+
+    zip.flush();
+    zip.close();
+
+    saveVerbose("extracted " + n + " certificates to", new File(outFile), out.toByteArray());
+    return null;
+  } // method execute0
+
+  private static byte[] removingTagAndLenFromExtensionValue(byte[] encodedExtensionValue) {
+    DEROctetString derOctet = (DEROctetString) DEROctetString.getInstance(
+        encodedExtensionValue);
+    return derOctet.getOctets();
+  }
 
 }

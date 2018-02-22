@@ -23,19 +23,20 @@ import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.p11.P11SM2KeyGenLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "speed-sm2-gen-p11",
-        description = "performance test of PKCS#11 SM2 key generation")
+    description = "performance test of PKCS#11 SM2 key generation")
 @Service
 // CHECKSTYLE:SKIP
 public class SpeedP11SM2KeyGenCmd extends SpeedP11Action {
 
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P11SM2KeyGenLoadTest(getSlot());
-    }
+  @Override
+  protected LoadExecutor getTester() throws Exception {
+    return new P11SM2KeyGenLoadTest(getSlot());
+  }
 
 }

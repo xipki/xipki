@@ -44,153 +44,154 @@ import org.xipki.security.util.SignerUtil;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 //CHECKSTYLE:SKIP
 class P11RSAContentSigner implements XiContentSigner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
 
-    private static final Map<ASN1ObjectIdentifier, HashAlgoType> sigAlgHashAlgMap = new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, HashAlgoType> sigAlgHashAlgMap = new HashMap<>();
 
-    private static final Map<HashAlgoType, Long> hashAlgMecMap = new HashMap<>();
+  private static final Map<HashAlgoType, Long> hashAlgMecMap = new HashMap<>();
 
-    private final AlgorithmIdentifier algorithmIdentifier;
+  private final AlgorithmIdentifier algorithmIdentifier;
 
-    private final byte[] encodedAlgorithmIdentifier;
+  private final byte[] encodedAlgorithmIdentifier;
 
-    private final long mechanism;
+  private final long mechanism;
 
-    private final OutputStream outputStream;
+  private final OutputStream outputStream;
 
-    private final P11CryptService cryptService;
+  private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier identityId;
+  private final P11EntityIdentifier identityId;
 
-    private final byte[] digestPkcsPrefix;
+  private final byte[] digestPkcsPrefix;
 
-    private final int modulusBitLen;
+  private final int modulusBitLen;
 
-    static {
-        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, HashAlgoType.SHA1);
-        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, HashAlgoType.SHA224);
-        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgoType.SHA256);
-        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgoType.SHA384);
-        sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgoType.SHA512);
-        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
-                HashAlgoType.SHA3_224);
-        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
-                HashAlgoType.SHA3_256);
-        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
-                HashAlgoType.SHA3_384);
-        sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
-                HashAlgoType.SHA3_512);
+  static {
+    sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, HashAlgoType.SHA1);
+    sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, HashAlgoType.SHA224);
+    sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgoType.SHA256);
+    sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgoType.SHA384);
+    sigAlgHashAlgMap.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgoType.SHA512);
+    sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
+        HashAlgoType.SHA3_224);
+    sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
+        HashAlgoType.SHA3_256);
+    sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
+        HashAlgoType.SHA3_384);
+    sigAlgHashAlgMap.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
+        HashAlgoType.SHA3_512);
 
-        hashAlgMecMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_SHA512_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_SHA3_224_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS);
-        hashAlgMecMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_SHA512_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_SHA3_224_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS);
+    hashAlgMecMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS);
+  }
+
+  P11RSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+      AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
+    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+    try {
+      this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
 
-    P11RSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
-            AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
-        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-        this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
-        try {
-            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
-        } catch (IOException ex) {
-            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
-        }
-
-        ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
-        HashAlgoType hashAlgo = sigAlgHashAlgMap.get(algOid);
-        if (hashAlgo == null) {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
-        }
-
-        P11SlotIdentifier slotId = identityId.slotId();
-        P11Slot slot = cryptService.getSlot(slotId);
-        if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS)) {
-            this.mechanism = PKCS11Constants.CKM_RSA_PKCS;
-        } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
-            this.mechanism = PKCS11Constants.CKM_RSA_X_509;
-        } else {
-            Long mech = hashAlgMecMap.get(hashAlgo);
-            if (mech == null) {
-                throw new RuntimeException("should not reach here, unknown HashAlgoType "
-                        + hashAlgo);
-            }
-            this.mechanism = mech.longValue();
-            if (!slot.supportsMechanism(this.mechanism)) {
-                throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
-            }
-        }
-
-        if (mechanism == PKCS11Constants.CKM_RSA_PKCS
-                || mechanism == PKCS11Constants.CKM_RSA_X_509) {
-            this.digestPkcsPrefix = SignerUtil.getDigestPkcsPrefix(hashAlgo);
-            Digest digest = hashAlgo.createDigest();
-            this.outputStream = new DigestOutputStream(digest);
-        } else {
-            this.digestPkcsPrefix = null;
-            this.outputStream = new ByteArrayOutputStream();
-        }
-
-        RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getIdentity(identityId).publicKey();
-        this.modulusBitLen = rsaPubKey.getModulus().bitLength();
+    ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
+    HashAlgoType hashAlgo = sigAlgHashAlgMap.get(algOid);
+    if (hashAlgo == null) {
+      throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
     }
 
-    @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return algorithmIdentifier;
+    P11SlotIdentifier slotId = identityId.slotId();
+    P11Slot slot = cryptService.getSlot(slotId);
+    if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS)) {
+      this.mechanism = PKCS11Constants.CKM_RSA_PKCS;
+    } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
+      this.mechanism = PKCS11Constants.CKM_RSA_X_509;
+    } else {
+      Long mech = hashAlgMecMap.get(hashAlgo);
+      if (mech == null) {
+        throw new RuntimeException("should not reach here, unknown HashAlgoType "
+            + hashAlgo);
+      }
+      this.mechanism = mech.longValue();
+      if (!slot.supportsMechanism(this.mechanism)) {
+        throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
+      }
     }
 
-    @Override
-    public byte[] getEncodedAlgorithmIdentifier() {
-        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+    if (mechanism == PKCS11Constants.CKM_RSA_PKCS
+        || mechanism == PKCS11Constants.CKM_RSA_X_509) {
+      this.digestPkcsPrefix = SignerUtil.getDigestPkcsPrefix(hashAlgo);
+      Digest digest = hashAlgo.createDigest();
+      this.outputStream = new DigestOutputStream(digest);
+    } else {
+      this.digestPkcsPrefix = null;
+      this.outputStream = new ByteArrayOutputStream();
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        if (outputStream instanceof ByteArrayOutputStream) {
-            ((ByteArrayOutputStream) outputStream).reset();
-        } else {
-            ((DigestOutputStream) outputStream).reset();
-        }
-        return outputStream;
+    RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getIdentity(identityId).publicKey();
+    this.modulusBitLen = rsaPubKey.getModulus().bitLength();
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return algorithmIdentifier;
+  }
+
+  @Override
+  public byte[] getEncodedAlgorithmIdentifier() {
+    return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    if (outputStream instanceof ByteArrayOutputStream) {
+      ((ByteArrayOutputStream) outputStream).reset();
+    } else {
+      ((DigestOutputStream) outputStream).reset();
+    }
+    return outputStream;
+  }
+
+  @Override
+  public byte[] getSignature() {
+    byte[] dataToSign;
+    if (outputStream instanceof ByteArrayOutputStream) {
+      dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+      ((ByteArrayOutputStream) outputStream).reset();
+    } else {
+      byte[] hashValue = ((DigestOutputStream) outputStream).digest();
+      ((DigestOutputStream) outputStream).reset();
+      dataToSign = new byte[digestPkcsPrefix.length + hashValue.length];
+      System.arraycopy(digestPkcsPrefix, 0, dataToSign, 0, digestPkcsPrefix.length);
+      System.arraycopy(hashValue, 0, dataToSign, digestPkcsPrefix.length, hashValue.length);
     }
 
-    @Override
-    public byte[] getSignature() {
-        byte[] dataToSign;
-        if (outputStream instanceof ByteArrayOutputStream) {
-            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
-            ((ByteArrayOutputStream) outputStream).reset();
-        } else {
-            byte[] hashValue = ((DigestOutputStream) outputStream).digest();
-            ((DigestOutputStream) outputStream).reset();
-            dataToSign = new byte[digestPkcsPrefix.length + hashValue.length];
-            System.arraycopy(digestPkcsPrefix, 0, dataToSign, 0, digestPkcsPrefix.length);
-            System.arraycopy(hashValue, 0, dataToSign, digestPkcsPrefix.length, hashValue.length);
-        }
+    try {
+      if (mechanism == PKCS11Constants.CKM_RSA_X_509) {
+        dataToSign = SignerUtil.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
+      }
 
-        try {
-            if (mechanism == PKCS11Constants.CKM_RSA_X_509) {
-                dataToSign = SignerUtil.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
-            }
-
-            return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
-        } catch (XiSecurityException | P11TokenException ex) {
-            LogUtil.error(LOG, ex, "could not sign");
-            throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
-        }
+      return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
+    } catch (XiSecurityException | P11TokenException ex) {
+      LogUtil.error(LOG, ex, "could not sign");
+      throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
     }
+  }
 
 }

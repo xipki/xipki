@@ -22,6 +22,7 @@ import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -29,21 +30,21 @@ import org.xipki.password.PasswordResolverException;
 // CHECKSTYLE:SKIP
 public class OBFPasswordCallback implements PasswordCallback {
 
-    private char[] password;
+  private char[] password;
 
-    @Override
-    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
-        if (password == null) {
-            throw new PasswordResolverException("please initialize me first");
-        }
-
-        return password;
+  @Override
+  public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
+    if (password == null) {
+      throw new PasswordResolverException("please initialize me first");
     }
 
-    @Override
-    public void init(String conf) throws PasswordResolverException {
-        ParamUtil.requireNonBlank("conf", conf);
-        this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
-    }
+    return password;
+  }
+
+  @Override
+  public void init(String conf) throws PasswordResolverException {
+    ParamUtil.requireNonBlank("conf", conf);
+    this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
+  }
 
 }

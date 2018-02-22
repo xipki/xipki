@@ -31,40 +31,41 @@ import org.xipki.security.speed.cmd.completer.RSASigAlgCompleter;
 import org.xipki.security.speed.p11.P11RSASignLoadTest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "bspeed-rsa-sign-p11",
-        description = "performance test of PKCS#11 RSA signature creation (batch)")
+    description = "performance test of PKCS#11 RSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
 public class BSpeedP11RSASignCmd extends BSpeedP11Action {
 
-    @Option(name = "--sig-algo", required = true,
-            description = "signature algorithm\n(required)")
-    @Completion(RSASigAlgCompleter.class)
-    private String sigAlgo;
+  @Option(name = "--sig-algo", required = true,
+      description = "signature algorithm\n(required)")
+  @Completion(RSASigAlgCompleter.class)
+  private String sigAlgo;
 
-    private final Queue<RSAControl> queue = new LinkedList<>();
+  private final Queue<RSAControl> queue = new LinkedList<>();
 
-    public BSpeedP11RSASignCmd() {
-        queue.add(new RSAControl(1024));
-        queue.add(new RSAControl(2048));
-        queue.add(new RSAControl(3072));
-        queue.add(new RSAControl(4096));
+  public BSpeedP11RSASignCmd() {
+    queue.add(new RSAControl(1024));
+    queue.add(new RSAControl(2048));
+    queue.add(new RSAControl(3072));
+    queue.add(new RSAControl(4096));
+  }
+
+  @Override
+  protected LoadExecutor nextTester() throws Exception {
+    RSAControl control = queue.poll();
+    if (control == null) {
+      return null;
     }
 
-    @Override
-    protected LoadExecutor nextTester() throws Exception {
-        RSAControl control = queue.poll();
-        if (control == null) {
-            return null;
-        }
-
-        P11Slot slot = getSlot();
-        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, control.modulusLen(),
-                                toBigInt("0x10001"));
-    }
+    P11Slot slot = getSlot();
+    return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, control.modulusLen(),
+                toBigInt("0x10001"));
+  }
 
 }

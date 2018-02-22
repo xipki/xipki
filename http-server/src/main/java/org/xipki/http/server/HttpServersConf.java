@@ -20,12 +20,13 @@ package org.xipki.http.server;
 import org.xipki.httpserver.v1.jaxb.Httpservers;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public interface HttpServersConf {
 
-    public Httpservers getConf();
+  public Httpservers getConf();
 
 }

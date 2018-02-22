@@ -30,48 +30,49 @@ import org.xipki.httpserver.v1.jaxb.Httpservers;
 import org.xipki.httpserver.v1.jaxb.ObjectFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class FileHttpServersConf implements HttpServersConf {
 
-    private String confFile;
+  private String confFile;
 
-    private Httpservers conf;
+  private Httpservers conf;
 
-    public void setConfFile(String confFile) throws Exception {
-        this.confFile = confFile;
+  public void setConfFile(String confFile) throws Exception {
+    this.confFile = confFile;
 
-        Object root;
-        try {
-            JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-            Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
-            final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                    XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL url = ObjectFactory.class.getResource("/xsd/httpserver.xsd");
-            jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
+    Object root;
+    try {
+      JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+      Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
+      final SchemaFactory schemaFact = SchemaFactory.newInstance(
+          XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      URL url = ObjectFactory.class.getResource("/xsd/httpserver.xsd");
+      jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 
-            root = jaxbUnmarshaller.unmarshal(new File(confFile));
-        } catch (Exception ex) {
-            throw new Exception("parsing config file failed, message: " + ex.getMessage(), ex);
-        }
-
-        if (root instanceof Httpservers) {
-            this.conf = (Httpservers) root;
-        } else if (root instanceof JAXBElement) {
-            this.conf = (Httpservers) ((JAXBElement<?>) root).getValue();
-        } else {
-            throw new Exception("invalid root element type");
-        }
+      root = jaxbUnmarshaller.unmarshal(new File(confFile));
+    } catch (Exception ex) {
+      throw new Exception("parsing config file failed, message: " + ex.getMessage(), ex);
     }
 
-    public String confFile() {
-        return confFile;
+    if (root instanceof Httpservers) {
+      this.conf = (Httpservers) root;
+    } else if (root instanceof JAXBElement) {
+      this.conf = (Httpservers) ((JAXBElement<?>) root).getValue();
+    } else {
+      throw new Exception("invalid root element type");
     }
+  }
 
-    public Httpservers getConf() {
-        return conf;
-    }
+  public String confFile() {
+    return confFile;
+  }
+
+  public Httpservers getConf() {
+    return conf;
+  }
 
 }

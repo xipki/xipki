@@ -27,32 +27,33 @@ import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class AbstractSecurityFactory implements SecurityFactory {
 
-    @Override
-    public ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
-            throws ObjectCreationException {
-        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert};
-        return createSigner(type, conf, certs);
-    }
+  @Override
+  public ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
+      throws ObjectCreationException {
+    X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert};
+    return createSigner(type, conf, certs);
+  }
 
-    @Override
-    public ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
-            throws InvalidKeyException {
-        ParamUtil.requireNonNull("cert", cert);
-        return getContentVerifierProvider(cert.getPublicKey());
-    }
+  @Override
+  public ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
+      throws InvalidKeyException {
+    ParamUtil.requireNonNull("cert", cert);
+    return getContentVerifierProvider(cert.getPublicKey());
+  }
 
-    @Override
-    public ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
-            throws InvalidKeyException {
-        ParamUtil.requireNonNull("cert", cert);
-        PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
-        return getContentVerifierProvider(publicKey);
-    }
+  @Override
+  public ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
+      throws InvalidKeyException {
+    ParamUtil.requireNonNull("cert", cert);
+    PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
+    return getContentVerifierProvider(publicKey);
+  }
 
 }

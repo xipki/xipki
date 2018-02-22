@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
@@ -31,69 +32,69 @@ import java.util.StringTokenizer;
 // CHECKSTYLE:SKIP
 public class ServletURI {
 
-    private String path;
+  private String path;
 
-    private String fragement;
+  private String fragement;
 
-    private String query;
+  private String query;
 
-    private Map<String, String> parameters;
+  private Map<String, String> parameters;
 
-    public ServletURI(String rawPath) throws URISyntaxException {
-        if (rawPath == null || rawPath.isEmpty() || "/".equals(rawPath)) {
-            path = "/";
-        } else {
-            URI uri = new URI(rawPath);
-            path = uri.getPath();
-            if (path == null || path.isEmpty()) {
-                path = "/";
-            } else if (path.charAt(0) != '/') {
-                path += "/" + path;
-            }
+  public ServletURI(String rawPath) throws URISyntaxException {
+    if (rawPath == null || rawPath.isEmpty() || "/".equals(rawPath)) {
+      path = "/";
+    } else {
+      URI uri = new URI(rawPath);
+      path = uri.getPath();
+      if (path == null || path.isEmpty()) {
+        path = "/";
+      } else if (path.charAt(0) != '/') {
+        path += "/" + path;
+      }
 
-            fragement = uri.getFragment();
-            query = uri.getQuery();
-        }
+      fragement = uri.getFragment();
+      query = uri.getQuery();
+    }
+  }
+
+  public void setPath(String path) {
+    this.path = (path == null || path.isEmpty()) ? "/" : path;
+  }
+
+  public String path() {
+    return path;
+  }
+
+  public String query() {
+    return query;
+  }
+
+  public String fragement() {
+    return fragement;
+  }
+
+  public String parameter(String name) {
+    if (query == null) {
+      return null;
     }
 
-    public void setPath(String path) {
-        this.path = (path == null || path.isEmpty()) ? "/" : path;
+    if (parameters != null) {
+      return parameters.get(name);
     }
 
-    public String path() {
-        return path;
+    parameters = new HashMap<>();
+    StringTokenizer st = new StringTokenizer(query, "&");
+    while (st.hasMoreTokens()) {
+      String token = st.nextToken();
+      int idx = token.indexOf('=');
+      if (idx != -1 && idx != token.length()) {
+        String pn = token.substring(0, idx);
+        String pv = token.substring(idx + 1);
+        parameters.put(pn, pv);
+      }
     }
 
-    public String query() {
-        return query;
-    }
-
-    public String fragement() {
-        return fragement;
-    }
-
-    public String parameter(String name) {
-        if (query == null) {
-            return null;
-        }
-
-        if (parameters != null) {
-            return parameters.get(name);
-        }
-
-        parameters = new HashMap<>();
-        StringTokenizer st = new StringTokenizer(query, "&");
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            int idx = token.indexOf('=');
-            if (idx != -1 && idx != token.length()) {
-                String pn = token.substring(0, idx);
-                String pv = token.substring(idx + 1);
-                parameters.put(pn, pv);
-            }
-        }
-
-        return parameters.get(name);
-    }
+    return parameters.get(name);
+  }
 
 }

@@ -26,32 +26,33 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "ec-p11",
-        description = "generate EC keypair in PKCS#11 device")
+    description = "generate EC keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11ECKeyGenCmd extends P11KeyGenAction {
 
-    @Option(name = "--curve",
-            description = "EC curve name")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName = "secp256r1";
+  @Option(name = "--curve",
+      description = "EC curve name")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName = "secp256r1";
 
-    @Override
-    protected Object execute0() throws Exception {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label, getControl());
-        finalize("EC", objId);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label, getControl());
+    finalize("EC", objId);
+    return null;
+  }
 
-    @Override
-    protected boolean getDefaultExtractable() {
-        return false;
-    }
+  @Override
+  protected boolean getDefaultExtractable() {
+    return false;
+  }
 
 }

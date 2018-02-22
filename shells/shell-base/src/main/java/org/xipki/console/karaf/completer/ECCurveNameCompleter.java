@@ -25,6 +25,7 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -33,9 +34,9 @@ import org.xipki.security.util.AlgorithmUtil;
 // CHECKSTYLE:SKIP
 public class ECCurveNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        return new HashSet<>(AlgorithmUtil.getECCurveNames());
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return new HashSet<>(AlgorithmUtil.getECCurveNames());
+  }
 
 }

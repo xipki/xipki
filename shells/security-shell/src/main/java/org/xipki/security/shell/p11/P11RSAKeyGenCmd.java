@@ -25,40 +25,41 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "xi", name = "rsa-p11",
-        description = "generate RSA keypair in PKCS#11 device")
+    description = "generate RSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11RSAKeyGenCmd extends P11KeyGenAction {
 
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
+  @Option(name = "--key-size",
+      description = "keysize in bit")
+  private Integer keysize = 2048;
 
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
+  @Option(name = "-e",
+      description = "public exponent")
+  private String publicExponent = "0x10001";
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (keysize % 1024 != 0) {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
-
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
-                label, getControl());
-        finalize("RSA", objId);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (keysize % 1024 != 0) {
+      throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
     }
 
-    @Override
-    protected boolean getDefaultExtractable() {
-        return false;
-    }
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+        label, getControl());
+    finalize("RSA", objId);
+    return null;
+  }
+
+  @Override
+  protected boolean getDefaultExtractable() {
+    return false;
+  }
 
 }

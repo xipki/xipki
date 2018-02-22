@@ -18,23 +18,24 @@
 package org.xipki.password;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
 public class OBFSinglePasswordResolver implements SinglePasswordResolver {
 
-    public OBFSinglePasswordResolver() {
-    }
+  public OBFSinglePasswordResolver() {
+  }
 
-    @Override
-    public boolean canResolveProtocol(String protocol) {
-        return "OBF".equalsIgnoreCase(protocol);
-    }
+  @Override
+  public boolean canResolveProtocol(String protocol) {
+    return "OBF".equalsIgnoreCase(protocol);
+  }
 
-    @Override
-    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
-        return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
-    }
+  @Override
+  public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
+    return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
+  }
 
 }

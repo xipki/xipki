@@ -20,32 +20,33 @@ package org.xipki.password.callback;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface PasswordCallback {
 
-    /**
-     * Initializes me.
-     *
-     * @param conf
-     *          Configuration. Could be {@code null}.
-     * @throws PasswordResolverException
-     *         if error occurs
-     */
-    void init(String conf) throws PasswordResolverException;
+  /**
+   * Initializes me.
+   *
+   * @param conf
+   *          Configuration. Could be {@code null}.
+   * @throws PasswordResolverException
+   *         if error occurs
+   */
+  void init(String conf) throws PasswordResolverException;
 
-    /**
-     * Resolves the password
-     * @param prompt
-     *          Prompt shown to use while asking password. Could be {@code null}.
-     * @param testToken
-     *          Token used to test whether the retrieved password is correct. Could be {@code null}.
-     * @return the resolved password
-     * @throws PasswordResolverException
-     *         if error occurs
-     */
-    char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
+  /**
+   * Resolves the password
+   * @param prompt
+   *          Prompt shown to use while asking password. Could be {@code null}.
+   * @param testToken
+   *          Token used to test whether the retrieved password is correct. Could be {@code null}.
+   * @return the resolved password
+   * @throws PasswordResolverException
+   *         if error occurs
+   */
+  char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
 
 }

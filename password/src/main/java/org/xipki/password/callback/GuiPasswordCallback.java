@@ -23,75 +23,76 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.password.SecurePasswordInputPanel;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class GuiPasswordCallback implements PasswordCallback {
 
-    private int quorum = 1;
+  private int quorum = 1;
 
-    private int tries = 3;
+  private int tries = 3;
 
-    protected boolean isPasswordValid(char[] password, String testToken) {
-        return true;
+  protected boolean isPasswordValid(char[] password, String testToken) {
+    return true;
+  }
+
+  @Override
+  public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
+    String tmpPrompt = prompt;
+    if (StringUtil.isBlank(tmpPrompt)) {
+      tmpPrompt = "Password required";
     }
 
-    @Override
-    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
-        String tmpPrompt = prompt;
-        if (StringUtil.isBlank(tmpPrompt)) {
-            tmpPrompt = "Password required";
+    for (int i = 0; i < tries; i++) {
+      char[] password;
+      if (quorum == 1) {
+        password = SecurePasswordInputPanel.readPassword(tmpPrompt);
+        if (password == null) {
+          throw new PasswordResolverException("user has cancelled");
         }
-
-        for (int i = 0; i < tries; i++) {
-            char[] password;
-            if (quorum == 1) {
-                password = SecurePasswordInputPanel.readPassword(tmpPrompt);
-                if (password == null) {
-                    throw new PasswordResolverException("user has cancelled");
-                }
-            } else {
-                char[][] passwordParts = new char[quorum][];
-                for (int j = 0; j < quorum; j++) {
-                    String promptPart = tmpPrompt + " (part " + (j + 1) + "/" + quorum + ")";
-                    passwordParts[j] = SecurePasswordInputPanel.readPassword(promptPart);
-                    if (passwordParts[j] == null) {
-                        throw new PasswordResolverException("user has cancelled");
-                    }
-                }
-                password = StringUtil.merge(passwordParts);
-            }
-
-            if (isPasswordValid(password, testToken)) {
-                return password;
-            }
+      } else {
+        char[][] passwordParts = new char[quorum][];
+        for (int j = 0; j < quorum; j++) {
+          String promptPart = tmpPrompt + " (part " + (j + 1) + "/" + quorum + ")";
+          passwordParts[j] = SecurePasswordInputPanel.readPassword(promptPart);
+          if (passwordParts[j] == null) {
+            throw new PasswordResolverException("user has cancelled");
+          }
         }
+        password = StringUtil.merge(passwordParts);
+      }
 
-        throw new PasswordResolverException("Could not get the password after " + tries + " tries");
+      if (isPasswordValid(password, testToken)) {
+        return password;
+      }
     }
 
-    @Override
-    public void init(String conf) throws PasswordResolverException {
-        if (StringUtil.isBlank(conf)) {
-            quorum = 1;
-            return;
-        }
+    throw new PasswordResolverException("Could not get the password after " + tries + " tries");
+  }
 
-        ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.value("quorum");
-        quorum = Integer.valueOf(str);
-        if (quorum < 1 || quorum > 10) {
-            throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
-        }
-
-        str = pairs.value("tries");
-        if (StringUtil.isNotBlank(str)) {
-            int intValue = Integer.parseInt(str);
-            if (intValue > 0) {
-                this.tries = intValue;
-            }
-        }
+  @Override
+  public void init(String conf) throws PasswordResolverException {
+    if (StringUtil.isBlank(conf)) {
+      quorum = 1;
+      return;
     }
+
+    ConfPairs pairs = new ConfPairs(conf);
+    String str = pairs.value("quorum");
+    quorum = Integer.valueOf(str);
+    if (quorum < 1 || quorum > 10) {
+      throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
+    }
+
+    str = pairs.value("tries");
+    if (StringUtil.isNotBlank(str)) {
+      int intValue = Integer.parseInt(str);
+      if (intValue > 0) {
+        this.tries = intValue;
+      }
+    }
+  }
 
 }

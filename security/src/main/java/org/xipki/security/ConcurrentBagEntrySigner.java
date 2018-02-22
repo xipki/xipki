@@ -20,14 +20,15 @@ package org.xipki.security;
 import org.xipki.common.concurrent.ConcurrentBagEntry;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class ConcurrentBagEntrySigner extends ConcurrentBagEntry<XiContentSigner> {
 
-    public ConcurrentBagEntrySigner(XiContentSigner value) {
-        super(value);
-    }
+  public ConcurrentBagEntrySigner(XiContentSigner value) {
+    super(value);
+  }
 
 }

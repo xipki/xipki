@@ -27,22 +27,23 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 @Service
 public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference (optional = true)
-    private P11CryptServiceFactory p11CryptServiceFactory;
+  @Reference (optional = true)
+  private P11CryptServiceFactory p11CryptServiceFactory;
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> names = p11CryptServiceFactory.moduleNames();
-        if (CollectionUtil.isEmpty(names)) {
-            return Collections.emptySet();
-        }
-        return names;
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> names = p11CryptServiceFactory.moduleNames();
+    if (CollectionUtil.isEmpty(names)) {
+      return Collections.emptySet();
     }
+    return names;
+  }
 
 }

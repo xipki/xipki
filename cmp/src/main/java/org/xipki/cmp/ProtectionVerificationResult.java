@@ -20,27 +20,28 @@ package org.xipki.cmp;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ProtectionVerificationResult {
 
-    private final Object requestor;
+  private final Object requestor;
 
-    private final ProtectionResult protectionResult;
+  private final ProtectionResult protectionResult;
 
-    public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
-        this.requestor = requestor;
-        this.protectionResult = ParamUtil.requireNonNull("protectionResult", protectionResult);
-    }
+  public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
+    this.requestor = requestor;
+    this.protectionResult = ParamUtil.requireNonNull("protectionResult", protectionResult);
+  }
 
-    public Object requestor() {
-        return requestor;
-    }
+  public Object requestor() {
+    return requestor;
+  }
 
-    public ProtectionResult protectionResult() {
-        return protectionResult;
-    }
+  public ProtectionResult protectionResult() {
+    return protectionResult;
+  }
 
 }

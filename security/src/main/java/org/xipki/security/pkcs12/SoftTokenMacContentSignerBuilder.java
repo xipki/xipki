@@ -44,96 +44,97 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class SoftTokenMacContentSignerBuilder {
 
-    private final SecretKey key;
+  private final SecretKey key;
 
-    public SoftTokenMacContentSignerBuilder(SecretKey key)
-            throws XiSecurityException {
-        this.key = ParamUtil.requireNonNull("key", key);
+  public SoftTokenMacContentSignerBuilder(SecretKey key)
+      throws XiSecurityException {
+    this.key = ParamUtil.requireNonNull("key", key);
+  }
+
+  public SoftTokenMacContentSignerBuilder(String keystoreType, InputStream keystoreStream,
+      char[] keystorePassword, String keyname, char[] keyPassword)
+      throws XiSecurityException {
+    if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
+      throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
+    }
+    ParamUtil.requireNonNull("keystoreStream", keystoreStream);
+    ParamUtil.requireNonNull("keystorePassword", keystorePassword);
+    ParamUtil.requireNonNull("keyPassword", keyPassword);
+
+    try {
+      KeyStore ks = KeyUtil.getKeyStore(keystoreType);
+      ks.load(keystoreStream, keystorePassword);
+
+      String tmpKeyname = keyname;
+      if (tmpKeyname == null) {
+        Enumeration<String> aliases = ks.aliases();
+        while (aliases.hasMoreElements()) {
+          String alias = aliases.nextElement();
+          if (ks.isKeyEntry(alias)) {
+            tmpKeyname = alias;
+            break;
+          }
+        }
+      } else {
+        if (!ks.isKeyEntry(tmpKeyname)) {
+          throw new XiSecurityException("unknown key named " + tmpKeyname);
+        }
+      }
+
+      this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
+    } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
+        | CertificateException | IOException | UnrecoverableKeyException
+        | ClassCastException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
+    }
+  }
+
+  public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
+      int parallelism, SecureRandom random) throws XiSecurityException {
+    ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+    ParamUtil.requireMin("parallelism", parallelism, 1);
+
+    List<XiContentSigner> signers = new ArrayList<>(parallelism);
+
+    boolean gmac = false;
+    ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
+    if (oid.equals(NISTObjectIdentifiers.id_aes128_GCM)
+        || oid.equals(NISTObjectIdentifiers.id_aes192_GCM)
+        || oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
+      gmac = true;
     }
 
-    public SoftTokenMacContentSignerBuilder(String keystoreType, InputStream keystoreStream,
-            char[] keystorePassword, String keyname, char[] keyPassword)
-            throws XiSecurityException {
-        if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
-            throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
-        }
-        ParamUtil.requireNonNull("keystoreStream", keystoreStream);
-        ParamUtil.requireNonNull("keystorePassword", keystorePassword);
-        ParamUtil.requireNonNull("keyPassword", keyPassword);
-
-        try {
-            KeyStore ks = KeyUtil.getKeyStore(keystoreType);
-            ks.load(keystoreStream, keystorePassword);
-
-            String tmpKeyname = keyname;
-            if (tmpKeyname == null) {
-                Enumeration<String> aliases = ks.aliases();
-                while (aliases.hasMoreElements()) {
-                    String alias = aliases.nextElement();
-                    if (ks.isKeyEntry(alias)) {
-                        tmpKeyname = alias;
-                        break;
-                    }
-                }
-            } else {
-                if (!ks.isKeyEntry(tmpKeyname)) {
-                    throw new XiSecurityException("unknown key named " + tmpKeyname);
-                }
-            }
-
-            this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
-        } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
-                | CertificateException | IOException | UnrecoverableKeyException
-                | ClassCastException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
-        }
+    for (int i = 0; i < parallelism; i++) {
+      XiContentSigner signer;
+      if (gmac) {
+        signer = new AESGmacContentSigner(oid, key);
+      } else {
+        signer = new HmacContentSigner(signatureAlgId, key);
+      }
+      signers.add(signer);
     }
 
-    public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
-            int parallelism, SecureRandom random) throws XiSecurityException {
-        ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
-        ParamUtil.requireMin("parallelism", parallelism, 1);
-
-        List<XiContentSigner> signers = new ArrayList<>(parallelism);
-
-        boolean gmac = false;
-        ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
-        if (oid.equals(NISTObjectIdentifiers.id_aes128_GCM)
-                || oid.equals(NISTObjectIdentifiers.id_aes192_GCM)
-                || oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
-            gmac = true;
-        }
-
-        for (int i = 0; i < parallelism; i++) {
-            XiContentSigner signer;
-            if (gmac) {
-                signer = new AESGmacContentSigner(oid, key);
-            } else {
-                signer = new HmacContentSigner(signatureAlgId, key);
-            }
-            signers.add(signer);
-        }
-
-        final boolean mac = true;
-        DfltConcurrentContentSigner concurrentSigner;
-        try {
-            concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
-        }
-        concurrentSigner.setSha1DigestOfMacKey(HashAlgoType.SHA1.hash(key.getEncoded()));
-
-        return concurrentSigner;
-    } // createSigner
-
-    public SecretKey key() {
-        return key;
+    final boolean mac = true;
+    DfltConcurrentContentSigner concurrentSigner;
+    try {
+      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
     }
+    concurrentSigner.setSha1DigestOfMacKey(HashAlgoType.SHA1.hash(key.getEncoded()));
+
+    return concurrentSigner;
+  } // createSigner
+
+  public SecretKey key() {
+    return key;
+  }
 
 }
