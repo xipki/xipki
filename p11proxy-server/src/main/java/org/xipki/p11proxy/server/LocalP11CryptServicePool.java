@@ -76,8 +76,7 @@ public class LocalP11CryptServicePool {
         short moduleId = deriveModuleId(moduleName);
         String hexModuleId = "0x" + Integer.toHexString(moduleId);
         if (p11CryptServices.containsKey(moduleId)) {
-          throw new P11TokenException(
-              "module Id " + moduleId + " for name " + moduleName
+          throw new P11TokenException("module Id " + moduleId + " for name " + moduleName
               + " already used, use another module name");
         }
         p11CryptServices.put(moduleId, p11Service);
