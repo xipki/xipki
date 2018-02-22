@@ -18,16 +18,17 @@
 package org.xipki.ca.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class InsuffientPermissionException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public InsuffientPermissionException(String message) {
-        super(message);
-    }
+  public InsuffientPermissionException(String message) {
+    super(message);
+  }
 
 }

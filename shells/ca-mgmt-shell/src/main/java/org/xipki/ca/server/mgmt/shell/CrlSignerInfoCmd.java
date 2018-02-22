@@ -32,56 +32,57 @@ import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "crlsigner-info",
-        description = "show information of CRL signer")
+    description = "show information of CRL signer")
 @Service
 public class CrlSignerInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "CRL signer name")
-    @Completion(CrlSignerNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "CRL signer name")
+  @Completion(CrlSignerNameCompleter.class)
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show CRL signer information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show CRL signer information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> names = caManager.getCrlSignerNames();
-            int size = names.size();
+    if (name == null) {
+      Set<String> names = caManager.getCrlSignerNames();
+      int size = names.size();
 
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1");
-                sb.append(" CRL signer is configured\n");
-            } else {
-                sb.append(size).append(" CRL signers are configured:\n");
-            }
+      if (size == 0 || size == 1) {
+        sb.append((size == 0) ? "no" : "1");
+        sb.append(" CRL signer is configured\n");
+      } else {
+        sb.append(size).append(" CRL signers are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String entry : sorted) {
-                sb.append("\t").append(entry).append("\n");
-            }
-        } else {
-            X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-            if (entry == null) {
-                throw new CmdFailure("\tno CRL signer named '" + name + "' is configured");
-            } else {
-                sb.append(entry.toString(verbose.booleanValue()));
-            }
-        }
-
-        println(sb.toString());
-        return null;
+      for (String entry : sorted) {
+        sb.append("\t").append(entry).append("\n");
+      }
+    } else {
+      X509CrlSignerEntry entry = caManager.getCrlSigner(name);
+      if (entry == null) {
+        throw new CmdFailure("\tno CRL signer named '" + name + "' is configured");
+      } else {
+        sb.append(entry.toString(verbose.booleanValue()));
+      }
     }
+
+    println(sb.toString());
+    return null;
+  }
 
 }

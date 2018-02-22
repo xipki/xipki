@@ -28,67 +28,68 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DbPortFileNameIterator implements Iterator<String> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);
 
-    private BufferedReader reader;
+  private BufferedReader reader;
 
-    private String nextFilename;
+  private String nextFilename;
 
-    public DbPortFileNameIterator(String filename) throws IOException {
-        ParamUtil.requireNonNull("filename", filename);
+  public DbPortFileNameIterator(String filename) throws IOException {
+    ParamUtil.requireNonNull("filename", filename);
 
-        this.reader = new BufferedReader(new FileReader(filename));
-        this.nextFilename = readNextFilenameLine();
+    this.reader = new BufferedReader(new FileReader(filename));
+    this.nextFilename = readNextFilenameLine();
+  }
+
+  @Override
+  public boolean hasNext() {
+    return nextFilename != null;
+  }
+
+  @Override
+  public String next() {
+    String str = nextFilename;
+    nextFilename = null;
+    try {
+      nextFilename = readNextFilenameLine();
+    } catch (IOException ex) {
+      throw new RuntimeException("could not read next file name");
+    }
+    return str;
+  }
+
+  @Override
+  public void remove() {
+    throw new UnsupportedOperationException("remove is not supported");
+  }
+
+  public void close() {
+    try {
+      reader.close();
+    } catch (Throwable th) {
+      LOG.error("could not close reader: {}", th.getMessage());
+      LOG.error("could not close reader", th);
+    }
+  }
+
+  private String readNextFilenameLine() throws IOException {
+    String line;
+    while ((line = reader.readLine()) != null) {
+      line = line.trim();
+      if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
+        continue;
+      }
+      return line;
     }
 
-    @Override
-    public boolean hasNext() {
-        return nextFilename != null;
-    }
-
-    @Override
-    public String next() {
-        String str = nextFilename;
-        nextFilename = null;
-        try {
-            nextFilename = readNextFilenameLine();
-        } catch (IOException ex) {
-            throw new RuntimeException("could not read next file name");
-        }
-        return str;
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("remove is not supported");
-    }
-
-    public void close() {
-        try {
-            reader.close();
-        } catch (Throwable th) {
-            LOG.error("could not close reader: {}", th.getMessage());
-            LOG.error("could not close reader", th);
-        }
-    }
-
-    private String readNextFilenameLine() throws IOException {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
-            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
-                continue;
-            }
-            return line;
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

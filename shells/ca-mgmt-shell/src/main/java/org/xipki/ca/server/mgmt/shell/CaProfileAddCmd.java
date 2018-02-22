@@ -28,33 +28,34 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "caprofile-add",
-        description = "add certificate profile to CA")
+    description = "add certificate profile to CA")
 @Service
 public class CaProfileAddCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile", required = true, multiValued = true,
-            description = "profile name\n(required, multi-valued)")
-    @Completion(ProfileNameCompleter.class)
-    private List<String> profileNames;
+  @Option(name = "--profile", required = true, multiValued = true,
+      description = "profile name\n(required, multi-valued)")
+  @Completion(ProfileNameCompleter.class)
+  private List<String> profileNames;
 
-    @Override
-    protected Object execute0() throws Exception {
-        for (String profileName : profileNames) {
-            boolean bo = caManager.addCertprofileToCa(profileName, caName);
-            output(bo, "associated", "could not associate",
-                    StringUtil.concat("certificate profiles ", profileName, " to CA ", caName));
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    for (String profileName : profileNames) {
+      boolean bo = caManager.addCertprofileToCa(profileName, caName);
+      output(bo, "associated", "could not associate",
+          StringUtil.concat("certificate profiles ", profileName, " to CA ", caName));
     }
+    return null;
+  }
 
 }

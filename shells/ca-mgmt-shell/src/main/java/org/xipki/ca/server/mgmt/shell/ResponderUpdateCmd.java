@@ -36,68 +36,69 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "responder-up",
-        description = "update responder")
+    description = "update responder")
 @Service
 public class ResponderUpdateCmd extends CaAction {
 
-    @Reference
-    protected PasswordResolver passwordResolver;
+  @Reference
+  protected PasswordResolver passwordResolver;
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "responder name\n(required)")
-    @Completion(ResponderNameCompleter.class)
-    protected String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "responder name\n(required)")
+  @Completion(ResponderNameCompleter.class)
+  protected String name;
 
-    @Option(name = "--signer-type",
-            description = "type of the responder signer")
-    @Completion(SignerTypeCompleter.class)
-    protected String signerType;
+  @Option(name = "--signer-type",
+      description = "type of the responder signer")
+  @Completion(SignerTypeCompleter.class)
+  protected String signerType;
 
-    @Option(name = "--cert",
-            description = "requestor certificate file or 'null'")
-    @Completion(FilePathCompleter.class)
-    protected String certFile;
+  @Option(name = "--cert",
+      description = "requestor certificate file or 'null'")
+  @Completion(FilePathCompleter.class)
+  protected String certFile;
 
-    @Option(name = "--signer-conf",
-            description = "conf of the responder signer or 'null'")
-    private String signerConf;
+  @Option(name = "--signer-conf",
+      description = "conf of the responder signer or 'null'")
+  private String signerConf;
 
-    protected String getSignerConf() throws Exception {
-        if (signerConf == null) {
-            return signerConf;
-        }
-        String tmpSignerType = signerType;
-        if (tmpSignerType == null) {
-            CmpResponderEntry entry = caManager.getResponder(name);
-            if (entry == null) {
-                throw new IllegalCmdParamException("please specify the signerType");
-            }
-            tmpSignerType = entry.type();
-        }
-
-        return ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf, passwordResolver,
-                securityFactory);
+  protected String getSignerConf() throws Exception {
+    if (signerConf == null) {
+      return signerConf;
+    }
+    String tmpSignerType = signerType;
+    if (tmpSignerType == null) {
+      CmpResponderEntry entry = caManager.getResponder(name);
+      if (entry == null) {
+        throw new IllegalCmdParamException("please specify the signerType");
+      }
+      tmpSignerType = entry.type();
     }
 
-    @Override
-    protected Object execute0() throws Exception {
-        String cert = null;
-        if (CaManager.NULL.equalsIgnoreCase(certFile)) {
-            cert = CaManager.NULL;
-        } else if (certFile != null) {
-            byte[] certBytes = IoUtil.read(certFile);
-            X509Util.parseCert(new ByteArrayInputStream(certBytes));
-            cert = Base64.encodeToString(certBytes);
-        }
+    return ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf, passwordResolver,
+        securityFactory);
+  }
 
-        boolean bo = caManager.changeResponder(name, signerType, getSignerConf(), cert);
-        output(bo, "updated", "could not update", "CMP responder " + name);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    String cert = null;
+    if (CaManager.NULL.equalsIgnoreCase(certFile)) {
+      cert = CaManager.NULL;
+    } else if (certFile != null) {
+      byte[] certBytes = IoUtil.read(certFile);
+      X509Util.parseCert(new ByteArrayInputStream(certBytes));
+      cert = Base64.encodeToString(certBytes);
     }
+
+    boolean bo = caManager.changeResponder(name, signerType, getSignerConf(), cert);
+    output(bo, "updated", "could not update", "CMP responder " + name);
+    return null;
+  }
 
 }

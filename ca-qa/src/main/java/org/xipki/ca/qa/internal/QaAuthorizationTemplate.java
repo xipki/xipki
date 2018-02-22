@@ -21,28 +21,29 @@ import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaAuthorizationTemplate extends QaExtension {
 
-    private final String type;
+  private final String type;
 
-    private final byte[] accessRights;
+  private final byte[] accessRights;
 
-    public QaAuthorizationTemplate(AuthorizationTemplate jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
-        this.type = jaxb.getType().getValue();
-        this.accessRights = jaxb.getAccessRights().getValue();
-    }
+  public QaAuthorizationTemplate(AuthorizationTemplate jaxb) {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    this.type = jaxb.getType().getValue();
+    this.accessRights = jaxb.getAccessRights().getValue();
+  }
 
-    public String type() {
-        return type;
-    }
+  public String type() {
+    return type;
+  }
 
-    public byte[] accessRights() {
-        return accessRights;
-    }
+  public byte[] accessRights() {
+    return accessRights;
+  }
 
 }

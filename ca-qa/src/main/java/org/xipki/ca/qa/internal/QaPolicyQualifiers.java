@@ -29,39 +29,40 @@ import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifie
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaPolicyQualifiers {
 
-    private final List<QaPolicyQualifierInfo> policyQualifiers;
+  private final List<QaPolicyQualifierInfo> policyQualifiers;
 
-    public QaPolicyQualifiers(PolicyQualifiers jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
-        List<QaPolicyQualifierInfo> list = new LinkedList<>();
-        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
-        for (JAXBElement<String> element : elements) {
-            String value = element.getValue();
-            String localPart = element.getName().getLocalPart();
+  public QaPolicyQualifiers(PolicyQualifiers jaxb) {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    List<QaPolicyQualifierInfo> list = new LinkedList<>();
+    List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+    for (JAXBElement<String> element : elements) {
+      String value = element.getValue();
+      String localPart = element.getName().getLocalPart();
 
-            QaPolicyQualifierInfo info;
-            if ("cpsUri".equals(localPart)) {
-                info = new QaCpsUriPolicyQualifier(value);
-            } else if ("userNotice".equals(localPart)) {
-                info = new QaUserNoticePolicyQualifierInfo(value);
-            } else {
-                throw new RuntimeException(
-                        "should not reach here, unknown child of PolicyQualifiers " + localPart);
-            }
-            list.add(info);
-        }
-
-        this.policyQualifiers = Collections.unmodifiableList(list);
+      QaPolicyQualifierInfo info;
+      if ("cpsUri".equals(localPart)) {
+        info = new QaCpsUriPolicyQualifier(value);
+      } else if ("userNotice".equals(localPart)) {
+        info = new QaUserNoticePolicyQualifierInfo(value);
+      } else {
+        throw new RuntimeException(
+            "should not reach here, unknown child of PolicyQualifiers " + localPart);
+      }
+      list.add(info);
     }
 
-    public List<QaPolicyQualifierInfo> policyQualifiers() {
-        return policyQualifiers;
-    }
+    this.policyQualifiers = Collections.unmodifiableList(list);
+  }
+
+  public List<QaPolicyQualifierInfo> policyQualifiers() {
+    return policyQualifiers;
+  }
 
 }

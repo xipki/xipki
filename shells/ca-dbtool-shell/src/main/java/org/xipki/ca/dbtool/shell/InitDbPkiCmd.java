@@ -24,35 +24,36 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "initdb-pki",
-        description = "reset and initialize the CA and OCSP databases")
+    description = "reset and initialize the CA and OCSP databases")
 @Service
 public class InitDbPkiCmd extends LiquibaseAction {
 
-    private static final String CA_SCHMEA_FILE = "xipki/sql/ca-init.xml";
+  private static final String CA_SCHMEA_FILE = "xipki/sql/ca-init.xml";
 
-    private static final String OCSP_SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
+  private static final String OCSP_SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
 
-    @Override
-    protected Object execute0() throws Exception {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+  @Override
+  protected Object execute0() throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        resetAndInit(dbConf, CA_SCHMEA_FILE);
+    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+    resetAndInit(dbConf, CA_SCHMEA_FILE);
 
-        for (String dbName : dbConfs.keySet()) {
-            if (!dbName.toLowerCase().contains("ocsp")) {
-                continue;
-            }
+    for (String dbName : dbConfs.keySet()) {
+      if (!dbName.toLowerCase().contains("ocsp")) {
+        continue;
+      }
 
-            dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, OCSP_SCHEMA_FILE);
-        }
-        return null;
+      dbConf = dbConfs.get(dbName);
+      resetAndInit(dbConf, OCSP_SCHEMA_FILE);
     }
+    return null;
+  }
 
 }

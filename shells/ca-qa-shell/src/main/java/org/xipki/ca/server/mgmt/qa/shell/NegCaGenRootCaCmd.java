@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.CaGenRcaCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-gen-rootca",
-        description = "generate selfsigned CA (negative, QA)")
+    description = "generate selfsigned CA (negative, QA)")
 @Service
 public class NegCaGenRootCaCmd extends CaGenRcaCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-gen-rootca");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-gen-rootca");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

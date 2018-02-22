@@ -20,20 +20,21 @@ package org.xipki.ca.api;
 import java.util.Set;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface EnvParameterResolver {
 
-    Set<String> allParameterNames();
+  Set<String> allParameterNames();
 
-    /**
-     *
-     * @param parameterName
-     *          Name of the parameter.
-     * @return the value of parameter.
-     */
-    String parameter(String parameterName);
+  /**
+   * TODO.
+   * @param parameterName
+   *          Name of the parameter.
+   * @return the value of parameter.
+   */
+  String parameter(String parameterName);
 
 }

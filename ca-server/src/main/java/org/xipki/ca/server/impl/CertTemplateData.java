@@ -25,57 +25,58 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertTemplateData {
 
-    private final X500Name subject;
+  private final X500Name subject;
 
-    private final SubjectPublicKeyInfo publicKeyInfo;
+  private final SubjectPublicKeyInfo publicKeyInfo;
 
-    private final Date notBefore;
+  private final Date notBefore;
 
-    private final Date notAfter;
+  private final Date notAfter;
 
-    private final String certprofileName;
+  private final String certprofileName;
 
-    private final Extensions extensions;
+  private final Extensions extensions;
 
-    public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
-            Date notAfter, Extensions extensions, String certprofileName) {
-        this.subject = ParamUtil.requireNonNull("subject", subject);
-        this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
-        this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
-                .toLowerCase();
-        this.extensions = extensions;
-        this.notBefore = notBefore;
-        this.notAfter = notAfter;
-    }
+  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
+      Date notAfter, Extensions extensions, String certprofileName) {
+    this.subject = ParamUtil.requireNonNull("subject", subject);
+    this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
+    this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
+        .toLowerCase();
+    this.extensions = extensions;
+    this.notBefore = notBefore;
+    this.notAfter = notAfter;
+  }
 
-    public X500Name subject() {
-        return subject;
-    }
+  public X500Name subject() {
+    return subject;
+  }
 
-    public SubjectPublicKeyInfo publicKeyInfo() {
-        return publicKeyInfo;
-    }
+  public SubjectPublicKeyInfo publicKeyInfo() {
+    return publicKeyInfo;
+  }
 
-    public Date notBefore() {
-        return notBefore;
-    }
+  public Date notBefore() {
+    return notBefore;
+  }
 
-    public Date notAfter() {
-        return notAfter;
-    }
+  public Date notAfter() {
+    return notAfter;
+  }
 
-    public String certprofileName() {
-        return certprofileName;
-    }
+  public String certprofileName() {
+    return certprofileName;
+  }
 
-    public Extensions extensions() {
-        return extensions;
-    }
+  public Extensions extensions() {
+    return extensions;
+  }
 
 }

@@ -18,27 +18,28 @@
 package org.xipki.ca.api.profile;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertprofileException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CertprofileException() {
-    }
+  public CertprofileException() {
+  }
 
-    public CertprofileException(String message) {
-        super(message);
-    }
+  public CertprofileException(String message) {
+    super(message);
+  }
 
-    public CertprofileException(Throwable cause) {
-        super(cause);
-    }
+  public CertprofileException(Throwable cause) {
+    super(cause);
+  }
 
-    public CertprofileException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CertprofileException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

@@ -38,62 +38,63 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class HttpRestServlet extends AbstractHttpServlet {
 
-    private CmpResponderManager responderManager;
+  private CmpResponderManager responderManager;
 
-    private AuditServiceRegister auditServiceRegister;
+  private AuditServiceRegister auditServiceRegister;
 
-    public HttpRestServlet() {
+  public HttpRestServlet() {
+  }
+
+  @Override
+  public boolean needsTlsSessionInfo() {
+    return true;
+  }
+
+  @Override
+  public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+      SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) {
+    HttpVersion version = request.protocolVersion();
+    HttpMethod method = request.method();
+    if (method != HttpMethod.POST && method != HttpMethod.GET) {
+      return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
     }
 
-    @Override
-    public boolean needsTlsSessionInfo() {
-        return true;
+    AuditEvent event = new AuditEvent(new Date());
+
+    try {
+      Rest rest = responderManager.getRest();
+      HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(
+          request, servletUri, sslSession, sslReverseProxyMode);
+      byte[] requestBytes = readContent(request);
+      RestResponse response = rest.service(servletUri.path(), event, requestBytes,
+          httpRetriever);
+
+      HttpResponseStatus status = HttpResponseStatus.valueOf(response.statusCode());
+      FullHttpResponse resp = createResponse(version, status, response.contentType(),
+          response.body());
+      for (String headerName : response.headers().keySet()) {
+        resp.headers().add(headerName, response.headers().get(headerName));
+      }
+      return resp;
+    } finally {
+      event.finish();
+      auditServiceRegister.getAuditService().logEvent(event);
     }
+  } // method service
 
-    @Override
-    public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) {
-        HttpVersion version = request.protocolVersion();
-        HttpMethod method = request.method();
-        if (method != HttpMethod.POST && method != HttpMethod.GET) {
-            return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
-        }
+  public void setResponderManager(CmpResponderManager responderManager) {
+    this.responderManager = responderManager;
+  }
 
-        AuditEvent event = new AuditEvent(new Date());
-
-        try {
-            Rest rest = responderManager.getRest();
-            HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(
-                    request, servletUri, sslSession, sslReverseProxyMode);
-            byte[] requestBytes = readContent(request);
-            RestResponse response = rest.service(servletUri.path(), event, requestBytes,
-                    httpRetriever);
-
-            HttpResponseStatus status = HttpResponseStatus.valueOf(response.statusCode());
-            FullHttpResponse resp = createResponse(version, status, response.contentType(),
-                    response.body());
-            for (String headerName : response.headers().keySet()) {
-                resp.headers().add(headerName, response.headers().get(headerName));
-            }
-            return resp;
-        } finally {
-            event.finish();
-            auditServiceRegister.getAuditService().logEvent(event);
-        }
-    } // method service
-
-    public void setResponderManager(CmpResponderManager responderManager) {
-        this.responderManager = responderManager;
-    }
-
-    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
-    }
+  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
+    this.auditServiceRegister = auditServiceRegister;
+  }
 
 }

@@ -28,67 +28,68 @@ import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class CaAction extends XiAction {
 
-    @Reference
-    protected CaManager caManager;
+  @Reference
+  protected CaManager caManager;
 
-    @Reference
-    protected SecurityFactory securityFactory;
+  @Reference
+  protected SecurityFactory securityFactory;
 
-    protected static String getRealString(String str) {
-        return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
+  protected static String getRealString(String str) {
+    return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
+  }
+
+  protected static String toString(Collection<? extends Object> col) {
+    if (col == null) {
+      return "null";
     }
 
-    protected static String toString(Collection<? extends Object> col) {
-        if (col == null) {
-            return "null";
-        }
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    int size = col.size();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        int size = col.size();
+    int idx = 0;
+    for (Object o : col) {
+      sb.append(o);
+      if (idx < size - 1) {
+        sb.append(", ");
+      }
+      idx++;
+    }
+    sb.append("}");
+    return sb.toString();
+  }
 
-        int idx = 0;
-        for (Object o : col) {
-            sb.append(o);
-            if (idx < size - 1) {
-                sb.append(", ");
-            }
-            idx++;
-        }
-        sb.append("}");
-        return sb.toString();
+  protected void output(boolean successful, String posPrefix, String negPrefix, String message)
+      throws CmdFailure {
+    if (successful) {
+      println(posPrefix + " " + message);
+    } else {
+      throw new CmdFailure(negPrefix + " " + message);
+    }
+  }
+
+  protected void printCaNames(StringBuilder sb, Set<String> caNames, String prefix) {
+    if (caNames.isEmpty()) {
+      sb.append(prefix).append("-\n");
+      return;
     }
 
-    protected void output(boolean successful, String posPrefix, String negPrefix, String message)
-            throws CmdFailure {
-        if (successful) {
-            println(posPrefix + " " + message);
-        } else {
-            throw new CmdFailure(negPrefix + " " + message);
-        }
+    for (String caName : caNames) {
+      Set<String> aliases = caManager.getAliasesForCa(caName);
+      if (CollectionUtil.isEmpty(aliases)) {
+        sb.append(prefix).append(caName);
+      } else {
+        sb.append(prefix).append(caName + " (aliases " + aliases + ")");
+      }
+      sb.append("\n");
     }
-
-    protected void printCaNames(StringBuilder sb, Set<String> caNames, String prefix) {
-        if (caNames.isEmpty()) {
-            sb.append(prefix).append("-\n");
-            return;
-        }
-
-        for (String caName : caNames) {
-            Set<String> aliases = caManager.getAliasesForCa(caName);
-            if (CollectionUtil.isEmpty(aliases)) {
-                sb.append(prefix).append(caName);
-            } else {
-                sb.append(prefix).append(caName + " (aliases " + aliases + ")");
-            }
-            sb.append("\n");
-        }
-    }
+  }
 
 }

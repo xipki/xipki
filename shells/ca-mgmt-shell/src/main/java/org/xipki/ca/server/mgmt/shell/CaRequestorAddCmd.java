@@ -32,53 +32,54 @@ import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.console.karaf.completer.YesNoCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "careq-add",
-        description = "add requestor to CA")
+    description = "add requestor to CA")
 @Service
 public class CaRequestorAddCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--requestor", required = true,
-            description = "requestor name\n(required)")
-    @Completion(RequestorNameCompleter.class)
-    private String requestorName;
+  @Option(name = "--requestor", required = true,
+      description = "requestor name\n(required)")
+  @Completion(RequestorNameCompleter.class)
+  private String requestorName;
 
-    @Option(name = "--ra",
-            description = "whether as RA")
-    @Completion(YesNoCompleter.class)
-    private String raS = "no";
+  @Option(name = "--ra",
+      description = "whether as RA")
+  @Completion(YesNoCompleter.class)
+  private String raS = "no";
 
-    @Option(name = "--permission", required = true, multiValued = true,
-            description = "permission\n(required, multi-valued)")
-    @Completion(PermissionCompleter.class)
-    private Set<String> permissions;
+  @Option(name = "--permission", required = true, multiValued = true,
+      description = "permission\n(required, multi-valued)")
+  @Completion(PermissionCompleter.class)
+  private Set<String> permissions;
 
-    @Option(name = "--profile", multiValued = true,
-            description = "profile name or 'all' for all profiles\n(multi-valued)")
-    @Completion(ProfileNameAndAllCompleter.class)
-    private Set<String> profiles;
+  @Option(name = "--profile", multiValued = true,
+      description = "profile name or 'all' for all profiles\n(multi-valued)")
+  @Completion(ProfileNameAndAllCompleter.class)
+  private Set<String> profiles;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean ra = isEnabled(raS, false, "ra");
+  @Override
+  protected Object execute0() throws Exception {
+    boolean ra = isEnabled(raS, false, "ra");
 
-        CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
-        entry.setRa(ra);
-        entry.setProfiles(profiles);
-        int intPermission = ShellUtil.getPermission(permissions);
-        entry.setPermission(intPermission);
+    CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
+    entry.setRa(ra);
+    entry.setProfiles(profiles);
+    int intPermission = ShellUtil.getPermission(permissions);
+    entry.setPermission(intPermission);
 
-        boolean bo = caManager.addRequestorToCa(entry, caName);
-        output(bo, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
-        return null;
-    }
+    boolean bo = caManager.addRequestorToCa(entry, caName);
+    output(bo, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
+    return null;
+  }
 
 }

@@ -28,35 +28,36 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "requestor-check",
-        description = "check information of requestors (QA)")
+    description = "check information of requestors (QA)")
 @Service
 public class RequestorCheckCmd extends RequestorUpdateCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("checking requestor " + name);
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking requestor " + name);
 
-        CmpRequestorEntry cr = caManager.getRequestor(name);
-        if (cr == null) {
-            throw new CmdFailure("requestor named '" + name + "' is not configured");
-        }
-
-        byte[] ex = IoUtil.read(certFile);
-        if (cr.base64Cert() == null) {
-            throw new CmdFailure("Cert: is not configured explicitly as expected");
-        }
-
-        if (!Arrays.equals(ex, Base64.decode(cr.base64Cert()))) {
-            throw new CmdFailure("Cert: the expected one and the actual one differ");
-        }
-
-        println(" checked requestor " + name);
-        return null;
+    CmpRequestorEntry cr = caManager.getRequestor(name);
+    if (cr == null) {
+      throw new CmdFailure("requestor named '" + name + "' is not configured");
     }
+
+    byte[] ex = IoUtil.read(certFile);
+    if (cr.base64Cert() == null) {
+      throw new CmdFailure("Cert: is not configured explicitly as expected");
+    }
+
+    if (!Arrays.equals(ex, Base64.decode(cr.base64Cert()))) {
+      throw new CmdFailure("Cert: the expected one and the actual one differ");
+    }
+
+    println(" checked requestor " + name);
+    return null;
+  }
 
 }

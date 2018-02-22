@@ -24,30 +24,31 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "caalias-add",
-        description = "add CA alias")
+    description = "add CA alias")
 @Service
 public class CaAliasAddCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--alias", required = true,
-            description = "CA alias\n(required)")
-    private String caAlias;
+  @Option(name = "--alias", required = true,
+      description = "CA alias\n(required)")
+  private String caAlias;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.addCaAlias(caAlias, caName);
-        output(bo, "added", "could not add",
-                "CA alias " + caAlias + " associated with CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.addCaAlias(caAlias, caName);
+    output(bo, "added", "could not add",
+        "CA alias " + caAlias + " associated with CA " + caName);
+    return null;
+  }
 
 }

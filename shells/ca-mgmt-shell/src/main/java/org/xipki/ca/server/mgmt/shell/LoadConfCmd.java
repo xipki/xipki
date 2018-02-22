@@ -25,26 +25,27 @@ import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "load-conf",
-        description = "load configuration")
+    description = "load configuration")
 @Service
 public class LoadConfCmd extends CaAction {
 
-    @Option(name = "--conf-file",
-            description = "CA system configuration file (XML or zip file")
-    @Completion(FilePathCompleter.class)
-    private String confFile;
+  @Option(name = "--conf-file",
+      description = "CA system configuration file (XML or zip file")
+  @Completion(FilePathCompleter.class)
+  private String confFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CaConf caConf = new CaConf(confFile, securityFactory);
-        boolean bo = caManager.loadConf(caConf);
-        output(bo, "loaded", "could not load", "configuration " + confFile);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    CaConf caConf = new CaConf(confFile, securityFactory);
+    boolean bo = caManager.loadConf(caConf);
+    output(bo, "loaded", "could not load", "configuration " + confFile);
+    return null;
+  }
 
 }

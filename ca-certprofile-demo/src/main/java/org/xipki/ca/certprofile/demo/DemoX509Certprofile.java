@@ -40,7 +40,7 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.XmlUtil;
 
 /**
- * This class adds two extensions to the certificate:
+ * This class adds two extensions to the certificate.
  * <ol>
  *   <li>add the extraControl of CA</li>
  *   <li>add the text defined in the XML block, like
@@ -58,106 +58,106 @@ import org.xipki.common.util.XmlUtil;
 
 public class DemoX509Certprofile extends XmlX509Certprofile {
 
-    public static final ASN1ObjectIdentifier id_demo_ca_extra_control =
-            new ASN1ObjectIdentifier("1.2.3.4.1");
+  public static final ASN1ObjectIdentifier id_demo_ca_extra_control =
+      new ASN1ObjectIdentifier("1.2.3.4.1");
 
-    public static final ASN1ObjectIdentifier id_demo_other_namespace =
-            new ASN1ObjectIdentifier("1.2.3.4.2");
+  public static final ASN1ObjectIdentifier id_demo_other_namespace =
+      new ASN1ObjectIdentifier("1.2.3.4.2");
 
-    private boolean addCaExtraControl;
+  private boolean addCaExtraControl;
 
-    private boolean addSequence;
+  private boolean addSequence;
 
-    private ASN1Sequence sequence;
+  private ASN1Sequence sequence;
 
-    @Override
-    protected void extraReset() {
-        addCaExtraControl = false;
-        addSequence = false;
-        sequence = null;
+  @Override
+  protected void extraReset() {
+    addCaExtraControl = false;
+    addSequence = false;
+    sequence = null;
+  }
+
+  @Override
+  protected boolean initExtraExtension(ASN1ObjectIdentifier extnId,
+      ExtensionControl extnControl, Object extnValue) throws CertprofileException {
+    if (id_demo_ca_extra_control.equals(extnId)) {
+      this.addCaExtraControl = true;
+      return true;
+    } else if (id_demo_other_namespace.equals(extnId)) {
+      if (!(extnValue instanceof Element)) {
+        throw new CertprofileException("extnValue is not an org.w3c.dom.Element");
+      }
+      Element el = (Element) extnValue;
+      String ns = el.getNamespaceURI();
+      String ln = el.getLocalName();
+      if (!(ns.equals("urn:extra") && ln.equals("sequence"))) {
+        throw new CertprofileException("element is not of {urn:extra}:sequence");
+      }
+
+      List<Element> textElements = XmlUtil.getElementChilden(el, ns, "text");
+      if (CollectionUtil.isEmpty(textElements)) {
+        throw new CertprofileException("no text element is defined");
+      }
+
+      int size = textElements.size();
+      DERUTF8String[] texts = new DERUTF8String[size];
+      for (int i = 0; i < size; i++) {
+        String text = XmlUtil.getNodeValue(textElements.get(i));
+        texts[i] = new DERUTF8String(text);
+      }
+
+      this.sequence = new DERSequence(texts);
+
+      this.addSequence = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public ExtensionValues getExtraExtensions(
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
+      X500Name requestedSubject, X500Name grantedSubject,
+      Extensions requestedExtensions, Date notBefore, Date notAfter,
+      PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
+    ExtensionValues extnValues = new ExtensionValues();
+
+    if (addCaExtraControl) {
+      ASN1ObjectIdentifier type = id_demo_ca_extra_control;
+      ExtensionControl extnControl = extensionOccurences.get(type);
+      if (extnControl != null) {
+        ConfPairs caExtraControl = caInfo.extraControl();
+        String name = "name-a";
+        String value = null;
+        if (caExtraControl != null) {
+          value = caExtraControl.value(name);
+        }
+
+        if (value == null) {
+          value = "UNDEF";
+        }
+
+        ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(),
+            new DERUTF8String(name + ": " + value));
+        extnValues.addExtension(type, extnValue);
+      }
     }
 
-    @Override
-    protected boolean initExtraExtension(ASN1ObjectIdentifier extnId,
-            ExtensionControl extnControl, Object extnValue) throws CertprofileException {
-        if (id_demo_ca_extra_control.equals(extnId)) {
-            this.addCaExtraControl = true;
-            return true;
-        } else if (id_demo_other_namespace.equals(extnId)) {
-            if (!(extnValue instanceof Element)) {
-                throw new CertprofileException("extnValue is not an org.w3c.dom.Element");
-            }
-            Element el = (Element) extnValue;
-            String ns = el.getNamespaceURI();
-            String ln = el.getLocalName();
-            if (!(ns.equals("urn:extra") && ln.equals("sequence"))) {
-                throw new CertprofileException("element is not of {urn:extra}:sequence");
-            }
-
-            List<Element> textElements = XmlUtil.getElementChilden(el, ns, "text");
-            if (CollectionUtil.isEmpty(textElements)) {
-                throw new CertprofileException("no text element is defined");
-            }
-
-            int size = textElements.size();
-            DERUTF8String[] texts = new DERUTF8String[size];
-            for (int i = 0; i < size; i++) {
-                String text = XmlUtil.getNodeValue(textElements.get(i));
-                texts[i] = new DERUTF8String(text);
-            }
-
-            this.sequence = new DERSequence(texts);
-
-            this.addSequence = true;
-            return true;
-        } else {
-            return false;
+    if (addSequence) {
+      ASN1ObjectIdentifier type = id_demo_other_namespace;
+      ExtensionControl extnControl = extensionOccurences.get(type);
+      if (extnControl != null) {
+        if (sequence == null) {
+          throw new IllegalStateException("CertProfile is not initialized");
         }
+
+        ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(), sequence);
+        extnValues.addExtension(type, extnValue);
+      }
     }
 
-    @Override
-    public ExtensionValues getExtraExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-            X500Name requestedSubject, X500Name grantedSubject,
-            Extensions requestedExtensions, Date notBefore, Date notAfter,
-            PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
-        ExtensionValues extnValues = new ExtensionValues();
-
-        if (addCaExtraControl) {
-            ASN1ObjectIdentifier type = id_demo_ca_extra_control;
-            ExtensionControl extnControl = extensionOccurences.get(type);
-            if (extnControl != null) {
-                ConfPairs caExtraControl = caInfo.extraControl();
-                String name = "name-a";
-                String value = null;
-                if (caExtraControl != null) {
-                    value = caExtraControl.value(name);
-                }
-
-                if (value == null) {
-                    value = "UNDEF";
-                }
-
-                ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(),
-                        new DERUTF8String(name + ": " + value));
-                extnValues.addExtension(type, extnValue);
-            }
-        }
-
-        if (addSequence) {
-            ASN1ObjectIdentifier type = id_demo_other_namespace;
-            ExtensionControl extnControl = extensionOccurences.get(type);
-            if (extnControl != null) {
-                if (sequence == null) {
-                    throw new IllegalStateException("CertProfile is not initialized");
-                }
-
-                ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(), sequence);
-                extnValues.addExtension(type, extnValue);
-            }
-        }
-
-        return extnValues.size() == 0 ? null : extnValues;
-    } // method getExtensions
+    return extnValues.size() == 0 ? null : extnValues;
+  } // method getExtensions
 
 }

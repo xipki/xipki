@@ -20,44 +20,45 @@ package org.xipki.ca.api.profile.x509;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum X509CertVersion {
 
-    v1(1),
-    v2(2),
-    v3(3);
+  v1(1),
+  v2(2),
+  v3(3);
 
-    private int versionNumber;
+  private int versionNumber;
 
-    X509CertVersion(int versionNumber) {
-        this.versionNumber = versionNumber;
+  X509CertVersion(int versionNumber) {
+    this.versionNumber = versionNumber;
+  }
+
+  public int versionNumber() {
+    return versionNumber;
+  }
+
+  public static X509CertVersion forName(String version) {
+    ParamUtil.requireNonNull("version", version);
+
+    for (X509CertVersion m : values()) {
+      if (m.name().equalsIgnoreCase(version)) {
+        return m;
+      }
     }
+    throw new IllegalArgumentException("invalid X509CertVersion " + version);
+  }
 
-    public int versionNumber() {
-        return versionNumber;
+  public static X509CertVersion forValue(int versionNumber) {
+    for (X509CertVersion m : values()) {
+      if (m.versionNumber == versionNumber) {
+        return m;
+      }
     }
-
-    public static X509CertVersion forName(String version) {
-        ParamUtil.requireNonNull("version", version);
-
-        for (X509CertVersion m : values()) {
-            if (m.name().equalsIgnoreCase(version)) {
-                return m;
-            }
-        }
-        throw new IllegalArgumentException("invalid X509CertVersion " + version);
-    }
-
-    public static X509CertVersion forValue(int versionNumber) {
-        for (X509CertVersion m : values()) {
-            if (m.versionNumber == versionNumber) {
-                return m;
-            }
-        }
-        throw new IllegalArgumentException("invalid X509CertVersion " + versionNumber);
-    }
+    throw new IllegalArgumentException("invalid X509CertVersion " + versionNumber);
+  }
 
 }

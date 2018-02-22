@@ -32,56 +32,57 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "profile-info",
-        description = "show information of certificate profile")
+    description = "show information of certificate profile")
 @Service
 public class ProfileInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "certificate profile name")
-    @Completion(ProfileNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "certificate profile name")
+  @Completion(ProfileNameCompleter.class)
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show certificate profile information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show certificate profile information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> names = caManager.getCertprofileNames();
-            int size = names.size();
+    if (name == null) {
+      Set<String> names = caManager.getCertprofileNames();
+      int size = names.size();
 
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1");
-                sb.append(" profile is configured\n");
-            } else {
-                sb.append(size).append(" profiles are configured:\n");
-            }
+      if (size == 0 || size == 1) {
+        sb.append((size == 0) ? "no" : "1");
+        sb.append(" profile is configured\n");
+      } else {
+        sb.append(size).append(" profiles are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String entry : sorted) {
-                sb.append("\t").append(entry).append("\n");
-            }
-        } else {
-            CertprofileEntry entry = caManager.getCertprofile(name);
-            if (entry == null) {
-                throw new CmdFailure("\tno certificate profile named '" + name + "' is configured");
-            } else {
-                sb.append(entry.toString(verbose));
-            }
-        }
+      for (String entry : sorted) {
+        sb.append("\t").append(entry).append("\n");
+      }
+    } else {
+      CertprofileEntry entry = caManager.getCertprofile(name);
+      if (entry == null) {
+        throw new CmdFailure("\tno certificate profile named '" + name + "' is configured");
+      } else {
+        sb.append(entry.toString(verbose));
+      }
+    }
 
-        println(sb.toString());
-        return null;
-    } // method execute0
+    println(sb.toString());
+    return null;
+  } // method execute0
 
 }

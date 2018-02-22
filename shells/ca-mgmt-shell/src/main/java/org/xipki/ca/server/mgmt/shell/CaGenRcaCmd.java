@@ -30,50 +30,51 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "gen-rootca",
-        description = "generate selfsigned CA")
+    description = "generate selfsigned CA")
 @Service
 public class CaGenRcaCmd extends CaAddOrGenAction {
 
-    @Option(name = "--csr", required = true,
-            description = "CSR of the Root CA\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR of the Root CA\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--profile", required = true,
-            description = "profile of the Root CA\n(required)")
-    private String rootcaProfile;
+  @Option(name = "--profile", required = true,
+      description = "profile of the Root CA\n(required)")
+  private String rootcaProfile;
 
-    @Option(name = "--serial",
-            description = "profile of the Root CA")
-    private String serialS;
+  @Option(name = "--serial",
+      description = "profile of the Root CA")
+  private String serialS;
 
-    @Option(name = "--out", aliases = "-o",
-            description = "where to save the generated CA certificate")
-    @Completion(FilePathCompleter.class)
-    private String rootcaCertOutFile;
+  @Option(name = "--out", aliases = "-o",
+      description = "where to save the generated CA certificate")
+  @Completion(FilePathCompleter.class)
+  private String rootcaCertOutFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        X509CaEntry caEntry = getCaEntry();
-        byte[] csr = IoUtil.read(csrFile);
-        BigInteger serialNumber = null;
-        if (serialS != null) {
-            serialNumber = toBigInt(serialS);
-        }
-
-        X509Certificate rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr,
-                serialNumber);
-        if (rootcaCertOutFile != null) {
-            saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
-                    rootcaCert.getEncoded());
-        }
-        println("generated root CA " + caEntry.ident().name());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    X509CaEntry caEntry = getCaEntry();
+    byte[] csr = IoUtil.read(csrFile);
+    BigInteger serialNumber = null;
+    if (serialS != null) {
+      serialNumber = toBigInt(serialS);
     }
+
+    X509Certificate rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr,
+        serialNumber);
+    if (rootcaCertOutFile != null) {
+      saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
+          rootcaCert.getEncoded());
+    }
+    println("generated root CA " + caEntry.ident().name());
+    return null;
+  }
 
 }

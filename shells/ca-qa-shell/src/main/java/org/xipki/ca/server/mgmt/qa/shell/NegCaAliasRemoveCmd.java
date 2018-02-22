@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.CaAliasRemoveCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-caalias-rm",
-        description = "remove CA alias (negative, QA)")
+    description = "remove CA alias (negative, QA)")
 @Service
 public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-caalias-rm");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-caalias-rm");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

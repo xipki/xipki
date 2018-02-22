@@ -37,93 +37,94 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.YesNoCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "careq-check",
-        description = "check information of requestors in CA (QA)")
+    description = "check information of requestors in CA (QA)")
 @Service
 public class CaRequestorCheckCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--requestor", required = true,
-            description = "requestor name\n(required)")
-    @Completion(RequestorNameCompleter.class)
-    private String requestorName;
+  @Option(name = "--requestor", required = true,
+      description = "requestor name\n(required)")
+  @Completion(RequestorNameCompleter.class)
+  private String requestorName;
 
-    @Option(name = "--ra",
-            description = "whether as RA")
-    @Completion(YesNoCompleter.class)
-    private String raS = "no";
+  @Option(name = "--ra",
+      description = "whether as RA")
+  @Completion(YesNoCompleter.class)
+  private String raS = "no";
 
-    @Option(name = "--permission", multiValued = true,
-            description = "permission\n(multi-valued)")
-    @Completion(PermissionCompleter.class)
-    private Set<String> permissions;
+  @Option(name = "--permission", multiValued = true,
+      description = "permission\n(multi-valued)")
+  @Completion(PermissionCompleter.class)
+  private Set<String> permissions;
 
-    @Option(name = "--profile", multiValued = true,
-            description = "profile name or 'all' for all profiles, and 'null' for no profiles\n"
-                    + "(multi-valued)")
-    @Completion(ProfileNameAndAllCompleter.class)
-    private Set<String> profiles;
+  @Option(name = "--profile", multiValued = true,
+      description = "profile name or 'all' for all profiles, and 'null' for no profiles\n"
+          + "(multi-valued)")
+  @Completion(ProfileNameAndAllCompleter.class)
+  private Set<String> profiles;
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
 
-        if (caManager.getCa(caName) == null) {
-            throw new UnexpectedException("could not find CA '" + caName + "'");
+    if (caManager.getCa(caName) == null) {
+      throw new UnexpectedException("could not find CA '" + caName + "'");
+    }
+
+    Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
+    CaHasRequestorEntry entry = null;
+    String upRequestorName = requestorName.toLowerCase();
+    for (CaHasRequestorEntry m : entries) {
+      if (m.requestorIdent().name().equals(upRequestorName)) {
+        entry = m;
+        break;
+      }
+    }
+
+    if (entry == null) {
+      throw new CmdFailure("CA is not associated with requestor '" + requestorName + "'");
+    }
+
+    boolean ra = isEnabled(raS, false, "ra");
+    boolean bo = entry.ra();
+    if (ra != bo) {
+      throw new CmdFailure("ra: is '" + bo + "', expected '" + ra + "'");
+    }
+
+    if (permissions != null) {
+      int intPermission = ShellUtil.getPermission(permissions);
+
+      if (intPermission != entry.permission()) {
+        throw new CmdFailure("permissions: is '" + entry.permission()
+            + "', but expected '" + intPermission + "'");
+      }
+    }
+
+    if (profiles != null) {
+      if (profiles.size() == 1) {
+        if (CaManager.NULL.equalsIgnoreCase(profiles.iterator().next())) {
+          profiles = Collections.emptySet();
         }
+      }
 
-        Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
-        CaHasRequestorEntry entry = null;
-        String upRequestorName = requestorName.toLowerCase();
-        for (CaHasRequestorEntry m : entries) {
-            if (m.requestorIdent().name().equals(upRequestorName)) {
-                entry = m;
-                break;
-            }
-        }
+      if (!profiles.equals(entry.profiles())) {
+        throw new CmdFailure("profiles: is '" + entry.profiles()
+            + "', but expected '" + profiles + "'");
+      }
+    }
 
-        if (entry == null) {
-            throw new CmdFailure("CA is not associated with requestor '" + requestorName + "'");
-        }
-
-        boolean ra = isEnabled(raS, false, "ra");
-        boolean bo = entry.ra();
-        if (ra != bo) {
-            throw new CmdFailure("ra: is '" + bo + "', expected '" + ra + "'");
-        }
-
-        if (permissions != null) {
-            int intPermission = ShellUtil.getPermission(permissions);
-
-            if (intPermission != entry.permission()) {
-                throw new CmdFailure("permissions: is '" + entry.permission()
-                        + "', but expected '" + intPermission + "'");
-            }
-        }
-
-        if (profiles != null) {
-            if (profiles.size() == 1) {
-                if (CaManager.NULL.equalsIgnoreCase(profiles.iterator().next())) {
-                    profiles = Collections.emptySet();
-                }
-            }
-
-            if (!profiles.equals(entry.profiles())) {
-                throw new CmdFailure("profiles: is '" + entry.profiles()
-                        + "', but expected '" + profiles + "'");
-            }
-        }
-
-        println(" checked CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
-        return null;
-    } // method execute0
+    println(" checked CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
+    return null;
+  } // method execute0
 
 }

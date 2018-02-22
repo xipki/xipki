@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.EnvUpdateCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-env-up",
-        description = "update environment parameter (negative, QA)")
+    description = "update environment parameter (negative, QA)")
 @Service
 public class NegEnvUpdateCmd extends EnvUpdateCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-env-up");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-env-up");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

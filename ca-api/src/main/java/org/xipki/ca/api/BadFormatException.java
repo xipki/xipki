@@ -18,27 +18,28 @@
 package org.xipki.ca.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class BadFormatException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public BadFormatException() {
-    }
+  public BadFormatException() {
+  }
 
-    public BadFormatException(String message) {
-        super(message);
-    }
+  public BadFormatException(String message) {
+    super(message);
+  }
 
-    public BadFormatException(Throwable cause) {
-        super(cause);
-    }
+  public BadFormatException(Throwable cause) {
+    super(cause);
+  }
 
-    public BadFormatException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public BadFormatException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

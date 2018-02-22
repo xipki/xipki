@@ -18,27 +18,28 @@
 package org.xipki.ocsp.server.impl.type;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class EncodingException extends Exception {
 
-    private static final long serialVersionUID = 1566332812160625918L;
+  private static final long serialVersionUID = 1566332812160625918L;
 
-    public EncodingException() {
-    }
+  public EncodingException() {
+  }
 
-    public EncodingException(String message) {
-        super(message);
-    }
+  public EncodingException(String message) {
+    super(message);
+  }
 
-    public EncodingException(Throwable cause) {
-        super(cause);
-    }
+  public EncodingException(Throwable cause) {
+    super(cause);
+  }
 
-    public EncodingException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public EncodingException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

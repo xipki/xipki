@@ -35,75 +35,76 @@ import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "scep-add",
-        description = "add SCEP")
+    description = "add SCEP")
 @Service
 public class ScepAddCmd extends CaAction {
 
-    @Option(name = "--name", required = true,
-            description = "name\n(required)")
-    private String name;
+  @Option(name = "--name", required = true,
+      description = "name\n(required)")
+  private String name;
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(ScepNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(ScepNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--inactive",
-            description = "do not activate this SCEP")
-    private Boolean inactive = Boolean.FALSE;
+  @Option(name = "--inactive",
+      description = "do not activate this SCEP")
+  private Boolean inactive = Boolean.FALSE;
 
-    @Option(name = "--resp-type", required = true,
-            description = "type of the responder\n(required)")
-    @Completion(SignerTypeCompleter.class)
-    private String responderType;
+  @Option(name = "--resp-type", required = true,
+      description = "type of the responder\n(required)")
+  @Completion(SignerTypeCompleter.class)
+  private String responderType;
 
-    @Option(name = "--resp-conf", required = true,
-            description = "conf of the responder\n(required)")
-    private String responderConf;
+  @Option(name = "--resp-conf", required = true,
+      description = "conf of the responder\n(required)")
+  private String responderConf;
 
-    @Option(name = "--resp-cert",
-            description = "responder certificate file")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--resp-cert",
+      description = "responder certificate file")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--control",
-            description = "SCEP control")
-    private String scepControl;
+  @Option(name = "--control",
+      description = "SCEP control")
+  private String scepControl;
 
-    @Option(name = "--profile", required = true, multiValued = true,
-            description = "profile name or 'all' for all profiles\n(required, multi-valued)")
-    @Completion(ProfileNameAndAllCompleter.class)
-    private Set<String> profiles;
+  @Option(name = "--profile", required = true, multiValued = true,
+      description = "profile name or 'all' for all profiles\n(required, multi-valued)")
+  @Completion(ProfileNameAndAllCompleter.class)
+  private Set<String> profiles;
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    @Override
-    protected Object execute0() throws Exception {
-        String base64Cert = null;
-        if (certFile != null) {
-            base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-        }
-
-        if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
-            responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
-                    passwordResolver, securityFactory);
-        }
-
-        ScepEntry entry = new ScepEntry(name, new NameId(null, caName), !inactive, responderType,
-                responderConf, base64Cert, profiles, scepControl);
-        if (entry.faulty()) {
-            throw new InvalidConfException("certificate is invalid");
-        }
-
-        boolean bo = caManager.addScep(entry);
-        output(bo, "added", "could not add", "SCEP responder " + name);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    String base64Cert = null;
+    if (certFile != null) {
+      base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
     }
+
+    if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
+      responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
+          passwordResolver, securityFactory);
+    }
+
+    ScepEntry entry = new ScepEntry(name, new NameId(null, caName), !inactive, responderType,
+        responderConf, base64Cert, profiles, scepControl);
+    if (entry.faulty()) {
+      throw new InvalidConfException("certificate is invalid");
+    }
+
+    boolean bo = caManager.addScep(entry);
+    output(bo, "added", "could not add", "SCEP responder " + name);
+    return null;
+  }
 
 }

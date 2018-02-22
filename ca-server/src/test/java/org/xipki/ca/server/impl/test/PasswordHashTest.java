@@ -30,49 +30,50 @@ import org.junit.Test;
 import org.xipki.ca.server.impl.util.PasswordHash;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class PasswordHashTest {
 
-    @Before
-    public void addBouncyCastleProvider() {
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
+  @Before
+  public void addBouncyCastleProvider() {
+    if (Security.getProvider("BC") == null) {
+      Security.addProvider(new BouncyCastleProvider());
+    }
+  }
+
+  @Test
+  public void testDuplication() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    Set<String> passwordHashes = new HashSet<>(20);
+    for (int i = 0; i < 10; i++) {
+      String passwordHash = PasswordHash.createHash("p\r\nassw0Rd!");
+      Assert.assertFalse("PasswordHash duplication occurs",
+          passwordHashes.contains(passwordHash));
+      passwordHashes.add(passwordHash);
+    }
+  }
+
+  @Test
+  public void testValidation() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    boolean failure = false;
+    for (int i = 0; i < 100; i++) {
+      String password = "" + i;
+      String hash = PasswordHash.createHash(password);
+
+      String wrongPassword = "" + (i + 1);
+      if (PasswordHash.validatePassword(wrongPassword, hash)) {
+        System.out.println("FAILURE: WRONG PASSWORD ACCEPTED!");
+        failure = true;
+      }
+      if (!PasswordHash.validatePassword(password, hash)) {
+        System.out.println("FAILURE: GOOD PASSWORD NOT ACCEPTED!");
+        failure = true;
+      }
     }
 
-    @Test
-    public void testDuplication() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        Set<String> passwordHashes = new HashSet<>(20);
-        for (int i = 0; i < 10; i++) {
-            String passwordHash = PasswordHash.createHash("p\r\nassw0Rd!");
-            Assert.assertFalse("PasswordHash duplication occurs",
-                    passwordHashes.contains(passwordHash));
-            passwordHashes.add(passwordHash);
-        }
-    }
-
-    @Test
-    public void testValidation() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        boolean failure = false;
-        for (int i = 0; i < 100; i++) {
-            String password = "" + i;
-            String hash = PasswordHash.createHash(password);
-
-            String wrongPassword = "" + (i + 1);
-            if (PasswordHash.validatePassword(wrongPassword, hash)) {
-                System.out.println("FAILURE: WRONG PASSWORD ACCEPTED!");
-                failure = true;
-            }
-            if (!PasswordHash.validatePassword(password, hash)) {
-                System.out.println("FAILURE: GOOD PASSWORD NOT ACCEPTED!");
-                failure = true;
-            }
-        }
-
-        Assert.assertFalse("test validation failed", failure);
-    }
+    Assert.assertFalse("test validation failed", failure);
+  }
 
 }

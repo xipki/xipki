@@ -34,163 +34,164 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class DigestDiffReporter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DigestDiffReporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DigestDiffReporter.class);
 
-    private final String reportDirname;
+  private final String reportDirname;
 
-    private final BufferedWriter goodWriter;
+  private final BufferedWriter goodWriter;
 
-    private final BufferedWriter diffWriter;
+  private final BufferedWriter diffWriter;
 
-    private final BufferedWriter missingWriter;
+  private final BufferedWriter missingWriter;
 
-    private final BufferedWriter unexpectedWriter;
+  private final BufferedWriter unexpectedWriter;
 
-    private final BufferedWriter errorWriter;
+  private final BufferedWriter errorWriter;
 
-    private Date startTime;
+  private Date startTime;
 
-    private AtomicInteger numGood = new AtomicInteger(0);
+  private AtomicInteger numGood = new AtomicInteger(0);
 
-    private AtomicInteger numDiff = new AtomicInteger(0);
+  private AtomicInteger numDiff = new AtomicInteger(0);
 
-    private AtomicInteger numMissing = new AtomicInteger(0);
+  private AtomicInteger numMissing = new AtomicInteger(0);
 
-    private AtomicInteger numUnexpected = new AtomicInteger(0);
+  private AtomicInteger numUnexpected = new AtomicInteger(0);
 
-    private AtomicInteger numError = new AtomicInteger(0);
+  private AtomicInteger numError = new AtomicInteger(0);
 
-    public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
-        this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
-        File dir = new File(reportDirname);
-        dir.mkdirs();
-        IoUtil.save(new File(dir, "ca.der"), caCertBytes);
+  public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
+    this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
+    File dir = new File(reportDirname);
+    dir.mkdirs();
+    IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
-        this.missingWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "missing"));
-        this.unexpectedWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "unexpected"));
-        this.diffWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "diff"));
-        this.goodWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "good"));
-        this.errorWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "error"));
+    this.missingWriter = new BufferedWriter(
+        new FileWriter(reportDirname + File.separator + "missing"));
+    this.unexpectedWriter = new BufferedWriter(
+        new FileWriter(reportDirname + File.separator + "unexpected"));
+    this.diffWriter = new BufferedWriter(
+        new FileWriter(reportDirname + File.separator + "diff"));
+    this.goodWriter = new BufferedWriter(
+        new FileWriter(reportDirname + File.separator + "good"));
+    this.errorWriter = new BufferedWriter(
+        new FileWriter(reportDirname + File.separator + "error"));
 
-        start();
+    start();
+  }
+
+  public void start() {
+    startTime = new Date();
+  }
+
+  public String reportDirname() {
+    return reportDirname;
+  }
+
+  public void addMissing(BigInteger serialNumber) throws IOException {
+    numMissing.incrementAndGet();
+    writeSerialNumberLine(missingWriter, serialNumber);
+  }
+
+  public void addGood(BigInteger serialNumber) throws IOException {
+    numGood.incrementAndGet();
+    writeSerialNumberLine(goodWriter, serialNumber);
+  }
+
+  public void addUnexpected(BigInteger serialNumber) throws IOException {
+    numUnexpected.incrementAndGet();
+    writeSerialNumberLine(unexpectedWriter, serialNumber);
+  }
+
+  public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
+    ParamUtil.requireNonNull("refCert", refCert);
+    ParamUtil.requireNonNull("targetCert", targetCert);
+
+    if (refCert.serialNumber().equals(targetCert.serialNumber())) {
+      throw new IllegalArgumentException(
+          "refCert and targetCert do not have the same serialNumber");
     }
 
-    public void start() {
-        startTime = new Date();
+    numDiff.incrementAndGet();
+    String msg = StringUtil.concat(refCert.serialNumber().toString(16),
+        "\t", refCert.encodedOmitSeriaNumber(),
+        "\t", targetCert.encodedOmitSeriaNumber(), "\n");
+    synchronized (diffWriter) {
+      diffWriter.write(msg);
     }
+  }
 
-    public String reportDirname() {
-        return reportDirname;
+  public void addError(String errorMessage) throws IOException {
+    ParamUtil.requireNonNull("errorMessage", errorMessage);
+
+    numError.incrementAndGet();
+    String msg = StringUtil.concat(errorMessage, "\n");
+    synchronized (errorWriter) {
+      errorWriter.write(msg);
     }
+  }
 
-    public void addMissing(BigInteger serialNumber) throws IOException {
-        numMissing.incrementAndGet();
-        writeSerialNumberLine(missingWriter, serialNumber);
+  public void addNoCaMatch() throws IOException {
+    synchronized (errorWriter) {
+      errorWriter.write("could not find corresponding CA in target to diff\n");
     }
+  }
 
-    public void addGood(BigInteger serialNumber) throws IOException {
-        numGood.incrementAndGet();
-        writeSerialNumberLine(goodWriter, serialNumber);
+  public void close() {
+    closeWriter(missingWriter);
+    closeWriter(unexpectedWriter);
+    closeWriter(diffWriter);
+    closeWriter(goodWriter);
+    closeWriter(errorWriter);
+
+    int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
+        + numError.get();
+    Date now = new Date();
+    int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
+
+    String speedStr = (durationSec > 0)
+        ? StringUtil.formatAccount(sum / durationSec, false) + " /s" : "--";
+
+    String str = StringUtil.concatObjectsCap(200,
+        "      sum : ", StringUtil.formatAccount(sum, false),
+        "\n      good: ", StringUtil.formatAccount(numGood.get(), false),
+        "\n      diff: ", StringUtil.formatAccount(numDiff.get(), false),
+        "\n   missing: ", StringUtil.formatAccount(numMissing.get(), false),
+        "\nunexpected: ", StringUtil.formatAccount(numUnexpected.get(), false),
+        "\n     error: ", StringUtil.formatAccount(numError.get(), false),
+        "\n  duration: ", StringUtil.formatTime(durationSec, false),
+        "\nstart time: ", startTime,
+        "\n  end time: ", now,
+        "\n     speed: ", speedStr, "\n");
+
+    try {
+      IoUtil.save(reportDirname + File.separator + "overview.txt", str.getBytes());
+    } catch (IOException ex) {
+      System.out.println("Could not write overview.txt with following content\n" + str);
     }
+  } // method close
 
-    public void addUnexpected(BigInteger serialNumber) throws IOException {
-        numUnexpected.incrementAndGet();
-        writeSerialNumberLine(unexpectedWriter, serialNumber);
+  private static void writeSerialNumberLine(BufferedWriter writer, BigInteger serialNumber)
+      throws IOException {
+    String msg = StringUtil.concat(serialNumber.toString(16), "\n");
+    synchronized (writer) {
+      writer.write(msg);
     }
+  }
 
-    public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
-        ParamUtil.requireNonNull("refCert", refCert);
-        ParamUtil.requireNonNull("targetCert", targetCert);
-
-        if (refCert.serialNumber().equals(targetCert.serialNumber())) {
-            throw new IllegalArgumentException(
-                    "refCert and targetCert do not have the same serialNumber");
-        }
-
-        numDiff.incrementAndGet();
-        String msg = StringUtil.concat(refCert.serialNumber().toString(16),
-                "\t", refCert.encodedOmitSeriaNumber(),
-                "\t", targetCert.encodedOmitSeriaNumber(), "\n");
-        synchronized (diffWriter) {
-            diffWriter.write(msg);
-        }
+  private static void closeWriter(Writer writer) {
+    try {
+      writer.close();
+    } catch (Exception ex) {
+      LogUtil.warn(LOG, ex, "could not close writer");
     }
-
-    public void addError(String errorMessage) throws IOException {
-        ParamUtil.requireNonNull("errorMessage", errorMessage);
-
-        numError.incrementAndGet();
-        String msg = StringUtil.concat(errorMessage, "\n");
-        synchronized (errorWriter) {
-            errorWriter.write(msg);
-        }
-    }
-
-    public void addNoCaMatch() throws IOException {
-        synchronized (errorWriter) {
-            errorWriter.write("could not find corresponding CA in target to diff\n");
-        }
-    }
-
-    public void close() {
-        closeWriter(missingWriter);
-        closeWriter(unexpectedWriter);
-        closeWriter(diffWriter);
-        closeWriter(goodWriter);
-        closeWriter(errorWriter);
-
-        int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
-                + numError.get();
-        Date now = new Date();
-        int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
-
-        String speedStr = (durationSec > 0)
-                ? StringUtil.formatAccount(sum / durationSec, false) + " /s" : "--";
-
-        String str = StringUtil.concatObjectsCap(200,
-                "      sum : ", StringUtil.formatAccount(sum, false),
-                "\n      good: ", StringUtil.formatAccount(numGood.get(), false),
-                "\n      diff: ", StringUtil.formatAccount(numDiff.get(), false),
-                "\n   missing: ", StringUtil.formatAccount(numMissing.get(), false),
-                "\nunexpected: ", StringUtil.formatAccount(numUnexpected.get(), false),
-                "\n     error: ", StringUtil.formatAccount(numError.get(), false),
-                "\n  duration: ", StringUtil.formatTime(durationSec, false),
-                "\nstart time: ", startTime,
-                "\n  end time: ", now,
-                "\n     speed: ", speedStr, "\n");
-
-        try {
-            IoUtil.save(reportDirname + File.separator + "overview.txt", str.getBytes());
-        } catch (IOException ex) {
-            System.out.println("Could not write overview.txt with following content\n" + str);
-        }
-    } // method close
-
-    private static void writeSerialNumberLine(BufferedWriter writer, BigInteger serialNumber)
-            throws IOException {
-        String msg = StringUtil.concat(serialNumber.toString(16), "\n");
-        synchronized (writer) {
-            writer.write(msg);
-        }
-    }
-
-    private static void closeWriter(Writer writer) {
-        try {
-            writer.close();
-        } catch (Exception ex) {
-            LogUtil.warn(LOG, ex, "could not close writer");
-        }
-    }
+  }
 
 }

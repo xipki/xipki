@@ -24,24 +24,25 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "caalias-rm",
-        description = "remove CA alias")
+    description = "remove CA alias")
 @Service
 public class CaAliasRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "alias", description = "CA alias", required = true)
-    @Completion(CaAliasCompleter.class)
-    private String caAlias;
+  @Argument(index = 0, name = "alias", description = "CA alias", required = true)
+  @Completion(CaAliasCompleter.class)
+  private String caAlias;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeCaAlias(caAlias);
-        output(bo, "removed", "could not remove", "CA alias " + caAlias);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeCaAlias(caAlias);
+    output(bo, "removed", "could not remove", "CA alias " + caAlias);
+    return null;
+  }
 
 }

@@ -21,26 +21,27 @@ import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface RequestorInfo {
 
-    static final String NAME_BY_USER = "BY-USER";
+  static final String NAME_BY_USER = "BY-USER";
 
-    static final String NAME_BY_CA = "BY-CA";
+  static final String NAME_BY_CA = "BY-CA";
 
-    NameId ident();
+  NameId ident();
 
-    boolean isRa();
+  boolean isRa();
 
-    boolean isCertProfilePermitted(String certprofile);
+  boolean isCertProfilePermitted(String certprofile);
 
-    boolean isPermitted(int requiredPermission);
+  boolean isPermitted(int requiredPermission);
 
-    void assertCertProfilePermitted(String certprofile) throws InsuffientPermissionException;
+  void assertCertProfilePermitted(String certprofile) throws InsuffientPermissionException;
 
-    void assertPermitted(int requiredPermission) throws InsuffientPermissionException;
+  void assertPermitted(int requiredPermission) throws InsuffientPermissionException;
 
 }

@@ -24,25 +24,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "cmpcontrol-rm",
-        description = "remove CMP control")
+    description = "remove CMP control")
 @Service
 public class CmpControlRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "CMP control name")
-    @Completion(CmpControlNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", required = true,
+      description = "CMP control name")
+  @Completion(CmpControlNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeCmpControl(name);
-        output(bo, "removed", "could not remove", "CMP control");
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeCmpControl(name);
+    output(bo, "removed", "could not remove", "CMP control");
+    return null;
+  }
 
 }

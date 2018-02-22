@@ -23,46 +23,47 @@ import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class ByCaRequestorInfo implements RequestorInfo {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    public ByCaRequestorInfo(NameId ident) {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-    }
+  public ByCaRequestorInfo(NameId ident) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
 
-    @Override
-    public NameId ident() {
-        return ident;
-    }
+  @Override
+  public NameId ident() {
+    return ident;
+  }
 
-    @Override
-    public boolean isRa() {
-        return false;
-    }
+  @Override
+  public boolean isRa() {
+    return false;
+  }
 
-    @Override
-    public boolean isCertProfilePermitted(String certprofile) {
-        return true;
-    }
+  @Override
+  public boolean isCertProfilePermitted(String certprofile) {
+    return true;
+  }
 
-    @Override
-    public boolean isPermitted(int requiredPermission) {
-        return true;
-    }
+  @Override
+  public boolean isPermitted(int requiredPermission) {
+    return true;
+  }
 
-    @Override
-    public void assertCertProfilePermitted(String certprofile)
-            throws InsuffientPermissionException {
-    }
+  @Override
+  public void assertCertProfilePermitted(String certprofile)
+      throws InsuffientPermissionException {
+  }
 
-    @Override
-    public void assertPermitted(int requiredPermission)
-            throws InsuffientPermissionException {
-    }
+  @Override
+  public void assertPermitted(int requiredPermission)
+      throws InsuffientPermissionException {
+  }
 
 }

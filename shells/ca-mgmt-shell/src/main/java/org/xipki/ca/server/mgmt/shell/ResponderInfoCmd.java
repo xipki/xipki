@@ -32,55 +32,56 @@ import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "responder-info",
-        description = "show information of responder")
+    description = "show information of responder")
 @Service
 public class ResponderInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "responder name")
-    @Completion(ResponderNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "responder name")
+  @Completion(ResponderNameCompleter.class)
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show responder information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show responder information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> names = caManager.getResponderNames();
-            int size = names.size();
+    if (name == null) {
+      Set<String> names = caManager.getResponderNames();
+      int size = names.size();
 
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1").append(" responder is configured\n");
-            } else {
-                sb.append(size).append(" responders are configured:\n");
-            }
+      if (size == 0 || size == 1) {
+        sb.append((size == 0) ? "no" : "1").append(" responder is configured\n");
+      } else {
+        sb.append(size).append(" responders are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String entry : sorted) {
-                sb.append("\t").append(entry).append("\n");
-            }
-        } else {
-            CmpResponderEntry entry = caManager.getResponder(name);
-            if (entry == null) {
-                throw new CmdFailure("could not find CMP responder '" + name + "'");
-            } else {
-                sb.append(entry.toString(verbose));
-            }
-        }
+      for (String entry : sorted) {
+        sb.append("\t").append(entry).append("\n");
+      }
+    } else {
+      CmpResponderEntry entry = caManager.getResponder(name);
+      if (entry == null) {
+        throw new CmdFailure("could not find CMP responder '" + name + "'");
+      } else {
+        sb.append(entry.toString(verbose));
+      }
+    }
 
-        println(sb.toString());
-        return null;
-    } // method execute0
+    println(sb.toString());
+    return null;
+  } // method execute0
 
 }

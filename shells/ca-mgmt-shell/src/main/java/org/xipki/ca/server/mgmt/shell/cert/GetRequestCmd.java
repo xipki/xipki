@@ -26,30 +26,31 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "get-request",
-        description = "get certificate request")
+    description = "get certificate request")
 @Service
 public class GetRequestCmd extends UnRevRmCertAction {
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the request")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the request")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        byte[] request = caManager.getCertRequest(caName, getSerialNumber());
-        if (request == null) {
-            System.out.println("certificate request unknown");
-            return null;
-        }
-
-        saveVerbose("certificate request saved to file", new File(outputFile), request);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    byte[] request = caManager.getCertRequest(caName, getSerialNumber());
+    if (request == null) {
+      System.out.println("certificate request unknown");
+      return null;
     }
+
+    saveVerbose("certificate request saved to file", new File(outputFile), request);
+    return null;
+  }
 
 }

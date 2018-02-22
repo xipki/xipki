@@ -31,52 +31,53 @@ import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "cmpcontrol-info",
-        description = "show information of CMP control")
+    description = "show information of CMP control")
 @Service
 public class CmpControlInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "CMP control name")
-    @Completion(CmpControlNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "CMP control name")
+  @Completion(CmpControlNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> names = caManager.getCmpControlNames();
-            int size = names.size();
+    if (name == null) {
+      Set<String> names = caManager.getCmpControlNames();
+      int size = names.size();
 
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1");
-                sb.append(" CMP control is configured\n");
-            } else {
-                sb.append(size).append(" CMP controls are configured:\n");
-            }
+      if (size == 0 || size == 1) {
+        sb.append((size == 0) ? "no" : "1");
+        sb.append(" CMP control is configured\n");
+      } else {
+        sb.append(size).append(" CMP controls are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String m : sorted) {
-                sb.append("\t").append(m).append("\n");
-            }
-        } else {
-            CmpControlEntry entry = caManager.getCmpControl(name);
-            if (entry == null) {
-                throw new CmdFailure("\tno CMP control named '" + name + "' is configured");
-            } else {
-                sb.append(entry.toString());
-            }
-        }
+      for (String m : sorted) {
+        sb.append("\t").append(m).append("\n");
+      }
+    } else {
+      CmpControlEntry entry = caManager.getCmpControl(name);
+      if (entry == null) {
+        throw new CmdFailure("\tno CMP control named '" + name + "' is configured");
+      } else {
+        sb.append(entry.toString());
+      }
+    }
 
-        println(sb.toString());
-        return null;
-    } // method execute0
+    println(sb.toString());
+    return null;
+  } // method execute0
 
 }

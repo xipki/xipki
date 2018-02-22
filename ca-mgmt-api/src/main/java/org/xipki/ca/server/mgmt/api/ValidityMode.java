@@ -20,26 +20,27 @@ package org.xipki.ca.server.mgmt.api;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum ValidityMode {
 
-    STRICT,
-    LAX,
-    CUTOFF;
+  STRICT,
+  LAX,
+  CUTOFF;
 
-    public static ValidityMode forName(String text) {
-        ParamUtil.requireNonNull("text", text);
+  public static ValidityMode forName(String text) {
+    ParamUtil.requireNonNull("text", text);
 
-        for (ValidityMode value : values()) {
-            if (value.name().equalsIgnoreCase(text)) {
-                return value;
-            }
-        }
-
-        throw new IllegalArgumentException("invalid ValidityMode " + text);
+    for (ValidityMode value : values()) {
+      if (value.name().equalsIgnoreCase(text)) {
+        return value;
+      }
     }
+
+    throw new IllegalArgumentException("invalid ValidityMode " + text);
+  }
 
 }

@@ -30,39 +30,40 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "publisher-export",
-        description = "export publisher configuration")
+    description = "export publisher configuration")
 @Service
 public class PublisherExportCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "publisher name\n(required)")
-    @Completion(PublisherNameCompleter.class)
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "publisher name\n(required)")
+  @Completion(PublisherNameCompleter.class)
+  private String name;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the publisher configuration\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String confFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the publisher configuration\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String confFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        PublisherEntry entry = caManager.getPublisher(name);
-        if (entry == null) {
-            throw new IllegalCmdParamException("no publisher named " + name + " is defined");
-        }
-
-        if (StringUtil.isBlank(entry.conf())) {
-            println("publisher does not have conf");
-        } else {
-            saveVerbose("saved publisher configuration to", new File(confFile),
-                    entry.conf().getBytes("UTF-8"));
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    PublisherEntry entry = caManager.getPublisher(name);
+    if (entry == null) {
+      throw new IllegalCmdParamException("no publisher named " + name + " is defined");
     }
+
+    if (StringUtil.isBlank(entry.conf())) {
+      println("publisher does not have conf");
+    } else {
+      saveVerbose("saved publisher configuration to", new File(confFile),
+          entry.conf().getBytes("UTF-8"));
+    }
+    return null;
+  }
 
 }

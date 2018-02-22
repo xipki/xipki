@@ -32,116 +32,117 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509IssuerInfo {
 
-    private final Set<String> caIssuerUrls;
+  private final Set<String> caIssuerUrls;
 
-    private final Set<String> ocspUrls;
+  private final Set<String> ocspUrls;
 
-    private final Set<String> crlUrls;
+  private final Set<String> crlUrls;
 
-    private final Set<String> deltaCrlUrls;
+  private final Set<String> deltaCrlUrls;
 
-    private final X509Certificate cert;
+  private final X509Certificate cert;
 
-    private final Certificate bcCert;
+  private final Certificate bcCert;
 
-    private final boolean cutoffNotAfter;
+  private final boolean cutoffNotAfter;
 
-    private final Date caNotBefore;
+  private final Date caNotBefore;
 
-    private final Date caNotAfter;
+  private final Date caNotAfter;
 
-    private final byte[] ski;
+  private final byte[] ski;
 
-    public X509IssuerInfo(List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
-            List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
-            throws CertificateException {
-        ParamUtil.requireNonNull("certBytes", certBytes);
+  public X509IssuerInfo(List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
+      List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
+      throws CertificateException {
+    ParamUtil.requireNonNull("certBytes", certBytes);
 
-        this.cutoffNotAfter = cutoffNotAfter;
+    this.cutoffNotAfter = cutoffNotAfter;
 
-        if (CollectionUtil.isEmpty(caIssuerUrls)) {
-            this.caIssuerUrls = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(caIssuerUrls);
-            this.caIssuerUrls = Collections.unmodifiableSet(set);
-        }
-
-        if (CollectionUtil.isEmpty(ocspUrls)) {
-            this.ocspUrls = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(ocspUrls);
-            this.ocspUrls = Collections.unmodifiableSet(set);
-        }
-
-        if (CollectionUtil.isEmpty(crlUrls)) {
-            this.crlUrls = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(crlUrls);
-            this.crlUrls = Collections.unmodifiableSet(set);
-        }
-
-        if (CollectionUtil.isEmpty(deltaCrlUrls)) {
-            this.deltaCrlUrls = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(deltaCrlUrls);
-            this.deltaCrlUrls = Collections.unmodifiableSet(set);
-        }
-
-        this.cert = X509Util.parseCert(certBytes);
-        this.bcCert = Certificate.getInstance(certBytes);
-        this.ski = X509Util.extractSki(cert);
-        this.caNotBefore = this.cert.getNotBefore();
-        this.caNotAfter = this.cert.getNotAfter();
-    } // constructor
-
-    public Set<String> caIssuerUrls() {
-        return caIssuerUrls;
+    if (CollectionUtil.isEmpty(caIssuerUrls)) {
+      this.caIssuerUrls = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(caIssuerUrls);
+      this.caIssuerUrls = Collections.unmodifiableSet(set);
     }
 
-    public Set<String> ocspUrls() {
-        return ocspUrls;
+    if (CollectionUtil.isEmpty(ocspUrls)) {
+      this.ocspUrls = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(ocspUrls);
+      this.ocspUrls = Collections.unmodifiableSet(set);
     }
 
-    public Set<String> crlUrls() {
-        return crlUrls;
+    if (CollectionUtil.isEmpty(crlUrls)) {
+      this.crlUrls = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(crlUrls);
+      this.crlUrls = Collections.unmodifiableSet(set);
     }
 
-    public Set<String> deltaCrlUrls() {
-        return deltaCrlUrls;
+    if (CollectionUtil.isEmpty(deltaCrlUrls)) {
+      this.deltaCrlUrls = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(deltaCrlUrls);
+      this.deltaCrlUrls = Collections.unmodifiableSet(set);
     }
 
-    public X509Certificate cert() {
-        return cert;
-    }
+    this.cert = X509Util.parseCert(certBytes);
+    this.bcCert = Certificate.getInstance(certBytes);
+    this.ski = X509Util.extractSki(cert);
+    this.caNotBefore = this.cert.getNotBefore();
+    this.caNotAfter = this.cert.getNotAfter();
+  } // constructor
 
-    public byte[] subjectKeyIdentifier() {
-        return Arrays.copyOf(ski, ski.length);
-    }
+  public Set<String> caIssuerUrls() {
+    return caIssuerUrls;
+  }
 
-    public Certificate bcCert() {
-        return bcCert;
-    }
+  public Set<String> ocspUrls() {
+    return ocspUrls;
+  }
 
-    public boolean isCutoffNotAfter() {
-        return cutoffNotAfter;
-    }
+  public Set<String> crlUrls() {
+    return crlUrls;
+  }
 
-    public Date caNotBefore() {
-        return caNotBefore;
-    }
+  public Set<String> deltaCrlUrls() {
+    return deltaCrlUrls;
+  }
 
-    public Date caNotAfter() {
-        return caNotAfter;
-    }
+  public X509Certificate cert() {
+    return cert;
+  }
+
+  public byte[] subjectKeyIdentifier() {
+    return Arrays.copyOf(ski, ski.length);
+  }
+
+  public Certificate bcCert() {
+    return bcCert;
+  }
+
+  public boolean isCutoffNotAfter() {
+    return cutoffNotAfter;
+  }
+
+  public Date caNotBefore() {
+    return caNotBefore;
+  }
+
+  public Date caNotAfter() {
+    return caNotAfter;
+  }
 
 }

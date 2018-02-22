@@ -41,83 +41,84 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaDbImportWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaDbImportWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaDbImportWorker.class);
 
-    private final DataSourceWrapper datasource;
+  private final DataSourceWrapper datasource;
 
-    private final Unmarshaller unmarshaller;
+  private final Unmarshaller unmarshaller;
 
-    private final boolean resume;
+  private final boolean resume;
 
-    private final String srcFolder;
+  private final String srcFolder;
 
-    private final int batchEntriesPerCommit;
+  private final int batchEntriesPerCommit;
 
-    private final boolean evaluateOnly;
+  private final boolean evaluateOnly;
 
-    public CaDbImportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-            String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
-            boolean evaluateOnly)
-            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
+  public CaDbImportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+      String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
+      boolean evaluateOnly)
+      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
-                passwordResolver);
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        this.resume = resume;
-        this.srcFolder = IoUtil.expandFilepath(srcFolder);
-        this.batchEntriesPerCommit = batchEntriesPerCommit;
-        this.evaluateOnly = evaluateOnly;
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+        passwordResolver);
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+    this.resume = resume;
+    this.srcFolder = IoUtil.expandFilepath(srcFolder);
+    this.batchEntriesPerCommit = batchEntriesPerCommit;
+    this.evaluateOnly = evaluateOnly;
+  }
+
+  @Override
+  protected void run0() throws Exception {
+    File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
+    if (resume) {
+      if (!processLogFile.exists()) {
+        throw new Exception("could not process with '--resume' option");
+      }
+    } else {
+      if (processLogFile.exists()) {
+        throw new Exception("please either specify '--resume' option or delete the file "
+            + processLogFile.getPath() + " first");
+      }
     }
 
-    @Override
-    protected void run0() throws Exception {
-        File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        if (resume) {
-            if (!processLogFile.exists()) {
-                throw new Exception("could not process with '--resume' option");
-            }
-        } else {
-            if (processLogFile.exists()) {
-                throw new Exception("please either specify '--resume' option or delete the file "
-                        + processLogFile.getPath() + " first");
-            }
-        }
+    long start = System.currentTimeMillis();
+    try {
+      if (!resume) {
+        // CAConfiguration
+        CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(datasource,
+            unmarshaller, srcFolder, stopMe, evaluateOnly);
+        caConfImporter.importToDb();
+        caConfImporter.shutdown();
+      }
 
-        long start = System.currentTimeMillis();
-        try {
-            if (!resume) {
-                // CAConfiguration
-                CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(datasource,
-                        unmarshaller, srcFolder, stopMe, evaluateOnly);
-                caConfImporter.importToDb();
-                caConfImporter.shutdown();
-            }
-
-            // CertStore
-            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(datasource,
-                    unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
-            certStoreImporter.importToDb();
-            certStoreImporter.shutdown();
-        } finally {
-            try {
-                datasource.close();
-            } catch (Throwable th) {
-                LOG.error("datasource.close()", th);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
-        }
-    } // method run0
+      // CertStore
+      CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(datasource,
+          unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+      certStoreImporter.importToDb();
+      certStoreImporter.shutdown();
+    } finally {
+      try {
+        datasource.close();
+      } catch (Throwable th) {
+        LOG.error("datasource.close()", th);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
+    }
+  } // method run0
 
 }

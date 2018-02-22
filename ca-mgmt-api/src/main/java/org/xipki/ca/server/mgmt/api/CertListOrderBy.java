@@ -18,37 +18,38 @@
 package org.xipki.ca.server.mgmt.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public enum CertListOrderBy {
 
-    NOT_BEFORE("notBefore"),
-    NOT_BEFORE_DESC("notBefore-desc"),
-    NOT_AFTER("notAfter"),
-    NOT_AFTER_DESC("notAfter-desc"),
-    SUBJECT("subject"),
-    SUBJECT_DESC("subject-desc");
+  NOT_BEFORE("notBefore"),
+  NOT_BEFORE_DESC("notBefore-desc"),
+  NOT_AFTER("notAfter"),
+  NOT_AFTER_DESC("notAfter-desc"),
+  SUBJECT("subject"),
+  SUBJECT_DESC("subject-desc");
 
-    private final String text;
+  private final String text;
 
-    private CertListOrderBy(String text) {
-        this.text = text;
+  private CertListOrderBy(String text) {
+    this.text = text;
+  }
+
+  public String text() {
+    return text;
+  }
+
+  public static CertListOrderBy forValue(String value) {
+    for (CertListOrderBy m : values()) {
+      if (m.name().equalsIgnoreCase(value) || m.text.equalsIgnoreCase(value)) {
+        return m;
+      }
     }
 
-    public String text() {
-        return text;
-    }
-
-    public static CertListOrderBy forValue(String value) {
-        for (CertListOrderBy m : values()) {
-            if (m.name().equalsIgnoreCase(value) || m.text.equalsIgnoreCase(value)) {
-                return m;
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

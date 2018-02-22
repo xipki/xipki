@@ -40,64 +40,65 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspDbImportWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
 
-    private final DataSourceWrapper datasource;
+  private final DataSourceWrapper datasource;
 
-    private final Unmarshaller unmarshaller;
+  private final Unmarshaller unmarshaller;
 
-    private final boolean resume;
+  private final boolean resume;
 
-    private final String srcFolder;
+  private final String srcFolder;
 
-    private final int batchEntriesPerCommit;
+  private final int batchEntriesPerCommit;
 
-    private final boolean evaluateOnly;
+  private final boolean evaluateOnly;
 
-    public OcspDbImportWorker(DataSourceFactory datasourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, boolean resume, String srcFolder,
-            int batchEntriesPerCommit, boolean evaluateOnly)
-            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
-        ParamUtil.requireNonNull("dbConfFile", dbConfFile);
+  public OcspDbImportWorker(DataSourceFactory datasourceFactory,
+      PasswordResolver passwordResolver, String dbConfFile, boolean resume, String srcFolder,
+      int batchEntriesPerCommit, boolean evaluateOnly)
+      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
+    ParamUtil.requireNonNull("dbConfFile", dbConfFile);
 
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
-                passwordResolver);
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
-        this.resume = resume;
-        this.srcFolder = IoUtil.expandFilepath(srcFolder);
-        this.batchEntriesPerCommit = batchEntriesPerCommit;
-        this.evaluateOnly = evaluateOnly;
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+        passwordResolver);
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
+    this.resume = resume;
+    this.srcFolder = IoUtil.expandFilepath(srcFolder);
+    this.batchEntriesPerCommit = batchEntriesPerCommit;
+    this.evaluateOnly = evaluateOnly;
+  }
+
+  @Override
+  protected void run0() throws Exception {
+    long start = System.currentTimeMillis();
+    // CertStore
+    try {
+      OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(datasource,
+          unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+      certStoreImporter.importToDb();
+      certStoreImporter.shutdown();
+    } finally {
+      try {
+        datasource.close();
+      } catch (Throwable th) {
+        LOG.error("datasource.close()", th);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
     }
-
-    @Override
-    protected void run0() throws Exception {
-        long start = System.currentTimeMillis();
-        // CertStore
-        try {
-            OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(datasource,
-                    unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
-            certStoreImporter.importToDb();
-            certStoreImporter.shutdown();
-        } finally {
-            try {
-                datasource.close();
-            } catch (Throwable th) {
-                LOG.error("datasource.close()", th);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-        }
-    }
+  }
 
 }

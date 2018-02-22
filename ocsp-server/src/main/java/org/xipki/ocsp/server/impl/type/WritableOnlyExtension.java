@@ -18,37 +18,38 @@
 package org.xipki.ocsp.server.impl.type;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class WritableOnlyExtension extends Extension {
 
-    private final byte[] encoded;
+  private final byte[] encoded;
 
-    private final int from;
+  private final int from;
 
-    private final int encodedLength;
+  private final int encodedLength;
 
-    public WritableOnlyExtension(byte[] encoded) {
-        this(encoded, 0, encoded.length);
-    }
+  public WritableOnlyExtension(byte[] encoded) {
+    this(encoded, 0, encoded.length);
+  }
 
-    public WritableOnlyExtension(byte[] encoded, int from, int encodedLength) {
-        this.encoded = encoded;
-        this.from = from;
-        this.encodedLength = encodedLength;
-    }
+  public WritableOnlyExtension(byte[] encoded, int from, int encodedLength) {
+    this.encoded = encoded;
+    this.from = from;
+    this.encodedLength = encodedLength;
+  }
 
-    @Override
-    public int encodedLength() {
-        return encodedLength;
-    }
+  @Override
+  public int encodedLength() {
+    return encodedLength;
+  }
 
-    @Override
-    public int write(byte[] out, int offset) {
-        System.arraycopy(encoded, from, out, offset, encodedLength);
-        return encodedLength;
-    }
+  @Override
+  public int write(byte[] out, int offset) {
+    System.arraycopy(encoded, from, out, offset, encodedLength);
+    return encodedLength;
+  }
 
 }

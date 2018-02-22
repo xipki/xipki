@@ -32,57 +32,58 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "diff-digest-db",
-        description = "diff digest XiPKI/EJBCA database")
+    description = "diff digest XiPKI/EJBCA database")
 @Service
 public class DiffDigestDbCmd extends DbPortAction {
 
-    @Option(name = "--ref-db", required = true,
-            description = "database configuration file of the reference system\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String refDbConf;
+  @Option(name = "--ref-db", required = true,
+      description = "database configuration file of the reference system\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String refDbConf;
 
-    @Option(name = "--target", required = true,
-            description = "configuration file of the target database to be evaluated")
-    @Completion(FilePathCompleter.class)
-    private String dbconfFile;
+  @Option(name = "--target", required = true,
+      description = "configuration file of the target database to be evaluated")
+  @Completion(FilePathCompleter.class)
+  private String dbconfFile;
 
-    @Option(name = "--report-dir", required = true,
-            description = "report directory\n(required)")
-    @Completion(DirPathCompleter.class)
-    private String reportDir;
+  @Option(name = "--report-dir", required = true,
+      description = "report directory\n(required)")
+  @Completion(DirPathCompleter.class)
+  private String reportDir;
 
-    @Option(name = "--revoked-only")
-    private Boolean revokedOnly = Boolean.FALSE;
+  @Option(name = "--revoked-only")
+  private Boolean revokedOnly = Boolean.FALSE;
 
-    @Option(name = "-k",
-            description = "number of certificates per SELECT")
-    private Integer numCertsPerSelect = 1000;
+  @Option(name = "-k",
+      description = "number of certificates per SELECT")
+  private Integer numCertsPerSelect = 1000;
 
-    @Option(name = "--target-threads",
-            description = "number of threads to query the target database")
-    private Integer numTargetThreads = 40;
+  @Option(name = "--target-threads",
+      description = "number of threads to query the target database")
+  private Integer numTargetThreads = 40;
 
-    @Option(name = "--ca-cert", multiValued = true,
-            description = "Certificate of CAs to be considered\n(multi-valued)")
-    @Completion(FilePathCompleter.class)
-    private List<String> caCertFiles;
+  @Option(name = "--ca-cert", multiValued = true,
+      description = "Certificate of CAs to be considered\n(multi-valued)")
+  @Completion(FilePathCompleter.class)
+  private List<String> caCertFiles;
 
-    protected DbPortWorker getDbPortWorker() throws Exception {
-        Set<byte[]> caCerts = null;
-        if (caCertFiles != null && !caCertFiles.isEmpty()) {
-            caCerts = new HashSet<>(caCertFiles.size());
-            for (String fileName : caCertFiles) {
-                caCerts.add(IoUtil.read(fileName));
-            }
-        }
-
-        return new DigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly,
-                refDbConf, dbconfFile, reportDir, numCertsPerSelect, numTargetThreads, caCerts);
+  protected DbPortWorker getDbPortWorker() throws Exception {
+    Set<byte[]> caCerts = null;
+    if (caCertFiles != null && !caCertFiles.isEmpty()) {
+      caCerts = new HashSet<>(caCertFiles.size());
+      for (String fileName : caCertFiles) {
+        caCerts.add(IoUtil.read(fileName));
+      }
     }
+
+    return new DigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly,
+        refDbConf, dbconfFile, reportDir, numCertsPerSelect, numTargetThreads, caCerts);
+  }
 
 }

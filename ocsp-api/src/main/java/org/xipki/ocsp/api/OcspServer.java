@@ -22,15 +22,16 @@ import java.io.UnsupportedEncodingException;
 import org.xipki.common.HealthCheckResult;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface OcspServer {
 
-    ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException;
+  ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException;
 
-    OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet);
+  OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet);
 
-    HealthCheckResult healthCheck(Responder responder);
+  HealthCheckResult healthCheck(Responder responder);
 }

@@ -31,51 +31,52 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "publisher-info",
-        description = "show information of publisher")
+    description = "show information of publisher")
 @Service
 public class PublisherInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "publisher name")
-    @Completion(PublisherNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "publisher name")
+  @Completion(PublisherNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (name == null) {
-            Set<String> names = caManager.getPublisherNames();
-            int size = names.size();
+  @Override
+  protected Object execute0() throws Exception {
+    if (name == null) {
+      Set<String> names = caManager.getPublisherNames();
+      int size = names.size();
 
-            StringBuilder sb = new StringBuilder();
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1");
-                sb.append(" publisher is configured\n");
-            } else {
-                sb.append(size).append(" publishers are configured:\n");
-            }
+      StringBuilder sb = new StringBuilder();
+      if (size == 0 || size == 1) {
+        sb.append((size == 0) ? "no" : "1");
+        sb.append(" publisher is configured\n");
+      } else {
+        sb.append(size).append(" publishers are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String entry : sorted) {
-                sb.append("\t").append(entry).append("\n");
-            }
-            println(sb.toString());
-        } else {
-            PublisherEntry entry = caManager.getPublisher(name);
-            if (entry == null) {
-                throw new CmdFailure("\tno publisher named '" + name + "' is configured");
-            } else {
-                println(entry.toString());
-            }
-        }
+      for (String entry : sorted) {
+        sb.append("\t").append(entry).append("\n");
+      }
+      println(sb.toString());
+    } else {
+      PublisherEntry entry = caManager.getPublisher(name);
+      if (entry == null) {
+        throw new CmdFailure("\tno publisher named '" + name + "' is configured");
+      } else {
+        println(entry.toString());
+      }
+    }
 
-        return null;
-    } // method execute0
+    return null;
+  } // method execute0
 
 }

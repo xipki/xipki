@@ -24,55 +24,56 @@ import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.1
  */
 
 public class ProfessionInfoOption {
 
-    private final NamingAuthority namingAuthority;
+  private final NamingAuthority namingAuthority;
 
-    private final List<String> professionItems;
+  private final List<String> professionItems;
 
-    private final List<ASN1ObjectIdentifier> professionOids;
+  private final List<ASN1ObjectIdentifier> professionOids;
 
-    private final RegistrationNumberOption registrationNumberOption;
+  private final RegistrationNumberOption registrationNumberOption;
 
-    private byte[] addProfessionalInfo;
+  private byte[] addProfessionalInfo;
 
-    public ProfessionInfoOption(NamingAuthority namingAuthority, List<String> professionItems,
-            List<ASN1ObjectIdentifier> professionOids,
-            RegistrationNumberOption registrationNumberOption,
-            byte[] addProfessionalInfo) {
-        this.namingAuthority = namingAuthority;
-        this.professionItems = ParamUtil.requireNonEmpty("professionItems", professionItems);
-        this.professionOids = professionOids;
-        this.registrationNumberOption = registrationNumberOption;
-        this.addProfessionalInfo = addProfessionalInfo;
-    }
+  public ProfessionInfoOption(NamingAuthority namingAuthority, List<String> professionItems,
+      List<ASN1ObjectIdentifier> professionOids,
+      RegistrationNumberOption registrationNumberOption,
+      byte[] addProfessionalInfo) {
+    this.namingAuthority = namingAuthority;
+    this.professionItems = ParamUtil.requireNonEmpty("professionItems", professionItems);
+    this.professionOids = professionOids;
+    this.registrationNumberOption = registrationNumberOption;
+    this.addProfessionalInfo = addProfessionalInfo;
+  }
 
-    public byte[] addProfessionalInfo() {
-        return addProfessionalInfo;
-    }
+  public byte[] addProfessionalInfo() {
+    return addProfessionalInfo;
+  }
 
-    public void setAddProfessionalInfo(byte[] addProfessionalInfo) {
-        this.addProfessionalInfo = addProfessionalInfo;
-    }
+  public void setAddProfessionalInfo(byte[] addProfessionalInfo) {
+    this.addProfessionalInfo = addProfessionalInfo;
+  }
 
-    public NamingAuthority namingAuthority() {
-        return namingAuthority;
-    }
+  public NamingAuthority namingAuthority() {
+    return namingAuthority;
+  }
 
-    public List<String> professionItems() {
-        return professionItems;
-    }
+  public List<String> professionItems() {
+    return professionItems;
+  }
 
-    public List<ASN1ObjectIdentifier> professionOids() {
-        return professionOids;
-    }
+  public List<ASN1ObjectIdentifier> professionOids() {
+    return professionOids;
+  }
 
-    public RegistrationNumberOption registrationNumberOption() {
-        return registrationNumberOption;
-    }
+  public RegistrationNumberOption registrationNumberOption() {
+    return registrationNumberOption;
+  }
 
 }

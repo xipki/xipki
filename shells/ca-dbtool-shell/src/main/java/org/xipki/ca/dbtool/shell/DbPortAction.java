@@ -29,51 +29,52 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.password.PasswordResolver;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class DbPortAction extends XiAction {
 
-    protected DataSourceFactory datasourceFactory;
+  protected DataSourceFactory datasourceFactory;
 
-    @Reference
-    protected PasswordResolver passwordResolver;
+  @Reference
+  protected PasswordResolver passwordResolver;
 
-    public DbPortAction() {
-        datasourceFactory = new DataSourceFactory();
+  public DbPortAction() {
+    datasourceFactory = new DataSourceFactory();
+  }
+
+  protected abstract DbPortWorker getDbPortWorker() throws Exception;
+
+  protected Object execute0() throws Exception {
+    ExecutorService executor = Executors.newFixedThreadPool(1);
+    DbPortWorker myRun = getDbPortWorker();
+    executor.execute(myRun);
+
+    executor.shutdown();
+    while (true) {
+      try {
+        boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
+        if (terminated) {
+          break;
+        }
+      } catch (InterruptedException ex) {
+        myRun.setStopMe(true);
+      }
     }
 
-    protected abstract DbPortWorker getDbPortWorker() throws Exception;
+    Exception ex = myRun.exception();
+    if (ex != null) {
+      String errMsg = ex.getMessage();
+      if (StringUtil.isBlank(errMsg)) {
+        errMsg = "ERROR";
+      }
 
-    protected Object execute0() throws Exception {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        DbPortWorker myRun = getDbPortWorker();
-        executor.execute(myRun);
-
-        executor.shutdown();
-        while (true) {
-            try {
-                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if (terminated) {
-                    break;
-                }
-            } catch (InterruptedException ex) {
-                myRun.setStopMe(true);
-            }
-        }
-
-        Exception ex = myRun.exception();
-        if (ex != null) {
-            String errMsg = ex.getMessage();
-            if (StringUtil.isBlank(errMsg)) {
-                errMsg = "ERROR";
-            }
-
-            System.err.println(errMsg);
-        }
-
-        return null;
+      System.err.println(errMsg);
     }
+
+    return null;
+  }
 
 }

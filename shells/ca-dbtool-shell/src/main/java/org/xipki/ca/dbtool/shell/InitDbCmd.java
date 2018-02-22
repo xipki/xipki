@@ -41,124 +41,125 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "initdb",
-        description = "reset and initialize single database")
+    description = "reset and initialize single database")
 @Service
 public class InitDbCmd extends XiAction {
 
-    private static final List<String> YES_NO = Arrays.asList("yes", "no");
+  private static final List<String> YES_NO = Arrays.asList("yes", "no");
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    @Option(name = "--force", aliases = "-f",
-            description = "never prompt for confirmation")
-    private Boolean force = Boolean.FALSE;
+  @Option(name = "--force", aliases = "-f",
+      description = "never prompt for confirmation")
+  private Boolean force = Boolean.FALSE;
 
-    @Option(name = "--log-level",
-            description = "log level, valid values are debug, info, warning, severe, off")
-    @Completion(LogLevelCompleter.class)
-    private String logLevel = "warning";
+  @Option(name = "--log-level",
+      description = "log level, valid values are debug, info, warning, severe, off")
+  @Completion(LogLevelCompleter.class)
+  private String logLevel = "warning";
 
-    @Option(name = "--log-file",
-            description = "log file")
-    @Completion(FilePathCompleter.class)
-    private String logFile;
+  @Option(name = "--log-file",
+      description = "log file")
+  @Completion(FilePathCompleter.class)
+  private String logFile;
 
-    @Option(name = "--db-conf", required = true,
-            description = "DB configuration file")
-    @Completion(FilePathCompleter.class)
-    private String dbConfFile;
+  @Option(name = "--db-conf", required = true,
+      description = "DB configuration file")
+  @Completion(FilePathCompleter.class)
+  private String dbConfFile;
 
-    @Option(name = "--db-schema", required = true,
-            description = "DB schema file")
-    @Completion(FilePathCompleter.class)
-    private String dbSchemaFile;
+  @Option(name = "--db-schema", required = true,
+      description = "DB schema file")
+  @Completion(FilePathCompleter.class)
+  private String dbSchemaFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        LiquibaseDatabaseConf dbConf = getDatabaseConf();
-        resetAndInit(dbConf, dbSchemaFile);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    LiquibaseDatabaseConf dbConf = getDatabaseConf();
+    resetAndInit(dbConf, dbSchemaFile);
+    return null;
+  }
+
+  private void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
+    ParamUtil.requireNonNull("dbConf", dbConf);
+    ParamUtil.requireNonNull("schemaFile", schemaFile);
+
+    LiquibaseAction.printDatabaseInfo(dbConf, schemaFile);
+    if (!force) {
+      if (!confirm("reset and initialize")) {
+        println("cancelled");
+        return;
+      }
     }
 
-    private void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
-        ParamUtil.requireNonNull("dbConf", dbConf);
-        ParamUtil.requireNonNull("schemaFile", schemaFile);
-
-        LiquibaseAction.printDatabaseInfo(dbConf, schemaFile);
-        if (!force) {
-            if (!confirm("reset and initialize")) {
-                println("cancelled");
-                return;
-            }
-        }
-
-        LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-        try {
-            liquibase.init(logLevel, logFile);
-            liquibase.releaseLocks();
-            liquibase.dropAll();
-            liquibase.update();
-        } finally {
-            liquibase.shutdown();
-        }
-
+    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+    try {
+      liquibase.init(logLevel, logFile);
+      liquibase.releaseLocks();
+      liquibase.dropAll();
+      liquibase.update();
+    } finally {
+      liquibase.shutdown();
     }
 
-    private LiquibaseDatabaseConf getDatabaseConf()
-            throws FileNotFoundException, IOException, PasswordResolverException {
-        Properties props = new Properties();
-        props.load(new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
+  }
+
+  private LiquibaseDatabaseConf getDatabaseConf()
+      throws FileNotFoundException, IOException, PasswordResolverException {
+    Properties props = new Properties();
+    props.load(new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
+  }
+
+  private boolean confirm(String command) throws IOException {
+    String text = read("\nDo you wish to " + command + " the database", YES_NO);
+    return "yes".equalsIgnoreCase(text);
+  }
+
+  private String read(String prompt, List<String> validValues) throws IOException {
+    String tmpPrompt = prompt;
+    List<String> tmpValidValues = validValues;
+    if (tmpValidValues == null) {
+      tmpValidValues = Collections.emptyList();
     }
 
-    private boolean confirm(String command) throws IOException {
-        String text = read("\nDo you wish to " + command + " the database", YES_NO);
-        return "yes".equalsIgnoreCase(text);
+    if (tmpPrompt == null) {
+      tmpPrompt = "Please enter";
     }
 
-    private String read(String prompt, List<String> validValues) throws IOException {
-        String tmpPrompt = prompt;
-        List<String> tmpValidValues = validValues;
-        if (tmpValidValues == null) {
-            tmpValidValues = Collections.emptyList();
+    if (isNotEmpty(tmpValidValues)) {
+      StringBuilder promptBuilder = new StringBuilder(tmpPrompt);
+      promptBuilder.append(" [");
+
+      for (String validValue : tmpValidValues) {
+        promptBuilder.append(validValue).append("/");
+      }
+      promptBuilder.deleteCharAt(promptBuilder.length() - 1);
+      promptBuilder.append("] ?");
+
+      tmpPrompt = promptBuilder.toString();
+    }
+
+    while (true) {
+      String answer = readPrompt(tmpPrompt);
+      if (isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
+        return answer;
+      } else {
+        StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
+        for (String validValue : tmpValidValues) {
+          retryPromptBuilder.append(validValue).append("/");
         }
-
-        if (tmpPrompt == null) {
-            tmpPrompt = "Please enter";
-        }
-
-        if (isNotEmpty(tmpValidValues)) {
-            StringBuilder promptBuilder = new StringBuilder(tmpPrompt);
-            promptBuilder.append(" [");
-
-            for (String validValue : tmpValidValues) {
-                promptBuilder.append(validValue).append("/");
-            }
-            promptBuilder.deleteCharAt(promptBuilder.length() - 1);
-            promptBuilder.append("] ?");
-
-            tmpPrompt = promptBuilder.toString();
-        }
-
-        while (true) {
-            String answer = readPrompt(tmpPrompt);
-            if (isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
-                return answer;
-            } else {
-                StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-                for (String validValue : tmpValidValues) {
-                    retryPromptBuilder.append(validValue).append("/");
-                }
-                retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-                tmpPrompt = retryPromptBuilder.toString();
-            }
-        }
-    } // method read
+        retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
+        tmpPrompt = retryPromptBuilder.toString();
+      }
+    }
+  } // method read
 
 }

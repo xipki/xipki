@@ -27,70 +27,71 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
 
-    protected static final String MSG_CERTS_FINISHED = "certs.finished";
+  protected static final String MSG_CERTS_FINISHED = "certs.finished";
 
-    protected static final String SQL_ADD_ISSUER =
-        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV,RR,RT,RIT,CERT) "
-        + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+  protected static final String SQL_ADD_ISSUER =
+      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV,RR,RT,RIT,CERT) "
+      + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-    protected static final String SQL_ADD_CERT =
-        "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN,HASH,SUBJECT)"
-        + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  protected static final String SQL_ADD_CERT =
+      "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN,HASH,SUBJECT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    protected static final String SQL_DEL_CERT = "DELETE FROM CERT WHERE ID>?";
+  protected static final String SQL_DEL_CERT = "DELETE FROM CERT WHERE ID>?";
 
-    AbstractOcspCertStoreDbImporter(DataSourceWrapper datasource, String srcDir,
-            AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
-        super(datasource, srcDir, stopMe, evaluateOnly);
-    }
+  AbstractOcspCertStoreDbImporter(DataSourceWrapper datasource, String srcDir,
+      AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
+    super(datasource, srcDir, stopMe, evaluateOnly);
+  }
 
-    protected String sha1(byte[] data) {
-        return HashAlgoType.SHA1.base64Hash(data);
-    }
+  protected String sha1(byte[] data) {
+    return HashAlgoType.SHA1.base64Hash(data);
+  }
 
-    protected String sha256(byte[] data) {
-        return HashAlgoType.SHA256.base64Hash(data);
-    }
+  protected String sha256(byte[] data) {
+    return HashAlgoType.SHA256.base64Hash(data);
+  }
 
-    protected String sha3_256(byte[] data) {
-        return HashAlgoType.SHA3_256.base64Hash(data);
-    }
+  protected String sha3_256(byte[] data) {
+    return HashAlgoType.SHA3_256.base64Hash(data);
+  }
 
-    protected void deleteCertGreatherThan(long id, Logger log) {
-        deleteFromTableWithLargerId("CERT", "ID", id, log);
-    }
+  protected void deleteCertGreatherThan(long id, Logger log) {
+    deleteFromTableWithLargerId("CERT", "ID", id, log);
+  }
 
-    protected void dropIndexes() throws DataAccessException {
-        System.out.println("dropping indexes");
-        long start = System.currentTimeMillis();
+  protected void dropIndexes() throws DataAccessException {
+    System.out.println("dropping indexes");
+    long start = System.currentTimeMillis();
 
-        datasource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
-        datasource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
+    datasource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
+    datasource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
 
-        datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
+    datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
 
-        long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
-    }
+    long duration = (System.currentTimeMillis() - start) / 1000;
+    System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
+  }
 
-    protected void recoverIndexes() throws DataAccessException {
-        System.out.println("recovering indexes");
-        long start = System.currentTimeMillis();
+  protected void recoverIndexes() throws DataAccessException {
+    System.out.println("recovering indexes");
+    long start = System.currentTimeMillis();
 
-        datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
+    datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
 
-        datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
-                "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
-        datasource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
+    datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
+        "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
+    datasource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
 
-        long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
-    }
+    long duration = (System.currentTimeMillis() - start) / 1000;
+    System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
+  }
 
 }

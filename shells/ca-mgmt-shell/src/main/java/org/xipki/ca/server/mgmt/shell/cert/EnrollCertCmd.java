@@ -36,63 +36,64 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "enroll-cert",
-        description = "enroll certificate")
+    description = "enroll certificate")
 @Service
 public class EnrollCertCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--csr", required = true,
-            description = "CSR file\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String csrFile;
+  @Option(name = "--csr", required = true,
+      description = "CSR file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String csrFile;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String outFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String outFile;
 
-    @Option(name = "--profile", aliases = "-p", required = true,
-            description = "profile name\n(required)")
-    @Completion(ProfileNameCompleter.class)
-    private String profileName;
+  @Option(name = "--profile", aliases = "-p", required = true,
+      description = "profile name\n(required)")
+  @Completion(ProfileNameCompleter.class)
+  private String profileName;
 
-    @Option(name = "--not-before",
-            description = "notBefore, UTC time of format yyyyMMddHHmmss")
-    private String notBeforeS;
+  @Option(name = "--not-before",
+      description = "notBefore, UTC time of format yyyyMMddHHmmss")
+  private String notBeforeS;
 
-    @Option(name = "--not-after",
-            description = "notAfter, UTC time of format yyyyMMddHHmmss")
-    private String notAfterS;
+  @Option(name = "--not-after",
+      description = "notAfter, UTC time of format yyyyMMddHHmmss")
+  private String notAfterS;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CaEntry ca = caManager.getCa(caName);
-        if (ca == null) {
-            throw new CmdFailure("CA " + caName + " not available");
-        }
-
-        Date notBefore = StringUtil.isNotBlank(notBeforeS)
-                ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-
-        Date notAfter = StringUtil.isNotBlank(notAfterS)
-                  ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
-
-        byte[] encodedCsr = IoUtil.read(csrFile);
-
-        X509Certificate cert = caManager.generateCertificate(caName, profileName, encodedCsr,
-                notBefore, notAfter);
-        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    CaEntry ca = caManager.getCa(caName);
+    if (ca == null) {
+      throw new CmdFailure("CA " + caName + " not available");
     }
+
+    Date notBefore = StringUtil.isNotBlank(notBeforeS)
+        ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+
+    Date notAfter = StringUtil.isNotBlank(notAfterS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+
+    byte[] encodedCsr = IoUtil.read(csrFile);
+
+    X509Certificate cert = caManager.generateCertificate(caName, profileName, encodedCsr,
+        notBefore, notAfter);
+    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+
+    return null;
+  }
 
 }

@@ -30,41 +30,42 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 @Command(scope = "ca", name = "get-cert",
-        description = "get certificate")
+    description = "get certificate")
 @Service
 public class GetCertCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    protected String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  protected String caName;
 
-    @Option(name = "--serial", aliases = "-s", required = true,
-            description = "serial number")
-    private String serialNumberS;
+  @Option(name = "--serial", aliases = "-s", required = true,
+      description = "serial number")
+  private String serialNumberS;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the certificate")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the certificate")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CertWithStatusInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
-        X509Certificate cert = (X509Certificate) certInfo.cert();
+  @Override
+  protected Object execute0() throws Exception {
+    CertWithStatusInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
+    X509Certificate cert = (X509Certificate) certInfo.cert();
 
-        if (cert == null) {
-            System.out.println("certificate unknown");
-            return null;
-        }
-
-        saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
-        return null;
+    if (cert == null) {
+      System.out.println("certificate unknown");
+      return null;
     }
+
+    saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

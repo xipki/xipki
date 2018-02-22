@@ -25,29 +25,30 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "ca-unrevoke",
-        description = "unrevoke CA")
+    description = "unrevoke CA")
 @Service
 public class CaUnrevokeCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "CA name")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Argument(index = 0, name = "name", required = true,
+      description = "CA name")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (!caManager.getCaNames().contains(caName)) {
-            throw new IllegalCmdParamException("invalid CA name " + caName);
-        }
-
-        boolean bo = caManager.unrevokeCa(caName);
-        output(bo, "unrevoked", "could not unrevoke", "CA " + caName);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (!caManager.getCaNames().contains(caName)) {
+      throw new IllegalCmdParamException("invalid CA name " + caName);
     }
+
+    boolean bo = caManager.unrevokeCa(caName);
+    output(bo, "unrevoked", "could not unrevoke", "CA " + caName);
+    return null;
+  }
 
 }

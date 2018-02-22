@@ -29,40 +29,41 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "caprofile-check",
-        description = "check information of certificate profiles in given CA (QA)")
+    description = "check information of certificate profiles in given CA (QA)")
 @Service
 public class CaProfileCheckCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile", required = true,
-            description = "profile name\n(required)")
-    @Completion(ProfileNameCompleter.class)
-    private String profileName;
+  @Option(name = "--profile", required = true,
+      description = "profile name\n(required)")
+  @Completion(ProfileNameCompleter.class)
+  private String profileName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
 
-        if (caManager.getCa(caName) == null) {
-            throw new CmdFailure("could not find CA '" + caName + "'");
-        }
-
-        Set<String> entries = caManager.getCertprofilesForCa(caName);
-        if (!entries.contains(profileName.toLowerCase())) {
-            throw new CmdFailure("CA is not associated with profile '" + profileName + "'");
-        }
-
-        println(" checked CA profile CA='" + caName + "', profile='" + profileName + "'");
-        return null;
+    if (caManager.getCa(caName) == null) {
+      throw new CmdFailure("could not find CA '" + caName + "'");
     }
+
+    Set<String> entries = caManager.getCertprofilesForCa(caName);
+    if (!entries.contains(profileName.toLowerCase())) {
+      throw new CmdFailure("CA is not associated with profile '" + profileName + "'");
+    }
+
+    println(" checked CA profile CA='" + caName + "', profile='" + profileName + "'");
+    return null;
+  }
 
 }

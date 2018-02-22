@@ -26,31 +26,32 @@ import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaPolicyMappingsOption extends QaExtension {
 
-    private final Map<String, String> policyMappings;
+  private final Map<String, String> policyMappings;
 
-    public QaPolicyMappingsOption(PolicyMappings jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
-        this.policyMappings = new HashMap<>();
-        for (PolicyIdMappingType type : jaxb.getMapping()) {
-            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
-            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
-            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
-        }
+  public QaPolicyMappingsOption(PolicyMappings jaxb) {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    this.policyMappings = new HashMap<>();
+    for (PolicyIdMappingType type : jaxb.getMapping()) {
+      String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+      String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+      policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
     }
+  }
 
-    public String subjectDomainPolicy(String issuerDomainPolicy) {
-        ParamUtil.requireNonNull("issuerDomainPolicy", issuerDomainPolicy);
-        return policyMappings.get(issuerDomainPolicy);
-    }
+  public String subjectDomainPolicy(String issuerDomainPolicy) {
+    ParamUtil.requireNonNull("issuerDomainPolicy", issuerDomainPolicy);
+    return policyMappings.get(issuerDomainPolicy);
+  }
 
-    public Set<String> issuerDomainPolicies() {
-        return policyMappings.keySet();
-    }
+  public Set<String> issuerDomainPolicies() {
+    return policyMappings.keySet();
+  }
 
 }

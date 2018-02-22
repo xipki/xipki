@@ -30,54 +30,55 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "ca-info",
-        description = "show information of CA")
+    description = "show information of CA")
 @Service
 public class CaInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CA name")
-    @Completion(CaNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", description = "CA name")
+  @Completion(CaNameCompleter.class)
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show CA information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show CA information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
-        if (name == null) {
-            sb.append("successful CAs:\n");
-            String prefix = "  ";
-            printCaNames(sb, caManager.getSuccessfulCaNames(), prefix);
+  @Override
+  protected Object execute0() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    if (name == null) {
+      sb.append("successful CAs:\n");
+      String prefix = "  ";
+      printCaNames(sb, caManager.getSuccessfulCaNames(), prefix);
 
-            sb.append("failed CAs:\n");
-            printCaNames(sb, caManager.getFailedCaNames(), prefix);
+      sb.append("failed CAs:\n");
+      printCaNames(sb, caManager.getFailedCaNames(), prefix);
 
-            sb.append("inactive CAs:\n");
-            printCaNames(sb, caManager.getInactiveCaNames(), prefix);
-        } else {
-            CaEntry entry = caManager.getCa(name);
-            if (entry == null) {
-                throw new CmdFailure("could not find CA '" + name + "'");
-            } else {
-                if (CaStatus.ACTIVE == entry.status()) {
-                    boolean started = caManager.getSuccessfulCaNames().contains(
-                            entry.ident().name());
-                    sb.append("started: ").append(started).append("\n");
-                }
-                Set<String> aliases = caManager.getAliasesForCa(name);
-                sb.append("aliases: ").append(toString(aliases)).append("\n");
-                sb.append(entry.toString(verbose.booleanValue()));
-            }
+      sb.append("inactive CAs:\n");
+      printCaNames(sb, caManager.getInactiveCaNames(), prefix);
+    } else {
+      CaEntry entry = caManager.getCa(name);
+      if (entry == null) {
+        throw new CmdFailure("could not find CA '" + name + "'");
+      } else {
+        if (CaStatus.ACTIVE == entry.status()) {
+          boolean started = caManager.getSuccessfulCaNames().contains(
+              entry.ident().name());
+          sb.append("started: ").append(started).append("\n");
         }
+        Set<String> aliases = caManager.getAliasesForCa(name);
+        sb.append("aliases: ").append(toString(aliases)).append("\n");
+        sb.append(entry.toString(verbose.booleanValue()));
+      }
+    }
 
-        println(sb.toString());
-        return null;
-    } // method execute0
+    println(sb.toString());
+    return null;
+  } // method execute0
 
 }

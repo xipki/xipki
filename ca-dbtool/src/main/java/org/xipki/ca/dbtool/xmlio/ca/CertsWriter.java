@@ -26,20 +26,21 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertsWriter extends DbiXmlWriter {
 
-    public CertsWriter() throws IOException, XMLStreamException {
-        super(CertType.TAG_PARENT, "1");
-    }
+  public CertsWriter() throws IOException, XMLStreamException {
+    super(CertType.TAG_PARENT, "1");
+  }
 
-    public void add(CertType cert) throws InvalidDataObjectException, XMLStreamException {
-        ParamUtil.requireNonNull("cert", cert);
-        cert.validate();
-        cert.writeTo(this);
-    }
+  public void add(CertType cert) throws InvalidDataObjectException, XMLStreamException {
+    ParamUtil.requireNonNull("cert", cert);
+    cert.validate();
+    cert.writeTo(this);
+  }
 
 }

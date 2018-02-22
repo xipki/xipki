@@ -20,36 +20,37 @@ package org.xipki.ca.server.impl;
 import org.xipki.ca.api.OperationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OperationExceptionWithIndex extends OperationException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final OperationException underlying;
+  private final OperationException underlying;
 
-    private final int index;
+  private final int index;
 
-    public OperationExceptionWithIndex(int index, OperationException underlying) {
-        super(underlying.errorCode());
-        this.index = index;
-        this.underlying = underlying;
-    }
+  public OperationExceptionWithIndex(int index, OperationException underlying) {
+    super(underlying.errorCode());
+    this.index = index;
+    this.underlying = underlying;
+  }
 
-    @Override
-    public ErrorCode errorCode() {
-        return underlying.errorCode();
-    }
+  @Override
+  public ErrorCode errorCode() {
+    return underlying.errorCode();
+  }
 
-    @Override
-    public String errorMessage() {
-        return underlying.errorMessage();
-    }
+  @Override
+  public String errorMessage() {
+    return underlying.errorMessage();
+  }
 
-    public int index() {
-        return index;
-    }
+  public int index() {
+    return index;
+  }
 
 }

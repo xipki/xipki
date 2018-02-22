@@ -20,26 +20,27 @@ package org.xipki.ocsp.api;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface OcspStoreFactory {
 
-    /**
-     *
-     * @param type
-     *          Type of the OCSP store. Must not be {@code null}.
-     * @return whether OCSP store of this type can be created.
-     */
-    boolean canCreateOcspStore(String type);
+  /**
+   * TODO.
+   * @param type
+   *          Type of the OCSP store. Must not be {@code null}.
+   * @return whether OCSP store of this type can be created.
+   */
+  boolean canCreateOcspStore(String type);
 
-    /**
-     *
-     * @param type
-     *          Type of the OCSP store. Must not be {@code null}.
-     * @return a new OCSP store
-     */
-    OcspStore newOcspStore(String type) throws ObjectCreationException;
+  /**
+   * TODO.
+   * @param type
+   *          Type of the OCSP store. Must not be {@code null}.
+   * @return a new OCSP store
+   */
+  OcspStore newOcspStore(String type) throws ObjectCreationException;
 
 }

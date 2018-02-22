@@ -29,32 +29,33 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "requestor-up",
-        description = "update requestor")
+    description = "update requestor")
 @Service
 public class RequestorUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "requestor name\n(required)")
-    protected String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "requestor name\n(required)")
+  protected String name;
 
-    @Option(name = "--cert", required = true,
-            description = "requestor certificate file\n(required)")
-    @Completion(FilePathCompleter.class)
-    protected String certFile;
+  @Option(name = "--cert", required = true,
+      description = "requestor certificate file\n(required)")
+  @Completion(FilePathCompleter.class)
+  protected String certFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        // check if the certificate is valid
-        byte[] certBytes = IoUtil.read(certFile);
-        X509Util.parseCert(new ByteArrayInputStream(certBytes));
-        boolean bo = caManager.changeRequestor(name, Base64.encodeToString(certBytes));
-        output(bo, "updated", "could not update", "CMP requestor " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    // check if the certificate is valid
+    byte[] certBytes = IoUtil.read(certFile);
+    X509Util.parseCert(new ByteArrayInputStream(certBytes));
+    boolean bo = caManager.changeRequestor(name, Base64.encodeToString(certBytes));
+    output(bo, "updated", "could not update", "CMP requestor " + name);
+    return null;
+  }
 
 }

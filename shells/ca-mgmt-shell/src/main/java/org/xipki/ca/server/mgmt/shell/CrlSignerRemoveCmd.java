@@ -24,25 +24,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "crlsigner-rm",
-        description = "remove CRL signer")
+    description = "remove CRL signer")
 @Service
 public class CrlSignerRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "CRL signer name")
-    @Completion(CrlSignerNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", required = true,
+      description = "CRL signer name")
+  @Completion(CrlSignerNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeCrlSigner(name);
-        output(bo, "removed", "could not remove", "CRL signer " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeCrlSigner(name);
+    output(bo, "removed", "could not remove", "CRL signer " + name);
+    return null;
+  }
 
 }

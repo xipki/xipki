@@ -26,65 +26,66 @@ import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CmpRequestorInfo implements RequestorInfo {
 
-    private final CaHasRequestorEntry caHasRequestor;
+  private final CaHasRequestorEntry caHasRequestor;
 
-    private final X509CertWithDbId cert;
+  private final X509CertWithDbId cert;
 
-    public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, X509CertWithDbId cert) {
-        this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
-        this.cert = ParamUtil.requireNonNull("cert", cert);
+  public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, X509CertWithDbId cert) {
+    this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+  }
+
+  public CaHasRequestorEntry caHasRequestor() {
+    return caHasRequestor;
+  }
+
+  public X509CertWithDbId cert() {
+    return cert;
+  }
+
+  @Override
+  public NameId ident() {
+    return caHasRequestor.requestorIdent();
+  }
+
+  @Override
+  public boolean isRa() {
+    return caHasRequestor.ra();
+  }
+
+  @Override
+  public boolean isCertProfilePermitted(String certprofile) {
+    return caHasRequestor.isCertProfilePermitted(certprofile);
+  }
+
+  @Override
+  public boolean isPermitted(int permission) {
+    return caHasRequestor.isPermitted(permission);
+  }
+
+  @Override
+  public void assertCertProfilePermitted(String certprofile)
+      throws InsuffientPermissionException {
+    if (!isCertProfilePermitted(certprofile)) {
+      throw new  InsuffientPermissionException(
+          "CertProfile " + certprofile + " is not permitted");
     }
+  }
 
-    public CaHasRequestorEntry caHasRequestor() {
-        return caHasRequestor;
+  @Override
+  public void assertPermitted(int permission)
+      throws InsuffientPermissionException {
+    if (!isPermitted(permission)) {
+      throw new  InsuffientPermissionException("Permission "
+          + PermissionConstants.getTextForCode(permission) + " is not permitted");
     }
-
-    public X509CertWithDbId cert() {
-        return cert;
-    }
-
-    @Override
-    public NameId ident() {
-        return caHasRequestor.requestorIdent();
-    }
-
-    @Override
-    public boolean isRa() {
-        return caHasRequestor.ra();
-    }
-
-    @Override
-    public boolean isCertProfilePermitted(String certprofile) {
-        return caHasRequestor.isCertProfilePermitted(certprofile);
-    }
-
-    @Override
-    public boolean isPermitted(int permission) {
-        return caHasRequestor.isPermitted(permission);
-    }
-
-    @Override
-    public void assertCertProfilePermitted(String certprofile)
-            throws InsuffientPermissionException {
-        if (!isCertProfilePermitted(certprofile)) {
-            throw new  InsuffientPermissionException(
-                    "CertProfile " + certprofile + " is not permitted");
-        }
-    }
-
-    @Override
-    public void assertPermitted(int permission)
-            throws InsuffientPermissionException {
-        if (!isPermitted(permission)) {
-            throw new  InsuffientPermissionException("Permission "
-                    + PermissionConstants.getTextForCode(permission) + " is not permitted");
-        }
-    }
+  }
 
 }

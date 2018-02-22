@@ -23,66 +23,67 @@ import java.util.List;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class IssuerStore {
 
-    private final List<IssuerEntry> entries;
+  private final List<IssuerEntry> entries;
 
-    IssuerStore(List<IssuerEntry> entries) {
-        ParamUtil.requireNonNull("entries", entries);
-        this.entries = new ArrayList<>(entries.size());
+  IssuerStore(List<IssuerEntry> entries) {
+    ParamUtil.requireNonNull("entries", entries);
+    this.entries = new ArrayList<>(entries.size());
 
-        for (IssuerEntry entry : entries) {
-            addIdentityEntry(entry);
-        }
+    for (IssuerEntry entry : entries) {
+      addIdentityEntry(entry);
+    }
+  }
+
+  void addIdentityEntry(IssuerEntry entry) {
+    ParamUtil.requireNonNull("entry", entry);
+    for (IssuerEntry existingEntry : entries) {
+      if (existingEntry.id() == entry.id()) {
+        throw new IllegalArgumentException(
+            "issuer with the same id " + entry.id() + " already available");
+      }
     }
 
-    void addIdentityEntry(IssuerEntry entry) {
-        ParamUtil.requireNonNull("entry", entry);
-        for (IssuerEntry existingEntry : entries) {
-            if (existingEntry.id() == entry.id()) {
-                throw new IllegalArgumentException(
-                        "issuer with the same id " + entry.id() + " already available");
-            }
-        }
+    entries.add(entry);
+  }
 
-        entries.add(entry);
+  Integer getIdForSubject(String subject) {
+    ParamUtil.requireNonBlank("subject", subject);
+    for (IssuerEntry entry : entries) {
+      if (entry.subject().equals(subject)) {
+        return entry.id();
+      }
     }
 
-    Integer getIdForSubject(String subject) {
-        ParamUtil.requireNonBlank("subject", subject);
-        for (IssuerEntry entry : entries) {
-            if (entry.subject().equals(subject)) {
-                return entry.id();
-            }
-        }
+    return null;
+  }
 
-        return null;
+  Integer getIdForSha1Fp(byte[] sha1FpCert) {
+    ParamUtil.requireNonNull("sha1FpCert", sha1FpCert);
+    for (IssuerEntry entry : entries) {
+      if (entry.matchSha1Fp(sha1FpCert)) {
+        return entry.id();
+      }
     }
 
-    Integer getIdForSha1Fp(byte[] sha1FpCert) {
-        ParamUtil.requireNonNull("sha1FpCert", sha1FpCert);
-        for (IssuerEntry entry : entries) {
-            if (entry.matchSha1Fp(sha1FpCert)) {
-                return entry.id();
-            }
-        }
+    return null;
+  }
 
-        return null;
+  Integer getIdForCert(byte[] encodedCert) {
+    ParamUtil.requireNonNull("encodedCert", encodedCert);
+    for (IssuerEntry entry : entries) {
+      if (entry.matchCert(encodedCert)) {
+        return entry.id();
+      }
     }
 
-    Integer getIdForCert(byte[] encodedCert) {
-        ParamUtil.requireNonNull("encodedCert", encodedCert);
-        for (IssuerEntry entry : entries) {
-            if (entry.matchCert(encodedCert)) {
-                return entry.id();
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

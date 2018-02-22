@@ -28,39 +28,40 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "careq-info",
-        description = "show information of requestor in CA")
+    description = "show information of requestor in CA")
 @Service
 public class CaRequestorInfoCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (caManager.getCa(caName) == null) {
-            throw new CmdFailure("could not find CA '" + caName + "'");
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
-        if (isNotEmpty(entries)) {
-            sb.append("requestors trusted by CA " + caName).append("\n");
-            for (CaHasRequestorEntry entry : entries) {
-                sb.append("\t").append(entry).append("\n");
-            }
-        } else {
-            sb.append("\tno requestor for CA " + caName + " is configured");
-        }
-        println(sb.toString());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (caManager.getCa(caName) == null) {
+      throw new CmdFailure("could not find CA '" + caName + "'");
     }
+
+    StringBuilder sb = new StringBuilder();
+
+    Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
+    if (isNotEmpty(entries)) {
+      sb.append("requestors trusted by CA " + caName).append("\n");
+      for (CaHasRequestorEntry entry : entries) {
+        sb.append("\t").append(entry).append("\n");
+      }
+    } else {
+      sb.append("\tno requestor for CA " + caName + " is configured");
+    }
+    println(sb.toString());
+    return null;
+  }
 
 }

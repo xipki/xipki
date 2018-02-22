@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.CaUnrevokeCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-ca-unrevoke",
-        description = "unrevoke CA (negative, QA)")
+    description = "unrevoke CA (negative, QA)")
 @Service
 public class NegCaUnrevokeCmd extends CaUnrevokeCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-ca-unrevoke");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-ca-unrevoke");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

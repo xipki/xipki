@@ -37,78 +37,79 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "crlsigner-up",
-        description = "update CRL signer")
+    description = "update CRL signer")
 @Service
 public class CrlSignerUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "CRL signer name\n(required)")
-    @Completion(CrlSignerNameCompleter.class)
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "CRL signer name\n(required)")
+  @Completion(CrlSignerNameCompleter.class)
+  private String name;
 
-    @Option(name = "--signer-type",
-            description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
-    @Completion(CrlSignerNamePlusNullCompleter.class)
-    private String signerType;
+  @Option(name = "--signer-type",
+      description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
+  @Completion(CrlSignerNamePlusNullCompleter.class)
+  private String signerType;
 
-    @Option(name = "--signer-conf",
-            description = "CRL signer configuration")
-    private String signerConf;
+  @Option(name = "--signer-conf",
+      description = "CRL signer configuration")
+  private String signerConf;
 
-    @Option(name = "--cert",
-            description = "CRL signer's certificate file or 'null'")
-    @Completion(FilePathCompleter.class)
-    private String signerCert;
+  @Option(name = "--cert",
+      description = "CRL signer's certificate file or 'null'")
+  @Completion(FilePathCompleter.class)
+  private String signerCert;
 
-    @Option(name = "--control",
-            description = "CRL control")
-    private String crlControl;
+  @Option(name = "--control",
+      description = "CRL control")
+  private String crlControl;
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry() throws Exception {
-        String signerCertConf = null;
-        if (CaManager.NULL.equalsIgnoreCase(signerCert)) {
-            signerCertConf = CaManager.NULL;
-        } else if (signerCert != null) {
-            byte[] certBytes = IoUtil.read(signerCert);
-            X509Util.parseCert(new ByteArrayInputStream(certBytes));
-            signerCertConf = Base64.encodeToString(certBytes);
-        }
-
-        if (signerConf != null) {
-            String tmpSignerType = signerType;
-            if (tmpSignerType == null) {
-                X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-                if (entry == null) {
-                    throw new IllegalCmdParamException("please specify the signerType");
-                }
-                tmpSignerType = entry.type();
-            }
-
-            signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,
-                    passwordResolver, securityFactory);
-        }
-
-        X509ChangeCrlSignerEntry dbEntry = new X509ChangeCrlSignerEntry(name);
-        dbEntry.setSignerType(signerType);
-        dbEntry.setSignerConf(signerConf);
-        dbEntry.setCrlControl(crlControl);
-        dbEntry.setBase64Cert(signerCertConf);
-        return dbEntry;
-    } // method getCrlSignerChangeEntry
-
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.changeCrlSigner(getCrlSignerChangeEntry());
-        output(bo, "updated", "could not update", "CRL signer " + name);
-        return null;
+  protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry() throws Exception {
+    String signerCertConf = null;
+    if (CaManager.NULL.equalsIgnoreCase(signerCert)) {
+      signerCertConf = CaManager.NULL;
+    } else if (signerCert != null) {
+      byte[] certBytes = IoUtil.read(signerCert);
+      X509Util.parseCert(new ByteArrayInputStream(certBytes));
+      signerCertConf = Base64.encodeToString(certBytes);
     }
+
+    if (signerConf != null) {
+      String tmpSignerType = signerType;
+      if (tmpSignerType == null) {
+        X509CrlSignerEntry entry = caManager.getCrlSigner(name);
+        if (entry == null) {
+          throw new IllegalCmdParamException("please specify the signerType");
+        }
+        tmpSignerType = entry.type();
+      }
+
+      signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,
+          passwordResolver, securityFactory);
+    }
+
+    X509ChangeCrlSignerEntry dbEntry = new X509ChangeCrlSignerEntry(name);
+    dbEntry.setSignerType(signerType);
+    dbEntry.setSignerConf(signerConf);
+    dbEntry.setCrlControl(crlControl);
+    dbEntry.setBase64Cert(signerCertConf);
+    return dbEntry;
+  } // method getCrlSignerChangeEntry
+
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.changeCrlSigner(getCrlSignerChangeEntry());
+    output(bo, "updated", "could not update", "CRL signer " + name);
+    return null;
+  }
 
 }

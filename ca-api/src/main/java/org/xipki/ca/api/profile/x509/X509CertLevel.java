@@ -18,12 +18,13 @@
 package org.xipki.ca.api.profile.x509;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum X509CertLevel {
-    RootCA,
-    SubCA,
-    EndEntity
+  RootCA,
+  SubCA,
+  EndEntity
 }

@@ -30,63 +30,64 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "crlsigner-add",
-        description = "add CRL signer")
+    description = "add CRL signer")
 @Service
 public class CrlSignerAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "CRL signer name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "CRL signer name\n(required)")
+  private String name;
 
-    @Option(name = "--signer-type", required = true,
-            description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n(required)")
-    @Completion(CrlSignerNameCompleter.class)
-    private String signerType;
+  @Option(name = "--signer-type", required = true,
+      description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n(required)")
+  @Completion(CrlSignerNameCompleter.class)
+  private String signerType;
 
-    @Option(name = "--signer-conf",
-            description = "CRL signer configuration")
-    private String signerConf;
+  @Option(name = "--signer-conf",
+      description = "CRL signer configuration")
+  private String signerConf;
 
-    @Option(name = "--cert",
-            description = "CRL signer's certificate file")
-    @Completion(FilePathCompleter.class)
-    private String signerCertFile;
+  @Option(name = "--cert",
+      description = "CRL signer's certificate file")
+  @Completion(FilePathCompleter.class)
+  private String signerCertFile;
 
-    @Option(name = "--control", required = true,
-            description = "CRL control\n(required)")
-    private String crlControl;
+  @Option(name = "--control", required = true,
+      description = "CRL control\n(required)")
+  private String crlControl;
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    @Override
-    protected Object execute0() throws Exception {
-        String base64Cert = null;
-        if (!"CA".equalsIgnoreCase(signerType)) {
-            if (signerCertFile != null) {
-                byte[] encodedCert = IoUtil.read(signerCertFile);
-                base64Cert = IoUtil.base64Encode(encodedCert, false);
-                X509Util.parseCert(encodedCert);
-            }
+  @Override
+  protected Object execute0() throws Exception {
+    String base64Cert = null;
+    if (!"CA".equalsIgnoreCase(signerType)) {
+      if (signerCertFile != null) {
+        byte[] encodedCert = IoUtil.read(signerCertFile);
+        base64Cert = IoUtil.base64Encode(encodedCert, false);
+        X509Util.parseCert(encodedCert);
+      }
 
-            if (signerConf != null) {
-                if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-                    signerConf = ShellUtil.canonicalizeSignerConf(signerType,
-                            signerConf, passwordResolver, securityFactory);
-                }
-            }
+      if (signerConf != null) {
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
+          signerConf = ShellUtil.canonicalizeSignerConf(signerType,
+              signerConf, passwordResolver, securityFactory);
         }
-
-        X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert,
-                crlControl);
-        boolean bo = caManager.addCrlSigner(entry);
-        output(bo, "added", "could not add", "CRL signer " + name);
-        return null;
+      }
     }
+
+    X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert,
+        crlControl);
+    boolean bo = caManager.addCrlSigner(entry);
+    output(bo, "added", "could not add", "CRL signer " + name);
+    return null;
+  }
 
 }

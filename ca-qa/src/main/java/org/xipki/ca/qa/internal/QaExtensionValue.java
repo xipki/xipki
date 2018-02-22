@@ -22,28 +22,29 @@ import java.util.Arrays;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaExtensionValue {
 
-    private final boolean critical;
+  private final boolean critical;
 
-    private final byte[] value;
+  private final byte[] value;
 
-    public QaExtensionValue(boolean critical, byte[] value) {
-        ParamUtil.requireNonNull("value", value);
-        this.critical = critical;
-        this.value = Arrays.copyOf(value, value.length);
-    }
+  public QaExtensionValue(boolean critical, byte[] value) {
+    ParamUtil.requireNonNull("value", value);
+    this.critical = critical;
+    this.value = Arrays.copyOf(value, value.length);
+  }
 
-    public boolean isCritical() {
-        return critical;
-    }
+  public boolean isCritical() {
+    return critical;
+  }
 
-    public byte[] value() {
-        return Arrays.copyOf(value, value.length);
-    }
+  public byte[] value() {
+    return Arrays.copyOf(value, value.length);
+  }
 
 }

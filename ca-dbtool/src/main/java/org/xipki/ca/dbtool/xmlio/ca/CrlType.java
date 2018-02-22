@@ -24,69 +24,70 @@ import org.xipki.ca.dbtool.xmlio.IdentifidDbObjectType;
 import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CrlType extends IdentifidDbObjectType {
 
-    public static final String TAG_PARENT = "crls";
+  public static final String TAG_PARENT = "crls";
 
-    public static final String TAG_ROOT = "crl";
+  public static final String TAG_ROOT = "crl";
 
-    public static final String TAG_CAID = "caId";
+  public static final String TAG_CAID = "caId";
 
-    public static final String TAG_CRLNO = "crlNo";
+  public static final String TAG_CRLNO = "crlNo";
 
-    private Integer caId;
+  private Integer caId;
 
-    private String crlNo;
+  private String crlNo;
 
-    private String file;
+  private String file;
 
-    public Integer caId() {
-        return caId;
-    }
+  public Integer caId() {
+    return caId;
+  }
 
-    public void setCaId(Integer caId) {
-        this.caId = caId;
-    }
+  public void setCaId(Integer caId) {
+    this.caId = caId;
+  }
 
-    public String crlNo() {
-        return crlNo;
-    }
+  public String crlNo() {
+    return crlNo;
+  }
 
-    public void setCrlNo(String crlNo) {
-        this.crlNo = crlNo;
-    }
+  public void setCrlNo(String crlNo) {
+    this.crlNo = crlNo;
+  }
 
-    public String file() {
-        return file;
-    }
+  public String file() {
+    return file;
+  }
 
-    public void setFile(String file) {
-        this.file = file;
-    }
+  public void setFile(String file) {
+    this.file = file;
+  }
 
-    @Override
-    public void validate() throws InvalidDataObjectException {
-        super.validate();
-        assertNotNull(TAG_CAID, caId);
-        assertNotBlank(TAG_CRLNO, crlNo);
-        assertNotBlank(TAG_FILE, file);
-    }
+  @Override
+  public void validate() throws InvalidDataObjectException {
+    super.validate();
+    assertNotNull(TAG_CAID, caId);
+    assertNotBlank(TAG_CRLNO, crlNo);
+    assertNotBlank(TAG_FILE, file);
+  }
 
-    @Override
-    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
-        validate();
+  @Override
+  public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
+    validate();
 
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id());
-        writeIfNotNull(writer, TAG_CAID, caId);
-        writeIfNotNull(writer, TAG_CRLNO, crlNo);
-        writeIfNotNull(writer, TAG_FILE, file);
-        writer.writeEndElement();
-        writer.writeNewline();
-    }
+    writer.writeStartElement(TAG_ROOT);
+    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_CAID, caId);
+    writeIfNotNull(writer, TAG_CRLNO, crlNo);
+    writeIfNotNull(writer, TAG_FILE, file);
+    writer.writeEndElement();
+    writer.writeNewline();
+  }
 
 }

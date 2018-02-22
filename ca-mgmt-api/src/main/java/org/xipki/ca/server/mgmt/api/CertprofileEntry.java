@@ -23,87 +23,88 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertprofileEntry {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    private final String type;
+  private final String type;
 
-    private final String conf;
+  private final String conf;
 
-    private boolean faulty;
+  private boolean faulty;
 
-    public CertprofileEntry(NameId ident, String type, String conf) {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-        this.type = ParamUtil.requireNonBlank("type", type);
-        this.conf = conf;
-        if ("all".equalsIgnoreCase(ident.name()) || "null".equalsIgnoreCase(ident.name())) {
-            throw new IllegalArgumentException(
-                    "certificate profile name must not be 'all' and 'null'");
-        }
+  public CertprofileEntry(NameId ident, String type, String conf) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.type = ParamUtil.requireNonBlank("type", type);
+    this.conf = conf;
+    if ("all".equalsIgnoreCase(ident.name()) || "null".equalsIgnoreCase(ident.name())) {
+      throw new IllegalArgumentException(
+          "certificate profile name must not be 'all' and 'null'");
+    }
+  }
+
+  public NameId ident() {
+    return ident;
+  }
+
+  public String type() {
+    return type;
+  }
+
+  public String conf() {
+    return conf;
+  }
+
+  public boolean isFaulty() {
+    return faulty;
+  }
+
+  public void setFaulty(boolean faulty) {
+    this.faulty = faulty;
+  }
+
+  @Override
+  public String toString() {
+    return toString(false);
+  }
+
+  public String toString(boolean verbose) {
+    boolean bo = (verbose || conf == null || conf.length() < 301);
+    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+        "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ",
+        (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if  (!(obj instanceof CertprofileEntry)) {
+      return false;
     }
 
-    public NameId ident() {
-        return ident;
+    CertprofileEntry objB = (CertprofileEntry) obj;
+    if (!ident.equals(objB.ident)) {
+      return false;
     }
 
-    public String type() {
-        return type;
+    if (!type.equals(objB.type)) {
+      return false;
     }
 
-    public String conf() {
-        return conf;
+    if (!CompareUtil.equalsObject(conf, objB.conf)) {
+      return false;
     }
 
-    public boolean isFaulty() {
-        return faulty;
-    }
+    return true;
+  }
 
-    public void setFaulty(boolean faulty) {
-        this.faulty = faulty;
-    }
-
-    @Override
-    public String toString() {
-        return toString(false);
-    }
-
-    public String toString(boolean verbose) {
-        boolean bo = (verbose || conf == null || conf.length() < 301);
-        return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
-                "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ",
-                (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if  (!(obj instanceof CertprofileEntry)) {
-            return false;
-        }
-
-        CertprofileEntry objB = (CertprofileEntry) obj;
-        if (!ident.equals(objB.ident)) {
-            return false;
-        }
-
-        if (!type.equals(objB.type)) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(conf, objB.conf)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return ident.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return ident.hashCode();
+  }
 
 }

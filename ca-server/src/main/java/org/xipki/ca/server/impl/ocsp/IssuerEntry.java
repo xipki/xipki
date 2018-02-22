@@ -22,41 +22,42 @@ import java.util.Arrays;
 import org.xipki.common.util.Base64;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class IssuerEntry {
 
-    private final int id;
+  private final int id;
 
-    private final String subject;
+  private final String subject;
 
-    private final byte[] sha1Fp;
+  private final byte[] sha1Fp;
 
-    private final byte[] cert;
+  private final byte[] cert;
 
-    IssuerEntry(int id, String subject, String b64Sha1Fp, String b64Cert) {
-        super();
-        this.id = id;
-        this.subject = subject;
-        this.sha1Fp = Base64.decode(b64Sha1Fp);
-        this.cert = Base64.decode(b64Cert);
-    }
+  IssuerEntry(int id, String subject, String b64Sha1Fp, String b64Cert) {
+    super();
+    this.id = id;
+    this.subject = subject;
+    this.sha1Fp = Base64.decode(b64Sha1Fp);
+    this.cert = Base64.decode(b64Cert);
+  }
 
-    int id() {
-        return id;
-    }
+  int id() {
+    return id;
+  }
 
-    String subject() {
-        return subject;
-    }
+  String subject() {
+    return subject;
+  }
 
-    boolean matchSha1Fp(byte[] anotherSha1Fp) {
-        return Arrays.equals(this.sha1Fp, anotherSha1Fp);
-    }
+  boolean matchSha1Fp(byte[] anotherSha1Fp) {
+    return Arrays.equals(this.sha1Fp, anotherSha1Fp);
+  }
 
-    boolean matchCert(byte[] encodedCert) {
-        return Arrays.equals(this.cert, encodedCert);
-    }
+  boolean matchCert(byte[] encodedCert) {
+    return Arrays.equals(this.cert, encodedCert);
+  }
 }

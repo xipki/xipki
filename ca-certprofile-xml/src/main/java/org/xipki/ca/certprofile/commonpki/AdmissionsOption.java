@@ -24,35 +24,36 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.1
  */
 
 public class AdmissionsOption {
 
-    private final GeneralName admissionAuthority;
+  private final GeneralName admissionAuthority;
 
-    private final NamingAuthority namingAuthority;
+  private final NamingAuthority namingAuthority;
 
-    private final List<ProfessionInfoOption> professionInfos;
+  private final List<ProfessionInfoOption> professionInfos;
 
-    public AdmissionsOption(GeneralName admissionAuthority, NamingAuthority namingAuthority,
-            List<ProfessionInfoOption> professionInfos) {
-        this.admissionAuthority = admissionAuthority;
-        this.namingAuthority = namingAuthority;
-        this.professionInfos = ParamUtil.requireNonEmpty("professionInfos", professionInfos);
-    }
+  public AdmissionsOption(GeneralName admissionAuthority, NamingAuthority namingAuthority,
+      List<ProfessionInfoOption> professionInfos) {
+    this.admissionAuthority = admissionAuthority;
+    this.namingAuthority = namingAuthority;
+    this.professionInfos = ParamUtil.requireNonEmpty("professionInfos", professionInfos);
+  }
 
-    public GeneralName admissionAuthority() {
-        return admissionAuthority;
-    }
+  public GeneralName admissionAuthority() {
+    return admissionAuthority;
+  }
 
-    public NamingAuthority namingAuthority() {
-        return namingAuthority;
-    }
+  public NamingAuthority namingAuthority() {
+    return namingAuthority;
+  }
 
-    public List<ProfessionInfoOption> professionInfos() {
-        return professionInfos;
-    }
+  public List<ProfessionInfoOption> professionInfos() {
+    return professionInfos;
+  }
 
 }

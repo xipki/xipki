@@ -27,103 +27,104 @@ import org.xipki.ca.dbtool.xmlio.DbiXmlReader;
 import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspCertsReader extends DbiXmlReader {
 
-    public OcspCertsReader(InputStream xmlStream)
-            throws XMLStreamException, InvalidDataObjectException {
-        super(OcspCertType.TAG_PARENT, xmlStream);
-    }
+  public OcspCertsReader(InputStream xmlStream)
+      throws XMLStreamException, InvalidDataObjectException {
+    super(OcspCertType.TAG_PARENT, xmlStream);
+  }
 
-    @Override
-    protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
-        OcspCertType ret = null;
-        StringBuilder buffer = new StringBuilder();
-        int lastEvent = -1;
+  @Override
+  protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
+    OcspCertType ret = null;
+    StringBuilder buffer = new StringBuilder();
+    int lastEvent = -1;
 
-        while (reader.hasNext()) {
-            int event = reader.next();
-            String tagContent = null;
+    while (reader.hasNext()) {
+      int event = reader.next();
+      String tagContent = null;
 
-            if (event != XMLStreamConstants.CHARACTERS) {
-                tagContent = buffer.toString();
+      if (event != XMLStreamConstants.CHARACTERS) {
+        tagContent = buffer.toString();
 
-                if (lastEvent == XMLStreamConstants.CHARACTERS) {
-                    buffer.delete(0, buffer.length());
-                }
-            }
+        if (lastEvent == XMLStreamConstants.CHARACTERS) {
+          buffer.delete(0, buffer.length());
+        }
+      }
 
-            lastEvent = event;
+      lastEvent = event;
 
-            switch (event) {
-            case XMLStreamConstants.START_ELEMENT:
-                if (OcspCertType.TAG_ROOT.equals(reader.getLocalName())) {
-                    ret = new OcspCertType();
-                }
-                break;
-            case XMLStreamConstants.CHARACTERS:
-                buffer.append(reader.getText());
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                if (ret == null) {
-                    break;
-                }
+      switch (event) {
+        case XMLStreamConstants.START_ELEMENT:
+          if (OcspCertType.TAG_ROOT.equals(reader.getLocalName())) {
+            ret = new OcspCertType();
+          }
+          break;
+        case XMLStreamConstants.CHARACTERS:
+          buffer.append(reader.getText());
+          break;
+        case XMLStreamConstants.END_ELEMENT:
+          if (ret == null) {
+            break;
+          }
 
-                switch (reader.getLocalName()) {
-                case OcspCertType.TAG_ROOT:
-                    ret.validate();
-                    return ret;
-                case OcspCertType.TAG_ID:
-                    ret.setId(Long.parseLong(tagContent));
-                    break;
-                case OcspCertType.TAG_HASH:
-                    ret.setHash(tagContent);
-                    break;
-                case OcspCertType.TAG_IID:
-                    ret.setIid(Integer.parseInt(tagContent));
-                    break;
-                case OcspCertType.TAG_NAFTER:
-                    ret.setNafter(Long.parseLong(tagContent));
-                    break;
-                case OcspCertType.TAG_NBEFORE:
-                    ret.setNbefore(Long.parseLong(tagContent));
-                    break;
-                case OcspCertType.TAG_PROFILE:
-                    ret.setProfile(tagContent);
-                    break;
-                case OcspCertType.TAG_REV:
-                    ret.setRev(Boolean.parseBoolean(tagContent));
-                    break;
-                case OcspCertType.TAG_RIT:
-                    ret.setRit(Long.parseLong(tagContent));
-                    break;
-                case OcspCertType.TAG_RR:
-                    ret.setRr(Integer.parseInt(tagContent));
-                    break;
-                case OcspCertType.TAG_RT:
-                    ret.setRt(Long.parseLong(tagContent));
-                    break;
-                case OcspCertType.TAG_SN:
-                    ret.setSn(tagContent);
-                    break;
-                case OcspCertType.TAG_SUBJECT:
-                    ret.setSubject(tagContent);
-                    break;
-                case OcspCertType.TAG_UPDATE:
-                    ret.setUpdate(Long.parseLong(tagContent));
-                    break;
-                default:
-                    break;
-                } // end switch (reader.getLocalName())
-                break;
+          switch (reader.getLocalName()) {
+            case OcspCertType.TAG_ROOT:
+              ret.validate();
+              return ret;
+            case OcspCertType.TAG_ID:
+              ret.setId(Long.parseLong(tagContent));
+              break;
+            case OcspCertType.TAG_HASH:
+              ret.setHash(tagContent);
+              break;
+            case OcspCertType.TAG_IID:
+              ret.setIid(Integer.parseInt(tagContent));
+              break;
+            case OcspCertType.TAG_NAFTER:
+              ret.setNafter(Long.parseLong(tagContent));
+              break;
+            case OcspCertType.TAG_NBEFORE:
+              ret.setNbefore(Long.parseLong(tagContent));
+              break;
+            case OcspCertType.TAG_PROFILE:
+              ret.setProfile(tagContent);
+              break;
+            case OcspCertType.TAG_REV:
+              ret.setRev(Boolean.parseBoolean(tagContent));
+              break;
+            case OcspCertType.TAG_RIT:
+              ret.setRit(Long.parseLong(tagContent));
+              break;
+            case OcspCertType.TAG_RR:
+              ret.setRr(Integer.parseInt(tagContent));
+              break;
+            case OcspCertType.TAG_RT:
+              ret.setRt(Long.parseLong(tagContent));
+              break;
+            case OcspCertType.TAG_SN:
+              ret.setSn(tagContent);
+              break;
+            case OcspCertType.TAG_SUBJECT:
+              ret.setSubject(tagContent);
+              break;
+            case OcspCertType.TAG_UPDATE:
+              ret.setUpdate(Long.parseLong(tagContent));
+              break;
             default:
-                break;
-            } // end switch (event)
-        } // end while
-        return null;
-    } // method retrieveNext
+              break;
+          } // end switch (reader.getLocalName())
+          break;
+        default:
+          break;
+      } // end switch (event)
+    } // end while
+    return null;
+  } // method retrieveNext
 
 }

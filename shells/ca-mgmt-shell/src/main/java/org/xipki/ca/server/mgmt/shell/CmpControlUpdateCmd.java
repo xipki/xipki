@@ -24,29 +24,30 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "cmpcontrol-up",
-        description = "update CMP control")
+    description = "update CMP control")
 @Service
 public class CmpControlUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "CMP control name\n(required)")
-    @Completion(CmpControlNameCompleter.class)
-    protected String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "CMP control name\n(required)")
+  @Completion(CmpControlNameCompleter.class)
+  protected String name;
 
-    @Option(name = "--conf", required = true,
-            description = "CMP control configuration\n(required)")
-    protected String conf;
+  @Option(name = "--conf", required = true,
+      description = "CMP control configuration\n(required)")
+  protected String conf;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.changeCmpControl(name, conf);
-        output(bo, "updated", "could not update", "CMP control " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.changeCmpControl(name, conf);
+    output(bo, "updated", "could not update", "CMP control " + name);
+    return null;
+  }
 
 }

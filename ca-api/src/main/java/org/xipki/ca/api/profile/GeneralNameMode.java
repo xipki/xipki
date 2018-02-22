@@ -25,34 +25,35 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class GeneralNameMode {
 
-    private final GeneralNameTag tag;
+  private final GeneralNameTag tag;
 
-    // not applied to all tags, currently only for tag otherName
-    private final Set<ASN1ObjectIdentifier> allowedTypes;
+  // not applied to all tags, currently only for tag otherName
+  private final Set<ASN1ObjectIdentifier> allowedTypes;
 
-    public GeneralNameMode(GeneralNameTag tag) {
-        this.tag = ParamUtil.requireNonNull("tag", tag);
-        this.allowedTypes = null;
-    }
+  public GeneralNameMode(GeneralNameTag tag) {
+    this.tag = ParamUtil.requireNonNull("tag", tag);
+    this.allowedTypes = null;
+  }
 
-    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes) {
-        this.tag = ParamUtil.requireNonNull("tag", tag);
-        this.allowedTypes = CollectionUtil.isEmpty(allowedTypes) ? Collections.emptySet()
-                : CollectionUtil.unmodifiableSet(allowedTypes);
-    }
+  public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes) {
+    this.tag = ParamUtil.requireNonNull("tag", tag);
+    this.allowedTypes = CollectionUtil.isEmpty(allowedTypes) ? Collections.emptySet()
+        : CollectionUtil.unmodifiableSet(allowedTypes);
+  }
 
-    public GeneralNameTag tag() {
-        return tag;
-    }
+  public GeneralNameTag tag() {
+    return tag;
+  }
 
-    public Set<ASN1ObjectIdentifier> allowedTypes() {
-        return allowedTypes;
-    }
+  public Set<ASN1ObjectIdentifier> allowedTypes() {
+    return allowedTypes;
+  }
 
 }

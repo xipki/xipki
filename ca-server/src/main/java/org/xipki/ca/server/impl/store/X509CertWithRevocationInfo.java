@@ -22,55 +22,56 @@ import org.xipki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.security.CertRevocationInfo;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CertWithRevocationInfo {
 
-    private X509CertWithDbId cert;
+  private X509CertWithDbId cert;
 
-    private CertRevocationInfo revInfo;
+  private CertRevocationInfo revInfo;
 
-    private String certprofile;
+  private String certprofile;
 
-    public X509CertWithRevocationInfo() {
-    }
+  public X509CertWithRevocationInfo() {
+  }
 
-    public X509CertWithDbId cert() {
-        return cert;
-    }
+  public X509CertWithDbId cert() {
+    return cert;
+  }
 
-    public boolean isRevoked() {
-        return revInfo != null;
-    }
+  public boolean isRevoked() {
+    return revInfo != null;
+  }
 
-    public CertRevocationInfo revInfo() {
-        return revInfo;
-    }
+  public CertRevocationInfo revInfo() {
+    return revInfo;
+  }
 
-    public void setCert(X509CertWithDbId cert) {
-        this.cert = cert;
-    }
+  public void setCert(X509CertWithDbId cert) {
+    this.cert = cert;
+  }
 
-    public void setRevInfo(CertRevocationInfo revInfo) {
-        this.revInfo = revInfo;
-    }
+  public void setRevInfo(CertRevocationInfo revInfo) {
+    this.revInfo = revInfo;
+  }
 
-    public String certprofile() {
-        return certprofile;
-    }
+  public String certprofile() {
+    return certprofile;
+  }
 
-    public void setCertprofile(String certprofile) {
-        this.certprofile = certprofile;
-    }
+  public void setCertprofile(String certprofile) {
+    this.certprofile = certprofile;
+  }
 
-    public CertWithStatusInfo toCertWithStatusInfo() {
-        CertWithStatusInfo ret = new CertWithStatusInfo();
-        ret.setCert(cert.cert());
-        ret.setCertprofile(certprofile);
-        ret.setRevocationInfo(revInfo);
-        return ret;
-    }
+  public CertWithStatusInfo toCertWithStatusInfo() {
+    CertWithStatusInfo ret = new CertWithStatusInfo();
+    ret.setCert(cert.cert());
+    ret.setCertprofile(certprofile);
+    ret.setRevocationInfo(revInfo);
+    return ret;
+  }
 
 }

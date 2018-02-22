@@ -27,86 +27,87 @@ import org.xipki.ocsp.api.OcspMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponderType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class ResponderOption {
 
-    private final OcspMode mode;
+  private final OcspMode mode;
 
-    private final boolean inheritCaRevocation;
+  private final boolean inheritCaRevocation;
 
-    private final String requestOptionName;
+  private final String requestOptionName;
 
-    private final String responseOptionName;
+  private final String responseOptionName;
 
-    private final String signerName;
+  private final String signerName;
 
-    private final List<String> storeNames;
+  private final List<String> storeNames;
 
-    private final List<String> servletPaths;
+  private final List<String> servletPaths;
 
-    ResponderOption(ResponderType conf) throws InvalidConfException {
-        ParamUtil.requireNonNull("conf", conf);
-        String str = conf.getMode();
-        if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {
-            this.mode = OcspMode.RFC6960;
-        } else if ("RFC2560".equalsIgnoreCase(str) || "RFC 2560".equals(str)) {
-            this.mode = OcspMode.RFC2560;
-        } else {
-            throw new InvalidConfException("invalid OCSP mode '" + str + "'");
-        }
-
-        this.signerName = conf.getSigner();
-        this.requestOptionName = conf.getRequest();
-        this.responseOptionName = conf.getResponse();
-        this.inheritCaRevocation = conf.isInheritCaRevocation();
-
-        List<String> list = new ArrayList<>(conf.getStores().getStore());
-        this.storeNames = Collections.unmodifiableList(list);
-
-        List<String> paths = conf.getServletPaths().getServletPath();
-        for (String path : paths) {
-            if (path.isEmpty()) {
-                continue;
-            }
-
-            if (path.charAt(0) != '/') {
-                throw new InvalidConfException(
-                        "servlet path '" + path + "' must start with '/'");
-            }
-        }
-        list = new ArrayList<>(paths);
-        this.servletPaths = Collections.unmodifiableList(list);
-    } // constructor
-
-    public OcspMode mode() {
-        return mode;
+  ResponderOption(ResponderType conf) throws InvalidConfException {
+    ParamUtil.requireNonNull("conf", conf);
+    String str = conf.getMode();
+    if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {
+      this.mode = OcspMode.RFC6960;
+    } else if ("RFC2560".equalsIgnoreCase(str) || "RFC 2560".equals(str)) {
+      this.mode = OcspMode.RFC2560;
+    } else {
+      throw new InvalidConfException("invalid OCSP mode '" + str + "'");
     }
 
-    public boolean inheritCaRevocation() {
-        return inheritCaRevocation;
-    }
+    this.signerName = conf.getSigner();
+    this.requestOptionName = conf.getRequest();
+    this.responseOptionName = conf.getResponse();
+    this.inheritCaRevocation = conf.isInheritCaRevocation();
 
-    public String signerName() {
-        return signerName;
-    }
+    List<String> list = new ArrayList<>(conf.getStores().getStore());
+    this.storeNames = Collections.unmodifiableList(list);
 
-    public String requestOptionName() {
-        return requestOptionName;
-    }
+    List<String> paths = conf.getServletPaths().getServletPath();
+    for (String path : paths) {
+      if (path.isEmpty()) {
+        continue;
+      }
 
-    public String responseOptionName() {
-        return responseOptionName;
+      if (path.charAt(0) != '/') {
+        throw new InvalidConfException(
+            "servlet path '" + path + "' must start with '/'");
+      }
     }
+    list = new ArrayList<>(paths);
+    this.servletPaths = Collections.unmodifiableList(list);
+  } // constructor
 
-    public List<String> storeNames() {
-        return storeNames;
-    }
+  public OcspMode mode() {
+    return mode;
+  }
 
-    public List<String> servletPaths() {
-        return servletPaths;
-    }
+  public boolean inheritCaRevocation() {
+    return inheritCaRevocation;
+  }
+
+  public String signerName() {
+    return signerName;
+  }
+
+  public String requestOptionName() {
+    return requestOptionName;
+  }
+
+  public String responseOptionName() {
+    return responseOptionName;
+  }
+
+  public List<String> storeNames() {
+    return storeNames;
+  }
+
+  public List<String> servletPaths() {
+    return servletPaths;
+  }
 
 }

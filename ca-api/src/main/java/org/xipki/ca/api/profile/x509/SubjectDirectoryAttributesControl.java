@@ -24,21 +24,22 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.1
  */
 
 public class SubjectDirectoryAttributesControl {
 
-    private final List<ASN1ObjectIdentifier> types;
+  private final List<ASN1ObjectIdentifier> types;
 
-    public SubjectDirectoryAttributesControl(List<ASN1ObjectIdentifier> types) {
-        ParamUtil.requireNonEmpty("types", types);
-        this.types = new ArrayList<>(types);
-    }
+  public SubjectDirectoryAttributesControl(List<ASN1ObjectIdentifier> types) {
+    ParamUtil.requireNonEmpty("types", types);
+    this.types = new ArrayList<>(types);
+  }
 
-    public List<ASN1ObjectIdentifier> types() {
-        return types;
-    }
+  public List<ASN1ObjectIdentifier> types() {
+    return types;
+  }
 
 }

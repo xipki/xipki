@@ -21,40 +21,41 @@ import org.xipki.ca.api.NameId;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class ChangeUserEntry {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    private Boolean active;
+  private Boolean active;
 
-    private String password;
+  private String password;
 
-    public ChangeUserEntry(NameId ident) throws CaMgmtException {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-    }
+  public ChangeUserEntry(NameId ident) throws CaMgmtException {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
 
-    public NameId ident() {
-        return ident;
-    }
+  public NameId ident() {
+    return ident;
+  }
 
-    public Boolean active() {
-        return active;
-    }
+  public Boolean active() {
+    return active;
+  }
 
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public String password() {
-        return password;
-    }
+  public String password() {
+    return password;
+  }
 
 }

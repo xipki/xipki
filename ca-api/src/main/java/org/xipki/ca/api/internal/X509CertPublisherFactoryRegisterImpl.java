@@ -28,58 +28,59 @@ import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFactoryRegister {
 
-    private static final Logger LOG = LoggerFactory.getLogger(
-            X509CertPublisherFactoryRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+      X509CertPublisherFactoryRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<X509CertPublisherFactory> services =
-            new ConcurrentLinkedDeque<X509CertPublisherFactory>();
+  private ConcurrentLinkedDeque<X509CertPublisherFactory> services =
+      new ConcurrentLinkedDeque<X509CertPublisherFactory>();
 
-    @Override
-    public X509CertPublisher newPublisher(String type) throws ObjectCreationException {
-        ParamUtil.requireNonBlank("type", type);
+  @Override
+  public X509CertPublisher newPublisher(String type) throws ObjectCreationException {
+    ParamUtil.requireNonBlank("type", type);
 
-        for (X509CertPublisherFactory service : services) {
-            if (service.canCreatePublisher(type)) {
-                return service.newPublisher(type);
-            }
-        }
-
-        throw new ObjectCreationException(
-                "could not find factory to create Publisher of type " + type);
+    for (X509CertPublisherFactory service : services) {
+      if (service.canCreatePublisher(type)) {
+        return service.newPublisher(type);
+      }
     }
 
-    public void bindService(X509CertPublisherFactory service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.info("bindService invoked with null.");
-            return;
-        }
+    throw new ObjectCreationException(
+        "could not find factory to create Publisher of type " + type);
+  }
 
-        boolean replaced = services.remove(service);
-        services.add(service);
-
-        String action = replaced ? "replaced" : "added";
-        LOG.info("{} X509CertPublisherFactory binding for {}", action, service);
+  public void bindService(X509CertPublisherFactory service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.info("bindService invoked with null.");
+      return;
     }
 
-    public void unbindService(X509CertPublisherFactory service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.info("unbindService invoked with null.");
-            return;
-        }
+    boolean replaced = services.remove(service);
+    services.add(service);
 
-        if (services.remove(service)) {
-            LOG.info("removed X509CertPublisherFactory binding for {}", service);
-        } else {
-            LOG.info("no X509CertPublisherFactory binding found to remove for {}", service);
-        }
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} X509CertPublisherFactory binding for {}", action, service);
+  }
+
+  public void unbindService(X509CertPublisherFactory service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.info("unbindService invoked with null.");
+      return;
     }
+
+    if (services.remove(service)) {
+      LOG.info("removed X509CertPublisherFactory binding for {}", service);
+    } else {
+      LOG.info("no X509CertPublisherFactory binding found to remove for {}", service);
+    }
+  }
 
 }

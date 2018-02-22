@@ -22,8 +22,7 @@ import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.StringUtil;
 
 /**
- *
- * Example configuration
+ * Example configuration.
  *
  * <pre>
  *
@@ -43,106 +42,106 @@ import org.xipki.common.util.StringUtil;
 
 public class ScepControl {
 
-    public static final String KEY_CACERT_INCLUDED = "cacert.included";
+  public static final String KEY_CACERT_INCLUDED = "cacert.included";
 
-    public static final String KEY_SIGNERCERT_INCLUDED = "signercert.included";
+  public static final String KEY_SIGNERCERT_INCLUDED = "signercert.included";
 
-    public static final String KEY_SUPPORT_GETCRL = "support.getcrl";
+  public static final String KEY_SUPPORT_GETCRL = "support.getcrl";
 
-    private boolean includeCaCert = true;
+  private boolean includeCaCert = true;
 
-    private boolean includeSignerCert = true;
+  private boolean includeSignerCert = true;
 
-    private boolean supportGetCrl = false;
+  private boolean supportGetCrl = false;
 
-    public ScepControl(String conf) throws InvalidConfException {
-        if (StringUtil.isBlank(conf)) {
-            return;
-        }
-
-        ConfPairs props;
-        try {
-            props = new ConfPairs(conf);
-        } catch (RuntimeException ex) {
-            throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-        }
-
-        this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
-        this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
-        this.supportGetCrl = getBoolean(props, KEY_SUPPORT_GETCRL, false);
+  public ScepControl(String conf) throws InvalidConfException {
+    if (StringUtil.isBlank(conf)) {
+      return;
     }
 
-    public String conf() {
-        ConfPairs pairs = new ConfPairs();
-        pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
-        pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
-
-        return pairs.getEncoded();
+    ConfPairs props;
+    try {
+      props = new ConfPairs(conf);
+    } catch (RuntimeException ex) {
+      throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
 
-    public boolean includeCaCert() {
-        return includeCaCert;
+    this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
+    this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
+    this.supportGetCrl = getBoolean(props, KEY_SUPPORT_GETCRL, false);
+  }
+
+  public String conf() {
+    ConfPairs pairs = new ConfPairs();
+    pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
+    pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
+
+    return pairs.getEncoded();
+  }
+
+  public boolean includeCaCert() {
+    return includeCaCert;
+  }
+
+  public void setIncludeCaCert(boolean includeCaCert) {
+    this.includeCaCert = includeCaCert;
+  }
+
+  public boolean includeSignerCert() {
+    return includeSignerCert;
+  }
+
+  public void setIncludeSignerCert(boolean includeSignerCert) {
+    this.includeSignerCert = includeSignerCert;
+  }
+
+  public boolean supportGetCrl() {
+    return supportGetCrl;
+  }
+
+  public void setSupportGetCrl(boolean supportGetCrl) {
+    this.supportGetCrl = supportGetCrl;
+  }
+
+  @Override
+  public String toString() {
+    return conf();
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ScepControl)) {
+      return false;
     }
 
-    public void setIncludeCaCert(boolean includeCaCert) {
-        this.includeCaCert = includeCaCert;
+    ScepControl obj2 = (ScepControl) obj;
+    if (includeCaCert != obj2.includeCaCert
+        || includeSignerCert != obj2.includeSignerCert) {
+      return false;
     }
 
-    public boolean includeSignerCert() {
-        return includeSignerCert;
+    return true;
+  }
+
+  private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
+      throws InvalidConfException {
+    String str = props.value(propKey);
+    if (str != null) {
+      str = str.trim();
+      if ("true".equalsIgnoreCase(str)) {
+        return Boolean.TRUE;
+      } else if ("false".equalsIgnoreCase(str)) {
+        return Boolean.FALSE;
+      } else {
+        throw new InvalidConfException(propKey + " does not have boolean value: " + str);
+      }
     }
-
-    public void setIncludeSignerCert(boolean includeSignerCert) {
-        this.includeSignerCert = includeSignerCert;
-    }
-
-    public boolean supportGetCrl() {
-        return supportGetCrl;
-    }
-
-    public void setSupportGetCrl(boolean supportGetCrl) {
-        this.supportGetCrl = supportGetCrl;
-    }
-
-    @Override
-    public String toString() {
-        return conf();
-    }
-
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ScepControl)) {
-            return false;
-        }
-
-        ScepControl obj2 = (ScepControl) obj;
-        if (includeCaCert != obj2.includeCaCert
-                || includeSignerCert != obj2.includeSignerCert) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
-            throws InvalidConfException {
-        String str = props.value(propKey);
-        if (str != null) {
-            str = str.trim();
-            if ("true".equalsIgnoreCase(str)) {
-                return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(str)) {
-                return Boolean.FALSE;
-            } else {
-                throw new InvalidConfException(propKey + " does not have boolean value: " + str);
-            }
-        }
-        return dfltValue;
-    }
+    return dfltValue;
+  }
 
 }

@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.ResponderAddCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-responder-add",
-        description = "add responder (negative, QA)")
+    description = "add responder (negative, QA)")
 @Service
 public class NegResponderAddCmd extends ResponderAddCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-responder-add");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-responder-add");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

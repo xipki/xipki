@@ -35,93 +35,94 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public class HealthCheckServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-    private static final String CT_RESPONSE = "application/json";
+  private static final String CT_RESPONSE = "application/json";
 
-    private CmpResponderManager responderManager;
+  private CmpResponderManager responderManager;
 
-    public HealthCheckServlet() {
-    }
+  public HealthCheckServlet() {
+  }
 
-    public void setResponderManager(CmpResponderManager responderManager) {
-        this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
-    }
+  public void setResponderManager(CmpResponderManager responderManager) {
+    this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
+  }
 
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "*");
+  @Override
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+      throws ServletException, IOException {
+    resp.setHeader("Access-Control-Allow-Origin", "*");
 
-        try {
-            if (responderManager == null) {
-                LOG.error("responderManager in servlet is not configured");
-                sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
-            }
+    try {
+      if (responderManager == null) {
+        LOG.error("responderManager in servlet is not configured");
+        sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        return;
+      }
 
-            String caName = null;
-            X509CaCmpResponder responder = null;
+      String caName = null;
+      X509CaCmpResponder responder = null;
 
-            String path = StringUtil.getRelativeRequestUri(
-                    req.getServletPath(), req.getRequestURI());
-            if (path.length() > 1) {
-                // skip the first char which is always '/'
-                String caAlias = path.substring(1);
-                caName = responderManager.getCaNameForAlias(caAlias);
-                if (caName == null) {
-                    caName = caAlias.toLowerCase();
-                }
-                responder = responderManager.getX509CaResponder(caName);
-            }
-
-            if (caName == null || responder == null || !responder.isOnService()) {
-                String auditMessage;
-                if (caName == null) {
-                    auditMessage = "no CA is specified";
-                } else if (responder == null) {
-                    auditMessage = "unknown CA '" + caName + "'";
-                } else {
-                    auditMessage = "CA '" + caName + "' is out of service";
-                }
-                LOG.warn(auditMessage);
-
-                sendError(resp, HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            HealthCheckResult healthResult = responder.healthCheck();
-            int status = healthResult.isHealthy()
-                    ? HttpServletResponse.SC_OK
-                    : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
-            resp.setStatus(status);
-            resp.setContentLength(respBytes.length);
-            resp.setContentType(CT_RESPONSE);
-            resp.getOutputStream().write(respBytes);
-        } catch (Throwable th) {
-            if (th instanceof EOFException) {
-                LogUtil.warn(LOG, th, "connection reset by peer");
-            } else {
-                LOG.error("Throwable thrown, this should not happen!", th);
-            }
-            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            resp.flushBuffer();
+      String path = StringUtil.getRelativeRequestUri(
+          req.getServletPath(), req.getRequestURI());
+      if (path.length() > 1) {
+        // skip the first char which is always '/'
+        String caAlias = path.substring(1);
+        caName = responderManager.getCaNameForAlias(caAlias);
+        if (caName == null) {
+          caName = caAlias.toLowerCase();
         }
-    } // method service0
+        responder = responderManager.getX509CaResponder(caName);
+      }
 
-    private static void sendError(HttpServletResponse resp, int status) {
-        resp.setStatus(status);
-        resp.setContentLength(0);
+      if (caName == null || responder == null || !responder.isOnService()) {
+        String auditMessage;
+        if (caName == null) {
+          auditMessage = "no CA is specified";
+        } else if (responder == null) {
+          auditMessage = "unknown CA '" + caName + "'";
+        } else {
+          auditMessage = "CA '" + caName + "' is out of service";
+        }
+        LOG.warn(auditMessage);
+
+        sendError(resp, HttpServletResponse.SC_NOT_FOUND);
+        return;
+      }
+
+      HealthCheckResult healthResult = responder.healthCheck();
+      int status = healthResult.isHealthy()
+          ? HttpServletResponse.SC_OK
+          : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
+      resp.setStatus(status);
+      resp.setContentLength(respBytes.length);
+      resp.setContentType(CT_RESPONSE);
+      resp.getOutputStream().write(respBytes);
+    } catch (Throwable th) {
+      if (th instanceof EOFException) {
+        LogUtil.warn(LOG, th, "connection reset by peer");
+      } else {
+        LOG.error("Throwable thrown, this should not happen!", th);
+      }
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    } finally {
+      resp.flushBuffer();
     }
+  } // method service0
+
+  private static void sendError(HttpServletResponse resp, int status) {
+    resp.setStatus(status);
+    resp.setContentLength(0);
+  }
 
 }

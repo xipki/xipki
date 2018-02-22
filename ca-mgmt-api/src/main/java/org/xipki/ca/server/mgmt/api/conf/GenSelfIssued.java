@@ -22,40 +22,41 @@ import java.math.BigInteger;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class GenSelfIssued {
 
-    private final String profile;
+  private final String profile;
 
-    private final byte[] csr;
+  private final byte[] csr;
 
-    private final String certFilename;
+  private final String certFilename;
 
-    private final BigInteger serialNumber;
+  private final BigInteger serialNumber;
 
-    public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber, String certFilename) {
-        this.profile = ParamUtil.requireNonBlank("profile", profile);
-        this.csr = ParamUtil.requireNonNull("csr", csr);
-        this.certFilename = certFilename;
-        this.serialNumber = serialNumber;
-    }
+  public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber, String certFilename) {
+    this.profile = ParamUtil.requireNonBlank("profile", profile);
+    this.csr = ParamUtil.requireNonNull("csr", csr);
+    this.certFilename = certFilename;
+    this.serialNumber = serialNumber;
+  }
 
-    public String profile() {
-        return profile;
-    }
+  public String profile() {
+    return profile;
+  }
 
-    public byte[] csr() {
-        return csr;
-    }
+  public byte[] csr() {
+    return csr;
+  }
 
-    public String certFilename() {
-        return certFilename;
-    }
+  public String certFilename() {
+    return certFilename;
+  }
 
-    public BigInteger serialNumber() {
-        return serialNumber;
-    }
+  public BigInteger serialNumber() {
+    return serialNumber;
+  }
 }

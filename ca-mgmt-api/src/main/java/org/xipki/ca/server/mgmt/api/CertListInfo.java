@@ -23,41 +23,42 @@ import java.util.Date;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class CertListInfo {
-    private final BigInteger serialNumber;
+  private final BigInteger serialNumber;
 
-    private final Date notBefore;
+  private final Date notBefore;
 
-    private final Date notAfter;
+  private final Date notAfter;
 
-    private final String subject;
+  private final String subject;
 
-    public CertListInfo(BigInteger serialNumber, String subject, Date notBefore, Date notAfter) {
-        super();
-        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
-        this.notBefore = ParamUtil.requireNonNull("notBefore", notBefore);
-        this.notAfter = ParamUtil.requireNonNull("notAfter", notAfter);
-        this.subject = ParamUtil.requireNonNull("subject", subject);
-    }
+  public CertListInfo(BigInteger serialNumber, String subject, Date notBefore, Date notAfter) {
+    super();
+    this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+    this.notBefore = ParamUtil.requireNonNull("notBefore", notBefore);
+    this.notAfter = ParamUtil.requireNonNull("notAfter", notAfter);
+    this.subject = ParamUtil.requireNonNull("subject", subject);
+  }
 
-    public BigInteger serialNumber() {
-        return serialNumber;
-    }
+  public BigInteger serialNumber() {
+    return serialNumber;
+  }
 
-    public Date notBefore() {
-        return notBefore;
-    }
+  public Date notBefore() {
+    return notBefore;
+  }
 
-    public Date notAfter() {
-        return notAfter;
-    }
+  public Date notAfter() {
+    return notAfter;
+  }
 
-    public String subject() {
-        return subject;
-    }
+  public String subject() {
+    return subject;
+  }
 
 }

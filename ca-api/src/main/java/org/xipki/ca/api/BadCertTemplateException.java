@@ -18,27 +18,28 @@
 package org.xipki.ca.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class BadCertTemplateException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public BadCertTemplateException() {
-    }
+  public BadCertTemplateException() {
+  }
 
-    public BadCertTemplateException(String message) {
-        super(message);
-    }
+  public BadCertTemplateException(String message) {
+    super(message);
+  }
 
-    public BadCertTemplateException(Throwable cause) {
-        super(cause);
-    }
+  public BadCertTemplateException(Throwable cause) {
+    super(cause);
+  }
 
-    public BadCertTemplateException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public BadCertTemplateException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

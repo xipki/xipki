@@ -25,6 +25,7 @@ import org.xipki.ca.qa.QaSystemManager;
 import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -32,12 +33,12 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 @Service
 public class X509CertprofileNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference
-    private QaSystemManager qaSystemManager;
+  @Reference
+  private QaSystemManager qaSystemManager;
 
-    @Override
-    protected Set<String> getEnums() {
-        return qaSystemManager.certprofileNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return qaSystemManager.certprofileNames();
+  }
 
 }

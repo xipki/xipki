@@ -18,28 +18,29 @@
 package org.xipki.ocsp.server.impl.store.crl;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 class ImportCrlException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public ImportCrlException() {
-        super();
-    }
+  public ImportCrlException() {
+    super();
+  }
 
-    public ImportCrlException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public ImportCrlException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ImportCrlException(String message) {
-        super(message);
-    }
+  public ImportCrlException(String message) {
+    super(message);
+  }
 
-    public ImportCrlException(Throwable cause) {
-        super(cause);
-    }
+  public ImportCrlException(Throwable cause) {
+    super(cause);
+  }
 
 }

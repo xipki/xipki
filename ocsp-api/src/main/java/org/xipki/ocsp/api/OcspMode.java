@@ -18,13 +18,14 @@
 package org.xipki.ocsp.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum OcspMode {
 
-    RFC2560,
-    RFC6960
+  RFC2560,
+  RFC6960
 
 }

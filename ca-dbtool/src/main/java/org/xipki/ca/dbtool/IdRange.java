@@ -18,32 +18,33 @@
 package org.xipki.ca.dbtool;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class IdRange {
 
-    private final long from;
+  private final long from;
 
-    private final long to;
+  private final long to;
 
-    public IdRange(long from, long to) {
-        if (from > to) {
-            throw new IllegalArgumentException(
-                    "from must not be greater than to: " + from + " > " + to);
-        }
-
-        this.from = from;
-        this.to = to;
+  public IdRange(long from, long to) {
+    if (from > to) {
+      throw new IllegalArgumentException(
+          "from must not be greater than to: " + from + " > " + to);
     }
 
-    public long from() {
-        return from;
-    }
+    this.from = from;
+    this.to = to;
+  }
 
-    public long to() {
-        return to;
-    }
+  public long from() {
+    return from;
+  }
+
+  public long to() {
+    return to;
+  }
 
 }

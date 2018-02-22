@@ -25,6 +25,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -32,35 +33,35 @@ import org.xipki.security.CrlReason;
 public class CertRevInfoWithSerial extends CertRevocationInfo
     implements Comparable<CertRevInfoWithSerial> {
 
-    private final long id;
+  private final long id;
 
-    private final BigInteger serial;
+  private final BigInteger serial;
 
-    public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
-            Date revocationTime, Date invalidityTime) {
-        super(reason, revocationTime, invalidityTime);
-        this.id = id;
-        this.serial = ParamUtil.requireNonNull("serial", serial);
-    }
+  public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
+      Date revocationTime, Date invalidityTime) {
+    super(reason, revocationTime, invalidityTime);
+    this.id = id;
+    this.serial = ParamUtil.requireNonNull("serial", serial);
+  }
 
-    public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
-            Date revocationTime, Date invalidityTime) {
-        super(reasonCode, revocationTime, invalidityTime);
-        this.id = id;
-        this.serial = ParamUtil.requireNonNull("serial", serial);
-    }
+  public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
+      Date revocationTime, Date invalidityTime) {
+    super(reasonCode, revocationTime, invalidityTime);
+    this.id = id;
+    this.serial = ParamUtil.requireNonNull("serial", serial);
+  }
 
-    public BigInteger serial() {
-        return serial;
-    }
+  public BigInteger serial() {
+    return serial;
+  }
 
-    public long id() {
-        return id;
-    }
+  public long id() {
+    return id;
+  }
 
-    @Override
-    public int compareTo(CertRevInfoWithSerial other) {
-        return serial.compareTo(other.serial);
-    }
+  @Override
+  public int compareTo(CertRevInfoWithSerial other) {
+    return serial.compareTo(other.serial);
+  }
 
 }

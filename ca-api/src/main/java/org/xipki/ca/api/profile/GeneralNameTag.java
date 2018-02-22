@@ -18,30 +18,31 @@
 package org.xipki.ca.api.profile;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum GeneralNameTag {
 
-    otherName(0),
-    rfc822Name(1),
-    dNSName(2),
-    x400Adress(3),
-    directoryName(4),
-    ediPartyName(5),
-    uniformResourceIdentifier(6),
-    iPAddress(7),
-    registeredID(8);
+  otherName(0),
+  rfc822Name(1),
+  dNSName(2),
+  x400Adress(3),
+  directoryName(4),
+  ediPartyName(5),
+  uniformResourceIdentifier(6),
+  iPAddress(7),
+  registeredID(8);
 
-    private final int tag;
+  private final int tag;
 
-    private GeneralNameTag(int tag) {
-        this.tag = tag;
-    }
+  private GeneralNameTag(int tag) {
+    this.tag = tag;
+  }
 
-    public int tag() {
-        return tag;
-    }
+  public int tag() {
+    return tag;
+  }
 
 }

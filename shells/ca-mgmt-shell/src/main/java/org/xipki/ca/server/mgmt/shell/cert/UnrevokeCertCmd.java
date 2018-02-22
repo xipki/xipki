@@ -21,21 +21,22 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "unrevoke-cert",
-        description = "unrevoke certificate")
+    description = "unrevoke certificate")
 @Service
 public class UnrevokeCertCmd extends UnRevRmCertAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
-        output(successful, "unrevoked", "could not unrevoke", "certificate");
+  @Override
+  protected Object execute0() throws Exception {
+    boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
+    output(successful, "unrevoked", "could not unrevoke", "certificate");
 
-        return null;
-    }
+    return null;
+  }
 
 }

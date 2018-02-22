@@ -27,51 +27,52 @@ import java.util.StringTokenizer;
 import org.xipki.ocsp.api.OcspStoreException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class StoreConf {
 
-    private static final String KEY_cacerts_includes = "cacerts.includes";
+  private static final String KEY_cacerts_includes = "cacerts.includes";
 
-    private static final String KEY_cacerts_excludes = "cacerts.excludes";
+  private static final String KEY_cacerts_excludes = "cacerts.excludes";
 
-    private final Set<String> caCertsIncludes = new HashSet<>();
+  private final Set<String> caCertsIncludes = new HashSet<>();
 
-    private final Set<String> caCertsExcludes = new HashSet<>();
+  private final Set<String> caCertsExcludes = new HashSet<>();
 
-    StoreConf(String propsConf) throws OcspStoreException {
-        Properties props = new Properties();
-        try {
-            props.load(new ByteArrayInputStream(propsConf.getBytes()));
-        } catch (IOException ex) {
-            throw new OcspStoreException("could not load properties: " + ex.getMessage(), ex);
-        }
-
-        String str = props.getProperty(KEY_cacerts_includes);
-        if (str != null) {
-            StringTokenizer st = new StringTokenizer(str, ", ");
-            while (st.hasMoreTokens()) {
-                caCertsIncludes.add(st.nextToken());
-            }
-        }
-
-        str = props.getProperty(KEY_cacerts_excludes);
-        if (str != null) {
-            StringTokenizer st = new StringTokenizer(str, ", ");
-            while (st.hasMoreTokens()) {
-                caCertsExcludes.add(st.nextToken());
-            }
-        }
+  StoreConf(String propsConf) throws OcspStoreException {
+    Properties props = new Properties();
+    try {
+      props.load(new ByteArrayInputStream(propsConf.getBytes()));
+    } catch (IOException ex) {
+      throw new OcspStoreException("could not load properties: " + ex.getMessage(), ex);
     }
 
-    Set<String> caCertsIncludes() {
-        return caCertsIncludes;
+    String str = props.getProperty(KEY_cacerts_includes);
+    if (str != null) {
+      StringTokenizer st = new StringTokenizer(str, ", ");
+      while (st.hasMoreTokens()) {
+        caCertsIncludes.add(st.nextToken());
+      }
     }
 
-    Set<String> caCertsExcludes() {
-        return caCertsExcludes;
+    str = props.getProperty(KEY_cacerts_excludes);
+    if (str != null) {
+      StringTokenizer st = new StringTokenizer(str, ", ");
+      while (st.hasMoreTokens()) {
+        caCertsExcludes.add(st.nextToken());
+      }
     }
+  }
+
+  Set<String> caCertsIncludes() {
+    return caCertsIncludes;
+  }
+
+  Set<String> caCertsExcludes() {
+    return caCertsExcludes;
+  }
 
 }

@@ -22,42 +22,43 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class QcStatementOption {
 
-    private final QCStatement statement;
+  private final QCStatement statement;
 
-    private final ASN1ObjectIdentifier statementId;
+  private final ASN1ObjectIdentifier statementId;
 
-    private final MonetaryValueOption monetaryValueOption;
+  private final MonetaryValueOption monetaryValueOption;
 
-    public QcStatementOption(QCStatement statement) {
-        this.statement = ParamUtil.requireNonNull("statement", statement);
-        this.statementId = null;
-        this.monetaryValueOption = null;
-    }
+  public QcStatementOption(QCStatement statement) {
+    this.statement = ParamUtil.requireNonNull("statement", statement);
+    this.statementId = null;
+    this.monetaryValueOption = null;
+  }
 
-    public QcStatementOption(ASN1ObjectIdentifier statementId,
-            MonetaryValueOption monetaryValueOption) {
-        this.statement = null;
-        this.statementId = ParamUtil.requireNonNull("statementId", statementId);
-        this.monetaryValueOption = ParamUtil.requireNonNull("monetaryValueOption",
-                monetaryValueOption);
-    }
+  public QcStatementOption(ASN1ObjectIdentifier statementId,
+      MonetaryValueOption monetaryValueOption) {
+    this.statement = null;
+    this.statementId = ParamUtil.requireNonNull("statementId", statementId);
+    this.monetaryValueOption = ParamUtil.requireNonNull("monetaryValueOption",
+        monetaryValueOption);
+  }
 
-    public QCStatement statement() {
-        return statement;
-    }
+  public QCStatement statement() {
+    return statement;
+  }
 
-    public ASN1ObjectIdentifier statementId() {
-        return statementId;
-    }
+  public ASN1ObjectIdentifier statementId() {
+    return statementId;
+  }
 
-    public MonetaryValueOption monetaryValueOption() {
-        return monetaryValueOption;
-    }
+  public MonetaryValueOption monetaryValueOption() {
+    return monetaryValueOption;
+  }
 
 }

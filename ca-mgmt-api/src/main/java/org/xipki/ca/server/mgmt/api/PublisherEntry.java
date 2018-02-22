@@ -23,77 +23,78 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class PublisherEntry {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    private final String type;
+  private final String type;
 
-    private final String conf;
+  private final String conf;
 
-    private boolean faulty;
+  private boolean faulty;
 
-    public PublisherEntry(NameId ident, String type, String conf) {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-        this.type = ParamUtil.requireNonBlank("type", type);
-        this.conf = conf;
+  public PublisherEntry(NameId ident, String type, String conf) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.type = ParamUtil.requireNonBlank("type", type);
+    this.conf = conf;
+  }
+
+  public NameId ident() {
+    return ident;
+  }
+
+  public String type() {
+    return type;
+  }
+
+  public String conf() {
+    return conf;
+  }
+
+  public boolean faulty() {
+    return faulty;
+  }
+
+  public void setFaulty(boolean faulty) {
+    this.faulty = faulty;
+  }
+
+  @Override
+  public String toString() {
+    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+        "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ", conf);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof PublisherEntry)) {
+      return false;
     }
 
-    public NameId ident() {
-        return ident;
+    PublisherEntry objB = (PublisherEntry) obj;
+    if (!ident.equals(objB.ident)) {
+      return false;
     }
 
-    public String type() {
-        return type;
+    if (!type.equals(objB.type)) {
+      return false;
     }
 
-    public String conf() {
-        return conf;
+    if (!CompareUtil.equalsObject(conf, objB.conf)) {
+      return false;
     }
 
-    public boolean faulty() {
-        return faulty;
-    }
+    return true;
+  }
 
-    public void setFaulty(boolean faulty) {
-        this.faulty = faulty;
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
-                "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ", conf);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof PublisherEntry)) {
-            return false;
-        }
-
-        PublisherEntry objB = (PublisherEntry) obj;
-        if (!ident.equals(objB.ident)) {
-            return false;
-        }
-
-        if (!type.equals(objB.type)) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(conf, objB.conf)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return ident.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return ident.hashCode();
+  }
 
 }

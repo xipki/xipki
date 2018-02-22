@@ -34,311 +34,312 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaEntry {
 
-    private NameId ident;
+  private NameId ident;
 
-    private CaStatus status;
+  private CaStatus status;
 
-    private CertValidity maxValidity;
+  private CertValidity maxValidity;
 
-    private String signerType;
+  private String signerType;
 
-    private String signerConf;
+  private String signerConf;
 
-    private String cmpControlName;
+  private String cmpControlName;
 
-    private String responderName;
+  private String responderName;
 
-    private boolean duplicateKeyPermitted;
+  private boolean duplicateKeyPermitted;
 
-    private boolean duplicateSubjectPermitted;
+  private boolean duplicateSubjectPermitted;
 
-    private boolean saveRequest;
+  private boolean saveRequest;
 
-    private ValidityMode validityMode = ValidityMode.STRICT;
+  private ValidityMode validityMode = ValidityMode.STRICT;
 
-    private int permission;
+  private int permission;
 
-    private int expirationPeriod;
+  private int expirationPeriod;
 
-    private int keepExpiredCertInDays;
+  private int keepExpiredCertInDays;
 
-    private ConfPairs extraControl;
+  private ConfPairs extraControl;
 
-    public CaEntry(NameId ident, String signerType, String signerConf, int expirationPeriod)
-            throws CaMgmtException {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-        this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
-        this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
-        this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+  public CaEntry(NameId ident, String signerType, String signerConf, int expirationPeriod)
+      throws CaMgmtException {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
+    this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
+    this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+  }
+
+  public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
+    ConfPairs pairs = new ConfPairs(conf);
+    String str = pairs.value("algo");
+    if (str == null) {
+      throw new XiSecurityException("no algo is defined in CA signerConf");
     }
 
-    public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
-        ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.value("algo");
-        if (str == null) {
-            throw new XiSecurityException("no algo is defined in CA signerConf");
-        }
-
-        List<String> list = StringUtil.split(str, ":");
-        if (CollectionUtil.isEmpty(list)) {
-            throw new XiSecurityException("empty algo is defined in CA signerConf");
-        }
-
-        List<String[]> signerConfs = new ArrayList<>(list.size());
-        for (String n : list) {
-            String c14nAlgo;
-            try {
-                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
-            }
-            pairs.putPair("algo", c14nAlgo);
-            signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
-        }
-
-        return signerConfs;
+    List<String> list = StringUtil.split(str, ":");
+    if (CollectionUtil.isEmpty(list)) {
+      throw new XiSecurityException("empty algo is defined in CA signerConf");
     }
 
-    public NameId ident() {
-        return ident;
+    List<String[]> signerConfs = new ArrayList<>(list.size());
+    for (String n : list) {
+      String c14nAlgo;
+      try {
+        c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new XiSecurityException(ex.getMessage(), ex);
+      }
+      pairs.putPair("algo", c14nAlgo);
+      signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
     }
 
-    public CertValidity maxValidity() {
-        return maxValidity;
+    return signerConfs;
+  }
+
+  public NameId ident() {
+    return ident;
+  }
+
+  public CertValidity maxValidity() {
+    return maxValidity;
+  }
+
+  public void setMaxValidity(CertValidity maxValidity) {
+    this.maxValidity = maxValidity;
+  }
+
+  public int keepExpiredCertInDays() {
+    return keepExpiredCertInDays;
+  }
+
+  public void setKeepExpiredCertInDays(int days) {
+    this.keepExpiredCertInDays = days;
+  }
+
+  public void setSignerConf(String signerConf) {
+    this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+  }
+
+  public String signerConf() {
+    return signerConf;
+  }
+
+  public CaStatus status() {
+    return status;
+  }
+
+  public void setStatus(CaStatus status) {
+    this.status = status;
+  }
+
+  public String signerType() {
+    return signerType;
+  }
+
+  public void setCmpControlName(String cmpControlName) {
+    this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
+  }
+
+  public String cmpControlName() {
+    return cmpControlName;
+  }
+
+  public String responderName() {
+    return responderName;
+  }
+
+  public void setResponderName(String responderName) {
+    this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+  }
+
+  public boolean duplicateKeyPermitted() {
+    return duplicateKeyPermitted;
+  }
+
+  public void setDuplicateKeyPermitted(boolean duplicateKeyPermitted) {
+    this.duplicateKeyPermitted = duplicateKeyPermitted;
+  }
+
+  public boolean duplicateSubjectPermitted() {
+    return duplicateSubjectPermitted;
+  }
+
+  public void setDuplicateSubjectPermitted(boolean duplicateSubjectPermitted) {
+    this.duplicateSubjectPermitted = duplicateSubjectPermitted;
+  }
+
+  public boolean saveRequest() {
+    return saveRequest;
+  }
+
+  public void setSaveRequest(boolean saveRequest) {
+    this.saveRequest = saveRequest;
+  }
+
+  public ValidityMode validityMode() {
+    return validityMode;
+  }
+
+  public void setValidityMode(ValidityMode mode) {
+    this.validityMode = ParamUtil.requireNonNull("mode", mode);
+  }
+
+  public int permission() {
+    return permission;
+  }
+
+  public void setPermission(int permission) {
+    this.permission = permission;
+  }
+
+  public int expirationPeriod() {
+    return expirationPeriod;
+  }
+
+  public ConfPairs extraControl() {
+    return extraControl;
+  }
+
+  public void setExtraControl(ConfPairs extraControl) {
+    this.extraControl = extraControl;
+  }
+
+  @Override
+  public String toString() {
+    return toString(false);
+  }
+
+  public String toString(boolean verbose) {
+    return toString(verbose, true);
+  }
+
+  public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
+    String extraCtrlText;
+    if (extraControl == null) {
+      extraCtrlText = "null";
+    } else {
+      extraCtrlText = extraControl.getEncoded();
+      if (!verbose && extraCtrlText.length() > 100) {
+        extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97), "...");
+      }
     }
 
-    public void setMaxValidity(CertValidity maxValidity) {
-        this.maxValidity = maxValidity;
+    return StringUtil.concatObjectsCap(500, "id: ", ident.id(), "\nname: ", ident.name(),
+        "\nstatus: ", (status == null ? "null" : status.status()),
+        "\nmaxValidity: ", maxValidity,
+        "\nexpirationPeriod: ", expirationPeriod, " days",
+        "\nsignerType: ", signerType,
+        "\nsignerConf: ", (signerConf == null ? "null" :
+          SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo)),
+        "\ncmpcontrolName: ", cmpControlName,
+        "\nresponderName: ", responderName,
+        "\nduplicateKey: ", duplicateKeyPermitted,
+        "\nduplicateSubject: ", duplicateSubjectPermitted,
+        "\nsaveRequest: ", saveRequest,
+        "\nvalidityMode: ", validityMode,
+        "\npermission: ", permission,
+        "\nkeepExpiredCerts: ", (keepExpiredCertInDays < 0
+                      ? "forever" : keepExpiredCertInDays + " days"),
+        "\nextraControl: ", extraCtrlText, "\n");
+  } // method toString
+
+  protected static String urisToString(Collection<? extends Object> tokens) {
+    if (CollectionUtil.isEmpty(tokens)) {
+      return null;
     }
 
-    public int keepExpiredCertInDays() {
-        return keepExpiredCertInDays;
+    StringBuilder sb = new StringBuilder();
+
+    int size = tokens.size();
+    int idx = 0;
+    for (Object token : tokens) {
+      sb.append(token);
+      if (idx++ < size - 1) {
+        sb.append(" ");
+      }
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CaEntry)) {
+      return false;
     }
 
-    public void setKeepExpiredCertInDays(int days) {
-        this.keepExpiredCertInDays = days;
+    CaEntry objB = (CaEntry) obj;
+    if (!ident.equals(objB.ident)) {
+      return false;
     }
 
-    public void setSignerConf(String signerConf) {
-        this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+    if (!signerType.equals(objB.signerType)) {
+      return false;
     }
 
-    public String signerConf() {
-        return signerConf;
+    if (!CompareUtil.equalsObject(status, objB.status)) {
+      return false;
     }
 
-    public CaStatus status() {
-        return status;
+    if (!CompareUtil.equalsObject(maxValidity, objB.maxValidity)) {
+      return false;
     }
 
-    public void setStatus(CaStatus status) {
-        this.status = status;
+    if (!CompareUtil.equalsObject(cmpControlName, objB.cmpControlName)) {
+      return false;
     }
 
-    public String signerType() {
-        return signerType;
+    if (!CompareUtil.equalsObject(responderName, objB.responderName)) {
+      return false;
     }
 
-    public void setCmpControlName(String cmpControlName) {
-        this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
+    if (duplicateKeyPermitted != objB.duplicateKeyPermitted) {
+      return false;
     }
 
-    public String cmpControlName() {
-        return cmpControlName;
+    if (duplicateSubjectPermitted != objB.duplicateSubjectPermitted) {
+      return false;
     }
 
-    public String responderName() {
-        return responderName;
+    if (saveRequest != objB.saveRequest) {
+      return false;
     }
 
-    public void setResponderName(String responderName) {
-        this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+    if (!CompareUtil.equalsObject(validityMode, objB.validityMode)) {
+      return false;
     }
 
-    public boolean duplicateKeyPermitted() {
-        return duplicateKeyPermitted;
+    if (permission != objB.permission) {
+      return false;
     }
 
-    public void setDuplicateKeyPermitted(boolean duplicateKeyPermitted) {
-        this.duplicateKeyPermitted = duplicateKeyPermitted;
+    if (expirationPeriod != objB.expirationPeriod) {
+      return false;
     }
 
-    public boolean duplicateSubjectPermitted() {
-        return duplicateSubjectPermitted;
+    if (keepExpiredCertInDays != objB.keepExpiredCertInDays) {
+      return false;
     }
 
-    public void setDuplicateSubjectPermitted(boolean duplicateSubjectPermitted) {
-        this.duplicateSubjectPermitted = duplicateSubjectPermitted;
+    if (!CompareUtil.equalsObject(extraControl, objB.extraControl)) {
+      return false;
     }
 
-    public boolean saveRequest() {
-        return saveRequest;
-    }
+    return true;
+  }
 
-    public void setSaveRequest(boolean saveRequest) {
-        this.saveRequest = saveRequest;
-    }
-
-    public ValidityMode validityMode() {
-        return validityMode;
-    }
-
-    public void setValidityMode(ValidityMode mode) {
-        this.validityMode = ParamUtil.requireNonNull("mode", mode);
-    }
-
-    public int permission() {
-        return permission;
-    }
-
-    public void setPermission(int permission) {
-        this.permission = permission;
-    }
-
-    public int expirationPeriod() {
-        return expirationPeriod;
-    }
-
-    public ConfPairs extraControl() {
-        return extraControl;
-    }
-
-    public void setExtraControl(ConfPairs extraControl) {
-        this.extraControl = extraControl;
-    }
-
-    @Override
-    public String toString() {
-        return toString(false);
-    }
-
-    public String toString(boolean verbose) {
-        return toString(verbose, true);
-    }
-
-    public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-        String extraCtrlText;
-        if (extraControl == null) {
-            extraCtrlText = "null";
-        } else {
-            extraCtrlText = extraControl.getEncoded();
-            if (!verbose && extraCtrlText.length() > 100) {
-                extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97), "...");
-            }
-        }
-
-        return StringUtil.concatObjectsCap(500, "id: ", ident.id(), "\nname: ", ident.name(),
-                "\nstatus: ", (status == null ? "null" : status.status()),
-                "\nmaxValidity: ", maxValidity,
-                "\nexpirationPeriod: ", expirationPeriod, " days",
-                "\nsignerType: ", signerType,
-                "\nsignerConf: ", (signerConf == null ? "null" :
-                    SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo)),
-                "\ncmpcontrolName: ", cmpControlName,
-                "\nresponderName: ", responderName,
-                "\nduplicateKey: ", duplicateKeyPermitted,
-                "\nduplicateSubject: ", duplicateSubjectPermitted,
-                "\nsaveRequest: ", saveRequest,
-                "\nvalidityMode: ", validityMode,
-                "\npermission: ", permission,
-                "\nkeepExpiredCerts: ", (keepExpiredCertInDays < 0
-                                            ? "forever" : keepExpiredCertInDays + " days"),
-                "\nextraControl: ", extraCtrlText, "\n");
-    } // method toString
-
-    protected static String urisToString(Collection<? extends Object> tokens) {
-        if (CollectionUtil.isEmpty(tokens)) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        int size = tokens.size();
-        int idx = 0;
-        for (Object token : tokens) {
-            sb.append(token);
-            if (idx++ < size - 1) {
-                sb.append(" ");
-            }
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CaEntry)) {
-            return false;
-        }
-
-        CaEntry objB = (CaEntry) obj;
-        if (!ident.equals(objB.ident)) {
-            return false;
-        }
-
-        if (!signerType.equals(objB.signerType)) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(status, objB.status)) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(maxValidity, objB.maxValidity)) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(cmpControlName, objB.cmpControlName)) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(responderName, objB.responderName)) {
-            return false;
-        }
-
-        if (duplicateKeyPermitted != objB.duplicateKeyPermitted) {
-            return false;
-        }
-
-        if (duplicateSubjectPermitted != objB.duplicateSubjectPermitted) {
-            return false;
-        }
-
-        if (saveRequest != objB.saveRequest) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(validityMode, objB.validityMode)) {
-            return false;
-        }
-
-        if (permission != objB.permission) {
-            return false;
-        }
-
-        if (expirationPeriod != objB.expirationPeriod) {
-            return false;
-        }
-
-        if (keepExpiredCertInDays != objB.keepExpiredCertInDays) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(extraControl, objB.extraControl)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return ident.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return ident.hashCode();
+  }
 
 }

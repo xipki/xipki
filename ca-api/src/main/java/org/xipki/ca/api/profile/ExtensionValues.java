@@ -27,57 +27,58 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ExtensionValues {
 
-    private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
+  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
-    public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value) {
-        ParamUtil.requireNonNull("type", type);
-        ParamUtil.requireNonNull("value", value);
+  public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value) {
+    ParamUtil.requireNonNull("type", type);
+    ParamUtil.requireNonNull("value", value);
 
-        if (extensions.containsKey(type)) {
-            return false;
-        }
-        extensions.put(type, new ExtensionValue(critical, value));
-        return true;
+    if (extensions.containsKey(type)) {
+      return false;
     }
+    extensions.put(type, new ExtensionValue(critical, value));
+    return true;
+  }
 
-    public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value) {
-        ParamUtil.requireNonNull("type", type);
-        ParamUtil.requireNonNull("value", value);
+  public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value) {
+    ParamUtil.requireNonNull("type", type);
+    ParamUtil.requireNonNull("value", value);
 
-        if (extensions.containsKey(type)) {
-            return false;
-        }
-        extensions.put(type, value);
-        return true;
+    if (extensions.containsKey(type)) {
+      return false;
     }
+    extensions.put(type, value);
+    return true;
+  }
 
-    public Set<ASN1ObjectIdentifier> extensionTypes() {
-        return Collections.unmodifiableSet(extensions.keySet());
-    }
+  public Set<ASN1ObjectIdentifier> extensionTypes() {
+    return Collections.unmodifiableSet(extensions.keySet());
+  }
 
-    public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type) {
-        ParamUtil.requireNonNull("type", type);
-        return extensions.get(type);
-    }
+  public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type) {
+    ParamUtil.requireNonNull("type", type);
+    return extensions.get(type);
+  }
 
-    public boolean removeExtensionTuple(ASN1ObjectIdentifier type) {
-        ParamUtil.requireNonNull("type", type);
-        return extensions.remove(type) != null;
-    }
+  public boolean removeExtensionTuple(ASN1ObjectIdentifier type) {
+    ParamUtil.requireNonNull("type", type);
+    return extensions.remove(type) != null;
+  }
 
-    public boolean containsExtension(ASN1ObjectIdentifier type) {
-        ParamUtil.requireNonNull("type", type);
-        return extensions.containsKey(type);
-    }
+  public boolean containsExtension(ASN1ObjectIdentifier type) {
+    ParamUtil.requireNonNull("type", type);
+    return extensions.containsKey(type);
+  }
 
-    public int size() {
-        return extensions.size();
-    }
+  public int size() {
+    return extensions.size();
+  }
 
 }

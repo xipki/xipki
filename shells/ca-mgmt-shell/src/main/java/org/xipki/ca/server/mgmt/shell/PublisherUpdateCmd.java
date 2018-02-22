@@ -27,46 +27,47 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "publisher-up",
-        description = "update publisher")
+    description = "update publisher")
 @Service
 public class PublisherUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "publisher name\n(required)")
-    @Completion(PublisherNameCompleter.class)
-    protected String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "publisher name\n(required)")
+  @Completion(PublisherNameCompleter.class)
+  protected String name;
 
-    @Option(name = "--type",
-            description = "publisher type")
-    protected String type;
+  @Option(name = "--type",
+      description = "publisher type")
+  protected String type;
 
-    @Option(name = "--conf",
-            description = "publisher configuration or 'null'")
-    protected String conf;
+  @Option(name = "--conf",
+      description = "publisher configuration or 'null'")
+  protected String conf;
 
-    @Option(name = "--conf-file",
-            description = "profile configuration file")
-    @Completion(FilePathCompleter.class)
-    protected String confFile;
+  @Option(name = "--conf-file",
+      description = "profile configuration file")
+  @Completion(FilePathCompleter.class)
+  protected String confFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (type == null && conf == null && confFile == null) {
-            throw new IllegalCmdParamException("nothing to update");
-        }
-
-        if (conf == null && confFile != null) {
-            conf = new String(IoUtil.read(confFile));
-        }
-
-        boolean bo = caManager.changePublisher(name, type, conf);
-        output(bo, "updated", "could not update", "publisher " + name);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (type == null && conf == null && confFile == null) {
+      throw new IllegalCmdParamException("nothing to update");
     }
+
+    if (conf == null && confFile != null) {
+      conf = new String(IoUtil.read(confFile));
+    }
+
+    boolean bo = caManager.changePublisher(name, type, conf);
+    output(bo, "updated", "could not update", "publisher " + name);
+    return null;
+  }
 
 }

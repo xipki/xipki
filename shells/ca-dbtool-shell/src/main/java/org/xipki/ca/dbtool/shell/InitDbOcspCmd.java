@@ -24,30 +24,31 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "initdb-ocsp",
-        description = "reset and initialize the OCSP databases")
+    description = "reset and initialize the OCSP databases")
 @Service
 public class InitDbOcspCmd extends LiquibaseAction {
 
-    private static final String SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
+  private static final String SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
 
-    @Override
-    protected Object execute0() throws Exception {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+  @Override
+  protected Object execute0() throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        for (String dbName : dbConfs.keySet()) {
-            if (!dbName.toLowerCase().contains("ocsp")) {
-                continue;
-            }
+    for (String dbName : dbConfs.keySet()) {
+      if (!dbName.toLowerCase().contains("ocsp")) {
+        continue;
+      }
 
-            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, SCHEMA_FILE);
-        }
-        return null;
+      LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
+      resetAndInit(dbConf, SCHEMA_FILE);
     }
+    return null;
+  }
 
 }

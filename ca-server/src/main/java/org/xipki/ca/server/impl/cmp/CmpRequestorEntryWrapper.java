@@ -22,30 +22,31 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CmpRequestorEntryWrapper {
 
-    private CmpRequestorEntry dbEntry;
+  private CmpRequestorEntry dbEntry;
 
-    private X509CertWithDbId cert;
+  private X509CertWithDbId cert;
 
-    public CmpRequestorEntryWrapper() {
-    }
+  public CmpRequestorEntryWrapper() {
+  }
 
-    public void setDbEntry(CmpRequestorEntry dbEntry) {
-        this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-        this.cert = new X509CertWithDbId(dbEntry.cert());
-    }
+  public void setDbEntry(CmpRequestorEntry dbEntry) {
+    this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
+    this.cert = new X509CertWithDbId(dbEntry.cert());
+  }
 
-    public X509CertWithDbId cert() {
-        return cert;
-    }
+  public X509CertWithDbId cert() {
+    return cert;
+  }
 
-    public CmpRequestorEntry dbEntry() {
-        return dbEntry;
-    }
+  public CmpRequestorEntry dbEntry() {
+    return dbEntry;
+  }
 
 }

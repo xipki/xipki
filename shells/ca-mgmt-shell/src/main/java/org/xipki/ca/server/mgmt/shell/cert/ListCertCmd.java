@@ -35,105 +35,107 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "list-cert",
-        description = "show a list of certificates")
+    description = "show a list of certificates")
 @Service
 public class ListCertCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    protected String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  protected String caName;
 
-    @Option(name = "--subject",
-            description = "the subject pattern, * is allowed.")
-    protected String subjectPatternS;
+  @Option(name = "--subject",
+      description = "the subject pattern, * is allowed.")
+  protected String subjectPatternS;
 
-    @Option(name = "--valid-from",
-            description = "start UTC time when the certificate is still valid, in form of"
-                    + "yyyyMMdd or yyyyMMddHHmmss")
-    private String validFromS;
+  @Option(name = "--valid-from",
+      description = "start UTC time when the certificate is still valid, in form of"
+          + "yyyyMMdd or yyyyMMddHHmmss")
+  private String validFromS;
 
-    @Option(name = "--valid-to",
-            description = "end UTC time when the certificate is still valid, in form of"
-                    + "yyyMMdd or yyyyMMddHHmmss")
-    private String validToS;
+  @Option(name = "--valid-to",
+      description = "end UTC time when the certificate is still valid, in form of"
+          + "yyyMMdd or yyyyMMddHHmmss")
+  private String validToS;
 
-    @Option(name = "-n",
-            description = "maximal number of entries (between 1 and 1000)")
-    private int num = 1000;
+  @Option(name = "-n",
+      description = "maximal number of entries (between 1 and 1000)")
+  private int num = 1000;
 
-    @Option(name = "--order",
-            description = "by which the result is ordered")
-    @Completion(CertListSortByCompleter.class)
-    private String orderByS;
+  @Option(name = "--order",
+      description = "by which the result is ordered")
+  @Completion(CertListSortByCompleter.class)
+  private String orderByS;
 
-    /**
-     * @return comma-separated serial numbers (in hex).
-     */
-    @Override
-    protected Object execute0() throws Exception {
-        Date validFrom = getDate(validFromS);
-        Date validTo = getDate(validToS);
-        X500Name subjectPattern = null;
-        if (StringUtil.isNotBlank(subjectPatternS)) {
-            subjectPattern = new X500Name(subjectPatternS);
-        }
-
-        CertListOrderBy orderBy = null;
-        if (orderByS != null) {
-            orderBy = CertListOrderBy.forValue(orderByS);
-            if (orderBy == null) {
-                throw new IllegalCmdParamException("invalid order '" + orderByS + "'");
-            }
-        }
-
-        List<CertListInfo> certInfos = caManager.listCertificates(caName, subjectPattern, validFrom,
-                validTo, orderBy, num);
-        final int n = certInfos.size();
-        if (n == 0) {
-            println("found no certificate");
-            return null;
-        }
-
-        println("     | serial               | notBefore      | notAfter       | subject");
-        println("-----+----------------------+----------------+----------------+-----------------");
-        for (int i = 0; i < n; i++) {
-            CertListInfo info = certInfos.get(i);
-            println(format(i + 1, info));
-        }
-
-        return null;
+  /**
+   * TODO.
+   * @return comma-separated serial numbers (in hex).
+   */
+  @Override
+  protected Object execute0() throws Exception {
+    Date validFrom = getDate(validFromS);
+    Date validTo = getDate(validToS);
+    X500Name subjectPattern = null;
+    if (StringUtil.isNotBlank(subjectPatternS)) {
+      subjectPattern = new X500Name(subjectPatternS);
     }
 
-    private String format(int index, CertListInfo info) {
-        return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
-                StringUtil.formatText(info.serialNumber().toString(16), 20), " | ",
-                DateUtil.toUtcTimeyyyyMMddhhmmss(info.notBefore()), " | ",
-                DateUtil.toUtcTimeyyyyMMddhhmmss(info.notAfter()), " | ", info.subject());
+    CertListOrderBy orderBy = null;
+    if (orderByS != null) {
+      orderBy = CertListOrderBy.forValue(orderByS);
+      if (orderBy == null) {
+        throw new IllegalCmdParamException("invalid order '" + orderByS + "'");
+      }
     }
 
-    private Date getDate(String str) throws IllegalCmdParamException {
-        if (str == null) {
-            return null;
-        }
-
-        final int len = str.length();
-        try {
-            if (len == 8) {
-                return DateUtil.parseUtcTimeyyyyMMdd(str);
-            } else if (len == 14) {
-                return DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-            } else {
-                throw new IllegalCmdParamException("invalid time " + str);
-            }
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalCmdParamException("invalid time " + str + ": " + ex.getMessage(), ex);
-        }
+    List<CertListInfo> certInfos = caManager.listCertificates(caName, subjectPattern, validFrom,
+        validTo, orderBy, num);
+    final int n = certInfos.size();
+    if (n == 0) {
+      println("found no certificate");
+      return null;
     }
+
+    println("     | serial               | notBefore      | notAfter       | subject");
+    println("-----+----------------------+----------------+----------------+-----------------");
+    for (int i = 0; i < n; i++) {
+      CertListInfo info = certInfos.get(i);
+      println(format(i + 1, info));
+    }
+
+    return null;
+  }
+
+  private String format(int index, CertListInfo info) {
+    return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
+        StringUtil.formatText(info.serialNumber().toString(16), 20), " | ",
+        DateUtil.toUtcTimeyyyyMMddhhmmss(info.notBefore()), " | ",
+        DateUtil.toUtcTimeyyyyMMddhhmmss(info.notAfter()), " | ", info.subject());
+  }
+
+  private Date getDate(String str) throws IllegalCmdParamException {
+    if (str == null) {
+      return null;
+    }
+
+    final int len = str.length();
+    try {
+      if (len == 8) {
+        return DateUtil.parseUtcTimeyyyyMMdd(str);
+      } else if (len == 14) {
+        return DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+      } else {
+        throw new IllegalCmdParamException("invalid time " + str);
+      }
+    } catch (IllegalArgumentException ex) {
+      throw new IllegalCmdParamException("invalid time " + str + ": " + ex.getMessage(), ex);
+    }
+  }
 
 }

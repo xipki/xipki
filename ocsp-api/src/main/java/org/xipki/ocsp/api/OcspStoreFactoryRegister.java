@@ -20,19 +20,20 @@ package org.xipki.ocsp.api;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface OcspStoreFactoryRegister {
 
-    /**
-     *
-     * @param type
-     *          type of the OcspStore. Must not be {@code null}.
-     * @return new OcspStore.
-     * @throws ObjectCreationException if OcspStore could not be created.
-     */
-    OcspStore newOcspStore(String type) throws ObjectCreationException;
+  /**
+   * TODO.
+   * @param type
+   *          type of the OcspStore. Must not be {@code null}.
+   * @return new OcspStore.
+   * @throws ObjectCreationException if OcspStore could not be created.
+   */
+  OcspStore newOcspStore(String type) throws ObjectCreationException;
 
 }

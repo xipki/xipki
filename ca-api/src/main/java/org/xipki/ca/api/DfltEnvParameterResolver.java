@@ -24,40 +24,41 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DfltEnvParameterResolver implements EnvParameterResolver {
 
-    private final Map<String, String> envParameters = new ConcurrentHashMap<>();
+  private final Map<String, String> envParameters = new ConcurrentHashMap<>();
 
-    public DfltEnvParameterResolver() {
-    }
+  public DfltEnvParameterResolver() {
+  }
 
-    @Override
-    public String parameter(String parameterName) {
-        ParamUtil.requireNonNull("parameterName", parameterName);
-        return envParameters.get(parameterName);
-    }
+  @Override
+  public String parameter(String parameterName) {
+    ParamUtil.requireNonNull("parameterName", parameterName);
+    return envParameters.get(parameterName);
+  }
 
-    @Override
-    public Set<String> allParameterNames() {
-        return envParameters.keySet();
-    }
+  @Override
+  public Set<String> allParameterNames() {
+    return envParameters.keySet();
+  }
 
-    public void addParameter(String name, String value) {
-        ParamUtil.requireNonNull("name", name);
-        envParameters.put(name, value);
-    }
+  public void addParameter(String name, String value) {
+    ParamUtil.requireNonNull("name", name);
+    envParameters.put(name, value);
+  }
 
-    public String removeParamater(String name) {
-        ParamUtil.requireNonNull("name", name);
-        return envParameters.remove(name);
-    }
+  public String removeParamater(String name) {
+    ParamUtil.requireNonNull("name", name);
+    return envParameters.remove(name);
+  }
 
-    public void clear() {
-        envParameters.clear();
-    }
+  public void clear() {
+    envParameters.clear();
+  }
 
 }

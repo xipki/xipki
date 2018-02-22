@@ -28,37 +28,38 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "scep-info",
-        description = "show information of SCEP")
+    description = "show information of SCEP")
 @Service
 public class ScepInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "SCEP name")
-    @Completion(ScepNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "SCEP name")
+  @Completion(ScepNameCompleter.class)
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show CA information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show CA information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (name == null) {
-            println(StringUtil.concatObjects("SCEPs: ", caManager.getScepNames()));
-        } else {
-            ScepEntry scep = caManager.getScepEntry(name);
-            if (scep == null) {
-                throw new CmdFailure("could not find SCEP '" + name + "'");
-            }
-            println(scep.toString(verbose.booleanValue()));
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    if (name == null) {
+      println(StringUtil.concatObjects("SCEPs: ", caManager.getScepNames()));
+    } else {
+      ScepEntry scep = caManager.getScepEntry(name);
+      if (scep == null) {
+        throw new CmdFailure("could not find SCEP '" + name + "'");
+      }
+      println(scep.toString(verbose.booleanValue()));
+    }
 
-        return null;
-    } // method execute0
+    return null;
+  } // method execute0
 
 }

@@ -26,20 +26,21 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RequestsWriter extends DbiXmlWriter {
 
-    public RequestsWriter() throws IOException, XMLStreamException {
-        super("requests", "1");
-    }
+  public RequestsWriter() throws IOException, XMLStreamException {
+    super("requests", "1");
+  }
 
-    public void add(RequestType request) throws InvalidDataObjectException, XMLStreamException {
-        ParamUtil.requireNonNull("request", request);
-        request.validate();
-        request.writeTo(this);
-    }
+  public void add(RequestType request) throws InvalidDataObjectException, XMLStreamException {
+    ParamUtil.requireNonNull("request", request);
+    request.validate();
+    request.writeTo(this);
+  }
 
 }

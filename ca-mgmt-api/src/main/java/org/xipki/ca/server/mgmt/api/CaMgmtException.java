@@ -22,31 +22,32 @@ import java.sql.SQLException;
 import org.xipki.datasource.DataSourceWrapper;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaMgmtException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CaMgmtException() {
-    }
+  public CaMgmtException() {
+  }
 
-    public CaMgmtException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CaMgmtException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public CaMgmtException(String message) {
-        super(message);
-    }
+  public CaMgmtException(String message) {
+    super(message);
+  }
 
-    public CaMgmtException(DataSourceWrapper datasource, String sql, SQLException sqlEx) {
-        this(datasource.translate(sql, sqlEx));
-    }
+  public CaMgmtException(DataSourceWrapper datasource, String sql, SQLException sqlEx) {
+    this(datasource.translate(sql, sqlEx));
+  }
 
-    public CaMgmtException(Throwable cause) {
-        super(cause.getMessage(), cause);
-    }
+  public CaMgmtException(Throwable cause) {
+    super(cause.getMessage(), cause);
+  }
 
 }

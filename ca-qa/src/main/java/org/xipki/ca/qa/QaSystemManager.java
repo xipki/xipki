@@ -20,30 +20,31 @@ package org.xipki.ca.qa;
 import java.util.Set;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface QaSystemManager {
 
-    Set<String> issuerNames();
+  Set<String> issuerNames();
 
-    /**
-     * Returns the issuer information.
-     * @param issuerName
-     *          Name of the issuer
-     * @return the issuer
-     */
-    X509IssuerInfo getIssuer(String issuerName);
+  /**
+   * Returns the issuer information.
+   * @param issuerName
+   *          Name of the issuer
+   * @return the issuer
+   */
+  X509IssuerInfo getIssuer(String issuerName);
 
-    Set<String> certprofileNames();
+  Set<String> certprofileNames();
 
-    /**
-     *
-     * @param certprofileName
-     *          Name of the cert profile.
-     * @return the cert profile.
-     */
-    X509CertprofileQa getCertprofile(String certprofileName);
+  /**
+   * TODO.
+   * @param certprofileName
+   *          Name of the cert profile.
+   * @return the cert profile.
+   */
+  X509CertprofileQa getCertprofile(String certprofileName);
 
 }

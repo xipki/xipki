@@ -21,27 +21,28 @@ import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaDirectoryString {
 
-    private final DirectoryStringType type;
+  private final DirectoryStringType type;
 
-    private final String text;
+  private final String text;
 
-    public QaDirectoryString(DirectoryStringType type, String text) {
-        this.type = ParamUtil.requireNonNull("type", type);
-        this.text = ParamUtil.requireNonBlank("text", text);
-    }
+  public QaDirectoryString(DirectoryStringType type, String text) {
+    this.type = ParamUtil.requireNonNull("type", type);
+    this.text = ParamUtil.requireNonBlank("text", text);
+  }
 
-    public DirectoryStringType type() {
-        return type;
-    }
+  public DirectoryStringType type() {
+    return type;
+  }
 
-    public String text() {
-        return text;
-    }
+  public String text() {
+    return text;
+  }
 
 }

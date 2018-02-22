@@ -23,29 +23,30 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "cmpcontrol-add",
-        description = "add CMP control")
+    description = "add CMP control")
 @Service
 public class CmpControlAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "CMP control name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "CMP control name\n(required)")
+  private String name;
 
-    @Option(name = "--conf", required = true,
-            description = "CMP control configuration\n(required)")
-    private String conf;
+  @Option(name = "--conf", required = true,
+      description = "CMP control configuration\n(required)")
+  private String conf;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CmpControlEntry entry = new CmpControlEntry(name, conf);
-        boolean bo = caManager.addCmpControl(entry);
-        output(bo, "added", "could not add", "CMP control " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    CmpControlEntry entry = new CmpControlEntry(name, conf);
+    boolean bo = caManager.addCmpControl(entry);
+    output(bo, "added", "could not add", "CMP control " + name);
+    return null;
+  }
 
 }

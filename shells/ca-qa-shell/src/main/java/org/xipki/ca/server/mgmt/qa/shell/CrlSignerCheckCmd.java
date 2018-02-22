@@ -26,50 +26,51 @@ import org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "crlsigner-check",
-        description = "check information of CRL signers (QA)")
+    description = "check information of CRL signers (QA)")
 @Service
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
-        String name = ey.name();
-        println("checking CRL signer " + name);
+  @Override
+  protected Object execute0() throws Exception {
+    X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
+    String name = ey.name();
+    println("checking CRL signer " + name);
 
-        X509CrlSignerEntry cs = caManager.getCrlSigner(name);
-        if (cs == null) {
-            throw new CmdFailure("CRL signer named '" + name + "' is not configured");
-        }
+    X509CrlSignerEntry cs = caManager.getCrlSigner(name);
+    if (cs == null) {
+      throw new CmdFailure("CRL signer named '" + name + "' is not configured");
+    }
 
-        if (ey.signerType() != null) {
-            MgmtQaShellUtil.assertEquals("signer type", ey.signerType(), cs.type());
-        }
+    if (ey.signerType() != null) {
+      MgmtQaShellUtil.assertEquals("signer type", ey.signerType(), cs.type());
+    }
 
-        if (ey.signerConf() != null) {
-            MgmtQaShellUtil.assertEquals("signer conf", ey.signerConf(), cs.conf());
-        }
+    if (ey.signerConf() != null) {
+      MgmtQaShellUtil.assertEquals("signer conf", ey.signerConf(), cs.conf());
+    }
 
-        if (ey.crlControl() != null) {
-            CrlControl ex = new CrlControl(ey.crlControl());
-            CrlControl is = new CrlControl(cs.crlControl());
+    if (ey.crlControl() != null) {
+      CrlControl ex = new CrlControl(ey.crlControl());
+      CrlControl is = new CrlControl(cs.crlControl());
 
-            if (!ex.equals(is)) {
-                throw new CmdFailure("CRL control: is '" + is.getConf() + "', but expected '"
-                        + ex.getConf() + "'");
-            }
-        }
+      if (!ex.equals(is)) {
+        throw new CmdFailure("CRL control: is '" + is.getConf() + "', but expected '"
+            + ex.getConf() + "'");
+      }
+    }
 
-        if (ey.base64Cert() != null) {
-            MgmtQaShellUtil.assertEquals("certificate", ey.base64Cert(), cs.base64Cert());
-        }
+    if (ey.base64Cert() != null) {
+      MgmtQaShellUtil.assertEquals("certificate", ey.base64Cert(), cs.base64Cert());
+    }
 
-        println(" checked CRL signer " + name);
-        return null;
-    } // method execute0
+    println(" checked CRL signer " + name);
+    return null;
+  } // method execute0
 
 }

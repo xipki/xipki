@@ -26,6 +26,7 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -33,21 +34,21 @@ import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 @Service
 public class RcaNameCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> ret = new HashSet<>();
-        for (String name : caManager.getCaNames()) {
-            CaEntry caEntry = caManager.getCa(name);
-            if (!(caEntry instanceof X509CaEntry)) {
-                continue;
-            }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>();
+    for (String name : caManager.getCaNames()) {
+      CaEntry caEntry = caManager.getCa(name);
+      if (!(caEntry instanceof X509CaEntry)) {
+        continue;
+      }
 
-            X509Certificate cert = ((X509CaEntry) caEntry).certificate();
-            if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
-                ret.add(name);
-            }
-        }
-        return ret;
+      X509Certificate cert = ((X509CaEntry) caEntry).certificate();
+      if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+        ret.add(name);
+      }
     }
+    return ret;
+  }
 
 }

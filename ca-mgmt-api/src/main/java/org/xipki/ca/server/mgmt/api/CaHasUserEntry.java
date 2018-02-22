@@ -26,74 +26,75 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class CaHasUserEntry {
 
-    private final NameId userIdent;
+  private final NameId userIdent;
 
-    private int permission;
+  private int permission;
 
-    private Set<String> profiles;
+  private Set<String> profiles;
 
-    public CaHasUserEntry(NameId userIdent) {
-        this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
+  public CaHasUserEntry(NameId userIdent) {
+    this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
+  }
+
+  public int permission() {
+    return permission;
+  }
+
+  public void setPermission(int permission) {
+    this.permission = permission;
+  }
+
+  public NameId userIdent() {
+    return userIdent;
+  }
+
+  public void setProfiles(Set<String> profiles) {
+    this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toLowerCaseSet(profiles));
+  }
+
+  public Set<String> profiles() {
+    return profiles;
+  }
+
+  @Override
+  public String toString() {
+    return StringUtil.concatObjectsCap(200, "user: ", userIdent,
+        "\nprofiles: ", profiles, "\npermission: ", permission);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CaHasUserEntry)) {
+      return false;
     }
 
-    public int permission() {
-        return permission;
+    CaHasUserEntry objB = (CaHasUserEntry) obj;
+
+    if (!userIdent.equals(objB.userIdent)) {
+      return false;
     }
 
-    public void setPermission(int permission) {
-        this.permission = permission;
+    if (permission != objB.permission) {
+      return false;
     }
 
-    public NameId userIdent() {
-        return userIdent;
+    if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
+      return false;
     }
 
-    public void setProfiles(Set<String> profiles) {
-        this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toLowerCaseSet(profiles));
-    }
+    return true;
+  }
 
-    public Set<String> profiles() {
-        return profiles;
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjectsCap(200, "user: ", userIdent,
-                "\nprofiles: ", profiles, "\npermission: ", permission);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CaHasUserEntry)) {
-            return false;
-        }
-
-        CaHasUserEntry objB = (CaHasUserEntry) obj;
-
-        if (!userIdent.equals(objB.userIdent)) {
-            return false;
-        }
-
-        if (permission != objB.permission) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return userIdent.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return userIdent.hashCode();
+  }
 
 }

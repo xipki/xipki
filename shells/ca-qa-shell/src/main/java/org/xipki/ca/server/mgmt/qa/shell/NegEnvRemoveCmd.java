@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.EnvRemoveCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-env-rm",
-        description = "remove environment parameter (negative, QA)")
+    description = "remove environment parameter (negative, QA)")
 @Service
 public class NegEnvRemoveCmd extends EnvRemoveCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-env-rm");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-env-rm");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

@@ -24,64 +24,65 @@ import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.Responder;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ResponderImpl implements Responder {
 
-    private final ResponderOption responderOption;
+  private final ResponderOption responderOption;
 
-    private final RequestOption requestOption;
+  private final RequestOption requestOption;
 
-    private final ResponseOption responseOption;
+  private final ResponseOption responseOption;
 
-    private final ResponderSigner signer;
+  private final ResponderSigner signer;
 
-    private final List<OcspStore> stores;
+  private final List<OcspStore> stores;
 
-    ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
-            ResponseOption responseOption, ResponderSigner signer, List<OcspStore> stores) {
-        this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
-        this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
-        this.responseOption = ParamUtil.requireNonNull("responseOption", responseOption);
-        this.signer = ParamUtil.requireNonNull("signer", signer);
-        this.stores = ParamUtil.requireNonEmpty("stores", stores);
-    }
+  ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
+      ResponseOption responseOption, ResponderSigner signer, List<OcspStore> stores) {
+    this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
+    this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
+    this.responseOption = ParamUtil.requireNonNull("responseOption", responseOption);
+    this.signer = ParamUtil.requireNonNull("signer", signer);
+    this.stores = ParamUtil.requireNonEmpty("stores", stores);
+  }
 
-    public ResponderOption responderOption() {
-        return responderOption;
-    }
+  public ResponderOption responderOption() {
+    return responderOption;
+  }
 
-    public RequestOption requestOption() {
-        return requestOption;
-    }
+  public RequestOption requestOption() {
+    return requestOption;
+  }
 
-    public ResponseOption responseOption() {
-        return responseOption;
-    }
+  public ResponseOption responseOption() {
+    return responseOption;
+  }
 
-    public ResponderSigner signer() {
-        return signer;
-    }
+  public ResponderSigner signer() {
+    return signer;
+  }
 
-    public List<OcspStore> stores() {
-        return stores;
-    }
+  public List<OcspStore> stores() {
+    return stores;
+  }
 
-    @Override
-    public int maxRequestSize() {
-        return requestOption.maxRequestSize();
-    }
+  @Override
+  public int maxRequestSize() {
+    return requestOption.maxRequestSize();
+  }
 
-    @Override
-    public boolean supportsHttpGet() {
-        return requestOption.supportsHttpGet();
-    }
+  @Override
+  public boolean supportsHttpGet() {
+    return requestOption.supportsHttpGet();
+  }
 
-    @Override
-    public Long cacheMaxAge() {
-        return responseOption.cacheMaxAge();
-    }
+  @Override
+  public Long cacheMaxAge() {
+    return responseOption.cacheMaxAge();
+  }
 
 }

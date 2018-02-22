@@ -27,37 +27,38 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "user-info",
-        description = "show information of user")
+    description = "show information of user")
 @Service
 public class UserInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true, description = "user name")
-    private String name;
+  @Argument(index = 0, name = "name", required = true, description = "user name")
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        UserEntry userEntry = caManager.getUser(name);
-        if (userEntry == null) {
-            throw new CmdFailure("no user named '" + name + "' is configured");
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(userEntry);
-
-        Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsers(name);
-        for (String ca : caHasUsers.keySet()) {
-            CaHasUserEntry entry = caHasUsers.get(ca);
-            sb.append("\n----- CA ").append(ca).append("-----");
-            sb.append("\nprofiles: ").append(entry.profiles()).append("\n");
-            sb.append("\npermission: ").append(entry.permission());
-        }
-        println(sb.toString());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    UserEntry userEntry = caManager.getUser(name);
+    if (userEntry == null) {
+      throw new CmdFailure("no user named '" + name + "' is configured");
     }
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(userEntry);
+
+    Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsers(name);
+    for (String ca : caHasUsers.keySet()) {
+      CaHasUserEntry entry = caHasUsers.get(ca);
+      sb.append("\n----- CA ").append(ca).append("-----");
+      sb.append("\nprofiles: ").append(entry.profiles()).append("\n");
+      sb.append("\npermission: ").append(entry.permission());
+    }
+    println(sb.toString());
+    return null;
+  }
 
 }

@@ -28,40 +28,41 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "caprofile-info",
-        description = "show information of certificate profile in given CA")
+    description = "show information of certificate profile in given CA")
 @Service
 public class CaProfileInfoCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (caManager.getCa(caName) == null) {
-            throw new CmdFailure("could not find CA '" + caName + "'");
-        }
-
-        StringBuilder sb = new StringBuilder();
-        Set<String> entries = caManager.getCertprofilesForCa(caName);
-        if (CollectionUtil.isNonEmpty(entries)) {
-            sb.append("certificate Profiles supported by CA " + caName).append("\n");
-
-            for (String name: entries) {
-                sb.append("\t").append(name).append("\n");
-            }
-        } else {
-            sb.append("\tno profile for CA " + caName + " is configured");
-        }
-
-        println(sb.toString());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (caManager.getCa(caName) == null) {
+      throw new CmdFailure("could not find CA '" + caName + "'");
     }
+
+    StringBuilder sb = new StringBuilder();
+    Set<String> entries = caManager.getCertprofilesForCa(caName);
+    if (CollectionUtil.isNonEmpty(entries)) {
+      sb.append("certificate Profiles supported by CA " + caName).append("\n");
+
+      for (String name: entries) {
+        sb.append("\t").append(name).append("\n");
+      }
+    } else {
+      sb.append("\tno profile for CA " + caName + " is configured");
+    }
+
+    println(sb.toString());
+    return null;
+  }
 
 }

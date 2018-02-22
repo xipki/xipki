@@ -29,39 +29,40 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "profile-export",
-        description = "export certificate profile configuration")
+    description = "export certificate profile configuration")
 @Service
 public class ProfileExportCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "profile name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "profile name\n(required)")
+  private String name;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-            description = "where to save the profile configuration\n(required)")
-    @Completion(FilePathCompleter.class)
-    private String confFile;
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the profile configuration\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String confFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CertprofileEntry entry = caManager.getCertprofile(name);
-        if (entry == null) {
-            throw new IllegalCmdParamException(
-                    "no certificate profile named " + name + " is defined");
-        }
-
-        if (StringUtil.isBlank(entry.conf())) {
-            println("cert profile does not have conf");
-        } else {
-            saveVerbose("saved cert profile configuration to", new File(confFile),
-                    entry.conf().getBytes("UTF-8"));
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    CertprofileEntry entry = caManager.getCertprofile(name);
+    if (entry == null) {
+      throw new IllegalCmdParamException(
+          "no certificate profile named " + name + " is defined");
     }
+
+    if (StringUtil.isBlank(entry.conf())) {
+      println("cert profile does not have conf");
+    } else {
+      saveVerbose("saved cert profile configuration to", new File(confFile),
+          entry.conf().getBytes("UTF-8"));
+    }
+    return null;
+  }
 
 }

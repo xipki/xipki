@@ -24,34 +24,35 @@ import org.xipki.ca.server.mgmt.shell.PublisherUpdateCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "publisher-check",
-        description = "check information of publishers (QA)")
+    description = "check information of publishers (QA)")
 @Service
 public class PublisherCheckCmd extends PublisherUpdateCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("checking publisher " + name);
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking publisher " + name);
 
-        PublisherEntry cp = caManager.getPublisher(name);
-        if (cp == null) {
-            throw new CmdFailure("publisher named '" + name + "' is not configured");
-        }
-
-        if (cp.type() != null) {
-            MgmtQaShellUtil.assertEquals("type", type, cp.type());
-        }
-
-        if (cp.conf() != null) {
-            MgmtQaShellUtil.assertEquals("signer conf", conf, cp.conf());
-        }
-
-        println(" checked publisher " + name);
-        return null;
+    PublisherEntry cp = caManager.getPublisher(name);
+    if (cp == null) {
+      throw new CmdFailure("publisher named '" + name + "' is not configured");
     }
+
+    if (cp.type() != null) {
+      MgmtQaShellUtil.assertEquals("type", type, cp.type());
+    }
+
+    if (cp.conf() != null) {
+      MgmtQaShellUtil.assertEquals("signer conf", conf, cp.conf());
+    }
+
+    println(" checked publisher " + name);
+    return null;
+  }
 
 }

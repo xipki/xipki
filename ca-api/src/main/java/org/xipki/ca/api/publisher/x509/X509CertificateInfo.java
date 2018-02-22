@@ -28,131 +28,132 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CertificateInfo {
 
-    private final byte[] subjectPublicKey;
+  private final byte[] subjectPublicKey;
 
-    private final X509CertWithDbId cert;
+  private final X509CertWithDbId cert;
 
-    private final NameId issuer;
+  private final NameId issuer;
 
-    private final X509Cert issuerCert;
+  private final X509Cert issuerCert;
 
-    private final NameId profile;
+  private final NameId profile;
 
-    private final NameId requestor;
+  private final NameId requestor;
 
-    private RequestType reqType;
+  private RequestType reqType;
 
-    private byte[] transactionId;
+  private byte[] transactionId;
 
-    private Integer user;
+  private Integer user;
 
-    private String warningMessage;
+  private String warningMessage;
 
-    private CertRevocationInfo revocationInfo;
+  private CertRevocationInfo revocationInfo;
 
-    private X500Name requestedSubject;
+  private X500Name requestedSubject;
 
-    private boolean alreadyIssued;
+  private boolean alreadyIssued;
 
-    public X509CertificateInfo(X509CertWithDbId cert, NameId issuer, X509Cert issuerCert,
-            byte[] subjectPublicKey, NameId profile, NameId requestor)
-            throws CertificateEncodingException {
-        this.profile = ParamUtil.requireNonNull("profile", profile);
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-        this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
-        this.issuer = ParamUtil.requireNonNull("issuer", issuer);
-        this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
-        this.requestor = ParamUtil.requireNonNull("requestor", requestor);
-    }
+  public X509CertificateInfo(X509CertWithDbId cert, NameId issuer, X509Cert issuerCert,
+      byte[] subjectPublicKey, NameId profile, NameId requestor)
+      throws CertificateEncodingException {
+    this.profile = ParamUtil.requireNonNull("profile", profile);
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
+    this.issuer = ParamUtil.requireNonNull("issuer", issuer);
+    this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
+    this.requestor = ParamUtil.requireNonNull("requestor", requestor);
+  }
 
-    public byte[] subjectPublicKey() {
-        return subjectPublicKey;
-    }
+  public byte[] subjectPublicKey() {
+    return subjectPublicKey;
+  }
 
-    public X509CertWithDbId cert() {
-        return cert;
-    }
+  public X509CertWithDbId cert() {
+    return cert;
+  }
 
-    public NameId issuer() {
-        return issuer;
-    }
+  public NameId issuer() {
+    return issuer;
+  }
 
-    public X509Cert issuerCert() {
-        return issuerCert;
-    }
+  public X509Cert issuerCert() {
+    return issuerCert;
+  }
 
-    public NameId profile() {
-        return profile;
-    }
+  public NameId profile() {
+    return profile;
+  }
 
-    public String warningMessage() {
-        return warningMessage;
-    }
+  public String warningMessage() {
+    return warningMessage;
+  }
 
-    public void setWarningMessage(String warningMessage) {
-        this.warningMessage = warningMessage;
-    }
+  public void setWarningMessage(String warningMessage) {
+    this.warningMessage = warningMessage;
+  }
 
-    public NameId requestor() {
-        return requestor;
-    }
+  public NameId requestor() {
+    return requestor;
+  }
 
-    public Integer user() {
-        return user;
-    }
+  public Integer user() {
+    return user;
+  }
 
-    public void setUser(Integer user) {
-        this.user = user;
-    }
+  public void setUser(Integer user) {
+    this.user = user;
+  }
 
-    public boolean isRevoked() {
-        return revocationInfo != null;
-    }
+  public boolean isRevoked() {
+    return revocationInfo != null;
+  }
 
-    public CertRevocationInfo revocationInfo() {
-        return revocationInfo;
-    }
+  public CertRevocationInfo revocationInfo() {
+    return revocationInfo;
+  }
 
-    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
-        this.revocationInfo = revocationInfo;
-    }
+  public void setRevocationInfo(CertRevocationInfo revocationInfo) {
+    this.revocationInfo = revocationInfo;
+  }
 
-    public boolean isAlreadyIssued() {
-        return alreadyIssued;
-    }
+  public boolean isAlreadyIssued() {
+    return alreadyIssued;
+  }
 
-    public void setAlreadyIssued(boolean alreadyIssued) {
-        this.alreadyIssued = alreadyIssued;
-    }
+  public void setAlreadyIssued(boolean alreadyIssued) {
+    this.alreadyIssued = alreadyIssued;
+  }
 
-    public RequestType reqType() {
-        return reqType;
-    }
+  public RequestType reqType() {
+    return reqType;
+  }
 
-    public byte[] transactionId() {
-        return transactionId;
-    }
+  public byte[] transactionId() {
+    return transactionId;
+  }
 
-    public void setReqType(RequestType reqType) {
-        this.reqType = reqType;
-    }
+  public void setReqType(RequestType reqType) {
+    this.reqType = reqType;
+  }
 
-    public void setTransactionId(byte[] transactionId) {
-        this.transactionId = transactionId;
-    }
+  public void setTransactionId(byte[] transactionId) {
+    this.transactionId = transactionId;
+  }
 
-    public X500Name requestedSubject() {
-        return requestedSubject;
-    }
+  public X500Name requestedSubject() {
+    return requestedSubject;
+  }
 
-    public void setRequestedSubject(X500Name requestedSubject) {
-        this.requestedSubject = requestedSubject;
-    }
+  public void setRequestedSubject(X500Name requestedSubject) {
+    this.requestedSubject = requestedSubject;
+  }
 
 }

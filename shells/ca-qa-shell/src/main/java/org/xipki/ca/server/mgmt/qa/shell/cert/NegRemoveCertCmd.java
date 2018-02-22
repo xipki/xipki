@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.cert.RemoveCertCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-remove-cert",
-        description = "remove certificate (negative, QA)")
+    description = "remove certificate (negative, QA)")
 @Service
 public class NegRemoveCertCmd extends RemoveCertCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-remove-cert");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-remove-cert");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("Exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("Exception expected, but received none");
+  }
 
 }

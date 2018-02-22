@@ -21,27 +21,28 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ExtKeyUsageControl {
 
-    private final ASN1ObjectIdentifier extKeyUsage;
+  private final ASN1ObjectIdentifier extKeyUsage;
 
-    private final boolean required;
+  private final boolean required;
 
-    public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
-        this.extKeyUsage = ParamUtil.requireNonNull("extKeyUsage", extKeyUsage);
-        this.required = required;
-    }
+  public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
+    this.extKeyUsage = ParamUtil.requireNonNull("extKeyUsage", extKeyUsage);
+    this.required = required;
+  }
 
-    public ASN1ObjectIdentifier extKeyUsage() {
-        return extKeyUsage;
-    }
+  public ASN1ObjectIdentifier extKeyUsage() {
+    return extKeyUsage;
+  }
 
-    public boolean isRequired() {
-        return required;
-    }
+  public boolean isRequired() {
+    return required;
+  }
 
 }

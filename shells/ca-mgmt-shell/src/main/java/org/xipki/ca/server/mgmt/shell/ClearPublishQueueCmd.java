@@ -27,50 +27,51 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "clear-publishqueue",
-        description = "clear publish queue")
+    description = "clear publish queue")
 @Service
 public class ClearPublishQueueCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name or 'all' for all CAs\n(required)")
-    @Completion(CaNamePlusAllCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name or 'all' for all CAs\n(required)")
+  @Completion(CaNamePlusAllCompleter.class)
+  private String caName;
 
-    @Option(name = "--publisher", required = true, multiValued = true,
-            description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
-    @Completion(PublisherNamePlusAllCompleter.class)
-    private List<String> publisherNames;
+  @Option(name = "--publisher", required = true, multiValued = true,
+      description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
+  @Completion(PublisherNamePlusAllCompleter.class)
+  private List<String> publisherNames;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (publisherNames == null) {
-            throw new RuntimeException("should not reach here");
-        }
-        boolean allPublishers = false;
-        for (String publisherName : publisherNames) {
-            if ("all".equalsIgnoreCase(publisherName)) {
-                allPublishers = true;
-                break;
-            }
-        }
-
-        if (allPublishers) {
-            publisherNames = null;
-        }
-
-        if ("all".equalsIgnoreCase(caName)) {
-            caName = null;
-        }
-
-        boolean bo = caManager.clearPublishQueue(caName, publisherNames);
-        output(bo, "cleared", "could not clear",
-                "publish queue of CA " + caName + " for publishers " + toString(publisherNames));
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (publisherNames == null) {
+      throw new RuntimeException("should not reach here");
     }
+    boolean allPublishers = false;
+    for (String publisherName : publisherNames) {
+      if ("all".equalsIgnoreCase(publisherName)) {
+        allPublishers = true;
+        break;
+      }
+    }
+
+    if (allPublishers) {
+      publisherNames = null;
+    }
+
+    if ("all".equalsIgnoreCase(caName)) {
+      caName = null;
+    }
+
+    boolean bo = caManager.clearPublishQueue(caName, publisherNames);
+    output(bo, "cleared", "could not clear",
+        "publish queue of CA " + caName + " for publishers " + toString(publisherNames));
+    return null;
+  }
 
 }

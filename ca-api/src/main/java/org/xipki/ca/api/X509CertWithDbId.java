@@ -22,28 +22,29 @@ import java.security.cert.X509Certificate;
 import org.xipki.security.X509Cert;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CertWithDbId extends X509Cert {
 
-    private Long certId;
+  private Long certId;
 
-    public X509CertWithDbId(X509Certificate cert) {
-        super(cert);
-    }
+  public X509CertWithDbId(X509Certificate cert) {
+    super(cert);
+  }
 
-    public X509CertWithDbId(X509Certificate cert, byte[] encodedCert) {
-        super(cert, encodedCert);
-    }
+  public X509CertWithDbId(X509Certificate cert, byte[] encodedCert) {
+    super(cert, encodedCert);
+  }
 
-    public Long certId() {
-        return certId;
-    }
+  public Long certId() {
+    return certId;
+  }
 
-    public void setCertId(Long certId) {
-        this.certId = certId;
-    }
+  public void setCertId(Long certId) {
+    this.certId = certId;
+  }
 
 }

@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -31,12 +32,12 @@ import org.xipki.ca.server.mgmt.api.CaManager;
 @Service
 public class ResponderNamePlusNullCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> ret = new HashSet<>();
-        ret.addAll(caManager.getResponderNames());
-        ret.add(CaManager.NULL);
-        return ret;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>();
+    ret.addAll(caManager.getResponderNames());
+    ret.add(CaManager.NULL);
+    return ret;
+  }
 
 }

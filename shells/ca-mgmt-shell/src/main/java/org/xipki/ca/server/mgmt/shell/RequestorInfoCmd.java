@@ -32,56 +32,57 @@ import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "requestor-info",
-        description = "show information of requestor")
+    description = "show information of requestor")
 @Service
 public class RequestorInfoCmd extends CaAction {
 
-    @Argument(index = 0, name = "name",
-            description = "requestor name")
-    @Completion(RequestorNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name",
+      description = "requestor name")
+  @Completion(RequestorNameCompleter.class)
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show requestor information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show requestor information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> names = caManager.getRequestorNames();
-            int size = names.size();
+    if (name == null) {
+      Set<String> names = caManager.getRequestorNames();
+      int size = names.size();
 
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1");
-                sb.append(" CMP requestor is configured\n");
-            } else {
-                sb.append(size).append(" CMP requestors are configured:\n");
-            }
+      if (size == 0 || size == 1) {
+        sb.append((size == 0) ? "no" : "1");
+        sb.append(" CMP requestor is configured\n");
+      } else {
+        sb.append(size).append(" CMP requestors are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String entry : sorted) {
-                sb.append("\t").append(entry).append("\n");
-            }
-        } else {
-            CmpRequestorEntry entry = caManager.getRequestor(name);
-            if (entry == null) {
-                throw new CmdFailure("could not find CMP requestor '" + name + "'");
-            } else {
-                sb.append(entry.toString(verbose.booleanValue()));
-            }
-        }
+      for (String entry : sorted) {
+        sb.append("\t").append(entry).append("\n");
+      }
+    } else {
+      CmpRequestorEntry entry = caManager.getRequestor(name);
+      if (entry == null) {
+        throw new CmdFailure("could not find CMP requestor '" + name + "'");
+      } else {
+        sb.append(entry.toString(verbose.booleanValue()));
+      }
+    }
 
-        println(sb.toString());
-        return null;
-    } // method execute0
+    println(sb.toString());
+    return null;
+  } // method execute0
 
 }

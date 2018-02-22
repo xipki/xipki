@@ -25,30 +25,31 @@ import org.xipki.ca.server.mgmt.shell.CmpControlUpdateCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "cmpcontrol-check",
-        description = "show information of CMP control (QA)")
+    description = "show information of CMP control (QA)")
 @Service
 public class CmpControlCheckCmd extends CmpControlUpdateCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("checking CMP control " + name);
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking CMP control " + name);
 
-        CmpControlEntry ce = caManager.getCmpControl(name);
-        if (ce == null) {
-            throw new CmdFailure("no CMP control named '" + name + "' is configured");
-        }
-
-        String is = ce.conf();
-        String ex = new CmpControl(new CmpControlEntry(name, conf)).dbEntry().conf();
-        MgmtQaShellUtil.assertEquals("CMP control", ex, is);
-
-        println(" checked CMP control " + name);
-        return null;
+    CmpControlEntry ce = caManager.getCmpControl(name);
+    if (ce == null) {
+      throw new CmdFailure("no CMP control named '" + name + "' is configured");
     }
+
+    String is = ce.conf();
+    String ex = new CmpControl(new CmpControlEntry(name, conf)).dbEntry().conf();
+    MgmtQaShellUtil.assertEquals("CMP control", ex, is);
+
+    println(" checked CMP control " + name);
+    return null;
+  }
 
 }

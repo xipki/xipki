@@ -25,78 +25,79 @@ import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
 
 public class SingleCaConf {
 
-    private final String name;
+  private final String name;
 
-    private final GenSelfIssued genSelfIssued;
+  private final GenSelfIssued genSelfIssued;
 
-    private final CaEntry caEntry;
+  private final CaEntry caEntry;
 
-    private final List<String> aliases;
+  private final List<String> aliases;
 
-    private final List<String> profileNames;
+  private final List<String> profileNames;
 
-    private final List<CaHasRequestorEntry> requestors;
+  private final List<CaHasRequestorEntry> requestors;
 
-    private final List<String> publisherNames;
+  private final List<String> publisherNames;
 
-    public SingleCaConf(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
-            List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
-            List<String> publisherNames) {
-        this.name = ParamUtil.requireNonBlank("name", name);
-        if (genSelfIssued != null) {
-            if (caEntry == null) {
-                throw new IllegalArgumentException(
-                        "caEntry must not be null if genSelfIssued is non-null");
-            }
+  public SingleCaConf(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
+      List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
+      List<String> publisherNames) {
+    this.name = ParamUtil.requireNonBlank("name", name);
+    if (genSelfIssued != null) {
+      if (caEntry == null) {
+        throw new IllegalArgumentException(
+            "caEntry must not be null if genSelfIssued is non-null");
+      }
 
-            if (caEntry instanceof X509CaEntry) {
-                if (((X509CaEntry) caEntry).certificate() != null) {
-                    throw new IllegalArgumentException(
-                            "caEntry.cert must not be null if genSelfIssued is non-null");
-                }
-            }
+      if (caEntry instanceof X509CaEntry) {
+        if (((X509CaEntry) caEntry).certificate() != null) {
+          throw new IllegalArgumentException(
+              "caEntry.cert must not be null if genSelfIssued is non-null");
         }
-
-        this.genSelfIssued = genSelfIssued;
-        this.caEntry = caEntry;
-        this.aliases = aliases;
-        this.profileNames = profileNames;
-        this.requestors = requestors;
-        this.publisherNames = publisherNames;
+      }
     }
 
-    public String name() {
-        return name;
-    }
+    this.genSelfIssued = genSelfIssued;
+    this.caEntry = caEntry;
+    this.aliases = aliases;
+    this.profileNames = profileNames;
+    this.requestors = requestors;
+    this.publisherNames = publisherNames;
+  }
 
-    public CaEntry caEntry() {
-        return caEntry;
-    }
+  public String name() {
+    return name;
+  }
 
-    public List<String> aliases() {
-        return aliases;
-    }
+  public CaEntry caEntry() {
+    return caEntry;
+  }
 
-    public GenSelfIssued genSelfIssued() {
-        return genSelfIssued;
-    }
+  public List<String> aliases() {
+    return aliases;
+  }
 
-    public List<String> profileNames() {
-        return profileNames;
-    }
+  public GenSelfIssued genSelfIssued() {
+    return genSelfIssued;
+  }
 
-    public List<CaHasRequestorEntry> requestors() {
-        return requestors;
-    }
+  public List<String> profileNames() {
+    return profileNames;
+  }
 
-    public List<String> publisherNames() {
-        return publisherNames;
-    }
+  public List<CaHasRequestorEntry> requestors() {
+    return requestors;
+  }
+
+  public List<String> publisherNames() {
+    return publisherNames;
+  }
 
 }

@@ -22,44 +22,45 @@ import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class MonetaryValueOption {
 
-    private final Iso4217CurrencyCode currency;
+  private final Iso4217CurrencyCode currency;
 
-    private final String currencyString;
+  private final String currencyString;
 
-    private final Range2Type amountRange;
+  private final Range2Type amountRange;
 
-    private final Range2Type exponentRange;
+  private final Range2Type exponentRange;
 
-    public MonetaryValueOption(Iso4217CurrencyCode currency, Range2Type amountRange,
-            Range2Type exponentRange) {
-        this.currency = ParamUtil.requireNonNull("currency", currency);
-        this.amountRange = ParamUtil.requireNonNull("amountRange", amountRange);
-        this.exponentRange = ParamUtil.requireNonNull("exponentRange", exponentRange);
+  public MonetaryValueOption(Iso4217CurrencyCode currency, Range2Type amountRange,
+      Range2Type exponentRange) {
+    this.currency = ParamUtil.requireNonNull("currency", currency);
+    this.amountRange = ParamUtil.requireNonNull("amountRange", amountRange);
+    this.exponentRange = ParamUtil.requireNonNull("exponentRange", exponentRange);
 
-        this.currencyString = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase()
-                : Integer.toString(currency.getNumeric());
-    }
+    this.currencyString = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase()
+        : Integer.toString(currency.getNumeric());
+  }
 
-    public Iso4217CurrencyCode currency() {
-        return currency;
-    }
+  public Iso4217CurrencyCode currency() {
+    return currency;
+  }
 
-    public Range2Type amountRange() {
-        return amountRange;
-    }
+  public Range2Type amountRange() {
+    return amountRange;
+  }
 
-    public Range2Type exponentRange() {
-        return exponentRange;
-    }
+  public Range2Type exponentRange() {
+    return exponentRange;
+  }
 
-    public String currencyString() {
-        return currencyString;
-    }
+  public String currencyString() {
+    return currencyString;
+  }
 
 }

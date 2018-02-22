@@ -29,77 +29,78 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CmpResponderEntryWrapper {
 
-    private CmpResponderEntry dbEntry;
+  private CmpResponderEntry dbEntry;
 
-    private ConcurrentContentSigner signer;
+  private ConcurrentContentSigner signer;
 
-    private X500Name subjectAsX500Name;
+  private X500Name subjectAsX500Name;
 
-    private GeneralName subjectAsGeneralName;
+  private GeneralName subjectAsGeneralName;
 
-    public CmpResponderEntryWrapper() {
+  public CmpResponderEntryWrapper() {
+  }
+
+  public void setDbEntry(CmpResponderEntry dbEntry) {
+    this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
+    signer = null;
+    if (dbEntry.certificate() != null) {
+      subjectAsX500Name = X500Name.getInstance(
+          dbEntry.certificate().getSubjectX500Principal().getEncoded());
+      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+    }
+  }
+
+  public ConcurrentContentSigner signer() {
+    return signer;
+  }
+
+  public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    if (signer != null) {
+      return;
     }
 
-    public void setDbEntry(CmpResponderEntry dbEntry) {
-        this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-        signer = null;
-        if (dbEntry.certificate() != null) {
-            subjectAsX500Name = X500Name.getInstance(
-                    dbEntry.certificate().getSubjectX500Principal().getEncoded());
-            subjectAsGeneralName = new GeneralName(subjectAsX500Name);
-        }
+    if (dbEntry == null) {
+      throw new ObjectCreationException("dbEntry is null");
     }
 
-    public ConcurrentContentSigner signer() {
-        return signer;
+    X509Certificate responderCert = dbEntry.certificate();
+    dbEntry.setConfFaulty(true);
+    signer = securityFactory.createSigner(dbEntry.type(), new SignerConf(dbEntry.conf()),
+        responderCert);
+    if (signer.getCertificate() == null) {
+      throw new ObjectCreationException("signer without certificate is not allowed");
     }
+    dbEntry.setConfFaulty(false);
 
-    public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
-        ParamUtil.requireNonNull("securityFactory", securityFactory);
-        if (signer != null) {
-            return;
-        }
-
-        if (dbEntry == null) {
-            throw new ObjectCreationException("dbEntry is null");
-        }
-
-        X509Certificate responderCert = dbEntry.certificate();
-        dbEntry.setConfFaulty(true);
-        signer = securityFactory.createSigner(dbEntry.type(), new SignerConf(dbEntry.conf()),
-                responderCert);
-        if (signer.getCertificate() == null) {
-            throw new ObjectCreationException("signer without certificate is not allowed");
-        }
-        dbEntry.setConfFaulty(false);
-
-        if (dbEntry.base64Cert() == null) {
-            dbEntry.setCertificate(signer.getCertificate());
-            subjectAsX500Name = X500Name.getInstance(signer.getBcCertificate().getSubject());
-            subjectAsGeneralName = new GeneralName(subjectAsX500Name);
-        }
-    } // method initSigner
-
-    public CmpResponderEntry dbEntry() {
-        return dbEntry;
+    if (dbEntry.base64Cert() == null) {
+      dbEntry.setCertificate(signer.getCertificate());
+      subjectAsX500Name = X500Name.getInstance(signer.getBcCertificate().getSubject());
+      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
     }
+  } // method initSigner
 
-    public boolean isHealthy() {
-        return (signer == null) ? false : signer.isHealthy();
-    }
+  public CmpResponderEntry dbEntry() {
+    return dbEntry;
+  }
 
-    public GeneralName subjectAsGeneralName() {
-        return subjectAsGeneralName;
-    }
+  public boolean isHealthy() {
+    return (signer == null) ? false : signer.isHealthy();
+  }
 
-    public X500Name subjectAsX500Name() {
-        return subjectAsX500Name;
-    }
+  public GeneralName subjectAsGeneralName() {
+    return subjectAsGeneralName;
+  }
+
+  public X500Name subjectAsX500Name() {
+    return subjectAsX500Name;
+  }
 
 }

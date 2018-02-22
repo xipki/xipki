@@ -23,24 +23,25 @@ import org.xipki.ca.server.mgmt.api.CaSystemStatus;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "system-status",
-        description = "show CA system status")
+    description = "show CA system status")
 @Service
 public class CaSystemStatusCmd extends CaAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        CaSystemStatus status = caManager.getCaSystemStatus();
-        if (status != null) {
-            println(status.toString());
-        } else {
-            throw new CmdFailure("status is null");
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    CaSystemStatus status = caManager.getCaSystemStatus();
+    if (status != null) {
+      println(status.toString());
+    } else {
+      throw new CmdFailure("status is null");
     }
+    return null;
+  }
 
 }

@@ -24,25 +24,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "profile-rm",
-        description = "remove certificate profile")
+    description = "remove certificate profile")
 @Service
 public class ProfileRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "certificate profile name")
-    @Completion(ProfileNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", required = true,
+      description = "certificate profile name")
+  @Completion(ProfileNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeCertprofile(name);
-        output(bo, "removed", "could not remove", "certificate profile " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeCertprofile(name);
+    output(bo, "removed", "could not remove", "certificate profile " + name);
+    return null;
+  }
 
 }

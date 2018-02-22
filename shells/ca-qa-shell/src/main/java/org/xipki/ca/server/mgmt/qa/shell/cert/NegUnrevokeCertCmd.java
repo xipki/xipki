@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-unrevoke-cert",
-        description = "unrevoke certificate (negative, QA)")
+    description = "unrevoke certificate (negative, QA)")
 @Service
 public class NegUnrevokeCertCmd extends UnrevokeCertCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-unrevoke-cert");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-unrevoke-cert");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("Exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("Exception expected, but received none");
+  }
 
 }

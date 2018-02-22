@@ -22,29 +22,30 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "env-up",
-        description = "update CA environment parameter")
+    description = "update CA environment parameter")
 @Service
 public class EnvUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "parameter name\n(required)")
-    protected String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "parameter name\n(required)")
+  protected String name;
 
-    @Option(name = "--value", required = true,
-            description = "environment parameter value\n(required)")
-    protected String value;
+  @Option(name = "--value", required = true,
+      description = "environment parameter value\n(required)")
+  protected String value;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.changeEnvParam(name, value);
-        output(bo, "updated", "could not update",
-                "the environment " + name + "=" + getRealString(value));
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.changeEnvParam(name, value);
+    output(bo, "updated", "could not update",
+        "the environment " + name + "=" + getRealString(value));
+    return null;
+  }
 
 }

@@ -29,39 +29,40 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "cert-status",
-        description = "show certificate status and save the certificate")
+    description = "show certificate status and save the certificate")
 @Service
 public class CertStatusCmd extends UnRevRmCertAction {
 
-    @Option(name = "--out", aliases = "-o",
-            description = "where to save the certificate")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o",
+      description = "where to save the certificate")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
-        X509Certificate cert = (X509Certificate) certInfo.cert();
+  @Override
+  protected Object execute0() throws Exception {
+    CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
+    X509Certificate cert = (X509Certificate) certInfo.cert();
 
-        if (cert == null) {
-            System.out.println("certificate unknown");
-            return null;
-        }
-
-        String msg = StringUtil.concat(
-                "certificate profile: ", certInfo.certprofile(),
-                "\nstatus: ", (certInfo.revocationInfo() == null ? "good"
-                        : "revoked with " + certInfo.revocationInfo()));
-        println(msg);
-        if (outputFile != null) {
-            saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
-        }
-        return null;
+    if (cert == null) {
+      System.out.println("certificate unknown");
+      return null;
     }
+
+    String msg = StringUtil.concat(
+        "certificate profile: ", certInfo.certprofile(),
+        "\nstatus: ", (certInfo.revocationInfo() == null ? "good"
+            : "revoked with " + certInfo.revocationInfo()));
+    println(msg);
+    if (outputFile != null) {
+      saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
+    }
+    return null;
+  }
 
 }

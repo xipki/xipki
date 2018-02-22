@@ -18,27 +18,28 @@
 package org.xipki.ca.api.profile.x509;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class AuthorityInfoAccessControl {
 
-    private final boolean includesCaIssuers;
+  private final boolean includesCaIssuers;
 
-    private final boolean includesOcsp;
+  private final boolean includesOcsp;
 
-    public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp) {
-        this.includesCaIssuers = includesCaIssuers;
-        this.includesOcsp = includesOcsp;
-    }
+  public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp) {
+    this.includesCaIssuers = includesCaIssuers;
+    this.includesOcsp = includesOcsp;
+  }
 
-    public boolean includesCaIssuers() {
-        return includesCaIssuers;
-    }
+  public boolean includesCaIssuers() {
+    return includesCaIssuers;
+  }
 
-    public boolean includesOcsp() {
-        return includesOcsp;
-    }
+  public boolean includesOcsp() {
+    return includesOcsp;
+  }
 
 }

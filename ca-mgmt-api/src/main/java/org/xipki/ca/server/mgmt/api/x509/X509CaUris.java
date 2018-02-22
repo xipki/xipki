@@ -22,38 +22,39 @@ import java.util.List;
 import org.xipki.common.util.CollectionUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CaUris {
-    private final List<String> cacertUris;
-    private final List<String> ocspUris;
-    private final List<String> crlUris;
-    private final List<String> deltaCrlUris;
+  private final List<String> cacertUris;
+  private final List<String> ocspUris;
+  private final List<String> crlUris;
+  private final List<String> deltaCrlUris;
 
-    public X509CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
-            List<String> deltaCrlUris) {
-        this.cacertUris = cacertUris;
-        this.ocspUris = ocspUris;
-        this.crlUris = crlUris;
-        this.deltaCrlUris = deltaCrlUris;
-    }
+  public X509CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
+      List<String> deltaCrlUris) {
+    this.cacertUris = cacertUris;
+    this.ocspUris = ocspUris;
+    this.crlUris = crlUris;
+    this.deltaCrlUris = deltaCrlUris;
+  }
 
-    public List<String> cacertUris() {
-        return CollectionUtil.unmodifiableList(cacertUris);
-    }
+  public List<String> cacertUris() {
+    return CollectionUtil.unmodifiableList(cacertUris);
+  }
 
-    public List<String> ocspUris() {
-        return CollectionUtil.unmodifiableList(ocspUris);
-    }
+  public List<String> ocspUris() {
+    return CollectionUtil.unmodifiableList(ocspUris);
+  }
 
-    public List<String> crlUris() {
-        return CollectionUtil.unmodifiableList(crlUris);
-    }
+  public List<String> crlUris() {
+    return CollectionUtil.unmodifiableList(crlUris);
+  }
 
-    public List<String> deltaCrlUris() {
-        return CollectionUtil.unmodifiableList(deltaCrlUris);
-    }
+  public List<String> deltaCrlUris() {
+    return CollectionUtil.unmodifiableList(deltaCrlUris);
+  }
 
 }

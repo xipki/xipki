@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.CrlSignerAddCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-crlsigner-add",
-        description = "add CRL signer (negative, QA)")
+    description = "add CRL signer (negative, QA)")
 @Service
 public class NegCrlSignerAddCmd extends CrlSignerAddCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-crlsigner-add");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-crlsigner-add");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

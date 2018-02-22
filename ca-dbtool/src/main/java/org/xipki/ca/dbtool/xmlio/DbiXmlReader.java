@@ -27,67 +27,68 @@ import javax.xml.stream.XMLStreamReader;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class DbiXmlReader {
 
-    protected final XMLStreamReader reader;
+  protected final XMLStreamReader reader;
 
-    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+  private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
-    private final String rootElementName;
+  private final String rootElementName;
 
-    private DbDataObject next;
+  private DbDataObject next;
 
-    public DbiXmlReader(String rootElementName, InputStream xmlStream)
-            throws XMLStreamException, InvalidDataObjectException {
-        this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
-        ParamUtil.requireNonNull("xmlStream", xmlStream);
+  public DbiXmlReader(String rootElementName, InputStream xmlStream)
+      throws XMLStreamException, InvalidDataObjectException {
+    this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
+    ParamUtil.requireNonNull("xmlStream", xmlStream);
 
-        synchronized (factory) {
-            reader = factory.createXMLStreamReader(xmlStream);
-        }
-
-        String thisRootElement = null;
-        while (reader.hasNext()) {
-            int event = reader.next();
-
-            if (event == XMLStreamConstants.START_ELEMENT) {
-                thisRootElement = reader.getLocalName();
-                break;
-            }
-        }
-
-        if (!this.rootElementName.equals(thisRootElement)) {
-            throw new InvalidDataObjectException("the given XML stream does not have root element '"
-                    + rootElementName + "', but '" + thisRootElement + "'");
-        }
-
-        this.next = retrieveNext();
+    synchronized (factory) {
+      reader = factory.createXMLStreamReader(xmlStream);
     }
 
-    public String rootElementName() {
-        return rootElementName;
+    String thisRootElement = null;
+    while (reader.hasNext()) {
+      int event = reader.next();
+
+      if (event == XMLStreamConstants.START_ELEMENT) {
+        thisRootElement = reader.getLocalName();
+        break;
+      }
     }
 
-    public boolean hasNext() {
-        return next != null;
+    if (!this.rootElementName.equals(thisRootElement)) {
+      throw new InvalidDataObjectException("the given XML stream does not have root element '"
+          + rootElementName + "', but '" + thisRootElement + "'");
     }
 
-    public DbDataObject next() throws InvalidDataObjectException, XMLStreamException {
-        if (next == null) {
-            throw new IllegalStateException("no more next element exists");
-        }
+    this.next = retrieveNext();
+  }
 
-        DbDataObject ret = next;
-        next = retrieveNext();
+  public String rootElementName() {
+    return rootElementName;
+  }
 
-        return ret;
+  public boolean hasNext() {
+    return next != null;
+  }
+
+  public DbDataObject next() throws InvalidDataObjectException, XMLStreamException {
+    if (next == null) {
+      throw new IllegalStateException("no more next element exists");
     }
 
-    protected abstract DbDataObject retrieveNext()
-            throws InvalidDataObjectException, XMLStreamException;
+    DbDataObject ret = next;
+    next = retrieveNext();
+
+    return ret;
+  }
+
+  protected abstract DbDataObject retrieveNext()
+      throws InvalidDataObjectException, XMLStreamException;
 
 }

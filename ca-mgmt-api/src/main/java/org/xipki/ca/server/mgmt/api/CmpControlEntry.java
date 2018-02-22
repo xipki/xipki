@@ -21,58 +21,59 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CmpControlEntry {
 
-    private final String name;
+  private final String name;
 
-    private final String conf;
+  private final String conf;
 
-    private boolean faulty;
+  private boolean faulty;
 
-    public CmpControlEntry(String name, String conf) {
-        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-        this.conf = ParamUtil.requireNonBlank("conf", conf);
+  public CmpControlEntry(String name, String conf) {
+    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.conf = ParamUtil.requireNonBlank("conf", conf);
+  }
+
+  public boolean faulty() {
+    return faulty;
+  }
+
+  public void setFaulty(boolean faulty) {
+    this.faulty = faulty;
+  }
+
+  public String name() {
+    return name;
+  }
+
+  public String conf() {
+    return conf;
+  }
+
+  @Override
+  public String toString() {
+    return StringUtil.concatObjectsCap(200, "name: ", name, "\nfaulty: ", faulty,
+        "\nconf: ", conf);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CmpControlEntry)) {
+      return false;
     }
 
-    public boolean faulty() {
-        return faulty;
-    }
+    CmpControlEntry objB = (CmpControlEntry) obj;
+    return name.equals(objB.name) && conf.equals(objB.conf);
+  }
 
-    public void setFaulty(boolean faulty) {
-        this.faulty = faulty;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public String conf() {
-        return conf;
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjectsCap(200, "name: ", name, "\nfaulty: ", faulty,
-                "\nconf: ", conf);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CmpControlEntry)) {
-            return false;
-        }
-
-        CmpControlEntry objB = (CmpControlEntry) obj;
-        return name.equals(objB.name) && conf.equals(objB.conf);
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
 
 }

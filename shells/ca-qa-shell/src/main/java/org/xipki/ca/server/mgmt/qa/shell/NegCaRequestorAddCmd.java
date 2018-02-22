@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.CaRequestorAddCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-careq-add",
-        description = "add requestor to CA (negative, QA)")
+    description = "add requestor to CA (negative, QA)")
 @Service
 public class NegCaRequestorAddCmd extends CaRequestorAddCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-careq-add");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-careq-add");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

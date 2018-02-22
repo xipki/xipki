@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.RepublishCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-republish",
-        description = "republish certificates (negative, QA)")
+    description = "republish certificates (negative, QA)")
 @Service
 public class NegRepublishCmd extends RepublishCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-republish");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-republish");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

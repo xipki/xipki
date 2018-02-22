@@ -20,37 +20,38 @@ package org.xipki.ca.dbtool.diffdb;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class IdentifiedDigestEntry {
 
-    private final DigestEntry content;
+  private final DigestEntry content;
 
-    private Integer caId;
+  private Integer caId;
 
-    private final long id;
+  private final long id;
 
-    public IdentifiedDigestEntry(DigestEntry content, long id) {
-        this.content = ParamUtil.requireNonNull("content", content);
-        this.id = id;
-    }
+  public IdentifiedDigestEntry(DigestEntry content, long id) {
+    this.content = ParamUtil.requireNonNull("content", content);
+    this.id = id;
+  }
 
-    public long id() {
-        return id;
-    }
+  public long id() {
+    return id;
+  }
 
-    public DigestEntry content() {
-        return content;
-    }
+  public DigestEntry content() {
+    return content;
+  }
 
-    public void setCaId(Integer caId) {
-        this.caId = caId;
-    }
+  public void setCaId(Integer caId) {
+    this.caId = caId;
+  }
 
-    public Integer caId() {
-        return caId;
-    }
+  public Integer caId() {
+    return caId;
+  }
 
 }

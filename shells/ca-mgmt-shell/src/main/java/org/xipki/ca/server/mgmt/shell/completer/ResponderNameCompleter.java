@@ -22,6 +22,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -29,8 +30,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class ResponderNameCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        return caManager.getResponderNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return caManager.getResponderNames();
+  }
 }

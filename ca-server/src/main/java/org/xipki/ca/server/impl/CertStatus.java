@@ -18,15 +18,16 @@
 package org.xipki.ca.server.impl;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum CertStatus {
 
-    UNKNOWN,
-    REVOKED,
-    GOOD
+  UNKNOWN,
+  REVOKED,
+  GOOD
 
 }
 

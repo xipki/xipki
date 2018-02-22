@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -28,8 +29,8 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 @Service
 public class CrlSignerTypeCompleter extends AbstractEnumCompleter {
 
-    public CrlSignerTypeCompleter() {
-        setTokens("CA, JKS, PKCS11, PKCS12");
-    }
+  public CrlSignerTypeCompleter() {
+    setTokens("CA, JKS, PKCS11, PKCS12");
+  }
 
 }

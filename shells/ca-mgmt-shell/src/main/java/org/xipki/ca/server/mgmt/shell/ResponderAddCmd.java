@@ -32,54 +32,55 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "responder-add",
-        description = "add responder")
+    description = "add responder")
 @Service
 public class ResponderAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "responder name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "responder name\n(required)")
+  private String name;
 
-    @Option(name = "--signer-type", required = true,
-            description = "type of the responder signer\n(required)")
-    @Completion(SignerTypeCompleter.class)
-    private String signerType;
+  @Option(name = "--signer-type", required = true,
+      description = "type of the responder signer\n(required)")
+  @Completion(SignerTypeCompleter.class)
+  private String signerType;
 
-    @Option(name = "--signer-conf", required = true,
-            description = "conf of the responder signer")
-    private String signerConf;
+  @Option(name = "--signer-conf", required = true,
+      description = "conf of the responder signer")
+  private String signerConf;
 
-    @Option(name = "--cert",
-            description = "responder certificate file")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert",
+      description = "responder certificate file")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    @Override
-    protected Object execute0() throws Exception {
-        String base64Cert = null;
-        X509Certificate signerCert = null;
-        if (certFile != null) {
-            signerCert = X509Util.parseCert(certFile);
-            base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
-        }
-
-        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
-                    securityFactory);
-        }
-        CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
-
-        boolean bo = caManager.addResponder(entry);
-        output(bo, "added", "could not add", "CMP responder " + name);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    String base64Cert = null;
+    X509Certificate signerCert = null;
+    if (certFile != null) {
+      signerCert = X509Util.parseCert(certFile);
+      base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
     }
+
+    if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
+      signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
+          securityFactory);
+    }
+    CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
+
+    boolean bo = caManager.addResponder(entry);
+    output(bo, "added", "could not add", "CMP responder " + name);
+    return null;
+  }
 
 }

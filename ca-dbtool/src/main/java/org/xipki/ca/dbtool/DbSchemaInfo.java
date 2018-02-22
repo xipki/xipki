@@ -31,56 +31,57 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DbSchemaInfo {
 
-    private final Map<String, String> variables = new HashMap<>();
+  private final Map<String, String> variables = new HashMap<>();
 
-    public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
-        ParamUtil.requireNonNull("datasource", datasource);
+  public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
+    ParamUtil.requireNonNull("datasource", datasource);
 
-        final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-        Connection connection = datasource.getConnection();
-        if (connection == null) {
-            throw new DataAccessException("could not get connection");
-        }
-
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = datasource.createStatement(connection);
-            if (stmt == null) {
-                throw new DataAccessException("could not create statement");
-            }
-
-            rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                String name = rs.getString("NAME");
-                String value = rs.getString("VALUE2");
-                variables.put(name, value);
-            }
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(stmt, rs);
-        }
-    } // constructor
-
-    public Set<String> variableNames() {
-        return Collections.unmodifiableSet(variables.keySet());
+    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+    Connection connection = datasource.getConnection();
+    if (connection == null) {
+      throw new DataAccessException("could not get connection");
     }
 
-    public String variableValue(String variableName) {
-        ParamUtil.requireNonNull("variableName", variableName);
-        return variables.get(variableName);
-    }
+    Statement stmt = null;
+    ResultSet rs = null;
 
-    public void setVariable(String name, String value) {
+    try {
+      stmt = datasource.createStatement(connection);
+      if (stmt == null) {
+        throw new DataAccessException("could not create statement");
+      }
+
+      rs = stmt.executeQuery(sql);
+      while (rs.next()) {
+        String name = rs.getString("NAME");
+        String value = rs.getString("VALUE2");
         variables.put(name, value);
+      }
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(stmt, rs);
     }
+  } // constructor
+
+  public Set<String> variableNames() {
+    return Collections.unmodifiableSet(variables.keySet());
+  }
+
+  public String variableValue(String variableName) {
+    ParamUtil.requireNonNull("variableName", variableName);
+    return variables.get(variableName);
+  }
+
+  public void setVariable(String name, String value) {
+    variables.put(name, value);
+  }
 
 }

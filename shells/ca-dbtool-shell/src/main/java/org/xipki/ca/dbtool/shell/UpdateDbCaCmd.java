@@ -24,24 +24,25 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "updatedb-ca",
-        description = "update the CA database schema")
+    description = "update the CA database schema")
 @Service
 public class UpdateDbCaCmd extends LiquibaseAction {
 
-    private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
+  private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
 
-    @Override
-    protected Object execute0() throws Exception {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+  @Override
+  protected Object execute0() throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        update(dbConf, SCHEMA_FILE);
-        return null;
-    }
+    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+    update(dbConf, SCHEMA_FILE);
+    return null;
+  }
 
 }

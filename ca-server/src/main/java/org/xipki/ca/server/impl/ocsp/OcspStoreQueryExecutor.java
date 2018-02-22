@@ -48,477 +48,479 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class OcspStoreQueryExecutor {
 
-    private static final String SQL_ADD_REVOKED_CERT =
-            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT,RT,RIT,RR)"
-            + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  private static final String SQL_ADD_REVOKED_CERT =
+      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT,RT,RIT,RR)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    private static final String SQL_ADD_CERT =
-            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+  private static final String SQL_ADD_CERT =
+      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT) "
+      + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-    private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
-    private final DataSourceWrapper datasource;
+  private final DataSourceWrapper datasource;
 
-    private final String sqlCertRegistered;
+  private final String sqlCertRegistered;
 
-    private final IssuerStore issuerStore;
+  private final IssuerStore issuerStore;
 
-    private final boolean publishGoodCerts;
+  private final boolean publishGoodCerts;
 
-    @SuppressWarnings("unused")
-    private final int dbSchemaVersion;
+  @SuppressWarnings("unused")
+  private final int dbSchemaVersion;
 
-    private final int maxX500nameLen;
+  private final int maxX500nameLen;
 
-    private final HashAlgoType certhashAlgo;
+  private final HashAlgoType certhashAlgo;
 
-    OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
-            throws DataAccessException, NoSuchAlgorithmException {
-        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-        this.issuerStore = initIssuerStore();
-        this.publishGoodCerts = publishGoodCerts;
+  OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
+      throws DataAccessException, NoSuchAlgorithmException {
+    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    this.issuerStore = initIssuerStore();
+    this.publishGoodCerts = publishGoodCerts;
 
-        this.sqlCertRegistered = datasource.buildSelectFirstSql(1,
-                "ID FROM CERT WHERE SN=? AND IID=?");
-        final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-        Connection conn = datasource.getConnection();
-        if (conn == null) {
-            throw new DataAccessException("could not get connection");
-        }
-
-        Map<String, String> variables = new HashMap<>();
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = datasource.createStatement(conn);
-            if (stmt == null) {
-                throw new DataAccessException("could not create statement");
-            }
-
-            rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                String name = rs.getString("NAME");
-                String value = rs.getString("VALUE2");
-                variables.put(name, value);
-            }
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(stmt, rs);
-        }
-
-        String str = variables.get("VERSION");
-        this.dbSchemaVersion = Integer.parseInt(str);
-        str = variables.get("X500NAME_MAXLEN");
-        this.maxX500nameLen = Integer.parseInt(str);
-
-        str = variables.get("CERTHASH_ALGO");
-        this.certhashAlgo = HashAlgoType.getNonNullHashAlgoType(str);
-    } // constructor
-
-    private IssuerStore initIssuerStore() throws DataAccessException {
-        final String sql = "SELECT ID,SUBJECT,S1C,CERT FROM ISSUER";
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-
-        try {
-            rs = ps.executeQuery();
-            List<IssuerEntry> caInfos = new LinkedList<>();
-            while (rs.next()) {
-                int id = rs.getInt("ID");
-                String subject = rs.getString("SUBJECT");
-                String sha1Fp = rs.getString("S1C");
-                String b64Cert = rs.getString("CERT");
-
-                IssuerEntry caInfoEntry = new IssuerEntry(id, subject, sha1Fp, b64Cert);
-                caInfos.add(caInfoEntry);
-            }
-
-            return new IssuerStore(caInfos);
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method initIssuerStore
-
-    void addCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile)
-            throws DataAccessException, OperationException {
-        addCert(issuer, certificate, certprofile, null);
+    this.sqlCertRegistered = datasource.buildSelectFirstSql(1,
+        "ID FROM CERT WHERE SN=? AND IID=?");
+    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+    Connection conn = datasource.getConnection();
+    if (conn == null) {
+      throw new DataAccessException("could not get connection");
     }
 
-    void addCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile,
-            CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-        addOrUpdateCert(issuer, certificate, certprofile, revInfo);
+    Map<String, String> variables = new HashMap<>();
+    Statement stmt = null;
+    ResultSet rs = null;
+
+    try {
+      stmt = datasource.createStatement(conn);
+      if (stmt == null) {
+        throw new DataAccessException("could not create statement");
+      }
+
+      rs = stmt.executeQuery(sql);
+      while (rs.next()) {
+        String name = rs.getString("NAME");
+        String value = rs.getString("VALUE2");
+        variables.put(name, value);
+      }
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(stmt, rs);
     }
 
-    private void addOrUpdateCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile,
-            CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-        ParamUtil.requireNonNull("issuer", issuer);
+    String str = variables.get("VERSION");
+    this.dbSchemaVersion = Integer.parseInt(str);
+    str = variables.get("X500NAME_MAXLEN");
+    this.maxX500nameLen = Integer.parseInt(str);
 
-        boolean revoked = (revInfo != null);
-        int issuerId = getIssuerId(issuer);
+    str = variables.get("CERTHASH_ALGO");
+    this.certhashAlgo = HashAlgoType.getNonNullHashAlgoType(str);
+  } // constructor
 
-        BigInteger serialNumber = certificate.cert().getSerialNumber();
-        Long certRegisteredId = getCertId(issuerId, serialNumber);
+  private IssuerStore initIssuerStore() throws DataAccessException {
+    final String sql = "SELECT ID,SUBJECT,S1C,CERT FROM ISSUER";
+    PreparedStatement ps = borrowPreparedStatement(sql);
+    ResultSet rs = null;
 
-        if (!publishGoodCerts && !revoked && certRegisteredId != null) {
-            return;
-        }
+    try {
+      rs = ps.executeQuery();
+      List<IssuerEntry> caInfos = new LinkedList<>();
+      while (rs.next()) {
+        int id = rs.getInt("ID");
+        String subject = rs.getString("SUBJECT");
+        String sha1Fp = rs.getString("S1C");
+        String b64Cert = rs.getString("CERT");
 
-        if (certRegisteredId != null) {
-            updateRegisteredCert(certRegisteredId, revInfo);
-            return;
-        }
+        IssuerEntry caInfoEntry = new IssuerEntry(id, subject, sha1Fp, b64Cert);
+        caInfos.add(caInfoEntry);
+      }
 
-        final String sql = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
+      return new IssuerStore(caInfos);
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+  } // method initIssuerStore
 
-        long certId = certificate.certId();
-        byte[] encodedCert = certificate.encodedCert();
-        String certHash = certhashAlgo.base64Hash(encodedCert);
+  void addCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile)
+      throws DataAccessException, OperationException {
+    addCert(issuer, certificate, certprofile, null);
+  }
 
-        long currentTimeSeconds = System.currentTimeMillis() / 1000;
-        X509Certificate cert = certificate.cert();
-        long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
-        long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
-        String cuttedSubject = X509Util.cutText(certificate.subject(), maxX500nameLen);
+  void addCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile,
+      CertRevocationInfo revInfo) throws DataAccessException, OperationException {
+    addOrUpdateCert(issuer, certificate, certprofile, revInfo);
+  }
 
-        PreparedStatement ps = borrowPreparedStatement(sql);
+  private void addOrUpdateCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile,
+      CertRevocationInfo revInfo) throws DataAccessException, OperationException {
+    ParamUtil.requireNonNull("issuer", issuer);
 
-        try {
-            // CERT
-            int idx = 1;
-            ps.setLong(idx++, certId);
-            ps.setLong(idx++, currentTimeSeconds);
-            ps.setString(idx++, serialNumber.toString(16));
-            ps.setLong(idx++, notBeforeSeconds);
-            ps.setLong(idx++, notAfterSeconds);
-            setBoolean(ps, idx++, revoked);
-            ps.setInt(idx++, issuerId);
-            ps.setString(idx++, certprofile);
-            ps.setString(idx++, certHash);
-            ps.setString(idx++, cuttedSubject);
+    boolean revoked = (revInfo != null);
+    int issuerId = getIssuerId(issuer);
 
-            if (revoked) {
-                long revTime = revInfo.revocationTime().getTime() / 1000;
-                ps.setLong(idx++, revTime);
-                if (revInfo.invalidityTime() != null) {
-                    ps.setLong(idx++, revInfo.invalidityTime().getTime() / 1000);
-                } else {
-                    ps.setNull(idx++, Types.BIGINT);
-                }
-                int reasonCode = (revInfo.reason() == null) ? 0 : revInfo.reason().code();
-                ps.setInt(idx++, reasonCode);
-            }
+    BigInteger serialNumber = certificate.cert().getSerialNumber();
+    Long certRegisteredId = getCertId(issuerId, serialNumber);
 
-            try {
-                ps.executeUpdate();
-            } catch (Throwable th) {
-                // more secure
-                datasource.deleteFromTable(null, "CERT", "ID", certId);
-
-                if (th instanceof SQLException) {
-                    SQLException ex = (SQLException) th;
-                    LOG.error("datasource {} could not add certificate with id {}: {}",
-                            datasource.datasourceName(), certId, th.getMessage());
-                    throw datasource.translate(sql, ex);
-                } else {
-                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
-                }
-            }
-        } catch (SQLException ex) {
-            throw datasource.translate(null, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method addOrUpdateCert
-
-    private void updateRegisteredCert(long registeredCertId, CertRevocationInfo revInfo)
-            throws DataAccessException {
-        boolean revoked = (revInfo != null);
-
-        final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-
-        long currentTimeSeconds = System.currentTimeMillis() / 1000;
-
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try {
-            int idx = 1;
-            ps.setLong(idx++, currentTimeSeconds);
-            setBoolean(ps, idx++, revoked);
-            if (revoked) {
-                long revTime = revInfo.revocationTime().getTime() / 1000;
-                ps.setLong(idx++, revTime);
-                if (revInfo.invalidityTime() != null) {
-                    ps.setLong(idx++, revInfo.invalidityTime().getTime() / 1000);
-                } else {
-                    ps.setNull(idx++, Types.INTEGER);
-                }
-                ps.setInt(idx++, revInfo.reason().code());
-            } else {
-                ps.setNull(idx++, Types.INTEGER); // rev_time
-                ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
-                ps.setNull(idx++, Types.INTEGER); // rev_reason
-            }
-            ps.setLong(idx++, registeredCertId);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
+    if (!publishGoodCerts && !revoked && certRegisteredId != null) {
+      return;
     }
 
-    void revokeCert(X509Cert caCert, X509CertWithDbId cert, String certprofile,
-            CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-        addOrUpdateCert(caCert, cert, certprofile, revInfo);
+    if (certRegisteredId != null) {
+      updateRegisteredCert(certRegisteredId, revInfo);
+      return;
     }
 
-    void unrevokeCert(X509Cert issuer, X509CertWithDbId cert) throws DataAccessException {
-        ParamUtil.requireNonNull("issuer", issuer);
-        ParamUtil.requireNonNull("cert", cert);
+    final String sql = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
-        Integer issuerId = issuerStore.getIdForCert(issuer.encodedCert());
-        if (issuerId == null) {
-            return;
-        }
+    long certId = certificate.certId();
+    byte[] encodedCert = certificate.encodedCert();
+    String certHash = certhashAlgo.base64Hash(encodedCert);
 
-        BigInteger serialNumber = cert.cert().getSerialNumber();
-        Long certRegisteredId = getCertId(issuerId, serialNumber);
+    long currentTimeSeconds = System.currentTimeMillis() / 1000;
+    X509Certificate cert = certificate.cert();
+    long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
+    long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
+    String cuttedSubject = X509Util.cutText(certificate.subject(), maxX500nameLen);
 
-        if (certRegisteredId == null) {
-            return;
-        }
+    PreparedStatement ps = borrowPreparedStatement(sql);
 
-        if (publishGoodCerts) {
-            final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-            PreparedStatement ps = borrowPreparedStatement(sql);
+    try {
+      // CERT
+      int idx = 1;
+      ps.setLong(idx++, certId);
+      ps.setLong(idx++, currentTimeSeconds);
+      ps.setString(idx++, serialNumber.toString(16));
+      ps.setLong(idx++, notBeforeSeconds);
+      ps.setLong(idx++, notAfterSeconds);
+      setBoolean(ps, idx++, revoked);
+      ps.setInt(idx++, issuerId);
+      ps.setString(idx++, certprofile);
+      ps.setString(idx++, certHash);
+      ps.setString(idx++, cuttedSubject);
 
-            try {
-                int idx = 1;
-                ps.setLong(idx++, System.currentTimeMillis() / 1000);
-                setBoolean(ps, idx++, false);
-                ps.setNull(idx++, Types.INTEGER);
-                ps.setNull(idx++, Types.INTEGER);
-                ps.setNull(idx++, Types.INTEGER);
-                ps.setLong(idx++, certRegisteredId);
-                ps.executeUpdate();
-            } catch (SQLException ex) {
-                throw datasource.translate(sql, ex);
-            } finally {
-                datasource.releaseResources(ps, null);
-            }
+      if (revoked) {
+        long revTime = revInfo.revocationTime().getTime() / 1000;
+        ps.setLong(idx++, revTime);
+        if (revInfo.invalidityTime() != null) {
+          ps.setLong(idx++, revInfo.invalidityTime().getTime() / 1000);
         } else {
-            final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
-            PreparedStatement ps = borrowPreparedStatement(sql);
-
-            try {
-                int idx = 1;
-                ps.setInt(idx++, issuerId);
-                ps.setString(idx++, serialNumber.toString(16));
-                ps.executeUpdate();
-            } catch (SQLException ex) {
-                throw datasource.translate(sql, ex);
-            } finally {
-                datasource.releaseResources(ps, null);
-            }
+          ps.setNull(idx++, Types.BIGINT);
         }
+        int reasonCode = (revInfo.reason() == null) ? 0 : revInfo.reason().code();
+        ps.setInt(idx++, reasonCode);
+      }
 
-    } // method unrevokeCert
+      try {
+        ps.executeUpdate();
+      } catch (Throwable th) {
+        // more secure
+        datasource.deleteFromTable(null, "CERT", "ID", certId);
 
-    void removeCert(X509Cert issuer, X509CertWithDbId cert) throws DataAccessException {
-        ParamUtil.requireNonNull("issuer", issuer);
-        ParamUtil.requireNonNull("cert", cert);
-
-        Integer issuerId = issuerStore.getIdForCert(issuer.encodedCert());
-        if (issuerId == null) {
-            return;
+        if (th instanceof SQLException) {
+          SQLException ex = (SQLException) th;
+          LOG.error("datasource {} could not add certificate with id {}: {}",
+              datasource.datasourceName(), certId, th.getMessage());
+          throw datasource.translate(sql, ex);
+        } else {
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
         }
+      }
+    } catch (SQLException ex) {
+      throw datasource.translate(null, ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  } // method addOrUpdateCert
 
-        final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
-        PreparedStatement ps = borrowPreparedStatement(sql);
+  private void updateRegisteredCert(long registeredCertId, CertRevocationInfo revInfo)
+      throws DataAccessException {
+    boolean revoked = (revInfo != null);
 
-        try {
-            ps.setInt(1, issuerId);
-            ps.setString(2, cert.cert().getSerialNumber().toString(16));
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
+    final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+
+    long currentTimeSeconds = System.currentTimeMillis() / 1000;
+
+    PreparedStatement ps = borrowPreparedStatement(sql);
+
+    try {
+      int idx = 1;
+      ps.setLong(idx++, currentTimeSeconds);
+      setBoolean(ps, idx++, revoked);
+      if (revoked) {
+        long revTime = revInfo.revocationTime().getTime() / 1000;
+        ps.setLong(idx++, revTime);
+        if (revInfo.invalidityTime() != null) {
+          ps.setLong(idx++, revInfo.invalidityTime().getTime() / 1000);
+        } else {
+          ps.setNull(idx++, Types.INTEGER);
         }
-    } // method removeCert
+        ps.setInt(idx++, revInfo.reason().code());
+      } else {
+        ps.setNull(idx++, Types.INTEGER); // rev_time
+        ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
+        ps.setNull(idx++, Types.INTEGER); // rev_reason
+      }
+      ps.setLong(idx++, registeredCertId);
+      ps.executeUpdate();
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  }
 
-    void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
-        ParamUtil.requireNonNull("caCert", caCert);
-        ParamUtil.requireNonNull("revInfo", revInfo);
+  void revokeCert(X509Cert caCert, X509CertWithDbId cert, String certprofile,
+      CertRevocationInfo revInfo) throws DataAccessException, OperationException {
+    addOrUpdateCert(caCert, cert, certprofile, revInfo);
+  }
 
-        Date revocationTime = revInfo.revocationTime();
-        Date invalidityTime = revInfo.invalidityTime();
-        if (invalidityTime == null) {
-            invalidityTime = revocationTime;
-        }
+  void unrevokeCert(X509Cert issuer, X509CertWithDbId cert) throws DataAccessException {
+    ParamUtil.requireNonNull("issuer", issuer);
+    ParamUtil.requireNonNull("cert", cert);
 
-        int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try {
-            int idx = 1;
-            setBoolean(ps, idx++, true);
-            ps.setLong(idx++, revocationTime.getTime() / 1000);
-            ps.setLong(idx++, invalidityTime.getTime() / 1000);
-            ps.setInt(idx++, revInfo.reason().code());
-            ps.setInt(idx++, issuerId);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method revokeCa
-
-    void unrevokeCa(X509Cert caCert) throws DataAccessException {
-        int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try {
-            int idx = 1;
-            setBoolean(ps, idx++, false);
-            ps.setNull(idx++, Types.INTEGER);
-            ps.setNull(idx++, Types.INTEGER);
-            ps.setNull(idx++, Types.INTEGER);
-            ps.setInt(idx++, issuerId);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method unrevokeCa
-
-    private int getIssuerId(X509Cert issuerCert) throws DataAccessException {
-        ParamUtil.requireNonNull("issuerCert", issuerCert);
-        Integer id = issuerStore.getIdForCert(issuerCert.encodedCert());
-        if (id == null) {
-            throw new IllegalStateException("could not find issuer, "
-                    + "please start XiPKI in master mode first the restart this XiPKI system");
-        }
-        return id.intValue();
+    Integer issuerId = issuerStore.getIdForCert(issuer.encodedCert());
+    if (issuerId == null) {
+      return;
     }
 
-    void addIssuer(X509Cert issuerCert) throws DataAccessException {
-        if (issuerStore.getIdForCert(issuerCert.encodedCert()) != null) {
-            return;
-        }
+    BigInteger serialNumber = cert.cert().getSerialNumber();
+    Long certRegisteredId = getCertId(issuerId, serialNumber);
 
-        String sha1FpCert = HashAlgoType.SHA1.base64Hash(issuerCert.encodedCert());
-        long maxId = datasource.getMax(null, "ISSUER", "ID");
-        int id = (int) maxId + 1;
-
-        byte[] encodedCert = issuerCert.encodedCert();
-        long notBeforeSeconds = issuerCert.cert().getNotBefore().getTime() / 1000;
-        long notAfterSeconds = issuerCert.cert().getNotAfter().getTime() / 1000;
-
-        final String sql =
-                "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
-
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try {
-            String b64Cert = Base64.encodeToString(encodedCert);
-            String subject = issuerCert.subject();
-            int idx = 1;
-            ps.setInt(idx++, id);
-            ps.setString(idx++, subject);
-            ps.setLong(idx++, notBeforeSeconds);
-            ps.setLong(idx++, notAfterSeconds);
-            ps.setString(idx++, sha1FpCert);
-            ps.setString(idx++, b64Cert);
-
-            ps.execute();
-
-            IssuerEntry newInfo = new IssuerEntry(id, subject, sha1FpCert, b64Cert);
-            issuerStore.addIdentityEntry(newInfo);
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method addIssuer
-
-    /**
-     * @param sqlQuery the SQL query
-     * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
-     *      can be created within 5 seconds.
-     */
-    private PreparedStatement borrowPreparedStatement(String sqlQuery) throws DataAccessException {
-        PreparedStatement ps = null;
-        Connection col = datasource.getConnection();
-        if (col != null) {
-            ps = datasource.prepareStatement(col, sqlQuery);
-        }
-        if (ps == null) {
-            throw new DataAccessException("could not create prepared statement for " + sqlQuery);
-        }
-        return ps;
+    if (certRegisteredId == null) {
+      return;
     }
 
-    /**
-     * Returns the database Id for the given issuer and serialNumber.
-     * @return the database table id if registered, <code>null</code> otherwise.
-     */
-    private Long getCertId(int issuerId, BigInteger serialNumber) throws DataAccessException {
-        final String sql = sqlCertRegistered;
-        ResultSet rs = null;
-        PreparedStatement ps = borrowPreparedStatement(sql);
+    if (publishGoodCerts) {
+      final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+      PreparedStatement ps = borrowPreparedStatement(sql);
 
-        try {
-            int idx = 1;
-            ps.setString(idx++, serialNumber.toString(16));
-            ps.setInt(idx++, issuerId);
+      try {
+        int idx = 1;
+        ps.setLong(idx++, System.currentTimeMillis() / 1000);
+        setBoolean(ps, idx++, false);
+        ps.setNull(idx++, Types.INTEGER);
+        ps.setNull(idx++, Types.INTEGER);
+        ps.setNull(idx++, Types.INTEGER);
+        ps.setLong(idx++, certRegisteredId);
+        ps.executeUpdate();
+      } catch (SQLException ex) {
+        throw datasource.translate(sql, ex);
+      } finally {
+        datasource.releaseResources(ps, null);
+      }
+    } else {
+      final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
+      PreparedStatement ps = borrowPreparedStatement(sql);
 
-            rs = ps.executeQuery();
-            return rs.next() ? rs.getLong("ID") : null;
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method getCertId
-
-    boolean isHealthy() {
-        final String sql = "SELECT ID FROM ISSUER";
-
-        try {
-            ResultSet rs = null;
-            PreparedStatement ps = borrowPreparedStatement(sql);
-
-            try {
-                rs = ps.executeQuery();
-            } finally {
-                datasource.releaseResources(ps, rs);
-            }
-            return true;
-        } catch (Exception ex) {
-            LogUtil.error(LOG, ex);
-            return false;
-        }
-    } // method isHealthy
-
-    private static void setBoolean(PreparedStatement ps, int index, boolean value)
-            throws SQLException {
-        ps.setInt(index, value ? 1 : 0);
+      try {
+        int idx = 1;
+        ps.setInt(idx++, issuerId);
+        ps.setString(idx++, serialNumber.toString(16));
+        ps.executeUpdate();
+      } catch (SQLException ex) {
+        throw datasource.translate(sql, ex);
+      } finally {
+        datasource.releaseResources(ps, null);
+      }
     }
+
+  } // method unrevokeCert
+
+  void removeCert(X509Cert issuer, X509CertWithDbId cert) throws DataAccessException {
+    ParamUtil.requireNonNull("issuer", issuer);
+    ParamUtil.requireNonNull("cert", cert);
+
+    Integer issuerId = issuerStore.getIdForCert(issuer.encodedCert());
+    if (issuerId == null) {
+      return;
+    }
+
+    final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
+    PreparedStatement ps = borrowPreparedStatement(sql);
+
+    try {
+      ps.setInt(1, issuerId);
+      ps.setString(2, cert.cert().getSerialNumber().toString(16));
+      ps.executeUpdate();
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  } // method removeCert
+
+  void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
+    ParamUtil.requireNonNull("caCert", caCert);
+    ParamUtil.requireNonNull("revInfo", revInfo);
+
+    Date revocationTime = revInfo.revocationTime();
+    Date invalidityTime = revInfo.invalidityTime();
+    if (invalidityTime == null) {
+      invalidityTime = revocationTime;
+    }
+
+    int issuerId = getIssuerId(caCert);
+    final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+    PreparedStatement ps = borrowPreparedStatement(sql);
+
+    try {
+      int idx = 1;
+      setBoolean(ps, idx++, true);
+      ps.setLong(idx++, revocationTime.getTime() / 1000);
+      ps.setLong(idx++, invalidityTime.getTime() / 1000);
+      ps.setInt(idx++, revInfo.reason().code());
+      ps.setInt(idx++, issuerId);
+      ps.executeUpdate();
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  } // method revokeCa
+
+  void unrevokeCa(X509Cert caCert) throws DataAccessException {
+    int issuerId = getIssuerId(caCert);
+    final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+    PreparedStatement ps = borrowPreparedStatement(sql);
+
+    try {
+      int idx = 1;
+      setBoolean(ps, idx++, false);
+      ps.setNull(idx++, Types.INTEGER);
+      ps.setNull(idx++, Types.INTEGER);
+      ps.setNull(idx++, Types.INTEGER);
+      ps.setInt(idx++, issuerId);
+      ps.executeUpdate();
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  } // method unrevokeCa
+
+  private int getIssuerId(X509Cert issuerCert) throws DataAccessException {
+    ParamUtil.requireNonNull("issuerCert", issuerCert);
+    Integer id = issuerStore.getIdForCert(issuerCert.encodedCert());
+    if (id == null) {
+      throw new IllegalStateException("could not find issuer, "
+          + "please start XiPKI in master mode first the restart this XiPKI system");
+    }
+    return id.intValue();
+  }
+
+  void addIssuer(X509Cert issuerCert) throws DataAccessException {
+    if (issuerStore.getIdForCert(issuerCert.encodedCert()) != null) {
+      return;
+    }
+
+    String sha1FpCert = HashAlgoType.SHA1.base64Hash(issuerCert.encodedCert());
+    long maxId = datasource.getMax(null, "ISSUER", "ID");
+    int id = (int) maxId + 1;
+
+    byte[] encodedCert = issuerCert.encodedCert();
+    long notBeforeSeconds = issuerCert.cert().getNotBefore().getTime() / 1000;
+    long notAfterSeconds = issuerCert.cert().getNotAfter().getTime() / 1000;
+
+    final String sql =
+        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
+
+    PreparedStatement ps = borrowPreparedStatement(sql);
+
+    try {
+      String b64Cert = Base64.encodeToString(encodedCert);
+      String subject = issuerCert.subject();
+      int idx = 1;
+      ps.setInt(idx++, id);
+      ps.setString(idx++, subject);
+      ps.setLong(idx++, notBeforeSeconds);
+      ps.setLong(idx++, notAfterSeconds);
+      ps.setString(idx++, sha1FpCert);
+      ps.setString(idx++, b64Cert);
+
+      ps.execute();
+
+      IssuerEntry newInfo = new IssuerEntry(id, subject, sha1FpCert, b64Cert);
+      issuerStore.addIdentityEntry(newInfo);
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  } // method addIssuer
+
+  /**
+   * TODO.
+   * @param sqlQuery the SQL query
+   * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
+   *      can be created within 5 seconds.
+   */
+  private PreparedStatement borrowPreparedStatement(String sqlQuery) throws DataAccessException {
+    PreparedStatement ps = null;
+    Connection col = datasource.getConnection();
+    if (col != null) {
+      ps = datasource.prepareStatement(col, sqlQuery);
+    }
+    if (ps == null) {
+      throw new DataAccessException("could not create prepared statement for " + sqlQuery);
+    }
+    return ps;
+  }
+
+  /**
+   * Returns the database Id for the given issuer and serialNumber.
+   * @return the database table id if registered, <code>null</code> otherwise.
+   */
+  private Long getCertId(int issuerId, BigInteger serialNumber) throws DataAccessException {
+    final String sql = sqlCertRegistered;
+    ResultSet rs = null;
+    PreparedStatement ps = borrowPreparedStatement(sql);
+
+    try {
+      int idx = 1;
+      ps.setString(idx++, serialNumber.toString(16));
+      ps.setInt(idx++, issuerId);
+
+      rs = ps.executeQuery();
+      return rs.next() ? rs.getLong("ID") : null;
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+  } // method getCertId
+
+  boolean isHealthy() {
+    final String sql = "SELECT ID FROM ISSUER";
+
+    try {
+      ResultSet rs = null;
+      PreparedStatement ps = borrowPreparedStatement(sql);
+
+      try {
+        rs = ps.executeQuery();
+      } finally {
+        datasource.releaseResources(ps, rs);
+      }
+      return true;
+    } catch (Exception ex) {
+      LogUtil.error(LOG, ex);
+      return false;
+    }
+  } // method isHealthy
+
+  private static void setBoolean(PreparedStatement ps, int index, boolean value)
+      throws SQLException {
+    ps.setInt(index, value ? 1 : 0);
+  }
 
 }

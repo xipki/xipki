@@ -18,35 +18,36 @@
 package org.xipki.ca.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum RequestType {
 
-    CA(1),
-    CMP(2),
-    SCEP(3),
-    REST(4);
+  CA(1),
+  CMP(2),
+  SCEP(3),
+  REST(4);
 
-    private final int code;
+  private final int code;
 
-    RequestType(int code) {
-        this.code = code;
+  RequestType(int code) {
+    this.code = code;
+  }
+
+  public int code() {
+    return code;
+  }
+
+  public static RequestType getInstance(int code) {
+    for (RequestType value : values()) {
+      if (code == value.code) {
+        return value;
+      }
     }
 
-    public int code() {
-        return code;
-    }
-
-    public static RequestType getInstance(int code) {
-        for (RequestType value : values()) {
-            if (code == value.code) {
-                return value;
-            }
-        }
-
-        throw new IllegalArgumentException("invalid RequestType code " + code);
-    }
+    throw new IllegalArgumentException("invalid RequestType code " + code);
+  }
 
 }

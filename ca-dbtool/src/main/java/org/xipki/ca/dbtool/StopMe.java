@@ -22,20 +22,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class StopMe {
 
-    private final AtomicBoolean stopMe;
+  private final AtomicBoolean stopMe;
 
-    public StopMe(AtomicBoolean stopMe) {
-        this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
-    }
+  public StopMe(AtomicBoolean stopMe) {
+    this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
+  }
 
-    public boolean stopMe() {
-        return stopMe.get();
-    }
+  public boolean stopMe() {
+    return stopMe.get();
+  }
 
 }

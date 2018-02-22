@@ -37,62 +37,62 @@ import org.xipki.security.CrlReason;
 
 public class RevokeSuspendedCertsControl {
 
-    public static final String KEY_REVOCATION_ENABLED = "revokeSuspendedCerts.enabled";
+  public static final String KEY_REVOCATION_ENABLED = "revokeSuspendedCerts.enabled";
 
-    public static final String KEY_REVOCATION_REASON = "revokeSuspendedCerts.targetReason";
+  public static final String KEY_REVOCATION_REASON = "revokeSuspendedCerts.targetReason";
 
-    public static final String KEY_UNCHANGED_SINCE = "revokeSuspendedCerts.unchangedSince";
+  public static final String KEY_UNCHANGED_SINCE = "revokeSuspendedCerts.unchangedSince";
 
-    private final CrlReason targetReason;
+  private final CrlReason targetReason;
 
-    private final CertValidity unchangedSince;
+  private final CertValidity unchangedSince;
 
-    public RevokeSuspendedCertsControl(CrlReason targetReason, CertValidity unchangedSince) {
-        this.targetReason = ParamUtil.requireNonNull("targetReason", targetReason);
-        this.unchangedSince = ParamUtil.requireNonNull("unchangedSince", unchangedSince);
+  public RevokeSuspendedCertsControl(CrlReason targetReason, CertValidity unchangedSince) {
+    this.targetReason = ParamUtil.requireNonNull("targetReason", targetReason);
+    this.unchangedSince = ParamUtil.requireNonNull("unchangedSince", unchangedSince);
 
-        switch (targetReason) {
-        case AFFILIATION_CHANGED:
-        case CESSATION_OF_OPERATION:
-        case KEY_COMPROMISE:
-        case PRIVILEGE_WITHDRAWN:
-        case SUPERSEDED:
-        case UNSPECIFIED:
-            break;
-        default:
-            throw new IllegalArgumentException("invalid targetReason " + targetReason);
-        }
-    } // constructor
+    switch (targetReason) {
+      case AFFILIATION_CHANGED:
+      case CESSATION_OF_OPERATION:
+      case KEY_COMPROMISE:
+      case PRIVILEGE_WITHDRAWN:
+      case SUPERSEDED:
+      case UNSPECIFIED:
+        break;
+      default:
+        throw new IllegalArgumentException("invalid targetReason " + targetReason);
+    }
+  } // constructor
 
-    public CrlReason targetReason() {
-        return targetReason;
+  public CrlReason targetReason() {
+    return targetReason;
+  }
+
+  public CertValidity unchangedSince() {
+    return unchangedSince;
+  }
+
+  @Override
+  public String toString() {
+    ConfPairs pairs = new ConfPairs();
+    pairs.putPair(KEY_REVOCATION_REASON, targetReason.description());
+    pairs.putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
+    return pairs.getEncoded();
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof RevokeSuspendedCertsControl)) {
+      return false;
     }
 
-    public CertValidity unchangedSince() {
-        return unchangedSince;
-    }
-
-    @Override
-    public String toString() {
-        ConfPairs pairs = new ConfPairs();
-        pairs.putPair(KEY_REVOCATION_REASON, targetReason.description());
-        pairs.putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
-        return pairs.getEncoded();
-    }
-
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof RevokeSuspendedCertsControl)) {
-            return false;
-        }
-
-        RevokeSuspendedCertsControl obj2 = (RevokeSuspendedCertsControl) obj;
-        return (targetReason == obj2.targetReason) && (unchangedSince != obj2.unchangedSince);
-    }
+    RevokeSuspendedCertsControl obj2 = (RevokeSuspendedCertsControl) obj;
+    return (targetReason == obj2.targetReason) && (unchangedSince != obj2.unchangedSince);
+  }
 
 }

@@ -20,20 +20,21 @@ package org.xipki.ca.api.profile.x509;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface X509CertprofileFactoryRegister {
 
-    /**
-     *
-     * @param type
-     *          Type of the certificate. Must not be {@code null}.
-     * @return new certificate profile.
-     * @throws ObjectCreationException
-     *           If certificate profile could not be created.
-     */
-    X509Certprofile newCertprofile(String type) throws ObjectCreationException;
+  /**
+   * TODO.
+   * @param type
+   *          Type of the certificate. Must not be {@code null}.
+   * @return new certificate profile.
+   * @throws ObjectCreationException
+   *           If certificate profile could not be created.
+   */
+  X509Certprofile newCertprofile(String type) throws ObjectCreationException;
 
 }

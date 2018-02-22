@@ -24,27 +24,28 @@ import java.util.Map;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class CertsBundle {
 
-    private Map<BigInteger, DigestEntry> certs;
+  private Map<BigInteger, DigestEntry> certs;
 
-    private List<BigInteger> serialNumbers;
+  private List<BigInteger> serialNumbers;
 
-    public CertsBundle(Map<BigInteger, DigestEntry> certs, List<BigInteger> serialNumbers) {
-        this.certs = ParamUtil.requireNonEmpty("certs", certs);
-        this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
-    }
+  public CertsBundle(Map<BigInteger, DigestEntry> certs, List<BigInteger> serialNumbers) {
+    this.certs = ParamUtil.requireNonEmpty("certs", certs);
+    this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
+  }
 
-    public Map<BigInteger, DigestEntry> certs() {
-        return certs;
-    }
+  public Map<BigInteger, DigestEntry> certs() {
+    return certs;
+  }
 
-    public List<BigInteger> serialNumbers() {
-        return serialNumbers;
-    }
+  public List<BigInteger> serialNumbers() {
+    return serialNumbers;
+  }
 
 }

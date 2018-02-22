@@ -21,16 +21,17 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public interface HttpRequestMetadataRetriever {
 
-    String getHeader(String headerName);
+  String getHeader(String headerName);
 
-    String getParameter(String paramName);
+  String getParameter(String paramName);
 
-    X509Certificate getTlsClientCert() throws IOException;
+  X509Certificate getTlsClientCert() throws IOException;
 
 }

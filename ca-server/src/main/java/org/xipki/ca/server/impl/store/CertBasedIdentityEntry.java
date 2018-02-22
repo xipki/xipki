@@ -23,43 +23,44 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class CertBasedIdentityEntry {
 
-    private final int id;
+  private final int id;
 
-    private final String subject;
+  private final String subject;
 
-    private final byte[] sha1Fp;
+  private final byte[] sha1Fp;
 
-    private final byte[] cert;
+  private final byte[] cert;
 
-    CertBasedIdentityEntry(int id, String subject, String b64Sha1Fp, String b64Cert) {
-        ParamUtil.requireNonBlank("b64Sha1Fp", b64Sha1Fp);
-        ParamUtil.requireNonBlank("b64Cert", b64Cert);
-        this.id = id;
-        this.subject = subject;
-        this.sha1Fp = Base64.decode(b64Sha1Fp);
-        this.cert = Base64.decode(b64Cert);
-    }
+  CertBasedIdentityEntry(int id, String subject, String b64Sha1Fp, String b64Cert) {
+    ParamUtil.requireNonBlank("b64Sha1Fp", b64Sha1Fp);
+    ParamUtil.requireNonBlank("b64Cert", b64Cert);
+    this.id = id;
+    this.subject = subject;
+    this.sha1Fp = Base64.decode(b64Sha1Fp);
+    this.cert = Base64.decode(b64Cert);
+  }
 
-    int id() {
-        return id;
-    }
+  int id() {
+    return id;
+  }
 
-    String subject() {
-        return subject;
-    }
+  String subject() {
+    return subject;
+  }
 
-    boolean matchSha1Fp(byte[] sha1HashValue) {
-        return Arrays.equals(this.sha1Fp, sha1HashValue);
-    }
+  boolean matchSha1Fp(byte[] sha1HashValue) {
+    return Arrays.equals(this.sha1Fp, sha1HashValue);
+  }
 
-    boolean matchCert(byte[] encodedCert) {
-        return Arrays.equals(this.cert, encodedCert);
-    }
+  boolean matchCert(byte[] encodedCert) {
+    return Arrays.equals(this.cert, encodedCert);
+  }
 
 }

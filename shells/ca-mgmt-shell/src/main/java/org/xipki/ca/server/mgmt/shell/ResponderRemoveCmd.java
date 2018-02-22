@@ -24,25 +24,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "responder-rm",
-        description = "remove responder")
+    description = "remove responder")
 @Service
 public class ResponderRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "responder name")
-    @Completion(ResponderNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", required = true,
+      description = "responder name")
+  @Completion(ResponderNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeResponder(name);
-        output(bo, "removed", "could not remove", "CMP responder " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeResponder(name);
+    output(bo, "removed", "could not remove", "CMP responder " + name);
+    return null;
+  }
 
 }

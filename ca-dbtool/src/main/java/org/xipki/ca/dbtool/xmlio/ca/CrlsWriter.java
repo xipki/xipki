@@ -26,20 +26,21 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CrlsWriter extends DbiXmlWriter {
 
-    public CrlsWriter() throws IOException, XMLStreamException {
-        super(CrlType.TAG_PARENT, "1");
-    }
+  public CrlsWriter() throws IOException, XMLStreamException {
+    super(CrlType.TAG_PARENT, "1");
+  }
 
-    public void add(CrlType crl) throws InvalidDataObjectException, XMLStreamException {
-        ParamUtil.requireNonNull("crl", crl);
-        crl.validate();
-        crl.writeTo(this);
-    }
+  public void add(CrlType crl) throws InvalidDataObjectException, XMLStreamException {
+    ParamUtil.requireNonNull("crl", crl);
+    crl.validate();
+    crl.writeTo(this);
+  }
 
 }

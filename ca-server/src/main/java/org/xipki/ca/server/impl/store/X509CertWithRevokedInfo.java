@@ -21,27 +21,28 @@ import org.xipki.ca.api.X509CertWithDbId;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CertWithRevokedInfo {
 
-    private final X509CertWithDbId cert;
+  private final X509CertWithDbId cert;
 
-    private final boolean revoked;
+  private final boolean revoked;
 
-    public X509CertWithRevokedInfo(X509CertWithDbId cert, boolean revoked) {
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-        this.revoked = revoked;
-    }
+  public X509CertWithRevokedInfo(X509CertWithDbId cert, boolean revoked) {
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.revoked = revoked;
+  }
 
-    public X509CertWithDbId cert() {
-        return cert;
-    }
+  public X509CertWithDbId cert() {
+    return cert;
+  }
 
-    public boolean isRevoked() {
-        return revoked;
-    }
+  public boolean isRevoked() {
+    return revoked;
+  }
 
 }

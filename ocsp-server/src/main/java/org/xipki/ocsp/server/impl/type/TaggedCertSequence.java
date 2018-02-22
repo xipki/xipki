@@ -20,46 +20,47 @@ package org.xipki.ocsp.server.impl.type;
 import org.xipki.common.ASN1Type;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class TaggedCertSequence extends ASN1Type {
 
-    private final byte[] encoded;
+  private final byte[] encoded;
 
-    private final int encodedLen;
+  private final int encodedLen;
 
-    public TaggedCertSequence(byte[] encodedCert) {
-        this(new byte[][]{encodedCert});
+  public TaggedCertSequence(byte[] encodedCert) {
+    this(new byte[][]{encodedCert});
+  }
+
+  public TaggedCertSequence(byte[][] encodedCerts) {
+    int seqBodyLen = 0;
+    for (int i = 0; i < encodedCerts.length; i++) {
+      seqBodyLen += encodedCerts[i].length;
     }
 
-    public TaggedCertSequence(byte[][] encodedCerts) {
-        int seqBodyLen = 0;
-        for (int i = 0; i < encodedCerts.length; i++) {
-            seqBodyLen += encodedCerts[i].length;
-        }
+    int seqLen = getLen(seqBodyLen);
+    encodedLen = getLen(seqLen);
 
-        int seqLen = getLen(seqBodyLen);
-        encodedLen = getLen(seqLen);
-
-        this.encoded = new byte[encodedLen];
-        int idx = 0;
-        idx += writeHeader((byte) 0xa0, seqLen, encoded, idx);
-        idx += writeHeader((byte) 0x30, seqBodyLen, encoded, idx);
-        for (int i = 0; i < encodedCerts.length; i++) {
-            idx += arraycopy(encodedCerts[i], encoded, idx);
-        }
+    this.encoded = new byte[encodedLen];
+    int idx = 0;
+    idx += writeHeader((byte) 0xa0, seqLen, encoded, idx);
+    idx += writeHeader((byte) 0x30, seqBodyLen, encoded, idx);
+    for (int i = 0; i < encodedCerts.length; i++) {
+      idx += arraycopy(encodedCerts[i], encoded, idx);
     }
+  }
 
-    @Override
-    public int encodedLength() {
-        return encodedLen;
-    }
+  @Override
+  public int encodedLength() {
+    return encodedLen;
+  }
 
-    @Override
-    public int write(byte[] out, int offset) {
-        return arraycopy(encoded, out, offset);
-    }
+  @Override
+  public int write(byte[] out, int offset) {
+    return arraycopy(encoded, out, offset);
+  }
 
 }

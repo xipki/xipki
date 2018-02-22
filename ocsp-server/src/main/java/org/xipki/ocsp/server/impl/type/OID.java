@@ -28,51 +28,52 @@ import org.xipki.common.util.CompareUtil;
 import org.xipki.security.ObjectIdentifiers;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 // CHECKSTYLE:SKIP
 public enum OID {
-    ID_PKIX_OCSP_NONCE(OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
-    ID_PKIX_OCSP_PREFSIGALGS(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs),
-    ID_PKIX_OCSP_EXTENDEDREVOKE(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke),
-    ID_ISISMTT_AT_CERTHASH(ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
-    ID_INVALIDITY_DATE(Extension.invalidityDate),
-    ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
+  ID_PKIX_OCSP_NONCE(OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
+  ID_PKIX_OCSP_PREFSIGALGS(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs),
+  ID_PKIX_OCSP_EXTENDEDREVOKE(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke),
+  ID_ISISMTT_AT_CERTHASH(ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
+  ID_INVALIDITY_DATE(Extension.invalidityDate),
+  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
 
-    private String id;
+  private String id;
 
-    private byte[] encoded;
+  private byte[] encoded;
 
-    private OID(ASN1ObjectIdentifier oid) {
-        this.id = oid.getId();
-        try {
-            this.encoded = oid.getEncoded();
-        } catch (IOException ex) {
-            throw new IllegalStateException("should not happen", ex);
-        }
+  private OID(ASN1ObjectIdentifier oid) {
+    this.id = oid.getId();
+    try {
+      this.encoded = oid.getEncoded();
+    } catch (IOException ex) {
+      throw new IllegalStateException("should not happen", ex);
     }
+  }
 
-    public String id() {
-        return id;
-    }
+  public String id() {
+    return id;
+  }
 
-    public int encodedLength() {
-        return encoded.length;
-    }
+  public int encodedLength() {
+    return encoded.length;
+  }
 
-    public int write(byte[] out, int offset) {
-        return ASN1Type.arraycopy(encoded, out, offset);
-    }
+  public int write(byte[] out, int offset) {
+    return ASN1Type.arraycopy(encoded, out, offset);
+  }
 
-    public static OID getInstanceForEncoded(byte[] data, int offset) {
-        for (OID m : OID.values()) {
-            if (CompareUtil.areEqual(data, offset, m.encoded, 0, m.encoded.length)) {
-                return m;
-            }
-        }
-        return null;
+  public static OID getInstanceForEncoded(byte[] data, int offset) {
+    for (OID m : OID.values()) {
+      if (CompareUtil.areEqual(data, offset, m.encoded, 0, m.encoded.length)) {
+        return m;
+      }
     }
+    return null;
+  }
 
 }

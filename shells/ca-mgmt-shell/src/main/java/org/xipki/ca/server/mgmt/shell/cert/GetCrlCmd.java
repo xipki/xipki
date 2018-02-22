@@ -33,74 +33,75 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "getcrl",
-        description = "download CRL")
+    description = "download CRL")
 @Service
 public class GetCrlCmd extends CrlAction {
 
-    @Option(name = "--with-basecrl",
-            description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
-    private Boolean withBaseCrl = Boolean.FALSE;
+  @Option(name = "--with-basecrl",
+      description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
+  private Boolean withBaseCrl = Boolean.FALSE;
 
-    @Option(name = "--basecrl-out",
-            description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
-    @Completion(FilePathCompleter.class)
-    private String baseCrlOut;
+  @Option(name = "--basecrl-out",
+      description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
+  @Completion(FilePathCompleter.class)
+  private String baseCrlOut;
 
-    @Override
-    protected X509CRL retrieveCrl() throws Exception {
-        return caManager.getCurrentCrl(caName);
+  @Override
+  protected X509CRL retrieveCrl() throws Exception {
+    return caManager.getCurrentCrl(caName);
+  }
+
+  @Override
+  protected Object execute0() throws Exception {
+    CaEntry ca = caManager.getCa(caName);
+    if (ca == null) {
+      throw new CmdFailure("CA " + caName + " not available");
     }
 
-    @Override
-    protected Object execute0() throws Exception {
-        CaEntry ca = caManager.getCa(caName);
-        if (ca == null) {
-            throw new CmdFailure("CA " + caName + " not available");
+    X509CRL crl = null;
+    try {
+      crl = retrieveCrl();
+    } catch (Exception ex) {
+      throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+    }
+
+    if (crl == null) {
+      throw new CmdFailure("received no CRL from server");
+    }
+
+    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+
+    if (withBaseCrl.booleanValue()) {
+      byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+      if (octetString != null) {
+        if (baseCrlOut == null) {
+          baseCrlOut = outFile + "-baseCRL";
         }
 
-        X509CRL crl = null;
+        byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+        BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+
         try {
-            crl = retrieveCrl();
+          crl = caManager.getCrl(caName, baseCrlNumber);
         } catch (Exception ex) {
-            throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+          throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
         }
 
         if (crl == null) {
-            throw new CmdFailure("received no CRL from server");
+          throw new CmdFailure("received no baseCRL from server");
+        } else {
+          saveVerbose("saved baseCRL to file", new File(baseCrlOut), crl.getEncoded());
         }
+      }
+    }
 
-        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
-
-        if (withBaseCrl.booleanValue()) {
-            byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-            if (octetString != null) {
-                if (baseCrlOut == null) {
-                    baseCrlOut = outFile + "-baseCRL";
-                }
-
-                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-
-                try {
-                    crl = caManager.getCrl(caName, baseCrlNumber);
-                } catch (Exception ex) {
-                    throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
-                }
-
-                if (crl == null) {
-                    throw new CmdFailure("received no baseCRL from server");
-                } else {
-                    saveVerbose("saved baseCRL to file", new File(baseCrlOut), crl.getEncoded());
-                }
-            }
-        }
-
-        return null;
-    } // method execute0
+    return null;
+  } // method execute0
 
 }

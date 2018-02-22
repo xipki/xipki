@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.RequestorRemoveCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-requestor-rm",
-        description = "remove requestor (negative, QA)")
+    description = "remove requestor (negative, QA)")
 @Service
 public class NegRequestorRemoveCmd extends RequestorRemoveCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-requestor-rm");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-requestor-rm");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

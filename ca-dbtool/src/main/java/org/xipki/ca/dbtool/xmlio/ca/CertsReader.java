@@ -27,120 +27,121 @@ import org.xipki.ca.dbtool.xmlio.DbiXmlReader;
 import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertsReader extends DbiXmlReader {
 
-    public CertsReader(InputStream xmlStream)
-            throws XMLStreamException, InvalidDataObjectException {
-        super(CertType.TAG_PARENT, xmlStream);
-    }
+  public CertsReader(InputStream xmlStream)
+      throws XMLStreamException, InvalidDataObjectException {
+    super(CertType.TAG_PARENT, xmlStream);
+  }
 
-    @Override
-    protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
-        CertType ret = null;
+  @Override
+  protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
+    CertType ret = null;
 
-        StringBuilder buffer = new StringBuilder();
-        int lastEvent = -1;
+    StringBuilder buffer = new StringBuilder();
+    int lastEvent = -1;
 
-        while (reader.hasNext()) {
-            int event = reader.next();
-            String tagContent = null;
+    while (reader.hasNext()) {
+      int event = reader.next();
+      String tagContent = null;
 
-            if (event != XMLStreamConstants.CHARACTERS) {
-                tagContent = buffer.toString();
+      if (event != XMLStreamConstants.CHARACTERS) {
+        tagContent = buffer.toString();
 
-                if (lastEvent == XMLStreamConstants.CHARACTERS) {
-                    buffer.delete(0, buffer.length());
-                }
-            }
+        if (lastEvent == XMLStreamConstants.CHARACTERS) {
+          buffer.delete(0, buffer.length());
+        }
+      }
 
-            lastEvent = event;
+      lastEvent = event;
 
-            switch (event) {
-            case XMLStreamConstants.START_ELEMENT:
-                if (CertType.TAG_ROOT.equals(reader.getLocalName())) {
-                    ret = new CertType();
-                }
-                break;
-            case XMLStreamConstants.CHARACTERS:
-                buffer.append(reader.getText());
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                if (ret == null) {
-                    break;
-                }
+      switch (event) {
+        case XMLStreamConstants.START_ELEMENT:
+          if (CertType.TAG_ROOT.equals(reader.getLocalName())) {
+            ret = new CertType();
+          }
+          break;
+        case XMLStreamConstants.CHARACTERS:
+          buffer.append(reader.getText());
+          break;
+        case XMLStreamConstants.END_ELEMENT:
+          if (ret == null) {
+            break;
+          }
 
-                switch (reader.getLocalName()) {
-                case CertType.TAG_ROOT:
-                    ret.validate();
-                    return ret;
-                case CertType.TAG_ART:
-                    ret.setArt(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_CAID:
-                    ret.setCaId(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_FILE:
-                    ret.setFile(tagContent);
-                    break;
-                case CertType.TAG_EE:
-                    ret.setEe(Boolean.parseBoolean(tagContent));
-                    break;
-                case CertType.TAG_FP_RS:
-                    ret.setFpRs(Long.parseLong(tagContent));
-                    break;
-                case CertType.TAG_ID:
-                    ret.setId(Long.parseLong(tagContent));
-                    break;
-                case CertType.TAG_PID:
-                    ret.setPid(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_REQ_TYPE:
-                    ret.setReqType(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_REV:
-                    ret.setRev(Boolean.parseBoolean(tagContent));
-                    break;
-                case CertType.TAG_RID:
-                    ret.setRid(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_RIT:
-                    ret.setRit(Long.parseLong(tagContent));
-                    break;
-                case CertType.TAG_RR:
-                    ret.setRr(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_RS:
-                    ret.setRs(tagContent);
-                    break;
-                case CertType.TAG_RT:
-                    ret.setRt(Long.parseLong(tagContent));
-                    break;
-                case CertType.TAG_SN:
-                    ret.setSn(tagContent);
-                    break;
-                case CertType.TAG_TID:
-                    ret.setTid(tagContent);
-                    break;
-                case CertType.TAG_UID:
-                    ret.setUid(Integer.parseInt(tagContent));
-                    break;
-                case CertType.TAG_UPDATE:
-                    ret.setUpdate(Long.parseLong(tagContent));
-                    break;
-                default:
-                    break;
-                } // end switch (reader.getLocalName())
-                break;
+          switch (reader.getLocalName()) {
+            case CertType.TAG_ROOT:
+              ret.validate();
+              return ret;
+            case CertType.TAG_ART:
+              ret.setArt(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_CAID:
+              ret.setCaId(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_FILE:
+              ret.setFile(tagContent);
+              break;
+            case CertType.TAG_EE:
+              ret.setEe(Boolean.parseBoolean(tagContent));
+              break;
+            case CertType.TAG_FP_RS:
+              ret.setFpRs(Long.parseLong(tagContent));
+              break;
+            case CertType.TAG_ID:
+              ret.setId(Long.parseLong(tagContent));
+              break;
+            case CertType.TAG_PID:
+              ret.setPid(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_REQ_TYPE:
+              ret.setReqType(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_REV:
+              ret.setRev(Boolean.parseBoolean(tagContent));
+              break;
+            case CertType.TAG_RID:
+              ret.setRid(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_RIT:
+              ret.setRit(Long.parseLong(tagContent));
+              break;
+            case CertType.TAG_RR:
+              ret.setRr(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_RS:
+              ret.setRs(tagContent);
+              break;
+            case CertType.TAG_RT:
+              ret.setRt(Long.parseLong(tagContent));
+              break;
+            case CertType.TAG_SN:
+              ret.setSn(tagContent);
+              break;
+            case CertType.TAG_TID:
+              ret.setTid(tagContent);
+              break;
+            case CertType.TAG_UID:
+              ret.setUid(Integer.parseInt(tagContent));
+              break;
+            case CertType.TAG_UPDATE:
+              ret.setUpdate(Long.parseLong(tagContent));
+              break;
             default:
-                break;
-            } // end switch (event)
-        } // end while
+              break;
+          } // end switch (reader.getLocalName())
+          break;
+        default:
+          break;
+      } // end switch (event)
+    } // end while
 
-        return null;
-    } // method retrieveNext
+    return null;
+  } // method retrieveNext
 
 }

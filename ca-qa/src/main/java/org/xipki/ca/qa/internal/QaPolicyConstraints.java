@@ -21,33 +21,34 @@ import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaPolicyConstraints extends QaExtension {
 
-    private final Integer requireExplicitPolicy;
+  private final Integer requireExplicitPolicy;
 
-    private final Integer inhibitPolicyMapping;
+  private final Integer inhibitPolicyMapping;
 
-    public QaPolicyConstraints(PolicyConstraints jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
-        if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
-            throw new IllegalArgumentException(
-                    "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
-        }
-
-        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
-        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
+  public QaPolicyConstraints(PolicyConstraints jaxb) {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
+      throw new IllegalArgumentException(
+          "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
     }
 
-    public Integer requireExplicitPolicy() {
-        return requireExplicitPolicy;
-    }
+    this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
+    this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
+  }
 
-    public Integer inhibitPolicyMapping() {
-        return inhibitPolicyMapping;
-    }
+  public Integer requireExplicitPolicy() {
+    return requireExplicitPolicy;
+  }
+
+  public Integer inhibitPolicyMapping() {
+    return inhibitPolicyMapping;
+  }
 
 }

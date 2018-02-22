@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -28,10 +29,10 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 @Service
 public class PermissionCompleter extends AbstractEnumCompleter {
 
-    private static final String tokens = "enroll_cert,revoke_cert,unrevoke_cert,remove_cert,"
-            + "key_update,gen_crl,get_crl,enroll_cross,all";
+  private static final String tokens = "enroll_cert,revoke_cert,unrevoke_cert,remove_cert,"
+      + "key_update,gen_crl,get_crl,enroll_cross,all";
 
-    public PermissionCompleter() {
-        setTokens(tokens);
-    }
+  public PermissionCompleter() {
+    setTokens(tokens);
+  }
 }

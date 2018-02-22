@@ -18,15 +18,16 @@
 package org.xipki.ocsp.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface Responder {
 
-    int maxRequestSize();
+  int maxRequestSize();
 
-    boolean supportsHttpGet();
+  boolean supportsHttpGet();
 
-    Long cacheMaxAge();
+  Long cacheMaxAge();
 }

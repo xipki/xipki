@@ -21,33 +21,34 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.scep.transaction.FailInfo;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class FailInfoException extends Exception {
 
-    public static final FailInfoException BAD_ALG = new FailInfoException(FailInfo.badAlg);
+  public static final FailInfoException BAD_ALG = new FailInfoException(FailInfo.badAlg);
 
-    public static final FailInfoException BAD_CERTID = new FailInfoException(FailInfo.badCertId);
+  public static final FailInfoException BAD_CERTID = new FailInfoException(FailInfo.badCertId);
 
-    public static final FailInfoException BAD_MESSAGE_CHECK
-            = new FailInfoException(FailInfo.badMessageCheck);
+  public static final FailInfoException BAD_MESSAGE_CHECK
+      = new FailInfoException(FailInfo.badMessageCheck);
 
-    public static final FailInfoException BAD_REQUEST = new FailInfoException(FailInfo.badRequest);
+  public static final FailInfoException BAD_REQUEST = new FailInfoException(FailInfo.badRequest);
 
-    public static final FailInfoException BAD_TIME = new FailInfoException(FailInfo.badTime);
+  public static final FailInfoException BAD_TIME = new FailInfoException(FailInfo.badTime);
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final FailInfo failInfo;
+  private final FailInfo failInfo;
 
-    private FailInfoException(FailInfo failInfo) {
-        this.failInfo = ParamUtil.requireNonNull("failInfo", failInfo);
-    }
+  private FailInfoException(FailInfo failInfo) {
+    this.failInfo = ParamUtil.requireNonNull("failInfo", failInfo);
+  }
 
-    public FailInfo failInfo() {
-        return failInfo;
-    }
+  public FailInfo failInfo() {
+    return failInfo;
+  }
 
 }

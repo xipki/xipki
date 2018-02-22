@@ -22,56 +22,57 @@ import javax.xml.stream.XMLStreamException;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class DbDataObject {
 
-    protected DbDataObject() {
+  protected DbDataObject() {
+  }
+
+  protected void assertNotBlank(String name, String value) throws InvalidDataObjectException {
+    if (StringUtil.isBlank(value)) {
+      throw new InvalidDataObjectException(name + " must not be blank");
+    }
+  }
+
+  protected void assertNotNull(String name, Object value) throws InvalidDataObjectException {
+    if (value == null) {
+      throw new InvalidDataObjectException(name + " must not be null");
+    }
+  }
+
+  protected static void writeIfNotNull(DbiXmlWriter writer, String tag, Object value)
+      throws XMLStreamException, InvalidDataObjectException {
+    if (value == null) {
+      return;
     }
 
-    protected void assertNotBlank(String name, String value) throws InvalidDataObjectException {
-        if (StringUtil.isBlank(value)) {
-            throw new InvalidDataObjectException(name + " must not be blank");
-        }
+    String valueS;
+    if (value instanceof String) {
+      valueS = (String) value;
+    } else if (value instanceof Number) {
+      valueS = value.toString();
+    } else if (value instanceof Boolean) {
+      valueS = value.toString();
+    } else {
+      throw new InvalidDataObjectException("value is not a String or Number");
     }
 
-    protected void assertNotNull(String name, Object value) throws InvalidDataObjectException {
-        if (value == null) {
-            throw new InvalidDataObjectException(name + " must not be null");
-        }
-    }
+    writer.writeElement(tag, valueS);
+  }
 
-    protected static void writeIfNotNull(DbiXmlWriter writer, String tag, Object value)
-            throws XMLStreamException, InvalidDataObjectException {
-        if (value == null) {
-            return;
-        }
+  public abstract void validate() throws InvalidDataObjectException;
 
-        String valueS;
-        if (value instanceof String) {
-            valueS = (String) value;
-        } else if (value instanceof Number) {
-            valueS = value.toString();
-        } else if (value instanceof Boolean) {
-            valueS = value.toString();
-        } else {
-            throw new InvalidDataObjectException("value is not a String or Number");
-        }
-
-        writer.writeElement(tag, valueS);
-    }
-
-    public abstract void validate() throws InvalidDataObjectException;
-
-    /**
-     *
-     * @param writer
-     *          Writer. Must not be {@code null}.
-     *
-     */
-    public abstract void writeTo(DbiXmlWriter writer)
-            throws InvalidDataObjectException, XMLStreamException;
+  /**
+   * TODO.
+   * @param writer
+   *          Writer. Must not be {@code null}.
+   *
+   */
+  public abstract void writeTo(DbiXmlWriter writer)
+      throws InvalidDataObjectException, XMLStreamException;
 
 }

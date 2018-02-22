@@ -44,151 +44,152 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public class HttpCmpServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
 
-    private static final String CT_REQUEST = "application/pkixcmp";
+  private static final String CT_REQUEST = "application/pkixcmp";
 
-    private static final String CT_RESPONSE = "application/pkixcmp";
+  private static final String CT_RESPONSE = "application/pkixcmp";
 
-    private CmpResponderManager responderManager;
+  private CmpResponderManager responderManager;
 
-    private AuditServiceRegister auditServiceRegister;
+  private AuditServiceRegister auditServiceRegister;
 
-    public HttpCmpServlet() {
+  public HttpCmpServlet() {
+  }
+
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    X509Certificate clientCert = ClientCertCache.getTlsClientCert(req);
+    AuditService auditService = auditServiceRegister.getAuditService();
+    AuditEvent event = new AuditEvent(new Date());
+    event.setApplicationName(CaAuditConstants.APPNAME);
+    event.setName(CaAuditConstants.NAME_PERF);
+    event.addEventData(CaAuditConstants.NAME_reqType, RequestType.CMP.name());
+
+    AuditLevel auditLevel = AuditLevel.INFO;
+    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
+    String auditMessage = null;
+    try {
+      if (responderManager == null) {
+        String message = "responderManager in servlet not configured";
+        LOG.error(message);
+        throw new HttpRespAuditException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            message, AuditLevel.ERROR, AuditStatus.FAILED);
+      }
+
+      String reqContentType = req.getHeader("Content-Type");
+      if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
+        String message = "unsupported media type " + reqContentType;
+        throw new HttpRespAuditException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+            message, AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      String caName = null;
+      X509CaCmpResponder responder = null;
+      String path = StringUtil.getRelativeRequestUri(
+          req.getServletPath(), req.getRequestURI());
+      if (path.length() > 1) {
+        // skip the first char which is always '/'
+        String caAlias = path.substring(1);
+        caName = responderManager.getCaNameForAlias(caAlias);
+        if (caName == null) {
+          caName = caAlias.toLowerCase();
+        }
+        responder = responderManager.getX509CaResponder(caName);
+      }
+
+      if (caName == null || responder == null || !responder.isOnService()) {
+        String message;
+        if (caName == null) {
+          message = "no CA is specified";
+        } else if (responder == null) {
+          message = "unknown CA '" + caName + "'";
+        } else {
+          message = "CA '" + caName + "' is out of service";
+        }
+        LOG.warn(message);
+        throw new HttpRespAuditException(HttpServletResponse.SC_NOT_FOUND, message,
+            AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      event.addEventData(CaAuditConstants.NAME_ca, responder.getCaName());
+
+      byte[] reqContent = IoUtil.read(req.getInputStream());
+      PKIMessage pkiReq;
+      try {
+        pkiReq = PKIMessage.getInstance(reqContent);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
+        throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST,
+            "bad request", AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, event);
+      byte[] encodedPkiResp = pkiResp.getEncoded();
+
+      resp.setContentType(CT_RESPONSE);
+      resp.setContentLength(encodedPkiResp.length);
+      resp.getOutputStream().write(encodedPkiResp);
+    } catch (HttpRespAuditException ex) {
+      auditStatus = ex.auditStatus();
+      auditLevel = ex.auditLevel();
+      auditMessage = ex.auditMessage();
+      sendError(resp, ex.httpStatus());
+    } catch (Throwable th) {
+      if (th instanceof EOFException) {
+        LogUtil.warn(LOG, th, "connection reset by peer");
+      } else {
+        LOG.error("Throwable thrown, this should not happen!", th);
+      }
+      auditLevel = AuditLevel.ERROR;
+      auditStatus = AuditStatus.FAILED;
+      auditMessage = "internal error";
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    } finally {
+      resp.flushBuffer();
+      audit(auditService, event, auditLevel, auditStatus, auditMessage);
+    }
+  } // method service
+
+  public void setResponderManager(CmpResponderManager responderManager) {
+    this.responderManager = responderManager;
+  }
+
+  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
+    this.auditServiceRegister = auditServiceRegister;
+  }
+
+  private static void audit(AuditService auditService, AuditEvent event,
+      AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
+    if (auditLevel != null) {
+      event.setLevel(auditLevel);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        X509Certificate clientCert = ClientCertCache.getTlsClientCert(req);
-        AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent event = new AuditEvent(new Date());
-        event.setApplicationName(CaAuditConstants.APPNAME);
-        event.setName(CaAuditConstants.NAME_PERF);
-        event.addEventData(CaAuditConstants.NAME_reqType, RequestType.CMP.name());
-
-        AuditLevel auditLevel = AuditLevel.INFO;
-        AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
-        String auditMessage = null;
-        try {
-            if (responderManager == null) {
-                String message = "responderManager in servlet not configured";
-                LOG.error(message);
-                throw new HttpRespAuditException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        message, AuditLevel.ERROR, AuditStatus.FAILED);
-            }
-
-            String reqContentType = req.getHeader("Content-Type");
-            if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
-                String message = "unsupported media type " + reqContentType;
-                throw new HttpRespAuditException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-                        message, AuditLevel.INFO, AuditStatus.FAILED);
-            }
-
-            String caName = null;
-            X509CaCmpResponder responder = null;
-            String path = StringUtil.getRelativeRequestUri(
-                    req.getServletPath(), req.getRequestURI());
-            if (path.length() > 1) {
-                // skip the first char which is always '/'
-                String caAlias = path.substring(1);
-                caName = responderManager.getCaNameForAlias(caAlias);
-                if (caName == null) {
-                    caName = caAlias.toLowerCase();
-                }
-                responder = responderManager.getX509CaResponder(caName);
-            }
-
-            if (caName == null || responder == null || !responder.isOnService()) {
-                String message;
-                if (caName == null) {
-                    message = "no CA is specified";
-                } else if (responder == null) {
-                    message = "unknown CA '" + caName + "'";
-                } else {
-                    message = "CA '" + caName + "' is out of service";
-                }
-                LOG.warn(message);
-                throw new HttpRespAuditException(HttpServletResponse.SC_NOT_FOUND, message,
-                        AuditLevel.INFO, AuditStatus.FAILED);
-            }
-
-            event.addEventData(CaAuditConstants.NAME_ca, responder.getCaName());
-
-            byte[] reqContent = IoUtil.read(req.getInputStream());
-            PKIMessage pkiReq;
-            try {
-                pkiReq = PKIMessage.getInstance(reqContent);
-            } catch (Exception ex) {
-                LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
-                throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST,
-                        "bad request", AuditLevel.INFO, AuditStatus.FAILED);
-            }
-
-            PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, event);
-            byte[] encodedPkiResp = pkiResp.getEncoded();
-
-            resp.setContentType(CT_RESPONSE);
-            resp.setContentLength(encodedPkiResp.length);
-            resp.getOutputStream().write(encodedPkiResp);
-        } catch (HttpRespAuditException ex) {
-            auditStatus = ex.auditStatus();
-            auditLevel = ex.auditLevel();
-            auditMessage = ex.auditMessage();
-            sendError(resp, ex.httpStatus());
-        } catch (Throwable th) {
-            if (th instanceof EOFException) {
-                LogUtil.warn(LOG, th, "connection reset by peer");
-            } else {
-                LOG.error("Throwable thrown, this should not happen!", th);
-            }
-            auditLevel = AuditLevel.ERROR;
-            auditStatus = AuditStatus.FAILED;
-            auditMessage = "internal error";
-            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            resp.flushBuffer();
-            audit(auditService, event, auditLevel, auditStatus, auditMessage);
-        }
-    } // method service
-
-    public void setResponderManager(CmpResponderManager responderManager) {
-        this.responderManager = responderManager;
+    if (auditStatus != null) {
+      event.setStatus(auditStatus);
     }
 
-    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
+    if (auditMessage != null) {
+      event.addEventData(CaAuditConstants.NAME_message, auditMessage);
     }
 
-    private static void audit(AuditService auditService, AuditEvent event,
-            AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
-        if (auditLevel != null) {
-            event.setLevel(auditLevel);
-        }
+    event.finish();
+    auditService.logEvent(event);
+  } // method audit
 
-        if (auditStatus != null) {
-            event.setStatus(auditStatus);
-        }
-
-        if (auditMessage != null) {
-            event.addEventData(CaAuditConstants.NAME_message, auditMessage);
-        }
-
-        event.finish();
-        auditService.logEvent(event);
-    } // method audit
-
-    private static void sendError(HttpServletResponse resp, int status) {
-        resp.setStatus(status);
-        resp.setContentLength(0);
-    }
+  private static void sendError(HttpServletResponse resp, int status) {
+    resp.setStatus(status);
+    resp.setContentLength(0);
+  }
 
 }

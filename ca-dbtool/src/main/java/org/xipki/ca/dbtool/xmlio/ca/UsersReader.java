@@ -27,77 +27,78 @@ import org.xipki.ca.dbtool.xmlio.DbiXmlReader;
 import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class UsersReader extends DbiXmlReader {
 
-    public UsersReader(InputStream xmlStream)
-            throws XMLStreamException, InvalidDataObjectException {
-        super(UserType.TAG_PARENT, xmlStream);
-    }
+  public UsersReader(InputStream xmlStream)
+      throws XMLStreamException, InvalidDataObjectException {
+    super(UserType.TAG_PARENT, xmlStream);
+  }
 
-    @Override
-    protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
-        UserType ret = null;
-        StringBuilder buffer = new StringBuilder();
-        int lastEvent = -1;
+  @Override
+  protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
+    UserType ret = null;
+    StringBuilder buffer = new StringBuilder();
+    int lastEvent = -1;
 
-        while (reader.hasNext()) {
-            int event = reader.next();
-            String tagContent = null;
+    while (reader.hasNext()) {
+      int event = reader.next();
+      String tagContent = null;
 
-            if (event != XMLStreamConstants.CHARACTERS) {
-                tagContent = buffer.toString();
+      if (event != XMLStreamConstants.CHARACTERS) {
+        tagContent = buffer.toString();
 
-                if (lastEvent == XMLStreamConstants.CHARACTERS) {
-                    buffer.delete(0, buffer.length());
-                }
-            }
+        if (lastEvent == XMLStreamConstants.CHARACTERS) {
+          buffer.delete(0, buffer.length());
+        }
+      }
 
-            lastEvent = event;
+      lastEvent = event;
 
-            switch (event) {
-            case XMLStreamConstants.START_ELEMENT:
-                if (UserType.TAG_ROOT.equals(reader.getLocalName())) {
-                    ret = new UserType();
-                }
-                break;
-            case XMLStreamConstants.CHARACTERS:
-                buffer.append(reader.getText());
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                if (ret == null) {
-                    break;
-                }
+      switch (event) {
+        case XMLStreamConstants.START_ELEMENT:
+          if (UserType.TAG_ROOT.equals(reader.getLocalName())) {
+            ret = new UserType();
+          }
+          break;
+        case XMLStreamConstants.CHARACTERS:
+          buffer.append(reader.getText());
+          break;
+        case XMLStreamConstants.END_ELEMENT:
+          if (ret == null) {
+            break;
+          }
 
-                switch (reader.getLocalName()) {
-                case UserType.TAG_ROOT:
-                    ret.validate();
-                    return ret;
-                case UserType.TAG_ID:
-                    ret.setId(Long.parseLong(tagContent));
-                    break;
-                case UserType.TAG_NAME:
-                    ret.setName(tagContent);
-                    break;
-                case UserType.TAG_ACTIVE:
-                    ret.setActive(Boolean.parseBoolean(tagContent));
-                    break;
-                case UserType.TAG_PASSWORD:
-                    ret.setPassword(tagContent);
-                    break;
-                default:
-                    break;
-                } // end switch (reader.getLocalName())
-                break;
+          switch (reader.getLocalName()) {
+            case UserType.TAG_ROOT:
+              ret.validate();
+              return ret;
+            case UserType.TAG_ID:
+              ret.setId(Long.parseLong(tagContent));
+              break;
+            case UserType.TAG_NAME:
+              ret.setName(tagContent);
+              break;
+            case UserType.TAG_ACTIVE:
+              ret.setActive(Boolean.parseBoolean(tagContent));
+              break;
+            case UserType.TAG_PASSWORD:
+              ret.setPassword(tagContent);
+              break;
             default:
-                break;
-            } // end switch (event)
-        } // end while
+              break;
+          } // end switch (reader.getLocalName())
+          break;
+        default:
+          break;
+      } // end switch (event)
+    } // end while
 
-        return null;
-    } // method retrieveNext
+    return null;
+  } // method retrieveNext
 
 }

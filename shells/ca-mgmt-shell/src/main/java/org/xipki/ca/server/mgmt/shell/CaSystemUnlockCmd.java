@@ -22,26 +22,27 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "unlock",
-        description = "unlock CA system")
+    description = "unlock CA system")
 @Service
 public class CaSystemUnlockCmd extends CaAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean unlocked = caManager.unlockCa();
+  @Override
+  protected Object execute0() throws Exception {
+    boolean unlocked = caManager.unlockCa();
 
-        if (unlocked) {
-            println("unlocked CA system, calling ca:restart to restart CA system");
-        } else {
-            throw new CmdFailure("could not unlock CA system");
-        }
-
-        return null;
+    if (unlocked) {
+      println("unlocked CA system, calling ca:restart to restart CA system");
+    } else {
+      throw new CmdFailure("could not unlock CA system");
     }
+
+    return null;
+  }
 
 }

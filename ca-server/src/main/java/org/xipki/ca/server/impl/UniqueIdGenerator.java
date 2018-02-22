@@ -23,6 +23,8 @@ import java.util.function.IntBinaryOperator;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * Unique Identifier Generator.
+ * <p/>
  * An id consists of
  * <ol>
  *  <li>highest bit is set to 0 to assure positive long.
@@ -30,7 +32,7 @@ import org.xipki.common.util.ParamUtil;
  *  <li>offset: 10 bits
  *  <li>shard_id: 7 bits
  * </ol>
- *
+ * <p/>
  * Idea is borrowed from http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
  * @author Lijun Liao
  * @since 2.0.0
@@ -39,42 +41,42 @@ import org.xipki.common.util.ParamUtil;
 
 public class UniqueIdGenerator {
 
-    private static class OffsetIncrement implements IntBinaryOperator {
+  private static class OffsetIncrement implements IntBinaryOperator {
 
-        @Override
-        public int applyAsInt(int left, int right) {
-            return (left >= right) ? 0 : left + 1;
-        }
-
+    @Override
+    public int applyAsInt(int left, int right) {
+      return (left >= right) ? 0 : left + 1;
     }
 
-    // maximal 10 bits
-    private static final int MAX_OFFSET = 0x3FF;
+  }
 
-    private final long epoch; // in milliseconds
+  // maximal 10 bits
+  private static final int MAX_OFFSET = 0x3FF;
 
-    private final int shardId; // 7 bits
+  private final long epoch; // in milliseconds
 
-    private final AtomicInteger offset = new AtomicInteger(0);
+  private final int shardId; // 7 bits
 
-    private final IntBinaryOperator accumulatorFunction;
+  private final AtomicInteger offset = new AtomicInteger(0);
 
-    public UniqueIdGenerator(long epoch, int shardId) {
-        this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
-        this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 127);
-        this.accumulatorFunction = new OffsetIncrement();
-    }
+  private final IntBinaryOperator accumulatorFunction;
 
-    public long nextId() {
-        long now = System.currentTimeMillis();
-        long ret = now - epoch;
-        ret <<= 10;
+  public UniqueIdGenerator(long epoch, int shardId) {
+    this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
+    this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 127);
+    this.accumulatorFunction = new OffsetIncrement();
+  }
 
-        ret += offset.getAndAccumulate(MAX_OFFSET, accumulatorFunction);
-        ret <<= 7;
+  public long nextId() {
+    long now = System.currentTimeMillis();
+    long ret = now - epoch;
+    ret <<= 10;
 
-        ret += shardId;
-        return ret;
-    }
+    ret += offset.getAndAccumulate(MAX_OFFSET, accumulatorFunction);
+    ret <<= 7;
+
+    ret += shardId;
+    return ret;
+  }
 
 }

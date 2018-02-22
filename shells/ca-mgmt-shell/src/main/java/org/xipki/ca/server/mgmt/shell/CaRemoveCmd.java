@@ -24,25 +24,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "ca-rm",
-        description = "remove CA")
+    description = "remove CA")
 @Service
 public class CaRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "CA name")
-    @Completion(CaNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", required = true,
+      description = "CA name")
+  @Completion(CaNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeCa(name);
-        output(bo, "removed", "could not remove", "CA " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeCa(name);
+    output(bo, "removed", "could not remove", "CA " + name);
+    return null;
+  }
 
 }

@@ -20,55 +20,56 @@ package org.xipki.ca.api.profile;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class Range {
 
-    private Integer min;
+  private Integer min;
 
-    private Integer max;
+  private Integer max;
 
-    public Range(Integer min, Integer max) {
-        setRange(min, max);
+  public Range(Integer min, Integer max) {
+    setRange(min, max);
+  }
+
+  public Integer min() {
+    return min;
+  }
+
+  public Integer max() {
+    return max;
+  }
+
+  public void setRange(Integer min, Integer max) {
+    if (min == null && max == null) {
+      throw new IllegalArgumentException("min and max must not be both null");
+    }
+    if (min != null && max != null && min > max) {
+      throw new IllegalArgumentException(String.format(
+          "min must not be greater than max: %d > %d", min, max));
+    }
+    this.min = min;
+    this.max = max;
+  }
+
+  public boolean match(int val) {
+    if (min != null && val < min) {
+      return false;
+    }
+    if (max != null && val > max) {
+      return false;
     }
 
-    public Integer min() {
-        return min;
-    }
+    return true;
+  }
 
-    public Integer max() {
-        return max;
-    }
-
-    public void setRange(Integer min, Integer max) {
-        if (min == null && max == null) {
-            throw new IllegalArgumentException("min and max must not be both null");
-        }
-        if (min != null && max != null && min > max) {
-            throw new IllegalArgumentException(String.format(
-                    "min must not be greater than max: %d > %d", min, max));
-        }
-        this.min = min;
-        this.max = max;
-    }
-
-    public boolean match(int val) {
-        if (min != null && val < min) {
-            return false;
-        }
-        if (max != null && val > max) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjects("[", (min == null ? "" : min), ",",
-                (max == null ? "" : max), "]");
-    }
+  @Override
+  public String toString() {
+    return StringUtil.concatObjects("[", (min == null ? "" : min), ",",
+        (max == null ? "" : max), "]");
+  }
 
 }

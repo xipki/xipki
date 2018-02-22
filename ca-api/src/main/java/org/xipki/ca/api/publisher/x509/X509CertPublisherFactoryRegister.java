@@ -20,20 +20,21 @@ package org.xipki.ca.api.publisher.x509;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public interface X509CertPublisherFactoryRegister {
 
-    /**
-     *
-     * @param type
-     *          Type of the publisher. Must not be {@code null}.
-     * @return new publisher.
-     * @throws ObjectCreationException
-     *           if publisher could not be created.
-     */
-    X509CertPublisher newPublisher(String type) throws ObjectCreationException;
+  /**
+   * TODO.
+   * @param type
+   *          Type of the publisher. Must not be {@code null}.
+   * @return new publisher.
+   * @throws ObjectCreationException
+   *           if publisher could not be created.
+   */
+  X509CertPublisher newPublisher(String type) throws ObjectCreationException;
 
 }

@@ -18,33 +18,34 @@
 package org.xipki.ca.server.mgmt.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum CertArt {
 
-    X509PKC(1),
-    X509AC(2),
-    CVC(3);
+  X509PKC(1),
+  X509AC(2),
+  CVC(3);
 
-    private final int code;
+  private final int code;
 
-    CertArt(int code) {
-        this.code = code;
+  CertArt(int code) {
+    this.code = code;
+  }
+
+  public int code() {
+    return code;
+  }
+
+  public static CertArt forValue(int code) {
+    for (CertArt value : values()) {
+      if (value.code == code) {
+        return value;
+      }
     }
-
-    public int code() {
-        return code;
-    }
-
-    public static CertArt forValue(int code) {
-        for (CertArt value : values()) {
-            if (value.code == code) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("invalid CertArt " + code);
-    }
+    throw new IllegalArgumentException("invalid CertArt " + code);
+  }
 
 }

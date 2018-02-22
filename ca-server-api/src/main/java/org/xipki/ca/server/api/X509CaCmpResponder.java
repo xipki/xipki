@@ -24,19 +24,20 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.common.HealthCheckResult;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public interface X509CaCmpResponder {
 
-    boolean isOnService();
+  boolean isOnService();
 
-    HealthCheckResult healthCheck();
+  HealthCheckResult healthCheck();
 
-    PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
-            AuditEvent event);
+  PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
+      AuditEvent event);
 
-    String getCaName();
+  String getCaName();
 
 }

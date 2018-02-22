@@ -27,103 +27,104 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaHasRequestorEntry {
 
-    private final NameId requestorIdent;
+  private final NameId requestorIdent;
 
-    private boolean ra;
+  private boolean ra;
 
-    private int permission;
+  private int permission;
 
-    private Set<String> profiles;
+  private Set<String> profiles;
 
-    public CaHasRequestorEntry(NameId requestorIdent) {
-        this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
+  public CaHasRequestorEntry(NameId requestorIdent) {
+    this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
+  }
+
+  public boolean ra() {
+    return ra;
+  }
+
+  public void setRa(boolean ra) {
+    this.ra = ra;
+  }
+
+  public int permission() {
+    return permission;
+  }
+
+  public void setPermission(int permission) {
+    this.permission = permission;
+  }
+
+  public NameId requestorIdent() {
+    return requestorIdent;
+  }
+
+  public void setProfiles(Set<String> profiles) {
+    if (CollectionUtil.isEmpty(profiles)) {
+      this.profiles = Collections.emptySet();
+    } else {
+      this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toLowerCaseSet(profiles));
+    }
+  }
+
+  public Set<String> profiles() {
+    return profiles;
+  }
+
+  public boolean isCertProfilePermitted(String certprofile) {
+    if (CollectionUtil.isEmpty(profiles)) {
+      return false;
     }
 
-    public boolean ra() {
-        return ra;
+    return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
+  }
+
+  public boolean isPermitted(int permission) {
+    return PermissionConstants.contains(this.permission, permission);
+  }
+
+  @Override
+  public String toString() {
+    return StringUtil.concatObjectsCap(200, "requestor: ", requestorIdent,
+        "\nra: ", ra,  "\nprofiles: ", profiles, "\npermission: ", permission);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CaHasRequestorEntry)) {
+      return false;
     }
 
-    public void setRa(boolean ra) {
-        this.ra = ra;
+    CaHasRequestorEntry objB = (CaHasRequestorEntry) obj;
+    if (ra != objB.ra) {
+      return false;
     }
 
-    public int permission() {
-        return permission;
+    if (!requestorIdent.equals(objB.requestorIdent)) {
+      return false;
     }
 
-    public void setPermission(int permission) {
-        this.permission = permission;
+    if (permission != objB.permission) {
+      return false;
     }
 
-    public NameId requestorIdent() {
-        return requestorIdent;
+    if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
+      return false;
     }
 
-    public void setProfiles(Set<String> profiles) {
-        if (CollectionUtil.isEmpty(profiles)) {
-            this.profiles = Collections.emptySet();
-        } else {
-            this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toLowerCaseSet(profiles));
-        }
-    }
+    return true;
+  }
 
-    public Set<String> profiles() {
-        return profiles;
-    }
-
-    public boolean isCertProfilePermitted(String certprofile) {
-        if (CollectionUtil.isEmpty(profiles)) {
-            return false;
-        }
-
-        return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
-    }
-
-    public boolean isPermitted(int permission) {
-        return PermissionConstants.contains(this.permission, permission);
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjectsCap(200, "requestor: ", requestorIdent,
-                "\nra: ", ra,  "\nprofiles: ", profiles, "\npermission: ", permission);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CaHasRequestorEntry)) {
-            return false;
-        }
-
-        CaHasRequestorEntry objB = (CaHasRequestorEntry) obj;
-        if (ra != objB.ra) {
-            return false;
-        }
-
-        if (!requestorIdent.equals(objB.requestorIdent)) {
-            return false;
-        }
-
-        if (permission != objB.permission) {
-            return false;
-        }
-
-        if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return requestorIdent.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return requestorIdent.hashCode();
+  }
 
 }

@@ -25,136 +25,137 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class OcspStore {
 
-    protected static final long DAY = 24L * 60 * 60 * 1000;
+  protected static final long DAY = 24L * 60 * 60 * 1000;
 
-    protected String name;
+  protected String name;
 
-    protected boolean unknownSerialAsGood;
+  protected boolean unknownSerialAsGood;
 
-    protected int retentionInterval;
+  protected int retentionInterval;
 
-    protected boolean includeArchiveCutoff;
+  protected boolean includeArchiveCutoff;
 
-    protected boolean includeCrlId;
+  protected boolean includeCrlId;
 
-    protected boolean ignoreExpiredCert;
+  protected boolean ignoreExpiredCert;
 
-    protected boolean ignoreNotYetValidCert;
+  protected boolean ignoreNotYetValidCert;
 
-    public OcspStore() {
-    }
+  public OcspStore() {
+  }
 
-    /**
-     *
-     * @param reqIssuer
-     *          Requested issuer
-     * @return whether this OCSP store knows the given issuer.
-     */
-    public abstract boolean knowsIssuer(RequestIssuer reqIssuer);
+  /**
+   * TODO.
+   * @param reqIssuer
+   *          Requested issuer
+   * @return whether this OCSP store knows the given issuer.
+   */
+  public abstract boolean knowsIssuer(RequestIssuer reqIssuer);
 
-    /**
-     *
-     * @param reqIssuer
-     *          Requested issuer
-     * @return the certificate of the given issuer.
-     */
-    public abstract X509Certificate getIssuerCert(RequestIssuer reqIssuer);
+  /**
+   * TODO.
+   * @param reqIssuer
+   *          Requested issuer
+   * @return the certificate of the given issuer.
+   */
+  public abstract X509Certificate getIssuerCert(RequestIssuer reqIssuer);
 
-    /**
-     *
-     * @param time
-     *          Time of the certificate status. Must not be {@code null}.
-     * @param reqIssuer
-     *          Requested issuer
-     * @param serialNumber
-     *          Serial number of the target certificate. Must not be {@code null}.
-     * @param includeCertHash
-     *          Whether to include the hash of target certificate in the response.
-     * @param includeRit
-     *          Whether to include the revocation invalidity time in the response.
-     * @param inheritCaRevocation
-     *          Whether to inherit CA revocation
-     * @return the certificate status.
-     */
-    public abstract CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
-            BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-            boolean inheritCaRevocation)
-            throws OcspStoreException;
+  /**
+   * TODO.
+   * @param time
+   *          Time of the certificate status. Must not be {@code null}.
+   * @param reqIssuer
+   *          Requested issuer
+   * @param serialNumber
+   *          Serial number of the target certificate. Must not be {@code null}.
+   * @param includeCertHash
+   *          Whether to include the hash of target certificate in the response.
+   * @param includeRit
+   *          Whether to include the revocation invalidity time in the response.
+   * @param inheritCaRevocation
+   *          Whether to inherit CA revocation
+   * @return the certificate status.
+   */
+  public abstract CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
+      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
+      boolean inheritCaRevocation)
+      throws OcspStoreException;
 
-    /**
-     *
-     * @param conf
-     *          Configuration. Could be {@code null}.
-     * @param datasource
-     *          Datasource. Could be {@code null}.
-     */
-    public abstract void init(String conf, DataSourceWrapper datasource)
-            throws OcspStoreException;
+  /**
+   * TODO.
+   * @param conf
+   *          Configuration. Could be {@code null}.
+   * @param datasource
+   *          Datasource. Could be {@code null}.
+   */
+  public abstract void init(String conf, DataSourceWrapper datasource)
+      throws OcspStoreException;
 
-    public abstract void shutdown() throws OcspStoreException;
+  public abstract void shutdown() throws OcspStoreException;
 
-    public abstract boolean isHealthy();
+  public abstract boolean isHealthy();
 
-    public void setName(String name) {
-        this.name = ParamUtil.requireNonBlank("name", name);
-    }
+  public void setName(String name) {
+    this.name = ParamUtil.requireNonBlank("name", name);
+  }
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    public boolean isUnknownSerialAsGood() {
-        return unknownSerialAsGood;
-    }
+  public boolean isUnknownSerialAsGood() {
+    return unknownSerialAsGood;
+  }
 
-    public void setUnknownSerialAsGood(boolean unknownSerialAsGood) {
-        this.unknownSerialAsGood = unknownSerialAsGood;
-    }
+  public void setUnknownSerialAsGood(boolean unknownSerialAsGood) {
+    this.unknownSerialAsGood = unknownSerialAsGood;
+  }
 
-    public boolean isIncludeArchiveCutoff() {
-        return includeArchiveCutoff;
-    }
+  public boolean isIncludeArchiveCutoff() {
+    return includeArchiveCutoff;
+  }
 
-    public void setIncludeArchiveCutoff(boolean includeArchiveCutoff) {
-        this.includeArchiveCutoff = includeArchiveCutoff;
-    }
+  public void setIncludeArchiveCutoff(boolean includeArchiveCutoff) {
+    this.includeArchiveCutoff = includeArchiveCutoff;
+  }
 
-    public int retentionInterval() {
-        return retentionInterval;
-    }
+  public int retentionInterval() {
+    return retentionInterval;
+  }
 
-    public void setRetentionInterval(int retentionInterval) {
-        this.retentionInterval = retentionInterval;
-    }
+  public void setRetentionInterval(int retentionInterval) {
+    this.retentionInterval = retentionInterval;
+  }
 
-    public boolean isIncludeCrlId() {
-        return includeCrlId;
-    }
+  public boolean isIncludeCrlId() {
+    return includeCrlId;
+  }
 
-    public void setIncludeCrlId(boolean includeCrlId) {
-        this.includeCrlId = includeCrlId;
-    }
+  public void setIncludeCrlId(boolean includeCrlId) {
+    this.includeCrlId = includeCrlId;
+  }
 
-    public boolean isIgnoreExpiredCert() {
-        return ignoreExpiredCert;
-    }
+  public boolean isIgnoreExpiredCert() {
+    return ignoreExpiredCert;
+  }
 
-    public void setIgnoreExpiredCert(boolean ignoreExpiredCert) {
-        this.ignoreExpiredCert = ignoreExpiredCert;
-    }
+  public void setIgnoreExpiredCert(boolean ignoreExpiredCert) {
+    this.ignoreExpiredCert = ignoreExpiredCert;
+  }
 
-    public boolean isIgnoreNotYetValidCert() {
-        return ignoreNotYetValidCert;
-    }
+  public boolean isIgnoreNotYetValidCert() {
+    return ignoreNotYetValidCert;
+  }
 
-    public void setIgnoreNotYetValidCert(boolean ignoreNotYetValidCert) {
-        this.ignoreNotYetValidCert = ignoreNotYetValidCert;
-    }
+  public void setIgnoreNotYetValidCert(boolean ignoreNotYetValidCert) {
+    this.ignoreNotYetValidCert = ignoreNotYetValidCert;
+  }
 
 }

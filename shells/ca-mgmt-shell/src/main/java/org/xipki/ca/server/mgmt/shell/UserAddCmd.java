@@ -24,36 +24,37 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "user-add",
-        description = "add user")
+    description = "add user")
 @Service
 public class UserAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "user Name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "user Name\n(required)")
+  private String name;
 
-    @Option(name = "--password",
-            description = "user password")
-    private String password;
+  @Option(name = "--password",
+      description = "user password")
+  private String password;
 
-    @Option(name = "--inactive",
-            description = "do not activate this user")
-    private Boolean inactive = Boolean.FALSE;
+  @Option(name = "--inactive",
+      description = "do not activate this user")
+  private Boolean inactive = Boolean.FALSE;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (password == null) {
-            password = new String(readPassword());
-        }
-        AddUserEntry userEntry = new AddUserEntry(new NameId(null, name), !inactive, password);
-        boolean bo = caManager.addUser(userEntry);
-        output(bo, "added", "could not add", "user " + name);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (password == null) {
+      password = new String(readPassword());
     }
+    AddUserEntry userEntry = new AddUserEntry(new NameId(null, name), !inactive, password);
+    boolean bo = caManager.addUser(userEntry);
+    output(bo, "added", "could not add", "user " + name);
+    return null;
+  }
 
 }

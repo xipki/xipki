@@ -26,97 +26,98 @@ import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509ChangeCaEntry extends ChangeCaEntry {
 
-    private List<String> crlUris;
+  private List<String> crlUris;
 
-    private List<String> deltaCrlUris;
+  private List<String> deltaCrlUris;
 
-    private List<String> ocspUris;
+  private List<String> ocspUris;
 
-    private List<String> caCertUris;
+  private List<String> caCertUris;
 
-    private X509Certificate cert;
+  private X509Certificate cert;
 
-    private String crlSignerName;
+  private String crlSignerName;
 
-    private Integer numCrls;
+  private Integer numCrls;
 
-    private Integer serialNoBitLen;
+  private Integer serialNoBitLen;
 
-    public X509ChangeCaEntry(NameId ident) throws CaMgmtException {
-        super(ident);
+  public X509ChangeCaEntry(NameId ident) throws CaMgmtException {
+    super(ident);
+  }
+
+  public Integer serialNoBitLen() {
+    return serialNoBitLen;
+  }
+
+  public void setSerialNoBitLen(Integer serialNoBitLen) {
+    if (serialNoBitLen != null) {
+      ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
     }
+    this.serialNoBitLen = serialNoBitLen;
+  }
 
-    public Integer serialNoBitLen() {
-        return serialNoBitLen;
-    }
+  public List<String> crlUris() {
+    return crlUris;
+  }
 
-    public void setSerialNoBitLen(Integer serialNoBitLen) {
-        if (serialNoBitLen != null) {
-            ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
-        }
-        this.serialNoBitLen = serialNoBitLen;
-    }
+  public void setCrlUris(List<String> crlUris) {
+    this.crlUris = crlUris;
+  }
 
-    public List<String> crlUris() {
-        return crlUris;
-    }
+  public List<String> deltaCrlUris() {
+    return deltaCrlUris;
+  }
 
-    public void setCrlUris(List<String> crlUris) {
-        this.crlUris = crlUris;
-    }
+  public void setDeltaCrlUris(List<String> deltaCrlUris) {
+    this.deltaCrlUris = deltaCrlUris;
+  }
 
-    public List<String> deltaCrlUris() {
-        return deltaCrlUris;
-    }
+  public List<String> ocspUris() {
+    return ocspUris;
+  }
 
-    public void setDeltaCrlUris(List<String> deltaCrlUris) {
-        this.deltaCrlUris = deltaCrlUris;
-    }
+  public void setOcspUris(List<String> ocspUris) {
+    this.ocspUris = ocspUris;
+  }
 
-    public List<String> ocspUris() {
-        return ocspUris;
-    }
+  public List<String> caCertUris() {
+    return caCertUris;
+  }
 
-    public void setOcspUris(List<String> ocspUris) {
-        this.ocspUris = ocspUris;
-    }
+  public void setCaCertUris(List<String> caCertUris) {
+    this.caCertUris = caCertUris;
+  }
 
-    public List<String> caCertUris() {
-        return caCertUris;
-    }
+  public X509Certificate cert() {
+    return cert;
+  }
 
-    public void setCaCertUris(List<String> caCertUris) {
-        this.caCertUris = caCertUris;
-    }
+  public void setCert(X509Certificate cert) {
+    this.cert = cert;
+  }
 
-    public X509Certificate cert() {
-        return cert;
-    }
+  public String crlSignerName() {
+    return crlSignerName;
+  }
 
-    public void setCert(X509Certificate cert) {
-        this.cert = cert;
-    }
+  public void setCrlSignerName(String crlSignerName) {
+    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
+  }
 
-    public String crlSignerName() {
-        return crlSignerName;
-    }
+  public Integer numCrls() {
+    return numCrls;
+  }
 
-    public void setCrlSignerName(String crlSignerName) {
-        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
-    }
-
-    public Integer numCrls() {
-        return numCrls;
-    }
-
-    public void setNumCrls(Integer numCrls) {
-        this.numCrls = numCrls;
-    }
+  public void setNumCrls(Integer numCrls) {
+    this.numCrls = numCrls;
+  }
 
 }

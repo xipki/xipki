@@ -22,56 +22,57 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public class HttpRespAuditException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final int httpStatus;
+  private final int httpStatus;
 
-    private final String httpErrorMessage;
+  private final String httpErrorMessage;
 
-    private final String auditMessage;
+  private final String auditMessage;
 
-    private final AuditLevel auditLevel;
+  private final AuditLevel auditLevel;
 
-    private AuditStatus auditStatus;
+  private AuditStatus auditStatus;
 
-    public HttpRespAuditException(int httpStatus, String auditMessage,
-            AuditLevel auditLevel, AuditStatus auditStatus) {
-        this(httpStatus, null, auditMessage, auditLevel, auditStatus);
-    }
+  public HttpRespAuditException(int httpStatus, String auditMessage,
+      AuditLevel auditLevel, AuditStatus auditStatus) {
+    this(httpStatus, null, auditMessage, auditLevel, auditStatus);
+  }
 
-    public HttpRespAuditException(int httpStatus, String httpErrorMessage,
-            String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
-        this.httpStatus = httpStatus;
-        this.httpErrorMessage = httpErrorMessage;
-        this.auditMessage = ParamUtil.requireNonBlank("auditMessage", auditMessage);
-        this.auditLevel = ParamUtil.requireNonNull("auditLevel", auditLevel);
-        this.auditStatus = ParamUtil.requireNonNull("auditStatus", auditStatus);
-    }
+  public HttpRespAuditException(int httpStatus, String httpErrorMessage,
+      String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
+    this.httpStatus = httpStatus;
+    this.httpErrorMessage = httpErrorMessage;
+    this.auditMessage = ParamUtil.requireNonBlank("auditMessage", auditMessage);
+    this.auditLevel = ParamUtil.requireNonNull("auditLevel", auditLevel);
+    this.auditStatus = ParamUtil.requireNonNull("auditStatus", auditStatus);
+  }
 
-    public int httpStatus() {
-        return httpStatus;
-    }
+  public int httpStatus() {
+    return httpStatus;
+  }
 
-    public String httpErrorMessage() {
-        return httpErrorMessage;
-    }
+  public String httpErrorMessage() {
+    return httpErrorMessage;
+  }
 
-    public String auditMessage() {
-        return auditMessage;
-    }
+  public String auditMessage() {
+    return auditMessage;
+  }
 
-    public AuditLevel auditLevel() {
-        return auditLevel;
-    }
+  public AuditLevel auditLevel() {
+    return auditLevel;
+  }
 
-    public AuditStatus auditStatus() {
-        return auditStatus;
-    }
+  public AuditStatus auditStatus() {
+    return auditStatus;
+  }
 
 }

@@ -25,60 +25,61 @@ import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class NameIdStore {
 
-    private final String table;
+  private final String table;
 
-    private final Map<String, Integer> entries;
+  private final Map<String, Integer> entries;
 
-    NameIdStore(String table, Map<String, Integer> entries) {
-        this.table = ParamUtil.requireNonNull("table", table);
-        this.entries = new HashMap<>();
+  NameIdStore(String table, Map<String, Integer> entries) {
+    this.table = ParamUtil.requireNonNull("table", table);
+    this.entries = new HashMap<>();
 
-        if (CollectionUtil.isNonEmpty(entries)) {
-            for (String name : entries.keySet()) {
-                addEntry(name, entries.get(name));
-            }
-        }
+    if (CollectionUtil.isNonEmpty(entries)) {
+      for (String name : entries.keySet()) {
+        addEntry(name, entries.get(name));
+      }
+    }
+  }
+
+  void addEntry(String name, Integer id) {
+    ParamUtil.requireNonBlank("name", name);
+    ParamUtil.requireNonNull("id", id);
+
+    if (entries.containsKey(name)) {
+      throw new IllegalArgumentException(
+          "entry with the same name " + name + " already available");
     }
 
-    void addEntry(String name, Integer id) {
-        ParamUtil.requireNonBlank("name", name);
-        ParamUtil.requireNonNull("id", id);
-
-        if (entries.containsKey(name)) {
-            throw new IllegalArgumentException(
-                    "entry with the same name " + name + " already available");
-        }
-
-        if (entries.containsValue(id)) {
-            throw new IllegalArgumentException(
-                    "entry with the same id " + id + " already available");
-        }
-
-        entries.put(name, id);
+    if (entries.containsValue(id)) {
+      throw new IllegalArgumentException(
+          "entry with the same id " + id + " already available");
     }
 
-    String getName(Integer id) {
-        for (String name : entries.keySet()) {
-            if (CompareUtil.equalsObject(id, entries.get(name))) {
-                return name;
-            }
-        }
+    entries.put(name, id);
+  }
 
-        return null;
+  String getName(Integer id) {
+    for (String name : entries.keySet()) {
+      if (CompareUtil.equalsObject(id, entries.get(name))) {
+        return name;
+      }
     }
 
-    Integer getId(String name) {
-        return entries.get(name);
-    }
+    return null;
+  }
 
-    public String table() {
-        return table;
-    }
+  Integer getId(String name) {
+    return entries.get(name);
+  }
+
+  public String table() {
+    return table;
+  }
 
 }

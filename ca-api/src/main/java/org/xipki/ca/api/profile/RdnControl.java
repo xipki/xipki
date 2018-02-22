@@ -24,103 +24,104 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RdnControl {
 
-    private final int minOccurs;
+  private final int minOccurs;
 
-    private final int maxOccurs;
+  private final int maxOccurs;
 
-    private final ASN1ObjectIdentifier type;
+  private final ASN1ObjectIdentifier type;
 
-    private List<Pattern> patterns;
+  private List<Pattern> patterns;
 
-    private StringType stringType;
+  private StringType stringType;
 
-    private Range stringLengthRange;
+  private Range stringLengthRange;
 
-    private String prefix;
+  private String prefix;
 
-    private String suffix;
+  private String suffix;
 
-    private String group;
+  private String group;
 
-    public RdnControl(ASN1ObjectIdentifier type) {
-        this(type, 1, 1);
+  public RdnControl(ASN1ObjectIdentifier type) {
+    this(type, 1, 1);
+  }
+
+  public RdnControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs) {
+    if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
+      throw new IllegalArgumentException(
+          String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
     }
 
-    public RdnControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs) {
-        if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
-            throw new IllegalArgumentException(
-                    String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
-        }
+    this.type = ParamUtil.requireNonNull("type", type);
+    this.minOccurs = minOccurs;
+    this.maxOccurs = maxOccurs;
+  }
 
-        this.type = ParamUtil.requireNonNull("type", type);
-        this.minOccurs = minOccurs;
-        this.maxOccurs = maxOccurs;
-    }
+  public int minOccurs() {
+    return minOccurs;
+  }
 
-    public int minOccurs() {
-        return minOccurs;
-    }
+  public int maxOccurs() {
+    return maxOccurs;
+  }
 
-    public int maxOccurs() {
-        return maxOccurs;
-    }
+  public ASN1ObjectIdentifier type() {
+    return type;
+  }
 
-    public ASN1ObjectIdentifier type() {
-        return type;
-    }
+  public StringType stringType() {
+    return stringType;
+  }
 
-    public StringType stringType() {
-        return stringType;
-    }
+  public List<Pattern> patterns() {
+    return patterns;
+  }
 
-    public List<Pattern> patterns() {
-        return patterns;
-    }
+  public Range stringLengthRange() {
+    return stringLengthRange;
+  }
 
-    public Range stringLengthRange() {
-        return stringLengthRange;
-    }
+  public void setStringType(StringType stringType) {
+    this.stringType = stringType;
+  }
 
-    public void setStringType(StringType stringType) {
-        this.stringType = stringType;
-    }
+  public void setStringLengthRange(Range stringLengthRange) {
+    this.stringLengthRange = stringLengthRange;
+  }
 
-    public void setStringLengthRange(Range stringLengthRange) {
-        this.stringLengthRange = stringLengthRange;
-    }
+  public void setPatterns(List<Pattern> patterns) {
+    this.patterns = patterns;
+  }
 
-    public void setPatterns(List<Pattern> patterns) {
-        this.patterns = patterns;
-    }
+  public String prefix() {
+    return prefix;
+  }
 
-    public String prefix() {
-        return prefix;
-    }
+  public void setPrefix(String prefix) {
+    this.prefix = prefix;
+  }
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
+  public String suffix() {
+    return suffix;
+  }
 
-    public String suffix() {
-        return suffix;
-    }
+  public void setSuffix(String suffix) {
+    this.suffix = suffix;
+  }
 
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
+  public String group() {
+    return group;
+  }
 
-    public String group() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
+  public void setGroup(String group) {
+    this.group = group;
+  }
 
 }

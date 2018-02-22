@@ -21,27 +21,28 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ExtensionValue {
 
-    private final boolean critical;
+  private final boolean critical;
 
-    private final ASN1Encodable value;
+  private final ASN1Encodable value;
 
-    public ExtensionValue(boolean critical, ASN1Encodable value) {
-        this.critical = critical;
-        this.value = ParamUtil.requireNonNull("value", value);
-    }
+  public ExtensionValue(boolean critical, ASN1Encodable value) {
+    this.critical = critical;
+    this.value = ParamUtil.requireNonNull("value", value);
+  }
 
-    public boolean isCritical() {
-        return critical;
-    }
+  public boolean isCritical() {
+    return critical;
+  }
 
-    public ASN1Encodable value() {
-        return value;
-    }
+  public ASN1Encodable value() {
+    return value;
+  }
 
 }

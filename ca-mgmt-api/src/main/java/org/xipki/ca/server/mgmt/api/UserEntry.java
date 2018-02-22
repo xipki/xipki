@@ -22,40 +22,41 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class UserEntry {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    private final boolean active;
+  private final boolean active;
 
-    private final String hashedPassword;
+  private final String hashedPassword;
 
-    public UserEntry(NameId ident, boolean active, String hashedPassword) throws CaMgmtException {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-        this.active = active;
-        this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
-    }
+  public UserEntry(NameId ident, boolean active, String hashedPassword) throws CaMgmtException {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.active = active;
+    this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
+  }
 
-    public NameId ident() {
-        return ident;
-    }
+  public NameId ident() {
+    return ident;
+  }
 
-    public boolean active() {
-        return active;
-    }
+  public boolean active() {
+    return active;
+  }
 
-    public String hashedPassword() {
-        return hashedPassword;
-    }
+  public String hashedPassword() {
+    return hashedPassword;
+  }
 
-    @Override
-    public String toString() {
-        return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
-                "\nactive: ", active, "\npassword: *****\n");
-    }
+  @Override
+  public String toString() {
+    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+        "\nactive: ", active, "\npassword: *****\n");
+  }
 
 }

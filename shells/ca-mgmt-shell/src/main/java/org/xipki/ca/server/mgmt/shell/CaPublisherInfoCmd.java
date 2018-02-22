@@ -29,39 +29,40 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "capub-info",
-        description = "show information of publisher in given CA")
+    description = "show information of publisher in given CA")
 @Service
 public class CaPublisherInfoCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (caManager.getCa(caName) == null) {
-            throw new CmdFailure("could not find CA '" + caName + "'");
-        }
-
-        List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
-        if (isNotEmpty(entries)) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("publishers for CA ").append(caName).append("\n");
-            for (PublisherEntry entry : entries) {
-                sb.append("\t").append(entry.ident().name()).append("\n");
-            }
-            println(sb.toString());
-        } else {
-            println(StringUtil.concat("no publisher for CA ", caName," is configured"));
-        }
-
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (caManager.getCa(caName) == null) {
+      throw new CmdFailure("could not find CA '" + caName + "'");
     }
+
+    List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
+    if (isNotEmpty(entries)) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("publishers for CA ").append(caName).append("\n");
+      for (PublisherEntry entry : entries) {
+        sb.append("\t").append(entry.ident().name()).append("\n");
+      }
+      println(sb.toString());
+    } else {
+      println(StringUtil.concat("no publisher for CA ", caName," is configured"));
+    }
+
+    return null;
+  }
 
 }

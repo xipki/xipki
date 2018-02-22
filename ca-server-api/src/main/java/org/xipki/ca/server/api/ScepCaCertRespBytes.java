@@ -30,33 +30,33 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.xipki.common.util.ParamUtil;
 
 /**
- *
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ScepCaCertRespBytes {
 
-    private final byte[] bytes;
+  private final byte[] bytes;
 
-    public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
-            throws CMSException, CertificateException {
-        ParamUtil.requireNonNull("caCert", caCert);
-        ParamUtil.requireNonNull("responderCert", responderCert);
+  public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
+      throws CMSException, CertificateException {
+    ParamUtil.requireNonNull("caCert", caCert);
+    ParamUtil.requireNonNull("responderCert", responderCert);
 
-        CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-        try {
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
-            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-            bytes = degenerateSignedData.getEncoded();
-        } catch (IOException ex) {
-            throw new CMSException("could not build CMS SignedDta");
-        }
+    CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+    try {
+      cmsSignedDataGen.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
+      cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
+      CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+      bytes = degenerateSignedData.getEncoded();
+    } catch (IOException ex) {
+      throw new CMSException("could not build CMS SignedDta");
     }
+  }
 
-    public byte[] bytes() {
-        return Arrays.copyOf(bytes, bytes.length);
-    }
+  public byte[] bytes() {
+    return Arrays.copyOf(bytes, bytes.length);
+  }
 
 }

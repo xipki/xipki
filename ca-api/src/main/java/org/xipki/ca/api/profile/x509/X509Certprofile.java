@@ -38,221 +38,222 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class X509Certprofile {
 
-    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
+  private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
-    public boolean isOnlyForRa() {
-        return false;
+  public boolean isOnlyForRa() {
+    return false;
+  }
+
+  public void shutdown() {
+  }
+
+  public X509CertVersion version() {
+    return X509CertVersion.v3;
+  }
+
+  public List<String> signatureAlgorithms() {
+    return null;
+  }
+
+  public SpecialX509CertprofileBehavior specialCertprofileBehavior() {
+    return null;
+  }
+
+  /**
+   * Returns whether include subject and serial number of the issuer certificate in the
+   * AuthorityKeyIdentifier extension.
+   *
+   * @return whether include subject and serial number of the issuer certificate in the
+   *         AuthorityKeyIdentifier extension.
+   */
+  public boolean includeIssuerAndSerialInAki() {
+    return false;
+  }
+
+  public AuthorityInfoAccessControl aiaControl() {
+    return null;
+  }
+
+  /**
+   * Increments the SerialNumber attribute in the subject.
+   * @param currentSerialNumber
+   *          Current serial number. Could be {@code null}.
+   * @return the incremented serial number
+   * @throws BadFormatException
+   *         If the currentSerialNumber is not a non-negative decimal long.
+   */
+  public String incSerialNumber(String currentSerialNumber) throws BadFormatException {
+    try {
+      long currentSn = (currentSerialNumber == null) ? 0
+          : Long.parseLong(currentSerialNumber.trim());
+      if (currentSn < 0) {
+        throw new BadFormatException("invalid currentSerialNumber " + currentSerialNumber);
+      }
+      return Long.toString(currentSn + 1);
+    } catch (NumberFormatException ex) {
+      throw new BadFormatException(String.format(
+          "invalid serialNumber attribute %s", currentSerialNumber));
     }
+  }
 
-    public void shutdown() {
-    }
+  public boolean isDuplicateKeyPermitted() {
+    return true;
+  }
 
-    public X509CertVersion version() {
-        return X509CertVersion.v3;
-    }
+  public boolean isDuplicateSubjectPermitted() {
+    return true;
+  }
 
-    public List<String> signatureAlgorithms() {
-        return null;
-    }
+  /**
+   * Whether the subject attribute serialNumber in request is permitted.
+   *
+   * @return whether the serialNumber is permitted in request.
+   */
+  public boolean isSerialNumberInReqPermitted() {
+    return true;
+  }
 
-    public SpecialX509CertprofileBehavior specialCertprofileBehavior() {
-        return null;
-    }
+  /**
+   * Returns the parameter value for the given name.
+   * @param paramName
+   *          Parameter name. Must not be {@code null}.
+   * @return parameter value.
+   */
+  public String parameter(String paramName) {
+    return null;
+  }
 
-    /**
-     * Returns whether include subject and serial number of the issuer certificate in the
-     * AuthorityKeyIdentifier extension.
-     *
-     * @return whether include subject and serial number of the issuer certificate in the
-     *         AuthorityKeyIdentifier extension.
-     */
-    public boolean includeIssuerAndSerialInAki() {
-        return false;
-    }
+  public boolean hasMidnightNotBefore() {
+    return false;
+  }
 
-    public AuthorityInfoAccessControl aiaControl() {
-        return null;
-    }
+  public TimeZone timezone() {
+    return timeZone;
+  }
 
-    /**
-     * Increments the SerialNumber attribute in the subject
-     * @param currentSerialNumber
-     *          Current serial number. Could be {@code null}.
-     * @return the incremented serial number
-     * @throws BadFormatException
-     *         If the currentSerialNumber is not a non-negative decimal long.
-     */
-    public String incSerialNumber(String currentSerialNumber) throws BadFormatException {
-        try {
-            long currentSn = (currentSerialNumber == null) ? 0
-                    : Long.parseLong(currentSerialNumber.trim());
-            if (currentSn < 0) {
-                throw new BadFormatException("invalid currentSerialNumber " + currentSerialNumber);
-            }
-            return Long.toString(currentSn + 1);
-        } catch (NumberFormatException ex) {
-            throw new BadFormatException(String.format(
-                    "invalid serialNumber attribute %s", currentSerialNumber));
-        }
-    }
+  public Set<ExtKeyUsageControl> extendedKeyUsages() {
+    return null;
+  }
 
-    public boolean isDuplicateKeyPermitted() {
-        return true;
-    }
+  /**
+   * Returns the SubjectInfoAccess modes.
+   * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
+   *
+   * @return the SubjectInfoAccess modes.
+   */
+  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
+    return null;
+  }
 
-    public boolean isDuplicateSubjectPermitted() {
-        return true;
-    }
+  public abstract Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls();
 
-    /**
-     * Whether the subject attribute serialNumber in request is permitted.
-     *
-     * @return whether the serialNumber is permitted in request.
-     */
-    public boolean isSerialNumberInReqPermitted() {
-        return true;
-    }
+  /**
+   * Initializes this object.
+   *
+   * @param data
+   *          Configuration. Could be {@code null}.
+   * @throws CertprofileException
+   *         if error during the initialization occurs.
+   */
+  public abstract void initialize(String data) throws CertprofileException;
 
-    /**
-     * Returns the parameter value for the given name.
-     * @param paramName
-     *          Parameter name. Must not be {@code null}.
-     * @return parameter value.
-     */
-    public String parameter(String paramName) {
-        return null;
-    }
+  public abstract X509CertLevel certLevel();
 
-    public boolean hasMidnightNotBefore() {
-        return false;
-    }
+  public abstract Set<KeyUsageControl> keyUsage();
 
-    public TimeZone timezone() {
-        return timeZone;
-    }
+  public abstract Integer pathLenBasicConstraint();
 
-    public Set<ExtKeyUsageControl> extendedKeyUsages() {
-        return null;
-    }
+  /**
+   * Sets the {{@link EnvParameterResolver}.
+   *
+   * @param parameterResolver
+   *          Parameter resolver. Could be {@code null}.
+   */
+  public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
-    /**
-     * Returns the SubjectInfoAccess modes.
-     * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
-     *
-     * @return the SubjectInfoAccess modes.
-     */
-    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
-        return null;
-    }
+  /**
+   * Checks and gets the granted NotBefore.
+   *
+   * @param notBefore
+   *          Requested NotBefore. Could be {@code null}.
+   * @return the granted NotBefore.
+   */
+  public abstract Date getNotBefore(Date notBefore);
 
-    public abstract Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls();
+  public abstract CertValidity validity();
 
-    /**
-     * Initializes this object.
-     *
-     * @param data
-     *          Configuration. Could be {@code null}.
-     * @throws CertprofileException
-     *         if error during the initialization occurs.
-     */
-    public abstract void initialize(String data) throws CertprofileException;
+  /**
+   * Checks the public key. If the check passes, returns the canonicalized public key.
+   *
+   * @param publicKey
+   *          Requested public key. Must not be {@code null}.
+   * @return the granted public key.
+   * @throws BadCertTemplateException
+   *         If the publicKey does not have correct format or is not permitted.
+   */
+  public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
+      throws BadCertTemplateException;
 
-    public abstract X509CertLevel certLevel();
+  /**
+   * Checks the requested subject. If the check passes, returns the canonicalized subject.
+   *
+   * @param requestedSubject
+   *          Requested subject. Must not be {@code null}.
+   * @return the granted subject
+   * @throws BadCertTemplateException
+   *         if the subject is not permitted.
+   * @throws CertprofileException
+   *         if error occurs.
+   */
+  public abstract SubjectInfo getSubject(X500Name requestedSubject)
+      throws CertprofileException, BadCertTemplateException;
 
-    public abstract Set<KeyUsageControl> keyUsage();
+  /**
+   * Checks the requested extensions and returns the canonicalized ones.
+   *
+   * @param extensionControls
+   *          Extension controls. Must not be {@code null}.
+   * @param requestedSubject
+   *          Requested subject. Must not be {@code null}.
+   * @param grantedSubject
+   *          Granted subject. Must not be {@code null}.
+   * @param requestedExtensions
+   *          Requested extensions. Could be {@code null}.
+   * @param notBefore
+   *          NotBefore. Must not be {@code null}.
+   * @param notAfter
+   *          NotAfter. Must not be {@code null}.
+   * @param caInfo
+   *          CA information.
+   * @return extensions of the certificate to be issued.
+   * @throws BadCertTemplateException
+   *         if at least one of extension is not permitted.
+   * @throws CertprofileException
+   *         if error occurs.
+   */
+  public abstract ExtensionValues getExtensions(
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+      X500Name requestedSubject, X500Name grantedSubject,
+      Extensions requestedExtensions, Date notBefore, Date notAfter,
+      PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException;
 
-    public abstract Integer pathLenBasicConstraint();
+  public abstract boolean incSerialNumberIfSubjectExists();
 
-    /**
-     * Sets the {{@link EnvParameterResolver}.
-     *
-     * @param parameterResolver
-     *          Parameter resolver. Could be {@code null}.
-     */
-    public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
-
-    /**
-     * Checks and gets the granted NotBefore.
-     *
-     * @param notBefore
-     *          Requested NotBefore. Could be {@code null}.
-     * @return the granted NotBefore.
-     */
-    public abstract Date getNotBefore(Date notBefore);
-
-    public abstract CertValidity validity();
-
-    /**
-     * Checks the public key. If the check passes, returns the canonicalized public key.
-     *
-     * @param publicKey
-     *          Requested public key. Must not be {@code null}.
-     * @return the granted public key.
-     * @throws BadCertTemplateException
-     *         If the publicKey does not have correct format or is not permitted.
-     */
-    public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
-            throws BadCertTemplateException;
-
-    /**
-     * Checks the requested subject. If the check passes, returns the canonicalized subject.
-     *
-     * @param requestedSubject
-     *          Requested subject. Must not be {@code null}.
-     * @return the granted subject
-     * @throws BadCertTemplateException
-     *         if the subject is not permitted.
-     * @throws CertprofileException
-     *         if error occurs.
-     */
-    public abstract SubjectInfo getSubject(X500Name requestedSubject)
-            throws CertprofileException, BadCertTemplateException;
-
-    /**
-     * Checks the requested extensions and returns the canonicalized ones.
-     *
-     * @param extensionControls
-     *          Extension controls. Must not be {@code null}.
-     * @param requestedSubject
-     *          Requested subject. Must not be {@code null}.
-     * @param grantedSubject
-     *          Granted subject. Must not be {@code null}.
-     * @param requestedExtensions
-     *          Requested extensions. Could be {@code null}.
-     * @param notBefore
-     *          NotBefore. Must not be {@code null}.
-     * @param notAfter
-     *          NotAfter. Must not be {@code null}.
-     * @param caInfo
-     *          CA information.
-     * @return extensions of the certificate to be issued.
-     * @throws BadCertTemplateException
-     *         if at least one of extension is not permitted.
-     * @throws CertprofileException
-     *         if error occurs.
-     */
-    public abstract ExtensionValues getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            X500Name requestedSubject, X500Name grantedSubject,
-            Extensions requestedExtensions, Date notBefore, Date notAfter,
-            PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException;
-
-    public abstract boolean incSerialNumberIfSubjectExists();
-
-    /**
-     * Returns maximal size in bytes of the certificate.
-     *
-     * @return maximal size in bytes of the certificate, 0 or negative value
-     *         indicates accepting all sizes.
-     */
-    public int maxCertSize() {
-        return 0;
-    }
+  /**
+   * Returns maximal size in bytes of the certificate.
+   *
+   * @return maximal size in bytes of the certificate, 0 or negative value
+   *         indicates accepting all sizes.
+   */
+  public int maxCertSize() {
+    return 0;
+  }
 
 }

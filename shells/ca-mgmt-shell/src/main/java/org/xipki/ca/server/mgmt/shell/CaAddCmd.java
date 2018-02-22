@@ -28,31 +28,32 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "ca-add",
-        description = "add CA")
+    description = "add CA")
 @Service
 public class CaAddCmd extends CaAddOrGenAction {
 
-    @Option(name = "--cert",
-            description = "CA certificate file")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert",
+      description = "CA certificate file")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Override
-    protected Object execute0() throws Exception {
-        X509CaEntry caEntry = getCaEntry();
-        if (certFile != null) {
-            X509Certificate caCert = X509Util.parseCert(certFile);
-            caEntry.setCertificate(caCert);
-        }
-
-        boolean bo = caManager.addCa(caEntry);
-        output(bo, "added", "could not add", "CA " + caEntry.ident().name());
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    X509CaEntry caEntry = getCaEntry();
+    if (certFile != null) {
+      X509Certificate caCert = X509Util.parseCert(certFile);
+      caEntry.setCertificate(caCert);
     }
+
+    boolean bo = caManager.addCa(caEntry);
+    output(bo, "added", "could not add", "CA " + caEntry.ident().name());
+    return null;
+  }
 
 }

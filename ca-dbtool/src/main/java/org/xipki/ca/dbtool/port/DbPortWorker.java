@@ -23,39 +23,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class DbPortWorker implements Runnable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
 
-    protected final AtomicBoolean stopMe = new AtomicBoolean(false);
+  protected final AtomicBoolean stopMe = new AtomicBoolean(false);
 
-    private Exception exception;
+  private Exception exception;
 
-    public DbPortWorker() {
+  public DbPortWorker() {
+  }
+
+  public final Exception exception() {
+    return exception;
+  }
+
+  public void setStopMe(boolean stopMe) {
+    this.stopMe.set(stopMe);
+  }
+
+  @Override
+  public void run() {
+    try {
+      run0();
+    } catch (Exception ex) {
+      LOG.error("exception thrown", ex);
+      exception = ex;
     }
+  }
 
-    public final Exception exception() {
-        return exception;
-    }
-
-    public void setStopMe(boolean stopMe) {
-        this.stopMe.set(stopMe);
-    }
-
-    @Override
-    public void run() {
-        try {
-            run0();
-        } catch (Exception ex) {
-            LOG.error("exception thrown", ex);
-            exception = ex;
-        }
-    }
-
-    protected abstract void run0() throws Exception;
+  protected abstract void run0() throws Exception;
 
 }

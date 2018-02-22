@@ -18,27 +18,28 @@
 package org.xipki.ocsp.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public class ResponderAndPath {
 
-    private String servletPath;
+  private String servletPath;
 
-    private Responder responder;
+  private Responder responder;
 
-    public ResponderAndPath(String servletPath, Responder responder) {
-        this.servletPath = servletPath;
-        this.responder = responder;
-    }
+  public ResponderAndPath(String servletPath, Responder responder) {
+    this.servletPath = servletPath;
+    this.responder = responder;
+  }
 
-    public String servletPath() {
-        return servletPath;
-    }
+  public String servletPath() {
+    return servletPath;
+  }
 
-    public Responder responder() {
-        return responder;
-    }
+  public Responder responder() {
+    return responder;
+  }
 
 }

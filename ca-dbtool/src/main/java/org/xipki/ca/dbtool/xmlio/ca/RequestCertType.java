@@ -25,58 +25,59 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RequestCertType extends IdentifidDbObjectType {
 
-    public static final String TAG_PARENT = "reqcerts";
+  public static final String TAG_PARENT = "reqcerts";
 
-    public static final String TAG_ROOT = "reqcert";
+  public static final String TAG_ROOT = "reqcert";
 
-    public static final String TAG_RID = "rid";
+  public static final String TAG_RID = "rid";
 
-    public static final String TAG_CID = "cid";
+  public static final String TAG_CID = "cid";
 
-    private Long rid;
+  private Long rid;
 
-    private Long cid;
+  private Long cid;
 
-    public Long rid() {
-        return rid;
-    }
+  public Long rid() {
+    return rid;
+  }
 
-    public void setRid(long rid) {
-        this.rid = rid;
-    }
+  public void setRid(long rid) {
+    this.rid = rid;
+  }
 
-    public Long cid() {
-        return cid;
-    }
+  public Long cid() {
+    return cid;
+  }
 
-    public void setCid(long cid) {
-        this.cid = cid;
-    }
+  public void setCid(long cid) {
+    this.cid = cid;
+  }
 
-    @Override
-    public void validate() throws InvalidDataObjectException {
-        super.validate();
-        assertNotNull(TAG_RID, rid);
-        assertNotNull(TAG_CID, cid);
-    }
+  @Override
+  public void validate() throws InvalidDataObjectException {
+    super.validate();
+    assertNotNull(TAG_RID, rid);
+    assertNotNull(TAG_CID, cid);
+  }
 
-    @Override
-    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
-        ParamUtil.requireNonNull("writer", writer);
-        validate();
+  @Override
+  public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
+    ParamUtil.requireNonNull("writer", writer);
+    validate();
 
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id());
-        writeIfNotNull(writer, TAG_RID, rid);
-        writeIfNotNull(writer, TAG_CID, cid);
-        writer.writeEndElement();
-        writer.writeNewline();
-    }
+    writer.writeStartElement(TAG_ROOT);
+    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_RID, rid);
+    writeIfNotNull(writer, TAG_CID, cid);
+    writer.writeEndElement();
+    writer.writeNewline();
+  }
 
 }

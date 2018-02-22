@@ -21,53 +21,54 @@ import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaGeneralSubtree {
 
-    private final GeneralSubtreeBaseType jaxb;
+  private final GeneralSubtreeBaseType jaxb;
 
-    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb) {
-        this.jaxb = ParamUtil.requireNonNull("jaxb", jaxb);
-        Integer min = jaxb.getMinimum();
-        if (min != null) {
-            ParamUtil.requireMin("jaxb.getMinimum()", min.intValue(), 0);
-        }
-
-        Integer max = jaxb.getMaximum();
-        if (max != null) {
-            ParamUtil.requireMin("jaxb.getMaximum()", max.intValue(), 0);
-        }
+  public QaGeneralSubtree(GeneralSubtreeBaseType jaxb) {
+    this.jaxb = ParamUtil.requireNonNull("jaxb", jaxb);
+    Integer min = jaxb.getMinimum();
+    if (min != null) {
+      ParamUtil.requireMin("jaxb.getMinimum()", min.intValue(), 0);
     }
 
-    public String rfc822Name() {
-        return jaxb.getRfc822Name();
+    Integer max = jaxb.getMaximum();
+    if (max != null) {
+      ParamUtil.requireMin("jaxb.getMaximum()", max.intValue(), 0);
     }
+  }
 
-    public String dnsName() {
-        return jaxb.getDnsName();
-    }
+  public String rfc822Name() {
+    return jaxb.getRfc822Name();
+  }
 
-    public String directoryName() {
-        return jaxb.getDirectoryName();
-    }
+  public String dnsName() {
+    return jaxb.getDnsName();
+  }
 
-    public String uri() {
-        return jaxb.getUri();
-    }
+  public String directoryName() {
+    return jaxb.getDirectoryName();
+  }
 
-    public String ipAddress() {
-        return jaxb.getIpAddress();
-    }
+  public String uri() {
+    return jaxb.getUri();
+  }
 
-    public Integer minimum() {
-        return jaxb.getMinimum();
-    }
+  public String ipAddress() {
+    return jaxb.getIpAddress();
+  }
 
-    public Integer maximum() {
-        return jaxb.getMaximum();
-    }
+  public Integer minimum() {
+    return jaxb.getMinimum();
+  }
+
+  public Integer maximum() {
+    return jaxb.getMaximum();
+  }
 
 }

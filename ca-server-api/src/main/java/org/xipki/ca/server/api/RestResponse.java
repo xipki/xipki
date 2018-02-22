@@ -22,58 +22,59 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public class RestResponse {
 
-    private int statusCode;
+  private int statusCode;
 
-    private String contentType;
+  private String contentType;
 
-    private Map<String, String> headers = new HashMap<>();
+  private Map<String, String> headers = new HashMap<>();
 
-    private byte[] body;
+  private byte[] body;
 
-    public RestResponse(int statusCode, String contentType, Map<String, String> headers,
-            byte[] body) {
-        this.statusCode = statusCode;
-        this.contentType = contentType;
-        this.headers = headers;
-        this.body = body;
-    }
+  public RestResponse(int statusCode, String contentType, Map<String, String> headers,
+      byte[] body) {
+    this.statusCode = statusCode;
+    this.contentType = contentType;
+    this.headers = headers;
+    this.body = body;
+  }
 
-    public int statusCode() {
-        return statusCode;
-    }
+  public int statusCode() {
+    return statusCode;
+  }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
+  public void setStatusCode(int statusCode) {
+    this.statusCode = statusCode;
+  }
 
-    public String contentType() {
-        return contentType;
-    }
+  public String contentType() {
+    return contentType;
+  }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
+  }
 
-    public Map<String, String> headers() {
-        return headers;
-    }
+  public Map<String, String> headers() {
+    return headers;
+  }
 
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
+  public void setHeaders(Map<String, String> headers) {
+    this.headers = headers;
+  }
 
-    public byte[] body() {
-        return body;
-    }
+  public byte[] body() {
+    return body;
+  }
 
-    public void setBody(byte[] body) {
-        this.body = body;
-    }
+  public void setBody(byte[] body) {
+    this.body = body;
+  }
 
 }

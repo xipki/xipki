@@ -21,60 +21,61 @@ import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509ChangeCrlSignerEntry {
 
-    private final String name;
+  private final String name;
 
-    private String signerType;
+  private String signerType;
 
-    private String signerConf;
+  private String signerConf;
 
-    private String base64Cert;
+  private String base64Cert;
 
-    private String crlControl;
+  private String crlControl;
 
-    public X509ChangeCrlSignerEntry(String name) throws InvalidConfException {
-        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-    }
+  public X509ChangeCrlSignerEntry(String name) throws InvalidConfException {
+    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+  }
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    public String signerType() {
-        return signerType;
-    }
+  public String signerType() {
+    return signerType;
+  }
 
-    public void setSignerType(String signerType) {
-        this.signerType = signerType;
-    }
+  public void setSignerType(String signerType) {
+    this.signerType = signerType;
+  }
 
-    public String signerConf() {
-        return signerConf;
-    }
+  public String signerConf() {
+    return signerConf;
+  }
 
-    public void setSignerConf(String signerConf) {
-        this.signerConf = signerConf;
-    }
+  public void setSignerConf(String signerConf) {
+    this.signerConf = signerConf;
+  }
 
-    public String base64Cert() {
-        return base64Cert;
-    }
+  public String base64Cert() {
+    return base64Cert;
+  }
 
-    public void setBase64Cert(String base64Cert) {
-        this.base64Cert = base64Cert;
-    }
+  public void setBase64Cert(String base64Cert) {
+    this.base64Cert = base64Cert;
+  }
 
-    public String crlControl() {
-        return crlControl;
-    }
+  public String crlControl() {
+    return crlControl;
+  }
 
-    public void setCrlControl(String crlControl) {
-        this.crlControl = crlControl;
-    }
+  public void setCrlControl(String crlControl) {
+    this.crlControl = crlControl;
+  }
 
 }

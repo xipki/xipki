@@ -20,27 +20,28 @@ package org.xipki.ca.server.impl;
 import java.math.BigInteger;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class SerialWithId {
 
-    private long id;
+  private long id;
 
-    private BigInteger serial;
+  private BigInteger serial;
 
-    public SerialWithId(long id, BigInteger serial) {
-        this.id = id;
-        this.serial = serial;
-    }
+  public SerialWithId(long id, BigInteger serial) {
+    this.id = id;
+    this.serial = serial;
+  }
 
-    public BigInteger serial() {
-        return serial;
-    }
+  public BigInteger serial() {
+    return serial;
+  }
 
-    public long id() {
-        return id;
-    }
+  public long id() {
+    return id;
+  }
 
 }

@@ -36,74 +36,75 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public class HttpRestServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private CmpResponderManager responderManager;
+  private CmpResponderManager responderManager;
 
-    private AuditServiceRegister auditServiceRegister;
+  private AuditServiceRegister auditServiceRegister;
 
-    public HttpRestServlet() {
+  public HttpRestServlet() {
+  }
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    service0(req, resp, false);
+  }
+
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    service0(req, resp, true);
+  }
+
+  private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
+      throws IOException {
+    AuditService auditService = auditServiceRegister.getAuditService();
+    AuditEvent event = new AuditEvent(new Date());
+    try {
+      Rest rest = responderManager.getRest();
+
+      String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
+          req.getRequestURI());
+      HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
+      byte[] requestBytes = IoUtil.read(req.getInputStream());
+      RestResponse response = rest.service(path, event, requestBytes, httpRetriever);
+
+      resp.setStatus(response.statusCode());
+      if (resp.getContentType() != null) {
+        resp.setContentType(resp.getContentType());
+      }
+
+      for (String headerName : response.headers().keySet()) {
+        resp.setHeader(headerName, response.headers().get(headerName));
+      }
+
+      byte[] respBody = response.body();
+      if (respBody == null) {
+        resp.setContentLength(0);
+      } else {
+        resp.setContentLength(respBody.length);
+        resp.getOutputStream().write(respBody);
+      }
+    } finally {
+      event.finish();
+      auditService.logEvent(event);
     }
+  } // method service
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        service0(req, resp, false);
-    }
+  public void setResponderManager(CmpResponderManager responderManager) {
+    this.responderManager = responderManager;
+  }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        service0(req, resp, true);
-    }
-
-    private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
-            throws IOException {
-        AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent event = new AuditEvent(new Date());
-        try {
-            Rest rest = responderManager.getRest();
-
-            String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
-                    req.getRequestURI());
-            HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
-            byte[] requestBytes = IoUtil.read(req.getInputStream());
-            RestResponse response = rest.service(path, event, requestBytes, httpRetriever);
-
-            resp.setStatus(response.statusCode());
-            if (resp.getContentType() != null) {
-                resp.setContentType(resp.getContentType());
-            }
-
-            for (String headerName : response.headers().keySet()) {
-                resp.setHeader(headerName, response.headers().get(headerName));
-            }
-
-            byte[] respBody = response.body();
-            if (respBody == null) {
-                resp.setContentLength(0);
-            } else {
-                resp.setContentLength(respBody.length);
-                resp.getOutputStream().write(respBody);
-            }
-        } finally {
-            event.finish();
-            auditService.logEvent(event);
-        }
-    } // method service
-
-    public void setResponderManager(CmpResponderManager responderManager) {
-        this.responderManager = responderManager;
-    }
-
-    public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
-    }
+  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
+    this.auditServiceRegister = auditServiceRegister;
+  }
 
 }

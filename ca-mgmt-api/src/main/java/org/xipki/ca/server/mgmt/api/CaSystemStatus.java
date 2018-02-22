@@ -18,17 +18,18 @@
 package org.xipki.ca.server.mgmt.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum CaSystemStatus {
 
-    STARTED_AS_MASTER,
-    STARTED_AS_SLAVE,
-    NOT_INITED,
-    INITIALIZING,
-    LOCK_FAILED,
-    ERROR;
+  STARTED_AS_MASTER,
+  STARTED_AS_SLAVE,
+  NOT_INITED,
+  INITIALIZING,
+  LOCK_FAILED,
+  ERROR;
 
 }

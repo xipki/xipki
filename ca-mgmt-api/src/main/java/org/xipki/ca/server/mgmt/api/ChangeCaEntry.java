@@ -23,160 +23,161 @@ import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ChangeCaEntry {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    private CaStatus status;
+  private CaStatus status;
 
-    private CertValidity maxValidity;
+  private CertValidity maxValidity;
 
-    private String signerType;
+  private String signerType;
 
-    private String signerConf;
+  private String signerConf;
 
-    private String cmpControlName;
+  private String cmpControlName;
 
-    private String responderName;
+  private String responderName;
 
-    private Boolean duplicateKeyPermitted;
+  private Boolean duplicateKeyPermitted;
 
-    private Boolean duplicateSubjectPermitted;
+  private Boolean duplicateSubjectPermitted;
 
-    private Boolean saveRequest;
+  private Boolean saveRequest;
 
-    private ValidityMode validityMode;
+  private ValidityMode validityMode;
 
-    private Integer permission;
+  private Integer permission;
 
-    private Integer keepExpiredCertInDays;
+  private Integer keepExpiredCertInDays;
 
-    private Integer expirationPeriod;
+  private Integer expirationPeriod;
 
-    private ConfPairs extraControl;
+  private ConfPairs extraControl;
 
-    public ChangeCaEntry(NameId ident) throws CaMgmtException {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-    }
+  public ChangeCaEntry(NameId ident) throws CaMgmtException {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
 
-    public NameId ident() {
-        return ident;
-    }
+  public NameId ident() {
+    return ident;
+  }
 
-    public CaStatus status() {
-        return status;
-    }
+  public CaStatus status() {
+    return status;
+  }
 
-    public void setStatus(CaStatus status) {
-        this.status = status;
-    }
+  public void setStatus(CaStatus status) {
+    this.status = status;
+  }
 
-    public CertValidity maxValidity() {
-        return maxValidity;
-    }
+  public CertValidity maxValidity() {
+    return maxValidity;
+  }
 
-    public void setMaxValidity(CertValidity maxValidity) {
-        this.maxValidity = maxValidity;
-    }
+  public void setMaxValidity(CertValidity maxValidity) {
+    this.maxValidity = maxValidity;
+  }
 
-    public String signerType() {
-        return signerType;
-    }
+  public String signerType() {
+    return signerType;
+  }
 
-    public void setSignerType(String signerType) {
-        this.signerType = signerType;
-    }
+  public void setSignerType(String signerType) {
+    this.signerType = signerType;
+  }
 
-    public String signerConf() {
-        return signerConf;
-    }
+  public String signerConf() {
+    return signerConf;
+  }
 
-    public void setSignerConf(String signerConf) {
-        this.signerConf = signerConf;
-    }
+  public void setSignerConf(String signerConf) {
+    this.signerConf = signerConf;
+  }
 
-    public String cmpControlName() {
-        return cmpControlName;
-    }
+  public String cmpControlName() {
+    return cmpControlName;
+  }
 
-    public void setCmpControlName(String cmpControlName) {
-        this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
-    }
+  public void setCmpControlName(String cmpControlName) {
+    this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
+  }
 
-    public String responderName() {
-        return responderName;
-    }
+  public String responderName() {
+    return responderName;
+  }
 
-    public void setResponderName(String responderName) {
-        this.responderName = (responderName == null) ? null : responderName.toLowerCase();
-    }
+  public void setResponderName(String responderName) {
+    this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+  }
 
-    public Boolean duplicateKeyPermitted() {
-        return duplicateKeyPermitted;
-    }
+  public Boolean duplicateKeyPermitted() {
+    return duplicateKeyPermitted;
+  }
 
-    public void setDuplicateKeyPermitted(Boolean duplicateKeyPermitted) {
-        this.duplicateKeyPermitted = duplicateKeyPermitted;
-    }
+  public void setDuplicateKeyPermitted(Boolean duplicateKeyPermitted) {
+    this.duplicateKeyPermitted = duplicateKeyPermitted;
+  }
 
-    public Boolean duplicateSubjectPermitted() {
-        return duplicateSubjectPermitted;
-    }
+  public Boolean duplicateSubjectPermitted() {
+    return duplicateSubjectPermitted;
+  }
 
-    public void setDuplicateSubjectPermitted(Boolean duplicateSubjectPermitted) {
-        this.duplicateSubjectPermitted = duplicateSubjectPermitted;
-    }
+  public void setDuplicateSubjectPermitted(Boolean duplicateSubjectPermitted) {
+    this.duplicateSubjectPermitted = duplicateSubjectPermitted;
+  }
 
-    public ValidityMode validityMode() {
-        return validityMode;
-    }
+  public ValidityMode validityMode() {
+    return validityMode;
+  }
 
-    public void setValidityMode(ValidityMode validityMode) {
-        this.validityMode = validityMode;
-    }
+  public void setValidityMode(ValidityMode validityMode) {
+    this.validityMode = validityMode;
+  }
 
-    public Boolean saveRequest() {
-        return saveRequest;
-    }
+  public Boolean saveRequest() {
+    return saveRequest;
+  }
 
-    public void setSaveRequest(Boolean saveRequest) {
-        this.saveRequest = saveRequest;
-    }
+  public void setSaveRequest(Boolean saveRequest) {
+    this.saveRequest = saveRequest;
+  }
 
-    public Integer permission() {
-        return permission;
-    }
+  public Integer permission() {
+    return permission;
+  }
 
-    public void setPermission(Integer permission) {
-        this.permission = permission;
-    }
+  public void setPermission(Integer permission) {
+    this.permission = permission;
+  }
 
-    public Integer expirationPeriod() {
-        return expirationPeriod;
-    }
+  public Integer expirationPeriod() {
+    return expirationPeriod;
+  }
 
-    public void setExpirationPeriod(Integer expirationPeriod) {
-        this.expirationPeriod = expirationPeriod;
-    }
+  public void setExpirationPeriod(Integer expirationPeriod) {
+    this.expirationPeriod = expirationPeriod;
+  }
 
-    public Integer keepExpiredCertInDays() {
-        return keepExpiredCertInDays;
-    }
+  public Integer keepExpiredCertInDays() {
+    return keepExpiredCertInDays;
+  }
 
-    public void setKeepExpiredCertInDays(Integer days) {
-        this.keepExpiredCertInDays = days;
-    }
+  public void setKeepExpiredCertInDays(Integer days) {
+    this.keepExpiredCertInDays = days;
+  }
 
-    public ConfPairs extraControl() {
-        return extraControl;
-    }
+  public ConfPairs extraControl() {
+    return extraControl;
+  }
 
-    public void setExtraControl(ConfPairs extraControl) {
-        this.extraControl = extraControl;
-    }
+  public void setExtraControl(ConfPairs extraControl) {
+    this.extraControl = extraControl;
+  }
 
 }

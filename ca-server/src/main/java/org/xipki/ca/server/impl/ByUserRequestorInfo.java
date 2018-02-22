@@ -28,70 +28,71 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class ByUserRequestorInfo implements RequestorInfo {
 
-    private final NameId ident;
+  private final NameId ident;
 
-    private final CaHasUserEntry caHasUser;
+  private final CaHasUserEntry caHasUser;
 
-    public ByUserRequestorInfo(NameId ident, CaHasUserEntry caHasUser) {
-        this.ident = ParamUtil.requireNonNull("ident", ident);
-        this.caHasUser = ParamUtil.requireNonNull("caHasUser", caHasUser);
+  public ByUserRequestorInfo(NameId ident, CaHasUserEntry caHasUser) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.caHasUser = ParamUtil.requireNonNull("caHasUser", caHasUser);
+  }
+
+  @Override
+  public NameId ident() {
+    return ident;
+  }
+
+  @Override
+  public boolean isRa() {
+    return false;
+  }
+
+  public int userId() {
+    return caHasUser.userIdent().id();
+  }
+
+  public CaHasUserEntry caHasUser() {
+    return caHasUser;
+  }
+
+  @Override
+  public boolean isCertProfilePermitted(String certprofile) {
+    Set<String> profiles = caHasUser.profiles();
+    if (CollectionUtil.isEmpty(profiles)) {
+      return false;
     }
 
-    @Override
-    public NameId ident() {
-        return ident;
-    }
+    return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
+  }
 
-    @Override
-    public boolean isRa() {
-        return false;
-    }
+  @Override
+  public boolean isPermitted(int permission) {
+    return PermissionConstants.contains(caHasUser.permission(), permission);
+  }
 
-    public int userId() {
-        return caHasUser.userIdent().id();
+  @Override
+  public void assertCertProfilePermitted(String certprofile)
+      throws InsuffientPermissionException {
+    if (!isCertProfilePermitted(certprofile)) {
+      throw new  InsuffientPermissionException(
+          "CertProfile " + certprofile + " is not permitted");
     }
+  }
 
-    public CaHasUserEntry caHasUser() {
-        return caHasUser;
+  @Override
+  public void assertPermitted(int permission)
+      throws InsuffientPermissionException {
+    if (!isPermitted(permission)) {
+      throw new  InsuffientPermissionException("Permission "
+          + PermissionConstants.getTextForCode(permission) + " is not permitted");
     }
-
-    @Override
-    public boolean isCertProfilePermitted(String certprofile) {
-        Set<String> profiles = caHasUser.profiles();
-        if (CollectionUtil.isEmpty(profiles)) {
-            return false;
-        }
-
-        return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
-    }
-
-    @Override
-    public boolean isPermitted(int permission) {
-        return PermissionConstants.contains(caHasUser.permission(), permission);
-    }
-
-    @Override
-    public void assertCertProfilePermitted(String certprofile)
-            throws InsuffientPermissionException {
-        if (!isCertProfilePermitted(certprofile)) {
-            throw new  InsuffientPermissionException(
-                    "CertProfile " + certprofile + " is not permitted");
-        }
-    }
-
-    @Override
-    public void assertPermitted(int permission)
-            throws InsuffientPermissionException {
-        if (!isPermitted(permission)) {
-            throw new  InsuffientPermissionException("Permission "
-                    + PermissionConstants.getTextForCode(permission) + " is not permitted");
-        }
-    }
+  }
 
 }

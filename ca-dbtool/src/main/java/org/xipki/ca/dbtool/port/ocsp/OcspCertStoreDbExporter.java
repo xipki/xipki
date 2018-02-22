@@ -52,387 +52,387 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class OcspCertStoreDbExporter extends DbPorter {
 
-    public static final String PROCESS_LOG_FILENAME = "export.process";
+  public static final String PROCESS_LOG_FILENAME = "export.process";
 
-    private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
 
-    private final Marshaller marshaller;
+  private final Marshaller marshaller;
 
-    private final Unmarshaller unmarshaller;
+  private final Unmarshaller unmarshaller;
 
-    private final int numCertsInBundle;
+  private final int numCertsInBundle;
 
-    private final int numCertsPerSelect;
+  private final int numCertsPerSelect;
 
-    private final boolean resume;
+  private final boolean resume;
 
-    OcspCertStoreDbExporter(DataSourceWrapper datasource, Marshaller marshaller,
-            Unmarshaller unmarshaller, String baseDir, int numCertsInBundle, int numCertsPerSelect,
-            boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
-        super(datasource, baseDir, stopMe, evaluateOnly);
+  OcspCertStoreDbExporter(DataSourceWrapper datasource, Marshaller marshaller,
+      Unmarshaller unmarshaller, String baseDir, int numCertsInBundle, int numCertsPerSelect,
+      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
+    super(datasource, baseDir, stopMe, evaluateOnly);
 
-        this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
-        this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
-        this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
-        this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
-        if (resume) {
-            File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-            if (!processLogFile.exists()) {
-                throw new Exception("could not process with '--resume' option");
-            }
-        }
-        this.resume = resume;
-    } // constructor
+    this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
+    this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
+    this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
+    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+    if (resume) {
+      File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+      if (!processLogFile.exists()) {
+        throw new Exception("could not process with '--resume' option");
+      }
+    }
+    this.resume = resume;
+  } // constructor
 
-    public void export() throws Exception {
-        CertStoreType certstore;
-        if (resume) {
-            try {
-                @SuppressWarnings("unchecked")
-                JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                        unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CERTSTORE));
-                certstore = root.getValue();
-            } catch (JAXBException ex) {
-                throw XmlUtil.convert(ex);
-            }
+  public void export() throws Exception {
+    CertStoreType certstore;
+    if (resume) {
+      try {
+        @SuppressWarnings("unchecked")
+        JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+            unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CERTSTORE));
+        certstore = root.getValue();
+      } catch (JAXBException ex) {
+        throw XmlUtil.convert(ex);
+      }
 
-            if (certstore.getVersion() > VERSION) {
-                throw new Exception("could not continue with CertStore greater than " + VERSION
-                        + ": " + certstore.getVersion());
-            }
-        } else {
-            certstore = new CertStoreType();
-            certstore.setVersion(VERSION);
-        }
-        System.out.println("exporting OCSP certstore from database");
+      if (certstore.getVersion() > VERSION) {
+        throw new Exception("could not continue with CertStore greater than " + VERSION
+            + ": " + certstore.getVersion());
+      }
+    } else {
+      certstore = new CertStoreType();
+      certstore.setVersion(VERSION);
+    }
+    System.out.println("exporting OCSP certstore from database");
 
-        if (!resume) {
-            exportHashAlgo(certstore);
-            exportIssuer(certstore);
-        }
-
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-        Exception exception = exportCert(certstore, processLogFile);
-
-        JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-        try {
-            marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CERTSTORE));
-        } catch (JAXBException ex) {
-            throw XmlUtil.convert(ex);
-        }
-
-        if (exception == null) {
-            System.out.println(" exported OCSP certstore from database");
-        } else {
-            throw exception;
-        }
-    } // method export
-
-    private void exportHashAlgo(CertStoreType certstore) throws DataAccessException {
-        String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
-        if (certHashAlgoStr == null) {
-            throw new DataAccessException(
-                    "CERTHASH_ALGO is not defined in table DBSCHEMA");
-        }
-
-        certstore.setCerthashAlgo(certHashAlgoStr);
+    if (!resume) {
+      exportHashAlgo(certstore);
+      exportIssuer(certstore);
     }
 
-    private void exportIssuer(CertStoreType certstore) throws DataAccessException, IOException {
-        System.out.println("exporting table ISSUER");
-        Issuers issuers = new Issuers();
-        certstore.setIssuers(issuers);
-        final String sql = "SELECT ID,CERT,REV,RR,RT,RIT FROM ISSUER";
+    File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+    Exception exception = exportCert(certstore, processLogFile);
 
-        Statement stmt = null;
-        ResultSet rs = null;
+    JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
+    try {
+      marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CERTSTORE));
+    } catch (JAXBException ex) {
+      throw XmlUtil.convert(ex);
+    }
 
-        try {
-            stmt = createStatement();
-            rs = stmt.executeQuery(sql);
+    if (exception == null) {
+      System.out.println(" exported OCSP certstore from database");
+    } else {
+      throw exception;
+    }
+  } // method export
 
-            String issuerCertsDir = "issuer-conf";
-            new File(issuerCertsDir).mkdirs();
+  private void exportHashAlgo(CertStoreType certstore) throws DataAccessException {
+    String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
+    if (certHashAlgoStr == null) {
+      throw new DataAccessException(
+          "CERTHASH_ALGO is not defined in table DBSCHEMA");
+    }
 
-            while (rs.next()) {
-                int id = rs.getInt("ID");
-                String cert = rs.getString("CERT");
+    certstore.setCerthashAlgo(certHashAlgoStr);
+  }
 
-                IssuerType issuer = new IssuerType();
-                issuer.setId(id);
+  private void exportIssuer(CertStoreType certstore) throws DataAccessException, IOException {
+    System.out.println("exporting table ISSUER");
+    Issuers issuers = new Issuers();
+    certstore.setIssuers(issuers);
+    final String sql = "SELECT ID,CERT,REV,RR,RT,RIT FROM ISSUER";
 
-                String certFileName = issuerCertsDir + "/cert-issuer-" + id;
-                IoUtil.save(new File(baseDir, certFileName), cert.getBytes("UTF-8"));
-                issuer.setCertFile(certFileName);
+    Statement stmt = null;
+    ResultSet rs = null;
 
-                boolean revoked = rs.getBoolean("REV");
-                issuer.setRevoked(revoked);
-                if (revoked) {
-                    int revReason = rs.getInt("RR");
-                    long revTime = rs.getLong("RT");
-                    long revInvalidityTime = rs.getLong("RIT");
-                    issuer.setRevReason(revReason);
-                    issuer.setRevTime(revTime);
-                    if (revInvalidityTime != 0) {
-                        issuer.setRevInvTime(revInvalidityTime);
-                    }
-                }
+    try {
+      stmt = createStatement();
+      rs = stmt.executeQuery(sql);
 
-                issuers.getIssuer().add(issuer);
+      String issuerCertsDir = "issuer-conf";
+      new File(issuerCertsDir).mkdirs();
+
+      while (rs.next()) {
+        int id = rs.getInt("ID");
+        String cert = rs.getString("CERT");
+
+        IssuerType issuer = new IssuerType();
+        issuer.setId(id);
+
+        String certFileName = issuerCertsDir + "/cert-issuer-" + id;
+        IoUtil.save(new File(baseDir, certFileName), cert.getBytes("UTF-8"));
+        issuer.setCertFile(certFileName);
+
+        boolean revoked = rs.getBoolean("REV");
+        issuer.setRevoked(revoked);
+        if (revoked) {
+          int revReason = rs.getInt("RR");
+          long revTime = rs.getLong("RT");
+          long revInvalidityTime = rs.getLong("RIT");
+          issuer.setRevReason(revReason);
+          issuer.setRevTime(revTime);
+          if (revInvalidityTime != 0) {
+            issuer.setRevInvTime(revInvalidityTime);
+          }
+        }
+
+        issuers.getIssuer().add(issuer);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    System.out.println(" exported table ISSUER");
+  } // method exportIssuer
+
+  private Exception exportCert(CertStoreType certstore, File processLogFile) {
+    final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
+    entriesDir.mkdirs();
+
+    FileOutputStream certsFileOs = null;
+
+    try {
+      certsFileOs = new FileOutputStream(
+          new File(baseDir, OcspDbEntryType.CERT.dirName() + ".mf"), true);
+      exportCert0(certstore, processLogFile, certsFileOs);
+      return null;
+    } catch (Exception ex) {
+      // delete the temporary files
+      deleteTmpFiles(baseDir, "tmp-certs-");
+      System.err.println("\nexporting table CERT has been cancelled due to error,\n"
+          + "please continue with the option '--resume'");
+      LOG.error("Exception", ex);
+      return ex;
+    } finally {
+      IoUtil.closeStream(certsFileOs);
+    }
+  } // method exportCert
+
+  private void exportCert0(CertStoreType certstore, File processLogFile,
+      FileOutputStream certsFileOs) throws Exception {
+    File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
+    Long minId = null;
+    if (processLogFile.exists()) {
+      byte[] content = IoUtil.read(processLogFile);
+      if (content != null && content.length > 0) {
+        minId = Long.parseLong(new String(content).trim());
+        minId++;
+      }
+    }
+
+    if (minId == null) {
+      minId = min("CERT", "ID");
+    }
+
+    System.out.println(exportingText() + "table CERT from ID " + minId);
+
+    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,NAFTER,NBEFORE,HASH,SUBJECT "
+        + "FROM CERT WHERE ID>=?";
+    final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
+
+    final long maxId = max("CERT", "ID");
+
+    int numProcessedBefore = certstore.getCountCerts();
+    final long total = count("CERT") - numProcessedBefore;
+    ProcessLog processLog = new ProcessLog(total);
+
+    PreparedStatement certPs = prepareStatement(certSql);
+
+    int sum = 0;
+    int numCertInCurrentFile = 0;
+
+    OcspCertsWriter certsInCurrentFile = new OcspCertsWriter();
+
+    File currentCertsZipFile = new File(baseDir,
+        "tmp-certs-" + System.currentTimeMillis() + ".zip");
+    ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
+
+    long minCertIdOfCurrentFile = -1;
+    long maxCertIdOfCurrentFile = -1;
+
+    processLog.printHeader();
+
+    String sql = null;
+    Long id = null;
+
+    try {
+      boolean interrupted = false;
+
+      long lastMaxId = minId - 1;
+
+      while (true) {
+        if (stopMe.get()) {
+          interrupted = true;
+          break;
+        }
+
+        sql = certSql;
+        certPs.setLong(1, lastMaxId + 1);
+
+        ResultSet rs = certPs.executeQuery();
+
+        if (!rs.next()) {
+          break;
+        }
+
+        do {
+          id = rs.getLong("ID");
+          if (lastMaxId < id) {
+            lastMaxId = id;
+          }
+
+          if (minCertIdOfCurrentFile == -1) {
+            minCertIdOfCurrentFile = id;
+          } else if (minCertIdOfCurrentFile > id) {
+            minCertIdOfCurrentFile = id;
+          }
+
+          if (maxCertIdOfCurrentFile == -1) {
+            maxCertIdOfCurrentFile = id;
+          } else if (maxCertIdOfCurrentFile < id) {
+            maxCertIdOfCurrentFile = id;
+          }
+
+          OcspCertType cert = new OcspCertType();
+
+          cert.setId(id);
+
+          int issuerId = rs.getInt("IID");
+          cert.setIid(issuerId);
+
+          String serial = rs.getString("SN");
+          cert.setSn(serial);
+
+          long update = rs.getLong("LUPDATE");
+          cert.setUpdate(update);
+
+          boolean revoked = rs.getBoolean("REV");
+          cert.setRev(revoked);
+
+          if (revoked) {
+            int revReason = rs.getInt("RR");
+            long revTime = rs.getLong("RT");
+            long revInvalidityTime = rs.getLong("RIT");
+            cert.setRr(revReason);
+            cert.setRt(revTime);
+            if (revInvalidityTime != 0) {
+              cert.setRit(revInvalidityTime);
             }
-        } catch (SQLException ex) {
-            throw translate(sql, ex);
-        } finally {
-            releaseResources(stmt, rs);
-        }
+          }
 
-        System.out.println(" exported table ISSUER");
-    } // method exportIssuer
+          String profile = rs.getString("PN");
+          cert.setProfile(profile);
 
-    private Exception exportCert(CertStoreType certstore, File processLogFile) {
-        final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
-        entriesDir.mkdirs();
+          String hash = rs.getString("HASH");
+          if (hash != null) {
+            cert.setHash(hash);
+          }
 
-        FileOutputStream certsFileOs = null;
+          String subject = rs.getString("SUBJECT");
+          if (subject != null) {
+            cert.setSubject(subject);
+          }
 
-        try {
-            certsFileOs = new FileOutputStream(
-                    new File(baseDir, OcspDbEntryType.CERT.dirName() + ".mf"), true);
-            exportCert0(certstore, processLogFile, certsFileOs);
-            return null;
-        } catch (Exception ex) {
-            // delete the temporary files
-            deleteTmpFiles(baseDir, "tmp-certs-");
-            System.err.println("\nexporting table CERT has been cancelled due to error,\n"
-                    + "please continue with the option '--resume'");
-            LOG.error("Exception", ex);
-            return ex;
-        } finally {
-            IoUtil.closeStream(certsFileOs);
-        }
-    } // method exportCert
+          long nafter = rs.getLong("NAFTER");
+          if (nafter != 0) {
+            cert.setNafter(nafter);
+          }
 
-    private void exportCert0(CertStoreType certstore, File processLogFile,
-            FileOutputStream certsFileOs) throws Exception {
-        File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
-        Long minId = null;
-        if (processLogFile.exists()) {
-            byte[] content = IoUtil.read(processLogFile);
-            if (content != null && content.length > 0) {
-                minId = Long.parseLong(new String(content).trim());
-                minId++;
-            }
-        }
+          long nbefore = rs.getLong("NBEFORE");
+          if (nbefore != 0) {
+            cert.setNbefore(nbefore);
+          }
 
-        if (minId == null) {
-            minId = min("CERT", "ID");
-        }
+          certsInCurrentFile.add(cert);
+          numCertInCurrentFile++;
+          sum++;
 
-        System.out.println(exportingText() + "table CERT from ID " + minId);
+          if (numCertInCurrentFile == numCertsInBundle) {
+            finalizeZip(currentCertsZip, certsInCurrentFile);
 
-        final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,NAFTER,NBEFORE,HASH,SUBJECT "
-                + "FROM CERT WHERE ID>=?";
-        final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
+            String currentCertsFilename = buildFilename("certs_", ".zip",
+                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
+            currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
-        final long maxId = max("CERT", "ID");
+            writeLine(certsFileOs, currentCertsFilename);
+            certstore.setCountCerts(numProcessedBefore + sum);
+            echoToFile(Long.toString(id), processLogFile);
 
-        int numProcessedBefore = certstore.getCountCerts();
-        final long total = count("CERT") - numProcessedBefore;
-        ProcessLog processLog = new ProcessLog(total);
+            processLog.addNumProcessed(numCertInCurrentFile);
+            processLog.printStatus();
 
-        PreparedStatement certPs = prepareStatement(certSql);
-
-        int sum = 0;
-        int numCertInCurrentFile = 0;
-
-        OcspCertsWriter certsInCurrentFile = new OcspCertsWriter();
-
-        File currentCertsZipFile = new File(baseDir,
+            // reset
+            certsInCurrentFile = new OcspCertsWriter();
+            numCertInCurrentFile = 0;
+            minCertIdOfCurrentFile = -1;
+            maxCertIdOfCurrentFile = -1;
+            currentCertsZipFile = new File(baseDir,
                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
-        ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
+            currentCertsZip = getZipOutputStream(currentCertsZipFile);
+          } // end if
+        } while (rs.next());
 
-        long minCertIdOfCurrentFile = -1;
-        long maxCertIdOfCurrentFile = -1;
+        rs.close();
+      } // end for
 
-        processLog.printHeader();
+      if (interrupted) {
+        throw new InterruptedException("interrupted by the user");
+      }
 
-        String sql = null;
-        Long id = null;
+      if (numCertInCurrentFile > 0) {
+        finalizeZip(currentCertsZip, certsInCurrentFile);
 
-        try {
-            boolean interrupted = false;
+        String currentCertsFilename = buildFilename("certs_", ".zip",
+            minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
+        currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
-            long lastMaxId = minId - 1;
-
-            while (true) {
-                if (stopMe.get()) {
-                    interrupted = true;
-                    break;
-                }
-
-                sql = certSql;
-                certPs.setLong(1, lastMaxId + 1);
-
-                ResultSet rs = certPs.executeQuery();
-
-                if (!rs.next()) {
-                    break;
-                }
-
-                do {
-                    id = rs.getLong("ID");
-                    if (lastMaxId < id) {
-                        lastMaxId = id;
-                    }
-
-                    if (minCertIdOfCurrentFile == -1) {
-                        minCertIdOfCurrentFile = id;
-                    } else if (minCertIdOfCurrentFile > id) {
-                        minCertIdOfCurrentFile = id;
-                    }
-
-                    if (maxCertIdOfCurrentFile == -1) {
-                        maxCertIdOfCurrentFile = id;
-                    } else if (maxCertIdOfCurrentFile < id) {
-                        maxCertIdOfCurrentFile = id;
-                    }
-
-                    OcspCertType cert = new OcspCertType();
-
-                    cert.setId(id);
-
-                    int issuerId = rs.getInt("IID");
-                    cert.setIid(issuerId);
-
-                    String serial = rs.getString("SN");
-                    cert.setSn(serial);
-
-                    long update = rs.getLong("LUPDATE");
-                    cert.setUpdate(update);
-
-                    boolean revoked = rs.getBoolean("REV");
-                    cert.setRev(revoked);
-
-                    if (revoked) {
-                        int revReason = rs.getInt("RR");
-                        long revTime = rs.getLong("RT");
-                        long revInvalidityTime = rs.getLong("RIT");
-                        cert.setRr(revReason);
-                        cert.setRt(revTime);
-                        if (revInvalidityTime != 0) {
-                            cert.setRit(revInvalidityTime);
-                        }
-                    }
-
-                    String profile = rs.getString("PN");
-                    cert.setProfile(profile);
-
-                    String hash = rs.getString("HASH");
-                    if (hash != null) {
-                        cert.setHash(hash);
-                    }
-
-                    String subject = rs.getString("SUBJECT");
-                    if (subject != null) {
-                        cert.setSubject(subject);
-                    }
-
-                    long nafter = rs.getLong("NAFTER");
-                    if (nafter != 0) {
-                        cert.setNafter(nafter);
-                    }
-
-                    long nbefore = rs.getLong("NBEFORE");
-                    if (nbefore != 0) {
-                        cert.setNbefore(nbefore);
-                    }
-
-                    certsInCurrentFile.add(cert);
-                    numCertInCurrentFile++;
-                    sum++;
-
-                    if (numCertInCurrentFile == numCertsInBundle) {
-                        finalizeZip(currentCertsZip, certsInCurrentFile);
-
-                        String currentCertsFilename = buildFilename("certs_", ".zip",
-                                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
-                        currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
-
-                        writeLine(certsFileOs, currentCertsFilename);
-                        certstore.setCountCerts(numProcessedBefore + sum);
-                        echoToFile(Long.toString(id), processLogFile);
-
-                        processLog.addNumProcessed(numCertInCurrentFile);
-                        processLog.printStatus();
-
-                        // reset
-                        certsInCurrentFile = new OcspCertsWriter();
-                        numCertInCurrentFile = 0;
-                        minCertIdOfCurrentFile = -1;
-                        maxCertIdOfCurrentFile = -1;
-                        currentCertsZipFile = new File(baseDir,
-                                "tmp-certs-" + System.currentTimeMillis() + ".zip");
-                        currentCertsZip = getZipOutputStream(currentCertsZipFile);
-                    } // end if
-                }
-                while (rs.next());
-
-                rs.close();
-            } // end for
-
-            if (interrupted) {
-                throw new InterruptedException("interrupted by the user");
-            }
-
-            if (numCertInCurrentFile > 0) {
-                finalizeZip(currentCertsZip, certsInCurrentFile);
-
-                String currentCertsFilename = buildFilename("certs_", ".zip",
-                        minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
-                currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
-
-                writeLine(certsFileOs, currentCertsFilename);
-                certstore.setCountCerts(numProcessedBefore + sum);
-                if (id != null) {
-                    echoToFile(Long.toString(id), processLogFile);
-                }
-
-                processLog.addNumProcessed(numCertInCurrentFile);
-            } else {
-                currentCertsZip.close();
-                currentCertsZipFile.delete();
-            }
-        } catch (SQLException ex) {
-            throw translate(sql, ex);
-        } finally {
-            releaseResources(certPs, null);
+        writeLine(certsFileOs, currentCertsFilename);
+        certstore.setCountCerts(numProcessedBefore + sum);
+        if (id != null) {
+          echoToFile(Long.toString(id), processLogFile);
         }
 
-        processLog.printTrailer();
-        // all successful, delete the processLogFile
-        processLogFile.delete();
-
-        System.out.println(exportedText() + processLog.numProcessed()
-                + " certificates from tables CERT");
-    } // method exportCert0
-
-    private void finalizeZip(ZipOutputStream zipOutStream, DbiXmlWriter certsType)
-            throws IOException, XMLStreamException {
-        ZipEntry certZipEntry = new ZipEntry("certs.xml");
-        zipOutStream.putNextEntry(certZipEntry);
-        try {
-            certsType.rewriteToZipStream(zipOutStream);
-        } finally {
-            zipOutStream.closeEntry();
-        }
-
-        zipOutStream.close();
+        processLog.addNumProcessed(numCertInCurrentFile);
+      } else {
+        currentCertsZip.close();
+        currentCertsZipFile.delete();
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(certPs, null);
     }
+
+    processLog.printTrailer();
+    // all successful, delete the processLogFile
+    processLogFile.delete();
+
+    System.out.println(exportedText() + processLog.numProcessed()
+        + " certificates from tables CERT");
+  } // method exportCert0
+
+  private void finalizeZip(ZipOutputStream zipOutStream, DbiXmlWriter certsType)
+      throws IOException, XMLStreamException {
+    ZipEntry certZipEntry = new ZipEntry("certs.xml");
+    zipOutStream.putNextEntry(certZipEntry);
+    try {
+      certsType.rewriteToZipStream(zipOutStream);
+    } finally {
+      zipOutStream.closeEntry();
+    }
+
+    zipOutStream.close();
+  }
 
 }

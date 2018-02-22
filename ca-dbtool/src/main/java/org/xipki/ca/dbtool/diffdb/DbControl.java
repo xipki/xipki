@@ -18,11 +18,12 @@
 package org.xipki.ca.dbtool.diffdb;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 enum DbControl {
-    XIPKI_CA_v3,
-    XIPKI_OCSP_v3;
+  XIPKI_CA_v3,
+  XIPKI_OCSP_v3;
 }

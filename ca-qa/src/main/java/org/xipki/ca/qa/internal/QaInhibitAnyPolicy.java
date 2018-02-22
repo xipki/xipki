@@ -21,21 +21,22 @@ import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaInhibitAnyPolicy extends QaExtension {
 
-    private final int skipCerts;
+  private final int skipCerts;
 
-    public QaInhibitAnyPolicy(InhibitAnyPolicy jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
-        this.skipCerts = jaxb.getSkipCerts();
-    }
+  public QaInhibitAnyPolicy(InhibitAnyPolicy jaxb) {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    this.skipCerts = jaxb.getSkipCerts();
+  }
 
-    public int skipCerts() {
-        return skipCerts;
-    }
+  public int skipCerts() {
+    return skipCerts;
+  }
 
 }

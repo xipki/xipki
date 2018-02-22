@@ -20,34 +20,35 @@ package org.xipki.ca.server.mgmt.api;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum CaStatus {
 
-    ACTIVE("active"),
-    INACTIVE("inactive");
+  ACTIVE("active"),
+  INACTIVE("inactive");
 
-    private String status;
+  private String status;
 
-    CaStatus(String status) {
-        this.status = status;
+  CaStatus(String status) {
+    this.status = status;
+  }
+
+  public String status() {
+    return status;
+  }
+
+  public static CaStatus forName(String status) {
+    ParamUtil.requireNonNull("status", status);
+    for (CaStatus value : values()) {
+      if (value.status.equalsIgnoreCase(status)) {
+        return value;
+      }
     }
 
-    public String status() {
-        return status;
-    }
-
-    public static CaStatus forName(String status) {
-        ParamUtil.requireNonNull("status", status);
-        for (CaStatus value : values()) {
-            if (value.status.equalsIgnoreCase(status)) {
-                return value;
-            }
-        }
-
-        throw new IllegalArgumentException("invalid CaStatus " + status);
-    }
+    throw new IllegalArgumentException("invalid CaStatus " + status);
+  }
 
 }

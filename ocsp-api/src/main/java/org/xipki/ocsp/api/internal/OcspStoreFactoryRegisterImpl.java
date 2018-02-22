@@ -28,59 +28,60 @@ import org.xipki.ocsp.api.OcspStoreFactory;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
 
-    private static final Logger LOG = LoggerFactory.getLogger(
-            OcspStoreFactoryRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+      OcspStoreFactoryRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<OcspStoreFactory> services =
-            new ConcurrentLinkedDeque<OcspStoreFactory>();
+  private ConcurrentLinkedDeque<OcspStoreFactory> services =
+      new ConcurrentLinkedDeque<OcspStoreFactory>();
 
-    @Override
-    public OcspStore newOcspStore(String type) throws ObjectCreationException {
-        ParamUtil.requireNonBlank("type", type);
+  @Override
+  public OcspStore newOcspStore(String type) throws ObjectCreationException {
+    ParamUtil.requireNonBlank("type", type);
 
-        for (OcspStoreFactory service : services) {
-            if (service.canCreateOcspStore(type)) {
-                LOG.info("found factory to create OcspStore of type '" + type + "'");
-                return service.newOcspStore(type);
-            }
-        }
-
-        throw new ObjectCreationException(
-                "could not find factory to create OcspStore of type '" + type + "'");
+    for (OcspStoreFactory service : services) {
+      if (service.canCreateOcspStore(type)) {
+        LOG.info("found factory to create OcspStore of type '" + type + "'");
+        return service.newOcspStore(type);
+      }
     }
 
-    public void bindService(OcspStoreFactory service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.info("bindService invoked with null.");
-            return;
-        }
+    throw new ObjectCreationException(
+        "could not find factory to create OcspStore of type '" + type + "'");
+  }
 
-        boolean replaced = services.remove(service);
-        services.add(service);
-
-        String action = replaced ? "replaced" : "added";
-        LOG.info("{} CertStatusStoreFactory binding for {}", action, service);
+  public void bindService(OcspStoreFactory service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.info("bindService invoked with null.");
+      return;
     }
 
-    public void unbindService(OcspStoreFactory service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.info("unbindService invoked with null.");
-            return;
-        }
+    boolean replaced = services.remove(service);
+    services.add(service);
 
-        if (services.remove(service)) {
-            LOG.info("removed CertStatusStoreFactory binding for {}", service);
-        } else {
-            LOG.info("no CertStatusStoreFactory binding found to remove for '{}'", service);
-        }
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} CertStatusStoreFactory binding for {}", action, service);
+  }
+
+  public void unbindService(OcspStoreFactory service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.info("unbindService invoked with null.");
+      return;
     }
+
+    if (services.remove(service)) {
+      LOG.info("removed CertStatusStoreFactory binding for {}", service);
+    } else {
+      LOG.info("no CertStatusStoreFactory binding found to remove for '{}'", service);
+    }
+  }
 
 }

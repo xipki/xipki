@@ -20,12 +20,13 @@ package org.xipki.ca.server.api;
 import org.xipki.audit.AuditEvent;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public interface Rest {
 
-    RestResponse service(String path, AuditEvent event, byte[] request,
-            HttpRequestMetadataRetriever httpRetriever);
+  RestResponse service(String path, AuditEvent event, byte[] request,
+      HttpRequestMetadataRetriever httpRetriever);
 }

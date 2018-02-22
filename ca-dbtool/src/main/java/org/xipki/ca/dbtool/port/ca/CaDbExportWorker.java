@@ -42,121 +42,122 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CaDbExportWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaDbExportWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaDbExportWorker.class);
 
-    private final DataSourceWrapper datasource;
+  private final DataSourceWrapper datasource;
 
-    private final Marshaller marshaller;
+  private final Marshaller marshaller;
 
-    private final Unmarshaller unmarshaller;
+  private final Unmarshaller unmarshaller;
 
-    private final String destFolder;
+  private final String destFolder;
 
-    private final boolean resume;
+  private final boolean resume;
 
-    private final int numCertsInBundle;
+  private final int numCertsInBundle;
 
-    private final int numCertsPerSelect;
+  private final int numCertsPerSelect;
 
-    private final boolean evaluateOnly;
+  private final boolean evaluateOnly;
 
-    public CaDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-            String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-            int numCertsPerSelect, boolean evaluateOnly)
-            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonBlank("dbConfFile", dbConfFile);
-        ParamUtil.requireNonBlank("destFolder", destFolder);
-        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
+  public CaDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+      String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
+      int numCertsPerSelect, boolean evaluateOnly)
+      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    ParamUtil.requireNonBlank("dbConfFile", dbConfFile);
+    ParamUtil.requireNonBlank("destFolder", destFolder);
+    ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
-                passwordResolver);
-        this.marshaller = getMarshaller();
-        this.unmarshaller = getUnmarshaller();
-        this.destFolder = IoUtil.expandFilepath(destFolder);
-        this.resume = resume;
-        this.numCertsInBundle = numCertsInBundle;
-        this.numCertsPerSelect = numCertsPerSelect;
-        this.evaluateOnly = evaluateOnly;
-        checkDestFolder();
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+        passwordResolver);
+    this.marshaller = getMarshaller();
+    this.unmarshaller = getUnmarshaller();
+    this.destFolder = IoUtil.expandFilepath(destFolder);
+    this.resume = resume;
+    this.numCertsInBundle = numCertsInBundle;
+    this.numCertsPerSelect = numCertsPerSelect;
+    this.evaluateOnly = evaluateOnly;
+    checkDestFolder();
+  }
+
+  private void checkDestFolder() throws IOException {
+    File file = new File(destFolder);
+    if (!file.exists()) {
+      file.mkdirs();
+    } else {
+      if (!file.isDirectory()) {
+        throw new IOException(destFolder + " is not a folder");
+      }
+
+      if (!file.canWrite()) {
+        throw new IOException(destFolder + " is not writable");
+      }
     }
 
-    private void checkDestFolder() throws IOException {
-        File file = new File(destFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        } else {
-            if (!file.isDirectory()) {
-                throw new IOException(destFolder + " is not a folder");
-            }
-
-            if (!file.canWrite()) {
-                throw new IOException(destFolder + " is not writable");
-            }
-        }
-
-        File processLogFile = new File(destFolder, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
-        if (resume) {
-            if (!processLogFile.exists()) {
-                throw new IOException("could not process with '--resume' option");
-            }
-        } else {
-            String[] children = file.list();
-            if (children != null && children.length > 0) {
-                throw new IOException(destFolder + " is not empty");
-            }
-        }
-    } // method checkDestFolder
-
-    @Override
-    protected void run0() throws Exception {
-        long start = System.currentTimeMillis();
-        try {
-            if (!resume) {
-                // CAConfiguration
-                CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
-                        datasource, marshaller, destFolder, stopMe, evaluateOnly);
-                caConfExporter.export();
-                caConfExporter.shutdown();
-            }
-
-            // CertStore
-            CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(datasource,
-                    marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerSelect,
-                    resume, stopMe, evaluateOnly);
-            certStoreExporter.export();
-            certStoreExporter.shutdown();
-        } finally {
-            try {
-                datasource.close();
-            } catch (Throwable th) {
-                LOG.error("datasource.close()", th);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
-        }
-    } // method run0
-
-    private static Marshaller getMarshaller() throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        return marshaller;
+    File processLogFile = new File(destFolder, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
+    if (resume) {
+      if (!processLogFile.exists()) {
+        throw new IOException("could not process with '--resume' option");
+      }
+    } else {
+      String[] children = file.list();
+      if (children != null && children.length > 0) {
+        throw new IOException(destFolder + " is not empty");
+      }
     }
+  } // method checkDestFolder
 
-    private static Unmarshaller getUnmarshaller() throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        return unmarshaller;
+  @Override
+  protected void run0() throws Exception {
+    long start = System.currentTimeMillis();
+    try {
+      if (!resume) {
+        // CAConfiguration
+        CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
+            datasource, marshaller, destFolder, stopMe, evaluateOnly);
+        caConfExporter.export();
+        caConfExporter.shutdown();
+      }
+
+      // CertStore
+      CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(datasource,
+          marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerSelect,
+          resume, stopMe, evaluateOnly);
+      certStoreExporter.export();
+      certStoreExporter.shutdown();
+    } finally {
+      try {
+        datasource.close();
+      } catch (Throwable th) {
+        LOG.error("datasource.close()", th);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
     }
+  } // method run0
+
+  private static Marshaller getMarshaller() throws JAXBException {
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    Marshaller marshaller = jaxbContext.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+    return marshaller;
+  }
+
+  private static Unmarshaller getUnmarshaller() throws JAXBException {
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+    return unmarshaller;
+  }
 
 }

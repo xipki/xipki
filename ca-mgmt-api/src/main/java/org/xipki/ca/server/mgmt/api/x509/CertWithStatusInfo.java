@@ -22,43 +22,44 @@ import java.security.cert.Certificate;
 import org.xipki.security.CertRevocationInfo;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertWithStatusInfo {
 
-    private Certificate cert;
+  private Certificate cert;
 
-    private String certprofile;
+  private String certprofile;
 
-    private CertRevocationInfo revocationInfo;
+  private CertRevocationInfo revocationInfo;
 
-    public CertWithStatusInfo() {
-    }
+  public CertWithStatusInfo() {
+  }
 
-    public Certificate cert() {
-        return cert;
-    }
+  public Certificate cert() {
+    return cert;
+  }
 
-    public void setCert(Certificate cert) {
-        this.cert = cert;
-    }
+  public void setCert(Certificate cert) {
+    this.cert = cert;
+  }
 
-    public String certprofile() {
-        return certprofile;
-    }
+  public String certprofile() {
+    return certprofile;
+  }
 
-    public void setCertprofile(String certprofile) {
-        this.certprofile = certprofile;
-    }
+  public void setCertprofile(String certprofile) {
+    this.certprofile = certprofile;
+  }
 
-    public CertRevocationInfo revocationInfo() {
-        return revocationInfo;
-    }
+  public CertRevocationInfo revocationInfo() {
+    return revocationInfo;
+  }
 
-    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
-        this.revocationInfo = revocationInfo;
-    }
+  public void setRevocationInfo(CertRevocationInfo revocationInfo) {
+    this.revocationInfo = revocationInfo;
+  }
 
 }

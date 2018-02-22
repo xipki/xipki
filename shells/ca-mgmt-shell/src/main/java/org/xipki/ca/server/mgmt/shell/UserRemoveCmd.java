@@ -22,24 +22,25 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "user-rm",
-        description = "remove user")
+    description = "remove user")
 @Service
 public class UserRemoveCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "user Name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "user Name\n(required)")
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeUser(name);
-        output(bo, "removed", "could not remove", "user " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeUser(name);
+    output(bo, "removed", "could not remove", "user " + name);
+    return null;
+  }
 
 }

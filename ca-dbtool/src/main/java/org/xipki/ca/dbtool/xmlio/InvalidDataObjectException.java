@@ -18,19 +18,20 @@
 package org.xipki.ca.dbtool.xmlio;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class InvalidDataObjectException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public InvalidDataObjectException() {
-    }
+  public InvalidDataObjectException() {
+  }
 
-    public InvalidDataObjectException(String message) {
-        super(message);
-    }
+  public InvalidDataObjectException(String message) {
+    super(message);
+  }
 
 }

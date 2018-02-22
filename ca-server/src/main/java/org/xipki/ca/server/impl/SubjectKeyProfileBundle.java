@@ -18,48 +18,49 @@
 package org.xipki.ca.server.impl;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class SubjectKeyProfileBundle {
 
-    private final int certId;
+  private final int certId;
 
-    private final long subjectFp;
+  private final long subjectFp;
 
-    private final long keyFp;
+  private final long keyFp;
 
-    private final String profile;
+  private final String profile;
 
-    private final boolean revoked;
+  private final boolean revoked;
 
-    public SubjectKeyProfileBundle(int certId, long subjectFp, long keyFp, String profile,
-            boolean revoked) {
-        this.certId = certId;
-        this.subjectFp = subjectFp;
-        this.keyFp = keyFp;
-        this.profile = profile;
-        this.revoked = revoked;
-    }
+  public SubjectKeyProfileBundle(int certId, long subjectFp, long keyFp, String profile,
+      boolean revoked) {
+    this.certId = certId;
+    this.subjectFp = subjectFp;
+    this.keyFp = keyFp;
+    this.profile = profile;
+    this.revoked = revoked;
+  }
 
-    public int certId() {
-        return certId;
-    }
+  public int certId() {
+    return certId;
+  }
 
-    public long subjectFp() {
-        return subjectFp;
-    }
+  public long subjectFp() {
+    return subjectFp;
+  }
 
-    public long keyFp() {
-        return keyFp;
-    }
+  public long keyFp() {
+    return keyFp;
+  }
 
-    public String profile() {
-        return profile;
-    }
+  public String profile() {
+    return profile;
+  }
 
-    public boolean isRevoked() {
-        return revoked;
-    }
+  public boolean isRevoked() {
+    return revoked;
+  }
 }

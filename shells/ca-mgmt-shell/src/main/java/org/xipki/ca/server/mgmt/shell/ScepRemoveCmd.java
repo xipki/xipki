@@ -24,25 +24,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "scep-rm",
-        description = "remove SCEP")
+    description = "remove SCEP")
 @Service
 public class ScepRemoveCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "SCEP CA name\n(required)")
-    @Completion(ScepNameCompleter.class)
-    private String name;
+  @Option(name = "--ca", required = true,
+      description = "SCEP CA name\n(required)")
+  @Completion(ScepNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeScep(name);
-        output(bo, "removed", "could not remove", "SCEP for CA " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeScep(name);
+    output(bo, "removed", "could not remove", "SCEP for CA " + name);
+    return null;
+  }
 
 }

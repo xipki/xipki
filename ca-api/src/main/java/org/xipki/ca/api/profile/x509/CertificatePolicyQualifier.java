@@ -20,37 +20,38 @@ package org.xipki.ca.api.profile.x509;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertificatePolicyQualifier {
 
-    private final String cpsUri;
+  private final String cpsUri;
 
-    private final String userNotice;
+  private final String userNotice;
 
-    private CertificatePolicyQualifier(String cpsUri, String userNotice) {
-        this.cpsUri = cpsUri;
-        this.userNotice = userNotice;
-    }
+  private CertificatePolicyQualifier(String cpsUri, String userNotice) {
+    this.cpsUri = cpsUri;
+    this.userNotice = userNotice;
+  }
 
-    public String cpsUri() {
-        return cpsUri;
-    }
+  public String cpsUri() {
+    return cpsUri;
+  }
 
-    public String userNotice() {
-        return userNotice;
-    }
+  public String userNotice() {
+    return userNotice;
+  }
 
-    public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice) {
-        ParamUtil.requireNonNull("userNotice", userNotice);
-        return new CertificatePolicyQualifier(null, userNotice);
-    }
+  public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice) {
+    ParamUtil.requireNonNull("userNotice", userNotice);
+    return new CertificatePolicyQualifier(null, userNotice);
+  }
 
-    public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri) {
-        ParamUtil.requireNonNull("cpsUri", cpsUri);
-        return new CertificatePolicyQualifier(cpsUri, null);
-    }
+  public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri) {
+    ParamUtil.requireNonNull("cpsUri", cpsUri);
+    return new CertificatePolicyQualifier(cpsUri, null);
+  }
 
 }

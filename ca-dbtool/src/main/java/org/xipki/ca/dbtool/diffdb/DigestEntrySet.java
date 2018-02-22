@@ -23,51 +23,52 @@ import java.util.List;
 import org.xipki.common.QueueEntry;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
 
-    private final long startId;
+  private final long startId;
 
-    private Exception exception;
+  private Exception exception;
 
-    private List<IdentifiedDigestEntry> entries = new LinkedList<>();
+  private List<IdentifiedDigestEntry> entries = new LinkedList<>();
 
-    public DigestEntrySet(long startId) {
-        this.startId = startId;
+  public DigestEntrySet(long startId) {
+    this.startId = startId;
+  }
+
+  public void setException(Exception exception) {
+    this.exception = exception;
+  }
+
+  public Exception exception() {
+    return exception;
+  }
+
+  public void addEntry(IdentifiedDigestEntry entry) {
+    entries.add(entry);
+  }
+
+  public long startId() {
+    return startId;
+  }
+
+  public List<IdentifiedDigestEntry> entries() {
+    return entries;
+  }
+
+  @Override
+  public int compareTo(DigestEntrySet obj) {
+    if (startId < obj.startId) {
+      return -1;
+    } else if (startId == obj.startId) {
+      return 0;
+    } else {
+      return 1;
     }
-
-    public void setException(Exception exception) {
-        this.exception = exception;
-    }
-
-    public Exception exception() {
-        return exception;
-    }
-
-    public void addEntry(IdentifiedDigestEntry entry) {
-        entries.add(entry);
-    }
-
-    public long startId() {
-        return startId;
-    }
-
-    public List<IdentifiedDigestEntry> entries() {
-        return entries;
-    }
-
-    @Override
-    public int compareTo(DigestEntrySet obj) {
-        if (startId < obj.startId) {
-            return -1;
-        } else if (startId == obj.startId) {
-            return 0;
-        } else {
-            return 1;
-        }
-    }
+  }
 
 }

@@ -18,29 +18,30 @@
 package org.xipki.ca.dbtool.xmlio;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class IdentifidDbObjectType extends DbDataObject {
 
-    public static final String TAG_ID = "id";
+  public static final String TAG_ID = "id";
 
-    public static final String TAG_FILE = "file";
+  public static final String TAG_FILE = "file";
 
-    private Long id;
+  private Long id;
 
-    public Long id() {
-        return id;
-    }
+  public Long id() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    @Override
-    public void validate() throws InvalidDataObjectException {
-        assertNotNull(TAG_ID, id);
-    }
+  @Override
+  public void validate() throws InvalidDataObjectException {
+    assertNotNull(TAG_ID, id);
+  }
 
 }

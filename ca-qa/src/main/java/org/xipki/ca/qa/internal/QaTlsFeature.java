@@ -25,24 +25,25 @@ import org.xipki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class QaTlsFeature extends QaExtension {
 
-    private final Set<Integer> features;
+  private final Set<Integer> features;
 
-    public QaTlsFeature(TlsFeature jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
-        this.features = new HashSet<>();
-        for (IntWithDescType m : jaxb.getFeature()) {
-            features.add(m.getValue());
-        }
+  public QaTlsFeature(TlsFeature jaxb) {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    this.features = new HashSet<>();
+    for (IntWithDescType m : jaxb.getFeature()) {
+      features.add(m.getValue());
     }
+  }
 
-    public Set<Integer> features() {
-        return features;
-    }
+  public Set<Integer> features() {
+    return features;
+  }
 
 }

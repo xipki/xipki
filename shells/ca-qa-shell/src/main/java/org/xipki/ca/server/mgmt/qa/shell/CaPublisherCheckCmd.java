@@ -30,45 +30,46 @@ import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "capub-check",
-        description = "check information of publishers in given CA (QA)")
+    description = "check information of publishers in given CA (QA)")
 @Service
 public class CaPublisherCheckCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--publisher", required = true,
-            description = "publisher name\n(required)")
-    @Completion(PublisherNameCompleter.class)
-    private String publisherName;
+  @Option(name = "--publisher", required = true,
+      description = "publisher name\n(required)")
+  @Completion(PublisherNameCompleter.class)
+  private String publisherName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
 
-        if (caManager.getCa(caName) == null) {
-            throw new CmdFailure("could not find CA '" + caName + "'");
-        }
-
-        List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
-
-        String upPublisherName = publisherName.toLowerCase();
-        for (PublisherEntry m : entries) {
-            if (m.ident().name().equals(upPublisherName)) {
-                println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName
-                        + "'");
-                return null;
-            }
-        }
-
-        throw new CmdFailure("CA is not associated with publisher '" + publisherName + "'");
+    if (caManager.getCa(caName) == null) {
+      throw new CmdFailure("could not find CA '" + caName + "'");
     }
+
+    List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
+
+    String upPublisherName = publisherName.toLowerCase();
+    for (PublisherEntry m : entries) {
+      if (m.ident().name().equals(upPublisherName)) {
+        println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName
+            + "'");
+        return null;
+      }
+    }
+
+    throw new CmdFailure("CA is not associated with publisher '" + publisherName + "'");
+  }
 
 }

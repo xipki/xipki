@@ -27,31 +27,32 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "export-conf",
-        description = "export configuration to zip file")
+    description = "export configuration to zip file")
 @Service
 public class ExportConfCmd extends CaAction {
 
-    @Option(name = "--conf-file", required = true,
-            description = "zip file that saves the exported configuration")
-    @Completion(FilePathCompleter.class)
-    private String confFile;
+  @Option(name = "--conf-file", required = true,
+      description = "zip file that saves the exported configuration")
+  @Completion(FilePathCompleter.class)
+  private String confFile;
 
-    @Option(name = "--ca", multiValued = true,
-            description = "CAs whose configuration should be exported."
-                    + " Empty list means all CAs\n(multi-valued)")
-    @Completion(CaNameCompleter.class)
-    private List<String> caNames;
+  @Option(name = "--ca", multiValued = true,
+      description = "CAs whose configuration should be exported."
+          + " Empty list means all CAs\n(multi-valued)")
+  @Completion(CaNameCompleter.class)
+  private List<String> caNames;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.exportConf(confFile, caNames);
-        output(bo, "exported", "could not export", "configuration to file " + confFile);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.exportConf(confFile, caNames);
+    output(bo, "exported", "could not export", "configuration to file " + confFile);
+    return null;
+  }
 
 }

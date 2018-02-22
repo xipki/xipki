@@ -20,25 +20,26 @@ package org.xipki.ca.api.profile.x509;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public enum SpecialX509CertprofileBehavior {
 
-    gematik_gSMC_K;
+  gematik_gSMC_K;
 
-    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
+  public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
 
-    public static SpecialX509CertprofileBehavior forName(String behavior) {
-        ParamUtil.requireNonNull("behavior", behavior);
-        for (SpecialX509CertprofileBehavior b : values()) {
-            if (b.name().equalsIgnoreCase(behavior)) {
-                return b;
-            }
-        }
-
-        throw new IllegalArgumentException("invalid SpecialX509CertprofileBehavior " + behavior);
+  public static SpecialX509CertprofileBehavior forName(String behavior) {
+    ParamUtil.requireNonNull("behavior", behavior);
+    for (SpecialX509CertprofileBehavior b : values()) {
+      if (b.name().equalsIgnoreCase(behavior)) {
+        return b;
+      }
     }
+
+    throw new IllegalArgumentException("invalid SpecialX509CertprofileBehavior " + behavior);
+  }
 
 }

@@ -28,74 +28,75 @@ import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ResponseOption {
 
-    static final Set<HashAlgoType> SUPPORTED_CERTHASH_ALGORITHMS = new HashSet<>();
+  static final Set<HashAlgoType> SUPPORTED_CERTHASH_ALGORITHMS = new HashSet<>();
 
-    static {
-        SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA1);
-        SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA256);
-        SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA3_256);
+  static {
+    SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA1);
+    SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA256);
+    SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA3_256);
+  }
+
+  private final boolean responderIdByName;
+
+  private final boolean includeInvalidityDate;
+
+  private final boolean includeRevReason;
+
+  private final EmbedCertsMode embedCertsMode;
+
+  private final boolean includeCerthash;
+
+  private final Long cacheMaxAge;
+
+  ResponseOption(ResponseOptionType conf) throws InvalidConfException {
+    ParamUtil.requireNonNull("conf", conf);
+    this.responderIdByName = getBoolean(conf.isResponderIdByName(), true);
+    this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
+    this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
+    this.embedCertsMode = (conf.getEmbedCertsMode() == null)
+        ? EmbedCertsMode.SIGNER : conf.getEmbedCertsMode();
+    this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
+    CacheType cacheConf = conf.getCache();
+    if (cacheConf != null && cacheConf.getCacheMaxAge() != null) {
+      this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
+    } else {
+      this.cacheMaxAge = null;
     }
+  }
 
-    private final boolean responderIdByName;
+  public boolean isResponderIdByName() {
+    return responderIdByName;
+  }
 
-    private final boolean includeInvalidityDate;
+  public boolean isIncludeInvalidityDate() {
+    return includeInvalidityDate;
+  }
 
-    private final boolean includeRevReason;
+  public boolean isIncludeRevReason() {
+    return includeRevReason;
+  }
 
-    private final EmbedCertsMode embedCertsMode;
+  public boolean isIncludeCerthash() {
+    return includeCerthash;
+  }
 
-    private final boolean includeCerthash;
+  public Long cacheMaxAge() {
+    return cacheMaxAge;
+  }
 
-    private final Long cacheMaxAge;
+  public EmbedCertsMode embedCertsMode() {
+    return embedCertsMode;
+  }
 
-    ResponseOption(ResponseOptionType conf) throws InvalidConfException {
-        ParamUtil.requireNonNull("conf", conf);
-        this.responderIdByName = getBoolean(conf.isResponderIdByName(), true);
-        this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
-        this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
-        this.embedCertsMode = (conf.getEmbedCertsMode() == null)
-                ? EmbedCertsMode.SIGNER : conf.getEmbedCertsMode();
-        this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
-        CacheType cacheConf = conf.getCache();
-        if (cacheConf != null && cacheConf.getCacheMaxAge() != null) {
-            this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
-        } else {
-            this.cacheMaxAge = null;
-        }
-    }
-
-    public boolean isResponderIdByName() {
-        return responderIdByName;
-    }
-
-    public boolean isIncludeInvalidityDate() {
-        return includeInvalidityDate;
-    }
-
-    public boolean isIncludeRevReason() {
-        return includeRevReason;
-    }
-
-    public boolean isIncludeCerthash() {
-        return includeCerthash;
-    }
-
-    public Long cacheMaxAge() {
-        return cacheMaxAge;
-    }
-
-    public EmbedCertsMode embedCertsMode() {
-        return embedCertsMode;
-    }
-
-    private static boolean getBoolean(Boolean bo, boolean dflt) {
-        return (bo == null) ? dflt : bo.booleanValue();
-    }
+  private static boolean getBoolean(Boolean bo, boolean dflt) {
+    return (bo == null) ? dflt : bo.booleanValue();
+  }
 
 }

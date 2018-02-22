@@ -28,33 +28,34 @@ import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.common.util.StringUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "caprofile-rm",
-        description = "remove certificate profile from CA")
+    description = "remove certificate profile from CA")
 @Service
 public class CaProfileRemoveCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile", required = true, multiValued = true,
-            description = "certificate profile name\n(required, multi-valued)")
-    @Completion(ProfileNameCompleter.class)
-    private List<String> profileNames;
+  @Option(name = "--profile", required = true, multiValued = true,
+      description = "certificate profile name\n(required, multi-valued)")
+  @Completion(ProfileNameCompleter.class)
+  private List<String> profileNames;
 
-    @Override
-    protected Object execute0() throws Exception {
-        for (String profileName : profileNames) {
-            boolean bo = caManager.removeCertprofileFromCa(profileName, caName);
-            output(bo, "removed", "could not remove",
-                    StringUtil.concat("certificate profile ", profileName, " from CA ", caName));
-        }
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    for (String profileName : profileNames) {
+      boolean bo = caManager.removeCertprofileFromCa(profileName, caName);
+      output(bo, "removed", "could not remove",
+          StringUtil.concat("certificate profile ", profileName, " from CA ", caName));
     }
+    return null;
+  }
 
 }

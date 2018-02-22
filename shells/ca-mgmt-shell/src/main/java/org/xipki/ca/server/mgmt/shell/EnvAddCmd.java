@@ -22,28 +22,29 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "env-add",
-        description = "add CA environment parameter")
+    description = "add CA environment parameter")
 @Service
 public class EnvAddCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "parameter Name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "parameter Name\n(required)")
+  private String name;
 
-    @Option(name = "--value", required = true,
-            description = "environment paremter value\n(required)")
-    private String value;
+  @Option(name = "--value", required = true,
+      description = "environment paremter value\n(required)")
+  private String value;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.addEnvParam(name, value);
-        output(bo, "added", "could not add", "environment parameter " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.addEnvParam(name, value);
+    output(bo, "added", "could not add", "environment parameter " + name);
+    return null;
+  }
 
 }

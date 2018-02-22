@@ -31,35 +31,35 @@ import org.xipki.security.util.X509Util;
 
 class InternUtil {
 
-    private InternUtil() {
+  private InternUtil() {
+  }
+
+  static String formatCert(X509Certificate cert, boolean verbose) {
+    if (cert == null) {
+      return "\tnull";
     }
 
-    static String formatCert(X509Certificate cert, boolean verbose) {
-        if (cert == null) {
-            return "\tnull";
-        }
+    StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
+    sb.append("\tissuer: ").append(
+        X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
+    sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
+        .append('\n');
+    sb.append("\tsubject: ").append(
+        X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
+    sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
+    sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
 
-        StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
-        sb.append("\tissuer: ").append(
-                X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
-        sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
-                .append('\n');
-        sb.append("\tsubject: ").append(
-                X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
-        sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
-        sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
-
-        if (verbose) {
-            sb.append("\tencoded: ");
-            try {
-                sb.append(Base64.encodeToString(cert.getEncoded()));
-            } catch (CertificateEncodingException ex) {
-                sb.append("ERROR");
-            }
-        }
-
-        return sb.toString();
-
+    if (verbose) {
+      sb.append("\tencoded: ");
+      try {
+        sb.append(Base64.encodeToString(cert.getEncoded()));
+      } catch (CertificateEncodingException ex) {
+        sb.append("ERROR");
+      }
     }
+
+    return sb.toString();
+
+  }
 
 }

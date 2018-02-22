@@ -23,33 +23,34 @@ import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class MgmtQaShellUtil {
 
-    private MgmtQaShellUtil() {
+  private MgmtQaShellUtil() {
+  }
+
+  public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
+    String tmpEx = ex;
+    if (CaManager.NULL.equals(tmpEx)) {
+      tmpEx = null;
     }
 
-    public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
-        String tmpEx = ex;
-        if (CaManager.NULL.equals(tmpEx)) {
-            tmpEx = null;
-        }
-
-        boolean bo = (tmpEx == null) ? (is == null) : tmpEx.equals(is);
-        if (!bo) {
-            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
-        }
+    boolean bo = (tmpEx == null) ? (is == null) : tmpEx.equals(is);
+    if (!bo) {
+      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
     }
+  }
 
-    public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
-            throws CmdFailure {
-        boolean bo = (ex == null) ? (is == null) : ex.equals(is);
-        if (!bo) {
-            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
-        }
+  public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
+      throws CmdFailure {
+    boolean bo = (ex == null) ? (is == null) : ex.equals(is);
+    if (!bo) {
+      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
     }
+  }
 
 }

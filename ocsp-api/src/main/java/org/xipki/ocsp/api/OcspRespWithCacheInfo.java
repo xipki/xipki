@@ -18,51 +18,52 @@
 package org.xipki.ocsp.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspRespWithCacheInfo {
 
-    public static final class ResponseCacheInfo {
+  public static final class ResponseCacheInfo {
 
-        private final long thisUpdate;
+    private final long thisUpdate;
 
-        private Long nextUpdate;
+    private Long nextUpdate;
 
-        public ResponseCacheInfo(long thisUpdate) {
-            this.thisUpdate = thisUpdate;
-        }
-
-        public long thisUpdate() {
-            return thisUpdate;
-        }
-
-        public void setNextUpdate(Long nextUpdate) {
-            this.nextUpdate = nextUpdate;
-        }
-
-        public Long nextUpdate() {
-            return nextUpdate;
-        }
-
-    } // class ResponseCacheInfo
-
-    private byte[] response;
-
-    private ResponseCacheInfo cacheInfo;
-
-    public OcspRespWithCacheInfo(byte[] response, ResponseCacheInfo cacheInfo) {
-        this.response = response;
-        this.cacheInfo = cacheInfo;
+    public ResponseCacheInfo(long thisUpdate) {
+      this.thisUpdate = thisUpdate;
     }
 
-    public byte[] response() {
-        return response;
+    public long thisUpdate() {
+      return thisUpdate;
     }
 
-    public ResponseCacheInfo cacheInfo() {
-        return cacheInfo;
+    public void setNextUpdate(Long nextUpdate) {
+      this.nextUpdate = nextUpdate;
     }
+
+    public Long nextUpdate() {
+      return nextUpdate;
+    }
+
+  } // class ResponseCacheInfo
+
+  private byte[] response;
+
+  private ResponseCacheInfo cacheInfo;
+
+  public OcspRespWithCacheInfo(byte[] response, ResponseCacheInfo cacheInfo) {
+    this.response = response;
+    this.cacheInfo = cacheInfo;
+  }
+
+  public byte[] response() {
+    return response;
+  }
+
+  public ResponseCacheInfo cacheInfo() {
+    return cacheInfo;
+  }
 
 }

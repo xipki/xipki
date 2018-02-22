@@ -20,40 +20,41 @@ package org.xipki.ca.certprofile.commonpki;
 import java.util.regex.Pattern;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.1
  */
 
 public class RegistrationNumberOption {
 
-    private final Pattern regex;
+  private final Pattern regex;
 
-    private final String constant;
+  private final String constant;
 
-    public RegistrationNumberOption(String regex, String constant) {
-        if (regex != null) {
-            if (constant != null) {
-                throw new IllegalArgumentException(
-                        "exactly one of regex and constant must be non null");
-            }
-            this.regex = Pattern.compile(regex);
-            this.constant = null;
-        } else {
-            if (constant == null) {
-                throw new IllegalArgumentException(
-                        "exactly one of regex and constant must be non null");
-            }
-            this.regex = null;
-            this.constant = constant;
-        }
+  public RegistrationNumberOption(String regex, String constant) {
+    if (regex != null) {
+      if (constant != null) {
+        throw new IllegalArgumentException(
+            "exactly one of regex and constant must be non null");
+      }
+      this.regex = Pattern.compile(regex);
+      this.constant = null;
+    } else {
+      if (constant == null) {
+        throw new IllegalArgumentException(
+            "exactly one of regex and constant must be non null");
+      }
+      this.regex = null;
+      this.constant = constant;
     }
+  }
 
-    public Pattern regex() {
-        return regex;
-    }
+  public Pattern regex() {
+    return regex;
+  }
 
-    public String constant() {
-        return constant;
-    }
+  public String constant() {
+    return constant;
+  }
 
 }

@@ -18,34 +18,35 @@
 package org.xipki.ca.api.profile;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ExtensionControl {
 
-    private final boolean critical;
+  private final boolean critical;
 
-    private final boolean required;
+  private final boolean required;
 
-    private final boolean request;
+  private final boolean request;
 
-    public ExtensionControl(boolean critical, boolean required, boolean request) {
-        this.critical = critical;
-        this.required = required;
-        this.request = request;
-    }
+  public ExtensionControl(boolean critical, boolean required, boolean request) {
+    this.critical = critical;
+    this.required = required;
+    this.request = request;
+  }
 
-    public boolean isCritical() {
-        return critical;
-    }
+  public boolean isCritical() {
+    return critical;
+  }
 
-    public boolean isRequired() {
-        return required;
-    }
+  public boolean isRequired() {
+    return required;
+  }
 
-    public boolean isRequest() {
-        return request;
-    }
+  public boolean isRequest() {
+    return request;
+  }
 
 }

@@ -30,44 +30,45 @@ import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 @Command(scope = "ca", name = "causer-add",
-        description = "add user to CA")
+    description = "add user to CA")
 @Service
 public class CaUserAddCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--user", required = true,
-            description = "user name\n(required)")
-    private String userName;
+  @Option(name = "--user", required = true,
+      description = "user name\n(required)")
+  private String userName;
 
-    @Option(name = "--permission", required = true, multiValued = true,
-            description = "permission\n(required, multi-valued)")
-    @Completion(PermissionCompleter.class)
-    private Set<String> permissions;
+  @Option(name = "--permission", required = true, multiValued = true,
+      description = "permission\n(required, multi-valued)")
+  @Completion(PermissionCompleter.class)
+  private Set<String> permissions;
 
-    @Option(name = "--profile", required = true, multiValued = true,
-            description = "profile name or 'all' for all profiles\n(required, multi-valued)")
-    @Completion(ProfileNameAndAllCompleter.class)
-    private Set<String> profiles;
+  @Option(name = "--profile", required = true, multiValued = true,
+      description = "profile name or 'all' for all profiles\n(required, multi-valued)")
+  @Completion(ProfileNameAndAllCompleter.class)
+  private Set<String> profiles;
 
-    @Override
-    protected Object execute0() throws Exception {
-        CaHasUserEntry entry = new CaHasUserEntry(new NameId(null, userName));
-        entry.setProfiles(profiles);
-        int intPermission = ShellUtil.getPermission(permissions);
-        entry.setPermission(intPermission);
+  @Override
+  protected Object execute0() throws Exception {
+    CaHasUserEntry entry = new CaHasUserEntry(new NameId(null, userName));
+    entry.setProfiles(profiles);
+    int intPermission = ShellUtil.getPermission(permissions);
+    entry.setPermission(intPermission);
 
-        boolean bo = caManager.addUserToCa(entry, caName);
-        output(bo, "added", "could not add", "user " + userName + " to CA " + caName);
-        return null;
-    }
+    boolean bo = caManager.addUserToCa(entry, caName);
+    output(bo, "added", "could not add", "user " + userName + " to CA " + caName);
+    return null;
+  }
 
 }

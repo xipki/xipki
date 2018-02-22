@@ -24,72 +24,73 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class IssuerStore {
 
-    private final List<IssuerEntry> entries;
+  private final List<IssuerEntry> entries;
 
-    private Set<Integer> ids;
+  private Set<Integer> ids;
 
-    public IssuerStore(List<IssuerEntry> entries) {
-        this.entries = new ArrayList<>(entries.size());
-        Set<Integer> idSet = new HashSet<>(entries.size());
+  public IssuerStore(List<IssuerEntry> entries) {
+    this.entries = new ArrayList<>(entries.size());
+    Set<Integer> idSet = new HashSet<>(entries.size());
 
-        for (IssuerEntry entry : entries) {
-            for (IssuerEntry existingEntry : this.entries) {
-                if (existingEntry.id() == entry.id()) {
-                    throw new IllegalArgumentException(
-                            "issuer with the same id " + entry.id() + " already available");
-                }
-            }
-            this.entries.add(entry);
-            idSet.add(entry.id());
+    for (IssuerEntry entry : entries) {
+      for (IssuerEntry existingEntry : this.entries) {
+        if (existingEntry.id() == entry.id()) {
+          throw new IllegalArgumentException(
+              "issuer with the same id " + entry.id() + " already available");
         }
-
-        this.ids = Collections.unmodifiableSet(idSet);
+      }
+      this.entries.add(entry);
+      idSet.add(entry.id());
     }
 
-    public int size() {
-        return ids.size();
+    this.ids = Collections.unmodifiableSet(idSet);
+  }
+
+  public int size() {
+    return ids.size();
+  }
+
+  public Set<Integer> ids() {
+    return ids;
+  }
+
+  public Integer getIssuerIdForFp(RequestIssuer reqIssuer) {
+    IssuerEntry issuerEntry = getIssuerForFp(reqIssuer);
+    return (issuerEntry == null) ? null : issuerEntry.id();
+  }
+
+  public IssuerEntry getIssuerForId(int id) {
+    for (IssuerEntry entry : entries) {
+      if (entry.id() == id) {
+        return entry;
+      }
     }
 
-    public Set<Integer> ids() {
-        return ids;
+    return null;
+  }
+
+  public IssuerEntry getIssuerForFp(RequestIssuer reqIssuer) {
+    for (IssuerEntry entry : entries) {
+      if (entry.matchHash(reqIssuer)) {
+        return entry;
+      }
     }
 
-    public Integer getIssuerIdForFp(RequestIssuer reqIssuer) {
-        IssuerEntry issuerEntry = getIssuerForFp(reqIssuer);
-        return (issuerEntry == null) ? null : issuerEntry.id();
-    }
+    return null;
+  }
 
-    public IssuerEntry getIssuerForId(int id) {
-        for (IssuerEntry entry : entries) {
-            if (entry.id() == id) {
-                return entry;
-            }
-        }
-
-        return null;
-    }
-
-    public IssuerEntry getIssuerForFp(RequestIssuer reqIssuer) {
-        for (IssuerEntry entry : entries) {
-            if (entry.matchHash(reqIssuer)) {
-                return entry;
-            }
-        }
-
-        return null;
-    }
-
-    public void addIssuer(IssuerEntry issuer) {
-        this.entries.add(issuer);
-        Set<Integer> newIds = new HashSet<>(this.ids);
-        newIds.add(issuer.id());
-        this.ids = Collections.unmodifiableSet(newIds);
-    }
+  public void addIssuer(IssuerEntry issuer) {
+    this.entries.add(issuer);
+    Set<Integer> newIds = new HashSet<>(this.ids);
+    newIds.add(issuer.id());
+    this.ids = Collections.unmodifiableSet(newIds);
+  }
 
 }

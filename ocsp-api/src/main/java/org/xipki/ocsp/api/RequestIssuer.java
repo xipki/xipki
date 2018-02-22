@@ -26,111 +26,112 @@ import org.xipki.common.util.Hex;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 public class RequestIssuer {
 
-    private final HashAlgoType hashAlgo;
+  private final HashAlgoType hashAlgo;
 
-    private final byte[] data;
+  private final byte[] data;
 
-    private final int from;
+  private final int from;
 
-    private final int nameHashFrom;
+  private final int nameHashFrom;
 
-    private final int len;
+  private final int len;
 
-    public RequestIssuer(HashAlgoType hashAlgo, byte[] hashData) {
-        int algIdLen = 2 + hashAlgo.encodedLength() + 2;
-        data = new byte[algIdLen + hashData.length];
-        int offset = 0;
-        data[offset++] = 0x30;
-        data[offset++] = (byte) (hashAlgo.encodedLength() + 2);
-        offset += hashAlgo.write(data, offset);
-        data[offset++] = 0x05;
-        data[offset++] = 0x00;
+  public RequestIssuer(HashAlgoType hashAlgo, byte[] hashData) {
+    int algIdLen = 2 + hashAlgo.encodedLength() + 2;
+    data = new byte[algIdLen + hashData.length];
+    int offset = 0;
+    data[offset++] = 0x30;
+    data[offset++] = (byte) (hashAlgo.encodedLength() + 2);
+    offset += hashAlgo.write(data, offset);
+    data[offset++] = 0x05;
+    data[offset++] = 0x00;
 
-        this.nameHashFrom = offset;
-        offset += ASN1Type.arraycopy(hashData, data, offset);
-        this.from = 0;
-        this.len = offset;
-        this.hashAlgo = hashAlgo;
+    this.nameHashFrom = offset;
+    offset += ASN1Type.arraycopy(hashData, data, offset);
+    this.from = 0;
+    this.len = offset;
+    this.hashAlgo = hashAlgo;
+  }
+
+  public RequestIssuer(byte[] data) {
+    this(data, 0, data.length);
+  }
+
+  public RequestIssuer(byte[] data, int from, int len) {
+    this.data = data;
+    this.from = from;
+    this.len = len;
+    this.hashAlgo = HashAlgoType.getInstanceForEncoded(data,
+        from + 2, 2 + data[from + 3]);
+
+    int hashAlgoFieldLen = 0xFF & data[from + 1];
+    this.nameHashFrom = from + 2 + hashAlgoFieldLen;
+  }
+
+  public HashAlgoType hashAlgorithm() {
+    return hashAlgo;
+  }
+
+  // CHECKSTYLE:SKIP
+  public String hashAlgorithmOID() {
+    if (hashAlgo != null) {
+      return hashAlgo.oid().getId();
+    } else {
+      final int start = from + 2;
+      byte[] bytes = Arrays.copyOfRange(data, start, start + 2 + (0xFF & data[from + 3]));
+      return ASN1ObjectIdentifier.getInstance(bytes).getId();
+    }
+  }
+
+  public int from() {
+    return from;
+  }
+
+  public byte[] data() {
+    return data;
+  }
+
+  public int nameHashFrom() {
+    return nameHashFrom;
+  }
+
+  public int length() {
+    return len;
+  }
+
+  public int write(byte[] out, int offset) {
+    System.arraycopy(data, from, out, offset, len);
+    return len;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
 
-    public RequestIssuer(byte[] data) {
-        this(data, 0, data.length);
+    if (!(obj instanceof RequestIssuer)) {
+      return false;
     }
 
-    public RequestIssuer(byte[] data, int from, int len) {
-        this.data = data;
-        this.from = from;
-        this.len = len;
-        this.hashAlgo = HashAlgoType.getInstanceForEncoded(data,
-                from + 2, 2 + data[from + 3]);
-
-        int hashAlgoFieldLen = 0xFF & data[from + 1];
-        this.nameHashFrom = from + 2 + hashAlgoFieldLen;
+    RequestIssuer other = (RequestIssuer) obj;
+    if (this.len != other.len) {
+      return false;
     }
 
-    public HashAlgoType hashAlgorithm() {
-        return hashAlgo;
-    }
+    return CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.len);
+  }
 
-    // CHECKSTYLE:SKIP
-    public String hashAlgorithmOID() {
-        if (hashAlgo != null) {
-            return hashAlgo.oid().getId();
-        } else {
-            final int start = from + 2;
-            byte[] bytes = Arrays.copyOfRange(data, start, start + 2 + (0xFF & data[from + 3]));
-            return ASN1ObjectIdentifier.getInstance(bytes).getId();
-        }
-    }
-
-    public int from() {
-        return from;
-    }
-
-    public byte[] data() {
-        return data;
-    }
-
-    public int nameHashFrom() {
-        return nameHashFrom;
-    }
-
-    public int length() {
-        return len;
-    }
-
-    public int write(byte[] out, int offset) {
-        System.arraycopy(data, from, out, offset, len);
-        return len;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof RequestIssuer)) {
-            return false;
-        }
-
-        RequestIssuer other = (RequestIssuer) obj;
-        if (this.len != other.len) {
-            return false;
-        }
-
-        return CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.len);
-    }
-
-    @Override
-    public String toString() {
-        return Hex.encode(Arrays.copyOfRange(data, from, from + len));
-    }
+  @Override
+  public String toString() {
+    return Hex.encode(Arrays.copyOfRange(data, from, from + len));
+  }
 
 }

@@ -25,21 +25,22 @@ import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.message.CaCaps;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 public interface Scep {
 
-    boolean isOnService();
+  boolean isOnService();
 
-    CaCaps caCaps();
+  CaCaps caCaps();
 
-    ScepCaCertRespBytes caCertResp() throws OperationException;
+  ScepCaCertRespBytes caCertResp() throws OperationException;
 
-    boolean supportsCertProfile(String profileName);
+  boolean supportsCertProfile(String profileName);
 
-    ContentInfo servicePkiOperation(CMSSignedData requestContent,
-            String certProfileName, String msgId, AuditEvent event)
-            throws MessageDecodingException, OperationException;
+  ContentInfo servicePkiOperation(CMSSignedData requestContent,
+      String certProfileName, String msgId, AuditEvent event)
+      throws MessageDecodingException, OperationException;
 }

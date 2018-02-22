@@ -50,473 +50,474 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class SubjectChecker {
 
-    private final SpecialX509CertprofileBehavior specialBehavior;
+  private final SpecialX509CertprofileBehavior specialBehavior;
 
-    private final SubjectControl subjectControl;
+  private final SubjectControl subjectControl;
 
-    public SubjectChecker(SpecialX509CertprofileBehavior specialBehavior,
-            SubjectControl subjectControl) throws CertprofileException {
-        this.specialBehavior = specialBehavior;
-        this.subjectControl = ParamUtil.requireNonNull("subjectControl", subjectControl);
+  public SubjectChecker(SpecialX509CertprofileBehavior specialBehavior,
+      SubjectControl subjectControl) throws CertprofileException {
+    this.specialBehavior = specialBehavior;
+    this.subjectControl = ParamUtil.requireNonNull("subjectControl", subjectControl);
+  }
+
+  public List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject) {
+    ParamUtil.requireNonNull("subject", subject);
+    ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+
+    // collect subject attribute types to check
+    Set<ASN1ObjectIdentifier> oids = new HashSet<>();
+
+    for (ASN1ObjectIdentifier oid : subjectControl.types()) {
+      oids.add(oid);
     }
 
-    public List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject) {
-        ParamUtil.requireNonNull("subject", subject);
-        ParamUtil.requireNonNull("requestedSubject", requestedSubject);
-
-        // collect subject attribute types to check
-        Set<ASN1ObjectIdentifier> oids = new HashSet<>();
-
-        for (ASN1ObjectIdentifier oid : subjectControl.types()) {
-            oids.add(oid);
-        }
-
-        for (ASN1ObjectIdentifier oid : subject.getAttributeTypes()) {
-            oids.add(oid);
-        }
-
-        List<ValidationIssue> result = new LinkedList<>();
-
-        ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
-        result.add(issue);
-        if (CollectionUtil.isNonEmpty(subjectControl.groups())) {
-            Set<String> groups = new HashSet<>(subjectControl.groups());
-            for (String g : groups) {
-                boolean toBreak = false;
-                RDN rdn = null;
-                for (ASN1ObjectIdentifier type : subjectControl.getTypesForGroup(g)) {
-                    RDN[] rdns = subject.getRDNs(type);
-                    if (rdns == null || rdns.length == 0) {
-                        continue;
-                    }
-
-                    if (rdns.length > 1) {
-                        issue.setFailureMessage("AttributeTypeAndValues of group " + g
-                                + " is not in one RDN");
-                        toBreak = true;
-                        break;
-                    }
-
-                    if (rdn == null) {
-                        rdn = rdns[0];
-                    } else if (rdn != rdns[0]) {
-                        issue.setFailureMessage("AttributeTypeAndValues of group " + g
-                                + " is not in one RDN");
-                        toBreak = true;
-                        break;
-                    }
-                }
-
-                if (toBreak) {
-                    break;
-                }
-            }
-        }
-
-        for (ASN1ObjectIdentifier type : oids) {
-            ValidationIssue valIssue;
-            try {
-                valIssue = checkSubjectAttribute(type, subject, requestedSubject);
-            } catch (BadCertTemplateException ex) {
-                valIssue = new ValidationIssue("X509.SUBJECT.REQUEST", "Subject in request");
-                valIssue.setFailureMessage(ex.getMessage());
-            }
-            result.add(valIssue);
-        }
-
-        return result;
-    } // method checkSubject
-
-    private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject,
-            X500Name requestedSubject) throws BadCertTemplateException {
-        boolean multiValuedRdn = subjectControl.getGroup(type) != null;
-        if (multiValuedRdn) {
-            return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
-        } else {
-            return checkSubjectAttributeNotMultiValued(type, subject, requestedSubject);
-        }
+    for (ASN1ObjectIdentifier oid : subject.getAttributeTypes()) {
+      oids.add(oid);
     }
 
-    private ValidationIssue checkSubjectAttributeNotMultiValued(ASN1ObjectIdentifier type,
-            X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
-        ValidationIssue issue = createSubjectIssue(type);
+    List<ValidationIssue> result = new LinkedList<>();
 
-        // control
-        RdnControl rdnControl = subjectControl.getControl(type);
-        int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
-        int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
+    ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
+    result.add(issue);
+    if (CollectionUtil.isNonEmpty(subjectControl.groups())) {
+      Set<String> groups = new HashSet<>(subjectControl.groups());
+      for (String g : groups) {
+        boolean toBreak = false;
+        RDN rdn = null;
+        for (ASN1ObjectIdentifier type : subjectControl.getTypesForGroup(g)) {
+          RDN[] rdns = subject.getRDNs(type);
+          if (rdns == null || rdns.length == 0) {
+            continue;
+          }
 
-        RDN[] rdns = subject.getRDNs(type);
-        int rdnsSize = (rdns == null) ? 0 : rdns.length;
-
-        if (rdnsSize < minOccurs || rdnsSize > maxOccurs) {
-            issue.setFailureMessage("number of RDNs '" + rdnsSize
-                    + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
-            return issue;
-        }
-
-        RDN[] requestedRdns = requestedSubject.getRDNs(type);
-
-        if (rdnsSize == 0) {
-            // check optional attribute but is present in requestedSubject
-            if (maxOccurs > 0 && requestedRdns != null && requestedRdns.length > 0) {
-                issue.setFailureMessage("is absent but expected present");
-            }
-            return issue;
-        }
-
-        StringBuilder failureMsg = new StringBuilder();
-
-        // check the encoding
-        StringType stringType = null;
-        if (rdnControl != null) {
-            stringType = rdnControl.stringType();
-        }
-
-        List<String> requestedCoreAtvTextValues = new LinkedList<>();
-        if (requestedRdns != null) {
-            for (RDN requestedRdn : requestedRdns) {
-                String textValue = getRdnTextValueOfRequest(requestedRdn);
-                requestedCoreAtvTextValues.add(textValue);
-            }
-
-            if (rdnControl != null && rdnControl.patterns() != null) {
-                // sort the requestedRDNs
-                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
-                        rdnControl.patterns());
-            }
-        }
-
-        if (rdns == null) { // return always false, only to make the null checker happy
-            return issue;
-        }
-
-        for (int i = 0; i < rdns.length; i++) {
-            RDN rdn = rdns[i];
-            AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
-            if (atvs.length > 1) {
-                failureMsg.append("size of RDN[" + i + "] is '" + atvs.length
-                        + "' but expected '1'");
-                failureMsg.append("; ");
-                continue;
-            }
-
-            String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType,
-                    failureMsg);
-            if (atvTextValue == null) {
-                continue;
-            }
-
-            checkAttributeTypeAndValue("RDN[" + i + "]", type,
-                    atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
-        }
-
-        int len = failureMsg.length();
-        if (len > 2) {
-            failureMsg.delete(len - 2, len);
-            issue.setFailureMessage(failureMsg.toString());
-        }
-
-        return issue;
-    } // method checkSubjectAttributeNotMultiValued
-
-    private ValidationIssue checkSubjectAttributeMultiValued(ASN1ObjectIdentifier type,
-            X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
-        ValidationIssue issue = createSubjectIssue(type);
-
-        RDN[] rdns = subject.getRDNs(type);
-        int rdnsSize = (rdns == null) ? 0 : rdns.length;
-
-        RDN[] requestedRdns = requestedSubject.getRDNs(type);
-
-        if (rdnsSize != 1) {
-            if (rdnsSize == 0) {
-                // check optional attribute but is present in requestedSubject
-                if (requestedRdns != null && requestedRdns.length > 0) {
-                    issue.setFailureMessage("is absent but expected present");
-                }
-            } else {
-                issue.setFailureMessage("number of RDNs '" + rdnsSize + "' is not 1");
-            }
-            return issue;
-        }
-
-        // control
-        final RdnControl rdnControl = subjectControl.getControl(type);
-
-        // check the encoding
-        StringType stringType = null;
-        if (rdnControl != null) {
-            stringType = rdnControl.stringType();
-        }
-        List<String> requestedCoreAtvTextValues = new LinkedList<>();
-        if (requestedRdns != null) {
-            for (RDN requestedRdn : requestedRdns) {
-                String textValue = getRdnTextValueOfRequest(requestedRdn);
-                requestedCoreAtvTextValues.add(textValue);
-            }
-
-            if (rdnControl != null && rdnControl.patterns() != null) {
-                // sort the requestedRDNs
-                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
-                        rdnControl.patterns());
-            }
-        }
-
-        if (rdns == null) { // return always false, only to make the null checker happy
-            return issue;
-        }
-
-        StringBuilder failureMsg = new StringBuilder();
-
-        AttributeTypeAndValue[] li = rdns[0].getTypesAndValues();
-        List<AttributeTypeAndValue> atvs = new LinkedList<>();
-        for (AttributeTypeAndValue m : li) {
-            if (type.equals(m.getType())) {
-                atvs.add(m);
-            }
-        }
-
-        final int atvsSize = atvs.size();
-
-        int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
-        int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
-
-        if (atvsSize < minOccurs || atvsSize > maxOccurs) {
-            issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize
-                    + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
-            return issue;
-        }
-
-        for (int i = 0; i < atvsSize; i++) {
-            AttributeTypeAndValue atv = atvs.get(i);
-            String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv,
-                    stringType, failureMsg);
-            if (atvTextValue == null) {
-                continue;
-            }
-
-            checkAttributeTypeAndValue("AttributeTypeAndValue[" + i + "]", type, atvTextValue,
-                    rdnControl, requestedCoreAtvTextValues, i, failureMsg);
-        }
-
-        int len = failureMsg.length();
-        if (len > 2) {
-            failureMsg.delete(len - 2, len);
-            issue.setFailureMessage(failureMsg.toString());
-        }
-
-        return issue;
-    } // method checkSubjectAttributeMultiValued
-
-    private void checkAttributeTypeAndValue(String name, ASN1ObjectIdentifier type,
-            String atvTextValue, RdnControl rdnControl, List<String> requestedCoreAtvTextValues,
-            int index, StringBuilder failureMsg) throws BadCertTemplateException {
-        String tmpAtvTextValue = atvTextValue;
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(tmpAtvTextValue).matches()) {
-                throw new BadCertTemplateException(
-                        "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
-            }
-        } else if (rdnControl != null) {
-            String prefix = rdnControl.prefix();
-            if (prefix != null) {
-                if (!tmpAtvTextValue.startsWith(prefix)) {
-                    failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-                        .append("' does not start with prefix '").append(prefix).append("'; ");
-                    return;
-                } else {
-                    tmpAtvTextValue = tmpAtvTextValue.substring(prefix.length());
-                }
-            }
-
-            String suffix = rdnControl.suffix();
-            if (suffix != null) {
-                if (!tmpAtvTextValue.endsWith(suffix)) {
-                    failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-                        .append("' does not end with suffix '").append(suffix).append("'; ");
-                    return;
-                } else {
-                    tmpAtvTextValue = tmpAtvTextValue.substring(0,
-                            tmpAtvTextValue.length() - suffix.length());
-                }
-            }
-
-            List<Pattern> patterns = rdnControl.patterns();
-            if (patterns != null) {
-                Pattern pattern = patterns.get(index);
-                boolean matches = pattern.matcher(tmpAtvTextValue).matches();
-                if (!matches) {
-                    failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-                        .append("' is not valid against regex '")
-                        .append(pattern.pattern()).append("'; ");
-                    return;
-                }
-            }
-        }
-
-        if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
-            if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-                failureMsg.append("is present but not contained in the request");
-                failureMsg.append("; ");
-            }
-        } else {
-            String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
-            if (ObjectIdentifiers.DN_CN.equals(type) && specialBehavior != null
-                    && SpecialX509CertprofileBehavior.gematik_gSMC_K.equals(specialBehavior)) {
-                if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
-                    failureMsg.append("content '").append(tmpAtvTextValue)
-                        .append("' does not start with '")
-                        .append(requestedCoreAtvTextValue).append("-'; ");
-                }
-            } else if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-                if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {
-                    failureMsg.append("content '").append(tmpAtvTextValue)
-                        .append("' but expected '").append(requestedCoreAtvTextValue).append("'; ");
-                }
-            }
-        }
-    } // mehtod checkAttributeTypeAndValue
-
-    private static List<String> sort(List<String> contentList, List<Pattern> patternList) {
-        List<String> sorted = new ArrayList<>(contentList.size());
-        for (Pattern p : patternList) {
-            for (String value : contentList) {
-                if (!sorted.contains(value) && p.matcher(value).matches()) {
-                    sorted.add(value);
-                }
-            }
-        }
-        for (String value : contentList) {
-            if (!sorted.contains(value)) {
-                sorted.add(value);
-            }
-        }
-        return sorted;
-    }
-
-    private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType) {
-        boolean correctStringType = true;
-        switch (stringType) {
-        case bmpString:
-            correctStringType = (atvValue instanceof DERBMPString);
+          if (rdns.length > 1) {
+            issue.setFailureMessage("AttributeTypeAndValues of group " + g
+                + " is not in one RDN");
+            toBreak = true;
             break;
-        case printableString:
-            correctStringType = (atvValue instanceof DERPrintableString);
+          }
+
+          if (rdn == null) {
+            rdn = rdns[0];
+          } else if (rdn != rdns[0]) {
+            issue.setFailureMessage("AttributeTypeAndValues of group " + g
+                + " is not in one RDN");
+            toBreak = true;
             break;
-        case teletexString:
-            correctStringType = (atvValue instanceof DERT61String);
-            break;
-        case utf8String:
-            correctStringType = (atvValue instanceof DERUTF8String);
-            break;
-        case ia5String:
-            correctStringType = (atvValue instanceof DERIA5String);
-            break;
-        default:
-            throw new RuntimeException("should not reach here, unknown StringType " + stringType);
-        } // end switch
-        return correctStringType;
+          }
+        }
+
+        if (toBreak) {
+          break;
+        }
+      }
     }
 
-    private static String getRdnTextValueOfRequest(RDN requestedRdn)
-            throws BadCertTemplateException {
-        ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
-        ASN1Encodable vec = requestedRdn.getFirst().getValue();
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!(vec instanceof ASN1GeneralizedTime)) {
-                throw new BadCertTemplateException("requested RDN is not of GeneralizedTime");
-            }
-            return ((ASN1GeneralizedTime) vec).getTimeString();
-        } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
-            if (!(vec instanceof ASN1Sequence)) {
-                throw new BadCertTemplateException("requested RDN is not of Sequence");
-            }
-
-            ASN1Sequence seq = (ASN1Sequence) vec;
-            final int n = seq.size();
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < n; i++) {
-                ASN1Encodable obj = seq.getObjectAt(i);
-                String textValue = X509Util.rdnValueToString(obj);
-                sb.append("[").append(i).append("]=").append(textValue).append(",");
-            }
-
-            return sb.toString();
-        } else {
-            return X509Util.rdnValueToString(vec);
-        }
+    for (ASN1ObjectIdentifier type : oids) {
+      ValidationIssue valIssue;
+      try {
+        valIssue = checkSubjectAttribute(type, subject, requestedSubject);
+      } catch (BadCertTemplateException ex) {
+        valIssue = new ValidationIssue("X509.SUBJECT.REQUEST", "Subject in request");
+        valIssue.setFailureMessage(ex.getMessage());
+      }
+      result.add(valIssue);
     }
 
-    private static ValidationIssue createSubjectIssue(ASN1ObjectIdentifier subjectAttrType) {
-        ValidationIssue issue;
-        String attrName = ObjectIdentifiers.getName(subjectAttrType);
-        if (attrName == null) {
-            attrName = subjectAttrType.getId().replace('.', '_');
-            issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute "
-                    + subjectAttrType.getId());
-        } else {
-            issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute " + attrName
-                    + " (" + subjectAttrType.getId() + ")");
-        }
-        return issue;
+    return result;
+  } // method checkSubject
+
+  private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject,
+      X500Name requestedSubject) throws BadCertTemplateException {
+    boolean multiValuedRdn = subjectControl.getGroup(type) != null;
+    if (multiValuedRdn) {
+      return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
+    } else {
+      return checkSubjectAttributeNotMultiValued(type, subject, requestedSubject);
+    }
+  }
+
+  private ValidationIssue checkSubjectAttributeNotMultiValued(ASN1ObjectIdentifier type,
+      X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
+    ValidationIssue issue = createSubjectIssue(type);
+
+    // control
+    RdnControl rdnControl = subjectControl.getControl(type);
+    int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
+    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
+
+    RDN[] rdns = subject.getRDNs(type);
+    int rdnsSize = (rdns == null) ? 0 : rdns.length;
+
+    if (rdnsSize < minOccurs || rdnsSize > maxOccurs) {
+      issue.setFailureMessage("number of RDNs '" + rdnsSize
+          + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+      return issue;
     }
 
-    private static String getAtvValueString(String name, AttributeTypeAndValue atv,
-            StringType stringType, StringBuilder failureMsg) {
-        ASN1ObjectIdentifier type = atv.getType();
-        ASN1Encodable atvValue = atv.getValue();
+    RDN[] requestedRdns = requestedSubject.getRDNs(type);
 
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!(atvValue instanceof ASN1GeneralizedTime)) {
-                failureMsg.append(name).append(" is not of type GeneralizedTime; ");
-                return null;
-            }
-            return ((ASN1GeneralizedTime) atvValue).getTimeString();
-        } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
-            if (!(atvValue instanceof ASN1Sequence)) {
-                failureMsg.append(name).append(" is not of type Sequence; ");
-                return null;
-            }
+    if (rdnsSize == 0) {
+      // check optional attribute but is present in requestedSubject
+      if (maxOccurs > 0 && requestedRdns != null && requestedRdns.length > 0) {
+        issue.setFailureMessage("is absent but expected present");
+      }
+      return issue;
+    }
 
-            ASN1Sequence seq = (ASN1Sequence) atvValue;
-            final int n = seq.size();
+    StringBuilder failureMsg = new StringBuilder();
 
-            StringBuilder sb = new StringBuilder();
-            boolean validEncoding = true;
-            for (int i = 0; i < n; i++) {
-                ASN1Encodable obj = seq.getObjectAt(i);
-                if (!matchStringType(obj, stringType)) {
-                    failureMsg.append(name).append(".[").append(i).append("] is not of type ")
-                        .append(stringType.name()).append("; ");
-                    validEncoding = false;
-                    break;
-                }
+    // check the encoding
+    StringType stringType = null;
+    if (rdnControl != null) {
+      stringType = rdnControl.stringType();
+    }
 
-                String textValue = X509Util.rdnValueToString(obj);
-                sb.append("[").append(i).append("]=").append(textValue).append(",");
-            }
+    List<String> requestedCoreAtvTextValues = new LinkedList<>();
+    if (requestedRdns != null) {
+      for (RDN requestedRdn : requestedRdns) {
+        String textValue = getRdnTextValueOfRequest(requestedRdn);
+        requestedCoreAtvTextValues.add(textValue);
+      }
 
-            if (!validEncoding) {
-                return null;
-            }
+      if (rdnControl != null && rdnControl.patterns() != null) {
+        // sort the requestedRDNs
+        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
+            rdnControl.patterns());
+      }
+    }
 
-            return sb.toString();
-        } else {
-            if (!matchStringType(atvValue, stringType)) {
-                failureMsg.append(name).append(" is not of type " + stringType.name()).append("; ");
-                return null;
-            }
+    if (rdns == null) { // return always false, only to make the null checker happy
+      return issue;
+    }
 
-            return X509Util.rdnValueToString(atvValue);
+    for (int i = 0; i < rdns.length; i++) {
+      RDN rdn = rdns[i];
+      AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
+      if (atvs.length > 1) {
+        failureMsg.append("size of RDN[" + i + "] is '" + atvs.length
+            + "' but expected '1'");
+        failureMsg.append("; ");
+        continue;
+      }
+
+      String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType,
+          failureMsg);
+      if (atvTextValue == null) {
+        continue;
+      }
+
+      checkAttributeTypeAndValue("RDN[" + i + "]", type,
+          atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
+    }
+
+    int len = failureMsg.length();
+    if (len > 2) {
+      failureMsg.delete(len - 2, len);
+      issue.setFailureMessage(failureMsg.toString());
+    }
+
+    return issue;
+  } // method checkSubjectAttributeNotMultiValued
+
+  private ValidationIssue checkSubjectAttributeMultiValued(ASN1ObjectIdentifier type,
+      X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
+    ValidationIssue issue = createSubjectIssue(type);
+
+    RDN[] rdns = subject.getRDNs(type);
+    int rdnsSize = (rdns == null) ? 0 : rdns.length;
+
+    RDN[] requestedRdns = requestedSubject.getRDNs(type);
+
+    if (rdnsSize != 1) {
+      if (rdnsSize == 0) {
+        // check optional attribute but is present in requestedSubject
+        if (requestedRdns != null && requestedRdns.length > 0) {
+          issue.setFailureMessage("is absent but expected present");
         }
-    } // method getAtvValueString
+      } else {
+        issue.setFailureMessage("number of RDNs '" + rdnsSize + "' is not 1");
+      }
+      return issue;
+    }
+
+    // control
+    final RdnControl rdnControl = subjectControl.getControl(type);
+
+    // check the encoding
+    StringType stringType = null;
+    if (rdnControl != null) {
+      stringType = rdnControl.stringType();
+    }
+    List<String> requestedCoreAtvTextValues = new LinkedList<>();
+    if (requestedRdns != null) {
+      for (RDN requestedRdn : requestedRdns) {
+        String textValue = getRdnTextValueOfRequest(requestedRdn);
+        requestedCoreAtvTextValues.add(textValue);
+      }
+
+      if (rdnControl != null && rdnControl.patterns() != null) {
+        // sort the requestedRDNs
+        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
+            rdnControl.patterns());
+      }
+    }
+
+    if (rdns == null) { // return always false, only to make the null checker happy
+      return issue;
+    }
+
+    StringBuilder failureMsg = new StringBuilder();
+
+    AttributeTypeAndValue[] li = rdns[0].getTypesAndValues();
+    List<AttributeTypeAndValue> atvs = new LinkedList<>();
+    for (AttributeTypeAndValue m : li) {
+      if (type.equals(m.getType())) {
+        atvs.add(m);
+      }
+    }
+
+    final int atvsSize = atvs.size();
+
+    int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
+    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
+
+    if (atvsSize < minOccurs || atvsSize > maxOccurs) {
+      issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize
+          + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+      return issue;
+    }
+
+    for (int i = 0; i < atvsSize; i++) {
+      AttributeTypeAndValue atv = atvs.get(i);
+      String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv,
+          stringType, failureMsg);
+      if (atvTextValue == null) {
+        continue;
+      }
+
+      checkAttributeTypeAndValue("AttributeTypeAndValue[" + i + "]", type, atvTextValue,
+          rdnControl, requestedCoreAtvTextValues, i, failureMsg);
+    }
+
+    int len = failureMsg.length();
+    if (len > 2) {
+      failureMsg.delete(len - 2, len);
+      issue.setFailureMessage(failureMsg.toString());
+    }
+
+    return issue;
+  } // method checkSubjectAttributeMultiValued
+
+  private void checkAttributeTypeAndValue(String name, ASN1ObjectIdentifier type,
+      String atvTextValue, RdnControl rdnControl, List<String> requestedCoreAtvTextValues,
+      int index, StringBuilder failureMsg) throws BadCertTemplateException {
+    String tmpAtvTextValue = atvTextValue;
+    if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+      if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(tmpAtvTextValue).matches()) {
+        throw new BadCertTemplateException(
+            "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+      }
+    } else if (rdnControl != null) {
+      String prefix = rdnControl.prefix();
+      if (prefix != null) {
+        if (!tmpAtvTextValue.startsWith(prefix)) {
+          failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+            .append("' does not start with prefix '").append(prefix).append("'; ");
+          return;
+        } else {
+          tmpAtvTextValue = tmpAtvTextValue.substring(prefix.length());
+        }
+      }
+
+      String suffix = rdnControl.suffix();
+      if (suffix != null) {
+        if (!tmpAtvTextValue.endsWith(suffix)) {
+          failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+            .append("' does not end with suffix '").append(suffix).append("'; ");
+          return;
+        } else {
+          tmpAtvTextValue = tmpAtvTextValue.substring(0,
+              tmpAtvTextValue.length() - suffix.length());
+        }
+      }
+
+      List<Pattern> patterns = rdnControl.patterns();
+      if (patterns != null) {
+        Pattern pattern = patterns.get(index);
+        boolean matches = pattern.matcher(tmpAtvTextValue).matches();
+        if (!matches) {
+          failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+            .append("' is not valid against regex '")
+            .append(pattern.pattern()).append("'; ");
+          return;
+        }
+      }
+    }
+
+    if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
+      if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+        failureMsg.append("is present but not contained in the request");
+        failureMsg.append("; ");
+      }
+    } else {
+      String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
+      if (ObjectIdentifiers.DN_CN.equals(type) && specialBehavior != null
+          && SpecialX509CertprofileBehavior.gematik_gSMC_K.equals(specialBehavior)) {
+        if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
+          failureMsg.append("content '").append(tmpAtvTextValue)
+            .append("' does not start with '")
+            .append(requestedCoreAtvTextValue).append("-'; ");
+        }
+      } else if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+        if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {
+          failureMsg.append("content '").append(tmpAtvTextValue)
+            .append("' but expected '").append(requestedCoreAtvTextValue).append("'; ");
+        }
+      }
+    }
+  } // mehtod checkAttributeTypeAndValue
+
+  private static List<String> sort(List<String> contentList, List<Pattern> patternList) {
+    List<String> sorted = new ArrayList<>(contentList.size());
+    for (Pattern p : patternList) {
+      for (String value : contentList) {
+        if (!sorted.contains(value) && p.matcher(value).matches()) {
+          sorted.add(value);
+        }
+      }
+    }
+    for (String value : contentList) {
+      if (!sorted.contains(value)) {
+        sorted.add(value);
+      }
+    }
+    return sorted;
+  }
+
+  private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType) {
+    boolean correctStringType = true;
+    switch (stringType) {
+      case bmpString:
+        correctStringType = (atvValue instanceof DERBMPString);
+        break;
+      case printableString:
+        correctStringType = (atvValue instanceof DERPrintableString);
+        break;
+      case teletexString:
+        correctStringType = (atvValue instanceof DERT61String);
+        break;
+      case utf8String:
+        correctStringType = (atvValue instanceof DERUTF8String);
+        break;
+      case ia5String:
+        correctStringType = (atvValue instanceof DERIA5String);
+        break;
+      default:
+        throw new RuntimeException("should not reach here, unknown StringType " + stringType);
+    } // end switch
+    return correctStringType;
+  }
+
+  private static String getRdnTextValueOfRequest(RDN requestedRdn)
+      throws BadCertTemplateException {
+    ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
+    ASN1Encodable vec = requestedRdn.getFirst().getValue();
+    if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+      if (!(vec instanceof ASN1GeneralizedTime)) {
+        throw new BadCertTemplateException("requested RDN is not of GeneralizedTime");
+      }
+      return ((ASN1GeneralizedTime) vec).getTimeString();
+    } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
+      if (!(vec instanceof ASN1Sequence)) {
+        throw new BadCertTemplateException("requested RDN is not of Sequence");
+      }
+
+      ASN1Sequence seq = (ASN1Sequence) vec;
+      final int n = seq.size();
+
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < n; i++) {
+        ASN1Encodable obj = seq.getObjectAt(i);
+        String textValue = X509Util.rdnValueToString(obj);
+        sb.append("[").append(i).append("]=").append(textValue).append(",");
+      }
+
+      return sb.toString();
+    } else {
+      return X509Util.rdnValueToString(vec);
+    }
+  }
+
+  private static ValidationIssue createSubjectIssue(ASN1ObjectIdentifier subjectAttrType) {
+    ValidationIssue issue;
+    String attrName = ObjectIdentifiers.getName(subjectAttrType);
+    if (attrName == null) {
+      attrName = subjectAttrType.getId().replace('.', '_');
+      issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute "
+          + subjectAttrType.getId());
+    } else {
+      issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute " + attrName
+          + " (" + subjectAttrType.getId() + ")");
+    }
+    return issue;
+  }
+
+  private static String getAtvValueString(String name, AttributeTypeAndValue atv,
+      StringType stringType, StringBuilder failureMsg) {
+    ASN1ObjectIdentifier type = atv.getType();
+    ASN1Encodable atvValue = atv.getValue();
+
+    if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+      if (!(atvValue instanceof ASN1GeneralizedTime)) {
+        failureMsg.append(name).append(" is not of type GeneralizedTime; ");
+        return null;
+      }
+      return ((ASN1GeneralizedTime) atvValue).getTimeString();
+    } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
+      if (!(atvValue instanceof ASN1Sequence)) {
+        failureMsg.append(name).append(" is not of type Sequence; ");
+        return null;
+      }
+
+      ASN1Sequence seq = (ASN1Sequence) atvValue;
+      final int n = seq.size();
+
+      StringBuilder sb = new StringBuilder();
+      boolean validEncoding = true;
+      for (int i = 0; i < n; i++) {
+        ASN1Encodable obj = seq.getObjectAt(i);
+        if (!matchStringType(obj, stringType)) {
+          failureMsg.append(name).append(".[").append(i).append("] is not of type ")
+            .append(stringType.name()).append("; ");
+          validEncoding = false;
+          break;
+        }
+
+        String textValue = X509Util.rdnValueToString(obj);
+        sb.append("[").append(i).append("]=").append(textValue).append(",");
+      }
+
+      if (!validEncoding) {
+        return null;
+      }
+
+      return sb.toString();
+    } else {
+      if (!matchStringType(atvValue, stringType)) {
+        failureMsg.append(name).append(" is not of type " + stringType.name()).append("; ");
+        return null;
+      }
+
+      return X509Util.rdnValueToString(atvValue);
+    }
+  } // method getAtvValueString
 
 }

@@ -39,245 +39,246 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xml.sax.SAXException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DbPorter extends DbToolBase {
 
-    public enum OcspDbEntryType {
-        CERT("certs", "CERT", 1);
+  public enum OcspDbEntryType {
+    CERT("certs", "CERT", 1);
 
-        private final String dirName;
+    private final String dirName;
 
-        private final String tableName;
+    private final String tableName;
 
-        private final float sqlBatchFactor;
+    private final float sqlBatchFactor;
 
-        private OcspDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
-            this.dirName = dirName;
-            this.tableName = tableName;
-            this.sqlBatchFactor = sqlBatchFactor;
-        }
-
-        public String dirName() {
-            return dirName;
-        }
-
-        public String tableName() {
-            return tableName;
-        }
-
-        public float sqlBatchFactor() {
-            return sqlBatchFactor;
-        }
-
+    private OcspDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
+      this.dirName = dirName;
+      this.tableName = tableName;
+      this.sqlBatchFactor = sqlBatchFactor;
     }
 
-    public enum CaDbEntryType {
-        CERT("certs", "CERT", 1),
-        CRL("crls", "CRL", 0.1f),
-        USER("users", "TUSER", 10),
-        CAUSER("causers", "CA_HAS_USER", 10),
-        REQUEST("requests", "REQUEST", 0.1f),
-        REQCERT("reqcerts", "REQCERT", 50);
-
-        private final String dirName;
-
-        private final String tableName;
-
-        private final float sqlBatchFactor;
-
-        private CaDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
-            this.dirName = dirName;
-            this.tableName = tableName;
-            this.sqlBatchFactor = sqlBatchFactor;
-        }
-
-        public String dirName() {
-            return dirName;
-        }
-
-        public String tableName() {
-            return tableName;
-        }
-
-        public float sqlBatchFactor() {
-            return sqlBatchFactor;
-        }
-
+    public String dirName() {
+      return dirName;
     }
 
-    public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.xml";
-
-    public static final String FILENAME_CA_CERTSTORE = "ca-certstore.xml";
-
-    public static final String FILENAME_OCSP_CERTSTORE = "ocsp-certstore.xml";
-
-    public static final String DIRNAME_CRL = "crl";
-
-    public static final String DIRNAME_CERT = "cert";
-
-    public static final String PREFIX_FILENAME_CERTS = "certs-";
-
-    public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
-
-    public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
-
-    public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
-
-    public static final int VERSION = 1;
-
-    protected final boolean evaulateOnly;
-
-    protected final int dbSchemaVersion;
-
-    protected final int maxX500nameLen;
-
-    protected final DbSchemaInfo dbSchemaInfo;
-
-    public DbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
-            boolean evaluateOnly) throws DataAccessException {
-        super(datasource, baseDir, stopMe);
-
-        this.evaulateOnly = evaluateOnly;
-
-        this.dbSchemaInfo = new DbSchemaInfo(datasource);
-        String str = dbSchemaInfo.variableValue("VERSION");
-        this.dbSchemaVersion = Integer.parseInt(str);
-        str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
-        this.maxX500nameLen = Integer.parseInt(str);
+    public String tableName() {
+      return tableName;
     }
 
-    protected FileOrValueType buildFileOrValue(String content, String fileName) throws IOException {
-        if (content == null) {
-            return null;
-        }
-
-        ParamUtil.requireNonNull("fileName", fileName);
-
-        FileOrValueType ret = new FileOrValueType();
-        if (content.length() < 256) {
-            ret.setValue(content);
-            return ret;
-        }
-
-        File file = new File(baseDir, fileName);
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
-        }
-
-        IoUtil.save(file, content.getBytes("UTF-8"));
-
-        ret.setFile(fileName);
-        return ret;
+    public float sqlBatchFactor() {
+      return sqlBatchFactor;
     }
 
-    protected String value(FileOrValueType fileOrValue) throws IOException {
-        if (fileOrValue == null) {
-            return null;
-        }
+  }
 
-        if (fileOrValue.getValue() != null) {
-            return fileOrValue.getValue();
-        }
+  public enum CaDbEntryType {
+    CERT("certs", "CERT", 1),
+    CRL("crls", "CRL", 0.1f),
+    USER("users", "TUSER", 10),
+    CAUSER("causers", "CA_HAS_USER", 10),
+    REQUEST("requests", "REQUEST", 0.1f),
+    REQCERT("reqcerts", "REQCERT", 50);
 
-        File file = new File(baseDir, fileOrValue.getFile());
-        return new String(IoUtil.read(file), "UTF-8");
+    private final String dirName;
+
+    private final String tableName;
+
+    private final float sqlBatchFactor;
+
+    private CaDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
+      this.dirName = dirName;
+      this.tableName = tableName;
+      this.sqlBatchFactor = sqlBatchFactor;
     }
 
-    protected FileOrBinaryType buildFileOrBase64Binary(String base64Content, String fileName)
-            throws IOException {
-        if (base64Content == null) {
-            return null;
-        }
-        return buildFileOrBinary(Base64.decode(base64Content), fileName);
+    public String dirName() {
+      return dirName;
     }
 
-    protected FileOrBinaryType buildFileOrBinary(byte[] content, String fileName)
-            throws IOException {
-        if (content == null) {
-            return null;
-        }
-
-        ParamUtil.requireNonNull("fileName", fileName);
-
-        FileOrBinaryType ret = new FileOrBinaryType();
-        if (content.length < 256) {
-            ret.setBinary(content);
-            return ret;
-        }
-
-        File file = new File(baseDir, fileName);
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
-        }
-
-        IoUtil.save(file, content);
-
-        ret.setFile(fileName);
-        return ret;
+    public String tableName() {
+      return tableName;
     }
 
-    protected byte[] binary(FileOrBinaryType fileOrValue) throws IOException {
-        if (fileOrValue == null) {
-            return null;
-        }
-
-        if (fileOrValue.getBinary() != null) {
-            return fileOrValue.getBinary();
-        }
-
-        File file = new File(baseDir, fileOrValue.getFile());
-        return IoUtil.read(file);
+    public float sqlBatchFactor() {
+      return sqlBatchFactor;
     }
 
-    protected String importingText() {
-        return evaulateOnly ? "evaluating import " : "importing ";
+  }
+
+  public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.xml";
+
+  public static final String FILENAME_CA_CERTSTORE = "ca-certstore.xml";
+
+  public static final String FILENAME_OCSP_CERTSTORE = "ocsp-certstore.xml";
+
+  public static final String DIRNAME_CRL = "crl";
+
+  public static final String DIRNAME_CERT = "cert";
+
+  public static final String PREFIX_FILENAME_CERTS = "certs-";
+
+  public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
+
+  public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
+
+  public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
+
+  public static final int VERSION = 1;
+
+  protected final boolean evaulateOnly;
+
+  protected final int dbSchemaVersion;
+
+  protected final int maxX500nameLen;
+
+  protected final DbSchemaInfo dbSchemaInfo;
+
+  public DbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
+      boolean evaluateOnly) throws DataAccessException {
+    super(datasource, baseDir, stopMe);
+
+    this.evaulateOnly = evaluateOnly;
+
+    this.dbSchemaInfo = new DbSchemaInfo(datasource);
+    String str = dbSchemaInfo.variableValue("VERSION");
+    this.dbSchemaVersion = Integer.parseInt(str);
+    str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
+    this.maxX500nameLen = Integer.parseInt(str);
+  }
+
+  protected FileOrValueType buildFileOrValue(String content, String fileName) throws IOException {
+    if (content == null) {
+      return null;
     }
 
-    protected String importedText() {
-        return evaulateOnly ? " evaluated import " : " imported ";
+    ParamUtil.requireNonNull("fileName", fileName);
+
+    FileOrValueType ret = new FileOrValueType();
+    if (content.length() < 256) {
+      ret.setValue(content);
+      return ret;
     }
 
-    protected String exportingText() {
-        return evaulateOnly ? "evaluating export " : "exporting ";
+    File file = new File(baseDir, fileName);
+    File parent = file.getParentFile();
+    if (parent != null && !parent.exists()) {
+      parent.mkdirs();
     }
 
-    protected String exportedText() {
-        return evaulateOnly ? " evaluated export " : " exported ";
+    IoUtil.save(file, content.getBytes("UTF-8"));
+
+    ret.setFile(fileName);
+    return ret;
+  }
+
+  protected String value(FileOrValueType fileOrValue) throws IOException {
+    if (fileOrValue == null) {
+      return null;
     }
 
-    public static final Schema retrieveSchema(String schemaPath) throws JAXBException {
-        ParamUtil.requireNonNull("schemaPath", schemaPath);
-
-        URL schemaUrl = DbPorter.class.getResource(schemaPath);
-        final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        try {
-            return schemaFact.newSchema(schemaUrl);
-        } catch (SAXException ex) {
-            throw new JAXBException("could not load schemas for the specified classes\nDetails:\n"
-                    + ex.getMessage());
-        }
+    if (fileOrValue.getValue() != null) {
+      return fileOrValue.getValue();
     }
 
-    public static void echoToFile(String content, File file) throws IOException {
-        ParamUtil.requireNonNull("content", content);
-        ParamUtil.requireNonNull("file", file);
+    File file = new File(baseDir, fileOrValue.getFile());
+    return new String(IoUtil.read(file), "UTF-8");
+  }
 
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(file);
-            out.write(content.getBytes());
-        } finally {
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
-        }
+  protected FileOrBinaryType buildFileOrBase64Binary(String base64Content, String fileName)
+      throws IOException {
+    if (base64Content == null) {
+      return null;
     }
+    return buildFileOrBinary(Base64.decode(base64Content), fileName);
+  }
+
+  protected FileOrBinaryType buildFileOrBinary(byte[] content, String fileName)
+      throws IOException {
+    if (content == null) {
+      return null;
+    }
+
+    ParamUtil.requireNonNull("fileName", fileName);
+
+    FileOrBinaryType ret = new FileOrBinaryType();
+    if (content.length < 256) {
+      ret.setBinary(content);
+      return ret;
+    }
+
+    File file = new File(baseDir, fileName);
+    File parent = file.getParentFile();
+    if (parent != null && !parent.exists()) {
+      parent.mkdirs();
+    }
+
+    IoUtil.save(file, content);
+
+    ret.setFile(fileName);
+    return ret;
+  }
+
+  protected byte[] binary(FileOrBinaryType fileOrValue) throws IOException {
+    if (fileOrValue == null) {
+      return null;
+    }
+
+    if (fileOrValue.getBinary() != null) {
+      return fileOrValue.getBinary();
+    }
+
+    File file = new File(baseDir, fileOrValue.getFile());
+    return IoUtil.read(file);
+  }
+
+  protected String importingText() {
+    return evaulateOnly ? "evaluating import " : "importing ";
+  }
+
+  protected String importedText() {
+    return evaulateOnly ? " evaluated import " : " imported ";
+  }
+
+  protected String exportingText() {
+    return evaulateOnly ? "evaluating export " : "exporting ";
+  }
+
+  protected String exportedText() {
+    return evaulateOnly ? " evaluated export " : " exported ";
+  }
+
+  public static final Schema retrieveSchema(String schemaPath) throws JAXBException {
+    ParamUtil.requireNonNull("schemaPath", schemaPath);
+
+    URL schemaUrl = DbPorter.class.getResource(schemaPath);
+    final SchemaFactory schemaFact = SchemaFactory.newInstance(
+        javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    try {
+      return schemaFact.newSchema(schemaUrl);
+    } catch (SAXException ex) {
+      throw new JAXBException("could not load schemas for the specified classes\nDetails:\n"
+          + ex.getMessage());
+    }
+  }
+
+  public static void echoToFile(String content, File file) throws IOException {
+    ParamUtil.requireNonNull("content", content);
+    ParamUtil.requireNonNull("file", file);
+
+    FileOutputStream out = null;
+    try {
+      out = new FileOutputStream(file);
+      out.write(content.getBytes());
+    } finally {
+      if (out != null) {
+        out.flush();
+        out.close();
+      }
+    }
+  }
 
 }

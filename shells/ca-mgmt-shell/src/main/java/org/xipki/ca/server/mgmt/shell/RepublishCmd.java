@@ -27,53 +27,54 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "republish",
-        description = "republish certificates")
+    description = "republish certificates")
 @Service
 public class RepublishCmd extends CaAction {
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--publisher", required = true, multiValued = true,
-            description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
-    @Completion(PublisherNamePlusAllCompleter.class)
-    private List<String> publisherNames;
+  @Option(name = "--publisher", required = true, multiValued = true,
+      description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
+  @Completion(PublisherNamePlusAllCompleter.class)
+  private List<String> publisherNames;
 
-    @Override
-    protected Object execute0() throws Exception {
-        if (publisherNames == null) {
-            throw new RuntimeException("should not reach here");
-        }
-        boolean allPublishers = false;
-        for (String publisherName : publisherNames) {
-            if ("all".equalsIgnoreCase(publisherName)) {
-                allPublishers = true;
-                break;
-            }
-        }
-
-        if (allPublishers) {
-            publisherNames = null;
-        }
-
-        if ("all".equalsIgnoreCase(caName)) {
-            caName = null;
-        }
-
-        boolean bo = caManager.republishCertificates(caName, publisherNames, numThreads);
-        output(bo, "republished", "could not republish", "certificates");
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    if (publisherNames == null) {
+      throw new RuntimeException("should not reach here");
     }
+    boolean allPublishers = false;
+    for (String publisherName : publisherNames) {
+      if ("all".equalsIgnoreCase(publisherName)) {
+        allPublishers = true;
+        break;
+      }
+    }
+
+    if (allPublishers) {
+      publisherNames = null;
+    }
+
+    if ("all".equalsIgnoreCase(caName)) {
+      caName = null;
+    }
+
+    boolean bo = caManager.republishCertificates(caName, publisherNames, numThreads);
+    output(bo, "republished", "could not republish", "certificates");
+    return null;
+  }
 
 }

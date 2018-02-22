@@ -24,30 +24,31 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.2.0
  */
 
 @Command(scope = "ca", name = "causer-rm",
-        description = "remove user from CA")
+    description = "remove user from CA")
 @Service
 public class CaUserRemoveCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--user", required = true,
-            description = "user name\n(required)")
-    private String userName;
+  @Option(name = "--user", required = true,
+      description = "user name\n(required)")
+  private String userName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeUserFromCa(userName, caName);
-        output(bo, "removed", "could not remove",
-                "user " + userName + " from CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeUserFromCa(userName, caName);
+    output(bo, "removed", "could not remove",
+        "user " + userName + " from CA " + caName);
+    return null;
+  }
 
 }

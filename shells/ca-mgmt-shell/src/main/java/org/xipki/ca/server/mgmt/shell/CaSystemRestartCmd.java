@@ -22,36 +22,37 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "restart",
-        description = "restart CA system")
+    description = "restart CA system")
 @Service
 public class CaSystemRestartCmd extends CaAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean successful = caManager.restartCaSystem();
-        if (!successful) {
-            throw new CmdFailure("could not restart CA system");
-        }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean successful = caManager.restartCaSystem();
+    if (!successful) {
+      throw new CmdFailure("could not restart CA system");
+    }
 
-        StringBuilder sb = new StringBuilder("restarted CA system\n");
+    StringBuilder sb = new StringBuilder("restarted CA system\n");
 
-        sb.append("  successful CAs:\n");
-        String prefix = "    ";
-        printCaNames(sb, caManager.getSuccessfulCaNames(), prefix);
+    sb.append("  successful CAs:\n");
+    String prefix = "    ";
+    printCaNames(sb, caManager.getSuccessfulCaNames(), prefix);
 
-        sb.append("  failed CAs:\n");
-        printCaNames(sb, caManager.getFailedCaNames(), prefix);
+    sb.append("  failed CAs:\n");
+    printCaNames(sb, caManager.getFailedCaNames(), prefix);
 
-        sb.append("  inactive CAs:\n");
-        printCaNames(sb, caManager.getInactiveCaNames(), prefix);
+    sb.append("  inactive CAs:\n");
+    printCaNames(sb, caManager.getInactiveCaNames(), prefix);
 
-        println(sb.toString());
-        return null;
-    } // method execute0
+    println(sb.toString());
+    return null;
+  } // method execute0
 
 }

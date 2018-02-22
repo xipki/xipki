@@ -24,95 +24,96 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class ChangeScepEntry {
 
-    private final String name;
+  private final String name;
 
-    private NameId caIdent;
+  private NameId caIdent;
 
-    private Boolean active;
+  private Boolean active;
 
-    private String responderType;
+  private String responderType;
 
-    private String responderConf;
+  private String responderConf;
 
-    private String base64Cert;
+  private String base64Cert;
 
-    private Set<String> certProfiles;
+  private Set<String> certProfiles;
 
-    private String control;
+  private String control;
 
-    public ChangeScepEntry(String name) {
-        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+  public ChangeScepEntry(String name) {
+    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+  }
+
+  public String name() {
+    return name;
+  }
+
+  public void setCa(NameId caIdent) {
+    this.caIdent = caIdent;
+  }
+
+  public NameId caIdent() {
+    return caIdent;
+  }
+
+  public Boolean active() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  public String responderType() {
+    return responderType;
+  }
+
+  public void setResponderType(String responderType) {
+    this.responderType = responderType;
+  }
+
+  public String responderConf() {
+    return responderConf;
+  }
+
+  public void setResponderConf(String responderConf) {
+    this.responderConf = responderConf;
+  }
+
+  public String base64Cert() {
+    return base64Cert;
+  }
+
+  public void setBase64Cert(String base64Cert) {
+    this.base64Cert = base64Cert;
+  }
+
+  public Set<String> certProfiles() {
+    return certProfiles;
+  }
+
+  public void setCertProfiles(Set<String> certProfiles) {
+    if (certProfiles == null) {
+      this.certProfiles = null;
+    } else {
+      this.certProfiles = CollectionUtil.unmodifiableSet(
+          CollectionUtil.toLowerCaseSet(certProfiles));
     }
+  }
 
-    public String name() {
-        return name;
-    }
+  public String control() {
+    return control;
+  }
 
-    public void setCa(NameId caIdent) {
-        this.caIdent = caIdent;
-    }
-
-    public NameId caIdent() {
-        return caIdent;
-    }
-
-    public Boolean active() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public String responderType() {
-        return responderType;
-    }
-
-    public void setResponderType(String responderType) {
-        this.responderType = responderType;
-    }
-
-    public String responderConf() {
-        return responderConf;
-    }
-
-    public void setResponderConf(String responderConf) {
-        this.responderConf = responderConf;
-    }
-
-    public String base64Cert() {
-        return base64Cert;
-    }
-
-    public void setBase64Cert(String base64Cert) {
-        this.base64Cert = base64Cert;
-    }
-
-    public Set<String> certProfiles() {
-        return certProfiles;
-    }
-
-    public void setCertProfiles(Set<String> certProfiles) {
-        if (certProfiles == null) {
-            this.certProfiles = null;
-        } else {
-            this.certProfiles = CollectionUtil.unmodifiableSet(
-                    CollectionUtil.toLowerCaseSet(certProfiles));
-        }
-    }
-
-    public String control() {
-        return control;
-    }
-
-    public void setControl(String control) {
-        this.control = control;
-    }
+  public void setControl(String control) {
+    this.control = control;
+  }
 
 }

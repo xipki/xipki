@@ -22,6 +22,7 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -29,13 +30,13 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 @Service
 public class ValidityModeCompleter extends AbstractEnumCompleter {
 
-    public ValidityModeCompleter() {
-        StringBuilder enums = new StringBuilder();
-        for (ValidityMode mode : ValidityMode.values()) {
-            enums.append(mode.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+  public ValidityModeCompleter() {
+    StringBuilder enums = new StringBuilder();
+    for (ValidityMode mode : ValidityMode.values()) {
+      enums.append(mode.name()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

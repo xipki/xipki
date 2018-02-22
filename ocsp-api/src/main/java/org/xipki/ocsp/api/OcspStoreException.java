@@ -18,27 +18,28 @@
 package org.xipki.ocsp.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OcspStoreException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public OcspStoreException() {
-    }
+  public OcspStoreException() {
+  }
 
-    public OcspStoreException(String message) {
-        super(message);
-    }
+  public OcspStoreException(String message) {
+    super(message);
+  }
 
-    public OcspStoreException(Throwable cause) {
-        super(cause);
-    }
+  public OcspStoreException(Throwable cause) {
+    super(cause);
+  }
 
-    public OcspStoreException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public OcspStoreException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

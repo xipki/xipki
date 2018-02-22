@@ -39,103 +39,104 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class X509CrlSignerEntryWrapper {
 
-    private X509CrlSignerEntry dbEntry;
+  private X509CrlSignerEntry dbEntry;
 
-    private CrlControl crlControl;
+  private CrlControl crlControl;
 
-    private ConcurrentContentSigner signer;
+  private ConcurrentContentSigner signer;
 
-    private byte[] subjectKeyIdentifier;
+  private byte[] subjectKeyIdentifier;
 
-    X509CrlSignerEntryWrapper() {
+  X509CrlSignerEntryWrapper() {
+  }
+
+  public void setDbEntry(X509CrlSignerEntry dbEntry) throws InvalidConfException {
+    this.dbEntry = dbEntry;
+    this.crlControl = new CrlControl(dbEntry.crlControl());
+  }
+
+  public CrlControl crlControl() {
+    return crlControl;
+  }
+
+  public void initSigner(SecurityFactory securityFactory)
+      throws XiSecurityException, OperationException, InvalidConfException {
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    if (signer != null) {
+      return;
     }
 
-    public void setDbEntry(X509CrlSignerEntry dbEntry) throws InvalidConfException {
-        this.dbEntry = dbEntry;
-        this.crlControl = new CrlControl(dbEntry.crlControl());
+    if (dbEntry == null) {
+      throw new XiSecurityException("dbEntry is null");
     }
 
-    public CrlControl crlControl() {
-        return crlControl;
+    if ("CA".equals(dbEntry.type())) {
+      return;
     }
 
-    public void initSigner(SecurityFactory securityFactory)
-            throws XiSecurityException, OperationException, InvalidConfException {
-        ParamUtil.requireNonNull("securityFactory", securityFactory);
-        if (signer != null) {
-            return;
-        }
+    dbEntry.setConfFaulty(true);
 
-        if (dbEntry == null) {
-            throw new XiSecurityException("dbEntry is null");
-        }
-
-        if ("CA".equals(dbEntry.type())) {
-            return;
-        }
-
-        dbEntry.setConfFaulty(true);
-
-        X509Certificate responderCert = dbEntry.certificate();
-        try {
-            signer = securityFactory.createSigner(dbEntry.type(),
-                    new SignerConf(dbEntry.conf()), responderCert);
-        } catch (ObjectCreationException ex1) {
-            throw new XiSecurityException("signer without certificate is not allowed");
-        }
-
-        X509Certificate signerCert = signer.getCertificate();
-        if (signerCert == null) {
-            throw new XiSecurityException("signer without certificate is not allowed");
-        }
-
-        if (dbEntry.base64Cert() == null) {
-            dbEntry.setCertificate(signerCert);
-        }
-
-        byte[] encodedSkiValue = signerCert.getExtensionValue(
-                Extension.subjectKeyIdentifier.getId());
-        if (encodedSkiValue == null) {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION,
-                    "CA certificate does not have required extension SubjectKeyIdentifier");
-        }
-
-        ASN1OctetString ski;
-        try {
-            ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
-        } catch (IOException ex) {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
-        }
-        this.subjectKeyIdentifier = ski.getOctets();
-
-        if (!X509Util.hasKeyusage(signerCert, KeyUsage.cRLSign)) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "CRL signer does not have keyusage cRLSign");
-        }
-        dbEntry.setConfFaulty(false);
-    } // method initSigner
-
-    public X509CrlSignerEntry dbEntry() {
-        return dbEntry;
+    X509Certificate responderCert = dbEntry.certificate();
+    try {
+      signer = securityFactory.createSigner(dbEntry.type(),
+          new SignerConf(dbEntry.conf()), responderCert);
+    } catch (ObjectCreationException ex1) {
+      throw new XiSecurityException("signer without certificate is not allowed");
     }
 
-    public X509Certificate cert() {
-        return (signer == null) ? dbEntry.certificate() : signer.getCertificate();
+    X509Certificate signerCert = signer.getCertificate();
+    if (signerCert == null) {
+      throw new XiSecurityException("signer without certificate is not allowed");
     }
 
-    public byte[] subjectKeyIdentifier() {
-        return (subjectKeyIdentifier == null) ? null
-                : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+    if (dbEntry.base64Cert() == null) {
+      dbEntry.setCertificate(signerCert);
     }
 
-    public ConcurrentContentSigner signer() {
-        return signer;
+    byte[] encodedSkiValue = signerCert.getExtensionValue(
+        Extension.subjectKeyIdentifier.getId());
+    if (encodedSkiValue == null) {
+      throw new OperationException(ErrorCode.INVALID_EXTENSION,
+          "CA certificate does not have required extension SubjectKeyIdentifier");
     }
+
+    ASN1OctetString ski;
+    try {
+      ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
+    } catch (IOException ex) {
+      throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
+    }
+    this.subjectKeyIdentifier = ski.getOctets();
+
+    if (!X509Util.hasKeyusage(signerCert, KeyUsage.cRLSign)) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+          "CRL signer does not have keyusage cRLSign");
+    }
+    dbEntry.setConfFaulty(false);
+  } // method initSigner
+
+  public X509CrlSignerEntry dbEntry() {
+    return dbEntry;
+  }
+
+  public X509Certificate cert() {
+    return (signer == null) ? dbEntry.certificate() : signer.getCertificate();
+  }
+
+  public byte[] subjectKeyIdentifier() {
+    return (subjectKeyIdentifier == null) ? null
+        : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+  }
+
+  public ConcurrentContentSigner signer() {
+    return signer;
+  }
 
 }

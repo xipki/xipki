@@ -21,21 +21,22 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "remove-cert",
-        description = "remove certificate")
+    description = "remove certificate")
 @Service
 public class RemoveCertCmd extends UnRevRmCertAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean successful =
-                caManager.removeCertificate(caName, getSerialNumber());
-        output(successful, "removed", "could not remove", "certificate");
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean successful =
+        caManager.removeCertificate(caName, getSerialNumber());
+    output(successful, "removed", "could not remove", "certificate");
+    return null;
+  }
 
 }

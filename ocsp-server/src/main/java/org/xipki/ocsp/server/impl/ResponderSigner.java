@@ -37,149 +37,150 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class ResponderSigner {
 
-    private final Map<String, ConcurrentContentSigner> algoSignerMap;
+  private final Map<String, ConcurrentContentSigner> algoSignerMap;
 
-    private final List<ConcurrentContentSigner> signers;
+  private final List<ConcurrentContentSigner> signers;
 
-    private final TaggedCertSequence sequenceOfCertificate;
+  private final TaggedCertSequence sequenceOfCertificate;
 
-    private final X509Certificate certificate;
+  private final X509Certificate certificate;
 
-    private final TaggedCertSequence sequenceOfCertificateChain;
+  private final TaggedCertSequence sequenceOfCertificateChain;
 
-    private final X509Certificate[] certificateChain;
+  private final X509Certificate[] certificateChain;
 
-    private final ResponderID responderIdByName;
+  private final ResponderID responderIdByName;
 
-    private final ResponderID responderIdByKey;
+  private final ResponderID responderIdByKey;
 
-    private final boolean macSigner;
+  private final boolean macSigner;
 
-    ResponderSigner(List<ConcurrentContentSigner> signers)
-            throws CertificateException, IOException {
-        this.signers = ParamUtil.requireNonEmpty("signers", signers);
-        ConcurrentContentSigner firstSigner = signers.get(0);
-        this.macSigner = firstSigner.isMac();
+  ResponderSigner(List<ConcurrentContentSigner> signers)
+      throws CertificateException, IOException {
+    this.signers = ParamUtil.requireNonEmpty("signers", signers);
+    ConcurrentContentSigner firstSigner = signers.get(0);
+    this.macSigner = firstSigner.isMac();
 
-        if (this.macSigner) {
-            this.responderIdByName = null;
-            this.certificate = null;
-            this.certificateChain = null;
-            this.sequenceOfCertificate = null;
-            this.sequenceOfCertificateChain = null;
+    if (this.macSigner) {
+      this.responderIdByName = null;
+      this.certificate = null;
+      this.certificateChain = null;
+      this.sequenceOfCertificate = null;
+      this.sequenceOfCertificateChain = null;
 
-            byte[] keySha1 = firstSigner.getSha1OfMacKey();
-            this.responderIdByKey = new ResponderID(keySha1);
-        } else {
-            X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();
-            if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
-                throw new CertificateException("no certificate is bound with the signer");
-            }
-            int len = tmpCertificateChain.length;
-            if (len > 1) {
-                X509Certificate cert = tmpCertificateChain[len - 1];
-                if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
-                    len--;
-                }
-            }
-            this.certificateChain = new X509Certificate[len];
-            System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
-
-            this.certificate = certificateChain[0];
-
-            byte[] encodedCertificate = this.certificate.getEncoded();
-            this.sequenceOfCertificate = new TaggedCertSequence(encodedCertificate);
-
-            byte[][] encodedCertificateChain = new byte[this.certificateChain.length][];
-            encodedCertificateChain[0] = encodedCertificate;
-            for (int i = 1; i < certificateChain.length; i++) {
-                encodedCertificateChain[i] = this.certificateChain[i].getEncoded();
-            }
-            this.sequenceOfCertificateChain = new TaggedCertSequence(encodedCertificateChain);
-
-            Certificate bcCertificate = Certificate.getInstance(encodedCertificate);
-            this.responderIdByName = new ResponderID(bcCertificate.getSubject());
-            byte[] keySha1 = HashAlgoType.SHA1.hash(
-                    bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
-            this.responderIdByKey = new ResponderID(keySha1);
+      byte[] keySha1 = firstSigner.getSha1OfMacKey();
+      this.responderIdByKey = new ResponderID(keySha1);
+    } else {
+      X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();
+      if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
+        throw new CertificateException("no certificate is bound with the signer");
+      }
+      int len = tmpCertificateChain.length;
+      if (len > 1) {
+        X509Certificate cert = tmpCertificateChain[len - 1];
+        if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+          len--;
         }
+      }
+      this.certificateChain = new X509Certificate[len];
+      System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
 
-        algoSignerMap = new HashMap<>();
-        for (ConcurrentContentSigner signer : signers) {
-            String algoName = signer.getAlgorithmName();
-            algoSignerMap.put(algoName, signer);
-        }
-    } // constructor
+      this.certificate = certificateChain[0];
 
-    public boolean isMacSigner() {
-        return macSigner;
+      byte[] encodedCertificate = this.certificate.getEncoded();
+      this.sequenceOfCertificate = new TaggedCertSequence(encodedCertificate);
+
+      byte[][] encodedCertificateChain = new byte[this.certificateChain.length][];
+      encodedCertificateChain[0] = encodedCertificate;
+      for (int i = 1; i < certificateChain.length; i++) {
+        encodedCertificateChain[i] = this.certificateChain[i].getEncoded();
+      }
+      this.sequenceOfCertificateChain = new TaggedCertSequence(encodedCertificateChain);
+
+      Certificate bcCertificate = Certificate.getInstance(encodedCertificate);
+      this.responderIdByName = new ResponderID(bcCertificate.getSubject());
+      byte[] keySha1 = HashAlgoType.SHA1.hash(
+          bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+      this.responderIdByKey = new ResponderID(keySha1);
     }
 
-    public ConcurrentContentSigner firstSigner() {
-        return signers.get(0);
+    algoSignerMap = new HashMap<>();
+    for (ConcurrentContentSigner signer : signers) {
+      String algoName = signer.getAlgorithmName();
+      algoSignerMap.put(algoName, signer);
+    }
+  } // constructor
+
+  public boolean isMacSigner() {
+    return macSigner;
+  }
+
+  public ConcurrentContentSigner firstSigner() {
+    return signers.get(0);
+  }
+
+  public ConcurrentContentSigner getSignerForPreferredSigAlgs(
+      List<AlgorithmIdentifier> prefSigAlgs) {
+    if (prefSigAlgs == null) {
+      return signers.get(0);
     }
 
-    public ConcurrentContentSigner getSignerForPreferredSigAlgs(
-            List<AlgorithmIdentifier> prefSigAlgs) {
-        if (prefSigAlgs == null) {
-            return signers.get(0);
-        }
+    for (AlgorithmIdentifier sigAlgId : prefSigAlgs) {
+      String algoName = getSignatureAlgorithmName(sigAlgId);
+      if (algoSignerMap.containsKey(algoName)) {
+        return algoSignerMap.get(algoName);
+      }
+    }
+    return null;
+  }
 
-        for (AlgorithmIdentifier sigAlgId : prefSigAlgs) {
-            String algoName = getSignatureAlgorithmName(sigAlgId);
-            if (algoSignerMap.containsKey(algoName)) {
-                return algoSignerMap.get(algoName);
-            }
-        }
-        return null;
+  public ResponderID getResponderId(boolean byName) {
+    return byName ? responderIdByName :  responderIdByKey;
+  }
+
+  public X509Certificate certificate() {
+    return certificate;
+  }
+
+  public X509Certificate[] certificateChain() {
+    return certificateChain;
+  }
+
+  public TaggedCertSequence sequenceOfCertificate() {
+    return sequenceOfCertificate;
+  }
+
+  public TaggedCertSequence sequenceOfCertificateChain() {
+    return sequenceOfCertificateChain;
+  }
+
+  public boolean isHealthy() {
+    for (ConcurrentContentSigner signer : signers) {
+      if (!signer.isHealthy()) {
+        return false;
+      }
     }
 
-    public ResponderID getResponderId(boolean byName) {
-        return byName ? responderIdByName :  responderIdByKey;
+    return true;
+  }
+
+  private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId) {
+    ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+    if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
+      return algOid.getId();
     }
 
-    public X509Certificate certificate() {
-        return certificate;
-    }
-
-    public X509Certificate[] certificateChain() {
-        return certificateChain;
-    }
-
-    public TaggedCertSequence sequenceOfCertificate() {
-        return sequenceOfCertificate;
-    }
-
-    public TaggedCertSequence sequenceOfCertificateChain() {
-        return sequenceOfCertificateChain;
-    }
-
-    public boolean isHealthy() {
-        for (ConcurrentContentSigner signer : signers) {
-            if (!signer.isHealthy()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId) {
-        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
-            return algOid.getId();
-        }
-
-        ASN1Encodable asn1Encodable = sigAlgId.getParameters();
-        RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
-        ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-        return digestAlgOid.getId() + "WITHRSAANDMGF1";
-    }
+    ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+    RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+    ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+    return digestAlgOid.getId() + "WITHRSAANDMGF1";
+  }
 
 }

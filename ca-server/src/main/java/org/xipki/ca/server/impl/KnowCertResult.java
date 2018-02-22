@@ -18,29 +18,30 @@
 package org.xipki.ca.server.impl;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class KnowCertResult {
 
-    public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
+  public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
 
-    private final boolean known;
+  private final boolean known;
 
-    private final Integer userId;
+  private final Integer userId;
 
-    public KnowCertResult(boolean known, Integer userId) {
-        this.known = known;
-        this.userId = userId;
-    }
+  public KnowCertResult(boolean known, Integer userId) {
+    this.known = known;
+    this.userId = userId;
+  }
 
-    public boolean isKnown() {
-        return known;
-    }
+  public boolean isKnown() {
+    return known;
+  }
 
-    public Integer userId() {
-        return userId;
-    }
+  public Integer userId() {
+    return userId;
+  }
 
 }

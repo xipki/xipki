@@ -20,38 +20,39 @@ package org.xipki.ca.qa.internal;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class QaPolicyQualifierInfo {
 
-    public static class QaCpsUriPolicyQualifier extends QaPolicyQualifierInfo {
+  public static class QaCpsUriPolicyQualifier extends QaPolicyQualifierInfo {
 
-        private final String cpsUri;
+    private final String cpsUri;
 
-        public QaCpsUriPolicyQualifier(String cpsUri) {
-            this.cpsUri = ParamUtil.requireNonBlank("cpsUri", cpsUri);
-        }
+    public QaCpsUriPolicyQualifier(String cpsUri) {
+      this.cpsUri = ParamUtil.requireNonBlank("cpsUri", cpsUri);
+    }
 
-        public String cpsUri() {
-            return cpsUri;
-        }
+    public String cpsUri() {
+      return cpsUri;
+    }
 
-    } // class QaCPSUriPolicyQualifier
+  } // class QaCPSUriPolicyQualifier
 
-    public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo {
+  public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo {
 
-        private final String userNotice;
+    private final String userNotice;
 
-        public QaUserNoticePolicyQualifierInfo(String userNotice) {
-            this.userNotice = ParamUtil.requireNonBlank("userNotice", userNotice);
-        }
+    public QaUserNoticePolicyQualifierInfo(String userNotice) {
+      this.userNotice = ParamUtil.requireNonBlank("userNotice", userNotice);
+    }
 
-        public String userNotice() {
-            return userNotice;
-        }
+    public String userNotice() {
+      return userNotice;
+    }
 
-    } // class QaUserNoticePolicyQualifierInfo
+  } // class QaUserNoticePolicyQualifierInfo
 
 }

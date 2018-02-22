@@ -25,72 +25,73 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class UserType extends IdentifidDbObjectType {
 
-    public static final String TAG_PARENT = "users";
+  public static final String TAG_PARENT = "users";
 
-    public static final String TAG_ROOT = "user";
+  public static final String TAG_ROOT = "user";
 
-    public static final String TAG_NAME = "name";
+  public static final String TAG_NAME = "name";
 
-    public static final String TAG_ACTIVE = "active";
+  public static final String TAG_ACTIVE = "active";
 
-    public static final String TAG_PASSWORD = "password";
+  public static final String TAG_PASSWORD = "password";
 
-    private String name;
+  private String name;
 
-    private Boolean active;
+  private Boolean active;
 
-    private String password;
+  private String password;
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public Boolean active() {
-        return active;
-    }
+  public Boolean active() {
+    return active;
+  }
 
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
 
-    public String password() {
-        return password;
-    }
+  public String password() {
+    return password;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    @Override
-    public void validate() throws InvalidDataObjectException {
-        super.validate();
-        assertNotBlank(TAG_NAME, name);
-        assertNotNull(TAG_ACTIVE, active);
-        assertNotBlank(TAG_PASSWORD, password);
-    }
+  @Override
+  public void validate() throws InvalidDataObjectException {
+    super.validate();
+    assertNotBlank(TAG_NAME, name);
+    assertNotNull(TAG_ACTIVE, active);
+    assertNotBlank(TAG_PASSWORD, password);
+  }
 
-    @Override
-    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
-        ParamUtil.requireNonNull("writer", writer);
-        validate();
+  @Override
+  public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
+    ParamUtil.requireNonNull("writer", writer);
+    validate();
 
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id());
-        writeIfNotNull(writer, TAG_ACTIVE, active);
-        writeIfNotNull(writer, TAG_NAME, name);
-        writeIfNotNull(writer, TAG_PASSWORD, password);
-        writer.writeEndElement();
-        writer.writeNewline();
-    }
+    writer.writeStartElement(TAG_ROOT);
+    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ACTIVE, active);
+    writeIfNotNull(writer, TAG_NAME, name);
+    writeIfNotNull(writer, TAG_PASSWORD, password);
+    writer.writeEndElement();
+    writer.writeNewline();
+  }
 
 }

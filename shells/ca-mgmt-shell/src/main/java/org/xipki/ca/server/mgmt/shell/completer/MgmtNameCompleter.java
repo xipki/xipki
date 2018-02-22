@@ -22,13 +22,14 @@ import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public abstract class MgmtNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference
-    protected CaManager caManager;
+  @Reference
+  protected CaManager caManager;
 
 }

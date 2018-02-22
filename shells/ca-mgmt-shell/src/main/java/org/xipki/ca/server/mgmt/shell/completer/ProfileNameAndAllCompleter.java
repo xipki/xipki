@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -30,11 +31,11 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class ProfileNameAndAllCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> ret = new HashSet<>(caManager.getCertprofileNames());
-        ret.add("all");
-        return ret;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>(caManager.getCertprofileNames());
+    ret.add("all");
+    return ret;
+  }
 
 }

@@ -27,46 +27,47 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "export-ocsp",
-        description = "export OCSP database")
+    description = "export OCSP database")
 @Service
 public class ExportOcspCmd extends DbPortAction {
 
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
+  private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
-    @Option(name = "--db-conf",
-            description = "database configuration file.")
-    @Completion(FilePathCompleter.class)
-    private String dbconfFile = DFLT_DBCONF_FILE;
+  @Option(name = "--db-conf",
+      description = "database configuration file.")
+  @Completion(FilePathCompleter.class)
+  private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "--out-dir", required = true,
-            description = "output directory\n(required)")
-    @Completion(DirPathCompleter.class)
-    private String outdir;
+  @Option(name = "--out-dir", required = true,
+      description = "output directory\n(required)")
+  @Completion(DirPathCompleter.class)
+  private String outdir;
 
-    @Option(name = "-n",
-            description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = 10000;
+  @Option(name = "-n",
+      description = "number of certificates in one zip file")
+  private Integer numCertsInBundle = 10000;
 
-    @Option(name = "-k",
-            description = "number of certificates per SELECT")
-    private Integer numCertsPerSelect = 100;
+  @Option(name = "-k",
+      description = "number of certificates per SELECT")
+  private Integer numCertsPerSelect = 100;
 
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
+  @Option(name = "--resume")
+  private Boolean resume = Boolean.FALSE;
 
-    @Option(name = "--test",
-            description = "just test the export, no real export")
-    private Boolean testOnly = Boolean.FALSE;
+  @Option(name = "--test",
+      description = "just test the export, no real export")
+  private Boolean testOnly = Boolean.FALSE;
 
-    @Override
-    protected DbPortWorker getDbPortWorker() throws Exception {
-        return new OcspDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir,
-                resume, numCertsInBundle, numCertsPerSelect, testOnly);
-    }
+  @Override
+  protected DbPortWorker getDbPortWorker() throws Exception {
+    return new OcspDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir,
+        resume, numCertsInBundle, numCertsPerSelect, testOnly);
+  }
 
 }

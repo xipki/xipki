@@ -39,89 +39,90 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class HealthCheckServlet extends AbstractHttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-    private static final String CT_RESPONSE = "application/json";
+  private static final String CT_RESPONSE = "application/json";
 
-    private CmpResponderManager responderManager;
+  private CmpResponderManager responderManager;
 
-    public HealthCheckServlet() {
+  public HealthCheckServlet() {
+  }
+
+  public void setResponderManager(CmpResponderManager responderManager) {
+    this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
+  }
+
+  @Override
+  public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+      SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
+    FullHttpResponse resp = service0(request, servletUri, sslSession);
+    resp.headers().add("Access-Control-Allow-Origin", "*");
+    return resp;
+  }
+
+  private FullHttpResponse service0(FullHttpRequest request, ServletURI servletUri,
+      SSLSession sslSession) {
+    HttpVersion version = request.protocolVersion();
+    HttpMethod method = request.method();
+
+    if (method != HttpMethod.GET) {
+      return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
     }
 
-    public void setResponderManager(CmpResponderManager responderManager) {
-        this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
-    }
+    try {
+      if (responderManager == null) {
+        LOG.error("responderManager in servlet is not configured");
+        return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+      }
 
-    @Override
-    public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
-        FullHttpResponse resp = service0(request, servletUri, sslSession);
-        resp.headers().add("Access-Control-Allow-Origin", "*");
-        return resp;
-    }
+      String caName = null;
+      X509CaCmpResponder responder = null;
 
-    private FullHttpResponse service0(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession) {
-        HttpVersion version = request.protocolVersion();
-        HttpMethod method = request.method();
-
-        if (method != HttpMethod.GET) {
-            return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
+      if (servletUri.path().length() > 1) {
+        // skip the first char which is always '/'
+        String caAlias = servletUri.path().substring(1);
+        caName = responderManager.getCaNameForAlias(caAlias);
+        if (caName == null) {
+          caName = caAlias.toLowerCase();
         }
+        responder = responderManager.getX509CaResponder(caName);
+      }
 
-        try {
-            if (responderManager == null) {
-                LOG.error("responderManager in servlet is not configured");
-                return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            String caName = null;
-            X509CaCmpResponder responder = null;
-
-            if (servletUri.path().length() > 1) {
-                // skip the first char which is always '/'
-                String caAlias = servletUri.path().substring(1);
-                caName = responderManager.getCaNameForAlias(caAlias);
-                if (caName == null) {
-                    caName = caAlias.toLowerCase();
-                }
-                responder = responderManager.getX509CaResponder(caName);
-            }
-
-            if (caName == null || responder == null || !responder.isOnService()) {
-                String auditMessage;
-                if (caName == null) {
-                    auditMessage = "no CA is specified";
-                } else if (responder == null) {
-                    auditMessage = "unknown CA '" + caName + "'";
-                } else {
-                    auditMessage = "CA '" + caName + "' is out of service";
-                }
-                LOG.warn(auditMessage);
-
-                return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
-            }
-
-            HealthCheckResult healthResult = responder.healthCheck();
-            HttpResponseStatus status = healthResult.isHealthy()
-                    ? HttpResponseStatus.OK
-                    : HttpResponseStatus.INTERNAL_SERVER_ERROR;
-            byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
-            return createResponse(version, status, HealthCheckServlet.CT_RESPONSE, respBytes);
-        } catch (Throwable th) {
-            if (th instanceof EOFException) {
-                LogUtil.warn(LOG, th, "connection reset by peer");
-            } else {
-                LOG.error("Throwable thrown, this should not happen!", th);
-            }
-            return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+      if (caName == null || responder == null || !responder.isOnService()) {
+        String auditMessage;
+        if (caName == null) {
+          auditMessage = "no CA is specified";
+        } else if (responder == null) {
+          auditMessage = "unknown CA '" + caName + "'";
+        } else {
+          auditMessage = "CA '" + caName + "' is out of service";
         }
-    } // method service0
+        LOG.warn(auditMessage);
+
+        return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
+      }
+
+      HealthCheckResult healthResult = responder.healthCheck();
+      HttpResponseStatus status = healthResult.isHealthy()
+          ? HttpResponseStatus.OK
+          : HttpResponseStatus.INTERNAL_SERVER_ERROR;
+      byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
+      return createResponse(version, status, HealthCheckServlet.CT_RESPONSE, respBytes);
+    } catch (Throwable th) {
+      if (th instanceof EOFException) {
+        LogUtil.warn(LOG, th, "connection reset by peer");
+      } else {
+        LOG.error("Throwable thrown, this should not happen!", th);
+      }
+      return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+    }
+  } // method service0
 
 }

@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -31,13 +32,13 @@ import org.xipki.ca.server.mgmt.api.RequestorInfo;
 @Service
 public class RequestorNameCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> names = new HashSet<>();
-        names.addAll(caManager.getRequestorNames());
-        names.remove(RequestorInfo.NAME_BY_CA);
-        names.remove(RequestorInfo.NAME_BY_USER);
-        return names;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> names = new HashSet<>();
+    names.addAll(caManager.getRequestorNames());
+    names.remove(RequestorInfo.NAME_BY_CA);
+    names.remove(RequestorInfo.NAME_BY_USER);
+    return names;
+  }
 
 }

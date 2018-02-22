@@ -23,26 +23,27 @@ import org.xipki.ca.server.mgmt.shell.PublisherAddCmd;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "caqa", name = "neg-publisher-add",
-        description = "add publisher (negative, QA)")
+    description = "add publisher (negative, QA)")
 @Service
 public class NegPublisherAddCmd extends PublisherAddCmd {
 
-    @Override
-    protected Object execute0() throws Exception {
-        println("neg-publisher-add");
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-publisher-add");
 
-        try {
-            super.execute0();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

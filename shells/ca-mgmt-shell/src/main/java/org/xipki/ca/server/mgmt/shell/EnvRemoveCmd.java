@@ -22,24 +22,25 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "env-rm",
-        description = "remove CA environment parameter")
+    description = "remove CA environment parameter")
 @Service
 public class EnvRemoveCmd extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-            description = "environment parameter name")
-    private String name;
+  @Argument(index = 0, name = "name", required = true,
+      description = "environment parameter name")
+  private String name;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeEnvParam(name);
-        output(bo, "removed", "could not remove", "environment parameter " + name);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeEnvParam(name);
+    output(bo, "removed", "could not remove", "environment parameter " + name);
+    return null;
+  }
 
 }

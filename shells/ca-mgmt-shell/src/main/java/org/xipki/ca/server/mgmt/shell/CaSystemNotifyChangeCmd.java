@@ -21,20 +21,21 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "notify-change",
-        description = "notify the change of CA system")
+    description = "notify the change of CA system")
 @Service
 public class CaSystemNotifyChangeCmd extends CaAction {
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.notifyCaChange();
-        output(bo, "notified", "could not notify", "the change of CA system");
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.notifyCaChange();
+    output(bo, "notified", "could not notify", "the change of CA system");
+    return null;
+  }
 
 }

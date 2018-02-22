@@ -22,6 +22,7 @@ import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.1.0
  */
@@ -29,14 +30,14 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 @Service
 public class CertListSortByCompleter extends AbstractEnumCompleter {
 
-    public CertListSortByCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public CertListSortByCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (CertListOrderBy sort : CertListOrderBy.values()) {
-            enums.append(sort.text()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (CertListOrderBy sort : CertListOrderBy.values()) {
+      enums.append(sort.text()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

@@ -37,92 +37,93 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class DigestDiffWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DigestDiffWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DigestDiffWorker.class);
 
-    private final boolean revokedOnly;
+  private final boolean revokedOnly;
 
-    private final DataSourceWrapper refDatasource;
+  private final DataSourceWrapper refDatasource;
 
-    private final Set<byte[]> includeCaCerts;
+  private final Set<byte[]> includeCaCerts;
 
-    private final DataSourceWrapper targetDatasource;
+  private final DataSourceWrapper targetDatasource;
 
-    private final String reportDir;
+  private final String reportDir;
 
-    private final int numCertsPerSelect;
+  private final int numCertsPerSelect;
 
-    private final int numThreads;
+  private final int numThreads;
 
-    public DigestDiffWorker(DataSourceFactory datasourceFactory,
-            PasswordResolver passwordResolver, boolean revokedOnly,
-            String refDbConfFile, String targetDbConfFile, String reportDirName,
-            int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
-            throws DataAccessException, PasswordResolverException, IOException {
-        this.reportDir = reportDirName;
-        this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
-        this.numCertsPerSelect = numCertsPerSelect;
-        this.includeCaCerts = includeCaCerts;
-        this.revokedOnly = revokedOnly;
+  public DigestDiffWorker(DataSourceFactory datasourceFactory,
+      PasswordResolver passwordResolver, boolean revokedOnly,
+      String refDbConfFile, String targetDbConfFile, String reportDirName,
+      int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
+      throws DataAccessException, PasswordResolverException, IOException {
+    this.reportDir = reportDirName;
+    this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
+    this.numCertsPerSelect = numCertsPerSelect;
+    this.includeCaCerts = includeCaCerts;
+    this.revokedOnly = revokedOnly;
 
-        File file = new File(reportDirName);
-        if (!file.exists()) {
-            file.mkdirs();
-        } else {
-            if (!file.isDirectory()) {
-                throw new IOException(reportDirName + " is not a folder");
-            }
+    File file = new File(reportDirName);
+    if (!file.exists()) {
+      file.mkdirs();
+    } else {
+      if (!file.isDirectory()) {
+        throw new IOException(reportDirName + " is not a folder");
+      }
 
-            if (!file.canWrite()) {
-                throw new IOException(reportDirName + " is not writable");
-            }
-        }
+      if (!file.canWrite()) {
+        throw new IOException(reportDirName + " is not writable");
+      }
+    }
 
-        String[] children = file.list();
-        if (children != null && children.length > 0) {
-            throw new IOException(reportDirName + " is not empty");
-        }
+    String[] children = file.list();
+    if (children != null && children.length > 0) {
+      throw new IOException(reportDirName + " is not empty");
+    }
 
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(targetDbConfFile)));
-        this.targetDatasource = datasourceFactory.createDataSource(
-                "ds-" + targetDbConfFile, props, passwordResolver);
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(targetDbConfFile)));
+    this.targetDatasource = datasourceFactory.createDataSource(
+        "ds-" + targetDbConfFile, props, passwordResolver);
 
-        Properties refProps = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
-        this.refDatasource = datasourceFactory.createDataSource(
-                "ds-" + refDbConfFile, refProps, passwordResolver);
-    } // constructor
+    Properties refProps = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
+    this.refDatasource = datasourceFactory.createDataSource(
+        "ds-" + refDbConfFile, refProps, passwordResolver);
+  } // constructor
 
-    @Override
-    protected void run0() throws Exception {
-        long start = System.currentTimeMillis();
+  @Override
+  protected void run0() throws Exception {
+    long start = System.currentTimeMillis();
 
-        try {
-            DigestDiff diff = new DigestDiff(refDatasource, targetDatasource,
-                    reportDir, revokedOnly, stopMe, numCertsPerSelect, numThreads);
-            diff.setIncludeCaCerts(includeCaCerts);
-            diff.diff();
-        } finally {
-            try {
-                refDatasource.close();
-            } catch (Throwable th) {
-                LOG.error("refDatasource.close()", th);
-            }
+    try {
+      DigestDiff diff = new DigestDiff(refDatasource, targetDatasource,
+          reportDir, revokedOnly, stopMe, numCertsPerSelect, numThreads);
+      diff.setIncludeCaCerts(includeCaCerts);
+      diff.diff();
+    } finally {
+      try {
+        refDatasource.close();
+      } catch (Throwable th) {
+        LOG.error("refDatasource.close()", th);
+      }
 
-            try {
-                targetDatasource.close();
-            } catch (Throwable th) {
-                LOG.error("datasource.close()", th);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-        }
-    } // method run0
+      try {
+        targetDatasource.close();
+      } catch (Throwable th) {
+        LOG.error("datasource.close()", th);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+    }
+  } // method run0
 
 }

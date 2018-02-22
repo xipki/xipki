@@ -25,31 +25,32 @@ import javax.servlet.http.HttpServletRequest;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
 
-    private final HttpServletRequest req;
+  private final HttpServletRequest req;
 
-    HttpRequestMetadataRetrieverImpl(HttpServletRequest req) {
-        this.req = req;
-    }
+  HttpRequestMetadataRetrieverImpl(HttpServletRequest req) {
+    this.req = req;
+  }
 
-    @Override
-    public String getHeader(String headerName) {
-        return req.getHeader(headerName);
-    }
+  @Override
+  public String getHeader(String headerName) {
+    return req.getHeader(headerName);
+  }
 
-    @Override
-    public String getParameter(String paramName) {
-        return req.getParameter(paramName);
-    }
+  @Override
+  public String getParameter(String paramName) {
+    return req.getParameter(paramName);
+  }
 
-    @Override
-    public X509Certificate getTlsClientCert() throws IOException {
-        return ClientCertCache.getTlsClientCert(req);
-    }
+  @Override
+  public X509Certificate getTlsClientCert() throws IOException {
+    return ClientCertCache.getTlsClientCert(req);
+  }
 
 }

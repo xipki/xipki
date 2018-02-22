@@ -25,62 +25,63 @@ import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "user-up",
-        description = "update user")
+    description = "update user")
 @Service
 public class UserUpdateCmd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "user Name\n(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n", required = true,
+      description = "user Name\n(required)")
+  private String name;
 
-    @Option(name = "--active",
-            description = "activate this user")
-    private Boolean active;
+  @Option(name = "--active",
+      description = "activate this user")
+  private Boolean active;
 
-    @Option(name = "--inactive",
-            description = "deactivate this user")
-    private Boolean inactive;
+  @Option(name = "--inactive",
+      description = "deactivate this user")
+  private Boolean inactive;
 
-    @Option(name = "--password",
-            description = "user password, 'CONSOLE' to read from console")
-    private String password;
+  @Option(name = "--password",
+      description = "user password, 'CONSOLE' to read from console")
+  private String password;
 
-    @Override
-    protected Object execute0() throws Exception {
-        Boolean realActive;
-        if (active != null) {
-            if (inactive != null) {
-                throw new IllegalCmdParamException(
-                        "maximal one of --active and --inactive can be set");
-            }
-            realActive = Boolean.TRUE;
-        } else if (inactive != null) {
-            realActive = Boolean.FALSE;
-        } else {
-            realActive = null;
-        }
-
-        ChangeUserEntry entry = new ChangeUserEntry(new NameId(null, name));
-        if (realActive != null) {
-            entry.setActive(realActive);
-        }
-
-        if ("CONSOLE".equalsIgnoreCase(password)) {
-            password = new String(readPassword());
-        }
-
-        if (password != null) {
-            entry.setPassword(password);
-        }
-
-        boolean bo = caManager.changeUser(entry);
-        output(bo, "changed", "could not change", "user " + name);
-        return null;
+  @Override
+  protected Object execute0() throws Exception {
+    Boolean realActive;
+    if (active != null) {
+      if (inactive != null) {
+        throw new IllegalCmdParamException(
+            "maximal one of --active and --inactive can be set");
+      }
+      realActive = Boolean.TRUE;
+    } else if (inactive != null) {
+      realActive = Boolean.FALSE;
+    } else {
+      realActive = null;
     }
+
+    ChangeUserEntry entry = new ChangeUserEntry(new NameId(null, name));
+    if (realActive != null) {
+      entry.setActive(realActive);
+    }
+
+    if ("CONSOLE".equalsIgnoreCase(password)) {
+      password = new String(readPassword());
+    }
+
+    if (password != null) {
+      entry.setPassword(password);
+    }
+
+    boolean bo = caManager.changeUser(entry);
+    output(bo, "changed", "could not change", "user " + name);
+    return null;
+  }
 
 }

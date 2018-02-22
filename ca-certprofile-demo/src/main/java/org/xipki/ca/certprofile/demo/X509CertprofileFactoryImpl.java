@@ -22,24 +22,25 @@ import org.xipki.ca.api.profile.x509.X509CertprofileFactory;
 import org.xipki.common.ObjectCreationException;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
 
-    @Override
-    public boolean canCreateProfile(String type) {
-        return "DemoXML".equalsIgnoreCase(type);
-    }
+  @Override
+  public boolean canCreateProfile(String type) {
+    return "DemoXML".equalsIgnoreCase(type);
+  }
 
-    @Override
-    public X509Certprofile newCertprofile(String type) throws ObjectCreationException {
-        if ("DemoXML".equalsIgnoreCase(type)) {
-            return new DemoX509Certprofile();
-        } else {
-            throw new ObjectCreationException("unknown certprofile type '" + type + "'");
-        }
+  @Override
+  public X509Certprofile newCertprofile(String type) throws ObjectCreationException {
+    if ("DemoXML".equalsIgnoreCase(type)) {
+      return new DemoX509Certprofile();
+    } else {
+      throw new ObjectCreationException("unknown certprofile type '" + type + "'");
     }
+  }
 
 }

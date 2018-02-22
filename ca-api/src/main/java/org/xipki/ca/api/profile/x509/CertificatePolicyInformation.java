@@ -23,28 +23,29 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertificatePolicyInformation {
 
-    private final String certPolicyId;
+  private final String certPolicyId;
 
-    private final List<CertificatePolicyQualifier> qualifiers;
+  private final List<CertificatePolicyQualifier> qualifiers;
 
-    public CertificatePolicyInformation(String certPolicyId,
-            List<CertificatePolicyQualifier> qualifiers) {
-        this.certPolicyId = ParamUtil.requireNonBlank("certPolicyId", certPolicyId);
-        this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
-    }
+  public CertificatePolicyInformation(String certPolicyId,
+      List<CertificatePolicyQualifier> qualifiers) {
+    this.certPolicyId = ParamUtil.requireNonBlank("certPolicyId", certPolicyId);
+    this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
+  }
 
-    public String certPolicyId() {
-        return certPolicyId;
-    }
+  public String certPolicyId() {
+    return certPolicyId;
+  }
 
-    public List<CertificatePolicyQualifier> qualifiers() {
-        return qualifiers;
-    }
+  public List<CertificatePolicyQualifier> qualifiers() {
+    return qualifiers;
+  }
 
 }

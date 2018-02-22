@@ -30,38 +30,39 @@ import org.xipki.http.servlet.SslReverseProxyMode;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 3.0.1
  */
 
 class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
 
-    private FullHttpRequest request;
-    private ServletURI servletUri;
-    private SSLSession sslSession;
-    private SslReverseProxyMode sslReverseProxyMode;
+  private FullHttpRequest request;
+  private ServletURI servletUri;
+  private SSLSession sslSession;
+  private SslReverseProxyMode sslReverseProxyMode;
 
-    public HttpRequestMetadataRetrieverImpl(FullHttpRequest request, ServletURI servletUri,
-            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) {
-        this.request = request;
-        this.servletUri = servletUri;
-        this.sslSession = sslSession;
-        this.sslReverseProxyMode = sslReverseProxyMode;
-    }
+  public HttpRequestMetadataRetrieverImpl(FullHttpRequest request, ServletURI servletUri,
+      SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) {
+    this.request = request;
+    this.servletUri = servletUri;
+    this.sslSession = sslSession;
+    this.sslReverseProxyMode = sslReverseProxyMode;
+  }
 
-    @Override
-    public String getHeader(String headerName) {
-        return request.headers().get(headerName);
-    }
+  @Override
+  public String getHeader(String headerName) {
+    return request.headers().get(headerName);
+  }
 
-    @Override
-    public String getParameter(String paramName) {
-        return servletUri.parameter(paramName);
-    }
+  @Override
+  public String getParameter(String paramName) {
+    return servletUri.parameter(paramName);
+  }
 
-    @Override
-    public X509Certificate getTlsClientCert() throws IOException {
-        return ClientCertCache.getTlsClientCert(request, sslSession, sslReverseProxyMode);
-    }
+  @Override
+  public X509Certificate getTlsClientCert() throws IOException {
+    return ClientCertCache.getTlsClientCert(request, sslSession, sslReverseProxyMode);
+  }
 
 }

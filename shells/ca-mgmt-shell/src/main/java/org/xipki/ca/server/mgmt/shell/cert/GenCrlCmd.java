@@ -23,18 +23,19 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "gencrl",
-        description = "generate CRL")
+    description = "generate CRL")
 @Service
 public class GenCrlCmd extends CrlAction {
 
-    @Override
-    protected X509CRL retrieveCrl() throws Exception {
-        return caManager.generateCrlOnDemand(caName);
-    }
+  @Override
+  protected X509CRL retrieveCrl() throws Exception {
+    return caManager.generateCrlOnDemand(caName);
+  }
 
 }

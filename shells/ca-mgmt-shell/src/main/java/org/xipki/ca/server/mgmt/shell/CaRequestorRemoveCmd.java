@@ -25,31 +25,32 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "careq-rm",
-        description = "remove requestor from CA")
+    description = "remove requestor from CA")
 @Service
 public class CaRequestorRemoveCmd extends CaAction {
 
-    @Option(name = "--ca", required = true,
-            description = "CA name\n(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca", required = true,
+      description = "CA name\n(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--requestor", required = true,
-            description = "requestor name\n(required)")
-    @Completion(RequestorNameCompleter.class)
-    private String requestorName;
+  @Option(name = "--requestor", required = true,
+      description = "requestor name\n(required)")
+  @Completion(RequestorNameCompleter.class)
+  private String requestorName;
 
-    @Override
-    protected Object execute0() throws Exception {
-        boolean bo = caManager.removeRequestorFromCa(requestorName, caName);
-        output(bo, "removed", "could not remove",
-                "requestor " + requestorName + " from CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object execute0() throws Exception {
+    boolean bo = caManager.removeRequestorFromCa(requestorName, caName);
+    output(bo, "removed", "could not remove",
+        "requestor " + requestorName + " from CA " + caName);
+    return null;
+  }
 
 }

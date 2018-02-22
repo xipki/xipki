@@ -25,57 +25,58 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class RequestType extends IdentifidDbObjectType {
 
-    public static final String TAG_PARENT = "requests";
+  public static final String TAG_PARENT = "requests";
 
-    public static final String TAG_ROOT = "request";
+  public static final String TAG_ROOT = "request";
 
-    public static final String TAG_UPDATE = "update";
+  public static final String TAG_UPDATE = "update";
 
-    private Long update;
+  private Long update;
 
-    private String file;
+  private String file;
 
-    public Long update() {
-        return update;
-    }
+  public Long update() {
+    return update;
+  }
 
-    public void setUpdate(Long update) {
-        this.update = update;
-    }
+  public void setUpdate(Long update) {
+    this.update = update;
+  }
 
-    public String file() {
-        return file;
-    }
+  public String file() {
+    return file;
+  }
 
-    public void setFile(String file) {
-        this.file = file;
-    }
+  public void setFile(String file) {
+    this.file = file;
+  }
 
-    @Override
-    public void validate() throws InvalidDataObjectException {
-        super.validate();
-        assertNotNull(TAG_UPDATE, update);
-        assertNotBlank(TAG_FILE, file);
-    }
+  @Override
+  public void validate() throws InvalidDataObjectException {
+    super.validate();
+    assertNotNull(TAG_UPDATE, update);
+    assertNotBlank(TAG_FILE, file);
+  }
 
-    @Override
-    public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
-        ParamUtil.requireNonNull("writer", writer);
+  @Override
+  public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
+    ParamUtil.requireNonNull("writer", writer);
 
-        validate();
+    validate();
 
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id());
-        writeIfNotNull(writer, TAG_UPDATE, update);
-        writeIfNotNull(writer, TAG_FILE, file);
-        writer.writeEndElement();
-        writer.writeNewline();
-    }
+    writer.writeStartElement(TAG_ROOT);
+    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_UPDATE, update);
+    writeIfNotNull(writer, TAG_FILE, file);
+    writer.writeEndElement();
+    writer.writeNewline();
+  }
 
 }

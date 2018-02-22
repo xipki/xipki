@@ -30,60 +30,61 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class BiometricInfoOption {
 
-    private final Set<Integer> predefinedTypes;
+  private final Set<Integer> predefinedTypes;
 
-    private final Set<ASN1ObjectIdentifier> idTypes;
+  private final Set<ASN1ObjectIdentifier> idTypes;
 
-    private final Set<ASN1ObjectIdentifier> hashAlgorithms;
+  private final Set<ASN1ObjectIdentifier> hashAlgorithms;
 
-    private final TripleState sourceDataUriOccurrence;
+  private final TripleState sourceDataUriOccurrence;
 
-    public BiometricInfoOption(BiometricInfo jaxb) throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("jaxb", jaxb);
+  public BiometricInfoOption(BiometricInfo jaxb) throws NoSuchAlgorithmException {
+    ParamUtil.requireNonNull("jaxb", jaxb);
 
-        this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
-        this.hashAlgorithms = XmlX509CertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
+    this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
+    this.hashAlgorithms = XmlX509CertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
 
-        for (ASN1ObjectIdentifier m : hashAlgorithms) {
-            AlgorithmUtil.getHashOutputSizeInOctets(m);
-        }
-
-        this.predefinedTypes = new HashSet<>();
-        this.idTypes = new HashSet<>();
-        for (BiometricTypeType m : jaxb.getType()) {
-            if (m.getPredefined() != null) {
-                predefinedTypes.add(m.getPredefined().getValue());
-            } else if (m.getOid() != null) {
-                idTypes.add(new ASN1ObjectIdentifier(m.getOid().getValue()));
-            } else {
-                throw new RuntimeException("should not reach here, invalid biometricType");
-            }
-        }
+    for (ASN1ObjectIdentifier m : hashAlgorithms) {
+      AlgorithmUtil.getHashOutputSizeInOctets(m);
     }
 
-    public boolean isTypePermitted(TypeOfBiometricData type) {
-        ParamUtil.requireNonNull("type", type);
-
-        if (type.isPredefined()) {
-            return predefinedTypes.contains(type.getPredefinedBiometricType());
-        } else {
-            return idTypes.contains(type.getBiometricDataOid());
-        }
+    this.predefinedTypes = new HashSet<>();
+    this.idTypes = new HashSet<>();
+    for (BiometricTypeType m : jaxb.getType()) {
+      if (m.getPredefined() != null) {
+        predefinedTypes.add(m.getPredefined().getValue());
+      } else if (m.getOid() != null) {
+        idTypes.add(new ASN1ObjectIdentifier(m.getOid().getValue()));
+      } else {
+        throw new RuntimeException("should not reach here, invalid biometricType");
+      }
     }
+  }
 
-    public boolean isHashAlgorithmPermitted(ASN1ObjectIdentifier hashAlgorithm) {
-        ParamUtil.requireNonNull("hashAlgorithm", hashAlgorithm);
-        return hashAlgorithms.contains(hashAlgorithm);
-    }
+  public boolean isTypePermitted(TypeOfBiometricData type) {
+    ParamUtil.requireNonNull("type", type);
 
-    public TripleState sourceDataUriOccurrence() {
-        return sourceDataUriOccurrence;
+    if (type.isPredefined()) {
+      return predefinedTypes.contains(type.getPredefinedBiometricType());
+    } else {
+      return idTypes.contains(type.getBiometricDataOid());
     }
+  }
+
+  public boolean isHashAlgorithmPermitted(ASN1ObjectIdentifier hashAlgorithm) {
+    ParamUtil.requireNonNull("hashAlgorithm", hashAlgorithm);
+    return hashAlgorithms.contains(hashAlgorithm);
+  }
+
+  public TripleState sourceDataUriOccurrence() {
+    return sourceDataUriOccurrence;
+  }
 
 }

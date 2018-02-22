@@ -18,73 +18,74 @@
 package org.xipki.ca.api;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class OperationException extends Exception {
 
-    public enum ErrorCode {
+  public enum ErrorCode {
 
-        ALREADY_ISSUED,
-        BAD_CERT_TEMPLATE,
-        BAD_REQUEST,
-        BAD_POP,
-        CERT_REVOKED,
-        CERT_UNREVOKED,
-        CRL_FAILURE,
-        DATABASE_FAILURE,
-        INVALID_EXTENSION,
-        NOT_PERMITTED,
-        SYSTEM_FAILURE,
-        SYSTEM_UNAVAILABLE,
-        UNKNOWN_CERT,
-        UNKNOWN_CERT_PROFILE
+    ALREADY_ISSUED,
+    BAD_CERT_TEMPLATE,
+    BAD_REQUEST,
+    BAD_POP,
+    CERT_REVOKED,
+    CERT_UNREVOKED,
+    CRL_FAILURE,
+    DATABASE_FAILURE,
+    INVALID_EXTENSION,
+    NOT_PERMITTED,
+    SYSTEM_FAILURE,
+    SYSTEM_UNAVAILABLE,
+    UNKNOWN_CERT,
+    UNKNOWN_CERT_PROFILE
 
-    } // enum ErrorCode
+  } // enum ErrorCode
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final ErrorCode errorCode;
+  private final ErrorCode errorCode;
 
-    private final String errorMessage;
+  private final String errorMessage;
 
-    public OperationException(ErrorCode errorCode) {
-        super(String.format("error code: %s", errorCode));
-        this.errorCode = errorCode;
-        this.errorMessage = null;
+  public OperationException(ErrorCode errorCode) {
+    super(String.format("error code: %s", errorCode));
+    this.errorCode = errorCode;
+    this.errorMessage = null;
+  }
+
+  public OperationException(ErrorCode errorCode, String errorMessage) {
+    super(String.format("error code: %s, error message: %s", errorCode, errorMessage));
+    this.errorCode = errorCode;
+    this.errorMessage = errorMessage;
+  }
+
+  public OperationException(ErrorCode errorCode, Throwable throwable) {
+    this(errorCode, getMessage(throwable));
+  }
+
+  public ErrorCode errorCode() {
+    return errorCode;
+  }
+
+  public String errorMessage() {
+    return errorMessage;
+  }
+
+  private static final String getMessage(Throwable throwable) {
+    if (throwable == null) {
+      return null;
     }
 
-    public OperationException(ErrorCode errorCode, String errorMessage) {
-        super(String.format("error code: %s, error message: %s", errorCode, errorMessage));
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+    StringBuilder sb = new StringBuilder();
+    sb.append(throwable.getClass().getSimpleName());
+    String msg = throwable.getMessage();
+    if (msg != null) {
+      sb.append(": ").append(msg);
     }
-
-    public OperationException(ErrorCode errorCode, Throwable throwable) {
-        this(errorCode, getMessage(throwable));
-    }
-
-    public ErrorCode errorCode() {
-        return errorCode;
-    }
-
-    public String errorMessage() {
-        return errorMessage;
-    }
-
-    private static final String getMessage(Throwable throwable) {
-        if (throwable == null) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(throwable.getClass().getSimpleName());
-        String msg = throwable.getMessage();
-        if (msg != null) {
-            sb.append(": ").append(msg);
-        }
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 
 }

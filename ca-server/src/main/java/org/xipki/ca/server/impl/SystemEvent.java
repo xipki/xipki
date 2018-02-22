@@ -20,34 +20,35 @@ package org.xipki.ca.server.impl;
 import org.xipki.common.util.ParamUtil;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 class SystemEvent {
 
-    private final String name;
+  private final String name;
 
-    private final String owner;
+  private final String owner;
 
-    private final long eventTime;
+  private final long eventTime;
 
-    SystemEvent(String name, String owner, long eventTime) {
-        this.name = ParamUtil.requireNonBlank("name", name);
-        this.owner = ParamUtil.requireNonBlank("owner", owner);
-        this.eventTime = eventTime;
-    }
+  SystemEvent(String name, String owner, long eventTime) {
+    this.name = ParamUtil.requireNonBlank("name", name);
+    this.owner = ParamUtil.requireNonBlank("owner", owner);
+    this.eventTime = eventTime;
+  }
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    public String owner() {
-        return owner;
-    }
+  public String owner() {
+    return owner;
+  }
 
-    public long eventTime() {
-        return eventTime;
-    }
+  public long eventTime() {
+    return eventTime;
+  }
 
 }

@@ -26,46 +26,47 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class IssuerFilter {
 
-    private final Set<String> includeSha1Fps;
+  private final Set<String> includeSha1Fps;
 
-    private final Set<String> excludeSha1Fps;
+  private final Set<String> excludeSha1Fps;
 
-    public IssuerFilter(Set<X509Certificate> includes, Set<X509Certificate> excludes)
-            throws CertificateEncodingException {
-        if (includes == null) {
-            includeSha1Fps = null;
-        } else {
-            includeSha1Fps = new HashSet<>(includes.size());
-            for (X509Certificate include : includes) {
-                String sha1Fp = HashAlgoType.SHA1.base64Hash(include.getEncoded());
-                includeSha1Fps.add(sha1Fp);
-            }
-        }
-
-        if (excludes == null) {
-            excludeSha1Fps = null;
-        } else {
-            excludeSha1Fps = new HashSet<>(excludes.size());
-            for (X509Certificate exclude : excludes) {
-                String sha1Fp = HashAlgoType.SHA1.base64Hash(exclude.getEncoded());
-                excludeSha1Fps.add(sha1Fp);
-            }
-        }
+  public IssuerFilter(Set<X509Certificate> includes, Set<X509Certificate> excludes)
+      throws CertificateEncodingException {
+    if (includes == null) {
+      includeSha1Fps = null;
+    } else {
+      includeSha1Fps = new HashSet<>(includes.size());
+      for (X509Certificate include : includes) {
+        String sha1Fp = HashAlgoType.SHA1.base64Hash(include.getEncoded());
+        includeSha1Fps.add(sha1Fp);
+      }
     }
 
-    public boolean includeIssuerWithSha1Fp(String sha1Fp) {
-        ParamUtil.requireNonBlank("sha1Fp", sha1Fp);
-        if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
-            return (excludeSha1Fps == null) ? true : !excludeSha1Fps.contains(sha1Fp);
-        } else {
-            return false;
-        }
+    if (excludes == null) {
+      excludeSha1Fps = null;
+    } else {
+      excludeSha1Fps = new HashSet<>(excludes.size());
+      for (X509Certificate exclude : excludes) {
+        String sha1Fp = HashAlgoType.SHA1.base64Hash(exclude.getEncoded());
+        excludeSha1Fps.add(sha1Fp);
+      }
     }
+  }
+
+  public boolean includeIssuerWithSha1Fp(String sha1Fp) {
+    ParamUtil.requireNonBlank("sha1Fp", sha1Fp);
+    if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
+      return (excludeSha1Fps == null) ? true : !excludeSha1Fps.contains(sha1Fp);
+    } else {
+      return false;
+    }
+  }
 
 }

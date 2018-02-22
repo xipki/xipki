@@ -27,49 +27,50 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 @Command(scope = "ca", name = "import-ocspfromca",
-        description = "import OCSP database from CA data")
+    description = "import OCSP database from CA data")
 @Service
 public class ImportOcspFromCaCmd extends DbPortAction {
 
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
+  private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
-    private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
+  private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
 
-    @Option(name = "--db-conf",
-            description = "database configuration file")
-    @Completion(FilePathCompleter.class)
-    private String dbconfFile = DFLT_DBCONF_FILE;
+  @Option(name = "--db-conf",
+      description = "database configuration file")
+  @Completion(FilePathCompleter.class)
+  private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "--in-dir", required = true,
-            description = "input directory\n(required)")
-    @Completion(DirPathCompleter.class)
-    private String indir;
+  @Option(name = "--in-dir", required = true,
+      description = "input directory\n(required)")
+  @Completion(DirPathCompleter.class)
+  private String indir;
 
-    @Option(name = "--publisher",
-            description = "publisher name")
-    private String publisherName = DFLT_PUBLISHER;
+  @Option(name = "--publisher",
+      description = "publisher name")
+  private String publisherName = DFLT_PUBLISHER;
 
-    @Option(name = "-k",
-            description = "number of certificates per commit")
-    private Integer numCertsPerCommit = 100;
+  @Option(name = "-k",
+      description = "number of certificates per commit")
+  private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
+  @Option(name = "--resume")
+  private Boolean resume = Boolean.FALSE;
 
-    @Option(name = "--test",
-            description = "just test the import, no real import")
-    private Boolean testOnly = Boolean.FALSE;
+  @Option(name = "--test",
+      description = "just test the import, no real import")
+  private Boolean testOnly = Boolean.FALSE;
 
-    @Override
-    protected DbPortWorker getDbPortWorker() throws Exception {
-        return new OcspFromCaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile,
-                publisherName, resume, indir, numCertsPerCommit.intValue(),
-                testOnly.booleanValue());
-    }
+  @Override
+  protected DbPortWorker getDbPortWorker() throws Exception {
+    return new OcspFromCaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile,
+        publisherName, resume, indir, numCertsPerCommit.intValue(),
+        testOnly.booleanValue());
+  }
 
 }

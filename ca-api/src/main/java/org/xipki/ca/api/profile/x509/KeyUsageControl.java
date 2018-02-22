@@ -21,27 +21,28 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.KeyUsage;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class KeyUsageControl {
 
-    private final KeyUsage keyUsage;
+  private final KeyUsage keyUsage;
 
-    private final boolean required;
+  private final boolean required;
 
-    public KeyUsageControl(KeyUsage keyUsage, boolean required) {
-        this.keyUsage = ParamUtil.requireNonNull("keyUsage", keyUsage);
-        this.required = required;
-    }
+  public KeyUsageControl(KeyUsage keyUsage, boolean required) {
+    this.keyUsage = ParamUtil.requireNonNull("keyUsage", keyUsage);
+    this.required = required;
+  }
 
-    public KeyUsage keyUsage() {
-        return keyUsage;
-    }
+  public KeyUsage keyUsage() {
+    return keyUsage;
+  }
 
-    public boolean isRequired() {
-        return required;
-    }
+  public boolean isRequired() {
+    return required;
+  }
 
 }

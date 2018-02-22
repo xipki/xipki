@@ -33,106 +33,107 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
 
 /**
+ * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class IssuerEntry {
 
-    private final int id;
+  private final int id;
 
-    private final Map<HashAlgoType, byte[]> issuerHashMap;
+  private final Map<HashAlgoType, byte[]> issuerHashMap;
 
-    private final Date notBefore;
+  private final Date notBefore;
 
-    private final X509Certificate cert;
+  private final X509Certificate cert;
 
-    private CertRevocationInfo revocationInfo;
+  private CertRevocationInfo revocationInfo;
 
-    private CrlInfo crlInfo;
+  private CrlInfo crlInfo;
 
-    public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
-        this.id = id;
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-        this.notBefore = cert.getNotBefore();
-        this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
+  public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
+    this.id = id;
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.notBefore = cert.getNotBefore();
+    this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
+  }
+
+  private static Map<HashAlgoType, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
+      throws CertificateEncodingException {
+    byte[] encodedName;
+    byte[] encodedKey;
+    try {
+      Certificate bcCert = Certificate.getInstance(encodedCert);
+      encodedName = bcCert.getSubject().getEncoded("DER");
+      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+    } catch (IllegalArgumentException | IOException ex) {
+      throw new CertificateEncodingException(ex.getMessage(), ex);
     }
 
-    private static Map<HashAlgoType, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
-            throws CertificateEncodingException {
-        byte[] encodedName;
-        byte[] encodedKey;
-        try {
-            Certificate bcCert = Certificate.getInstance(encodedCert);
-            encodedName = bcCert.getSubject().getEncoded("DER");
-            encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
-        } catch (IllegalArgumentException | IOException ex) {
-            throw new CertificateEncodingException(ex.getMessage(), ex);
-        }
+    Map<HashAlgoType, byte[]> hashes = new HashMap<>();
+    for (HashAlgoType ha : HashAlgoType.values()) {
+      int hlen = ha.length();
+      byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
+      int offset = 0;
+      nameAndKeyHash[offset++] = 0x04;
+      nameAndKeyHash[offset++] = (byte) hlen;
+      System.arraycopy(ha.hash(encodedName), 0, nameAndKeyHash, offset, hlen);
+      offset += hlen;
 
-        Map<HashAlgoType, byte[]> hashes = new HashMap<>();
-        for (HashAlgoType ha : HashAlgoType.values()) {
-            int hlen = ha.length();
-            byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
-            int offset = 0;
-            nameAndKeyHash[offset++] = 0x04;
-            nameAndKeyHash[offset++] = (byte) hlen;
-            System.arraycopy(ha.hash(encodedName), 0, nameAndKeyHash, offset, hlen);
-            offset += hlen;
+      nameAndKeyHash[offset++] = 0x04;
+      nameAndKeyHash[offset++] = (byte) hlen;
+      System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
+      offset += hlen;
 
-            nameAndKeyHash[offset++] = 0x04;
-            nameAndKeyHash[offset++] = (byte) hlen;
-            System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
-            offset += hlen;
+      hashes.put(ha, nameAndKeyHash);
+    }
+    return hashes;
+  }
 
-            hashes.put(ha, nameAndKeyHash);
-        }
-        return hashes;
+  public int id() {
+    return id;
+  }
+
+  public byte[] getEncodedHash(HashAlgoType hashAlgo) {
+    byte[] data = issuerHashMap.get(hashAlgo);
+    return Arrays.copyOf(data, data.length);
+  }
+
+  public boolean matchHash(RequestIssuer reqIssuer) {
+    byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
+    if (issuerHash == null) {
+      return false;
     }
 
-    public int id() {
-        return id;
-    }
+    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
+        reqIssuer.nameHashFrom(), issuerHash.length);
+  }
 
-    public byte[] getEncodedHash(HashAlgoType hashAlgo) {
-        byte[] data = issuerHashMap.get(hashAlgo);
-        return Arrays.copyOf(data, data.length);
-    }
+  public void setRevocationInfo(Date revocationTime) {
+    ParamUtil.requireNonNull("revocationTime", revocationTime);
+    this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+        revocationTime, null);
+  }
 
-    public boolean matchHash(RequestIssuer reqIssuer) {
-        byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
-        if (issuerHash == null) {
-            return false;
-        }
+  public void setCrlInfo(CrlInfo crlInfo) {
+    this.crlInfo = crlInfo;
+  }
 
-        return CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
-                reqIssuer.nameHashFrom(), issuerHash.length);
-    }
+  public CrlInfo crlInfo() {
+    return crlInfo;
+  }
 
-    public void setRevocationInfo(Date revocationTime) {
-        ParamUtil.requireNonNull("revocationTime", revocationTime);
-        this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-                revocationTime, null);
-    }
+  public CertRevocationInfo revocationInfo() {
+    return revocationInfo;
+  }
 
-    public void setCrlInfo(CrlInfo crlInfo) {
-        this.crlInfo = crlInfo;
-    }
+  public Date notBefore() {
+    return notBefore;
+  }
 
-    public CrlInfo crlInfo() {
-        return crlInfo;
-    }
-
-    public CertRevocationInfo revocationInfo() {
-        return revocationInfo;
-    }
-
-    public Date notBefore() {
-        return notBefore;
-    }
-
-    public X509Certificate cert() {
-        return cert;
-    }
+  public X509Certificate cert() {
+    return cert;
+  }
 
 }
