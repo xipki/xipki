@@ -161,8 +161,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
               invalidityDate, CaAuditConstants.MSGID_ca_routine);
         } catch (Throwable th) {
           LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
-              ca.caInfo().ident(), LogUtil.formatCsn(serialNumber),
-              th.getMessage());
+              ca.caInfo().ident(), LogUtil.formatCsn(serialNumber), th.getMessage());
         }
       }
     } // method run
@@ -334,8 +333,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
       AuditStatus auditStatus = AuditStatus.FAILED;
       org.xipki.cmp.PkiStatusInfo pkiStatus =
-          new org.xipki.cmp.PkiStatusInfo(
-              errorMsgContent.getPKIStatusInfo());
+          new org.xipki.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
 
       if (pkiStatus.pkiFailureInfo() == PKIFailureInfo.systemFailure) {
         auditStatus = AuditStatus.FAILED;
@@ -435,8 +433,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
       if (!tmpRequestor.isCertProfilePermitted(certprofileName)) {
         String msg = "certprofile " + certprofileName + " is not allowed";
-        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized,
-            msg));
+        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg));
         continue;
       }
 
@@ -457,8 +454,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       }
 
       CertTemplateData certTempData = new CertTemplateData(certTemp.getSubject(),
-          certTemp.getPublicKey(), notBefore, notAfter,  certTemp.getExtensions(),
-          certprofileName);
+          certTemp.getPublicKey(), notBefore, notAfter,  certTemp.getExtensions(), certprofileName);
       certTemplateDatas.put(i, certTempData);
     } // end for
 
@@ -490,8 +486,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
         ASN1Integer certReqId = certReqIds.get(i);
         String msg = "error in certReq " + failCertReqId;
-        PKIStatusInfo tmpStatus = generateRejectionStatus(failStatus,
-            failureInfo.intValue(), msg);
+        PKIStatusInfo tmpStatus = generateRejectionStatus(failStatus, failureInfo.intValue(), msg);
         certResps[i] = new CertResponse(certReqId, tmpStatus);
       }
 
@@ -513,9 +508,8 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       reqIndexToCertIndexMap.put(i, certTemplateList.size() - 1);
     }
 
-    List<CertResponse> generateCertResponses = generateCertificates(
-        certTemplateList, certReqIdList, tmpRequestor, tid,
-        keyUpdate, request, cmpControl, msgId, event);
+    List<CertResponse> generateCertResponses = generateCertificates(certTemplateList, certReqIdList,
+        tmpRequestor, tid, keyUpdate, request, cmpControl, msgId, event);
     boolean anyCertEnrolled = false;
 
     CertResponse[] certResps = new CertResponse[n];
@@ -592,15 +586,13 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
         certprofileName = certprofileName.toLowerCase();
         if (!requestor.isCertProfilePermitted(certprofileName)) {
           String msg = "certprofile " + certprofileName + " is not allowed";
-          certResp = buildErrorCertResponse(certReqId,
-              PKIFailureInfo.notAuthorized, msg);
+          certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
         } else {
           CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
               notBefore, notAfter, extensions, certprofileName);
 
-          certResp = generateCertificates(Arrays.asList(certTemplateData),
-              Arrays.asList(certReqId), requestor, tid, false, request,
-              cmpControl, msgId, event).get(0);
+          certResp = generateCertificates(Arrays.asList(certTemplateData), Arrays.asList(certReqId),
+              requestor, tid, false, request, cmpControl, msgId, event).get(0);
           certGenerated = true;
         }
       }
@@ -714,8 +706,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
     PKIStatusInfo statusInfo;
     if (StringUtil.isBlank(warningMsg)) {
       statusInfo = certInfo.isAlreadyIssued()
-          ? new PKIStatusInfo(PKIStatus.grantedWithMods,
-            new PKIFreeText("ALREADY_ISSUED"))
+          ? new PKIStatusInfo(PKIStatus.grantedWithMods, new PKIFreeText("ALREADY_ISSUED"))
           : new PKIStatusInfo(PKIStatus.granted);
     } else {
       statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods,
@@ -746,18 +737,18 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
         X500Name caSubject = getCa().caInfo().certificate().subjectAsX500Name();
 
         if (issuer == null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection,
-              PKIFailureInfo.badCertTemplate, "issuer is not present");
+          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+              "issuer is not present");
         }
 
         if (!issuer.equals(caSubject)) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection,
-              PKIFailureInfo.badCertTemplate, "issuer does not target at the CA");
+          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+              "issuer does not target at the CA");
         }
 
         if (serialNumber == null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection,
-              PKIFailureInfo.badCertTemplate, "serialNumber is not present");
+          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+              "serialNumber is not present");
         }
 
         if (certDetails.getSigningAlg() != null
@@ -766,16 +757,15 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             || certDetails.getPublicKey() != null
             || certDetails.getIssuerUID() != null
             || certDetails.getSubjectUID() != null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection,
-              PKIFailureInfo.badCertTemplate,
+          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
               "only version, issuer and serialNumber in RevDetails.certDetails are "
               + "allowed, but more is specified");
         }
 
         if (certDetails.getExtensions() == null) {
           if (cmpControl.rrAkiRequired()) {
-            return buildErrorMsgPkiBody(PKIStatus.rejection,
-                PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
+            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                "issuer's AKI not present");
           }
         } else {
           Extensions exts = certDetails.getExtensions();
@@ -783,8 +773,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
           if (oids != null) {
             for (ASN1ObjectIdentifier oid : oids) {
               if (!Extension.authorityKeyIdentifier.equals(oid)) {
-                return buildErrorMsgPkiBody(PKIStatus.rejection,
-                    PKIFailureInfo.badCertTemplate,
+                return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
                     "unknown critical extension " + oid.getId());
               }
             }
@@ -792,21 +781,19 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
           Extension ext = exts.getExtension(Extension.authorityKeyIdentifier);
           if (ext == null) {
-            return buildErrorMsgPkiBody(PKIStatus.rejection,
-                PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
+            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                "issuer's AKI not present");
           } else {
-            AuthorityKeyIdentifier aki =
-                AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
+            AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
 
             if (aki.getKeyIdentifier() == null) {
-              return buildErrorMsgPkiBody(PKIStatus.rejection,
-                  PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
+              return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                  "issuer's AKI not present");
             }
 
             boolean issuerMatched = true;
 
-            byte[] caSki = getCa().caInfo().certificate()
-                .subjectKeyIdentifier();
+            byte[] caSki = getCa().caInfo().certificate().subjectKeyIdentifier();
             if (!Arrays.equals(caSki, aki.getKeyIdentifier())) {
               issuerMatched = false;
             }
@@ -834,8 +821,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             }
 
             if (!issuerMatched) {
-              return buildErrorMsgPkiBody(PKIStatus.rejection,
-                  PKIFailureInfo.badCertTemplate,
+              return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
                   "issuer does not target at the CA");
             }
           }
@@ -893,8 +879,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             ASN1ObjectIdentifier extId = Extension.reasonCode;
             ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
             if (extValue != null) {
-              int reasonCode =
-                  ASN1Enumerated.getInstance(extValue).getValue().intValue();
+              int reasonCode = ASN1Enumerated.getInstance(extValue).getValue().intValue();
               reason = CrlReason.forReasonCode(reasonCode);
             }
 
@@ -902,8 +887,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             extValue = crlDetails.getExtensionParsedValue(extId);
             if (extValue != null) {
               try {
-                invalidityDate =
-                    ASN1GeneralizedTime.getInstance(extValue).getDate();
+                invalidityDate = ASN1GeneralizedTime.getInstance(extValue).getDate();
               } catch (ParseException ex) {
                 throw new OperationException(ErrorCode.INVALID_EXTENSION,
                     "invalid extension " + extId.getId());
@@ -1046,8 +1030,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       if (certInfo == null) {
         if (LOG.isWarnEnabled()) {
           LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
-              transactionId, certReqId.getPositiveValue(),
-              Hex.encode(certHash));
+              transactionId, certReqId.getPositiveValue(), Hex.encode(certHash));
         }
         continue;
       }
@@ -1068,8 +1051,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       BigInteger serialNumber = certInfo.cert().cert().getSerialNumber();
       X509Ca ca = getCa();
       try {
-        ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(),
-            msgId);
+        ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(), msgId);
       } catch (OperationException ex) {
         LogUtil.warn(LOG, ex,
             "could not revoke certificate ca=" + ca.caInfo().ident()
@@ -1219,11 +1201,9 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       Set<String> requestorProfiles = requestor.caHasRequestor().profiles();
 
       Set<String> supportedProfileNames = new HashSet<>();
-      Set<String> caProfileNames = ca.caManager().getCertprofilesForCa(
-          ca.caInfo().ident().name());
+      Set<String> caProfileNames = ca.caManager().getCertprofilesForCa(ca.caInfo().ident().name());
       for (String caProfileName : caProfileNames) {
-        if (requestorProfiles.contains("all")
-            || requestorProfiles.contains(caProfileName)) {
+        if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
           supportedProfileNames.add(caProfileName);
         }
       }
@@ -1284,8 +1264,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
     if (requestRecipient.getTagNo() == GeneralName.directoryName) {
       X500Name x500Name = X500Name.getInstance(requestRecipient.getName());
-      if (x500Name.equals(
-          caManager.cmpResponderWrapper(getResponderName()).subjectAsX500Name())) {
+      if (x500Name.equals(caManager.cmpResponderWrapper(getResponderName()).subjectAsX500Name())) {
         return true;
       }
     }
@@ -1305,8 +1284,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
   private PKIBody cmpEnrollCert(PKIMessage request, PKIHeaderBuilder respHeader,
       CmpControl cmpControl, PKIHeader reqHeader, PKIBody reqBody, CmpRequestorInfo requestor,
-      ASN1OctetString tid, String msgId, AuditEvent event)
-      throws InsuffientPermissionException {
+      ASN1OctetString tid, String msgId, AuditEvent event) throws InsuffientPermissionException {
     long confirmWaitTime = cmpControl.confirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;
@@ -1350,8 +1328,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       Date now = new Date();
       respHeader.setMessageTime(new ASN1GeneralizedTime(now));
       tv = new InfoTypeAndValue(CMPObjectIdentifiers.it_confirmWaitTime,
-          new ASN1GeneralizedTime(
-              new Date(System.currentTimeMillis() + confirmWaitTime)));
+          new ASN1GeneralizedTime(new Date(System.currentTimeMillis() + confirmWaitTime)));
     }
 
     respHeader.setGeneralInfo(tv);
@@ -1420,8 +1397,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       } catch (InsuffientPermissionException ex) {
         event.setStatus(AuditStatus.FAILED);
         event.addEventData(CaAuditConstants.NAME_message, "NOT_PERMITTED");
-        return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized,
-            null);
+        return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized, null);
       }
       return unRevokeRemoveCertificates(request, rr, requiredPermission, cmpControl, msgId);
     }
@@ -1447,8 +1423,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
     if (itv == null) {
       String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
           + " is only supported with the sub-types " + KNOWN_GENMSG_IDS.toString();
-      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-          statusMessage);
+      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest, statusMessage);
     }
 
     InfoTypeAndValue itvResp = null;

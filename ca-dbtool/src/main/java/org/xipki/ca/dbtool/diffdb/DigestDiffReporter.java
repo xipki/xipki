@@ -121,8 +121,7 @@ class DigestDiffReporter {
 
     numDiff.incrementAndGet();
     String msg = StringUtil.concat(refCert.serialNumber().toString(16),
-        "\t", refCert.encodedOmitSeriaNumber(),
-        "\t", targetCert.encodedOmitSeriaNumber(), "\n");
+        "\t", refCert.encodedOmitSeriaNumber(), "\t", targetCert.encodedOmitSeriaNumber(), "\n");
     synchronized (diffWriter) {
       diffWriter.write(msg);
     }

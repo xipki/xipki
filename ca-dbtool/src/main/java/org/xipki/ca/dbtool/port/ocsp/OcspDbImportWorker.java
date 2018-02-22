@@ -20,11 +20,9 @@ package org.xipki.ca.dbtool.port.ocsp;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
@@ -33,7 +31,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -61,10 +58,9 @@ public class OcspDbImportWorker extends DbPortWorker {
 
   private final boolean evaluateOnly;
 
-  public OcspDbImportWorker(DataSourceFactory datasourceFactory,
-      PasswordResolver passwordResolver, String dbConfFile, boolean resume, String srcFolder,
-      int batchEntriesPerCommit, boolean evaluateOnly)
-      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+  public OcspDbImportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+      String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
+      boolean evaluateOnly) throws PasswordResolverException, IOException, JAXBException {
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
 

@@ -290,8 +290,7 @@ public class CrlControl {
           int minute = Integer.parseInt(tokens.get(1));
           this.intervalDayTime = new HourMinute(hour, minute);
         } catch (IllegalArgumentException ex) {
-          throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '"
-              + str + "'");
+          throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
         }
       } else {
         int minutes = getInteger(props, KEY_INTERVAL_MINUTES, 0);

@@ -68,8 +68,7 @@ public class HealthCheckServlet extends HttpServlet {
         return;
       }
 
-      String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
-          req.getRequestURI());
+      String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
 
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
       if (responderAndPath == null) {
@@ -80,8 +79,7 @@ public class HealthCheckServlet extends HttpServlet {
 
       HealthCheckResult healthResult = server.healthCheck(responderAndPath.responder());
       int status = healthResult.isHealthy()
-          ? HttpServletResponse.SC_OK
-          : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+          ? HttpServletResponse.SC_OK : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
       byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
       resp.setStatus(status);

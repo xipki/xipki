@@ -151,24 +151,20 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
       }
 
-      if (CaDbEntryType.USER == typeProcessedInLastProcess
-            || typeProcessedInLastProcess == null) {
+      if (CaDbEntryType.USER == typeProcessedInLastProcess || typeProcessedInLastProcess == null) {
         exception = exportEntries(CaDbEntryType.USER, certstore, processLogFile,
             idProcessedInLastProcess);
         typeProcessedInLastProcess = null;
         idProcessedInLastProcess = null;
       }
 
-      CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CAUSER,
-        CaDbEntryType.CRL, CaDbEntryType.CERT,
-        CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
+      CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CAUSER, CaDbEntryType.CRL,
+          CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
       for (CaDbEntryType type : types) {
         if (exception == null
-            && (type == typeProcessedInLastProcess
-              || typeProcessedInLastProcess == null)) {
-          exception = exportEntries(type, certstore, processLogFile,
-              idProcessedInLastProcess);
+            && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
+          exception = exportEntries(type, certstore, processLogFile, idProcessedInLastProcess);
           typeProcessedInLastProcess = null;
           idProcessedInLastProcess = null;
         }
@@ -176,8 +172,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
       JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
       try {
-        marshaller.marshal(root,
-            new File(baseDir + File.separator + FILENAME_CA_CERTSTORE));
+        marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CERTSTORE));
       } catch (JAXBException ex) {
         throw XmlUtil.convert(ex);
       }
@@ -238,8 +233,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
         coreSql = "ID,SN,CA_ID,PID,RID,ART,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-            + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? "
-            + "AND CERT.ID=CRAW.CID";
+            + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID=CRAW.CID";
         break;
       case CRL:
         numProcessedBefore = certstore.getCountCrls();
@@ -451,8 +445,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             crl.setCaId(caId);
 
             byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-            BigInteger crlNumber = ASN1Integer.getInstance(extnValue)
-                .getPositiveValue();
+            BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
             crl.setCrlNo(crlNumber.toString());
             crl.setFile(crlFilename);
 
@@ -526,8 +519,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             String currentEntriesFilename = buildFilename(type.dirName() + "_",
                 ".zip", minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
             finalizeZip(currentEntriesZip, "overview.xml", entriesInCurrentFile);
-            currentEntriesZipFile.renameTo(
-                new File(entriesDir, currentEntriesFilename));
+            currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
 
             writeLine(filenameListOs, currentEntriesFilename);
             setCount(type, certstore, numProcessedBefore + sum);
@@ -589,8 +581,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
   private void exportPublishQueue(CertStoreType certstore) throws DataAccessException {
     System.out.println("exporting table PUBLISHQUEUE");
 
-    String sql =
-        "SELECT CID,PID,CA_ID FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC";
+    String sql = "SELECT CID,PID,CA_ID FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC";
     final int minId = (int) min("PUBLISHQUEUE", "CID");
     final int maxId = (int) max("PUBLISHQUEUE", "CID");
 

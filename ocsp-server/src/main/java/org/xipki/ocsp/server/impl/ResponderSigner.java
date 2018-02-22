@@ -62,8 +62,7 @@ class ResponderSigner {
 
   private final boolean macSigner;
 
-  ResponderSigner(List<ConcurrentContentSigner> signers)
-      throws CertificateException, IOException {
+  ResponderSigner(List<ConcurrentContentSigner> signers) throws CertificateException, IOException {
     this.signers = ParamUtil.requireNonEmpty("signers", signers);
     ConcurrentContentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();

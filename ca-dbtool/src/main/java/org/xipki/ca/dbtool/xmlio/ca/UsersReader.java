@@ -34,8 +34,7 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class UsersReader extends DbiXmlReader {
 
-  public UsersReader(InputStream xmlStream)
-      throws XMLStreamException, InvalidDataObjectException {
+  public UsersReader(InputStream xmlStream) throws XMLStreamException, InvalidDataObjectException {
     super(UserType.TAG_PARENT, xmlStream);
   }
 

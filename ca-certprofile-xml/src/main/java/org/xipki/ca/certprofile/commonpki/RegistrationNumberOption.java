@@ -34,15 +34,13 @@ public class RegistrationNumberOption {
   public RegistrationNumberOption(String regex, String constant) {
     if (regex != null) {
       if (constant != null) {
-        throw new IllegalArgumentException(
-            "exactly one of regex and constant must be non null");
+        throw new IllegalArgumentException("exactly one of regex and constant must be non null");
       }
       this.regex = Pattern.compile(regex);
       this.constant = null;
     } else {
       if (constant == null) {
-        throw new IllegalArgumentException(
-            "exactly one of regex and constant must be non null");
+        throw new IllegalArgumentException("exactly one of regex and constant must be non null");
       }
       this.regex = null;
       this.constant = constant;

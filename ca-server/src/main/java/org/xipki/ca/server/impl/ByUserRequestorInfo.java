@@ -81,8 +81,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
   public void assertCertProfilePermitted(String certprofile)
       throws InsuffientPermissionException {
     if (!isCertProfilePermitted(certprofile)) {
-      throw new  InsuffientPermissionException(
-          "CertProfile " + certprofile + " is not permitted");
+      throw new  InsuffientPermissionException("CertProfile " + certprofile + " is not permitted");
     }
   }
 

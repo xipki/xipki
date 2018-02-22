@@ -72,8 +72,8 @@ public class OCSPRespBuilder {
    * @param certStatus status of the certificate - null if okay
    * @param singleExtensions optional extensions
    */
-  public void addResponse(CertID certId, byte[] certStatus,
-      Date thisUpdate, Date nextUpdate, Extensions singleExtensions) {
+  public void addResponse(CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate,
+      Extensions singleExtensions) {
     list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
   }
 

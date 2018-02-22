@@ -120,8 +120,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     }
 
     if (certstore.getVersion() > VERSION) {
-      throw new InvalidInputException(
-          "could not import CertStore greater than " + VERSION + ": "
+      throw new InvalidInputException("could not import CertStore greater than " + VERSION + ": "
           + certstore.getVersion());
     }
 
@@ -252,8 +251,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
   }
 
   private void importIssuer0(CaType issuer, String sql, PreparedStatement ps, List<CaType> cas,
-      List<Integer> relatedCaIds)
-      throws IOException, DataAccessException, CertificateException {
+      List<Integer> relatedCaIds) throws IOException, DataAccessException, CertificateException {
     try {
       byte[] encodedCert = binary(issuer.getCert());
 
@@ -367,9 +365,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         }
 
         try {
-          long lastId = importCert0(certhashAlgo, psCert, certsFile,
-              profileMap, revokedOnly, caIds, minId, processLogFile, processLog,
-              numProcessedBefore, importLog);
+          long lastId = importCert0(certhashAlgo, psCert, certsFile, profileMap, revokedOnly, caIds,
+              minId, processLogFile, processLog, numProcessedBefore, importLog);
           minId = lastId + 1;
         } catch (Exception ex) {
           System.err.println("\ncould not import certificates from file " + certsFile
@@ -461,11 +458,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
               int idx = 1;
               psCert.setLong(idx++, id);
               psCert.setInt(idx++, caId);
-              psCert.setString(idx++,
-                  tbsCert.getSerialNumber().getPositiveValue().toString(16));
+              psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
               psCert.setLong(idx++, cert.update());
-              psCert.setLong(idx++,
-                  tbsCert.getStartDate().getDate().getTime() / 1000);
+              psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
               psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
               setBoolean(psCert, idx++, cert.rev());
               setInt(psCert, idx++, cert.rr());
@@ -489,8 +484,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         boolean isLastBlock = !certs.hasNext();
 
         if (numImportedEntriesInBatch > 0
-            && (numImportedEntriesInBatch % this.numCertsPerCommit == 0
-                || isLastBlock)) {
+            && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
           if (evaulateOnly) {
             psCert.clearBatch();
           } else {

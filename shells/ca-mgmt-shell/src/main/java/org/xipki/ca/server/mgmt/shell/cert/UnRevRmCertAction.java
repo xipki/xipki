@@ -74,8 +74,7 @@ public abstract class UnRevRmCertAction extends CaAction {
       X509Certificate caCert = ((X509CaEntry) ca).certificate();
       X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
       if (!X509Util.issues(caCert, cert)) {
-        throw new CmdFailure(
-            "certificate '" + certFile + "' is not issued by CA " + caName);
+        throw new CmdFailure("certificate '" + certFile + "' is not issued by CA " + caName);
       }
       serialNumber = cert.getSerialNumber();
     } else {

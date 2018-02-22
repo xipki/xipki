@@ -167,8 +167,7 @@ public class RestImpl implements Rest {
 
         if (user == null) {
           throw new HttpRespAuditException(HttpResponseStatus.UNAUTHORIZED,
-              "invalid Authorization information",
-              AuditLevel.INFO, AuditStatus.FAILED);
+              "invalid Authorization information", AuditLevel.INFO, AuditStatus.FAILED);
         }
         NameId userIdent = ca.authenticateUser(user, password);
         if (userIdent == null) {

@@ -71,8 +71,7 @@ public class HttpRestServlet extends HttpServlet {
     try {
       Rest rest = responderManager.getRest();
 
-      String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
-          req.getRequestURI());
+      String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
       byte[] requestBytes = IoUtil.read(req.getInputStream());
       RestResponse response = rest.service(path, event, requestBytes, httpRetriever);

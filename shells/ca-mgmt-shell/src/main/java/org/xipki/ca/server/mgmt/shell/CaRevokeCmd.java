@@ -91,8 +91,7 @@ public class CaRevokeCmd extends CaAction {
       invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
     }
 
-    CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate,
-        invalidityDate);
+    CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate, invalidityDate);
     boolean bo = caManager.revokeCa(caName, revInfo);
     output(bo, "revoked", "could not revoke", "CA " + caName);
     return null;

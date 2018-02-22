@@ -209,8 +209,7 @@ public class RequestOption {
     try {
       this.certs = (certsType == null) ? null : getCerts(certsType);
     } catch (Exception ex) {
-      throw new InvalidConfException(
-          "could not initialize the certs: " + ex.getMessage(), ex);
+      throw new InvalidConfException("could not initialize the certs: " + ex.getMessage(), ex);
     }
   } // constructor
 

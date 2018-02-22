@@ -57,8 +57,7 @@ public class CmpControlEntry {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "name: ", name, "\nfaulty: ", faulty,
-        "\nconf: ", conf);
+    return StringUtil.concatObjectsCap(200, "name: ", name, "\nfaulty: ", faulty, "\nconf: ", conf);
   }
 
   @Override

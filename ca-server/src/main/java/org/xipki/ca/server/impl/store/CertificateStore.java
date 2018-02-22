@@ -80,8 +80,7 @@ public class CertificateStore {
     } catch (Exception ex) {
       LOG.error("could not save certificate {}: {}. Message: {}",
           new Object[]{certInfo.cert().subject(),
-            Base64.encodeToString(certInfo.cert().encodedCert(), true),
-            ex.getMessage()});
+              Base64.encodeToString(certInfo.cert().encodedCert(), true), ex.getMessage()});
       LOG.debug("error", ex);
       return false;
     }
@@ -589,8 +588,7 @@ public class CertificateStore {
     }
   }
 
-  public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial)
-      throws OperationException {
+  public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
     try {
       return queryExecutor.knowsCertForSerial(ca, serial);
     } catch (DataAccessException ex) {

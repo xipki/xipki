@@ -54,10 +54,8 @@ public class CertStatusCmd extends UnRevRmCertAction {
       return null;
     }
 
-    String msg = StringUtil.concat(
-        "certificate profile: ", certInfo.certprofile(),
-        "\nstatus: ", (certInfo.revocationInfo() == null ? "good"
-            : "revoked with " + certInfo.revocationInfo()));
+    String msg = StringUtil.concat("certificate profile: ", certInfo.certprofile(), "\nstatus: ",
+        (certInfo.revocationInfo() == null ? "good" : "revoked with " + certInfo.revocationInfo()));
     println(msg);
     if (outputFile != null) {
       saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());

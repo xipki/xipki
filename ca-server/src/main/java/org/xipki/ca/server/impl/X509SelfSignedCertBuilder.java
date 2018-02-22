@@ -123,8 +123,7 @@ class X509SelfSignedCertBuilder {
 
     X509CertLevel level = certprofile.certLevel();
     if (X509CertLevel.RootCA != level) {
-      throw new IllegalArgumentException("certprofile is not of level "
-          + X509CertLevel.RootCA);
+      throw new IllegalArgumentException("certprofile is not of level " + X509CertLevel.RootCA);
     }
 
     if (!securityFactory.verifyPopo(csr, null)) {

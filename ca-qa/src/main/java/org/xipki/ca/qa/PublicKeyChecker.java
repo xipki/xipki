@@ -90,8 +90,7 @@ public class PublicKeyChecker {
     try {
       c14nRequestedPublicKey = X509Util.toRfc3279Style(requestedPublicKey);
       if (!c14nRequestedPublicKey.equals(publicKey)) {
-        issue.setFailureMessage(
-            "public key in the certificate does not equal the requested one");
+        issue.setFailureMessage("public key in the certificate does not equal the requested one");
       }
     } catch (InvalidKeySpecException ex) {
       issue.setFailureMessage("public key in request is invalid");
@@ -122,13 +121,11 @@ public class PublicKeyChecker {
       if (algParam instanceof ASN1ObjectIdentifier) {
         curveOid = (ASN1ObjectIdentifier) algParam;
         if (!ecOption.allowsCurve(curveOid)) {
-          throw new BadCertTemplateException("EC curve "
-              + AlgorithmUtil.getCurveName(curveOid)
+          throw new BadCertTemplateException("EC curve " + AlgorithmUtil.getCurveName(curveOid)
               + " (OID: " + curveOid.getId() + ") is not allowed");
         }
       } else {
-        throw new BadCertTemplateException(
-            "only namedCurve EC public key is supported");
+        throw new BadCertTemplateException("only namedCurve EC public key is supported");
       }
 
       // point encoding
@@ -139,8 +136,7 @@ public class PublicKeyChecker {
         }
         byte pointEncoding = keyData[0];
         if (!ecOption.pointEncodings().contains(pointEncoding)) {
-          throw new BadCertTemplateException(
-              "not-accepted EC point encoding " + pointEncoding);
+          throw new BadCertTemplateException("not-accepted EC point encoding " + pointEncoding);
         }
       }
 
@@ -182,9 +178,7 @@ public class PublicKeyChecker {
 
       try {
         ASN1Sequence seq = ASN1Sequence.getInstance(params);
-        // CHECKSTYLE:SKIP
         ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-        // CHECKSTYLE:SKIP
         ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
         plength = p.getPositiveValue().bitLength();
         qlength = q.getPositiveValue().bitLength();
@@ -230,8 +224,7 @@ public class PublicKeyChecker {
       case 0x06: // hybrid
       case 0x07: // hybrid
         if (encoded.length != (2 * expectedLength + 1)) {
-          throw new BadCertTemplateException(
-              "incorrect length for uncompressed/hybrid encoding");
+          throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
         }
         break;
       default:

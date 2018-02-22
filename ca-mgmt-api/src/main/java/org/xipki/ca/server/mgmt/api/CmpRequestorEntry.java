@@ -56,8 +56,7 @@ public class CmpRequestorEntry {
     try {
       this.cert = X509Util.parseBase64EncodedCert(base64Cert);
     } catch (Throwable th) {
-      LogUtil.error(LOG, th,
-          "could not parse the certificate for requestor '" + ident + "'");
+      LogUtil.error(LOG, th, "could not parse the certificate for requestor '" + ident + "'");
     }
   }
 
@@ -86,12 +85,11 @@ public class CmpRequestorEntry {
 
     if (cert != null) {
       sb.append("cert: ").append("\n");
-      sb.append("\tissuer: ").append(
-          X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append("\n");
-      sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
-          .append("\n");
-      sb.append("\tsubject: ").append(
-          X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
+      sb.append("\tissuer: ")
+        .append(X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append("\n");
+      sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append("\n");
+      sb.append("\tsubject: ")
+        .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
 
       if (verbose) {
         sb.append("\tencoded: ");

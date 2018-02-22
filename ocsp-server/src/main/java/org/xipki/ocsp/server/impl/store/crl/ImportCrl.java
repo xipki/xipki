@@ -97,8 +97,7 @@ public class ImportCrl {
   private static final String SQL_INSERT_CERT_REV
       = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE) VALUES(?,?,?,?,?,?,?,?)";
 
-  private static final String SQL_DELETE_CERT
-      = "DELETE FROM CERT WHERE IID=? AND SN=?";
+  private static final String SQL_DELETE_CERT = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
   private static final String SQL_UPDATE_CERT
       = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,PN=?,HASH=? WHERE ID=?";
@@ -107,8 +106,7 @@ public class ImportCrl {
       = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,PN,HASH) "
         + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
-  private static final String CORE_SQL_SELECT_ID_CERT
-      = "ID FROM CERT WHERE IID=? AND SN=?";
+  private static final String CORE_SQL_SELECT_ID_CERT = "ID FROM CERT WHERE IID=? AND SN=?";
 
   private final String sqlSelectIdCert;
 
@@ -146,10 +144,9 @@ public class ImportCrl {
   private PreparedStatement psUpdateCert;
   private PreparedStatement psUpdateCertRev;
 
-  public ImportCrl(DataSourceWrapper datasource, boolean useCrlUpdates, X509CRL crl,
-      String crlUrl, X509Certificate caCert, X509Certificate issuerCert,
-      CertRevocationInfo caRevInfo, String certsDirName)
-      throws ImportCrlException, DataAccessException {
+  public ImportCrl(DataSourceWrapper datasource, boolean useCrlUpdates, X509CRL crl, String crlUrl,
+      X509Certificate caCert, X509Certificate issuerCert, CertRevocationInfo caRevInfo,
+      String certsDirName) throws ImportCrlException, DataAccessException {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
     this.useCrlUpdates = useCrlUpdates;
@@ -317,8 +314,7 @@ public class ImportCrl {
         }
 
         if (!baseCrlNumber.equals(lastFullCrlNumber)) {
-          throw new ImportCrlException(
-              "Given CRL is a deltaCRL for the full CRL with number "
+          throw new ImportCrlException("Given CRL is a deltaCRL for the full CRL with number "
               + crlNumber + ", please import this full CRL first.");
         }
       }
@@ -333,7 +329,6 @@ public class ImportCrl {
     rs = null;
     sql = null;
     try {
-
       // issuer exists
       if (addNew) {
         int maxId = (int) datasource.getMax(conn, "ISSUER", "ID");
@@ -412,8 +407,7 @@ public class ImportCrl {
         BigInteger serial = c.getSerialNumber();
 
         if (issuer != null && !caSubject.equals(issuer)) {
-          throw new ImportCrlException("invalid CRLEntry for certificate number "
-              + serial);
+          throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
         }
 
         Date rt = c.getRevocationDate();
@@ -522,13 +516,13 @@ public class ImportCrl {
 
         if (cert != null) {
           if (!caSubject.equals(cert.getIssuer())) {
-            LOG.warn("issuer not match (serial=" + LogUtil.formatCsn(serialNumber)
-                + ") in CRL Extension Xipki-CertSet, ignore it");
+            LOG.warn("issuer not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
+                LogUtil.formatCsn(serialNumber));
           }
 
           if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
-            LOG.warn("serialNumber not match (serial=" + LogUtil.formatCsn(serialNumber)
-                + ") in CRL Extension Xipki-CertSet, ignore it");
+            LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
+                LogUtil.formatCsn(serialNumber));
           }
         }
 
@@ -541,17 +535,17 @@ public class ImportCrl {
       File certsDir = new File(certsDirName);
 
       if (!certsDir.exists()) {
-        LOG.warn("the folder " + certsDirName + " does not exist, ignore it");
+        LOG.warn("the folder {} does not exist, ignore it", certsDirName);
         return;
       }
 
       if (!certsDir.isDirectory()) {
-        LOG.warn("the path " + certsDirName + " does not point to a folder, ignore it");
+        LOG.warn("the path {} does not point to a folder, ignore it", certsDirName);
         return;
       }
 
       if (!certsDir.canRead()) {
-        LOG.warn("the folder " + certsDirName + " must not be read, ignore it");
+        LOG.warn("the folder {} must not be read, ignore it", certsDirName);
         return;
       }
 
@@ -629,8 +623,7 @@ public class ImportCrl {
         aki = X509Util.extractAki(cert);
       } catch (CertificateEncodingException ex) {
         LogUtil.error(LOG, ex,
-            "invalid AuthorityKeyIdentifier of certificate {}" + certLogId
-            + ", ignore it");
+            "invalid AuthorityKeyIdentifier of certificate {}" + certLogId + ", ignore it");
         return;
       }
 

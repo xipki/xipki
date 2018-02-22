@@ -74,13 +74,11 @@ class Template {
       extnCerthashPrefixMap.put(h, prefix);
     }
 
-    Extension extension = new ExtendedExtension(OID.ID_INVALIDITY_DATE, false,
-        new byte[17]);
+    Extension extension = new ExtendedExtension(OID.ID_INVALIDITY_DATE, false, new byte[17]);
     extnInvalidityDate = new byte[extension.encodedLength()];
     extension.write(extnInvalidityDate, 0);
 
-    extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF, false,
-        new byte[17]);
+    extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF, false, new byte[17]);
     extnArchiveCutof = new byte[extension.encodedLength()];
     extension.write(extnArchiveCutof, 0);
   }

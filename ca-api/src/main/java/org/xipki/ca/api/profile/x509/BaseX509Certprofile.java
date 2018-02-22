@@ -272,13 +272,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       if (algParam instanceof ASN1ObjectIdentifier) {
         curveOid = (ASN1ObjectIdentifier) algParam;
         if (!ecOption.allowsCurve(curveOid)) {
-          throw new BadCertTemplateException(String.format(
-              "EC curve %s (OID: %s) is not allowed",
+          throw new BadCertTemplateException(String.format("EC curve %s (OID: %s) is not allowed",
               AlgorithmUtil.getCurveName(curveOid), curveOid.getId()));
         }
       } else {
-        throw new BadCertTemplateException(
-            "only namedCurve EC public key is supported");
+        throw new BadCertTemplateException("only namedCurve EC public key is supported");
       }
 
       // point encoding
@@ -310,8 +308,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
       ASN1Integer modulus;
       try {
-        ASN1Sequence seq = ASN1Sequence.getInstance(
-            publicKey.getPublicKeyData().getBytes());
+        ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
         modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
       } catch (IllegalArgumentException ex) {
         throw new BadCertTemplateException("invalid publicKeyData");
@@ -403,20 +400,19 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
       if (!present) {
         throw new BadCertTemplateException(String.format(
-            "required subject DN of type %s is not present",
-            oidToDisplayName(occurence.type())));
+            "required subject DN of type %s is not present", oidToDisplayName(occurence.type())));
       }
     }
   } // method verifySubjectDnOccurence
 
-  protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type,
-      RdnControl option, int index) throws BadCertTemplateException {
+  protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option,
+      int index) throws BadCertTemplateException {
     ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
     return (rdnValue == null) ? null : new RDN(type, rdnValue);
   }
 
-  private static RDN createDateOfBirthRdn(ASN1ObjectIdentifier type,
-      ASN1Encodable rdnValue) throws BadCertTemplateException {
+  private static RDN createDateOfBirthRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue)
+      throws BadCertTemplateException {
     ParamUtil.requireNonNull("type", type);
 
     String text;
@@ -447,8 +443,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     ParamUtil.requireNonNull("type", type);
 
     if (!(rdnValue instanceof ASN1Sequence)) {
-      throw new BadCertTemplateException(
-          "rdnValue of RDN postalAddress has incorrect syntax");
+      throw new BadCertTemplateException("rdnValue of RDN postalAddress has incorrect syntax");
     }
 
     ASN1Sequence seq = (ASN1Sequence) rdnValue;
@@ -523,8 +518,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         if (!pattern.matcher(tmpText).matches()) {
           throw new BadCertTemplateException(
             String.format("invalid subject %s '%s' against regex '%s'",
-                ObjectIdentifiers.oidToDisplayName(type), tmpText,
-                pattern.pattern()));
+                ObjectIdentifiers.oidToDisplayName(type), tmpText, pattern.pattern()));
         }
       }
 
@@ -586,8 +580,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       case 0x06: // hybrid
       case 0x07: // hybrid
         if (encoded.length != (2 * expectedLength + 1)) {
-          throw new BadCertTemplateException(
-              "incorrect length for uncompressed/hybrid encoding");
+          throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
         }
         break;
       default:

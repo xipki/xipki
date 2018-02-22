@@ -98,8 +98,7 @@ public class SubjectChecker {
           }
 
           if (rdns.length > 1) {
-            issue.setFailureMessage("AttributeTypeAndValues of group " + g
-                + " is not in one RDN");
+            issue.setFailureMessage("AttributeTypeAndValues of group " + g + " is not in one RDN");
             toBreak = true;
             break;
           }
@@ -107,8 +106,7 @@ public class SubjectChecker {
           if (rdn == null) {
             rdn = rdns[0];
           } else if (rdn != rdns[0]) {
-            issue.setFailureMessage("AttributeTypeAndValues of group " + g
-                + " is not in one RDN");
+            issue.setFailureMessage("AttributeTypeAndValues of group " + g + " is not in one RDN");
             toBreak = true;
             break;
           }
@@ -189,8 +187,7 @@ public class SubjectChecker {
 
       if (rdnControl != null && rdnControl.patterns() != null) {
         // sort the requestedRDNs
-        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
-            rdnControl.patterns());
+        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.patterns());
       }
     }
 
@@ -202,20 +199,18 @@ public class SubjectChecker {
       RDN rdn = rdns[i];
       AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
       if (atvs.length > 1) {
-        failureMsg.append("size of RDN[" + i + "] is '" + atvs.length
-            + "' but expected '1'");
+        failureMsg.append("size of RDN[" + i + "] is '" + atvs.length + "' but expected '1'");
         failureMsg.append("; ");
         continue;
       }
 
-      String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType,
-          failureMsg);
+      String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType, failureMsg);
       if (atvTextValue == null) {
         continue;
       }
 
-      checkAttributeTypeAndValue("RDN[" + i + "]", type,
-          atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
+      checkAttributeTypeAndValue("RDN[" + i + "]", type, atvTextValue, rdnControl,
+          requestedCoreAtvTextValues, i, failureMsg);
     }
 
     int len = failureMsg.length();
@@ -265,8 +260,7 @@ public class SubjectChecker {
 
       if (rdnControl != null && rdnControl.patterns() != null) {
         // sort the requestedRDNs
-        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
-            rdnControl.patterns());
+        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.patterns());
       }
     }
 
@@ -355,8 +349,7 @@ public class SubjectChecker {
         boolean matches = pattern.matcher(tmpAtvTextValue).matches();
         if (!matches) {
           failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-            .append("' is not valid against regex '")
-            .append(pattern.pattern()).append("'; ");
+            .append("' is not valid against regex '").append(pattern.pattern()).append("'; ");
           return;
         }
       }
@@ -364,8 +357,7 @@ public class SubjectChecker {
 
     if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
       if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-        failureMsg.append("is present but not contained in the request");
-        failureMsg.append("; ");
+        failureMsg.append("is present but not contained in the request; ");
       }
     } else {
       String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
@@ -373,8 +365,7 @@ public class SubjectChecker {
           && SpecialX509CertprofileBehavior.gematik_gSMC_K.equals(specialBehavior)) {
         if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
           failureMsg.append("content '").append(tmpAtvTextValue)
-            .append("' does not start with '")
-            .append(requestedCoreAtvTextValue).append("-'; ");
+            .append("' does not start with '").append(requestedCoreAtvTextValue).append("-'; ");
         }
       } else if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
         if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {

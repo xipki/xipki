@@ -90,8 +90,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     if (datasource == null) {
-      throw new CertPublisherException(
-          "no datasource named '" + datasourceName + "' is specified");
+      throw new CertPublisherException("no datasource named '" + datasourceName + "' is specified");
     }
 
     try {
@@ -123,8 +122,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     X509CertWithDbId cert = certInfo.cert();
 
     try {
-      queryExecutor.addCert(caCert, cert, certInfo.profile().name(),
-          certInfo.revocationInfo());
+      queryExecutor.addCert(caCert, cert, certInfo.profile().name(), certInfo.revocationInfo());
       return true;
     } catch (Exception ex) {
       logAndAudit(caCert.subject(), cert, ex, "could not save certificate");
@@ -150,8 +148,7 @@ public class OcspCertPublisher extends X509CertPublisher {
       queryExecutor.unrevokeCert(caCert, cert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.subject(), cert, ex,
-          "could not publish unrevocation of certificate");
+      logAndAudit(caCert.subject(), cert, ex, "could not publish unrevocation of certificate");
       return false;
     }
   }
@@ -228,8 +225,7 @@ public class OcspCertPublisher extends X509CertPublisher {
       queryExecutor.removeCert(issuerCert, cert);
       return true;
     } catch (Exception ex) {
-      String issuerText = X509Util.getRfc4519Name(
-          issuerCert.cert().getIssuerX500Principal());
+      String issuerText = X509Util.getRfc4519Name(issuerCert.cert().getIssuerX500Principal());
       logAndAudit(issuerText, issuerCert, ex, "could not publish removal of certificate");
       return false;
     }

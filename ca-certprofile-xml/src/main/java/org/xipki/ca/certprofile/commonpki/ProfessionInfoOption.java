@@ -42,8 +42,7 @@ public class ProfessionInfoOption {
   private byte[] addProfessionalInfo;
 
   public ProfessionInfoOption(NamingAuthority namingAuthority, List<String> professionItems,
-      List<ASN1ObjectIdentifier> professionOids,
-      RegistrationNumberOption registrationNumberOption,
+      List<ASN1ObjectIdentifier> professionOids, RegistrationNumberOption registrationNumberOption,
       byte[] addProfessionalInfo) {
     this.namingAuthority = namingAuthority;
     this.professionItems = ParamUtil.requireNonEmpty("professionItems", professionItems);

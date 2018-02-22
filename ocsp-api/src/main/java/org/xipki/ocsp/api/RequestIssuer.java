@@ -68,8 +68,7 @@ public class RequestIssuer {
     this.data = data;
     this.from = from;
     this.len = len;
-    this.hashAlgo = HashAlgoType.getInstanceForEncoded(data,
-        from + 2, 2 + data[from + 3]);
+    this.hashAlgo = HashAlgoType.getInstanceForEncoded(data, from + 2, 2 + data[from + 3]);
 
     int hashAlgoFieldLen = 0xFF & data[from + 1];
     this.nameHashFrom = from + 2 + hashAlgoFieldLen;

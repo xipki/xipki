@@ -265,9 +265,8 @@ public class ScepImpl implements Scep {
     }
   }
 
-  public ContentInfo servicePkiOperation(CMSSignedData requestContent,
-      String certProfileName, String msgId, AuditEvent event)
-      throws MessageDecodingException, OperationException {
+  public ContentInfo servicePkiOperation(CMSSignedData requestContent, String certProfileName,
+      String msgId, AuditEvent event) throws MessageDecodingException, OperationException {
     CaStatus status = status();
 
     if (CaStatus.ACTIVE != status) {
@@ -275,8 +274,7 @@ public class ScepImpl implements Scep {
       throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE);
     }
 
-    DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
-        envelopedDataDecryptor, null);
+    DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor, null);
 
     PkiMessage rep = servicePkiOperation0(requestContent, req, certProfileName, msgId, event);
     audit(event, CaAuditConstants.NAME_SCEP_pkiStatus, rep.pkiStatus().toString());
@@ -310,8 +308,7 @@ public class ScepImpl implements Scep {
       audit(event, CaAuditConstants.NAME_SCEP_decryption, "failed");
     }
 
-    PkiMessage rep = new PkiMessage(req.transactionId(), MessageType.CertRep,
-        Nonce.randomNonce());
+    PkiMessage rep = new PkiMessage(req.transactionId(), MessageType.CertRep, Nonce.randomNonce());
     rep.setRecipientNonce(req.senderNonce());
 
     if (req.failureMessage() != null) {
@@ -447,8 +444,7 @@ public class ScepImpl implements Scep {
           X509Certificate reqSignatureCert = req.signatureCert();
           X500Principal reqSigCertSubject = reqSignatureCert.getSubjectX500Principal();
 
-          boolean selfSigned = reqSigCertSubject.equals(
-              reqSignatureCert.getIssuerX500Principal());
+          boolean selfSigned = reqSigCertSubject.equals(reqSignatureCert.getIssuerX500Principal());
           if (selfSigned) {
             X500Name tmp = X500Name.getInstance(reqSigCertSubject.getEncoded());
             if (!tmp.equals(csrReqInfo.getSubject())) {
@@ -468,8 +464,7 @@ public class ScepImpl implements Scep {
           if (challengePwd != null) {
             String[] strs = challengePwd.split(":");
             if (strs == null || strs.length != 2) {
-              LOG.warn("tid={}: challengePassword does not have the"
-                  + " format <user>:<password>", tid);
+              LOG.warn("tid={}: challengePassword does not have the format <user>:<password>", tid);
               throw FailInfoException.BAD_REQUEST;
             }
 
@@ -546,8 +541,7 @@ public class ScepImpl implements Scep {
         case CertPoll:
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.messageData());
           audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(is.issuer()));
-          audit(event, CaAuditConstants.NAME_subject,
-              X509Util.getRfc4519Name(is.subject()));
+          audit(event, CaAuditConstants.NAME_subject, X509Util.getRfc4519Name(is.subject()));
 
           ensureIssuedByThisCa(caX500Name, is.issuer());
           signedData = pollCert(ca, is.subject(), req.transactionId());
@@ -747,8 +741,7 @@ public class ScepImpl implements Scep {
           try {
             bytes = Base64.decode(tid);
           } catch (Exception ex2) {
-            LOG.error("could not decode (hex or base64) '{}': {}", tid,
-                ex2.getMessage());
+            LOG.error("could not decode (hex or base64) '{}': {}", tid, ex2.getMessage());
           }
         }
       }

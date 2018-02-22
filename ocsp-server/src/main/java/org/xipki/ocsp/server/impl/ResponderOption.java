@@ -74,8 +74,7 @@ class ResponderOption {
       }
 
       if (path.charAt(0) != '/') {
-        throw new InvalidConfException(
-            "servlet path '" + path + "' must start with '/'");
+        throw new InvalidConfException("servlet path '" + path + "' must start with '/'");
       }
     }
     list = new ArrayList<>(paths);

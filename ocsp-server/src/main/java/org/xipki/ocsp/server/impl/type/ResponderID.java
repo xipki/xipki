@@ -36,8 +36,7 @@ public class ResponderID extends ASN1Type {
   private final int encodedLength;
 
   public ResponderID(byte[] key) throws IOException {
-    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(
-        new DEROctetString(key)).getEncoded();
+    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(new DEROctetString(key)).getEncoded();
     this.encodedLength = encoded.length;
   }
 

@@ -91,8 +91,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_CRAW =
       "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
@@ -206,8 +205,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             entriesFinished = true;
             break;
           default:
-            throw new RuntimeException("unsupported CaDbEntryType "
-                + typeProcessedInLastProcess);
+            throw new RuntimeException("unsupported CaDbEntryType " + typeProcessedInLastProcess);
         }
       }
 
@@ -228,8 +226,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         for (CaDbEntryType type : types) {
           if (exception == null
-              && (type == typeProcessedInLastProcess
-              || typeProcessedInLastProcess == null)) {
+              && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
             exception = importEntries(type, certstore, processLogFile,
                 numProcessedInLastProcess, idProcessedInLastProcess);
           }
@@ -267,8 +264,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
           ps.execute();
         } catch (SQLException ex) {
           System.err.println("could not import PUBLISHQUEUE with CID="
-              + tbp.getCertId() + " and PID=" + tbp.getPubId() + ", message: "
-              + ex.getMessage());
+              + tbp.getCertId() + " and PID=" + tbp.getPubId() + ", message: " + ex.getMessage());
           throw translate(sql, ex);
         }
       }
@@ -294,9 +290,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
           ps.setInt(idx++, entry.getCaId());
           ps.execute();
         } catch (SQLException ex) {
-          System.err.println("could not import DELTACRL_CACHE with caId="
-              + entry.getCaId() + " and serial=" + entry.getSerial()
-              + ", message: " + ex.getMessage());
+          System.err.println("could not import DELTACRL_CACHE with caId=" + entry.getCaId()
+              + " and serial=" + entry.getSerial() + ", message: " + ex.getMessage());
           throw translate(sql, ex);
         }
       }
@@ -391,12 +386,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 continue;
               }
             } catch (Exception ex) {
-              LOG.warn("invalid file name '{}', but will still be processed",
-                  entriesFile);
+              LOG.warn("invalid file name '{}', but will still be processed", entriesFile);
             }
           } else {
-            LOG.warn("invalid file name '{}', but will still be processed",
-                entriesFile);
+            LOG.warn("invalid file name '{}', but will still be processed", entriesFile);
           }
 
           try {
@@ -515,8 +508,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             psCert.setLong(idx++, id);
             psCert.setInt(idx++, certArt);
             psCert.setLong(idx++, cert.update());
-            psCert.setString(idx++,
-                tbsCert.getSerialNumber().getPositiveValue().toString(16));
+            psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
 
             psCert.setString(idx++, subjectText);
             long fpSubject = X509Util.fpCanonicalizedName(tbsCert.getSubject());
@@ -540,8 +532,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             setInt(psCert, idx++, cert.rid());
             setInt(psCert, idx++, cert.uid());
             psCert.setLong(idx++, FpIdCalculator.hash(encodedKey));
-            Extension extension =
-                tbsCert.getExtensions().getExtension(Extension.basicConstraints);
+            Extension extension = tbsCert.getExtensions().getExtension(Extension.basicConstraints);
             boolean ee = true;
             if (extension != null) {
               ASN1Encodable asn1 = extension.getParsedValue();
@@ -604,8 +595,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
             // CHECKSTYLE:SKIP
-            BigInteger crlNumber = ASN1Integer.getInstance(extnValue)
-                .getPositiveValue();
+            BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
             BigInteger baseCrlNumber = null;
             octetString = x509crl.getExtensionValue(

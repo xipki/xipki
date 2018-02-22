@@ -286,8 +286,7 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private void init0()
-      throws InvalidConfException, DataAccessException, PasswordResolverException {
+  private void init0() throws InvalidConfException, DataAccessException, PasswordResolverException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
     }
@@ -307,8 +306,7 @@ public class OcspServerImpl implements OcspServer {
     for (ResponderType m : conf.getResponders().getResponder()) {
       String name = m.getName();
       if (set.contains(name)) {
-        throw new InvalidConfException(
-            "duplicated definition of responder named '" + name + "'");
+        throw new InvalidConfException("duplicated definition of responder named '" + name + "'");
       }
 
       if (StringUtil.isBlank(name)) {
@@ -363,8 +361,7 @@ public class OcspServerImpl implements OcspServer {
     for (StoreType m : conf.getStores().getStore()) {
       String name = m.getName();
       if (set.contains(name)) {
-        throw new InvalidConfException(
-            "duplicated definition of store named '" + name + "'");
+        throw new InvalidConfException("duplicated definition of store named '" + name + "'");
       }
     }
 
@@ -454,14 +451,12 @@ public class OcspServerImpl implements OcspServer {
 
       String reqOptName = option.requestOptionName();
       if (!requestOptions.containsKey(reqOptName)) {
-        throw new InvalidConfException(
-            "no requestOption named '" + reqOptName + "' is defined");
+        throw new InvalidConfException("no requestOption named '" + reqOptName + "' is defined");
       }
 
       String respOptName = option.responseOptionName();
       if (!responseOptions.containsKey(respOptName)) {
-        throw new InvalidConfException(
-            "no responseOption named '" + respOptName + "' is defined");
+        throw new InvalidConfException("no responseOption named '" + respOptName + "' is defined");
       }
 
       // required HashAlgorithms for certificate
@@ -494,14 +489,12 @@ public class OcspServerImpl implements OcspServer {
       if (signer.isMacSigner()) {
         if (responseOption.isResponderIdByName()) {
           throw new InvalidConfException(
-              "could not use ResponderIdByName for signer "
-              + option.signerName());
+              "could not use ResponderIdByName for signer " + option.signerName());
         }
 
         if (EmbedCertsMode.NONE != responseOption.embedCertsMode()) {
           throw new InvalidConfException(
-              "could not embed certifcate in response for signer "
-              + option.signerName());
+              "could not embed certifcate in response for signer " + option.signerName());
         }
       }
 
@@ -621,8 +614,7 @@ public class OcspServerImpl implements OcspServer {
 
       ConcurrentContentSigner concurrentSigner = null;
       if (responder.responderOption().mode() != OcspMode.RFC2560) {
-        ExtendedExtension extn = removeExtension(reqExtensions,
-            OID.ID_PKIX_OCSP_PREFSIGALGS);
+        ExtendedExtension extn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_PREFSIGALGS);
         if (extn != null) {
           ASN1InputStream asn1Stream = new ASN1InputStream(extn.getExtnValueStream());
 
@@ -750,8 +742,7 @@ public class OcspServerImpl implements OcspServer {
 
       byte[] encodeOcspResponse;
       try {
-        encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner,
-            certsInResp, new Date());
+        encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner, certsInResp, new Date());
       } catch (NoIdleSignerException ex) {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
       } catch (OCSPException ex) {
@@ -763,9 +754,9 @@ public class OcspServerImpl implements OcspServer {
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result in DDoS
         // of storage
-        responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
-            cacheDbSerialNumber, repControl.cacheThisUpdate,
-            repControl.cacheNextUpdate, cacheDbSigAlgCode, encodeOcspResponse);
+        responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(), cacheDbSerialNumber,
+            repControl.cacheThisUpdate, repControl.cacheNextUpdate, cacheDbSigAlgCode,
+            encodeOcspResponse);
       }
 
       if (viaGet && repControl.canCacheInfo) {
@@ -783,9 +774,9 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method ask
 
-  private OcspRespWithCacheInfo processCertReq(CertID certId,
-      OCSPRespBuilder builder, ResponderImpl responder, RequestOption reqOpt,
-      ResponseOption repOpt, OcspRespControl repControl) throws IOException {
+  private OcspRespWithCacheInfo processCertReq(CertID certId, OCSPRespBuilder builder,
+      ResponderImpl responder, RequestOption reqOpt, ResponseOption repOpt,
+      OcspRespControl repControl) throws IOException {
     HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
@@ -852,8 +843,7 @@ public class OcspServerImpl implements OcspServer {
       case REVOKED:
         CertRevocationInfo revInfo = certStatusInfo.revocationInfo();
         certStatus = Template.getEncodeRevokedInfo(
-            repOpt.isIncludeRevReason() ? revInfo.reason() : null,
-            revInfo.revocationTime());
+            repOpt.isIncludeRevReason() ? revInfo.reason() : null, revInfo.revocationTime());
 
         Date invalidityDate = revInfo.invalidityTime();
         if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
@@ -902,8 +892,7 @@ public class OcspServerImpl implements OcspServer {
     if (CollectionUtil.isEmpty(extensions)) {
       builder.addResponse(certId, certStatus, thisUpdate, nextUpdate, null);
     } else {
-      builder.addResponse(certId, certStatus, thisUpdate, nextUpdate,
-          new Extensions(extensions));
+      builder.addResponse(certId, certStatus, thisUpdate, nextUpdate, new Extensions(extensions));
     }
 
     repControl.cacheThisUpdate = Math.max(repControl.cacheThisUpdate, thisUpdate.getTime());
@@ -924,8 +913,7 @@ public class OcspServerImpl implements OcspServer {
       boolean storeHealthy = store.isHealthy();
       healthy &= storeHealthy;
 
-      HealthCheckResult storeHealth = new HealthCheckResult(
-          "CertStatusStore." + store.name());
+      HealthCheckResult storeHealth = new HealthCheckResult("CertStatusStore." + store.name());
       storeHealth.setHealthy(storeHealthy);
       result.addChildCheck(storeHealth);
     }
@@ -974,8 +962,7 @@ public class OcspServerImpl implements OcspServer {
     for (String sigAlgo : sigAlgos) {
       try {
         ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-            responderSignerType,
-            new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
+            responderSignerType, new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
             explicitCertificateChain);
         singleSigners.add(requestorSigner);
       } catch (ObjectCreationException ex) {
@@ -1023,8 +1010,7 @@ public class OcspServerImpl implements OcspServer {
     if (datasourceName != null) {
       datasource = datasources.get(datasourceName);
       if (datasource == null) {
-        throw new InvalidConfException("datasource named '" + datasourceName
-            + "' not defined");
+        throw new InvalidConfException("datasource named '" + datasourceName + "' not defined");
       }
     }
     try {
@@ -1211,11 +1197,9 @@ public class OcspServerImpl implements OcspServer {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
       SchemaFactory schemaFact = SchemaFactory.newInstance(
           javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      Schema schema = schemaFact.newSchema(
-          OcspServerImpl.class.getResource("/xsd/ocsp-conf.xsd"));
+      Schema schema = schemaFact.newSchema(OcspServerImpl.class.getResource("/xsd/ocsp-conf.xsd"));
       unmarshaller.setSchema(schema);
-      return (OCSPServer) unmarshaller.unmarshal(
-          new File(IoUtil.expandFilepath(confFilename)));
+      return (OCSPServer) unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFilename)));
     } catch (SAXException ex) {
       throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(), ex);
     } catch (JAXBException ex) {

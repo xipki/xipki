@@ -67,8 +67,8 @@ public interface CaManager {
    *          if error occurs.
    *
    */
-  boolean republishCertificates(String caName, List<String> publisherNames,
-      int numThreads) throws CaMgmtException;
+  boolean republishCertificates(String caName, List<String> publisherNames, int numThreads)
+      throws CaMgmtException;
 
   /**
    * Clear the publish queue for the CA {@code caName} and publishers {@code publisherNames}.
@@ -81,8 +81,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean clearPublishQueue(String caName, List<String> publisherNames)
-      throws CaMgmtException;
+  boolean clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException;
 
   /**
    * Removes the CA {@code caName} from the system.
@@ -201,8 +200,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCertprofileFromCa(String profileName, String caName)
-      throws CaMgmtException;
+  boolean removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException;
 
   /**
    * Add the certificate profile {@code profileName} the the CA {@code caName}.
@@ -214,8 +212,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCertprofileToCa(String profileName, String caName)
-      throws CaMgmtException;
+  boolean addCertprofileToCa(String profileName, String caName) throws CaMgmtException;
 
   /**
    * Removes publisher {@code publisherName} from the CA {@code caName}.
@@ -227,8 +224,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removePublisherFromCa(String publisherName, String caName)
-      throws CaMgmtException;
+  boolean removePublisherFromCa(String publisherName, String caName) throws CaMgmtException;
 
   /**
    * Adds publisher {@code publisherName} to CA {@code caName}.
@@ -240,8 +236,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addPublisherToCa(String publisherName, String caName)
-      throws CaMgmtException;
+  boolean addPublisherToCa(String publisherName, String caName) throws CaMgmtException;
 
   /**
    * Returns the CertProfile names supported by the CA {@code caName}.
@@ -298,8 +293,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeRequestor(String name, String base64Cert)
-      throws CaMgmtException;
+  boolean changeRequestor(String name, String base64Cert) throws CaMgmtException;
 
   /**
    * Removes the requestor {@code requestorName} from the CA {@code caName}.
@@ -311,8 +305,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeRequestorFromCa(String requestorName, String caName)
-      throws CaMgmtException;
+  boolean removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException;
 
   /**
    * Adds the requestor {@code requestorName} to the CA {@code caName}.
@@ -324,8 +317,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addRequestorToCa(CaHasRequestorEntry requestor, String caName)
-      throws CaMgmtException;
+  boolean addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException;
 
   /**
    * Removes the user {@code userName} from the CA {@code caName}.
@@ -337,8 +329,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeUserFromCa(String userName, String caName)
-      throws CaMgmtException;
+  boolean removeUserFromCa(String userName, String caName) throws CaMgmtException;
 
   /**
    * Adds the user {@code userName} from the CA {@code caName}.
@@ -350,8 +341,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addUserToCa(CaHasUserEntry user, String caName)
-      throws CaMgmtException;
+  boolean addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException;
 
   /**
    * Returns map between CA name an CaHasUserEntry for given user.
@@ -360,8 +350,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  Map<String, CaHasUserEntry> getCaHasUsers(String user)
-      throws CaMgmtException;
+  Map<String, CaHasUserEntry> getCaHasUsers(String user) throws CaMgmtException;
 
   /**
    * Returns the certificate profile named {@code profileName}.
@@ -393,8 +382,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeCertprofile(String name, String type, String conf)
-      throws CaMgmtException;
+  boolean changeCertprofile(String name, String type, String conf) throws CaMgmtException;
 
   /**
    * Adds a certificate profile.
@@ -537,8 +525,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changePublisher(String name, String type, String conf)
-      throws CaMgmtException;
+  boolean changePublisher(String name, String type, String conf) throws CaMgmtException;
 
   /**
    * Returns the CMP control.
@@ -634,8 +621,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException;
+  boolean revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException;
 
   /**
    * Unrevokes the CA {@code caName}.
@@ -662,8 +648,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean revokeCertificate(String caName, BigInteger serialNumber,
-      CrlReason reason, Date invalidityTime) throws CaMgmtException;
+  boolean revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
+      Date invalidityTime) throws CaMgmtException;
 
   /**
    * Unrevokes a certificate with the serial number {@code serialNumber}, and
@@ -677,8 +663,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean unrevokeCertificate(String caName, BigInteger serialNumber)
-      throws CaMgmtException;
+  boolean unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Removes a certificate with the serial number {@code serialNumber}, and
@@ -692,8 +677,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCertificate(String caName, BigInteger serialNumber)
-      throws CaMgmtException;
+  boolean removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * CA {@code caName} issues a new certificate.
@@ -712,9 +696,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Certificate generateCertificate(String caName, String profileName,
-      byte[] encodedCsr, Date notBefore, Date notAfter)
-      throws CaMgmtException;
+  X509Certificate generateCertificate(String caName, String profileName, byte[] encodedCsr,
+      Date notBefore, Date notAfter) throws CaMgmtException;
 
   /**
    * Generates a self-signed CA certificate.
@@ -730,8 +713,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Certificate generateRootCa(X509CaEntry caEntry, String certprofileName,
-      byte[] encodedCsr, BigInteger serialNumber) throws CaMgmtException;
+  X509Certificate generateRootCa(X509CaEntry caEntry, String certprofileName, byte[] encodedCsr,
+      BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Adds a user.
@@ -858,8 +841,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  CertWithStatusInfo getCert(String caName, BigInteger serialNumber)
-      throws CaMgmtException;
+  CertWithStatusInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Loads the CA system configuration.
@@ -883,8 +865,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if non-IO error occurs.
    */
-  boolean exportConf(String zipFilename, List<String> caNames)
-      throws CaMgmtException, IOException;
+  boolean exportConf(String zipFilename, List<String> caNames) throws CaMgmtException, IOException;
 
   /**
    * Returns a sorted list of certificate meta information.
@@ -904,9 +885,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  List<CertListInfo> listCertificates(String caName, X500Name subjectPattern,
-      Date validFrom, Date validTo, CertListOrderBy orderBy,
-      int numEntries) throws CaMgmtException;
+  List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
+      Date validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException;
 
   /**
    * Returns the request used to enroll the given certificate.
@@ -918,7 +898,6 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  byte[] getCertRequest(String caName, BigInteger serialNumber)
-      throws CaMgmtException;
+  byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException;
 
 }

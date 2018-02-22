@@ -132,8 +132,7 @@ class TargetDigestRetriever {
       datasource.returnConnection(conn);
     } // method run
 
-    private Map<BigInteger, DigestEntry> query(CertsBundle bundle)
-        throws DataAccessException {
+    private Map<BigInteger, DigestEntry> query(CertsBundle bundle) throws DataAccessException {
       List<BigInteger> serialNumbers = bundle.serialNumbers();
       int size = serialNumbers.size();
       boolean batchSupported = datasource.databaseType() != DatabaseType.H2;
@@ -171,10 +170,10 @@ class TargetDigestRetriever {
 
   private final List<Retriever> retrievers;
 
-  public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog,
-      RefDigestReader reader, DigestDiffReporter reporter,
-      DataSourceWrapper datasource, DbControl dbControl, HashAlgoType certHashAlgo,
-      int caId, int numPerSelect, int numThreads, StopMe stopMe) throws DataAccessException {
+  public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
+      DigestDiffReporter reporter, DataSourceWrapper datasource, DbControl dbControl,
+      HashAlgoType certHashAlgo, int caId, int numPerSelect, int numThreads, StopMe stopMe)
+      throws DataAccessException {
     this.processLog = ParamUtil.requireNonNull("processLog", processLog);
     this.numPerSelect = numPerSelect;
     this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
@@ -188,9 +187,8 @@ class TargetDigestRetriever {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
       if (certHashAlgo != HashAlgoType.getHashAlgoType(certHashAlgoInDb)) {
-        throw new IllegalArgumentException(
-            "certHashAlgo in parameter (" + certHashAlgo + ") != in DB ("
-            + certHashAlgoInDb + ")");
+        throw new IllegalArgumentException("certHashAlgo in parameter (" + certHashAlgo
+            + ") != in DB (" + certHashAlgoInDb + ")");
       }
     }
 
@@ -305,8 +303,7 @@ class TargetDigestRetriever {
     Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
     while (rs.next()) {
-      BigInteger serialNumber = new BigInteger(rs.getString("SN"),
-          16);
+      BigInteger serialNumber = new BigInteger(rs.getString("SN"), 16);
       if (!serialNumbers.contains(serialNumber)) {
         continue;
       }
@@ -325,16 +322,16 @@ class TargetDigestRetriever {
       }
 
       String base64Certhash = getBase64HashValue(rs);
-      DigestEntry certB = new DigestEntry(serialNumber, revoked, revReason, revTime,
-          revInvTime, base64Certhash);
+      DigestEntry certB = new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime,
+          base64Certhash);
       ret.put(serialNumber, certB);
     }
 
     return ret;
   }
 
-  private DigestEntry getSingleCert(PreparedStatement singleSelectStmt,
-      BigInteger serialNumber) throws DataAccessException {
+  private DigestEntry getSingleCert(PreparedStatement singleSelectStmt, BigInteger serialNumber)
+      throws DataAccessException {
     ResultSet rs = null;
     try {
       singleSelectStmt.setString(1, serialNumber.toString(16));
@@ -355,8 +352,7 @@ class TargetDigestRetriever {
         }
       }
       String base64CertHash = getBase64HashValue(rs);
-      return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime,
-          base64CertHash);
+      return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, base64CertHash);
     } catch (SQLException ex) {
       throw datasource.translate(singleCertSql, ex);
     } finally {

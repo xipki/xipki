@@ -214,8 +214,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         }
 
         if (cacheInfo.nextUpdate() != null) {
-          maxAge = Math.min(maxAge,
-              (cacheInfo.nextUpdate() - cacheInfo.thisUpdate()) / 1000);
+          maxAge = Math.min(maxAge, (cacheInfo.nextUpdate() - cacheInfo.thisUpdate()) / 1000);
         }
 
         headers.add("Cache-Control",

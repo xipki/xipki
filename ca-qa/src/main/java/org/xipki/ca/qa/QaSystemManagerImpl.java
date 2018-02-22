@@ -141,8 +141,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
               issuerType.getOcspUrl(), issuerType.getCrlUrl(),
               issuerType.getDeltaCrlUrl(), certBytes, cutoffNotAfter);
         } catch (CertificateException ex) {
-          LogUtil.error(LOG, ex,
-              "could not parse certificate of issuer " + issuerType.getName());
+          LogUtil.error(LOG, ex, "could not parse certificate of issuer " + issuerType.getName());
           continue;
         }
 

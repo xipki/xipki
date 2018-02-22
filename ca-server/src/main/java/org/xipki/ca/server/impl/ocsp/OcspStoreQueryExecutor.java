@@ -86,8 +86,7 @@ class OcspStoreQueryExecutor {
     this.issuerStore = initIssuerStore();
     this.publishGoodCerts = publishGoodCerts;
 
-    this.sqlCertRegistered = datasource.buildSelectFirstSql(1,
-        "ID FROM CERT WHERE SN=? AND IID=?");
+    this.sqlCertRegistered = datasource.buildSelectFirstSql(1, "ID FROM CERT WHERE SN=? AND IID=?");
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
     Connection conn = datasource.getConnection();
     if (conn == null) {

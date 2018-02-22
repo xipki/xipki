@@ -152,8 +152,7 @@ public class CaConf {
           zipFile = new ZipFile(confFile);
           caConfStream = zipFile.getInputStream(zipFile.getEntry("caconf.xml"));
         } catch (ZipException ex) {
-          LOG.info("the configuration file {} is not a ZIP file, try as an XML file",
-              confFilename);
+          LOG.info("the configuration file {} is not a ZIP file, try as an XML file", confFilename);
           zipFile = null;
           caConfStream = new FileInputStream(confFile);
         }
@@ -214,8 +213,7 @@ public class CaConf {
   }
 
   private void init(CAConfType jaxb, String baseDir, ZipFile zipFile,
-      SecurityFactory securityFactory)
-      throws IOException, InvalidConfException, CaMgmtException {
+      SecurityFactory securityFactory) throws IOException, InvalidConfException, CaMgmtException {
     // Properties
     if (baseDir != null) {
       properties.put("baseDir", baseDir);
@@ -234,8 +232,7 @@ public class CaConf {
     // CMP controls
     if (jaxb.getCmpcontrols() != null) {
       for (CmpcontrolType m : jaxb.getCmpcontrols().getCmpcontrol()) {
-        CmpControlEntry en = new CmpControlEntry(m.getName(),
-            getValue(m.getConf(), zipFile));
+        CmpControlEntry en = new CmpControlEntry(m.getName(), getValue(m.getConf(), zipFile));
         addCmpControl(en);
       }
     }
@@ -308,8 +305,7 @@ public class CaConf {
               if (ci.getCert().getFile() != null) {
                 certFilename = expandConf(ci.getCert().getFile());
               } else {
-                throw new InvalidConfException("cert.file of CA " + name
-                    + " must not be null");
+                throw new InvalidConfException("cert.file of CA " + name + " must not be null");
               }
             }
             byte[] csr = getBinary(ci.getGenSelfIssued().getCsr(), zipFile);
@@ -336,10 +332,9 @@ public class CaConf {
 
           int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
 
-          caEntry = new X509CaEntry(new NameId(null, name), ci.getSnSize(),
-              ci.getNextCrlNo(), expandConf(ci.getSignerType()),
-              getValue(ci.getSignerConf(), zipFile),
-              caUris, numCrls, exprirationPeriod);
+          caEntry = new X509CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
+              expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile), caUris,
+              numCrls, exprirationPeriod);
 
           caEntry.setCmpControlName(ci.getCmpcontrolName());
           caEntry.setCrlSignerName(ci.getCrlsignerName());
@@ -376,8 +371,7 @@ public class CaConf {
               try {
                 caCert = X509Util.parseCert(bytes);
               } catch (CertificateException ex) {
-                throw new InvalidConfException("invalid certificate of CA " + name,
-                    ex);
+                throw new InvalidConfException("invalid certificate of CA " + name, ex);
               }
             } else {
               // extract from the signer configuration
@@ -387,12 +381,10 @@ public class CaConf {
                     getValue(ci.getSignerConf(), zipFile));
                 SignerConf signerConf = new SignerConf(signerConfs.get(0)[1]);
 
-                signer = securityFactory.createSigner(
-                    expandConf(ci.getSignerType()), signerConf,
+                signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf,
                     (X509Certificate) null);
               } catch (ObjectCreationException | XiSecurityException ex) {
-                throw new InvalidConfException("could not create CA signer for CA "
-                    + name, ex);
+                throw new InvalidConfException("could not create CA signer for CA " + name, ex);
               }
               caCert = signer.getCertificate();
             }

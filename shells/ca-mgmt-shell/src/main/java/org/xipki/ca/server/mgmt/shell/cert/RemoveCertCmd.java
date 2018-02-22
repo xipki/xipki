@@ -33,8 +33,7 @@ public class RemoveCertCmd extends UnRevRmCertAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean successful =
-        caManager.removeCertificate(caName, getSerialNumber());
+    boolean successful = caManager.removeCertificate(caName, getSerialNumber());
     output(successful, "removed", "could not remove", "certificate");
     return null;
   }

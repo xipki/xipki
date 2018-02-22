@@ -139,8 +139,7 @@ class CertStoreQueryExecutor {
       if (fpSubject == fpReqSubject) {
         fpReqSubject = null;
       } else {
-        reqSubjectText = X509Util.cutX500Name(CaUtil.sortX509Name(reqSubject),
-            maxX500nameLen);
+        reqSubjectText = X509Util.cutX500Name(CaUtil.sortX509Name(reqSubject), maxX500nameLen);
       }
     }
 
@@ -452,8 +451,8 @@ class CertStoreQueryExecutor {
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     ParamUtil.requireNonNull("revInfo", revInfo);
 
-    X509CertWithRevocationInfo certWithRevInfo
-        = getCertWithRevocationInfo(ca, serialNumber, idNameMap);
+    X509CertWithRevocationInfo certWithRevInfo =
+        getCertWithRevocationInfo(ca, serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
           ca.name(), LogUtil.formatCsn(serialNumber));
@@ -539,8 +538,7 @@ class CertStoreQueryExecutor {
     CrlReason currentReason = currentRevInfo.reason();
     if (currentReason != CrlReason.CERTIFICATE_HOLD) {
       throw new OperationException(ErrorCode.CERT_REVOKED,
-          "certificate is revoked but not with reason "
-          + CrlReason.CERTIFICATE_HOLD.description());
+          "certificate is revoked but not with reason " + CrlReason.CERTIFICATE_HOLD.description());
     }
 
     long certId = certWithRevInfo.cert().certId().longValue();
@@ -657,8 +655,8 @@ class CertStoreQueryExecutor {
 
   X509CertWithDbId getCert(NameId ca, BigInteger serialNumber, CaIdNameMap idNameMap)
       throws OperationException, DataAccessException {
-    X509CertWithRevocationInfo crtWithRevInfo
-        = getCertWithRevocationInfo(ca, serialNumber, idNameMap);
+    X509CertWithRevocationInfo crtWithRevInfo =
+        getCertWithRevocationInfo(ca, serialNumber, idNameMap);
     return (crtWithRevInfo == null) ? null : crtWithRevInfo.cert();
   }
 
@@ -783,8 +781,7 @@ class CertStoreQueryExecutor {
     ParamUtil.requireMin("numEntries", numEntries, 1);
 
     if (onlyCaCerts && onlyUserCerts) {
-      throw new IllegalArgumentException(
-          "onlyCaCerts and onlyUserCerts cannot be both of true");
+      throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
     }
     boolean withEe = onlyCaCerts || onlyUserCerts;
     final String sql = sqls.getSqlSerials(numEntries, notExpiredAt, onlyRevoked, withEe);
@@ -996,9 +993,9 @@ class CertStoreQueryExecutor {
     X509Certificate cert = X509Util.parseCert(encodedCert);
     X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
     certWithMeta.setCertId(certId);
-    X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
-        ca, caCert, cert.getPublicKey().getEncoded(),
-        idNameMap.certprofile(certprofileId), idNameMap.requestor(requestorId));
+    X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, ca, caCert,
+        cert.getPublicKey().getEncoded(), idNameMap.certprofile(certprofileId),
+        idNameMap.requestor(requestorId));
     if (!revoked) {
       return certInfo;
     }
@@ -1163,8 +1160,7 @@ class CertStoreQueryExecutor {
       byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
           .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
       X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, ca,
-          caCert, subjectPublicKeyInfo,
-          idNameMap.certprofile(certprofileId),
+          caCert, subjectPublicKeyInfo, idNameMap.certprofile(certprofileId),
           idNameMap.requestor(requestorId));
 
       if (!revoked) {
@@ -1172,8 +1168,8 @@ class CertStoreQueryExecutor {
       }
 
       Date invalidityTime = (revInvTime == 0) ? null : new Date(revInvTime * 1000);
-      CertRevocationInfo revInfo = new CertRevocationInfo(revReason,
-          new Date(revTime * 1000), invalidityTime);
+      CertRevocationInfo revInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000),
+          invalidityTime);
       certInfo.setRevocationInfo(revInfo);
       return certInfo;
     } catch (IOException ex) {
@@ -1558,8 +1554,7 @@ class CertStoreQueryExecutor {
     ParamUtil.requireNonNull("notExpiredAt", notExpiredAt);
     ParamUtil.requireMin("numEntries", numEntries, 1);
     if (onlyCaCerts && onlyUserCerts) {
-      throw new IllegalArgumentException(
-          "onlyCaCerts and onlyUserCerts cannot be both of true");
+      throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
     }
     boolean withEe = onlyCaCerts || onlyUserCerts;
 
@@ -1586,11 +1581,9 @@ class CertStoreQueryExecutor {
         long revTime = rs.getLong("RT");
         long revInvalidityTime = rs.getLong("RIT");
 
-        Date invalidityTime = (revInvalidityTime == 0) ? null
-            : new Date(1000 * revInvalidityTime);
+        Date invalidityTime = (revInvalidityTime == 0) ? null : new Date(1000 * revInvalidityTime);
         CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id,
-            new BigInteger(serial, 16), revReason, new Date(1000 * revTime),
-            invalidityTime);
+            new BigInteger(serial, 16), revReason, new Date(1000 * revTime), invalidityTime);
         ret.add(revInfo);
       }
 
@@ -1679,8 +1672,7 @@ class CertStoreQueryExecutor {
     return ret;
   } // method getCertificatesForDeltaCrl
 
-  CertStatus getCertStatusForSubject(NameId ca, X500Principal subject)
-      throws DataAccessException {
+  CertStatus getCertStatusForSubject(NameId ca, X500Principal subject) throws DataAccessException {
     long subjectFp = X509Util.fpCanonicalizedName(subject);
     return getCertStatusForSubjectFp(ca, subjectFp);
   }
@@ -1783,8 +1775,7 @@ class CertStoreQueryExecutor {
         LOG.warn("could not close connection", th);
       }
 
-      throw new DataAccessException(
-          "could not create prepared statement for " + sqlQueries[i]);
+      throw new DataAccessException("could not create prepared statement for " + sqlQueries[i]);
     }
 
     return pss;

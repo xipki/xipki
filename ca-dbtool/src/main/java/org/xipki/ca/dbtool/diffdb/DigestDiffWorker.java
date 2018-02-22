@@ -60,9 +60,8 @@ public class DigestDiffWorker extends DbPortWorker {
 
   private final int numThreads;
 
-  public DigestDiffWorker(DataSourceFactory datasourceFactory,
-      PasswordResolver passwordResolver, boolean revokedOnly,
-      String refDbConfFile, String targetDbConfFile, String reportDirName,
+  public DigestDiffWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+      boolean revokedOnly, String refDbConfFile, String targetDbConfFile, String reportDirName,
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
       throws DataAccessException, PasswordResolverException, IOException {
     this.reportDir = reportDirName;
@@ -105,8 +104,8 @@ public class DigestDiffWorker extends DbPortWorker {
     long start = System.currentTimeMillis();
 
     try {
-      DigestDiff diff = new DigestDiff(refDatasource, targetDatasource,
-          reportDir, revokedOnly, stopMe, numCertsPerSelect, numThreads);
+      DigestDiff diff = new DigestDiff(refDatasource, targetDatasource, reportDir, revokedOnly,
+          stopMe, numCertsPerSelect, numThreads);
       diff.setIncludeCaCerts(includeCaCerts);
       diff.diff();
     } finally {

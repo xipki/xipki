@@ -103,8 +103,8 @@ public class AdmissionSyntaxOption {
           registrationNumber = pio.registrationNumberOption().constant();
         }
         pis[i] = new ProfessionInfo(pio.namingAuthority(), professionItems,
-            pio.professionOids().toArray(new ASN1ObjectIdentifier[0]),
-            registrationNumber, addProfessionInfo);
+            pio.professionOids().toArray(new ASN1ObjectIdentifier[0]), registrationNumber,
+            addProfessionInfo);
       }
 
       vec.add(new Admissions(ao.admissionAuthority(), ao.namingAuthority(), pis));

@@ -52,8 +52,7 @@ public class SingleCaConf {
     this.name = ParamUtil.requireNonBlank("name", name);
     if (genSelfIssued != null) {
       if (caEntry == null) {
-        throw new IllegalArgumentException(
-            "caEntry must not be null if genSelfIssued is non-null");
+        throw new IllegalArgumentException("caEntry must not be null if genSelfIssued is non-null");
       }
 
       if (caEntry instanceof X509CaEntry) {

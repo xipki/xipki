@@ -78,8 +78,8 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
   }
 
   @Override
-  protected boolean initExtraExtension(ASN1ObjectIdentifier extnId,
-      ExtensionControl extnControl, Object extnValue) throws CertprofileException {
+  protected boolean initExtraExtension(ASN1ObjectIdentifier extnId, ExtensionControl extnControl,
+      Object extnValue) throws CertprofileException {
     if (id_demo_ca_extra_control.equals(extnId)) {
       this.addCaExtraControl = true;
       return true;
@@ -118,9 +118,9 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
   @Override
   public ExtensionValues getExtraExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-      X500Name requestedSubject, X500Name grantedSubject,
-      Extensions requestedExtensions, Date notBefore, Date notAfter,
-      PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
+      X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
+      Date notBefore, Date notAfter, PublicCaInfo caInfo)
+      throws CertprofileException, BadCertTemplateException {
     ExtensionValues extnValues = new ExtensionValues();
 
     if (addCaExtraControl) {

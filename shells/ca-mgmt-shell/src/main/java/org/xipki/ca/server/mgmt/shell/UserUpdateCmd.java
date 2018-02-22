@@ -56,8 +56,7 @@ public class UserUpdateCmd extends CaAction {
     Boolean realActive;
     if (active != null) {
       if (inactive != null) {
-        throw new IllegalCmdParamException(
-            "maximal one of --active and --inactive can be set");
+        throw new IllegalCmdParamException("maximal one of --active and --inactive can be set");
       }
       realActive = Boolean.TRUE;
     } else if (inactive != null) {

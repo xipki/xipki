@@ -41,8 +41,7 @@ public class RevokeCertCmd extends UnRevRmCertAction {
 
   @Option(name = "--reason", aliases = "-r",
       required = true,
-      description = "CRL reason\n"
-          + "(required)")
+      description = "CRL reason\n(required)")
   @Completion(ClientCrlReasonCompleter.class)
   private String reason;
 

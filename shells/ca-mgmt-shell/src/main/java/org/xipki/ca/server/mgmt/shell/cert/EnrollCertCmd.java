@@ -85,7 +85,7 @@ public class EnrollCertCmd extends CaAction {
         ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
 
     Date notAfter = StringUtil.isNotBlank(notAfterS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+        ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
 
     byte[] encodedCsr = IoUtil.read(csrFile);
 

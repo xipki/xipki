@@ -480,8 +480,7 @@ public class SubjectDnSpec {
     ASN1ObjectIdentifier type = control.type();
     StringType stringType = control.stringType();
     if (stringType != null) {
-      if (STRING_TYPE_SET.containsKey(type)
-          && !STRING_TYPE_SET.get(type).contains(stringType)) {
+      if (STRING_TYPE_SET.containsKey(type) && !STRING_TYPE_SET.get(type).contains(stringType)) {
         throw new CertprofileException(
           String.format("%s is not allowed %s", stringType.name(), type.getId()));
       }
@@ -555,8 +554,7 @@ public class SubjectDnSpec {
     } else {
       InputStream confStream = SubjectDnSpec.class.getResourceAsStream(fallbackResource);
       if (confStream == null) {
-        throw new RuntimeException("could not access non-existing resource "
-            + fallbackResource);
+        throw new RuntimeException("could not access non-existing resource " + fallbackResource);
       }
       LOG.info("read from resource " + fallbackResource);
       return new BufferedReader(new InputStreamReader(confStream));

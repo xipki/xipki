@@ -48,8 +48,7 @@ public class CaRequestorRemoveCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     boolean bo = caManager.removeRequestorFromCa(requestorName, caName);
-    output(bo, "removed", "could not remove",
-        "requestor " + requestorName + " from CA " + caName);
+    output(bo, "removed", "could not remove", "requestor " + requestorName + " from CA " + caName);
     return null;
   }
 

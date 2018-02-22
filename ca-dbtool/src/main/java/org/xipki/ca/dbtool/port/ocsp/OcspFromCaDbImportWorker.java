@@ -66,7 +66,7 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
   public OcspFromCaDbImportWorker(DataSourceFactory datasourceFactory,
       PasswordResolver passwordResolver, String dbConfFile, String publisherName,
       boolean resume, String srcFolder, int batchEntriesPerCommit, boolean evaluateOnly)
-      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+      throws PasswordResolverException, IOException, JAXBException {
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 

@@ -71,9 +71,9 @@ public class PublicCaInfo {
 
   private final ConfPairs extraControl;
 
-  public PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris,
-      List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-      ConfPairs extraControl) throws OperationException {
+  public PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris, List<String> ocspUris,
+      List<String> crlUris, List<String> deltaCrlUris, ConfPairs extraControl)
+      throws OperationException {
     ParamUtil.requireNonNull("caCertificate", caCertificate);
 
     this.caCertificate = new X509Cert(caCertificate);
@@ -155,8 +155,7 @@ public class PublicCaInfo {
   }
 
   public void setCrlSignerCertificate(X509Certificate crlSignerCert) {
-    this.crlSignerCertificate = caCertificate.cert().equals(crlSignerCert)
-        ? null : crlSignerCert;
+    this.crlSignerCertificate = caCertificate.cert().equals(crlSignerCert) ? null : crlSignerCert;
   }
 
   public X500Principal subject() {

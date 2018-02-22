@@ -85,8 +85,7 @@ public abstract class OcspStore {
    */
   public abstract CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation)
-      throws OcspStoreException;
+      boolean inheritCaRevocation) throws OcspStoreException;
 
   /**
    * TODO.

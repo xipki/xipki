@@ -34,8 +34,7 @@ import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class CertsReader extends DbiXmlReader {
 
-  public CertsReader(InputStream xmlStream)
-      throws XMLStreamException, InvalidDataObjectException {
+  public CertsReader(InputStream xmlStream) throws XMLStreamException, InvalidDataObjectException {
     super(CertType.TAG_PARENT, xmlStream);
   }
 

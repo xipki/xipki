@@ -185,9 +185,8 @@ class RefDigestReader {
 
   } // class XipkiDbRetriever
 
-  private RefDigestReader(DataSourceWrapper datasource, X509Certificate caCert,
-      int totalAccount, long minId, int numBlocksToRead, StopMe stopMe)
-      throws Exception {
+  private RefDigestReader(DataSourceWrapper datasource, X509Certificate caCert, int totalAccount,
+      long minId, int numBlocksToRead, StopMe stopMe) throws Exception {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
     this.caCert = ParamUtil.requireNonNull("caCert", caCert);
     this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
@@ -197,8 +196,8 @@ class RefDigestReader {
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
 
-  private void init(DbControl dbControl, HashAlgoType certhashAlgo,
-      int caId, int numPerSelect) throws Exception {
+  private void init(DbControl dbControl, HashAlgoType certhashAlgo, int caId, int numPerSelect)
+      throws Exception {
     this.caId = caId;
     this.conn = datasource.getConnection();
     this.dbControl = dbControl;
@@ -210,8 +209,7 @@ class RefDigestReader {
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
       if (certhashAlgo != HashAlgoType.getHashAlgoType(certHashAlgoInDb)) {
         throw new IllegalArgumentException(
-            "certHashAlgo in parameter (" + certhashAlgo + ") != in DB ("
-            + certHashAlgoInDb + ")");
+            "certHashAlgo in parameter (" + certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");
       }
 
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
@@ -219,8 +217,8 @@ class RefDigestReader {
     } else { // if (dbControl == DbControl.XIPKI_CA_v2) {
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
           (certhashAlgo == HashAlgoType.SHA1 ? "SHA1" : "CERT"),
-          " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=",
-          Integer.toString(caId), " AND CERT.ID>=? AND CERT.ID=CRAW.CID");
+          " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=", Integer.toString(caId),
+          " AND CERT.ID>=? AND CERT.ID=CRAW.CID");
     }
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 
@@ -241,9 +239,9 @@ class RefDigestReader {
     return caId;
   }
 
-  public static RefDigestReader getInstance(DataSourceWrapper datasource,
-      DbControl dbControl, HashAlgoType certhashAlgo, int caId, int numBlocksToRead,
-      int numPerSelect, StopMe stopMe) throws Exception {
+  public static RefDigestReader getInstance(DataSourceWrapper datasource, DbControl dbControl,
+      HashAlgoType certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, StopMe stopMe)
+      throws Exception {
     ParamUtil.requireNonNull("datasource", datasource);
 
     Connection conn = datasource.getConnection();

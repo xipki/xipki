@@ -158,8 +158,7 @@ class IdentifiedX509Certprofile {
     this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
 
     this.certprofile.initialize(dbEntry.conf());
-    if (certProfile.specialCertprofileBehavior()
-        == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
+    if (certProfile.specialCertprofileBehavior() == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
       String paramName = SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME;
       String str = certProfile.parameter(paramName);
       if (str == null) {
@@ -231,8 +230,7 @@ class IdentifiedX509Certprofile {
       for (RDN rdn : countryRdns) {
         String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
         if (!SubjectDnSpec.isValidCountryAreaCode(textValue)) {
-          throw new BadCertTemplateException("invalid country/area code '" + textValue
-              + "'");
+          throw new BadCertTemplateException("invalid country/area code '" + textValue + "'");
         }
       }
     }
@@ -262,8 +260,8 @@ class IdentifiedX509Certprofile {
    * @return the extensions of the certificate to be issued.
    */
   public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
-      Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo,
-      PublicCaInfo publicCaInfo, X509Certificate crlSignerCert, Date notBefore, Date notAfter)
+      Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo,
+      X509Certificate crlSignerCert, Date notBefore, Date notAfter)
       throws CertprofileException, BadCertTemplateException {
     ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
     ExtensionValues values = new ExtensionValues();
@@ -277,8 +275,7 @@ class IdentifiedX509Certprofile {
       Extension reqExtension = requestedExtensions.getExtension(
           ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
       if (reqExtension != null) {
-        ExtensionExistence ee = ExtensionExistence.getInstance(
-            reqExtension.getParsedValue());
+        ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
         neededExtTypes.addAll(ee.needExtensions());
         wantedExtTypes.addAll(ee.wantExtensions());
       }
@@ -289,8 +286,7 @@ class IdentifiedX509Certprofile {
         }
 
         if (!controls.containsKey(oid)) {
-          throw new BadCertTemplateException(
-              "could not add needed extension " + oid.getId());
+          throw new BadCertTemplateException("could not add needed extension " + oid.getId());
         }
       }
     }
@@ -315,8 +311,7 @@ class IdentifiedX509Certprofile {
         if (certprofile.includeIssuerAndSerialInAki()) {
           GeneralNames x509CaSubject = new GeneralNames(
               new GeneralName(publicCaInfo.x500Subject()));
-          value = new AuthorityKeyIdentifier(ikiValue, x509CaSubject,
-              publicCaInfo.serialNumber());
+          value = new AuthorityKeyIdentifier(ikiValue, x509CaSubject, publicCaInfo.serialNumber());
         } else {
           value = new AuthorityKeyIdentifier(ikiValue);
         }
@@ -369,8 +364,7 @@ class IdentifiedX509Certprofile {
         if (CollectionUtil.isNonEmpty(publicCaInfo.crlUris())) {
           CRLDistPoint value = CaUtil.createCrlDistributionPoints(
               publicCaInfo.crlUris(), x500CaPrincipal, crlSignerSubject);
-          addExtension(values, extType, value, extControl, neededExtTypes,
-              wantedExtTypes);
+          addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
       }
 
@@ -381,8 +375,7 @@ class IdentifiedX509Certprofile {
         if (CollectionUtil.isNonEmpty(publicCaInfo.deltaCrlUris())) {
           CRLDistPoint value = CaUtil.createCrlDistributionPoints(
               publicCaInfo.deltaCrlUris(), x500CaPrincipal, crlSignerSubject);
-          addExtension(values, extType, value, extControl, neededExtTypes,
-              wantedExtTypes);
+          addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
       }
     }
@@ -459,8 +452,7 @@ class IdentifiedX509Certprofile {
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
       ASN1Sequence value = null;
       if (requestedExtensions != null && extControl.isRequest()) {
-        value = createSubjectInfoAccess(requestedExtensions,
-            certprofile.subjectInfoAccessModes());
+        value = createSubjectInfoAccess(requestedExtensions, certprofile.subjectInfoAccessModes());
       }
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
@@ -617,8 +609,7 @@ class IdentifiedX509Certprofile {
     }
 
     if (CollectionUtil.isNonEmpty(set)) {
-      msg.append("extensions ").append(toString(set));
-      msg.append(" must not be contained in request, ");
+      msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
     }
 
     X509CertLevel level = certLevel();
@@ -635,8 +626,7 @@ class IdentifiedX509Certprofile {
       }
 
       if (CollectionUtil.isNonEmpty(set)) {
-        msg.append("EE profile contains CA-only extensions ").append(toString(set))
-          .append(", ");
+        msg.append("EE profile contains CA-only extensions ").append(toString(set)).append(", ");
       }
     }
 
@@ -674,8 +664,8 @@ class IdentifiedX509Certprofile {
     }
 
     if (CollectionUtil.isNonEmpty(set)) {
-      msg.append("non-critical extensions are marked as critical ").append(toString(set));
-      msg.append(", ");
+      msg.append("non-critical extensions are marked as critical ").append(toString(set))
+        .append(", ");
     }
 
     // make sure that required extensions are present
@@ -699,8 +689,8 @@ class IdentifiedX509Certprofile {
     }
 
     if (!set.isEmpty()) {
-      msg.append("required extensions are not marked as required ");
-      msg.append(toString(set)).append(", ");
+      msg.append("required extensions are not marked as required ")
+        .append(toString(set)).append(", ");
     }
 
     // KeyUsage
@@ -709,8 +699,8 @@ class IdentifiedX509Certprofile {
     if (ca) {
       // make sure the CA certificate contains usage keyCertSign
       if (!containsKeyusage(usages, KeyUsage.keyCertSign)) {
-        msg.append("CA profile does not contain keyUsage ");
-        msg.append(KeyUsage.keyCertSign).append(", ");
+        msg.append("CA profile does not contain keyUsage ")
+          .append(KeyUsage.keyCertSign).append(", ");
       }
     } else {
       // make sure the EE certificate does not contain CA-only usages
@@ -809,8 +799,7 @@ class IdentifiedX509Certprofile {
       return;
     }
 
-    ExtendedKeyUsage reqKeyUsage =
-        ExtendedKeyUsage.getInstance(extension.getParsedValue());
+    ExtendedKeyUsage reqKeyUsage = ExtendedKeyUsage.getInstance(extension.getParsedValue());
     for (ExtKeyUsageControl k : usageOccs) {
       if (k.isRequired()) {
         continue;

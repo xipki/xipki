@@ -242,8 +242,7 @@ abstract class CmpResponder {
             errorStatus = "request is not protected by signature";
             break;
           case SENDER_NOT_AUTHORIZED:
-            errorStatus =
-              "request is protected by signature but the requestor is not authorized";
+            errorStatus = "request is protected by signature but the requestor is not authorized";
             break;
           case SIGALGO_FORBIDDEN:
             errorStatus = "request is protected by signature but the protection algorithm"

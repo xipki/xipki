@@ -52,13 +52,11 @@ class NameIdStore {
     ParamUtil.requireNonNull("id", id);
 
     if (entries.containsKey(name)) {
-      throw new IllegalArgumentException(
-          "entry with the same name " + name + " already available");
+      throw new IllegalArgumentException("entry with the same name " + name + " already available");
     }
 
     if (entries.containsValue(id)) {
-      throw new IllegalArgumentException(
-          "entry with the same id " + id + " already available");
+      throw new IllegalArgumentException("entry with the same id " + id + " already available");
     }
 
     entries.put(name, id);

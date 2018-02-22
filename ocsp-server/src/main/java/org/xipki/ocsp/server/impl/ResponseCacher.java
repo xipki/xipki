@@ -142,8 +142,7 @@ class ResponseCacher {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
     this.master = master;
     this.validity = ParamUtil.requireMin("validity", validity, 1);
-    this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1,
-        "CERT FROM ISSUER WHERE ID=?");
+    this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,THIS_UPDATE,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
     this.onService = new AtomicBoolean(false);
@@ -589,7 +588,7 @@ class ResponseCacher {
       }
     }
 
-    return    (0x7FL & hash[0]) << 56 // ignore the first bit
+    return (0x7FL & hash[0]) << 56 // ignore the first bit
         | (0xFFL & hash[1]) << 48
         | (0xFFL & hash[2]) << 40
         | (0xFFL & hash[3]) << 32

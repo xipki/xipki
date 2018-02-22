@@ -196,8 +196,7 @@ public class DbPorter extends DbToolBase {
     return buildFileOrBinary(Base64.decode(base64Content), fileName);
   }
 
-  protected FileOrBinaryType buildFileOrBinary(byte[] content, String fileName)
-      throws IOException {
+  protected FileOrBinaryType buildFileOrBinary(byte[] content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }

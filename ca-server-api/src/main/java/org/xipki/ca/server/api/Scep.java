@@ -40,7 +40,6 @@ public interface Scep {
 
   boolean supportsCertProfile(String profileName);
 
-  ContentInfo servicePkiOperation(CMSSignedData requestContent,
-      String certProfileName, String msgId, AuditEvent event)
-      throws MessageDecodingException, OperationException;
+  ContentInfo servicePkiOperation(CMSSignedData requestContent, String certProfileName,
+      String msgId, AuditEvent event) throws MessageDecodingException, OperationException;
 }

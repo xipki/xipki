@@ -103,8 +103,7 @@ public class X509CertprofileQa {
   public X509CertprofileQa(byte[] dataBytes) throws CertprofileException {
     ParamUtil.requireNonNull("dataBytes", dataBytes);
     try {
-      X509ProfileType conf = XmlX509CertprofileUtil.parse(
-          new ByteArrayInputStream(dataBytes));
+      X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(dataBytes));
 
       certProfile = new XmlX509Certprofile();
       certProfile.initialize(conf);
@@ -201,8 +200,7 @@ public class X509CertprofileQa {
         String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
         if (!issue.isFailed()) {
           if (!signatureAlgorithms.contains(sigAlgo)) {
-            issue.setFailureMessage("signatureAlgorithm '" + sigAlgo
-                + "' is not allowed");
+            issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
           }
         }
 
@@ -284,8 +282,7 @@ public class X509CertprofileQa {
     issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
     resultIssues.add(issue);
     if (!cert.getIssuerX500Principal().equals(issuerInfo.cert().getSubjectX500Principal())) {
-      issue.setFailureMessage(
-          "issue in certificate does not equal the subject of CA certificate");
+      issue.setFailureMessage("issue in certificate does not equal the subject of CA certificate");
     }
 
     // subject
@@ -309,9 +306,8 @@ public class X509CertprofileQa {
     issue = new ValidationIssue("X509.GrantedSubject", "grantedSubject");
     resultIssues.add(issue);
 
-    resultIssues.addAll(
-        extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions,
-            requestedSubject));
+    resultIssues.addAll(extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions,
+        requestedSubject));
 
     return new ValidationResult(resultIssues);
   } // method checkCert
@@ -344,8 +340,7 @@ public class X509CertprofileQa {
       }
 
       ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-      if (Extension.subjectAlternativeName.equals(oid)
-          || Extension.subjectInfoAccess.equals(oid)
+      if (Extension.subjectAlternativeName.equals(oid) || Extension.subjectInfoAccess.equals(oid)
           || Extension.biometricInfo.equals(oid)) {
         continue;
       }

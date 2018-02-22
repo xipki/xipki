@@ -120,8 +120,7 @@ public class ScepControl {
     }
 
     ScepControl obj2 = (ScepControl) obj;
-    if (includeCaCert != obj2.includeCaCert
-        || includeSignerCert != obj2.includeSignerCert) {
+    if (includeCaCert != obj2.includeCaCert || includeSignerCert != obj2.includeSignerCert) {
       return false;
     }
 

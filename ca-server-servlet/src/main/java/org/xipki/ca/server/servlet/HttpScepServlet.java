@@ -93,8 +93,7 @@ public class HttpScepServlet extends HttpServlet {
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws ServletException, IOException {
-    String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
-        req.getRequestURI());
+    String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
 
     String scepName = null;
     String certProfileName = null;

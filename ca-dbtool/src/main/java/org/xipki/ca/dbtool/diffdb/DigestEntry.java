@@ -98,13 +98,9 @@ class DigestEntry {
   }
 
   private String encoded(boolean withSerialNumber) {
-    return StringUtil.concatObjects(
-        (withSerialNumber ? serialNumber.toString(16) + ";" : ""),
-        base64HashValue, ";",
-        (revoked ? "1" : "0"), ";",
-        (revReason != null ? revReason : ""), ";",
-        (revTime != null ? revTime : ""), ";",
-        (revInvTime != null ? revInvTime : ""));
+    return StringUtil.concatObjects((withSerialNumber ? serialNumber.toString(16) + ";" : ""),
+        base64HashValue, ";", (revoked ? "1" : "0"), ";", (revReason != null ? revReason : ""), ";",
+        (revTime != null ? revTime : ""), ";", (revInvTime != null ? revInvTime : ""));
   }
 
   public boolean contentEquals(DigestEntry obj) {

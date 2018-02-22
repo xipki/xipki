@@ -38,7 +38,6 @@ public class CertListInfo {
   private final String subject;
 
   public CertListInfo(BigInteger serialNumber, String subject, Date notBefore, Date notAfter) {
-    super();
     this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
     this.notBefore = ParamUtil.requireNonNull("notBefore", notBefore);
     this.notAfter = ParamUtil.requireNonNull("notAfter", notAfter);

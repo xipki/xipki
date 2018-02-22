@@ -261,8 +261,7 @@ public class XmlX509CertprofileUtil {
     ParamUtil.requireNonNull("type", type);
     GeneralName base = null;
     if (type.getDirectoryName() != null) {
-      base = new GeneralName(X509Util.reverse(
-          new X500Name(type.getDirectoryName())));
+      base = new GeneralName(X509Util.reverse(new X500Name(type.getDirectoryName())));
     } else if (type.getDnsName() != null) {
       base = new GeneralName(GeneralName.dNSName, type.getDnsName());
     } else if (type.getIpAddress() != null) {
@@ -272,8 +271,7 @@ public class XmlX509CertprofileUtil {
     } else if (type.getUri() != null) {
       base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
     } else {
-      throw new RuntimeException(
-          "should not reach here, unknown child of GeneralSubtreeBaseType");
+      throw new RuntimeException("should not reach here, unknown child of GeneralSubtreeBaseType");
     }
 
     Integer min = type.getMinimum();
@@ -398,8 +396,7 @@ public class XmlX509CertprofileUtil {
       for (OidWithDescType algId : algIds) {
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
         if (keyAlgorithms.containsKey(oid)) {
-          throw new CertprofileException(
-              "duplicate definition of keyAlgorithm " + oid.getId());
+          throw new CertprofileException("duplicate definition of keyAlgorithm " + oid.getId());
         }
         oids.add(oid);
       }
@@ -420,8 +417,7 @@ public class XmlX509CertprofileUtil {
     for (ExtensionType m : extensionsType.getExtension()) {
       ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
       if (controls.containsKey(oid)) {
-        throw new CertprofileException(
-            "duplicated definition of extension " + oid.getId());
+        throw new CertprofileException("duplicated definition of extension " + oid.getId());
       }
       ExtensionControl ctrl = new ExtensionControl(m.isCritical(), m.isRequired(),
           m.isPermittedInRequest());
@@ -676,8 +672,7 @@ public class XmlX509CertprofileUtil {
       return option;
     } else if (paramsObj instanceof DHParameters) {
       DHParameters params = (DHParameters) paramsObj;
-      KeyParametersOption.DHParametersOption option =
-          new KeyParametersOption.DHParametersOption();
+      KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
 
       Set<Range> plengths = buildParametersMap(params.getPLength());
       option.setPlengths(plengths);
@@ -724,7 +719,7 @@ public class XmlX509CertprofileUtil {
         return DirectoryStringType.utf8String;
       default:
         throw new RuntimeException(
-          "should not reach here, undefined DirectoryStringType " + jaxbType);
+            "should not reach here, undefined DirectoryStringType " + jaxbType);
     }
   }
 
@@ -803,8 +798,7 @@ public class XmlX509CertprofileUtil {
   private static NamingAuthority buildNamingAuthority(NamingAuthorityType jaxb) {
     ASN1ObjectIdentifier oid = (jaxb.getOid() == null) ? null
         : new ASN1ObjectIdentifier(jaxb.getOid().getValue());
-    String url = StringUtil.isBlank(jaxb.getUrl()) ? null
-        : jaxb.getUrl();
+    String url = StringUtil.isBlank(jaxb.getUrl()) ? null : jaxb.getUrl();
     DirectoryString text = StringUtil.isBlank(jaxb.getText()) ? null
         : new DirectoryString(jaxb.getText());
     return new NamingAuthority(oid, url, text);

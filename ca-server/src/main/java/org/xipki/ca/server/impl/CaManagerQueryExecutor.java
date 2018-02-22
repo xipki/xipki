@@ -488,10 +488,8 @@ class CaManagerQueryExecutor {
         int revReason = rs.getInt("RR");
         long revTime = rs.getInt("RT");
         long revInvalidityTime = rs.getInt("RIT");
-        Date revInvTime = (revInvalidityTime == 0) ? null
-            : new Date(revInvalidityTime * 1000);
-        revocationInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000),
-            revInvTime);
+        Date revInvTime = (revInvalidityTime == 0) ? null : new Date(revInvalidityTime * 1000);
+        revocationInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000), revInvTime);
       }
 
       List<String> tmpCrlUris = null;
@@ -516,8 +514,7 @@ class CaManagerQueryExecutor {
         tmpCacertUris = StringUtil.splitByComma(cacertUris);
       }
 
-      X509CaUris caUris = new X509CaUris(tmpCacertUris, tmpOcspUris, tmpCrlUris,
-          tmpDeltaCrlUris);
+      X509CaUris caUris = new X509CaUris(tmpCacertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
 
       int id = rs.getInt("ID");
       int serialNoSize = rs.getInt("SN_SIZE");
@@ -738,12 +735,11 @@ class CaManagerQueryExecutor {
 
     X509CaEntry entry = (X509CaEntry) caEntry;
 
-    final String sql = "INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS"
-        + ",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE"
-        + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
-        + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD"
-        + ",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    final String sql = "INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
+        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPECRLSIGNER_NAME,"
+        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,"
+        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
+        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -954,8 +950,8 @@ class CaManagerQueryExecutor {
     final NameId requestorIdent = requestor.requestorIdent();
 
     PreparedStatement ps = null;
-    final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,"
-        + " PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
+    final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA, PERMISSION,PROFILES)"
+        + " VALUES (?,?,?,?,?)";
     try {
       ps = prepareStatement(sql);
       int idx = 1;
@@ -992,8 +988,8 @@ class CaManagerQueryExecutor {
     }
 
     String name = dbEntry.name();
-    String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,"
-        + "CRL_CONTROL,SIGNER_CONF) VALUES (?,?,?,?,?)";
+    String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF)"
+        + " VALUES (?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -1103,8 +1099,7 @@ class CaManagerQueryExecutor {
     ParamUtil.requireNonNull("changeCaEntry", changeCaEntry);
     ParamUtil.requireNonNull("securityFactory", securityFactory);
     if (!(changeCaEntry instanceof X509ChangeCaEntry)) {
-      throw new CaMgmtException(
-          "unsupported ChangeCAEntry " + changeCaEntry.getClass().getName());
+      throw new CaMgmtException("unsupported ChangeCAEntry " + changeCaEntry.getClass().getName());
     }
 
     X509ChangeCaEntry entry = (X509ChangeCaEntry) changeCaEntry;
@@ -1112,8 +1107,7 @@ class CaManagerQueryExecutor {
     if (cert != null) {
       boolean anyCertIssued;
       try {
-        anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID",
-            entry.ident().id());
+        anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID", entry.ident().id());
       } catch (DataAccessException ex) {
         throw new CaMgmtException(ex);
       }
@@ -1214,8 +1208,7 @@ class CaManagerQueryExecutor {
     Integer idxSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
     Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
     Integer idxCrlUris = addToSqlIfNotNull(sqlBuilder, index, crlUris, "CRL_URIS");
-    Integer idxDeltaCrlUris = addToSqlIfNotNull(sqlBuilder, index, deltaCrlUris,
-        "DELTACRL_URIS");
+    Integer idxDeltaCrlUris = addToSqlIfNotNull(sqlBuilder, index, deltaCrlUris, "DELTACRL_URIS");
     Integer idxOcspUris = addToSqlIfNotNull(sqlBuilder, index, ocspUris, "OCSP_URIS");
     Integer idxCacertUris = addToSqlIfNotNull(sqlBuilder, index, cacertUris, "CACERT_URIS");
     Integer idxMaxValidity = addToSqlIfNotNull(sqlBuilder, index, maxValidity, "MAX_VALIDITY");
@@ -1230,18 +1223,15 @@ class CaManagerQueryExecutor {
         "DUPLICATE_KEY");
     Integer idxDuplicateSubject = addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted,
         "DUPLICATE_SUBJECT");
-    Integer idxSaveReq = addToSqlIfNotNull(sqlBuilder, index, saveReq,
-        "SAVE_REQ");
+    Integer idxSaveReq = addToSqlIfNotNull(sqlBuilder, index, saveReq, "SAVE_REQ");
     Integer idxPermission = addToSqlIfNotNull(sqlBuilder, index, permission, "PERMISSION");
     Integer idxNumCrls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
     Integer idxExpirationPeriod = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod,
         "EXPIRATION_PERIOD");
     Integer idxExpiredCerts = addToSqlIfNotNull(sqlBuilder, index, keepExpiredCertInDays,
          "KEEP_EXPIRED_CERT_DAYS");
-    Integer idxValidityMode = addToSqlIfNotNull(sqlBuilder, index, validityMode,
-        "VALIDITY_MODE");
-    Integer idxExtraControl = addToSqlIfNotNull(sqlBuilder, index, extraControl,
-        "EXTRA_CONTROL");
+    Integer idxValidityMode = addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
+    Integer idxExtraControl = addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
     Integer idxSignerConf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
 
     // delete the last ','
@@ -1813,8 +1803,7 @@ class CaManagerQueryExecutor {
     Integer idxCa = addToSqlIfNotNull(sqlBuilder, index, caIdent, "CA_ID");
     Integer idxActive = addToSqlIfNotNull(sqlBuilder, index, active, "ACTIVE");
     Integer idxType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
-    Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert,
-        "RESPONDER_CERT");
+    Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert, "RESPONDER_CERT");
     Integer idxProfiles = addToSqlIfNotNull(sqlBuilder, index, certProfiles, "PROFILES");
     Integer idxControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
     Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
@@ -2497,8 +2486,8 @@ class CaManagerQueryExecutor {
     userIdent.setId(existingId);
 
     PreparedStatement ps = null;
-    final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,"
-        + " PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
+    final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID, PERMISSION,PROFILES)"
+        + " VALUES (?,?,?,?,?)";
 
     long maxId;
     try {

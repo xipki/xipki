@@ -92,8 +92,7 @@ public class CaUserType extends IdentifidDbObjectType {
   }
 
   @Override
-  public void writeTo(DbiXmlWriter writer)
-      throws InvalidDataObjectException, XMLStreamException {
+  public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
     ParamUtil.requireNonNull("writer", writer);
     validate();
 

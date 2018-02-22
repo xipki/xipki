@@ -194,8 +194,7 @@ class CaConfigurationDbExporter extends DbPorter {
         crlsigner.setSignerConf(
             buildFileOrValue(signerConf, "ca-conf/signerconf-crlsigner-" + name));
         crlsigner.setSignerCert(
-            buildFileOrBase64Binary(signerCert,
-                "ca-conf/signercert-crlsigner-" + name + ".der"));
+            buildFileOrBase64Binary(signerCert, "ca-conf/signercert-crlsigner-" + name + ".der"));
         crlsigner.setCrlControl(crlControl);
 
         crlsigners.getCrlsigner().add(crlsigner);
@@ -260,8 +259,7 @@ class CaConfigurationDbExporter extends DbPorter {
         RequestorType requestor = new RequestorType();
         requestor.setId(id);
         requestor.setName(name);
-        requestor.setCert(
-            buildFileOrBase64Binary(cert, "ca-conf/cert-requestor-" + name + ".der"));
+        requestor.setCert(buildFileOrBase64Binary(cert, "ca-conf/cert-requestor-" + name + ".der"));
         requestors.getRequestor().add(requestor);
       }
     } catch (SQLException ex) {
@@ -298,8 +296,7 @@ class CaConfigurationDbExporter extends DbPorter {
         responder.setName(name);
         responder.setType(type);
         responder.setConf(buildFileOrValue(conf, "ca-conf/conf-responder-" + name));
-        responder.setCert(
-            buildFileOrBase64Binary(cert, "ca-conf/cert-responder-" + name + ".der"));
+        responder.setCert(buildFileOrBase64Binary(cert, "ca-conf/cert-responder-" + name + ".der"));
         responders.getResponder().add(responder);
       }
     } catch (SQLException ex) {
@@ -577,11 +574,9 @@ class CaConfigurationDbExporter extends DbPorter {
         scep.setActive(active);
         scep.setProfiles(profiles);
         scep.setResponderType(respType);
-        scep.setResponderConf(
-            buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caId));
+        scep.setResponderConf(buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caId));
         scep.setResponderCert(
-            buildFileOrBase64Binary(respCert,
-                "ca-conf/respondercert-scep-" + caId + ".der"));
+            buildFileOrBase64Binary(respCert, "ca-conf/respondercert-scep-" + caId + ".der"));
         scep.setControl(control);
         sceps.getScep().add(scep);
       }

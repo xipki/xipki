@@ -40,12 +40,11 @@ class InternUtil {
     }
 
     StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
-    sb.append("\tissuer: ").append(
-        X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
-    sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
-        .append('\n');
-    sb.append("\tsubject: ").append(
-        X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
+    sb.append("\tissuer: ")
+      .append(X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
+    sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
+    sb.append("\tsubject: ")
+      .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
     sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
     sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
 

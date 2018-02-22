@@ -111,8 +111,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
 
       HealthCheckResult healthResult = responder.healthCheck();
       HttpResponseStatus status = healthResult.isHealthy()
-          ? HttpResponseStatus.OK
-          : HttpResponseStatus.INTERNAL_SERVER_ERROR;
+          ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
       byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
       return createResponse(version, status, HealthCheckServlet.CT_RESPONSE, respBytes);
     } catch (Throwable th) {

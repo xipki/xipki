@@ -248,9 +248,9 @@ public class DbCertStatusStore extends OcspStore {
   } // method initIssuerStore
 
   @Override
-  public CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
-      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException {
+  public CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
     }
@@ -356,8 +356,7 @@ public class DbCertStatusStore extends OcspStore {
           certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
               thisUpdate, nextUpdate, null);
         } else {
-          certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate,
-              nextUpdate);
+          certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
         }
       } else {
         if (ignore) {
@@ -409,8 +408,7 @@ public class DbCertStatusStore extends OcspStore {
       if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
         replaced = true;
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.revocationInfo().revocationTime().after(
-            caRevInfo.revocationTime())) {
+        if (certStatusInfo.revocationInfo().revocationTime().after(caRevInfo.revocationTime())) {
           replaced = true;
         }
       }
@@ -424,9 +422,8 @@ public class DbCertStatusStore extends OcspStore {
               caRevInfo.revocationTime(), caRevInfo.invalidityTime());
         }
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
-            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
-            certStatusInfo.certprofile());
+            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(), certStatusInfo.thisUpdate(),
+            certStatusInfo.nextUpdate(), certStatusInfo.certprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {

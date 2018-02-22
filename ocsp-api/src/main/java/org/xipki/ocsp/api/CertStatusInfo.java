@@ -116,8 +116,7 @@ public class CertStatusInfo {
 
   public static CertStatusInfo getGoodCertStatusInfo(HashAlgoType certHashAlgo, byte[] certHash,
       Date thisUpdate, Date nextUpdate, String certprofile) {
-    CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate,
-        certprofile);
+    CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
     return ret;

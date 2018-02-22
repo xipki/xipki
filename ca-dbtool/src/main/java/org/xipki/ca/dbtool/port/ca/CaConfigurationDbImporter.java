@@ -173,8 +173,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import CRLSIGNER with NAME="
-              + responder.getName());
+          System.err.println("could not import CRLSIGNER with NAME=" + responder.getName());
           throw translate(sql, ex);
         }
       }
@@ -198,8 +197,7 @@ class CaConfigurationDbImporter extends DbPorter {
           ps.setString(idx++, environment.getValue());
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import ENVIRONMENT with NAME="
-              + environment.getName());
+          System.err.println("could not import ENVIRONMENT with NAME=" + environment.getName());
           throw translate(sql, ex);
         }
       }
@@ -229,8 +227,7 @@ class CaConfigurationDbImporter extends DbPorter {
           ps.setString(idx++, value(crlsigner.getSignerConf()));
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import CRLSIGNER with NAME="
-              + crlsigner.getName());
+          System.err.println("could not import CRLSIGNER with NAME=" + crlsigner.getName());
           throw translate(sql, ex);
         }
       }
@@ -258,8 +255,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import REQUESTOR with NAME="
-              + requestor.getName());
+          System.err.println("could not import REQUESTOR with NAME=" + requestor.getName());
           throw translate(sql, ex);
         }
       }
@@ -285,8 +281,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import PUBLISHER with NAME="
-              + publisher.getName());
+          System.err.println("could not import PUBLISHER with NAME=" + publisher.getName());
           throw translate(sql, ex);
         }
       }
@@ -316,12 +311,10 @@ class CaConfigurationDbImporter extends DbPorter {
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import PROFILE with NAME="
-              + certprofile.getName());
+          System.err.println("could not import PROFILE with NAME=" + certprofile.getName());
           throw translate(sql, ex);
         } catch (IOException ex) {
-          System.err.println("could not import PROFILE with NAME="
-              + certprofile.getName());
+          System.err.println("could not import PROFILE with NAME=" + certprofile.getName());
           throw ex;
         }
       }
@@ -355,8 +348,7 @@ class CaConfigurationDbImporter extends DbPorter {
           ps.setInt(idx++, ca.getId());
           ps.setString(idx++, ca.getName().toLowerCase());
           ps.setInt(idx++, art);
-          ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(),
-              maxX500nameLen));
+          ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(), maxX500nameLen));
           ps.setInt(idx++, ca.getSnSize());
           ps.setLong(idx++, ca.getNextCrlNo());
           ps.setString(idx++, ca.getStatus());
@@ -427,8 +419,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
   private void importCaHasRequestor(CaHasRequestors caHasRequestors) throws DataAccessException {
     System.out.println("importing table CA_HAS_REQUESTOR");
-    final String sql =
-        "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,PERMISSION,PROFILES)"
+    final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,PERMISSION,PROFILES)"
         + " VALUES (?,?,?,?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {

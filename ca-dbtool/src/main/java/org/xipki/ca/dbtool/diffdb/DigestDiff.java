@@ -76,9 +76,8 @@ class DigestDiff {
 
   private final int numTargetThreads;
 
-  public DigestDiff(DataSourceWrapper refDatasource,
-      DataSourceWrapper targetDatasource, String reportDirName,
-      boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
+  public DigestDiff(DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource,
+      String reportDirName, boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
       int numThreads) throws IOException, DataAccessException {
     this.refDatasource = ParamUtil.requireNonNull("refDatasource", refDatasource);
     this.revokedOnly = revokedOnly;
@@ -166,9 +165,8 @@ class DigestDiff {
 
     final int numBlocksToRead = numTargetThreads * 3 / 2;
     for (Integer refCaId : refCaIds) {
-      RefDigestReader refReader = RefDigestReader.getInstance(refDatasource,
-          refDbControl, certhashAlgo, refCaId, numBlocksToRead, numPerSelect,
-          new StopMe(stopMe));
+      RefDigestReader refReader = RefDigestReader.getInstance(refDatasource, refDbControl,
+          certhashAlgo, refCaId, numBlocksToRead, numPerSelect, new StopMe(stopMe));
       diffSingleCa(refReader, caIdCertMap);
     }
   } // method diff
@@ -232,8 +230,7 @@ class DigestDiff {
     } catch (InterruptedException ex) {
       throw ex;
     } catch (Exception ex) {
-      reporter.addError("Exception thrown: " + ex.getClass().getName() + ": "
-          + ex.getMessage());
+      reporter.addError("Exception thrown: " + ex.getClass().getName() + ": " + ex.getMessage());
       LOG.error("exception in diffSingleCa", ex);
     } finally {
       reporter.close();
@@ -276,12 +273,10 @@ class DigestDiff {
     return caIdCertMap;
   }
 
-  public static DbControl detectDbControl(DataSourceWrapper datasource)
-      throws DataAccessException {
+  public static DbControl detectDbControl(DataSourceWrapper datasource) throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
-      if (datasource.tableExists(conn, "CA")
-          && datasource.tableExists(conn, "CRAW")) {
+      if (datasource.tableExists(conn, "CA") && datasource.tableExists(conn, "CRAW")) {
         return DbControl.XIPKI_CA_v3;
       } else if (datasource.tableExists(conn, "ISSUER")) {
         return DbControl.XIPKI_OCSP_v3;
