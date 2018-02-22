@@ -62,7 +62,7 @@ import org.xipki.common.concurrent.ConcurrentBag.IConcurrentBagEntry;
  * @param <T> the templated type to store in the bag
  */
 public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseable {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentBag.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConcurrentBag.class);
 
   private final CopyOnWriteArrayList<T> sharedList;
   private final boolean weakThreadLocals;
@@ -211,7 +211,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
    */
   public void add(T bagEntry) {
     if (closed) {
-      LOGGER.info("ConcurrentBag has been closed, ignoring add()");
+      LOG.info("ConcurrentBag has been closed, ignoring add()");
       throw new IllegalStateException("ConcurrentBag has been closed, ignoring add()");
     }
 
@@ -236,14 +236,14 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     if (!bagEntry.compareAndSet(STATE_IN_USE, STATE_REMOVED)
         && !bagEntry.compareAndSet(STATE_RESERVED, STATE_REMOVED)
         && !closed) {
-      LOGGER.warn("Attempt to remove an object from the bag that was not borrowed or reserved: {}",
+      LOG.warn("Attempt to remove an object from the bag that was not borrowed or reserved: {}",
           bagEntry);
       return false;
     }
 
     final boolean removed = sharedList.remove(bagEntry);
     if (!removed && !closed) {
-      LOGGER.warn("Attempt to remove an object from the bag that does not exist: {}", bagEntry);
+      LOG.warn("Attempt to remove an object from the bag that does not exist: {}", bagEntry);
     }
 
     return removed;
@@ -315,7 +315,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
         yield();
       }
     } else {
-      LOGGER.warn("Attempt to relinquish an object to the bag that was not reserved: {}", bagEntry);
+      LOG.warn("Attempt to relinquish an object to the bag that was not reserved: {}", bagEntry);
     }
   }
 
@@ -366,7 +366,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
   }
 
   public void dumpState() {
-    sharedList.forEach(entry -> LOGGER.info(entry.toString()));
+    sharedList.forEach(entry -> LOG.info(entry.toString()));
   }
 
   /**

@@ -55,8 +55,7 @@ public class Asn1ServerCaps extends ASN1Object {
 
   public Asn1ServerCaps(boolean readOnly, Set<Short> versions) {
     this.readOnly = readOnly;
-    this.versions = Collections.unmodifiableSet(
-        ParamUtil.requireNonEmpty("versions", versions));
+    this.versions = Collections.unmodifiableSet(ParamUtil.requireNonEmpty("versions", versions));
   }
 
   private Asn1ServerCaps(ASN1Sequence seq) throws BadAsn1ObjectException {
@@ -103,8 +102,7 @@ public class Asn1ServerCaps extends ASN1Object {
         throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
       }
     } catch (IOException | IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
     }
   }
 

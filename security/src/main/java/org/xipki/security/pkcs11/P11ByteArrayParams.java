@@ -22,7 +22,6 @@ package org.xipki.security.pkcs11;
  * @author Lijun Liao
  */
 
-// CHECKSTYLE:SKIP
 public class P11ByteArrayParams implements P11Params {
 
   private final byte[] bytes;

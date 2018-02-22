@@ -88,8 +88,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.moduleName(),
         null, slotId.id(), null, objectId.id(), signatureAlgorithm, 20);
     try {
-      this.signer = securityFactory.createSigner("PKCS11", signerConf,
-          (X509Certificate) null);
+      this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
     } catch (ObjectCreationException ex) {
       shutdown();
       throw ex;

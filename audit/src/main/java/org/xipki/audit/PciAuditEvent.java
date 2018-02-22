@@ -164,21 +164,20 @@ public class PciAuditEvent {
   public CharArrayWriter toCharArrayWriter(String prefix) {
     CharArrayWriter buffer = new CharArrayWriter(100);
 
-    final char delimiter = DEFAULT_DELIMITER;
-    final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+    final char de = DEFAULT_DELIMITER;
+    final String newDe = DEFAULT_REPLACE_DELIMITER;
 
     if (prefix != null && !prefix.isEmpty()) {
       buffer.append(prefix);
     }
 
-    buffer.append(replaceDelimiter(userId(), delimiter, replaceDelimiter)).append(delimiter);
-    buffer.append(replaceDelimiter(eventType(), delimiter, replaceDelimiter)).append(delimiter);
-    buffer.append(replaceDelimiter(date(), delimiter, replaceDelimiter)).append(delimiter);
-    buffer.append(replaceDelimiter(time(), delimiter, replaceDelimiter)).append(delimiter);
-    buffer.append(replaceDelimiter(status(), delimiter, replaceDelimiter)).append(delimiter);
-    buffer.append(replaceDelimiter(origination(), delimiter, replaceDelimiter))
-      .append(delimiter);
-    buffer.append(replaceDelimiter(affectedResource(), delimiter, replaceDelimiter));
+    buffer.append(replaceDelimiter(userId(), de, newDe)).append(de);
+    buffer.append(replaceDelimiter(eventType(), de, newDe)).append(de);
+    buffer.append(replaceDelimiter(date(), de, newDe)).append(de);
+    buffer.append(replaceDelimiter(time(), de, newDe)).append(de);
+    buffer.append(replaceDelimiter(status(), de, newDe)).append(de);
+    buffer.append(replaceDelimiter(origination(), de, newDe)).append(de);
+    buffer.append(replaceDelimiter(affectedResource(), de, newDe));
 
     return buffer;
   }

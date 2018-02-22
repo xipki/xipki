@@ -59,8 +59,7 @@ public class SoftTokenMacContentSignerBuilder {
   }
 
   public SoftTokenMacContentSignerBuilder(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword)
-      throws XiSecurityException {
+      char[] keystorePassword, String keyname, char[] keyPassword) throws XiSecurityException {
     if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
@@ -90,8 +89,7 @@ public class SoftTokenMacContentSignerBuilder {
 
       this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
     } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
-        | CertificateException | IOException | UnrecoverableKeyException
-        | ClassCastException ex) {
+        | CertificateException | IOException | UnrecoverableKeyException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   }

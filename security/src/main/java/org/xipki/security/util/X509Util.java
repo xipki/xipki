@@ -165,8 +165,7 @@ public class X509Util {
     ParamUtil.requireNonNull("certStream", certStream);
     X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
     if (cert == null) {
-      throw new CertificateEncodingException(
-          "the given one is not a valid X.509 certificate");
+      throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
     }
     return cert;
   }
@@ -310,14 +309,12 @@ public class X509Util {
           AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
           for (AttributeTypeAndValue atv : atvs) {
             if (type.equals(atv.getType().getId())) {
-              String textValue =
-                  IETFUtils.valueToString(atv.getValue()).toLowerCase();
+              String textValue = IETFUtils.valueToString(atv.getValue()).toLowerCase();
               values.add(textValue);
             }
           }
         } else {
-          String textValue =
-              IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
+          String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
           values.add(textValue);
         }
       } // end for(j)
@@ -376,7 +373,7 @@ public class X509Util {
       return aki.getKeyIdentifier();
     } catch (IllegalArgumentException ex) {
       throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
-          + ex.getMessage());
+    + ex.getMessage());
     }
   }
 
@@ -614,8 +611,7 @@ public class X509Util {
   }
 
   public static boolean issues(org.bouncycastle.asn1.x509.Certificate issuerCert,
-      org.bouncycastle.asn1.x509.Certificate cert)
-      throws CertificateEncodingException {
+      org.bouncycastle.asn1.x509.Certificate cert) throws CertificateEncodingException {
     ParamUtil.requireNonNull("issuerCert", issuerCert);
     ParamUtil.requireNonNull("cert", cert);
 
@@ -649,16 +645,14 @@ public class X509Util {
         return publicKeyInfo;
       } else {
         AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
-        return new SubjectPublicKeyInfo(keyAlgId,
-            publicKeyInfo.getPublicKeyData().getBytes());
+        return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
       }
     } else if (X9ObjectIdentifiers.id_dsa.equals(algOid)) {
       if (keyParameters == null) {
         return publicKeyInfo;
       } else if (DERNull.INSTANCE.equals(keyParameters)) {
         AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid);
-        return new SubjectPublicKeyInfo(keyAlgId,
-            publicKeyInfo.getPublicKeyData().getBytes());
+        return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
       } else {
         try {
           DSAParameter.getInstance(keyParameters);
@@ -700,8 +694,8 @@ public class X509Util {
     return cutText(text, maxLen);
   }
 
-  public static Extension createExtnSubjectAltName(List<String> taggedValues,
-      boolean critical) throws BadInputException {
+  public static Extension createExtnSubjectAltName(List<String> taggedValues, boolean critical)
+      throws BadInputException {
     GeneralNames names = createGeneralNames(taggedValues);
     if (names == null) {
       return null;
@@ -739,14 +733,12 @@ public class X509Util {
     try {
       pairs = new ConfPairs(accessMethodAndLocation);
     } catch (IllegalArgumentException ex) {
-      throw new BadInputException("invalid accessMethodAndLocation "
-          + accessMethodAndLocation);
+      throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);
     }
 
     Set<String> oids = pairs.names();
     if (oids == null || oids.size() != 1) {
-      throw new BadInputException("invalid accessMethodAndLocation "
-          + accessMethodAndLocation);
+      throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);
     }
 
     String accessMethodS = oids.iterator().next();

@@ -158,8 +158,7 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         if could not create public key.
    */
-  PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
-      throws InvalidKeyException;
+  PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException;
 
   /**
    * Extracts the keystore with minimal required information.

@@ -107,17 +107,17 @@ public class CertInfoCmd extends SecurityAction {
     }
 
     if (no instanceof Byte) {
-      return "0X" + Hex.encode(new byte[]{(byte) no});
+      return "0x" + Hex.encode(new byte[]{(byte) no});
     } else if (no instanceof Short) {
-      return "0X" + Integer.toHexString(Integer.valueOf((short) no));
+      return "0x" + Integer.toHexString(Integer.valueOf((short) no));
     } else if (no instanceof Integer) {
-      return "0X" + Integer.toHexString((int) no);
+      return "0x" + Integer.toHexString((int) no);
     } else if (no instanceof Long) {
-      return "0X" + Long.toHexString((long) no);
+      return "0x" + Long.toHexString((long) no);
     } else if (no instanceof Long) {
-      return "0X" + Long.toHexString((long) no);
+      return "0x" + Long.toHexString((long) no);
     } else if (no instanceof BigInteger) {
-      return "0X" + ((BigInteger) no).toString(16);
+      return "0x" + ((BigInteger) no).toString(16);
     } else {
       return no.toString();
     }

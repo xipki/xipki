@@ -90,8 +90,7 @@ public class Asn1NewKeyControl extends ASN1Object {
   @Override
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    vector.add(new DERTaggedObject(0,
-        ASN1Boolean.getInstance(control.isExtractable())));
+    vector.add(new DERTaggedObject(0, ASN1Boolean.getInstance(control.isExtractable())));
     return new DERSequence(vector);
   }
 

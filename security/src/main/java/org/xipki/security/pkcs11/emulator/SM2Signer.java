@@ -105,7 +105,7 @@ class SM2Signer {
     return generateSignatureForHash(hash);
   }
 
-  // CHECKSTYLE:OFF
+  // CHECKSTYLE:SKIP
   public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
     BigInteger n = ecParams.getN();
     BigInteger e = new BigInteger(1, eHash);
@@ -128,16 +128,15 @@ class SM2Signer {
 
         // A5
         r = e.add(p.getAffineXCoord().toBigInteger()).mod(n);
-      }
-      while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
+      } while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
 
       // A6
+      // CHECKSTYLE:SKIP
       BigInteger dPlus1ModN = d.add(ECConstants.ONE).modInverse(n);
 
       s = k.subtract(r.multiply(d)).mod(n);
       s = dPlus1ModN.multiply(s).mod(n);
-    }
-    while (s.equals(ECConstants.ZERO));
+    } while (s.equals(ECConstants.ZERO));
 
     // A7
     try {

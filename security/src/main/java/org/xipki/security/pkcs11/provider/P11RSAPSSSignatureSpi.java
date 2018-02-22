@@ -77,8 +77,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA224withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA224withRSA() {
-      super(new PSSParameterSpec("SHA-224", "MGF1",
-          new MGF1ParameterSpec("SHA-224"), 28, 1));
+      super(new PSSParameterSpec("SHA-224", "MGF1", new MGF1ParameterSpec("SHA-224"), 28, 1));
     }
 
   } // class SHA224withRSA
@@ -87,8 +86,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA256withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA256withRSA() {
-      super(new PSSParameterSpec("SHA-256", "MGF1",
-          new MGF1ParameterSpec("SHA-256"), 32, 1));
+      super(new PSSParameterSpec("SHA-256", "MGF1", new MGF1ParameterSpec("SHA-256"), 32, 1));
     }
 
   } // class SHA256withRSA
@@ -97,8 +95,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA384withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA384withRSA() {
-      super(new PSSParameterSpec("SHA-384", "MGF1",
-          new MGF1ParameterSpec("SHA-384"), 48, 1));
+      super(new PSSParameterSpec("SHA-384", "MGF1", new MGF1ParameterSpec("SHA-384"), 48, 1));
     }
 
   } // class SHA384withRSA
@@ -107,8 +104,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA512withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA512withRSA() {
-      super(new PSSParameterSpec("SHA-512", "MGF1",
-          new MGF1ParameterSpec("SHA-512"), 64, 1));
+      super(new PSSParameterSpec("SHA-512", "MGF1", new MGF1ParameterSpec("SHA-512"), 64, 1));
     }
 
   } // class SHA512withRSA
@@ -117,8 +113,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA3_224withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA3_224withRSA() {
-      super(new PSSParameterSpec("SHA3-224", "MGF1",
-          new MGF1ParameterSpec("SHA3-224"), 28, 1));
+      super(new PSSParameterSpec("SHA3-224", "MGF1", new MGF1ParameterSpec("SHA3-224"), 28, 1));
     }
 
   } // class SHA224withRSA
@@ -127,8 +122,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA3_256withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA3_256withRSA() {
-      super(new PSSParameterSpec("SHA3-256", "MGF1",
-          new MGF1ParameterSpec("SHA3-256"), 32, 1));
+      super(new PSSParameterSpec("SHA3-256", "MGF1", new MGF1ParameterSpec("SHA3-256"), 32, 1));
     }
 
   } // class SHA256withRSA
@@ -137,8 +131,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA3_384withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA3_384withRSA() {
-      super(new PSSParameterSpec("SHA3-384", "MGF1",
-          new MGF1ParameterSpec("SHA3-384"), 48, 1));
+      super(new PSSParameterSpec("SHA3-384", "MGF1", new MGF1ParameterSpec("SHA3-384"), 48, 1));
     }
 
   } // class SHA384withRSA
@@ -147,8 +140,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   public static class SHA3_512withRSA extends P11RSAPSSSignatureSpi {
 
     public SHA3_512withRSA() {
-      super(new PSSParameterSpec("SHA3-512", "MGF1",
-          new MGF1ParameterSpec("SHA3-512"), 64, 1));
+      super(new PSSParameterSpec("SHA3-512", "MGF1", new MGF1ParameterSpec("SHA3-512"), 64, 1));
     }
 
   } // class SHA512withRSA
@@ -319,8 +311,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
         }
       }
       if (!newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1")
-          && !newParamSpec.getMGFAlgorithm().equals(
-              PKCSObjectIdentifiers.id_mgf1.getId())) {
+          && !newParamSpec.getMGFAlgorithm().equals(PKCSObjectIdentifiers.id_mgf1.getId())) {
         throw new InvalidParameterException("unknown mask generation function specified");
       }
 

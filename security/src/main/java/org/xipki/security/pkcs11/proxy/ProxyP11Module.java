@@ -135,8 +135,7 @@ public class ProxyP11Module extends AbstractP11Module {
     }
 
     if (!caps.versions().contains(version)) {
-      throw new P11TokenException(
-          "Server does not support any version supported by the client");
+      throw new P11TokenException("Server does not support any version supported by the client");
     }
     this.readOnly = caps.isReadOnly();
 
@@ -347,8 +346,7 @@ public class ProxyP11Module extends AbstractP11Module {
     // RC
     short rc = IoUtil.parseShort(response, 10);
     if (rc != 0) {
-      throw new P11TokenException(
-          "server returned RC " + P11ProxyConstants.getReturnCodeName(rc));
+      throw new P11TokenException("server returned RC " + P11ProxyConstants.getReturnCodeName(rc));
     }
 
     // Version

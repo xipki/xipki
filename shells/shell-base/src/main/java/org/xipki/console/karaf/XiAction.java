@@ -169,12 +169,10 @@ public abstract class XiAction implements Action {
   }
 
   private static boolean isEnabled(String enabledS, String optionName) {
-    if ("yes".equalsIgnoreCase(enabledS)
-        || "enabled".equalsIgnoreCase(enabledS)
+    if ("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS)
         || "true".equalsIgnoreCase(enabledS)) {
       return true;
-    } else if ("no".equalsIgnoreCase(enabledS)
-        || "disabled".equalsIgnoreCase(enabledS)
+    } else if ("no".equalsIgnoreCase(enabledS) || "disabled".equalsIgnoreCase(enabledS)
         || "false".equalsIgnoreCase(enabledS)) {
       return false;
     } else {
@@ -217,8 +215,8 @@ public abstract class XiAction implements Action {
 
     String passwordUi = System.getProperty("org.xipki.console.passwordui");
     return "gui".equalsIgnoreCase(passwordUi)
-        ? SecurePasswordInputPanel.readPassword(tmpPrompt)
-        : readLine(tmpPrompt, '*').toCharArray();
+              ? SecurePasswordInputPanel.readPassword(tmpPrompt)
+              : readLine(tmpPrompt, '*').toCharArray();
   }
 
   private String readLine(String prompt, Character ch) throws IOException {

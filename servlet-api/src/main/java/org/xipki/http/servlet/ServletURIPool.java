@@ -36,8 +36,7 @@ public class ServletURIPool {
     try {
       SLASH_URI = new ServletURI("/");
     } catch (URISyntaxException ex) {
-      throw new ExceptionInInitializerError(
-          "could not create ServletURI: " + ex.getMessage());
+      throw new ExceptionInInitializerError("could not create ServletURI: " + ex.getMessage());
     }
   }
 

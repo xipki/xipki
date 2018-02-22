@@ -46,8 +46,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger> {
 
   private BigInteger currentNumber;
 
-  public FileBigIntegerIterator(String fileName, boolean hex, boolean loop)
-      throws IOException {
+  public FileBigIntegerIterator(String fileName, boolean hex, boolean loop) throws IOException {
     this.fileName = ParamUtil.requireNonBlank("fileName", fileName);
     this.hex = hex;
     this.loop = loop;

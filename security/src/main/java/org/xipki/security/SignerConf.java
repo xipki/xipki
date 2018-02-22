@@ -170,12 +170,10 @@ public class SignerConf {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
     if (slotIndex == null && slotId == null) {
-      throw new IllegalArgumentException(
-          "at least one of slotIndex and slotId must not be null");
+      throw new IllegalArgumentException("at least one of slotIndex and slotId must not be null");
     }
     if (keyId == null && keyLabel == null) {
-      throw new IllegalArgumentException(
-          "at least one of keyId and keyLabel must not be null");
+      throw new IllegalArgumentException("at least one of keyId and keyLabel must not be null");
     }
 
     ConfPairs conf = new ConfPairs();
@@ -205,17 +203,14 @@ public class SignerConf {
   }
 
   public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-      Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm,
-      int parallelism) {
+      Long slotId, String keyLabel, byte[] keyId, String signatureAlgorithm, int parallelism) {
     ParamUtil.requireMin("parallelism", parallelism, 1);
     ParamUtil.requireNonNull("algo", signatureAlgorithm);
     if (slotIndex == null && slotId == null) {
-      throw new IllegalArgumentException(
-          "at least one of slotIndex and slotId must not be null");
+      throw new IllegalArgumentException("at least one of slotIndex and slotId must not be null");
     }
     if (keyId == null && keyLabel == null) {
-      throw new IllegalArgumentException(
-          "at least one of keyId and keyLabel must not be null");
+      throw new IllegalArgumentException("at least one of keyId and keyLabel must not be null");
     }
 
     ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);

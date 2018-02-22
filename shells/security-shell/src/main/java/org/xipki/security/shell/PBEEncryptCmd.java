@@ -84,8 +84,7 @@ public class PBEEncryptCmd extends SecurityAction {
       } else {
         char[][] parts = new char[mquorum][];
         for (int i = 0; i < mquorum; i++) {
-          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum
-              + ")");
+          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum + ")");
         }
         masterPassword = StringUtil.merge(parts);
       }
@@ -102,8 +101,7 @@ public class PBEEncryptCmd extends SecurityAction {
       password = StringUtil.merge(parts);
     }
 
-    String passwordHint = PBEPasswordService.encryptPassword(
-        PBEAlgo.PBEWithHmacSHA256AndAES_256,
+    String passwordHint = PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256,
         iterationCount, masterPassword, password);
     if (outFile != null) {
       saveVerbose("saved the encrypted password to file", new File(outFile),

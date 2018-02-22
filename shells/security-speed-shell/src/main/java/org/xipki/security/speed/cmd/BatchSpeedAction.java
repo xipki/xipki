@@ -77,7 +77,8 @@ public abstract class BatchSpeedAction extends SecurityAction {
     return null;
   }
 
-  protected List<String> getECCurveNames() { // CHECKSTYLE:SKIP
+  // CHECKSTYLE:SKIP
+  protected List<String> getECCurveNames() {
     return AlgorithmUtil.getECCurveNames();
   }
 

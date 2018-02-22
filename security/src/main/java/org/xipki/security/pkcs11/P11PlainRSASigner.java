@@ -46,8 +46,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
     }
 
     if (!(cipherParam instanceof P11RSAKeyParameter)) {
-      throw new IllegalArgumentException(
-          "invalid param type " + cipherParam.getClass().getName());
+      throw new IllegalArgumentException("invalid param type " + cipherParam.getClass().getName());
     }
     this.param = (P11RSAKeyParameter) cipherParam;
   }

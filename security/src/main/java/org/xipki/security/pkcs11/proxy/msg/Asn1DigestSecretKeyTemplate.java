@@ -57,8 +57,7 @@ public class Asn1DigestSecretKeyTemplate extends ASN1Object {
     this.mechanism = new Asn1Mechanism(mechanism, null);
   }
 
-  public static Asn1DigestSecretKeyTemplate getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static Asn1DigestSecretKeyTemplate getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof Asn1DigestSecretKeyTemplate) {
       return (Asn1DigestSecretKeyTemplate) obj;
     }
@@ -72,8 +71,7 @@ public class Asn1DigestSecretKeyTemplate extends ASN1Object {
         throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
       }
     } catch (IOException | IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
     }
   }
 

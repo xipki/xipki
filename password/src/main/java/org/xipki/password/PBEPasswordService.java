@@ -72,11 +72,9 @@ public class PBEPasswordService {
     int iterationCount = new BigInteger(1, iterationCountBytes).intValue();
     byte[] pwd;
     try {
-      pwd = PasswordBasedEncryption.decrypt(algo, cipherText, masterPassword,
-          iterationCount, salt);
+      pwd = PasswordBasedEncryption.decrypt(algo, cipherText, masterPassword, iterationCount, salt);
     } catch (GeneralSecurityException ex) {
-      throw new PasswordResolverException("could not decrypt the password: "
-          + ex.getMessage());
+      throw new PasswordResolverException("could not decrypt the password: " + ex.getMessage());
     }
 
     char[] ret = new char[pwd.length];
@@ -105,8 +103,7 @@ public class PBEPasswordService {
       encrypted = PasswordBasedEncryption.encrypt(algo, new String(password).getBytes(),
           masterPassword, iterationCount, salt);
     } catch (GeneralSecurityException ex) {
-      throw new PasswordResolverException("could not encrypt the password: "
-          + ex.getMessage());
+      throw new PasswordResolverException("could not encrypt the password: " + ex.getMessage());
     }
 
     byte[] encryptedText = new byte[1 + 2 + salt.length + encrypted.length];

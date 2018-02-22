@@ -61,8 +61,7 @@ public enum DatabaseType {
       return MARIADB;
     } else if (url.startsWith("jdbc:oracle")) {
       return ORACLE;
-    } else if (url.startsWith("jdbc:pgsql")
-        || url.startsWith("jdbc:postgres")
+    } else if (url.startsWith("jdbc:pgsql") || url.startsWith("jdbc:postgres")
         || url.startsWith("jdbc:postgresql")) {
       return POSTGRES;
     } else {

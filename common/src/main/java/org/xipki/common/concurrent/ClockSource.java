@@ -179,8 +179,8 @@ public interface ClockSource {
     return sb.toString();
   }
 
-  TimeUnit[] TIMEUNITS_DESCENDING = {DAYS, HOURS, MINUTES, SECONDS,
-    MILLISECONDS, MICROSECONDS, NANOSECONDS};
+  TimeUnit[] TIMEUNITS_DESCENDING = {DAYS, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS,
+      NANOSECONDS};
 
   String[] TIMEUNIT_DISPLAY_VALUES = {"ns", "µs", "ms", "s", "m", "h", "d"};
 

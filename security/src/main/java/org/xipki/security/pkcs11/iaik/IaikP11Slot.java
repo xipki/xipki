@@ -130,8 +130,8 @@ class IaikP11Slot extends AbstractP11Slot {
   private Session writableSession;
 
   IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
-      long userType, List<char[]> password, int maxMessageSize,
-      P11MechanismFilter mechanismFilter) throws P11TokenException {
+      long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter)
+      throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
     this.slot = ParamUtil.requireNonNull("slot", slot);
     this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
@@ -452,9 +452,8 @@ class IaikP11Slot extends AbstractP11Slot {
     Params paramObj;
     if (parameters instanceof P11RSAPkcsPssParams) {
       P11RSAPkcsPssParams param = (P11RSAPkcsPssParams) parameters;
-      paramObj = new RSAPkcsPssParams(
-          Mechanism.get(param.hashAlgorithm()), param.maskGenerationFunction(),
-          param.saltLength());
+      paramObj = new RSAPkcsPssParams(Mechanism.get(param.hashAlgorithm()),
+          param.maskGenerationFunction(), param.saltLength());
     } else if (parameters instanceof P11ByteArrayParams) {
       paramObj = new OpaqueParams(((P11ByteArrayParams) parameters).getBytes());
     } else if (parameters instanceof P11IVParams) {
@@ -672,8 +671,7 @@ class IaikP11Slot extends AbstractP11Slot {
     boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
     boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
 
-    boolean sessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn)
-        && deviceError == 0);
+    boolean sessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn) && deviceError == 0);
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
     return sessionLoggedIn;
   }
@@ -921,8 +919,7 @@ class IaikP11Slot extends AbstractP11Slot {
         || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
       mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
     } else {
-      throw new IllegalArgumentException("unsupported key type 0x"
-          + Util.toFullHex((int)keyType));
+      throw new IllegalArgumentException("unsupported key type 0x" + Util.toFullHex((int)keyType));
     }
 
     assertMechanismSupported(mech);
@@ -1018,10 +1015,9 @@ class IaikP11Slot extends AbstractP11Slot {
   }
 
   @Override
-  // CHECKSTYLE:OFF
+  // CHECKSTYLE:SKIP
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       String label, P11NewKeyControl control) throws P11TokenException {
-  // CHECKSTYLE:ON
     long mech = PKCS11Constants.CKM_DSA_KEY_PAIR_GEN;
     assertMechanismSupported(mech);
 
@@ -1077,8 +1073,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     SM2PrivateKey privateKey = new SM2PrivateKey();
     SM2PublicKey publicKey = new SM2PublicKey();
-    setKeyAttributes(label, PKCS11VendorConstants.CKK_VENDOR_SM2,
-        control, publicKey, privateKey);
+    setKeyAttributes(label, PKCS11VendorConstants.CKK_VENDOR_SM2, control, publicKey, privateKey);
     return generateKeyPair(mech, privateKey, publicKey);
   }
 
@@ -1144,12 +1139,9 @@ class IaikP11Slot extends AbstractP11Slot {
     newCertTemp.getLabel().setCharArrayValue(label);
     newCertTemp.getToken().setBooleanValue(true);
     newCertTemp.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
-    newCertTemp.getSubject().setByteArrayValue(
-        cert.cert().getSubjectX500Principal().getEncoded());
-    newCertTemp.getIssuer().setByteArrayValue(
-        cert.cert().getIssuerX500Principal().getEncoded());
-    newCertTemp.getSerialNumber().setByteArrayValue(
-        cert.cert().getSerialNumber().toByteArray());
+    newCertTemp.getSubject().setByteArrayValue(cert.cert().getSubjectX500Principal().getEncoded());
+    newCertTemp.getIssuer().setByteArrayValue(cert.cert().getIssuerX500Principal().getEncoded());
+    newCertTemp.getSerialNumber().setByteArrayValue(cert.cert().getSerialNumber().toByteArray());
     newCertTemp.getValue().setByteArrayValue(cert.encodedCert());
     return newCertTemp;
   }

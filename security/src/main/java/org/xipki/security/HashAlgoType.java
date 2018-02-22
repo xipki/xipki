@@ -93,6 +93,7 @@ public enum HashAlgoType {
     this.oid = new ASN1ObjectIdentifier(oid).intern();
     this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
     this.name = name;
+
     try {
       this.encoded = new ASN1ObjectIdentifier(oid).getEncoded();
     } catch (IOException ex) {

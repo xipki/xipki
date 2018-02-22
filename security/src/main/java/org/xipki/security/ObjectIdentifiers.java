@@ -376,8 +376,6 @@ public class ObjectIdentifiers {
   public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier(
       "1.2.840.113549.1.9.15");
 
-  // CHECKSTYLE:ON
-
   static {
     oidNameMap = new HashMap<>();
 

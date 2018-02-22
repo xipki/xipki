@@ -164,8 +164,7 @@ public class XmlUtil {
     return node.getNodeValue();
   }
 
-  public static Element getFirstElementChild(Element element, String namespace,
-      String localname) {
+  public static Element getFirstElementChild(Element element, String namespace, String localname) {
     ParamUtil.requireNonNull("element", element);
     ParamUtil.requireNonBlank("localname", localname);
     Node node = element.getFirstChild();

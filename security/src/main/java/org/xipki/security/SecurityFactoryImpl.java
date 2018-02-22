@@ -112,6 +112,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       X509Certificate[] certificateChain) throws ObjectCreationException {
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
         certificateChain);
+
     if (!signer.isMac()) {
       validateSigner(signer, type, conf);
     }
@@ -124,8 +125,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     ParamUtil.requireNonNull("publicKey", publicKey);
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
-
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
+
     if (builder == null) {
       if ("RSA".equals(keyAlg)) {
         builder = new XiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
@@ -167,6 +168,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   public boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator) {
     if (algoValidator != null) {
       AlgorithmIdentifier algId = csr.getSignatureAlgorithm();
+
       if (!algoValidator.isAlgorithmPermitted(algId)) {
         String algoName;
         try {
@@ -336,6 +338,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       verifier.initVerify(signer.getPublicKey());
       verifier.update(dummyContent);
       boolean valid = verifier.verify(signatureValue);
+
       if (!valid) {
         StringBuilder sb = new StringBuilder();
         sb.append("private key and public key does not match, ");

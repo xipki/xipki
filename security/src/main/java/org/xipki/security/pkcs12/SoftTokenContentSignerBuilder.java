@@ -93,16 +93,15 @@ public class SoftTokenContentSignerBuilder {
   private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
     private RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
-            throws NoSuchAlgorithmException, NoSuchPaddingException {
+        throws NoSuchAlgorithmException, NoSuchPaddingException {
       super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-            throws OperatorCreationException {
+        throws OperatorCreationException {
       if (!AlgorithmUtil.isRSASigAlgId(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid RSA signature algirthm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
+        throw new OperatorCreationException("the given algorithm is not a valid RSA signature "
+            + "algirthm '" + sigAlgId.getAlgorithm().getId() + "'");
       }
 
       if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
@@ -125,23 +124,21 @@ public class SoftTokenContentSignerBuilder {
     private final boolean plain;
 
     private DSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId, boolean plain)
-            throws NoSuchAlgorithmException {
+        throws NoSuchAlgorithmException {
       super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
       this.plain = plain;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-            throws OperatorCreationException {
+        throws OperatorCreationException {
       if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid DSA signature algirthm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
+        throw new OperatorCreationException("the given algorithm is not a valid DSA signature "
+            + "algirthm '" + sigAlgId.getAlgorithm().getId() + "'");
       }
 
       Digest dig = digestProvider.get(digAlgId);
       DSASigner dsaSigner = new DSASigner();
-      return plain ? new DSAPlainDigestSigner(dsaSigner, dig)
-          : new DSADigestSigner(dsaSigner, dig);
+      return plain ? new DSAPlainDigestSigner(dsaSigner, dig) : new DSADigestSigner(dsaSigner, dig);
     }
 
   } // class DSAContentSignerBuilder
@@ -152,24 +149,22 @@ public class SoftTokenContentSignerBuilder {
     private final boolean plain;
 
     private ECDSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId, boolean plain)
-            throws NoSuchAlgorithmException {
+        throws NoSuchAlgorithmException {
       super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
       this.plain = plain;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-            throws OperatorCreationException {
+        throws OperatorCreationException {
       if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid EC signature algorithm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
+        throw new OperatorCreationException("the given algorithm is not a valid EC signature "
+            + "algorithm '" + sigAlgId.getAlgorithm().getId() + "'");
       }
 
       Digest dig = digestProvider.get(digAlgId);
       ECDSASigner dsaSigner = new ECDSASigner();
 
-      return plain ? new DSAPlainDigestSigner(dsaSigner, dig)
-          : new DSADigestSigner(dsaSigner, dig);
+      return plain ? new DSAPlainDigestSigner(dsaSigner, dig) : new DSADigestSigner(dsaSigner, dig);
     }
 
   } // class ECDSAContentSignerBuilder
@@ -182,10 +177,9 @@ public class SoftTokenContentSignerBuilder {
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
             throws OperatorCreationException {
-      if (!AlgorithmUtil.isSm2SigAlg(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid EC signature algorithm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
+      if (!AlgorithmUtil.isSM2SigAlg(sigAlgId)) {
+        throw new OperatorCreationException("the given algorithm is not a valid EC signature "
+            + "algorithm '" + sigAlgId.getAlgorithm().getId() + "'");
       }
 
       return new SM2Signer();
@@ -212,6 +206,7 @@ public class SoftTokenContentSignerBuilder {
     if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
+
     ParamUtil.requireNonNull("keystoreStream", keystoreStream);
     ParamUtil.requireNonNull("keystorePassword", keystorePassword);
     ParamUtil.requireNonNull("keyPassword", keyPassword);
@@ -327,8 +322,7 @@ public class SoftTokenContentSignerBuilder {
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
           }
         } else {
-          throw new XiSecurityException("unsupported key "
-              + key.getClass().getName());
+          throw new XiSecurityException("unsupported key " + key.getClass().getName());
         }
       } catch (InvalidKeyException ex) {
         throw new XiSecurityException("invalid key", ex);
@@ -368,8 +362,7 @@ public class SoftTokenContentSignerBuilder {
   } // createSigner
 
   public X509Certificate certificate() {
-    return (certificateChain != null && certificateChain.length > 0)
-        ? certificateChain[0] : null;
+    return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
   }
 
   public X509Certificate[] certificateChain() {

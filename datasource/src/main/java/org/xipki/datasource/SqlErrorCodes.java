@@ -35,7 +35,6 @@ class SqlErrorCodes {
   private static class DB2 extends SqlErrorCodes {
 
     DB2() {
-      super();
       badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115, -128, -199, -204, -206, -301,
           -408, -441, -491);
       duplicateKeyCodes = toSet(-803);
@@ -50,7 +49,6 @@ class SqlErrorCodes {
   private static class H2 extends SqlErrorCodes {
 
     H2() {
-      super();
       badSqlGrammarCodes = toSet(42000, 42001, 42101, 42102, 42111, 42112, 42121, 42122, 42132);
       duplicateKeyCodes = toSet(23001, 23505);
       dataIntegrityViolationCodes = toSet(22001, 22003, 22012, 22018, 22025, 23000, 23002,
@@ -65,7 +63,6 @@ class SqlErrorCodes {
   private static class HSQL extends SqlErrorCodes {
 
     HSQL() {
-      super();
       badSqlGrammarCodes = toSet(-22, -28);
       duplicateKeyCodes = toSet(-104);
       dataIntegrityViolationCodes = toSet(-9);
@@ -78,7 +75,6 @@ class SqlErrorCodes {
   private static class MySQL extends SqlErrorCodes {
 
     MySQL() {
-      super();
       badSqlGrammarCodes = toSet(1054, 1064, 1146);
       duplicateKeyCodes = toSet(1062);
       dataIntegrityViolationCodes = toSet(630, 839, 840, 893, 1169, 1215, 1216, 1217, 1364,
@@ -94,7 +90,6 @@ class SqlErrorCodes {
   private static class MariaDB extends MySQL {
 
     MariaDB() {
-      super();
     }
 
   } // class MariaDB
@@ -102,7 +97,6 @@ class SqlErrorCodes {
   private static class Oracle extends SqlErrorCodes {
 
     Oracle() {
-      super();
       badSqlGrammarCodes = toSet(900, 903, 904, 917, 936, 942, 17006, 6550);
       invalidResultSetAccessCodes = toSet(17003);
       duplicateKeyCodes = toSet(1);
@@ -119,7 +113,6 @@ class SqlErrorCodes {
   private static class PostgreSQL extends SqlErrorCodes {
 
     PostgreSQL() {
-      super();
       useSqlStateForTranslation = true;
       badSqlGrammarCodes = toSet("03000", "42000", "42601", "42602", "42622", "42804", "42P01");
       duplicateKeyCodes = toSet(23505);

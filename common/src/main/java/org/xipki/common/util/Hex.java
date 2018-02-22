@@ -25,13 +25,11 @@ package org.xipki.common.util;
 
 public class Hex {
 
-  private static final char[] DIGITS = {
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-  };
+  private static final char[] DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'a', 'b', 'c', 'd', 'e', 'f'};
 
-  private static final char[] UPPER_DIGITS = {
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-  };
+  private static final char[] UPPER_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      'A', 'B', 'C', 'D', 'E', 'F'};
 
   private static final int[] LINTS = new int['f' + 1];
   private static final int[] HINTS = new int[LINTS.length];

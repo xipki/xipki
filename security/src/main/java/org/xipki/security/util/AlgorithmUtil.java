@@ -143,55 +143,32 @@ public class AlgorithmUtil {
       map.put(X9ObjectIdentifiers.ecdsa_with_SHA256, AlgorithmCode.SHA256WITHECDSA);
       map.put(X9ObjectIdentifiers.ecdsa_with_SHA384, AlgorithmCode.SHA384WITHECDSA);
       map.put(X9ObjectIdentifiers.ecdsa_with_SHA512, AlgorithmCode.SHA512WITHECDSA);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224,
-          AlgorithmCode.SHA3_224WITHECDSA);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256,
-          AlgorithmCode.SHA3_256WITHECDSA);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384,
-          AlgorithmCode.SHA3_384WITHECDSA);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512,
-          AlgorithmCode.SHA3_512WITHECDSA);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1,
-          AlgorithmCode.SHA1WITHPLAIN_ECDSA);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224,
-          AlgorithmCode.SHA224WITHPLAIN_ECDSA);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256,
-          AlgorithmCode.SHA256WITHPLAIN_ECDSA);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384,
-          AlgorithmCode.SHA384WITHPLAIN_ECDSA);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512,
-          AlgorithmCode.SHA512WITHPLAIN_ECDSA);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224, AlgorithmCode.SHA3_224WITHECDSA);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256, AlgorithmCode.SHA3_256WITHECDSA);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384, AlgorithmCode.SHA3_384WITHECDSA);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512, AlgorithmCode.SHA3_512WITHECDSA);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1, AlgorithmCode.SHA1WITHPLAIN_ECDSA);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224, AlgorithmCode.SHA224WITHPLAIN_ECDSA);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256, AlgorithmCode.SHA256WITHPLAIN_ECDSA);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384, AlgorithmCode.SHA384WITHPLAIN_ECDSA);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512, AlgorithmCode.SHA512WITHPLAIN_ECDSA);
 
       // DSA
-      map.put(X9ObjectIdentifiers.id_dsa_with_sha1,
-          AlgorithmCode.SHA1WITHDSA);
-      map.put(NISTObjectIdentifiers.dsa_with_sha224,
-          AlgorithmCode.SHA224WITHDSA);
-      map.put(NISTObjectIdentifiers.dsa_with_sha256,
-          AlgorithmCode.SHA256WITHDSA);
-      map.put(NISTObjectIdentifiers.dsa_with_sha384,
-          AlgorithmCode.SHA384WITHDSA);
-      map.put(NISTObjectIdentifiers.dsa_with_sha512,
-          AlgorithmCode.SHA512WITHDSA);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224,
-          AlgorithmCode.SHA3_224WITHDSA);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256,
-          AlgorithmCode.SHA3_256WITHDSA);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384,
-          AlgorithmCode.SHA3_384WITHDSA);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512,
-          AlgorithmCode.SHA3_512WITHDSA);
+      map.put(X9ObjectIdentifiers.id_dsa_with_sha1, AlgorithmCode.SHA1WITHDSA);
+      map.put(NISTObjectIdentifiers.dsa_with_sha224, AlgorithmCode.SHA224WITHDSA);
+      map.put(NISTObjectIdentifiers.dsa_with_sha256, AlgorithmCode.SHA256WITHDSA);
+      map.put(NISTObjectIdentifiers.dsa_with_sha384, AlgorithmCode.SHA384WITHDSA);
+      map.put(NISTObjectIdentifiers.dsa_with_sha512, AlgorithmCode.SHA512WITHDSA);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224, AlgorithmCode.SHA3_224WITHDSA);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256, AlgorithmCode.SHA3_256WITHDSA);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384, AlgorithmCode.SHA3_384WITHDSA);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512, AlgorithmCode.SHA3_512WITHDSA);
       // RSA
-      map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption,
-          AlgorithmCode.SHA1WITHDSA);
-      map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption,
-          AlgorithmCode.SHA224WITHRSA);
-      map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption,
-          AlgorithmCode.SHA256WITHRSA);
-      map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption,
-          AlgorithmCode.SHA384WITHRSA);
-      map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption,
-          AlgorithmCode.SHA512WITHRSA);
+      map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, AlgorithmCode.SHA1WITHDSA);
+      map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, AlgorithmCode.SHA224WITHRSA);
+      map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, AlgorithmCode.SHA256WITHRSA);
+      map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, AlgorithmCode.SHA384WITHRSA);
+      map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, AlgorithmCode.SHA512WITHRSA);
       map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
           AlgorithmCode.SHA3_224WITHRSA);
       map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
@@ -202,8 +179,7 @@ public class AlgorithmUtil {
           AlgorithmCode.SHA3_512WITHRSA);
 
       // SM2
-      map.put(GMObjectIdentifiers.sm2sign_with_sm3,
-          AlgorithmCode.SM2WITHSM3);
+      map.put(GMObjectIdentifiers.sm2sign_with_sm3, AlgorithmCode.SM2WITHSM3);
 
       // Hash
       for (HashAlgoType hashAlgo : HashAlgoType.values()) {
@@ -272,14 +248,10 @@ public class AlgorithmUtil {
       map.put(HashAlgoType.SHA256, PKCSObjectIdentifiers.sha256WithRSAEncryption);
       map.put(HashAlgoType.SHA384, PKCSObjectIdentifiers.sha384WithRSAEncryption);
       map.put(HashAlgoType.SHA512, PKCSObjectIdentifiers.sha512WithRSAEncryption);
-      map.put(HashAlgoType.SHA3_224,
-          NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224);
-      map.put(HashAlgoType.SHA3_256,
-          NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256);
-      map.put(HashAlgoType.SHA3_384,
-          NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384);
-      map.put(HashAlgoType.SHA3_512,
-          NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512);
+      map.put(HashAlgoType.SHA3_224, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224);
+      map.put(HashAlgoType.SHA3_256, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256);
+      map.put(HashAlgoType.SHA3_384, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384);
+      map.put(HashAlgoType.SHA3_512, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512);
       digestToRSASigAlgMap = Collections.unmodifiableMap(map);
     }
 
@@ -453,8 +425,7 @@ public class AlgorithmUtil {
   }
 
   private static void addOidNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
-      Map<String, ASN1ObjectIdentifier> nameOidMap, ASN1ObjectIdentifier oid,
-      String... names) {
+      Map<String, ASN1ObjectIdentifier> nameOidMap, ASN1ObjectIdentifier oid, String... names) {
     oidNameMap.put(oid, names[0].toUpperCase());
     nameOidMap.put(oid.getId(), oid);
     for (String name : names) {
@@ -511,8 +482,7 @@ public class AlgorithmUtil {
       }
       return code;
     } else {
-      throw new NoSuchAlgorithmException("unsupported signature algorithm "
-          + oid.getId());
+      throw new NoSuchAlgorithmException("unsupported signature algorithm " + oid.getId());
     }
   } // method getSignatureAlgoName
 
@@ -552,13 +522,11 @@ public class AlgorithmUtil {
     return isPlainECDSASigAlg(algId);
   }
 
-  public static String canonicalizeSignatureAlgo(String algoName)
-      throws NoSuchAlgorithmException {
+  public static String canonicalizeSignatureAlgo(String algoName) throws NoSuchAlgorithmException {
     return getSignatureAlgoName(getSigAlgId(algoName));
   }
 
-  public static AlgorithmIdentifier getMacAlgId(String macAlgName)
-      throws NoSuchAlgorithmException {
+  public static AlgorithmIdentifier getMacAlgId(String macAlgName) throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("macAlgName", macAlgName);
     String algoS = macAlgName.toUpperCase();
     algoS = canonicalizeAlgoText(algoS);
@@ -616,8 +584,7 @@ public class AlgorithmUtil {
       } else if (pubKey instanceof DSAPublicKey) {
         return getDSASigAlgId(hashAlgo);
       } else {
-        throw new NoSuchAlgorithmException("Unknown public key '"
-            + pubKey.getClass().getName());
+        throw new NoSuchAlgorithmException("Unknown public key '" + pubKey.getClass().getName());
       }
     }
   }
@@ -636,8 +603,7 @@ public class AlgorithmUtil {
     } else if (pubKey instanceof DSAPublicKey) {
       return getDSASigAlgId(hashAlgo);
     } else {
-      throw new NoSuchAlgorithmException("Unknown public key '"
-          + pubKey.getClass().getName());
+      throw new NoSuchAlgorithmException("Unknown public key '" + pubKey.getClass().getName());
     }
   }
 
@@ -703,7 +669,7 @@ public class AlgorithmUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static boolean isSm2SigAlg(AlgorithmIdentifier algId) {
+  public static boolean isSM2SigAlg(AlgorithmIdentifier algId) {
     ParamUtil.requireNonNull("algId", algId);
 
     ASN1ObjectIdentifier oid = algId.getAlgorithm();
@@ -786,8 +752,7 @@ public class AlgorithmUtil {
     } else if (plainSignature) {
       sigAlgOid = digestToECPlainSigAlgMap.get(hashAlgo);
       if (sigAlgOid == null) {
-        throw new NoSuchAlgorithmException(
-            "unsupported hash " + hashAlgo + " for SM2 EC key");
+        throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for SM2 EC key");
       }
     } else {
       sigAlgOid = digestToECSigAlgMap.get(hashAlgo);
@@ -896,11 +861,10 @@ public class AlgorithmUtil {
       throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("digestAlg", digestAlg);
     int saltSize = digestAlg.length();
-    AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlg.oid(),
-        DERNull.INSTANCE);
+    AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlg.oid(), DERNull.INSTANCE);
     return new RSASSAPSSparams(digAlgId,
-      new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
-      new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
+        new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
+        new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
   } // method createPSSRSAParams
 
   private static ASN1ObjectIdentifier getCurveOidForName(String curveName) {

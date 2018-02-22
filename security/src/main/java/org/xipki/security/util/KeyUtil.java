@@ -124,8 +124,7 @@ public class KeyUtil {
 
   // CHECKSTYLE:SKIP
   public static KeyPair generateDSAKeypair(int plength, int qlength, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException,
-        InvalidAlgorithmParameterException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength,
         random);
     KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
@@ -137,8 +136,7 @@ public class KeyUtil {
 
   // CHECKSTYLE:SKIP
   public static KeyPair generateDSAKeypair(DSAParameters dsaParams, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException,
-        InvalidAlgorithmParameterException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
         dsaParams.getG());
     KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
@@ -171,8 +169,7 @@ public class KeyUtil {
 
   // CHECKSTYLE:SKIP
   public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException,
-        InvalidAlgorithmParameterException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     ParamUtil.requireNonNull("curveId", curveId);
 
     ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
@@ -327,8 +324,7 @@ public class KeyUtil {
       RSAPublicKey rsaPubKey = (RSAPublicKey) publicKey;
       try {
         return new SubjectPublicKeyInfo(
-            new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
-                DERNull.INSTANCE),
+            new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
             new org.bouncycastle.asn1.pkcs.RSAPublicKey(rsaPubKey.getModulus(),
                 rsaPubKey.getPublicExponent()));
       } catch (IOException ex) {
@@ -366,8 +362,7 @@ public class KeyUtil {
           curveOid);
       return new SubjectPublicKeyInfo(algId, pubKey);
     } else {
-      throw new InvalidKeyException(
-          "unknown publicKey class " + publicKey.getClass().getName());
+      throw new InvalidKeyException("unknown publicKey class " + publicKey.getClass().getName());
     }
   }
 
@@ -404,8 +399,7 @@ public class KeyUtil {
   }
 
   private static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
-    org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec =
-        EC5Util.convertSpec(paramSpec, false);
+    org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec, false);
     return ECUtil.getNamedCurveOid(bcParamSpec);
   }
 

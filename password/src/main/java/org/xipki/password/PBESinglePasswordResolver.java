@@ -50,11 +50,10 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
       init();
       if (masterPassword == null) {
         if (masterPwdCallback == null) {
-          throw new PasswordResolverException(
-              "masterPasswordCallback is not initialized");
+          throw new PasswordResolverException("masterPasswordCallback is not initialized");
         }
-        this.masterPassword = masterPwdCallback.getPassword(
-            "Please enter the master password", encryptedPassword);
+        this.masterPassword = masterPwdCallback.getPassword("Please enter the master password",
+            encryptedPassword);
       }
       return masterPassword;
     }
@@ -102,8 +101,7 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
       pwdCallback.init(conf);
     } catch (PasswordResolverException ex) {
       throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-          + masterPasswordCallback + ", " + ex.getClass().getName() + ": "
-          + ex.getMessage());
+          + masterPasswordCallback + ", " + ex.getClass().getName() + ": " + ex.getMessage());
     }
     this.masterPwdCallback = pwdCallback;
   }

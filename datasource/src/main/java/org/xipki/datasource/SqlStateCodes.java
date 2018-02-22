@@ -48,7 +48,6 @@ public class SqlStateCodes {
   private static class H2 extends SqlStateCodes {
 
     H2() {
-      super();
     }
 
   } // class H2
@@ -57,7 +56,6 @@ public class SqlStateCodes {
   private static class HSQL extends SqlStateCodes {
 
     HSQL() {
-      super();
     }
 
   } // class HSQL
@@ -65,21 +63,18 @@ public class SqlStateCodes {
   // CHECKSTYLE:SKIP
   private static class MySQL extends SqlStateCodes {
     MySQL() {
-      super();
     }
   }
 
   // CHECKSTYLE:SKIP
   private static class MariaDB extends MySQL {
     MariaDB() {
-      super();
     }
   }
 
   private static class Oracle extends SqlStateCodes {
 
     Oracle() {
-      super();
       // 65: unknown identifier
       badSqlGrammarCodes = addToSet(badSqlGrammarCodes, "65");
       // 61: deadlock
@@ -92,7 +87,6 @@ public class SqlStateCodes {
   private static class PostgreSQL extends SqlStateCodes {
 
     PostgreSQL() {
-      super();
       // 53: insufficient resources (e.g. disk full)
       // 54: program limit exceeded (e.g. statement too complex)
       dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "53", "54");
@@ -145,8 +139,7 @@ public class SqlStateCodes {
 
   private SqlStateCodes() {
     badSqlGrammarCodes = toSet(BGE_DYNAMIC_SQL_ERROR, BGE_CARDINALITY_VIOLATION,
-        BGE_SYNTAX_ERROR_DIRECT_SQL, BGE_SYNTAX_ERROR_DYNAMIC_SQL,
-        BGE_GENERAL_SQL_SYNTAX_ERROR);
+        BGE_SYNTAX_ERROR_DIRECT_SQL, BGE_SYNTAX_ERROR_DYNAMIC_SQL, BGE_GENERAL_SQL_SYNTAX_ERROR);
     dataIntegrityViolationCodes = toSet(DIV_DATA_TRUNCATION, DIV_INTEGRITY_CONSTRAINT_VIOLATION,
         DIV_NO_DATA_FOUND, DIV_TRIGGERED_DATA_CHANGE_VIOLATION,
         DIV_VALUE_OUTOF_RANGE, DIV_WITH_CHECK_VIOLATION);

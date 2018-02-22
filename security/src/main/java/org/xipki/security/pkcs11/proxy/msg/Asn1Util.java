@@ -94,8 +94,7 @@ public class Asn1Util {
     try {
       return ASN1ObjectIdentifier.getInstance(object);
     } catch (IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("invalid object ObjectIdentifier: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("invalid object ObjectIdentifier: " + ex.getMessage(), ex);
     }
   }
 

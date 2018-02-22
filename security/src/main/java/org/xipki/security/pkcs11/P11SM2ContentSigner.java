@@ -107,8 +107,7 @@ class P11SM2ContentSigner implements XiContentSigner {
 
       Long ll = hashMechMap.get(hashAlgo);
       if (ll == null) {
-        throw new XiSecurityException("hash algorithm " + hashAlgo
-            + " is not suitable for SM2");
+        throw new XiSecurityException("hash algorithm " + hashAlgo + " is not suitable for SM2");
       }
       this.mechanism = ll.longValue();
       if (!slot.supportsMechanism(this.mechanism)) {

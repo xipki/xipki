@@ -95,8 +95,7 @@ public class Asn1ImportSecretKeyParams extends ASN1Object {
         throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
       }
     } catch (IOException | IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
     }
   }
 

@@ -64,9 +64,8 @@ class IaikP11Identity extends P11Identity {
     } else if (publicKey instanceof DSAPublicKey) {
       expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
     } else {
-      throw new IllegalArgumentException(
-          "currently only RSA, DSA and EC public key are supported, but not "
-          + this.publicKey.getAlgorithm()
+      throw new IllegalArgumentException("currently only RSA, DSA and EC public key are supported,"
+          + " but not " + this.publicKey.getAlgorithm()
           + " (class: " + publicKey.getClass().getName() + ")");
     }
   }

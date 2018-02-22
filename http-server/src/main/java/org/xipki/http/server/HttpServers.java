@@ -355,8 +355,7 @@ public final class HttpServers {
     if (clientAuth != ClientAuth.NONE) {
       TruststoreType tst = tt.getTruststore();
       if (tst == null) {
-        throw new Exception(
-            "Client authentication is activated, but no truststore is configured");
+        throw new Exception("Client authentication is activated, but no truststore is configured");
       }
 
       char[] pwd = passwordResolver.resolvePassword(tst.getPassword());
@@ -400,9 +399,8 @@ public final class HttpServers {
 
   private static void logOpenSslWarning() {
     if (LOG.isWarnEnabled()) {
-      LOG.warn("To use the OpenSSL as SSL provider, both libapr-1 and "
-          + "OpenSSL must be installed and configured. Note that OpenSSL cannot be "
-          + "applied in Fedora distribution");
+      LOG.warn("To use the OpenSSL as SSL provider, both libapr-1 and OpenSSL must be installed "
+          + "and configured. Note that OpenSSL cannot be applied in Fedora distribution");
     }
   }
 

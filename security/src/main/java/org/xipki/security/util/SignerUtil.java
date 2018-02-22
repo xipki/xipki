@@ -84,8 +84,7 @@ public class SignerUtil {
 
       return new RSAPrivateCrtKeyParameters(rsaKey.getModulus(), rsaKey.getPublicExponent(),
           rsaKey.getPrivateExponent(), rsaKey.getPrimeP(), rsaKey.getPrimeQ(),
-          rsaKey.getPrimeExponentP(), rsaKey.getPrimeExponentQ(),
-          rsaKey.getCrtCoefficient());
+          rsaKey.getPrimeExponentP(), rsaKey.getPrimeExponentQ(), rsaKey.getCrtCoefficient());
     } else {
       return new RSAKeyParameters(true, key.getModulus(), key.getPrivateExponent());
     }
@@ -320,7 +319,6 @@ public class SignerUtil {
     return dsaSigToPlain(sigR, sigS, keyBitLen);
   }
 
-  // CHECKSTYLE:SKIP
   public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int keyBitLen)
       throws XiSecurityException {
     ParamUtil.requireNonNull("sigR", sigR);
@@ -356,8 +354,7 @@ public class SignerUtil {
     if (hat != null) {
       return hat.createDigest();
     } else {
-      throw new XiSecurityException(
-          "could not get digest for " + hashAlgo.getAlgorithm().getId());
+      throw new XiSecurityException("could not get digest for " + hashAlgo.getAlgorithm().getId());
     }
   }
 

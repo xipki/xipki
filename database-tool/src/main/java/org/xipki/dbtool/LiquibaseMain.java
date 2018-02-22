@@ -98,8 +98,7 @@ public class LiquibaseMain {
       (String) null); // databaseChangeLogLockTableName
 
     try {
-      CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener,
-          clOpener);
+      CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener, clOpener);
 
       DiffOutputControl diffOutputControl = new DiffOutputControl(false, // includeCatalog
           false, // includeSchema

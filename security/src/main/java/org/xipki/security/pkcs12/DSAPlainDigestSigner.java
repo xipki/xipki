@@ -106,8 +106,7 @@ public class DSAPlainDigestSigner implements Signer {
   @Override
   public byte[] generateSignature() {
     if (!forSigning) {
-      throw new IllegalStateException(
-          "DSADigestSigner not initialized for signature generation.");
+      throw new IllegalStateException("DSADigestSigner not initialized for signature generation.");
     }
 
     byte[] hash = new byte[digest.getDigestSize()];

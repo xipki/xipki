@@ -93,6 +93,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
 
     LOG.info("hostname: {}", hostname);
     String commonName = null;
+
     try {
       Principal peerPrincipal = session.getPeerPrincipal();
       if (peerPrincipal == null) {
@@ -117,6 +118,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
 
     ConfPairs pairs = new ConfPairs(commonnameHostMap);
     Set<String> commonNames = pairs.names();
+
     for (String commonName :commonNames) {
       String str = pairs.value(commonName);
       Set<String> hosts = StringUtil.splitAsSet(str, ",; \t");

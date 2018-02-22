@@ -90,6 +90,7 @@ public class P11ModuleConf {
       if (mechanismSetsMap.containsKey(name)) {
         throw new InvalidConfException("Duplication mechanismSets named " + name);
       }
+
       Set<Long> mechanisms = new HashSet<>();
       for (String mechStr : m.getMechanism()) {
         mechStr = mechStr.trim().toUpperCase();
@@ -138,10 +139,11 @@ public class P11ModuleConf {
       for (MechanismFilterType filterType : mechFilters.getMechanismFilter()) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
         String mechanismSetName = filterType.getMechanismSet();
+
         if (!mechanismSetsMap.containsKey(mechanismSetName)) {
-          throw new InvalidConfException(
-              "MechanismSet '" +  mechanismSetName + "' is not defined");
+          throw new InvalidConfException("MechanismSet '" +  mechanismSetName + "' is not defined");
         }
+
         Set<Long> mechanisms = mechanismSetsMap.get(mechanismSetName);
         if (mechanisms == null) {
           mechanismFilter.addAcceptAllEntry(slots);
@@ -158,8 +160,7 @@ public class P11ModuleConf {
       passwordRetriever.setPasswordResolver(passwordResolver);
       for (PasswordsType passwordType : passwordsList.getPasswords()) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
-        passwordRetriever.addPasswordEntry(slots,
-            new ArrayList<>(passwordType.getPassword()));
+        passwordRetriever.addPasswordEntry(slots, new ArrayList<>(passwordType.getPassword()));
       }
     }
 

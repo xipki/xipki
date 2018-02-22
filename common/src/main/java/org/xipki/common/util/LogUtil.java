@@ -112,8 +112,7 @@ public class LogUtil {
   }
 
   private static String getMessage(Throwable th) {
-    return (th instanceof JAXBException)
-      ? XmlUtil.getMessage((JAXBException) th) : th.getMessage();
+    return (th instanceof JAXBException) ? XmlUtil.getMessage((JAXBException) th) : th.getMessage();
   }
 
 }

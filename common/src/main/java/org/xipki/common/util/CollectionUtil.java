@@ -61,11 +61,7 @@ public class CollectionUtil {
   }
 
   public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K, ? extends V> map) {
-    if (map == null) {
-      return Collections.emptyMap();
-    }
-
-    return Collections.unmodifiableMap(map);
+    return (map == null) ? Collections.emptyMap() : Collections.unmodifiableMap(map);
   }
 
   public static List<String> toLowerCaseList(List<String> list) {
@@ -93,27 +89,15 @@ public class CollectionUtil {
   }
 
   public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
-    if (set == null) {
-      return Collections.emptySet();
-    }
-
-    return Collections.unmodifiableSet(set);
+    return (set == null) ? Collections.emptySet() : Collections.unmodifiableSet(set);
   }
 
   public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> col) {
-    if (col == null) {
-      return Collections.emptySet();
-    }
-
-    return Collections.unmodifiableCollection(col);
+    return (col == null) ? Collections.emptySet() : Collections.unmodifiableCollection(col);
   }
 
   public static <T> List<T> unmodifiableList(List<? extends T> list) {
-    if (list == null) {
-      return Collections.emptyList();
-    }
-
-    return Collections.unmodifiableList(list);
+    return (list == null) ? Collections.emptyList() : Collections.unmodifiableList(list);
   }
 
 }

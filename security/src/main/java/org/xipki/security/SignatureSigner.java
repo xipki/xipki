@@ -120,8 +120,7 @@ public class SignatureSigner implements XiContentSigner {
     try {
       return stream.getSignature();
     } catch (SignatureException ex) {
-      throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(),
-          ex);
+      throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(), ex);
     }
   }
 

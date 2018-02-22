@@ -188,8 +188,7 @@ public final class HttpServer {
   public HttpServer(SslContext sslContext, int port, int numThreads) {
     this.sslContext = sslContext;
     this.port = port;
-    this.numThreads = (numThreads > 0)
-        ? numThreads : Runtime.getRuntime().availableProcessors();
+    this.numThreads = (numThreads > 0) ? numThreads : Runtime.getRuntime().availableProcessors();
   }
 
   public void setServletListener(ServletListener servletListener) {
@@ -263,8 +262,7 @@ public final class HttpServer {
         channelClass = (Class<? extends ServerSocketChannel>)
             clazz("io.netty.channel.kqueue.KQueueServerSocketChannel", false, loader);
 
-        Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup",
-            true, loader);
+        Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup", true, loader);
         Constructor<?> constructor = clazz.getConstructor(int.class);
         this.bossGroup = (EventLoopGroup) constructor.newInstance(bossGroupThreads);
         this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);

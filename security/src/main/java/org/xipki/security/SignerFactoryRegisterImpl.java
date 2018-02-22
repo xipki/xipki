@@ -190,12 +190,10 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
       }
 
       if (macAlgId != null) {
-        SoftTokenMacContentSignerBuilder signerBuilder =
-            new SoftTokenMacContentSignerBuilder(
-                type, keystoreStream, password, keyLabel, password);
+        SoftTokenMacContentSignerBuilder signerBuilder = new SoftTokenMacContentSignerBuilder(
+            type, keystoreStream, password, keyLabel, password);
 
-        return signerBuilder.createSigner(macAlgId, parallelism,
-            securityFactory.getRandom4Sign());
+        return signerBuilder.createSigner(macAlgId, parallelism, securityFactory.getRandom4Sign());
       } else {
         SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
             type, keystoreStream, password, keyLabel, password, certificateChain);
@@ -258,10 +256,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
       keyId = Hex.decode(str);
     }
 
-    if ((keyId == null && keyLabel == null)
-        || (keyId != null && keyLabel != null)) {
-      throw new ObjectCreationException(
-          "exactly one of key-id and key-label must be specified");
+    if ((keyId == null && keyLabel == null) || (keyId != null && keyLabel != null)) {
+      throw new ObjectCreationException("exactly one of key-id and key-label must be specified");
     }
 
     P11CryptService p11Service;
@@ -283,8 +279,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     }
 
     P11ObjectIdentifier p11ObjId = (keyId != null)
-        ? slot.getObjectIdForId(keyId)
-        : slot.getObjectIdForLabel(keyLabel);
+        ? slot.getObjectIdForId(keyId) : slot.getObjectIdForLabel(keyLabel);
     if (p11ObjId == null) {
       String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
       throw new ObjectCreationException("cound not find identity with " + str2);

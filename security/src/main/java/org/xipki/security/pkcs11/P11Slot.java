@@ -124,8 +124,7 @@ public interface P11Slot {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  P11ObjectIdentifier addCert(X509Certificate cert)
-      throws P11TokenException, CertificateException;
+  P11ObjectIdentifier addCert(X509Certificate cert) throws P11TokenException, CertificateException;
 
   /**
    * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
@@ -158,8 +157,8 @@ public interface P11Slot {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
-      String label, P11NewKeyControl control) throws P11TokenException;
+  P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent, String label,
+      P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates an RSA keypair.
@@ -197,10 +196,9 @@ public interface P11Slot {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  // CHECKSTYLE:OFF
-  P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-      String label, P11NewKeyControl control) throws P11TokenException;
-  // CHECKSTYLE:ON
+  // CHECKSTYLE:SKIP
+  P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g, String label,
+      P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates an EC keypair.
@@ -296,7 +294,6 @@ public interface P11Slot {
    * @throws IOException
    *         if IO error occurs.
    */
-  void showDetails(OutputStream stream, boolean verbose)
-      throws P11TokenException, IOException;
+  void showDetails(OutputStream stream, boolean verbose) throws P11TokenException, IOException;
 
 }

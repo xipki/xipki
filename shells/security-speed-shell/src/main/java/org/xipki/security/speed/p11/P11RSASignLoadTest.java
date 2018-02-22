@@ -36,8 +36,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
       String signatureAlgorithm, int keysize, BigInteger publicExponent) throws Exception {
     super(securityFactory, slot, signatureAlgorithm,
         generateKey(slot, keysize, publicExponent),
-        "PKCS#11 RSA signature creation\n"
-            + "keysize: " + keysize + "\n"
+        "PKCS#11 RSA signature creation\n" + "keysize: " + keysize + "\n"
             + "public exponent: " + publicExponent);
   }
 

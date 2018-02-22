@@ -59,8 +59,7 @@ public class DateUtil {
       Instant instant = localDate.atZone(ZONE_UTC).toInstant();
       return Date.from(instant);
     } catch (DateTimeParseException ex) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-          + ex.getMessage());
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
   }
 
@@ -82,8 +81,7 @@ public class DateUtil {
       Instant instant = localDate.atZone(ZONE_UTC).toInstant();
       return Date.from(instant);
     } catch (DateTimeParseException ex) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-          + ex.getMessage());
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
   }
 

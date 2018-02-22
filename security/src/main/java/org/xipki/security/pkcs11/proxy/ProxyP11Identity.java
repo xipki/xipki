@@ -48,8 +48,8 @@ class ProxyP11Identity extends P11Identity {
     super(slot, entityId, 0);
   }
 
-  ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId,
-      PublicKey publicKey, X509Certificate[] certificateChain) {
+  ProxyP11Identity(P11Slot slot, P11EntityIdentifier entityId, PublicKey publicKey,
+      X509Certificate[] certificateChain) {
     super(slot, entityId, publicKey, certificateChain);
   }
 
@@ -63,8 +63,7 @@ class ProxyP11Identity extends P11Identity {
           new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
     } else if (parameters instanceof P11ByteArrayParams) {
       byte[] bytes = ((P11ByteArrayParams) parameters).getBytes();
-      p11Param = new Asn1P11Params(Asn1P11Params.TAG_OPAQUE,
-          new DEROctetString(bytes));
+      p11Param = new Asn1P11Params(Asn1P11Params.TAG_OPAQUE, new DEROctetString(bytes));
     } else if (parameters instanceof P11IVParams) {
       p11Param = new Asn1P11Params(Asn1P11Params.TAG_IV,
           new DEROctetString(((P11IVParams) parameters).getIV()));
@@ -90,8 +89,7 @@ class ProxyP11Identity extends P11Identity {
   @Override
   protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
     Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
-    Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(
-        asn1EntityId, mechanism);
+    Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(asn1EntityId, mechanism);
     byte[] result = ((ProxyP11Slot) slot).module().send(
         P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
 

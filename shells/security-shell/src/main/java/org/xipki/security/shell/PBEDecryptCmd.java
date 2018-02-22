@@ -97,8 +97,7 @@ public class PBEDecryptCmd extends SecurityAction {
       } else {
         char[][] parts = new char[mquorum][];
         for (int i = 0; i < mquorum; i++) {
-          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum
-              + ")");
+          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum + ")");
         }
         masterPassword = StringUtil.merge(parts);
       }
@@ -106,8 +105,7 @@ public class PBEDecryptCmd extends SecurityAction {
     char[] password = PBEPasswordService.decryptPassword(masterPassword, passwordHint);
 
     if (outFile != null) {
-      saveVerbose("saved the password to file", new File(outFile),
-          new String(password).getBytes());
+      saveVerbose("saved the password to file", new File(outFile), new String(password).getBytes());
     } else {
       println("the password is: '" + new String(password) + "'");
     }

@@ -125,8 +125,7 @@ class P11RSAContentSigner implements XiContentSigner {
     } else {
       Long mech = hashAlgMecMap.get(hashAlgo);
       if (mech == null) {
-        throw new RuntimeException("should not reach here, unknown HashAlgoType "
-            + hashAlgo);
+        throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
       }
       this.mechanism = mech.longValue();
       if (!slot.supportsMechanism(this.mechanism)) {
@@ -134,8 +133,7 @@ class P11RSAContentSigner implements XiContentSigner {
       }
     }
 
-    if (mechanism == PKCS11Constants.CKM_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_RSA_X_509) {
+    if (mechanism == PKCS11Constants.CKM_RSA_PKCS || mechanism == PKCS11Constants.CKM_RSA_X_509) {
       this.digestPkcsPrefix = SignerUtil.getDigestPkcsPrefix(hashAlgo);
       Digest digest = hashAlgo.createDigest();
       this.outputStream = new DigestOutputStream(digest);

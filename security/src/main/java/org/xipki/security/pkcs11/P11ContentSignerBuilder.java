@@ -134,7 +134,7 @@ public class P11ContentSignerBuilder {
         if (i == 0) {
           isSm2p256v1 = GMUtil.isSm2primev2Curve(ecKey.getParams().getCurve());
           if (isSm2p256v1) {
-            if (!AlgorithmUtil.isSm2SigAlg(signatureAlgId)) {
+            if (!AlgorithmUtil.isSM2SigAlg(signatureAlgId)) {
               throw new XiSecurityException(
                 "the given algorithm is not a valid SM2 signature algorithm '"
                 + signatureAlgId.getAlgorithm().getId() + "'");
@@ -149,7 +149,6 @@ public class P11ContentSignerBuilder {
         }
 
         if (isSm2p256v1) {
-          // CHECKSTYLE:SKIP
           java.security.spec.ECPoint w = ecKey.getW();
           signer = createSM2ContentSigner(signatureAlgId, GMObjectIdentifiers.sm2p256v1,
               w.getAffineX(), w.getAffineY());

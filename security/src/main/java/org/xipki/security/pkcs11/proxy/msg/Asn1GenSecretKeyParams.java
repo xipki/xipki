@@ -46,7 +46,6 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
 public class Asn1GenSecretKeyParams extends ASN1Object {
 
   private final P11SlotIdentifier slotId;
@@ -93,8 +92,7 @@ public class Asn1GenSecretKeyParams extends ASN1Object {
         throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
       }
     } catch (IOException | IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
     }
   }
 

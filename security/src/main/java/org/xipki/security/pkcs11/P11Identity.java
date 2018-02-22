@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
@@ -89,10 +89,9 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     } else if (this.publicKey instanceof DSAPublicKey) {
       signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
     } else {
-      throw new IllegalArgumentException(
-          "currently only RSA, DSA and EC public key are supported, but not "
-          + this.publicKey.getAlgorithm()
-          + " (class: " + this.publicKey.getClass().getName() + ")");
+      throw new IllegalArgumentException("currently only RSA, DSA and EC public key are supported, "
+          + "but not " + this.publicKey.getAlgorithm() + " (class: "
+          + this.publicKey.getClass().getName() + ")");
     }
   } // constructor
 
@@ -125,31 +124,27 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   protected abstract byte[] sign0(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException;
 
-  public byte[] digestSecretKey(long mechanism)
-      throws P11TokenException, XiSecurityException {
+  public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("digest secret with mechanism {}",
-          Pkcs11Functions.getMechanismDesc(mechanism));
+      LOG.debug("digest secret with mechanism {}", Pkcs11Functions.getMechanismDesc(mechanism));
     }
     return digestSecretKey0(mechanism);
   }
 
-  protected abstract byte[] digestSecretKey0(long mechanism)
-      throws P11TokenException;
+  protected abstract byte[] digestSecretKey0(long mechanism) throws P11TokenException;
 
   public P11EntityIdentifier identityId() {
     return identityId;
   }
 
   public X509Certificate certificate() {
-    return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0]
-        : null;
+    return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
   }
 
   public X509Certificate[] certificateChain() {
     return (certificateChain == null) ? null
-        : java.util.Arrays.copyOf(certificateChain, certificateChain.length);
+        : Arrays.copyOf(certificateChain, certificateChain.length);
   }
 
   public PublicKey publicKey() {

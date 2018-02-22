@@ -340,14 +340,7 @@ public class CanonicalizeCode {
       sb.delete(lastNonSpaceCharIndex, sb.length());
     }
 
-    String ret = sb.toString();
-    if (ret.startsWith("    throws ")) {
-      ret = "        " + ret;
-    } else if (ret.startsWith("        throws ")) {
-      ret = "    " + ret;
-    }
-
-    return ret;
+    return sb.toString();
   } // end canonicalizeLine
 
   /**

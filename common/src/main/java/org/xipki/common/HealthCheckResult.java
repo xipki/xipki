@@ -115,7 +115,7 @@ public class HealthCheckResult {
     for (String entry : names) {
       count++;
       append(sb, entry, statuses.get(entry), level + 1, pretty,
-          CollectionUtil.isEmpty(childChecks) && count == size);
+          (CollectionUtil.isEmpty(childChecks) && count == size));
     }
 
     if (CollectionUtil.isNonEmpty(childChecks)) {

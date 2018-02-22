@@ -40,8 +40,7 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
 
   private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-  public XiECContentVerifierProviderBuilder(
-      DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+  public XiECContentVerifierProviderBuilder(DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
     super(digestAlgorithmFinder);
     this.digestAlgorithmFinder = digestAlgorithmFinder;
   }
@@ -56,7 +55,7 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
       return new DSAPlainDigestSigner(new ECDSASigner(), dig);
     }
 
-    boolean sm2 = AlgorithmUtil.isSm2SigAlg(sigAlgId);
+    boolean sm2 = AlgorithmUtil.isSM2SigAlg(sigAlgId);
     if (sm2) {
       AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
       if (GMObjectIdentifiers.sm3.equals(digAlg.getAlgorithm())) {

@@ -115,8 +115,7 @@ public class SimpleXpath {
       int idx = step.indexOf('@');
       if (idx != -1) {
         if (stepNo != countTokens) {
-          throw new XPathExpressionException(
-              "attribute is only allowed in the last step");
+          throw new XPathExpressionException("attribute is only allowed in the last step");
         } else {
           if (idx > 0) {
             steps.add(new SimpleXpathStep(step.substring(0, idx), nsPrefixUriMap));

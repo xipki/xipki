@@ -55,8 +55,8 @@ public abstract class AbstractHttpServlet implements HttpServlet {
   }
 
   // CHECKSTYLE:SKIP
-  protected static FullHttpResponse createOKResponse(HttpVersion version,
-      String contentType, byte[] content) {
+  protected static FullHttpResponse createOKResponse(HttpVersion version, String contentType,
+      byte[] content) {
     return createResponse(version, HttpResponseStatus.OK, contentType, content);
   }
 
@@ -88,8 +88,7 @@ public abstract class AbstractHttpServlet implements HttpServlet {
   }
 
   protected X509Certificate getClientCert(HttpRequest request, SSLSession sslSession,
-      SslReverseProxyMode sslReverseProxyMode)
-      throws IOException {
+      SslReverseProxyMode sslReverseProxyMode) throws IOException {
     return ClientCertCache.getTlsClientCert(request, sslSession, sslReverseProxyMode);
   }
 

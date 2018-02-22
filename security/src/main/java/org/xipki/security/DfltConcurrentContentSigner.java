@@ -80,6 +80,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   static {
     final String propKey = "org.xipki.security.signservice.timeout";
     String str = System.getProperty(propKey);
+
     if (str != null) {
       int vi = Integer.parseInt(str);
       // valid value is between 0 and 60 seconds
@@ -195,8 +196,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     this.certificateChain = certificateChain;
     setPublicKey(certificateChain[0].getPublicKey());
     final int n = certificateChain.length;
-
     this.bcCertificateChain = new X509CertificateHolder[n];
+
     for (int i = 0; i < n; i++) {
       X509Certificate cert = this.certificateChain[i];
       try {

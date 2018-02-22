@@ -199,8 +199,7 @@ public class ProcessLog {
     long currentSpeed = 0;
     long t2inms = nowMs - referenceMeasurePoint.measureTime(); // in ms
     if (t2inms > 0) {
-      currentSpeed =
-          (tmpNumProcessed - referenceMeasurePoint.measureAccount()) * 1000 / t2inms;
+      currentSpeed = (tmpNumProcessed - referenceMeasurePoint.measureAccount()) * 1000 / t2inms;
     }
     sb.append(StringUtil.formatAccount(currentSpeed, true));
 

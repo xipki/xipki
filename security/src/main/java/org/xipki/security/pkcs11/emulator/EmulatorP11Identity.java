@@ -137,9 +137,8 @@ public class EmulatorP11Identity extends P11Identity {
       } else if (this.publicKey instanceof DSAPublicKey) {
         algorithm = "NONEwithDSA";
       } else {
-        throw new IllegalArgumentException(
-            "Currently only RSA, DSA and EC public key are supported, but not "
-            + this.publicKey.getAlgorithm()
+        throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are "
+            + "supported, but not " + this.publicKey.getAlgorithm()
             + " (class: " + this.publicKey.getClass().getName() + ")");
       }
 
@@ -151,8 +150,7 @@ public class EmulatorP11Identity extends P11Identity {
         }
       } else {
         for (int i = 0; i < maxSessions; i++) {
-          SM2Signer sm2signer = new SM2Signer(
-              ECUtil.generatePrivateKeyParameter(privateKey));
+          SM2Signer sm2signer = new SM2Signer(ECUtil.generatePrivateKeyParameter(privateKey));
           sm2Signers.add(new ConcurrentBagEntry<>(sm2signer));
         }
       }
@@ -328,11 +326,9 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
-    HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
-        pssParam.hashAlgorithm());
+    HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(pssParam.hashAlgorithm());
     if (contentHash == null) {
-      throw new P11TokenException(
-          "unsupported HashAlgorithm " + pssParam.hashAlgorithm());
+      throw new P11TokenException("unsupported HashAlgorithm " + pssParam.hashAlgorithm());
     } else if (hashAlgo != null && contentHash != hashAlgo) {
       throw new P11TokenException("Invalid parameters: invalid hash algorithm");
     }
@@ -340,8 +336,7 @@ public class EmulatorP11Identity extends P11Identity {
     HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
         pssParam.maskGenerationFunction());
     if (mgfHash == null) {
-      throw new P11TokenException(
-          "unsupported MaskGenerationFunction " + pssParam.hashAlgorithm());
+      throw new P11TokenException("unsupported MaskGenerationFunction " + pssParam.hashAlgorithm());
     }
 
     byte[] hashValue = (hashAlgo == null) ? contentToSign : hashAlgo.hash(contentToSign);
@@ -355,8 +350,7 @@ public class EmulatorP11Identity extends P11Identity {
     return rsaX509Sign(encodedHashValue);
   }
 
-  private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgoType hashAlgo)
-      throws P11TokenException {
+  private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgoType hashAlgo) throws P11TokenException {
     int modulusBitLen = signatureKeyBitLength();
     byte[] paddedHash;
     try {
@@ -404,8 +398,7 @@ public class EmulatorP11Identity extends P11Identity {
     try {
       sig0 = dsaSignatures.borrow(5000, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
-      throw new P11TokenException(
-          "InterruptedException occurs while retrieving idle signature");
+      throw new P11TokenException("InterruptedException occurs while retrieving idle signature");
     }
 
     if (sig0 == null) {
@@ -431,8 +424,7 @@ public class EmulatorP11Identity extends P11Identity {
     try {
       sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
-      throw new P11TokenException(
-          "InterruptedException occurs while retrieving idle signature");
+      throw new P11TokenException("InterruptedException occurs while retrieving idle signature");
     }
 
     if (sig0 == null) {
@@ -469,8 +461,7 @@ public class EmulatorP11Identity extends P11Identity {
     try {
       sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
-      throw new P11TokenException(
-          "InterruptedException occurs while retrieving idle signature");
+      throw new P11TokenException("InterruptedException occurs while retrieving idle signature");
     }
 
     if (sig0 == null) {

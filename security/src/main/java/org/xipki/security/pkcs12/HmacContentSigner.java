@@ -76,8 +76,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   public HmacContentSigner(HashAlgoType hashAlgo, AlgorithmIdentifier algorithmIdentifier,
       SecretKey signingKey) throws XiSecurityException {
-    this.algorithmIdentifier = ParamUtil.requireNonNull("algorithmIdentifier",
-        algorithmIdentifier);
+    this.algorithmIdentifier = ParamUtil.requireNonNull("algorithmIdentifier", algorithmIdentifier);
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {

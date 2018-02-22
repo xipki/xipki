@@ -138,8 +138,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     // check the key.
     try {
-      cipher.init(Cipher.ENCRYPT_MODE, signingKey,
-          new GCMParameterSpec(tagByteLen << 3, nonce));
+      cipher.init(Cipher.ENCRYPT_MODE, signingKey, new GCMParameterSpec(tagByteLen << 3, nonce));
     } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
       throw new XiSecurityException(ex);
     }
@@ -162,8 +161,7 @@ public class AESGmacContentSigner implements XiContentSigner {
   public OutputStream getOutputStream() {
     random.nextBytes(nonce);
     try {
-      cipher.init(Cipher.ENCRYPT_MODE, signingKey,
-          new GCMParameterSpec(tagByteLen << 3, nonce));
+      cipher.init(Cipher.ENCRYPT_MODE, signingKey, new GCMParameterSpec(tagByteLen << 3, nonce));
     } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
       throw new IllegalStateException(ex);
     }

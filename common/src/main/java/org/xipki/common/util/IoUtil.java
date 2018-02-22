@@ -152,7 +152,7 @@ public class IoUtil {
     ParamUtil.requireNonBlank("path", path);
 
     return path.startsWith("~" + File.separator)
-      ? System.getProperty("user.home") + path.substring(1) : path;
+        ? System.getProperty("user.home") + path.substring(1) : path;
   }
 
   public static File expandFilepath(File file) {
@@ -185,8 +185,7 @@ public class IoUtil {
   }
 
   public static short parseShort(byte[] bytes, int offset) {
-    return (short)  ((0xFF & bytes[offset++]) << 8
-            | 0xFF & bytes[offset]);
+    return (short) ((0xFF & bytes[offset++]) << 8 | 0xFF & bytes[offset]);
   }
 
   public static void writeInt(int value, byte[] dest, int destOffset) {
@@ -197,7 +196,7 @@ public class IoUtil {
   }
 
   public static int parseInt(byte[] bytes, int offset) {
-    return    (0xFF & bytes[offset++]) << 24
+    return (0xFF & bytes[offset++]) << 24
         | (0xFF & bytes[offset++]) << 16
         | (0xFF & bytes[offset++]) << 8
         |  0xFF & bytes[offset];

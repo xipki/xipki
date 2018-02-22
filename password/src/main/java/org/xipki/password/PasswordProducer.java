@@ -40,8 +40,7 @@ public class PasswordProducer {
   private static ConcurrentHashMap<String, BlockingQueue<char[]>> namePasswordsMap =
       new ConcurrentHashMap<>();
 
-  private static ConcurrentHashMap<String, Boolean> nameResultMap =
-      new ConcurrentHashMap<>();
+  private static ConcurrentHashMap<String, Boolean> nameResultMap = new ConcurrentHashMap<>();
 
   public static void registerPasswordConsumer(String name) {
     ParamUtil.requireNonBlank("name", name);
@@ -78,8 +77,7 @@ public class PasswordProducer {
       throws InterruptedException, PasswordResolverException {
     ParamUtil.requireNonBlank("name", name);
     if (!namePasswordsMap.containsKey(name)) {
-      throw new PasswordResolverException("password consumer '" + name
-          + "' is not registered ");
+      throw new PasswordResolverException("password consumer '" + name + "' is not registered ");
     }
     char[] pwd = namePasswordsMap.get(name).take();
     final String str = "took password consumer " + name;
@@ -92,8 +90,7 @@ public class PasswordProducer {
       throws InterruptedException, PasswordResolverException {
     ParamUtil.requireNonBlank("name", name);
     if (!namePasswordsMap.containsKey(name)) {
-      throw new PasswordResolverException("password consumer '" + name
-          + "' is not registered ");
+      throw new PasswordResolverException("password consumer '" + name + "' is not registered ");
     }
 
     nameResultMap.remove(name);

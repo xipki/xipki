@@ -100,7 +100,6 @@ public class Base64 {
   // ****************************************************************************************
 
   /**
-   *
    * The same as encodeToChar(byte[], false)
    *
    * @param sArr The bytes to convert. If <code>null</code> or length 0, an empty array will be

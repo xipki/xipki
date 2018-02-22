@@ -311,8 +311,7 @@ public abstract class CsrGenAction extends SecurityAction {
     wantExtensionTypes.addAll(getAdditionalWantExtensionTypes());
 
     if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
-      ExtensionExistence ee = new ExtensionExistence(
-          textToAsn1ObjectIdentifers(needExtensionTypes),
+      ExtensionExistence ee = new ExtensionExistence(textToAsn1ObjectIdentifers(needExtensionTypes),
           textToAsn1ObjectIdentifers(wantExtensionTypes));
       extensions.add(new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
           ee.toASN1Primitive().getEncoded()));

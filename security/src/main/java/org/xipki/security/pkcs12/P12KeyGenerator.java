@@ -73,7 +73,7 @@ public class P12KeyGenerator {
     private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
     KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
-            throws InvalidKeySpecException {
+        throws InvalidKeySpecException {
       super();
       this.keypair = keypair;
       this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
@@ -127,8 +127,7 @@ public class P12KeyGenerator {
   // CHECKSTYLE:SKIP
   public P12KeyGenerationResult generateRSAKeypair(int keysize, BigInteger publicExponent,
       KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
-    KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent,
-        params.random());
+    KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent, params.random());
     return generateIdentity(kp, params, selfSignedCertSubject);
   }
 
@@ -149,8 +148,7 @@ public class P12KeyGenerator {
   public P12KeyGenerationResult generateSecretKey(String algorithm, int keyBitLen,
       KeystoreGenerationParameters params) throws Exception {
     if (keyBitLen % 8 != 0) {
-      throw new IllegalArgumentException(
-          "keyBitLen (" + keyBitLen + ") must be multiple of 8");
+      throw new IllegalArgumentException("keyBitLen (" + keyBitLen + ") must be multiple of 8");
     }
 
     SecureRandom random = params.random();
@@ -180,12 +178,13 @@ public class P12KeyGenerator {
   }
 
   // CHECKSTYLE:SKIP
-  private KeyPairWithSubjectPublicKeyInfo genECKeypair(String curveNameOrOid,
-      SecureRandom random) throws Exception {
+  private KeyPairWithSubjectPublicKeyInfo genECKeypair(String curveNameOrOid, SecureRandom random)
+      throws Exception {
     ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
     if (curveOid == null) {
       throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
     }
+
     KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
     AlgorithmIdentifier algId = new AlgorithmIdentifier(
         X9ObjectIdentifiers.id_ecPublicKey, curveOid);
@@ -213,8 +212,7 @@ public class P12KeyGenerator {
   private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(int plength, int qlength,
       SecureRandom random) throws Exception {
     KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
-    SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(
-        (DSAPublicKey) kp.getPublic());
+    SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo((DSAPublicKey) kp.getPublic());
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   }
 
@@ -231,7 +229,7 @@ public class P12KeyGenerator {
 
     // Generate keystore
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
-        BigInteger.valueOf(1), notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
+        BigInteger.ONE, notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
 
     KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
         kp.kypair().getPrivate());

@@ -139,8 +139,7 @@ public class EmulatorP11Module extends AbstractP11Module {
       }
 
       if (pwd.size() != 1) {
-        throw new P11TokenException(pwd.size()
-            + " passwords are configured, but 1 is permitted");
+        throw new P11TokenException(pwd.size() + " passwords are configured, but 1 is permitted");
       }
 
       char[] firstPwd = pwd.get(0);
@@ -148,8 +147,8 @@ public class EmulatorP11Module extends AbstractP11Module {
 
       int maxSessions = 20;
       P11Slot slot = new EmulatorP11Slot(moduleConf.name(), slotDir, slotId,
-          moduleConf.isReadOnly(), firstPwd, privateKeyCryptor,
-          moduleConf.p11MechanismFilter(), maxSessions);
+          moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.p11MechanismFilter(),
+          maxSessions);
       slots.add(slot);
     }
 

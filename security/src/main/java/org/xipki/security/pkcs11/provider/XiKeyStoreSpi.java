@@ -166,11 +166,11 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
         keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keyid-"
             + objId.idHex(), keyCertEntry);
         keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keylabel-"
-              + objId.label(), keyCertEntry);
+            + objId.label(), keyCertEntry);
         keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keyid-"
-              + objId.idHex(), keyCertEntry);
+            + objId.idHex(), keyCertEntry);
         keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keylabel-"
-              + objId.label(), keyCertEntry);
+            + objId.label(), keyCertEntry);
       }
     }
   } // method engineLoad
@@ -229,8 +229,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
   }
 
   @Override
-  public void engineSetCertificateEntry(String alias, Certificate cert)
-      throws KeyStoreException {
+  public void engineSetCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
     throw new KeyStoreException("keystore is read only");
   }
 

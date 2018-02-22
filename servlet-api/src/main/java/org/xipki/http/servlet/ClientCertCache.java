@@ -70,8 +70,7 @@ public class ClientCertCache {
         return (X509Certificate) cert;
       }
     } else if (mode != SslReverseProxyMode.APACHE) {
-      throw new RuntimeException(
-          "Should not reach here, unknown SslReverseProxyMode " + mode);
+      throw new RuntimeException("Should not reach here, unknown SslReverseProxyMode " + mode);
     }
 
     // check whether this application is behind a reverse proxy and the TLS client certificate
@@ -101,9 +100,8 @@ public class ClientCertCache {
 
     try {
       String b64 = pemClientCert.replace("-----BEGIN CERTIFICATE-----", "")
-          .replace("-----END CERTIFICATE-----", "");
-      byte[] encoded = Base64.getDecoder().decode(
-                b64.getBytes(CharsetUtil.US_ASCII));
+           .replace("-----END CERTIFICATE-----", "");
+      byte[] encoded = Base64.getDecoder().decode(b64.getBytes(CharsetUtil.US_ASCII));
       clientCert = (X509Certificate)
           cf.generateCertificate(new ByteArrayInputStream(encoded));
     } catch (CertificateException ex) {

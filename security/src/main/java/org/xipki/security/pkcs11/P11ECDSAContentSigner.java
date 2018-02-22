@@ -76,14 +76,10 @@ class P11ECDSAContentSigner implements XiContentSigner {
     sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA256.getId(), HashAlgoType.SHA256);
     sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA384.getId(), HashAlgoType.SHA384);
     sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA512.getId(), HashAlgoType.SHA512);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId(),
-        HashAlgoType.SHA3_224);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(),
-        HashAlgoType.SHA3_256);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(),
-        HashAlgoType.SHA3_384);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(),
-        HashAlgoType.SHA3_512);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId(), HashAlgoType.SHA3_224);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(), HashAlgoType.SHA3_256);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(), HashAlgoType.SHA3_384);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(), HashAlgoType.SHA3_512);
 
     sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA1.getId(), HashAlgoType.SHA1);
     sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA224.getId(), HashAlgoType.SHA224);

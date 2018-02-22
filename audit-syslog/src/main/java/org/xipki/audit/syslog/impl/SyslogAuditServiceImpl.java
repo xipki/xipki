@@ -208,15 +208,14 @@ public class SyslogAuditServiceImpl extends AuditService {
     LOG.info("initializing: {}", SyslogAuditServiceImpl.class);
 
     MessageFormat msgFormat;
-    if ("rfc3164".equalsIgnoreCase(messageFormat)
-        || "rfc_3164".equalsIgnoreCase(messageFormat)) {
+    if ("rfc3164".equalsIgnoreCase(messageFormat) || "rfc_3164".equalsIgnoreCase(messageFormat)) {
       msgFormat = MessageFormat.RFC_3164;
     } else if ("rfc5424".equalsIgnoreCase(messageFormat)
         || "rfc_5424".equalsIgnoreCase(messageFormat)) {
       msgFormat = MessageFormat.RFC_5424;
     } else {
-      LOG.warn("invalid message format '{}', use the default one '{}'",
-          messageFormat, DFLT_MESSAGE_FORMAT);
+      LOG.warn("invalid message format '{}', use the default one '{}'", messageFormat,
+          DFLT_MESSAGE_FORMAT);
       msgFormat = MessageFormat.RFC_5424;
     }
 
@@ -289,8 +288,7 @@ public class SyslogAuditServiceImpl extends AuditService {
   }
 
   public void setMessageFormat(String messageFormat) {
-    this.messageFormat = Objects.requireNonNull(messageFormat,
-        "messageFormat must not be null");
+    this.messageFormat = Objects.requireNonNull(messageFormat, "messageFormat must not be null");
   }
 
   public void setWriteRetries(int writeRetries) {

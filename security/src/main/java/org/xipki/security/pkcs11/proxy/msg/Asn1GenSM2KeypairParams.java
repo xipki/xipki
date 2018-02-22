@@ -52,8 +52,7 @@ public class Asn1GenSM2KeypairParams extends ASN1Object {
 
   private final P11NewKeyControl control;
 
-  public Asn1GenSM2KeypairParams(P11SlotIdentifier slotId, String label,
-      P11NewKeyControl control) {
+  public Asn1GenSM2KeypairParams(P11SlotIdentifier slotId, String label, P11NewKeyControl control) {
     this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     this.label = ParamUtil.requireNonBlank("label", label);
     this.control = ParamUtil.requireNonNull("control", control);
@@ -81,8 +80,7 @@ public class Asn1GenSM2KeypairParams extends ASN1Object {
         throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
       }
     } catch (IOException | IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
     }
   }
 

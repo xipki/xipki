@@ -62,8 +62,7 @@ public class Asn1EntityIdAndCert extends ASN1Object {
     try {
       encoded = certificate.getEncoded();
     } catch (CertificateEncodingException ex) {
-      throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(),
-          ex);
+      throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
     }
     this.certificate = Certificate.getInstance(encoded);
   }

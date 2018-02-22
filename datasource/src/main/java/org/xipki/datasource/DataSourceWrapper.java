@@ -104,8 +104,7 @@ public abstract class DataSourceWrapper {
         if (rs.next()) {
           ret = rs.getLong(1);
         } else {
-          throw new DataAccessException(
-              "could not increment the sequence " + sequenceName);
+          throw new DataAccessException("could not increment the sequence " + sequenceName);
         }
       } catch (SQLException ex) {
         throw translate(sqlUpdate, ex);
@@ -124,8 +123,7 @@ public abstract class DataSourceWrapper {
     @Override
     protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable)
             throws DataAccessException {
-      return StringUtil.concat("ALTER TABLE ", baseTable, " DROP FOREIGN KEY ",
-          constraintName);
+      return StringUtil.concat("ALTER TABLE ", baseTable, " DROP FOREIGN KEY ", constraintName);
     }
 
     @Override
@@ -176,8 +174,7 @@ public abstract class DataSourceWrapper {
 
     @Override
     protected String buildNextSeqValueSql(String sequenceName) {
-      return StringUtil.concat("SELECT NEXT VALUE FOR ", sequenceName,
-          " FROM sysibm.sysdummy1");
+      return StringUtil.concat("SELECT NEXT VALUE FOR ", sequenceName, " FROM sysibm.sysdummy1");
     }
 
   } // class DB2
@@ -247,8 +244,8 @@ public abstract class DataSourceWrapper {
     public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
       if (StringUtil.isBlank(orderBy)) {
         return StringUtil.concat("SELECT ", coreSql,
-          (coreSql.contains(" WHERE") ? " AND" : " WHERE"),
-          " ROWNUM<", Integer.toString(rows + 1));
+            (coreSql.contains(" WHERE") ? " AND" : " WHERE"), " ROWNUM<",
+            Integer.toString(rows + 1));
       } else {
         return StringUtil.concat("SELECT * FROM (SELECT ", coreSql, " ORDER BY ", orderBy,
             " ) WHERE ROWNUM<", Integer.toString(rows + 1));
@@ -292,8 +289,7 @@ public abstract class DataSourceWrapper {
     }
 
     @Override
-    protected String getSqlToAddPrimaryKey(String primaryKeyName, String table,
-        String... columns) {
+    protected String getSqlToAddPrimaryKey(String primaryKeyName, String table, String... columns) {
       StringBuilder sb = new StringBuilder(100);
       sb.append("ALTER TABLE ").append(table);
       sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
@@ -673,8 +669,7 @@ public abstract class DataSourceWrapper {
       stmt.execute(sql);
     } catch (Throwable th) {
       if (LOG.isWarnEnabled()) {
-        LOG.warn("datasource {} could not deletefrom table {}: {}", name, table,
-            th.getMessage());
+        LOG.warn("datasource {} could not deletefrom table {}: {}", name, table, th.getMessage());
       }
       return false;
     } finally {
@@ -700,8 +695,7 @@ public abstract class DataSourceWrapper {
     PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = (conn != null) ? conn.prepareStatement(sql)
-          : getConnection().prepareStatement(sql);
+      stmt = (conn != null) ? conn.prepareStatement(sql) : getConnection().prepareStatement(sql);
       if (value instanceof Integer) {
         stmt.setInt(1, (Integer) value);
       } else if (value instanceof Long) {
@@ -870,8 +864,7 @@ public abstract class DataSourceWrapper {
               }
             }
           } else {
-            throw new DataAccessException(
-                "could not increment the sequence " + sequenceName);
+            throw new DataAccessException("could not increment the sequence " + sequenceName);
           }
         } finally {
           releaseStatementAndResultSet(null, rs);
@@ -922,27 +915,27 @@ public abstract class DataSourceWrapper {
     return sb.toString();
   }
 
-  public void addPrimaryKey(Connection conn, String primaryKeyName,
-      String table, String... columns) throws DataAccessException {
+  public void addPrimaryKey(Connection conn, String primaryKeyName, String table, String... columns)
+      throws DataAccessException {
     executeUpdate(conn, getSqlToAddPrimaryKey(primaryKeyName, table, columns));
   }
 
-  protected String getSqlToDropForeignKeyConstraint(String constraintName,
-      String baseTable) throws DataAccessException {
+  protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable)
+      throws DataAccessException {
     ParamUtil.requireNonBlank("constraintName", constraintName);
     ParamUtil.requireNonBlank("baseTable", baseTable);
 
     return StringUtil.concat("ALTER TABLE ", baseTable, " DROP CONSTRAINT ", constraintName);
   }
 
-  public void dropForeignKeyConstraint(Connection conn, String constraintName,
-      String baseTable) throws DataAccessException {
+  public void dropForeignKeyConstraint(Connection conn, String constraintName, String baseTable)
+      throws DataAccessException {
     executeUpdate(conn, getSqlToDropForeignKeyConstraint(constraintName, baseTable));
   }
 
-  protected String getSqlToAddForeignKeyConstraint(String constraintName,
-      String baseTable, String baseColumn, String referencedTable,
-      String referencedColumn, String onDeleteAction, String onUpdateAction) {
+  protected String getSqlToAddForeignKeyConstraint(String constraintName, String baseTable,
+      String baseColumn, String referencedTable, String referencedColumn, String onDeleteAction,
+      String onUpdateAction) {
     ParamUtil.requireNonBlank("constraintName", constraintName);
     ParamUtil.requireNonBlank("baseTable", baseTable);
     ParamUtil.requireNonBlank("baseColumn", baseColumn);
@@ -953,14 +946,12 @@ public abstract class DataSourceWrapper {
 
     return StringUtil.concat("ALTER TABLE ", baseTable, " ADD CONSTRAINT ", constraintName,
       " FOREIGN KEY (", baseColumn, ")", " REFERENCES ", referencedTable,
-      " (", referencedColumn, ")", " ON DELETE ", onDeleteAction,
-      " ON UPDATE ", onUpdateAction);
+      " (", referencedColumn, ")", " ON DELETE ", onDeleteAction, " ON UPDATE ", onUpdateAction);
   }
 
-  public void addForeignKeyConstraint(Connection conn, String constraintName,
-      String baseTable, String baseColumn, String referencedTable,
-      String referencedColumn, String onDeleteAction, String onUpdateAction)
-      throws DataAccessException {
+  public void addForeignKeyConstraint(Connection conn, String constraintName, String baseTable,
+      String baseColumn, String referencedTable, String referencedColumn, String onDeleteAction,
+      String onUpdateAction) throws DataAccessException {
     final String sql = getSqlToAddForeignKeyConstraint(constraintName, baseTable, baseColumn,
         referencedTable, referencedColumn, onDeleteAction, onUpdateAction);
     executeUpdate(conn, sql);
@@ -995,8 +986,8 @@ public abstract class DataSourceWrapper {
     return sb.toString();
   }
 
-  public void createIndex(Connection conn, String indexName, String table,
-      String... columns) throws DataAccessException {
+  public void createIndex(Connection conn, String indexName, String table, String... columns)
+      throws DataAccessException {
     executeUpdate(conn, getSqlToCreateIndex(indexName, table, columns));
   }
 
@@ -1018,9 +1009,8 @@ public abstract class DataSourceWrapper {
     ParamUtil.requireNonBlank("table", table);
 
     final StringBuilder sb = new StringBuilder(100);
-    sb.append("ALTER TABLE ").append(table)
-      .append(" ADD CONSTRAINT ").append(constraintName)
-      .append(" UNIQUE (");
+    sb.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT ")
+      .append(constraintName).append(" UNIQUE (");
     final int n = columns.length;
     for (int i = 0; i < n; i++) {
       if (i != 0) {
@@ -1074,16 +1064,14 @@ public abstract class DataSourceWrapper {
       // look for grouped error codes.
       if (sqlErrorCodes.badSqlGrammarCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.BadSqlGrammar,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.BadSqlGrammar, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.invalidResultSetAccessCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
         return new DataAccessException(Reason.InvalidResultSetAccess,
             buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.duplicateKeyCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.DuplicateKey,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.DuplicateKey, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.dataIntegrityViolationCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
         return new DataAccessException(Reason.DataIntegrityViolation,
@@ -1102,8 +1090,7 @@ public abstract class DataSourceWrapper {
             buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.cannotAcquireLockCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.CannotAcquireLock,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.CannotAcquireLock, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.deadlockLoserCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
         return new DataAccessException(Reason.DeadlockLoserDataAccess,
@@ -1119,20 +1106,16 @@ public abstract class DataSourceWrapper {
     if (sqlState != null && sqlState.length() >= 2) {
       String classCode = sqlState.substring(0, 2);
       if (sqlStateCodes.badSqlGrammarCodes.contains(classCode)) {
-        return new DataAccessException(Reason.BadSqlGrammar,
-            buildMessage(sql, sqlEx), ex);
+        return new DataAccessException(Reason.BadSqlGrammar, buildMessage(sql, sqlEx), ex);
       } else if (sqlStateCodes.dataIntegrityViolationCodes.contains(classCode)) {
-        return new DataAccessException(Reason.DataIntegrityViolation,
-            buildMessage(sql, ex), ex);
+        return new DataAccessException(Reason.DataIntegrityViolation, buildMessage(sql, ex), ex);
       } else if (sqlStateCodes.dataAccessResourceFailureCodes.contains(classCode)) {
-        return new DataAccessException(Reason.DataAccessResourceFailure,
-            buildMessage(sql, ex), ex);
+        return new DataAccessException(Reason.DataAccessResourceFailure, buildMessage(sql, ex), ex);
       } else if (sqlStateCodes.transientDataAccessResourceCodes.contains(classCode)) {
         return new DataAccessException(Reason.TransientDataAccessResource,
             buildMessage(sql, ex), ex);
       } else if (sqlStateCodes.concurrencyFailureCodes.contains(classCode)) {
-        return new DataAccessException(Reason.ConcurrencyFailure,
-            buildMessage(sql, ex), ex);
+        return new DataAccessException(Reason.ConcurrencyFailure, buildMessage(sql, ex), ex);
       }
     }
 
@@ -1149,8 +1132,7 @@ public abstract class DataSourceWrapper {
         codes = StringUtil.concatObjectsCap(60, "SQL state '", sqlEx.getSQLState(),
             "', error code '", sqlEx.getErrorCode());
       } else {
-        codes = StringUtil.concat("Error code '",
-            Integer.toString(sqlEx.getErrorCode()), "'");
+        codes = StringUtil.concat("Error code '", Integer.toString(sqlEx.getErrorCode()), "'");
       }
       LOG.debug("Unable to translate SQLException with " + codes);
     }

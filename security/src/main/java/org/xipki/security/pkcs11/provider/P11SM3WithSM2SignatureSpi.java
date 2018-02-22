@@ -99,11 +99,9 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
       outputStream = new DigestOutputStream(HashAlgoType.SM3.createDigest());
       p11Params = null;
 
-      // CHECKSTYLE:SKIP
       ECPoint w = pubKey.getW();
 
-      sm2Z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
-          w.getAffineX(), w.getAffineY());
+      sm2Z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1, w.getAffineX(), w.getAffineY());
       try {
         outputStream.write(sm2Z, 0, sm2Z.length);
       } catch (IOException ex) {

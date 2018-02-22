@@ -38,8 +38,7 @@ public class P11HMACSignLoadTest extends P11SignLoadTest {
   public P11HMACSignLoadTest(SecurityFactory securityFactory, P11Slot slot,
       String signatureAlgorithm) throws Exception {
     super(securityFactory, slot, signatureAlgorithm,
-        generateKey(slot, signatureAlgorithm),
-        "PKCS#11 HMAC signature creation");
+        generateKey(slot, signatureAlgorithm), "PKCS#11 HMAC signature creation");
   }
 
   private static P11ObjectIdentifier generateKey(P11Slot slot, String signatureAlgorithm)
@@ -49,8 +48,7 @@ public class P11HMACSignLoadTest extends P11SignLoadTest {
     byte[] keyBytes = new byte[keysize / 8];
     new SecureRandom().nextBytes(keyBytes);
     return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
-        "loadtest-" + System.currentTimeMillis(),
-        getNewKeyControl());
+        "loadtest-" + System.currentTimeMillis(), getNewKeyControl());
   }
 
 }

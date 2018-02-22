@@ -114,39 +114,31 @@ public class XiProvider extends Provider {
       provider.put("Signature.NONEwithRSA", P11RSADigestSignatureSpi.NoneRSA.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithNONE", "NONEwithRSA");
 
-      provider.put("Signature.SHA1withRSA",  P11RSADigestSignatureSpi.SHA1.class.getName());
+      provider.put("Signature.SHA1withRSA", P11RSADigestSignatureSpi.SHA1.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA1", "SHA1withRSA");
 
-      provider.put("Signature.SHA224withRSA",
-          P11RSADigestSignatureSpi.SHA224.class.getName());
+      provider.put("Signature.SHA224withRSA", P11RSADigestSignatureSpi.SHA224.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA224", "SHA224withRSA");
 
-      provider.put("Signature.SHA256withRSA",
-          P11RSADigestSignatureSpi.SHA256.class.getName());
+      provider.put("Signature.SHA256withRSA", P11RSADigestSignatureSpi.SHA256.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA256", "SHA256withRSA");
 
-      provider.put("Signature.SHA384withRSA",
-          P11RSADigestSignatureSpi.SHA384.class.getName());
+      provider.put("Signature.SHA384withRSA", P11RSADigestSignatureSpi.SHA384.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA384", "SHA384withRSA");
 
-      provider.put("Signature.SHA512withRSA",
-          P11RSADigestSignatureSpi.SHA512.class.getName());
+      provider.put("Signature.SHA512withRSA", P11RSADigestSignatureSpi.SHA512.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA512", "SHA512withRSA");
 
-      provider.put("Signature.SHA3-224withRSA",
-          P11RSADigestSignatureSpi.SHA3_224.class.getName());
+      provider.put("Signature.SHA3-224withRSA", P11RSADigestSignatureSpi.SHA3_224.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA3-224", "SHA3-224withRSA");
 
-      provider.put("Signature.SHA3-256withRSA",
-          P11RSADigestSignatureSpi.SHA3_256.class.getName());
+      provider.put("Signature.SHA3-256withRSA", P11RSADigestSignatureSpi.SHA3_256.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA3-256", "SHA3-256withRSA");
 
-      provider.put("Signature.SHA3-384withRSA",
-          P11RSADigestSignatureSpi.SHA3_384.class.getName());
+      provider.put("Signature.SHA3-384withRSA", P11RSADigestSignatureSpi.SHA3_384.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA3-384", "SHA3-384withRSA");
 
-      provider.put("Signature.SHA3-512withRSA",
-          P11RSADigestSignatureSpi.SHA3_512.class.getName());
+      provider.put("Signature.SHA3-512withRSA", P11RSADigestSignatureSpi.SHA3_512.class.getName());
       provider.put("Alg.Alias.Signature.RSAwithSHA3-512", "SHA3-512withRSA");
 
       provider.put("Signature.NONEwithDSA", P11DSASignatureSpi.NONE.class.getName());
@@ -197,30 +189,24 @@ public class XiProvider extends Provider {
       provider.put("Signature.SHA512withECDSA", P11ECDSASignatureSpi.SHA512.class.getName());
       provider.put("Alg.Alias.Signature.ECDSAwithSHA512", "SHA512withECDSA");
 
-      provider.put("Signature.SHA3-224withECDSA",
-          P11ECDSASignatureSpi.SHA3_224.class.getName());
+      provider.put("Signature.SHA3-224withECDSA", P11ECDSASignatureSpi.SHA3_224.class.getName());
       provider.put("Alg.Alias.Signature.ECDSAwithSHA3-224", "SHA3-224withECDSA");
 
-      provider.put("Signature.SHA3-256withECDSA",
-          P11ECDSASignatureSpi.SHA3_256.class.getName());
+      provider.put("Signature.SHA3-256withECDSA", P11ECDSASignatureSpi.SHA3_256.class.getName());
       provider.put("Alg.Alias.Signature.ECDSAwithSHA3-256", "SHA3-256withECDSA");
 
-      provider.put("Signature.SHA3-384withECDSA",
-          P11ECDSASignatureSpi.SHA3_384.class.getName());
+      provider.put("Signature.SHA3-384withECDSA", P11ECDSASignatureSpi.SHA3_384.class.getName());
       provider.put("Alg.Alias.Signature.ECDSAwithSHA3-384", "SHA3-384withECDSA");
 
-      provider.put("Signature.SHA3-512withECDSA",
-          P11ECDSASignatureSpi.SHA3_512.class.getName());
+      provider.put("Signature.SHA3-512withECDSA", P11ECDSASignatureSpi.SHA3_512.class.getName());
       provider.put("Alg.Alias.Signature.ECDSAwithSHA3-512", "SHA3-512withECDSA");
 
-      provider.put("Signature.NONEwithPlain-ECDSA",
-          P11PlainECDSASignatureSpi.NONE.class.getName());
+      provider.put("Signature.NONEwithPlain-ECDSA", P11PlainECDSASignatureSpi.NONE.class.getName());
       provider.put("Alg.Alias.Signature.Plain-ECDSAwithNONE", "NONEwithPlain-ECDSA");
       provider.put("Alg.Alias.Signature.NONEwithPlainECDSA", "NONEwithPlain-ECDSA");
       provider.put("Alg.Alias.Signature.PlainECDSAwithNONE", "NONEwithPlain-ECDSA");
 
-      provider.put("Signature.SHA1withPlain-ECDSA",
-          P11PlainECDSASignatureSpi.SHA1.class.getName());
+      provider.put("Signature.SHA1withPlain-ECDSA", P11PlainECDSASignatureSpi.SHA1.class.getName());
       provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA1", "SHA1withPlain-ECDSA");
       provider.put("Alg.Alias.Signature.SHAwithPlainECDSA1", "SHA1withPlain-ECDSA");
       provider.put("Alg.Alias.Signature.PlainECDSAwithSHA1", "SHA1withPlain-ECDSA");
@@ -249,8 +235,7 @@ public class XiProvider extends Provider {
       provider.put("Alg.Alias.Signature.SHA512withPlainECDSA", "SHA512withPlain-ECDSA");
       provider.put("Alg.Alias.Signature.PlainECDSAwithSHA512", "SHA512withPlain-ECDSA");
 
-      provider.put("Signature.SM3withSM2",
-          P11SM3WithSM2SignatureSpi.class.getName());
+      provider.put("Signature.SM3withSM2", P11SM3WithSM2SignatureSpi.class.getName());
       provider.put("Alg.Alias.Signature.SM2withSM3", "SM3withSM2");
 
       provider.put("Signature.SHA1withRSAandMGF1",

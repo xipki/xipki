@@ -54,14 +54,13 @@ public class P11MacContentSignerBuilder {
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);
   } // constructor
 
-  public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
-      int parallelism) throws XiSecurityException, P11TokenException {
+  public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism)
+      throws XiSecurityException, P11TokenException {
     ParamUtil.requireMin("parallelism", parallelism, 1);
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer = new P11MacContentSigner(
-          cryptService, identityId, signatureAlgId);
+      XiContentSigner signer = new P11MacContentSigner(cryptService, identityId, signatureAlgId);
       signers.add(signer);
     } // end for
 

@@ -52,8 +52,7 @@ public class CmpUtil {
   }
 
   public static PKIMessage addProtection(PKIMessage pkiMessage, ConcurrentContentSigner signer,
-      GeneralName signerName, boolean addSignerCert)
-      throws CMPException, NoIdleSignerException {
+      GeneralName signerName, boolean addSignerCert) throws CMPException, NoIdleSignerException {
     ParamUtil.requireNonNull("pkiMessage", pkiMessage);
     ParamUtil.requireNonNull("signer", signer);
 

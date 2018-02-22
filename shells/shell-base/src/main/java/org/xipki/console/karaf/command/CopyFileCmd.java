@@ -72,8 +72,7 @@ public class CopyFileCmd extends XiAction {
         System.err.println("cannot override an existing directory by a file");
         return null;
       } else {
-        if (!force.booleanValue()
-            && !confirm("Do you want to override the file " + dest, 3)) {
+        if (!force.booleanValue() && !confirm("Do you want to override the file " + dest, 3)) {
           return null;
         }
       }
