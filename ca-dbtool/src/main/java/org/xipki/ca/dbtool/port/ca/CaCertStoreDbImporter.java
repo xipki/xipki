@@ -491,8 +491,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             throw new CertificateException(ex.getMessage(), ex);
           }
 
-          byte[] encodedKey = tbsCert.getSubjectPublicKeyInfo().getPublicKeyData()
-              .getBytes();
+          byte[] encodedKey = tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
           String b64Sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
 

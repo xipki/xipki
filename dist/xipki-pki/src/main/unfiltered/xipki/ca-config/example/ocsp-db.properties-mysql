@@ -17,6 +17,7 @@
 #dataSource.databaseName = ocsp
 
 jdbcUrl = jdbc:mysql://127.0.0.1:3306/ocsp;useSSL=false
+driverClassName = com.mysql.jdbc.Driver
 
 dataSource.user = root
 # encrypted password 123456
