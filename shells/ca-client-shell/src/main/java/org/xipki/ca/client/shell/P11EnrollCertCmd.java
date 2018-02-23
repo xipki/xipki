@@ -18,6 +18,7 @@
 package org.xipki.ca.client.shell;
 
 import java.security.cert.X509Certificate;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;

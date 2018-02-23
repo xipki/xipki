@@ -26,6 +26,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -48,6 +49,7 @@ import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
