@@ -58,7 +58,7 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -122,7 +122,7 @@ public class DbCertStatusStore extends OcspStore {
 
   private IssuerStore issuerStore;
 
-  private HashAlgoType certHashAlgo;
+  private HashAlgo certHashAlgo;
 
   private boolean initialized;
 
@@ -213,8 +213,8 @@ public class DbCertStatusStore extends OcspStore {
             CrlInfo crlInfo = new CrlInfo(crlInfoStr);
             caInfoEntry.setCrlInfo(crlInfo);
           }
-          RequestIssuer reqIssuer = new RequestIssuer(HashAlgoType.SHA1,
-              caInfoEntry.getEncodedHash(HashAlgoType.SHA1));
+          RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
+              caInfoEntry.getEncodedHash(HashAlgo.SHA1));
           for (IssuerEntry existingIssuer : caInfos) {
             if (existingIssuer.matchHash(reqIssuer)) {
               throw new Exception(
@@ -582,8 +582,7 @@ public class DbCertStatusStore extends OcspStore {
     return certs;
   }
 
-  public static HashAlgoType getCertHashAlgo(DataSourceWrapper datasource)
-      throws DataAccessException {
+  public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource) throws DataAccessException {
     // analyze the database
     String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
         "NAME='CERTHASH_ALGO'", String.class);
@@ -593,7 +592,7 @@ public class DbCertStatusStore extends OcspStore {
           "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
     }
 
-    return HashAlgoType.getNonNullHashAlgoType(certHashAlgoStr);
+    return HashAlgo.getNonNullInstance(certHashAlgoStr);
   }
 
 }

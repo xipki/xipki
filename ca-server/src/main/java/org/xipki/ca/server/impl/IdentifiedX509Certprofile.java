@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -76,7 +75,7 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ExtensionExistence;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -296,7 +295,7 @@ class IdentifiedX509Certprofile {
     ExtensionControl extControl = controls.remove(extType);
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
       byte[] encodedSpki = publicKeyInfo.getPublicKeyData().getBytes();
-      byte[] skiValue = HashAlgoType.SHA1.hash(encodedSpki);
+      byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
       SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }

@@ -30,7 +30,7 @@ import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ public class IssuerEntry {
 
   private final int id;
 
-  private final Map<HashAlgoType, byte[]> issuerHashMap;
+  private final Map<HashAlgo, byte[]> issuerHashMap;
 
   private final Date notBefore;
 
@@ -59,7 +59,7 @@ public class IssuerEntry {
     this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
   }
 
-  private static Map<HashAlgoType, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
+  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
       throws CertificateEncodingException {
     byte[] encodedName;
     byte[] encodedKey;
@@ -71,8 +71,8 @@ public class IssuerEntry {
       throw new CertificateEncodingException(ex.getMessage(), ex);
     }
 
-    Map<HashAlgoType, byte[]> hashes = new HashMap<>();
-    for (HashAlgoType ha : HashAlgoType.values()) {
+    Map<HashAlgo, byte[]> hashes = new HashMap<>();
+    for (HashAlgo ha : HashAlgo.values()) {
       int hlen = ha.length();
       byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
       int offset = 0;
@@ -95,7 +95,7 @@ public class IssuerEntry {
     return id;
   }
 
-  public byte[] getEncodedHash(HashAlgoType hashAlgo) {
+  public byte[] getEncodedHash(HashAlgo hashAlgo) {
     byte[] data = issuerHashMap.get(hashAlgo);
     return Arrays.copyOf(data, data.length);
   }

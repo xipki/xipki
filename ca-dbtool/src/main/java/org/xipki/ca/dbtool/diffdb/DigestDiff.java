@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.StopMe;
@@ -41,7 +40,7 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -64,7 +63,7 @@ class DigestDiff {
 
   private final DbControl targetDbControl;
 
-  private final HashAlgoType certhashAlgo;
+  private final HashAlgo certhashAlgo;
 
   private Set<byte[]> includeCaCerts;
 
@@ -95,8 +94,8 @@ class DigestDiff {
             "Could not compare refDataSource (CA) and targetDataSource (OCSP)");
       }
 
-      HashAlgoType refAlgo = detectOcspDbCerthashAlgo(refDatasource);
-      HashAlgoType targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
+      HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
+      HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
         throw new IllegalArgumentException("Could not compare OCSP datasources with"
             + " different CERTHASH_ALGO: refDataSource (" + refAlgo
@@ -107,7 +106,7 @@ class DigestDiff {
       if (targetDbControl == DbControl.XIPKI_OCSP_v3) {
         this.certhashAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       } else {
-        this.certhashAlgo = HashAlgoType.SHA1;
+        this.certhashAlgo = HashAlgo.SHA1;
       }
     } else {
       throw new RuntimeException("should not reach here, unknown dbContro " + refDbControl);
@@ -288,11 +287,11 @@ class DigestDiff {
     }
   }
 
-  public static HashAlgoType detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
+  public static HashAlgo detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
     String str = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'",
         String.class);
-    return HashAlgoType.getNonNullHashAlgoType(str);
+    return HashAlgo.getNonNullInstance(str);
   }
 
 }

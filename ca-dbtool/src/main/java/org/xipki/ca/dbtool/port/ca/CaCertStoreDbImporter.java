@@ -76,7 +76,7 @@ import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.FpIdCalculator;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -493,7 +493,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           byte[] encodedKey = tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-          String b64Sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
+          String b64Sha1FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
 
           // cert
           String subjectText = X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen);

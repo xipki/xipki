@@ -72,7 +72,7 @@ import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.dbtool.InvalidInputException;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -332,7 +332,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             String b64Cert = rs.getString("CERT");
             byte[] certBytes = Base64.decodeFast(b64Cert);
 
-            String sha1 = HashAlgoType.SHA1.hexHash(certBytes);
+            String sha1 = HashAlgo.SHA1.hexHash(certBytes);
             String certFileName = sha1 + ".der";
             if (!evaulateOnly) {
               ZipEntry certZipEntry = new ZipEntry(certFileName);
@@ -425,7 +425,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
               LOG.warn("CRL without CRL number, ignore it");
               continue;
             }
-            String sha1 = HashAlgoType.SHA1.hexHash(crlBytes);
+            String sha1 = HashAlgo.SHA1.hexHash(crlBytes);
 
             final String crlFilename = sha1 + ".crl";
             if (!evaulateOnly) {
@@ -484,7 +484,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             long update = rs.getLong("LUPDATE");
             String b64Data = rs.getString("DATA");
             byte[] dataBytes = Base64.decodeFast(b64Data);
-            String sha1 = HashAlgoType.SHA1.hexHash(dataBytes);
+            String sha1 = HashAlgo.SHA1.hexHash(dataBytes);
             final String dataFilename = sha1 + ".req";
             if (!evaulateOnly) {
               ZipEntry certZipEntry = new ZipEntry(dataFilename);

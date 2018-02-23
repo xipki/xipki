@@ -51,7 +51,7 @@ import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.security.AlgorithmCode;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -149,7 +149,7 @@ class ResponseCacher {
 
     this.idDigesters = new ConcurrentBag<>();
     for (int i = 0; i < 20; i++) {
-      Digest md = HashAlgoType.SHA1.createDigest();
+      Digest md = HashAlgo.SHA1.createDigest();
       idDigesters.add(new ConcurrentBagEntry<Digest>(md));
     }
   }
@@ -220,7 +220,7 @@ class ResponseCacher {
     }
 
     byte[] encodedCert = issuerCert.getEncoded();
-    String sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
+    String sha1FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
 
     int maxId = (int) datasource.getMax(null, "ISSUER", "ID");
     int id = maxId + 1;
@@ -504,8 +504,8 @@ class ResponseCacher {
         String b64Cert = rs.getString("CERT");
         X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
         IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
-        RequestIssuer reqIssuer = new RequestIssuer(HashAlgoType.SHA1,
-            caInfoEntry.getEncodedHash(HashAlgoType.SHA1));
+        RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
+            caInfoEntry.getEncodedHash(HashAlgo.SHA1));
 
         boolean duplicated = false;
         for (IssuerEntry existingIssuer : caInfos) {
@@ -570,7 +570,7 @@ class ResponseCacher {
 
     boolean newDigest = (digest0 == null);
     if (newDigest) {
-      digest0 = new ConcurrentBagEntry<Digest>(HashAlgoType.SHA1.createDigest());
+      digest0 = new ConcurrentBagEntry<Digest>(HashAlgo.SHA1.createDigest());
     }
 
     byte[] hash = new byte[20];

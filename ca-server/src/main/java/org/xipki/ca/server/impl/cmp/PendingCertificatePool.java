@@ -23,12 +23,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -52,7 +51,7 @@ class PendingCertificatePool {
       this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
       this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
       this.waitForConfirmTill = waitForConfirmTill;
-      this.certHash = HashAlgoType.SHA1.hash(certInfo.cert().encodedCert());
+      this.certHash = HashAlgo.SHA1.hash(certInfo.cert().encodedCert());
     }
 
     @Override

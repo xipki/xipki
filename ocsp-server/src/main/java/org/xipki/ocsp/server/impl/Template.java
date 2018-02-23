@@ -33,7 +33,7 @@ import org.xipki.ocsp.server.impl.type.Extension;
 import org.xipki.ocsp.server.impl.type.OID;
 import org.xipki.ocsp.server.impl.type.WritableOnlyExtension;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -43,7 +43,7 @@ import org.xipki.security.HashAlgoType;
 
 class Template {
 
-  private static final Map<HashAlgoType, byte[]> extnCerthashPrefixMap = new HashMap<>();
+  private static final Map<HashAlgo, byte[]> extnCerthashPrefixMap = new HashMap<>();
 
   private static final byte[] extnInvalidityDate;
 
@@ -57,7 +57,7 @@ class Template {
 
   static {
     // CertHash
-    for (HashAlgoType h : HashAlgoType.values()) {
+    for (HashAlgo h : HashAlgo.values()) {
       int hlen = h.length();
 
       AlgorithmIdentifier algId = new AlgorithmIdentifier(h.oid(), DERNull.INSTANCE);
@@ -83,8 +83,7 @@ class Template {
     extension.write(extnArchiveCutof, 0);
   }
 
-  public static WritableOnlyExtension getCertHashExtension(HashAlgoType hashAlgo,
-      byte[] certHash) {
+  public static WritableOnlyExtension getCertHashExtension(HashAlgo hashAlgo, byte[] certHash) {
     if (hashAlgo.length() != certHash.length) {
       throw new IllegalArgumentException("hashAlgo and certHash do not match");
     }

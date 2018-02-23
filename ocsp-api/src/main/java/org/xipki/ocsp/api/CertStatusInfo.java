@@ -22,7 +22,7 @@ import java.util.Date;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ public class CertStatusInfo {
 
   private CertRevocationInfo revocationInfo;
 
-  private HashAlgoType certHashAlgo;
+  private HashAlgo certHashAlgo;
 
   private byte[] certHash;
 
@@ -74,7 +74,7 @@ public class CertStatusInfo {
     return revocationInfo;
   }
 
-  public HashAlgoType certHashAlgo() {
+  public HashAlgo certHashAlgo() {
     return certHashAlgo;
   }
 
@@ -114,7 +114,7 @@ public class CertStatusInfo {
     return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
   }
 
-  public static CertStatusInfo getGoodCertStatusInfo(HashAlgoType certHashAlgo, byte[] certHash,
+  public static CertStatusInfo getGoodCertStatusInfo(HashAlgo certHashAlgo, byte[] certHash,
       Date thisUpdate, Date nextUpdate, String certprofile) {
     CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
     ret.certHashAlgo = certHashAlgo;
@@ -127,7 +127,7 @@ public class CertStatusInfo {
   }
 
   public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
-      HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
+      HashAlgo certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
       String certprofile) {
     if (revocationInfo == null) {
       throw new IllegalArgumentException("revocationInfo must not be null");

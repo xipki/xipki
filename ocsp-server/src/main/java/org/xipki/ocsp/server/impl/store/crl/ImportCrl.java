@@ -77,7 +77,7 @@ import org.xipki.ocsp.api.CrlInfo;
 import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
@@ -135,7 +135,7 @@ public class ImportCrl {
 
   private final CertRevocationInfo caRevInfo;
 
-  private final HashAlgoType certhashAlgo;
+  private final HashAlgo certhashAlgo;
 
   private PreparedStatement psDeleteCert;
   private PreparedStatement psInsertCert;
@@ -263,7 +263,7 @@ public class ImportCrl {
     } catch (CertificateEncodingException ex) {
       throw new ImportCrlException("could not encode CA certificate");
     }
-    String fpCaCert = HashAlgoType.SHA1.base64Hash(encodedCaCert);
+    String fpCaCert = HashAlgo.SHA1.base64Hash(encodedCaCert);
 
     Integer issuerId = null;
     CrlInfo crlInfo = null;

@@ -41,7 +41,7 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -146,7 +146,7 @@ class TargetDigestRetriever {
 
   private final DbControl dbControl;
 
-  private final HashAlgoType certhashAlgo;
+  private final HashAlgo certhashAlgo;
 
   private final DataSourceWrapper datasource;
 
@@ -172,7 +172,7 @@ class TargetDigestRetriever {
 
   public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
       DigestDiffReporter reporter, DataSourceWrapper datasource, DbControl dbControl,
-      HashAlgoType certHashAlgo, int caId, int numPerSelect, int numThreads, StopMe stopMe)
+      HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, StopMe stopMe)
       throws DataAccessException {
     this.processLog = ParamUtil.requireNonNull("processLog", processLog);
     this.numPerSelect = numPerSelect;
@@ -186,7 +186,7 @@ class TargetDigestRetriever {
     if (dbControl == DbControl.XIPKI_OCSP_v3) {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
-      if (certHashAlgo != HashAlgoType.getHashAlgoType(certHashAlgoInDb)) {
+      if (certHashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
         throw new IllegalArgumentException("certHashAlgo in parameter (" + certHashAlgo
             + ") != in DB (" + certHashAlgoInDb + ")");
       }
@@ -207,7 +207,7 @@ class TargetDigestRetriever {
       arrayBuffer.append(")");
     } else if (dbControl == DbControl.XIPKI_CA_v3) {
       String hashOrCertColumn;
-      if (certHashAlgo == HashAlgoType.SHA1) {
+      if (certHashAlgo == HashAlgo.SHA1) {
         hashOrCertColumn = "SHA1";
       } else {
         hashOrCertColumn = "CERT";
@@ -382,7 +382,7 @@ class TargetDigestRetriever {
     if (dbControl == DbControl.XIPKI_OCSP_v3) {
       return rs.getString("HASH");
     } else { // if (dbControl == DbControl.XIPKI_CA_v3) {
-      if (certhashAlgo == HashAlgoType.SHA1) {
+      if (certhashAlgo == HashAlgo.SHA1) {
         return rs.getString("SHA1");
       } else {
         String b64Cert = rs.getString("CERT");

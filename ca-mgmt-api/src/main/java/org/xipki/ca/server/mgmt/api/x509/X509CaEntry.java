@@ -31,7 +31,7 @@ import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.util.X509Util;
 
@@ -103,7 +103,7 @@ public class X509CaEntry extends CaEntry {
       } catch (CertificateEncodingException ex) {
         throw new CaMgmtException("could not encoded certificate", ex);
       }
-      this.hexSha1OfCert = HashAlgoType.SHA1.hexHash(encodedCert);
+      this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
     }
   }
 

@@ -19,12 +19,10 @@ package org.xipki.ocsp.server.servlet;
 
 import java.io.EOFException;
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.Base64;
@@ -36,7 +34,7 @@ import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -187,7 +185,7 @@ public class HttpOcspServlet extends HttpServlet {
         // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
         // HEX representation of the SHA1 hash of the OCSPResponse structure.
         resp.addHeader("ETag",
-            StringUtil.concat("\\", HashAlgoType.SHA1.hexHash(encodedOcspResp), "\\"));
+            StringUtil.concat("\\", HashAlgo.SHA1.hexHash(encodedOcspResp), "\\"));
 
         // Max age must be in seconds in the cache-control header
         long maxAge;

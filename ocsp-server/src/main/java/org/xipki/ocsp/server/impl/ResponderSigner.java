@@ -34,7 +34,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.server.impl.type.ResponderID;
 import org.xipki.ocsp.server.impl.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -105,7 +105,7 @@ class ResponderSigner {
 
       Certificate bcCertificate = Certificate.getInstance(encodedCertificate);
       this.responderIdByName = new ResponderID(bcCertificate.getSubject());
-      byte[] keySha1 = HashAlgoType.SHA1.hash(
+      byte[] keySha1 = HashAlgo.SHA1.hash(
           bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
       this.responderIdByKey = new ResponderID(keySha1);
     }

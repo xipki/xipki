@@ -21,9 +21,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -44,7 +43,7 @@ public class IssuerFilter {
     } else {
       includeSha1Fps = new HashSet<>(includes.size());
       for (X509Certificate include : includes) {
-        String sha1Fp = HashAlgoType.SHA1.base64Hash(include.getEncoded());
+        String sha1Fp = HashAlgo.SHA1.base64Hash(include.getEncoded());
         includeSha1Fps.add(sha1Fp);
       }
     }
@@ -54,7 +53,7 @@ public class IssuerFilter {
     } else {
       excludeSha1Fps = new HashSet<>(excludes.size());
       for (X509Certificate exclude : excludes) {
-        String sha1Fp = HashAlgoType.SHA1.base64Hash(exclude.getEncoded());
+        String sha1Fp = HashAlgo.SHA1.base64Hash(exclude.getEncoded());
         excludeSha1Fps.add(sha1Fp);
       }
     }

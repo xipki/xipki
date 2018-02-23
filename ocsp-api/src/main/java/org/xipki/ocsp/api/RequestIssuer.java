@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.ASN1Type;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.Hex;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ import org.xipki.security.HashAlgoType;
 
 public class RequestIssuer {
 
-  private final HashAlgoType hashAlgo;
+  private final HashAlgo hashAlgo;
 
   private final byte[] data;
 
@@ -43,7 +43,7 @@ public class RequestIssuer {
 
   private final int len;
 
-  public RequestIssuer(HashAlgoType hashAlgo, byte[] hashData) {
+  public RequestIssuer(HashAlgo hashAlgo, byte[] hashData) {
     int algIdLen = 2 + hashAlgo.encodedLength() + 2;
     data = new byte[algIdLen + hashData.length];
     int offset = 0;
@@ -68,13 +68,13 @@ public class RequestIssuer {
     this.data = data;
     this.from = from;
     this.len = len;
-    this.hashAlgo = HashAlgoType.getInstanceForEncoded(data, from + 2, 2 + data[from + 3]);
+    this.hashAlgo = HashAlgo.getInstanceForEncoded(data, from + 2, 2 + data[from + 3]);
 
     int hashAlgoFieldLen = 0xFF & data[from + 1];
     this.nameHashFrom = from + 2 + hashAlgoFieldLen;
   }
 
-  public HashAlgoType hashAlgorithm() {
+  public HashAlgo hashAlgorithm() {
     return hashAlgo;
   }
 

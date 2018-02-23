@@ -77,7 +77,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.FpIdCalculator;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -1742,7 +1742,7 @@ class CertStoreQueryExecutor {
   }
 
   private String base64Fp(byte[] data) {
-    return HashAlgoType.SHA1.base64Hash(data);
+    return HashAlgo.SHA1.base64Hash(data);
   }
 
   private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)

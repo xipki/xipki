@@ -45,7 +45,7 @@ import org.xipki.ocsp.server.impl.jaxb.RequestOptionType.CertpathValidation;
 import org.xipki.ocsp.server.impl.jaxb.RequestOptionType.HashAlgorithms;
 import org.xipki.ocsp.server.impl.jaxb.VersionsType;
 import org.xipki.security.CertpathValidationModel;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
@@ -57,18 +57,18 @@ import org.xipki.security.util.X509Util;
 
 public class RequestOption {
 
-  static final Set<HashAlgoType> SUPPORTED_HASH_ALGORITHMS = new HashSet<>();
+  static final Set<HashAlgo> SUPPORTED_HASH_ALGORITHMS = new HashSet<>();
 
   static {
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA1);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA224);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA256);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA384);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA512);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA3_224);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA3_256);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA3_384);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA3_512);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA1);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA224);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA256);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA384);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA512);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_224);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_256);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_384);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_512);
   }
 
   private final boolean supportsHttpGet;
@@ -89,7 +89,7 @@ public class RequestOption {
 
   private final int nonceMaxLen;
 
-  private final Set<HashAlgoType> hashAlgos;
+  private final Set<HashAlgo> hashAlgos;
 
   private final Set<CertWithEncoded> trustAnchors;
 
@@ -159,7 +159,7 @@ public class RequestOption {
     HashAlgorithms reqHashAlgosConf = conf.getHashAlgorithms();
     if (reqHashAlgosConf != null) {
       for (String token : reqHashAlgosConf.getAlgorithm()) {
-        HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
+        HashAlgo algo = HashAlgo.getInstance(token);
         if (algo != null && SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
           hashAlgos.add(algo);
         } else {
@@ -213,7 +213,7 @@ public class RequestOption {
     }
   } // constructor
 
-  public Set<HashAlgoType> hashAlgos() {
+  public Set<HashAlgo> hashAlgos() {
     return hashAlgos;
   }
 
@@ -249,7 +249,7 @@ public class RequestOption {
     return nonceMaxLen;
   }
 
-  public boolean allows(HashAlgoType hashAlgo) {
+  public boolean allows(HashAlgo hashAlgo) {
     return (hashAlgo == null) ? false : hashAlgos.contains(hashAlgo);
   }
 

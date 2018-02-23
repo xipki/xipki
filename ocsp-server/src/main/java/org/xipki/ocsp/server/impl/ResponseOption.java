@@ -17,15 +17,11 @@
 
 package org.xipki.ocsp.server.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.server.impl.jaxb.CacheType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;
-import org.xipki.security.HashAlgoType;
 
 /**
  * TODO.
@@ -34,14 +30,6 @@ import org.xipki.security.HashAlgoType;
  */
 
 public class ResponseOption {
-
-  static final Set<HashAlgoType> SUPPORTED_CERTHASH_ALGORITHMS = new HashSet<>();
-
-  static {
-    SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA1);
-    SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA256);
-    SUPPORTED_CERTHASH_ALGORITHMS.add(HashAlgoType.SHA3_256);
-  }
 
   private final boolean responderIdByName;
 

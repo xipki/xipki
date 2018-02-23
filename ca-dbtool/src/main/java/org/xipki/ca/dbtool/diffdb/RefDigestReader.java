@@ -46,7 +46,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -87,7 +87,7 @@ class RefDigestReader {
 
   private DbControl dbControl;
 
-  private HashAlgoType certhashAlgo;
+  private HashAlgo certhashAlgo;
 
   private class Retriever implements Runnable {
 
@@ -139,7 +139,7 @@ class RefDigestReader {
           if (dbControl == DbControl.XIPKI_OCSP_v3) {
             hash = rs.getString("HASH");
           } else { // if (dbControl = DbControl.XIPKI_CA_v2) {
-            if (certhashAlgo == HashAlgoType.SHA1) {
+            if (certhashAlgo == HashAlgo.SHA1) {
               hash = rs.getString("SHA1");
             } else {
               String b64Cert = rs.getString("CERT");
@@ -196,7 +196,7 @@ class RefDigestReader {
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
 
-  private void init(DbControl dbControl, HashAlgoType certhashAlgo, int caId, int numPerSelect)
+  private void init(DbControl dbControl, HashAlgo certhashAlgo, int caId, int numPerSelect)
       throws Exception {
     this.caId = caId;
     this.conn = datasource.getConnection();
@@ -207,7 +207,7 @@ class RefDigestReader {
     if (dbControl == DbControl.XIPKI_OCSP_v3) {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
-      if (certhashAlgo != HashAlgoType.getHashAlgoType(certHashAlgoInDb)) {
+      if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
         throw new IllegalArgumentException(
             "certHashAlgo in parameter (" + certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");
       }
@@ -216,7 +216,7 @@ class RefDigestReader {
           Integer.toString(caId), " AND ID>=?");
     } else { // if (dbControl == DbControl.XIPKI_CA_v2) {
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
-          (certhashAlgo == HashAlgoType.SHA1 ? "SHA1" : "CERT"),
+          (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
           " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=", Integer.toString(caId),
           " AND CERT.ID>=? AND CERT.ID=CRAW.CID");
     }
@@ -240,7 +240,7 @@ class RefDigestReader {
   }
 
   public static RefDigestReader getInstance(DataSourceWrapper datasource, DbControl dbControl,
-      HashAlgoType certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, StopMe stopMe)
+      HashAlgo certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, StopMe stopMe)
       throws Exception {
     ParamUtil.requireNonNull("datasource", datasource);
 

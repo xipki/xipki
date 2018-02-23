@@ -24,7 +24,7 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -52,15 +52,15 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
   }
 
   protected String sha1(byte[] data) {
-    return HashAlgoType.SHA1.base64Hash(data);
+    return HashAlgo.SHA1.base64Hash(data);
   }
 
   protected String sha256(byte[] data) {
-    return HashAlgoType.SHA256.base64Hash(data);
+    return HashAlgo.SHA256.base64Hash(data);
   }
 
   protected String sha3_256(byte[] data) {
-    return HashAlgoType.SHA3_256.base64Hash(data);
+    return HashAlgo.SHA3_256.base64Hash(data);
   }
 
   protected void deleteCertGreatherThan(long id, Logger log) {

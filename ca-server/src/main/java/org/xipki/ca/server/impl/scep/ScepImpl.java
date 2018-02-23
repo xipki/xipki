@@ -28,9 +28,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -93,7 +91,7 @@ import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyCertPair;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
@@ -175,7 +173,7 @@ public class ScepImpl implements Scep {
     KeyCertPair privKeyAndCert;
     try {
       // ResponderConf does not contain algo.
-      SignerConf signerConf = new SignerConf(dbEntry.responderConf(), HashAlgoType.SHA256,
+      SignerConf signerConf = new SignerConf(dbEntry.responderConf(), HashAlgo.SHA256,
           new SignatureAlgoControl());
       privKeyAndCert = caManager.securityFactory().createPrivateKeyAndCert(
           dbEntry.responderType(), signerConf, dbEntry.certificate());

@@ -130,7 +130,7 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.util.AlgorithmUtil;
@@ -1652,8 +1652,8 @@ public class ProfileConfCreatorDemo {
     extValue.getType().add(type);
 
     // hash algorithm
-    HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA256, HashAlgoType.SHA384};
-    for (HashAlgoType hashAlgo : hashAlgos) {
+    HashAlgo[] hashAlgos = new HashAlgo[]{HashAlgo.SHA256, HashAlgo.SHA384};
+    for (HashAlgo hashAlgo : hashAlgos) {
       extValue.getHashAlgorithm().add(createOidType(hashAlgo.oid(), hashAlgo.getName()));
     }
 

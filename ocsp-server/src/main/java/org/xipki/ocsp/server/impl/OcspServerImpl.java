@@ -112,7 +112,7 @@ import org.xipki.security.AlgorithmCode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.NoIdleSignerException;
@@ -670,7 +670,7 @@ public class OcspServerImpl implements OcspServer {
       if (canCacheDb) {
         // try to find the cached response
         CertID certId = requestList.get(0);
-        HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
+        HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
         if (!reqOpt.allows(reqHashAlgo)) {
           LOG.warn("CertID.hashAlgorithm {} not allowed",
               reqHashAlgo != null ? reqHashAlgo : certId.issuer().hashAlgorithmOID());
@@ -777,7 +777,7 @@ public class OcspServerImpl implements OcspServer {
   private OcspRespWithCacheInfo processCertReq(CertID certId, OCSPRespBuilder builder,
       ResponderImpl responder, RequestOption reqOpt, ResponseOption repOpt,
       OcspRespControl repControl) throws IOException {
-    HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
+    HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);

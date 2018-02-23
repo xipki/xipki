@@ -152,7 +152,7 @@ import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ExtensionExistence;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -828,7 +828,7 @@ public class ExtensionsChecker {
     SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extensionValue);
     byte[] ski = asn1.getKeyIdentifier();
     byte[] pkData = subjectPublicKeyInfo.getPublicKeyData().getBytes();
-    byte[] expectedSki = HashAlgoType.SHA1.hash(pkData);
+    byte[] expectedSki = HashAlgo.SHA1.hash(pkData);
     if (!Arrays.equals(expectedSki, ski)) {
       addViolation(failureMsg, "SKI", hex(ski), hex(expectedSki));
     }

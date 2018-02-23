@@ -33,11 +33,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
@@ -62,7 +60,7 @@ import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.dbtool.InvalidInputException;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -288,7 +286,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
       ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
       ps.setLong(idx++, cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
       ps.setLong(idx++, cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-      ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedCert));
+      ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
       setBoolean(ps, idx++, ca.isRevoked());
       setInt(ps, idx++, ca.getRevReason());
       setLong(ps, idx++, ca.getRevTime());
@@ -307,7 +305,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
   private void importCert(CertStoreType certstore, Map<Integer, String> profileMap,
       boolean revokedOnly, List<Integer> caIds, File processLogFile) throws Exception {
-    HashAlgoType certhashAlgo = getCertHashAlgo(datasource);
+    HashAlgo certhashAlgo = getCertHashAlgo(datasource);
 
     int numProcessedBefore = 0;
     long minId = 1;
@@ -386,7 +384,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         + importedText() + importLog.numProcessed() + " certificates");
   } // method importCert
 
-  private long importCert0(HashAlgoType certhashAlgo, PreparedStatement psCert,
+  private long importCert0(HashAlgo certhashAlgo, PreparedStatement psCert,
       String certsZipFile, Map<Integer, String> profileMap, boolean revokedOnly,
       List<Integer> caIds, long minId, File processLogFile,ProcessLog processLog,
       int numProcessedInLastProcess, ProcessLog importLog) throws Exception {
@@ -534,7 +532,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     }
   } // method importCert0
 
-  private HashAlgoType getCertHashAlgo(DataSourceWrapper datasource)
+  private HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
@@ -542,7 +540,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
           "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
     }
 
-    return HashAlgoType.getNonNullHashAlgoType(certHashAlgoStr);
+    return HashAlgo.getNonNullInstance(certHashAlgoStr);
   }
 
 }

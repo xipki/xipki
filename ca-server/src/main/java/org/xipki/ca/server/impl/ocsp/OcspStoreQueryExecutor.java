@@ -43,7 +43,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 
@@ -78,7 +78,7 @@ class OcspStoreQueryExecutor {
 
   private final int maxX500nameLen;
 
-  private final HashAlgoType certhashAlgo;
+  private final HashAlgo certhashAlgo;
 
   OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
       throws DataAccessException, NoSuchAlgorithmException {
@@ -121,7 +121,7 @@ class OcspStoreQueryExecutor {
     this.maxX500nameLen = Integer.parseInt(str);
 
     str = variables.get("CERTHASH_ALGO");
-    this.certhashAlgo = HashAlgoType.getNonNullHashAlgoType(str);
+    this.certhashAlgo = HashAlgo.getNonNullInstance(str);
   } // constructor
 
   private IssuerStore initIssuerStore() throws DataAccessException {
@@ -422,7 +422,7 @@ class OcspStoreQueryExecutor {
       return;
     }
 
-    String sha1FpCert = HashAlgoType.SHA1.base64Hash(issuerCert.encodedCert());
+    String sha1FpCert = HashAlgo.SHA1.base64Hash(issuerCert.encodedCert());
     long maxId = datasource.getMax(null, "ISSUER", "ID");
     int id = (int) maxId + 1;
 
