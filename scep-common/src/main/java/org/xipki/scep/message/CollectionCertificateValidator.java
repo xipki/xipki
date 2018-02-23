@@ -52,7 +52,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
   public CollectionCertificateValidator(X509Certificate cert) {
     ScepUtil.requireNonNull("cert", cert);
 
-    certHashes = new HashSet<String>(1);
+    certHashes = new HashSet<String>(2);
     String hash;
     try {
       hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());

@@ -66,6 +66,7 @@ public class ScepClient extends Client {
         if (requestContentType != null) {
           httpConn.setRequestProperty("Content-Type", requestContentType);
         }
+
         httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
         OutputStream outputstream = httpConn.getOutputStream();
         outputstream.write(request);
@@ -80,6 +81,7 @@ public class ScepClient extends Client {
 
   protected ScepHttpResponse parseResponse(HttpURLConnection conn) throws ScepClientException {
     ScepUtil.requireNonNull("conn", conn);
+
     try {
       InputStream inputstream = conn.getInputStream();
       if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
@@ -107,6 +109,7 @@ public class ScepClient extends Client {
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;
     }
+
     throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
   }
 

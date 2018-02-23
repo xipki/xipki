@@ -91,8 +91,7 @@ public abstract class Client {
 
   private boolean useInsecureAlgorithms;
 
-  public Client(CaIdentifier caId, CaCertValidator caCertValidator)
-      throws MalformedURLException {
+  public Client(CaIdentifier caId, CaCertValidator caCertValidator) throws MalformedURLException {
     this.caId = ScepUtil.requireNonNull("caId", caId);
     this.caCertValidator = ScepUtil.requireNonNull("caCertValidator", caCertValidator);
   }
@@ -361,8 +360,7 @@ public abstract class Client {
 
     initIfNotInited();
 
-    boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
-    if (!selfSigned) {
+    if (!ScepUtil.isSelfSigned(identityCert)) {
       throw new IllegalArgumentException("identityCert is not self-signed");
     }
 
@@ -680,8 +678,7 @@ public abstract class Client {
   private static void assertSameNonce(PkiMessage request, PkiMessage response)
       throws ScepClientException {
     if (request.senderNonce().equals(response.recipientNonce())) {
-      throw new ScepClientException(
-              "SenderNonce of the request and RecipientNonce of response are not the same");
+      throw new ScepClientException("SenderNonce in request != RecipientNonce in response");
     }
   }
 

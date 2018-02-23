@@ -92,6 +92,9 @@ public class ScepUtil {
   private static final long MIN_IN_MS = 60L * 1000;
   private static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
+  private static final AlgorithmIdentifier ALGID_RSA =
+      new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+
   private static CertificateFactory certFact;
   private static Object certFactLock = new Object();
 
@@ -104,8 +107,7 @@ public class ScepUtil {
     if (publicKey instanceof java.security.interfaces.RSAPublicKey) {
       java.security.interfaces.RSAPublicKey rsaPubKey =
           (java.security.interfaces.RSAPublicKey) publicKey;
-      return new SubjectPublicKeyInfo(
-          new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
+      return new SubjectPublicKeyInfo(ALGID_RSA,
           new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
     } else {
       throw new IllegalArgumentException("unsupported public key " + publicKey);
@@ -188,8 +190,7 @@ public class ScepUtil {
         BigInteger.ONE, notBefore, notAfter, subjectDn, pubKeyInfo);
 
     X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature
-        | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement
-        | X509KeyUsage.keyEncipherment);
+        | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement | X509KeyUsage.keyEncipherment);
     try {
       certGenerator.addExtension(Extension.keyUsage, true, ku);
     } catch (CertIOException ex) {

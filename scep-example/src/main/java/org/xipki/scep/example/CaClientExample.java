@@ -29,7 +29,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECGenParameterSpec;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -47,6 +46,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.encoders.Base64;
 
 /**
  * TODO.
@@ -54,6 +54,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
  */
 
 public class CaClientExample {
+
+  private static final int PEM_LINE_LENGTH = 64;
 
   // plen: 2048, qlen: 256
   private static final BigInteger P2048_Q256_P = new BigInteger(
@@ -186,9 +188,8 @@ public class CaClientExample {
     System.out.println(cert.getSerialNumber().toString(16));
     System.out.println("NotBefore: " + cert.getNotBefore());
     System.out.println(" NotAfter: " + cert.getNotAfter());
-    System.out.println("-----BEGIN CERTIFICATE-----");
-    System.out.println(Base64.encodeToString(cert.getEncoded(), true));
-    System.out.println("-----END CERTIFICATE-----");
+    String pemCert = toPEM("CERTIFICATE", cert.getEncoded());
+    System.out.println(pemCert);
   }
 
   protected static ContentSigner buildSigner(PrivateKey signingKey, String hashAlgo)
@@ -222,6 +223,32 @@ public class CaClientExample {
     } else {
       System.arraycopy(source, 0, dest, destPos + length - srcLen, srcLen);
     }
+  }
+
+  // CHECKSTYLE:SKIP
+  private static String toPEM(String type, byte[] data) {
+    byte[] base64Data = Base64.encode(data);
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("-----BEGIN ").append(type).append("-----\n");
+    int numBlock = (base64Data.length + PEM_LINE_LENGTH - 1) / PEM_LINE_LENGTH;
+
+    byte[] lineBytes = new byte[PEM_LINE_LENGTH];
+
+    int offset = 0;
+    for (int i = 0; i < numBlock - 1; i++) {
+      System.arraycopy(base64Data, offset, lineBytes, 0, PEM_LINE_LENGTH);
+      sb.append(new String(lineBytes)).append("\n");
+      offset += PEM_LINE_LENGTH;
+    }
+
+    // print the last block
+    lineBytes = new byte[base64Data.length - offset];
+    System.arraycopy(base64Data, offset, lineBytes, 0, lineBytes.length);
+    sb.append(new String(lineBytes)).append("\n");
+
+    sb.append("-----END ").append(type).append("-----");
+    return sb.toString();
   }
 
 }

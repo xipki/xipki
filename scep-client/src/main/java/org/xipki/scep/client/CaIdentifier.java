@@ -41,6 +41,7 @@ public class CaIdentifier {
     ScepUtil.requireNonBlank("serverUrl", serverUrl);
     URL tmpUrl = new URL(serverUrl);
     final String protocol = tmpUrl.getProtocol();
+
     if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
       throw new IllegalArgumentException(
           "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
@@ -71,6 +72,7 @@ public class CaIdentifier {
     ScepUtil.requireNonNull("operation", operation);
     StringBuilder ub = new StringBuilder(url);
     ub.append('?').append("operation=").append(operation.code());
+
     if (message != null && !message.isEmpty()) {
       String urlMessage;
       try {

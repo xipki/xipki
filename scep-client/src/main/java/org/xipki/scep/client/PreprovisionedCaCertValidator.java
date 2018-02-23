@@ -37,18 +37,21 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
   public PreprovisionedCaCertValidator(X509Certificate cert) {
     ScepUtil.requireNonNull("cert", cert);
     fpOfCerts = new HashSet<String>(1);
+
     String hexFp;
     try {
       hexFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
     } catch (CertificateEncodingException ex) {
       throw new IllegalArgumentException("at least one of the certificate could not be encoded");
     }
+
     fpOfCerts.add(hexFp);
   }
 
   public PreprovisionedCaCertValidator(Set<X509Certificate> certs) {
     ScepUtil.requireNonNull("certs", certs);
     fpOfCerts = new HashSet<String>(certs.size());
+
     for (X509Certificate m : certs) {
       String hexFp;
       try {
@@ -56,6 +59,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
       } catch (CertificateEncodingException ex) {
         throw new IllegalArgumentException("at least one of the certificate could not be encoded");
       }
+
       fpOfCerts.add(hexFp);
     }
   }
@@ -63,6 +67,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
   @Override
   public boolean isTrusted(X509Certificate cert) {
     ScepUtil.requireNonNull("cert", cert);
+
     try {
       String hextFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
       return fpOfCerts.contains(hextFp);
