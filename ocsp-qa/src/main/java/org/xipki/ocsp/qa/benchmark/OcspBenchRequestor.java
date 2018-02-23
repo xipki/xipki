@@ -26,7 +26,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -47,9 +46,8 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
@@ -95,8 +93,7 @@ class OcspBenchRequestor {
     ParamUtil.requireNonNull("responseHandler", responseHandler);
     this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
 
-    HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(
-        requestOptions.hashAlgorithmId());
+    HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.hashAlgorithmId());
     if (hashAlgo == null) {
       throw new OcspRequestorException("unknown HashAlgo "
           + requestOptions.hashAlgorithmId().getId());

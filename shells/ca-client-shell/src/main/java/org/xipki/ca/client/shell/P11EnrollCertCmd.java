@@ -18,7 +18,6 @@
 package org.xipki.ca.client.shell;
 
 import java.security.cert.X509Certificate;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -27,7 +26,7 @@ import org.xipki.ca.client.shell.completer.P11ModuleNameCompleter;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Hex;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -71,7 +70,7 @@ public class P11EnrollCertCmd extends EnrollCertAction {
     }
 
     SignerConf signerConf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, keyLabel,
-        keyIdBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+        keyIdBytes, 1, HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
   }
 

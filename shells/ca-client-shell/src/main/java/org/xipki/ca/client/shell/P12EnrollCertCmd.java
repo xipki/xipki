@@ -27,7 +27,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 
@@ -64,7 +64,7 @@ public class P12EnrollCertCmd extends EnrollCertAction {
     }
 
     SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, password,
-        HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+        HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
   }
 

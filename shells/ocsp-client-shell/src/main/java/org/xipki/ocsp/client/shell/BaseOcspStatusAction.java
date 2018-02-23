@@ -55,7 +55,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.ocsp.client.api.OcspRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -270,8 +270,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
       debug = new RequestResponseDebug(saveReq, saveResp);
     }
 
-    IssuerHash issuerHash = new IssuerHash(
-        HashAlgoType.getNonNullHashAlgoType(options.hashAlgorithmId()),
+    IssuerHash issuerHash = new IssuerHash(HashAlgo.getNonNullInstance(options.hashAlgorithmId()),
         Certificate.getInstance(issuerCert.getEncoded()));
     OCSPResp response;
     try {

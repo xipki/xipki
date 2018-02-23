@@ -66,7 +66,7 @@ import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.api.ResponderUnreachableException;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -313,7 +313,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
   private OCSPRequest buildRequest(X509Certificate caCert, BigInteger[] serialNumbers,
       byte[] nonce, RequestOptions requestOptions) throws OcspRequestorException {
-    HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.hashAlgorithmId());
+    HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.hashAlgorithmId());
     if (hashAlgo == null) {
       throw new OcspRequestorException("unknown HashAlgo "
           + requestOptions.hashAlgorithmId().getId());

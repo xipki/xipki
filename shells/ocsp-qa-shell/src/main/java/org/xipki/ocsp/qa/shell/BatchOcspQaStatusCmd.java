@@ -29,7 +29,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.StringTokenizer;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -60,7 +59,7 @@ import org.xipki.ocsp.qa.OcspQa;
 import org.xipki.ocsp.qa.OcspResponseOption;
 import org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
@@ -224,7 +223,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
     RequestOptions requestOptions = getRequestOptions();
 
     IssuerHash issuerHash = new IssuerHash(
-        HashAlgoType.getNonNullHashAlgoType(requestOptions.hashAlgorithmId()),
+        HashAlgo.getNonNullInstance(requestOptions.hashAlgorithmId()),
         Certificate.getInstance(issuerCert.getEncoded()));
 
     OutputStream resultOut = new FileOutputStream(new File(outDir, "overview.txt"));

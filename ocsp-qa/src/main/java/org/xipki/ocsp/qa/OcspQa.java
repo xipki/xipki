@@ -54,7 +54,7 @@ import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
@@ -226,7 +226,7 @@ public class OcspQa {
               respSigner = cert;
             }
           } else {
-            byte[] spkiSha1 = HashAlgoType.SHA1.hash(
+            byte[] spkiSha1 = HashAlgo.SHA1.hash(
                 cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
             if (Arrays.equals(respIdByKey, spkiSha1)) {
               respSigner = cert;
@@ -339,7 +339,7 @@ public class OcspQa {
     issues.add(issue);
 
     CertificateID certId = singleResp.getCertID();
-    HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(certId.getHashAlgOID());
+    HashAlgo hashAlgo = HashAlgo.getInstance(certId.getHashAlgOID());
     if (hashAlgo == null) {
       issue.setFailureMessage("unknown hash algorithm " + certId.getHashAlgOID().getId());
     } else {

@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -55,7 +54,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
@@ -133,7 +132,7 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
             respSigner = cert;
           }
         } else {
-          byte[] spkiSha1 = HashAlgoType.SHA1.hash(
+          byte[] spkiSha1 = HashAlgo.SHA1.hash(
               cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
           if (Arrays.equals(respIdByKey, spkiSha1)) {
             respSigner = cert;
@@ -233,7 +232,7 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
       StringBuilder msg = new StringBuilder();
 
       CertificateID certId = singleResp.getCertID();
-      HashAlgoType hashAlgo = HashAlgoType.getNonNullHashAlgoType(certId.getHashAlgOID());
+      HashAlgo hashAlgo = HashAlgo.getNonNullInstance(certId.getHashAlgOID());
       boolean issuerMatch = issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
           certId.getIssuerKeyHash());
       BigInteger serialNumber = certId.getSerialNumber();
