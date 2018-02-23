@@ -30,13 +30,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class IssuerHash {
-  private final HashAlgoType hashAlgo;
+  private final HashAlgo hashAlgo;
 
   private final byte[] issuerNameHash;
 
   private final byte[] issuerKeyHash;
 
-  public IssuerHash(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
+  public IssuerHash(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
     this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     this.issuerNameHash = ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);
     this.issuerKeyHash = ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);
@@ -46,7 +46,7 @@ public class IssuerHash {
     ParamUtil.requireRange("issuerKeyHash.length", issuerKeyHash.length, len, len);
   }
 
-  public IssuerHash(HashAlgoType hashAlgo, Certificate issuerCert) throws IOException {
+  public IssuerHash(HashAlgo hashAlgo, Certificate issuerCert) throws IOException {
     this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     ParamUtil.requireNonNull("issuerCert", issuerCert);
 
@@ -56,7 +56,7 @@ public class IssuerHash {
     this.issuerKeyHash = HashCalculator.hash(hashAlgo, encodedKey);
   }
 
-  public HashAlgoType hashAlgo() {
+  public HashAlgo hashAlgo() {
     return hashAlgo;
   }
 
@@ -68,7 +68,7 @@ public class IssuerHash {
     return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
   }
 
-  public boolean match(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
+  public boolean match(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);
     ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);

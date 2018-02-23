@@ -46,7 +46,7 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.security.AlgorithmCode;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 
@@ -66,17 +66,17 @@ public class AlgorithmUtil {
 
   private static final Map<ASN1ObjectIdentifier, AlgorithmCode> algOidToCodeMap;
 
-  private static final Map<ASN1ObjectIdentifier, HashAlgoType> sigAlgOidToDigestMap;
+  private static final Map<ASN1ObjectIdentifier, HashAlgo> sigAlgOidToDigestMap;
 
-  private static final Map<ASN1ObjectIdentifier, HashAlgoType> macAlgOidToDigestMap;
+  private static final Map<ASN1ObjectIdentifier, HashAlgo> macAlgOidToDigestMap;
 
-  private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToECSigAlgMap;
+  private static final Map<HashAlgo, ASN1ObjectIdentifier> digestToECSigAlgMap;
 
-  private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToECPlainSigAlgMap;
+  private static final Map<HashAlgo, ASN1ObjectIdentifier> digestToECPlainSigAlgMap;
 
-  private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToDSASigAlgMap;
+  private static final Map<HashAlgo, ASN1ObjectIdentifier> digestToDSASigAlgMap;
 
-  private static final Map<HashAlgoType, ASN1ObjectIdentifier> digestToRSASigAlgMap;
+  private static final Map<HashAlgo, ASN1ObjectIdentifier> digestToRSASigAlgMap;
 
   private static final Map<ASN1ObjectIdentifier, String> macAlgOidToNameMap;
 
@@ -90,7 +90,7 @@ public class AlgorithmUtil {
 
   private static final Map<ASN1ObjectIdentifier, String> digestOidToMgf1SigNameMap;
 
-  private static final Map<String, HashAlgoType> mgf1SigNameToDigestOidMap;
+  private static final Map<String, HashAlgo> mgf1SigNameToDigestOidMap;
 
   static {
     //----- initialize the static fields curveNames, curveNameOidMap, curveOidNameMap
@@ -182,7 +182,7 @@ public class AlgorithmUtil {
       map.put(GMObjectIdentifiers.sm2sign_with_sm3, AlgorithmCode.SM2WITHSM3);
 
       // Hash
-      for (HashAlgoType hashAlgo : HashAlgoType.values()) {
+      for (HashAlgo hashAlgo : HashAlgo.values()) {
         map.put(hashAlgo.oid(), hashAlgo.algorithmCode());
       }
       algOidToCodeMap = Collections.unmodifiableMap(map);
@@ -191,15 +191,15 @@ public class AlgorithmUtil {
     //----- Initialize the static field digstMgf1AlgCodeMap
     {
       Map<ASN1ObjectIdentifier, AlgorithmCode> map = new HashMap<>();
-      map.put(HashAlgoType.SHA1.oid(),   AlgorithmCode.SHA1WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA224.oid(), AlgorithmCode.SHA224WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA256.oid(), AlgorithmCode.SHA256WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA384.oid(), AlgorithmCode.SHA384WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA512.oid(), AlgorithmCode.SHA512WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA3_224.oid(), AlgorithmCode.SHA3_224WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA3_256.oid(), AlgorithmCode.SHA3_256WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA3_384.oid(), AlgorithmCode.SHA3_384WITHRSAANDMGF1);
-      map.put(HashAlgoType.SHA3_512.oid(), AlgorithmCode.SHA3_512WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA1.oid(),   AlgorithmCode.SHA1WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA224.oid(), AlgorithmCode.SHA224WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA256.oid(), AlgorithmCode.SHA256WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA384.oid(), AlgorithmCode.SHA384WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA512.oid(), AlgorithmCode.SHA512WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA3_224.oid(), AlgorithmCode.SHA3_224WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA3_256.oid(), AlgorithmCode.SHA3_256WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA3_384.oid(), AlgorithmCode.SHA3_384WITHRSAANDMGF1);
+      map.put(HashAlgo.SHA3_512.oid(), AlgorithmCode.SHA3_512WITHRSAANDMGF1);
       digestToMgf1AlgCodeMap = Collections.unmodifiableMap(map);
     }
 
@@ -207,109 +207,109 @@ public class AlgorithmUtil {
     // digestDSASigAlgMap, digestRSASigAlgMap
     {
       // ECDSA
-      Map<HashAlgoType, ASN1ObjectIdentifier> map = new HashMap<>();
-      map.put(HashAlgoType.SHA1,   X9ObjectIdentifiers.ecdsa_with_SHA1);
-      map.put(HashAlgoType.SHA224, X9ObjectIdentifiers.ecdsa_with_SHA224);
-      map.put(HashAlgoType.SHA256, X9ObjectIdentifiers.ecdsa_with_SHA256);
-      map.put(HashAlgoType.SHA384, X9ObjectIdentifiers.ecdsa_with_SHA384);
-      map.put(HashAlgoType.SHA512, X9ObjectIdentifiers.ecdsa_with_SHA512);
-      map.put(HashAlgoType.SHA3_224, NISTObjectIdentifiers.id_ecdsa_with_sha3_224);
-      map.put(HashAlgoType.SHA3_256, NISTObjectIdentifiers.id_ecdsa_with_sha3_256);
-      map.put(HashAlgoType.SHA3_384, NISTObjectIdentifiers.id_ecdsa_with_sha3_384);
-      map.put(HashAlgoType.SHA3_512, NISTObjectIdentifiers.id_ecdsa_with_sha3_512);
+      Map<HashAlgo, ASN1ObjectIdentifier> map = new HashMap<>();
+      map.put(HashAlgo.SHA1,   X9ObjectIdentifiers.ecdsa_with_SHA1);
+      map.put(HashAlgo.SHA224, X9ObjectIdentifiers.ecdsa_with_SHA224);
+      map.put(HashAlgo.SHA256, X9ObjectIdentifiers.ecdsa_with_SHA256);
+      map.put(HashAlgo.SHA384, X9ObjectIdentifiers.ecdsa_with_SHA384);
+      map.put(HashAlgo.SHA512, X9ObjectIdentifiers.ecdsa_with_SHA512);
+      map.put(HashAlgo.SHA3_224, NISTObjectIdentifiers.id_ecdsa_with_sha3_224);
+      map.put(HashAlgo.SHA3_256, NISTObjectIdentifiers.id_ecdsa_with_sha3_256);
+      map.put(HashAlgo.SHA3_384, NISTObjectIdentifiers.id_ecdsa_with_sha3_384);
+      map.put(HashAlgo.SHA3_512, NISTObjectIdentifiers.id_ecdsa_with_sha3_512);
       digestToECSigAlgMap = Collections.unmodifiableMap(map);
 
       // PlainECDSA
       map = new HashMap<>();
-      map.put(HashAlgoType.SHA1,   BSIObjectIdentifiers.ecdsa_plain_SHA1);
-      map.put(HashAlgoType.SHA224, BSIObjectIdentifiers.ecdsa_plain_SHA224);
-      map.put(HashAlgoType.SHA256, BSIObjectIdentifiers.ecdsa_plain_SHA256);
-      map.put(HashAlgoType.SHA384, BSIObjectIdentifiers.ecdsa_plain_SHA384);
-      map.put(HashAlgoType.SHA512, BSIObjectIdentifiers.ecdsa_plain_SHA512);
+      map.put(HashAlgo.SHA1,   BSIObjectIdentifiers.ecdsa_plain_SHA1);
+      map.put(HashAlgo.SHA224, BSIObjectIdentifiers.ecdsa_plain_SHA224);
+      map.put(HashAlgo.SHA256, BSIObjectIdentifiers.ecdsa_plain_SHA256);
+      map.put(HashAlgo.SHA384, BSIObjectIdentifiers.ecdsa_plain_SHA384);
+      map.put(HashAlgo.SHA512, BSIObjectIdentifiers.ecdsa_plain_SHA512);
       digestToECPlainSigAlgMap = Collections.unmodifiableMap(map);
 
       // DSA
       map = new HashMap<>();
-      map.put(HashAlgoType.SHA1,   X9ObjectIdentifiers.id_dsa_with_sha1);
-      map.put(HashAlgoType.SHA224, NISTObjectIdentifiers.dsa_with_sha224);
-      map.put(HashAlgoType.SHA256, NISTObjectIdentifiers.dsa_with_sha256);
-      map.put(HashAlgoType.SHA384, NISTObjectIdentifiers.dsa_with_sha384);
-      map.put(HashAlgoType.SHA512, NISTObjectIdentifiers.dsa_with_sha512);
-      map.put(HashAlgoType.SHA3_224, NISTObjectIdentifiers.id_dsa_with_sha3_224);
-      map.put(HashAlgoType.SHA3_256, NISTObjectIdentifiers.id_dsa_with_sha3_256);
-      map.put(HashAlgoType.SHA3_384, NISTObjectIdentifiers.id_dsa_with_sha3_384);
-      map.put(HashAlgoType.SHA3_512, NISTObjectIdentifiers.id_dsa_with_sha3_512);
+      map.put(HashAlgo.SHA1,   X9ObjectIdentifiers.id_dsa_with_sha1);
+      map.put(HashAlgo.SHA224, NISTObjectIdentifiers.dsa_with_sha224);
+      map.put(HashAlgo.SHA256, NISTObjectIdentifiers.dsa_with_sha256);
+      map.put(HashAlgo.SHA384, NISTObjectIdentifiers.dsa_with_sha384);
+      map.put(HashAlgo.SHA512, NISTObjectIdentifiers.dsa_with_sha512);
+      map.put(HashAlgo.SHA3_224, NISTObjectIdentifiers.id_dsa_with_sha3_224);
+      map.put(HashAlgo.SHA3_256, NISTObjectIdentifiers.id_dsa_with_sha3_256);
+      map.put(HashAlgo.SHA3_384, NISTObjectIdentifiers.id_dsa_with_sha3_384);
+      map.put(HashAlgo.SHA3_512, NISTObjectIdentifiers.id_dsa_with_sha3_512);
       digestToDSASigAlgMap = Collections.unmodifiableMap(map);
 
       // RSA
       map = new HashMap<>();
-      map.put(HashAlgoType.SHA1,   PKCSObjectIdentifiers.sha1WithRSAEncryption);
-      map.put(HashAlgoType.SHA224, PKCSObjectIdentifiers.sha224WithRSAEncryption);
-      map.put(HashAlgoType.SHA256, PKCSObjectIdentifiers.sha256WithRSAEncryption);
-      map.put(HashAlgoType.SHA384, PKCSObjectIdentifiers.sha384WithRSAEncryption);
-      map.put(HashAlgoType.SHA512, PKCSObjectIdentifiers.sha512WithRSAEncryption);
-      map.put(HashAlgoType.SHA3_224, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224);
-      map.put(HashAlgoType.SHA3_256, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256);
-      map.put(HashAlgoType.SHA3_384, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384);
-      map.put(HashAlgoType.SHA3_512, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512);
+      map.put(HashAlgo.SHA1,   PKCSObjectIdentifiers.sha1WithRSAEncryption);
+      map.put(HashAlgo.SHA224, PKCSObjectIdentifiers.sha224WithRSAEncryption);
+      map.put(HashAlgo.SHA256, PKCSObjectIdentifiers.sha256WithRSAEncryption);
+      map.put(HashAlgo.SHA384, PKCSObjectIdentifiers.sha384WithRSAEncryption);
+      map.put(HashAlgo.SHA512, PKCSObjectIdentifiers.sha512WithRSAEncryption);
+      map.put(HashAlgo.SHA3_224, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224);
+      map.put(HashAlgo.SHA3_256, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256);
+      map.put(HashAlgo.SHA3_384, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384);
+      map.put(HashAlgo.SHA3_512, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512);
       digestToRSASigAlgMap = Collections.unmodifiableMap(map);
     }
 
     //----- Initialize the static fields sigAlgOidDigestMap
     {
-      Map<ASN1ObjectIdentifier, HashAlgoType> map = new HashMap<>();
-      map.put(X9ObjectIdentifiers.ecdsa_with_SHA1,   HashAlgoType.SHA1);
-      map.put(X9ObjectIdentifiers.ecdsa_with_SHA224, HashAlgoType.SHA224);
-      map.put(X9ObjectIdentifiers.ecdsa_with_SHA256, HashAlgoType.SHA256);
-      map.put(X9ObjectIdentifiers.ecdsa_with_SHA384, HashAlgoType.SHA384);
-      map.put(X9ObjectIdentifiers.ecdsa_with_SHA512, HashAlgoType.SHA512);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224, HashAlgoType.SHA3_224);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256, HashAlgoType.SHA3_256);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384, HashAlgoType.SHA3_384);
-      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512, HashAlgoType.SHA3_512);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1,   HashAlgoType.SHA1);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224, HashAlgoType.SHA224);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256, HashAlgoType.SHA256);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384, HashAlgoType.SHA384);
-      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512, HashAlgoType.SHA512);
-      map.put(X9ObjectIdentifiers.id_dsa_with_sha1,  HashAlgoType.SHA1);
-      map.put(NISTObjectIdentifiers.dsa_with_sha224, HashAlgoType.SHA224);
-      map.put(NISTObjectIdentifiers.dsa_with_sha256, HashAlgoType.SHA256);
-      map.put(NISTObjectIdentifiers.dsa_with_sha384, HashAlgoType.SHA384);
-      map.put(NISTObjectIdentifiers.dsa_with_sha512, HashAlgoType.SHA512);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224, HashAlgoType.SHA3_224);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256, HashAlgoType.SHA3_256);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384, HashAlgoType.SHA3_384);
-      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512, HashAlgoType.SHA3_512);
-      map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption,   HashAlgoType.SHA1);
-      map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, HashAlgoType.SHA224);
-      map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgoType.SHA256);
-      map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgoType.SHA384);
-      map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgoType.SHA512);
+      Map<ASN1ObjectIdentifier, HashAlgo> map = new HashMap<>();
+      map.put(X9ObjectIdentifiers.ecdsa_with_SHA1,   HashAlgo.SHA1);
+      map.put(X9ObjectIdentifiers.ecdsa_with_SHA224, HashAlgo.SHA224);
+      map.put(X9ObjectIdentifiers.ecdsa_with_SHA256, HashAlgo.SHA256);
+      map.put(X9ObjectIdentifiers.ecdsa_with_SHA384, HashAlgo.SHA384);
+      map.put(X9ObjectIdentifiers.ecdsa_with_SHA512, HashAlgo.SHA512);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224, HashAlgo.SHA3_224);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256, HashAlgo.SHA3_256);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384, HashAlgo.SHA3_384);
+      map.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512, HashAlgo.SHA3_512);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA1,   HashAlgo.SHA1);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA224, HashAlgo.SHA224);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA256, HashAlgo.SHA256);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA384, HashAlgo.SHA384);
+      map.put(BSIObjectIdentifiers.ecdsa_plain_SHA512, HashAlgo.SHA512);
+      map.put(X9ObjectIdentifiers.id_dsa_with_sha1,  HashAlgo.SHA1);
+      map.put(NISTObjectIdentifiers.dsa_with_sha224, HashAlgo.SHA224);
+      map.put(NISTObjectIdentifiers.dsa_with_sha256, HashAlgo.SHA256);
+      map.put(NISTObjectIdentifiers.dsa_with_sha384, HashAlgo.SHA384);
+      map.put(NISTObjectIdentifiers.dsa_with_sha512, HashAlgo.SHA512);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_224, HashAlgo.SHA3_224);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256, HashAlgo.SHA3_256);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384, HashAlgo.SHA3_384);
+      map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512, HashAlgo.SHA3_512);
+      map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption,   HashAlgo.SHA1);
+      map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, HashAlgo.SHA224);
+      map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgo.SHA256);
+      map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgo.SHA384);
+      map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgo.SHA512);
       map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
-          HashAlgoType.SHA3_224);
+          HashAlgo.SHA3_224);
       map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
-          HashAlgoType.SHA3_256);
+          HashAlgo.SHA3_256);
       map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
-          HashAlgoType.SHA3_384);
+          HashAlgo.SHA3_384);
       map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
-          HashAlgoType.SHA3_512);
-      map.put(GMObjectIdentifiers.sm2sign_with_sm3, HashAlgoType.SM3);
+          HashAlgo.SHA3_512);
+      map.put(GMObjectIdentifiers.sm2sign_with_sm3, HashAlgo.SM3);
       sigAlgOidToDigestMap = Collections.unmodifiableMap(map);
     }
 
     //----- Initialize the static field macAlgOidDigestMap
     {
-      Map<ASN1ObjectIdentifier, HashAlgoType> map = new HashMap<>();
-      map.put(PKCSObjectIdentifiers.id_hmacWithSHA1,   HashAlgoType.SHA1);
-      map.put(PKCSObjectIdentifiers.id_hmacWithSHA224, HashAlgoType.SHA224);
-      map.put(PKCSObjectIdentifiers.id_hmacWithSHA256, HashAlgoType.SHA256);
-      map.put(PKCSObjectIdentifiers.id_hmacWithSHA384, HashAlgoType.SHA384);
-      map.put(PKCSObjectIdentifiers.id_hmacWithSHA512, HashAlgoType.SHA512);
-      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_224, HashAlgoType.SHA224);
-      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256, HashAlgoType.SHA256);
-      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384, HashAlgoType.SHA384);
-      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512, HashAlgoType.SHA512);
+      Map<ASN1ObjectIdentifier, HashAlgo> map = new HashMap<>();
+      map.put(PKCSObjectIdentifiers.id_hmacWithSHA1,   HashAlgo.SHA1);
+      map.put(PKCSObjectIdentifiers.id_hmacWithSHA224, HashAlgo.SHA224);
+      map.put(PKCSObjectIdentifiers.id_hmacWithSHA256, HashAlgo.SHA256);
+      map.put(PKCSObjectIdentifiers.id_hmacWithSHA384, HashAlgo.SHA384);
+      map.put(PKCSObjectIdentifiers.id_hmacWithSHA512, HashAlgo.SHA512);
+      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_224, HashAlgo.SHA224);
+      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256, HashAlgo.SHA256);
+      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384, HashAlgo.SHA384);
+      map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512, HashAlgo.SHA512);
       macAlgOidToDigestMap = Collections.unmodifiableMap(map);
     }
 
@@ -408,16 +408,16 @@ public class AlgorithmUtil {
       sigAlgNameToOidMap = Collections.unmodifiableMap(m2);
 
       m1 = new HashMap<>();
-      Map<String, HashAlgoType> m3 = new HashMap<>();
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA1,   "SHA1WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA224, "SHA224WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA256, "SHA256WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA384, "SHA384WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA512, "SHA512WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_224, "SHA3-224WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_256, "SHA3-256WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_384, "SHA3-384WITHRSAANDMGF1");
-      addHashAlgoNameMap(m1, m3, HashAlgoType.SHA3_512, "SHA3-512WITHRSAANDMGF1");
+      Map<String, HashAlgo> m3 = new HashMap<>();
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA1,   "SHA1WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA224, "SHA224WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA256, "SHA256WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA384, "SHA384WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA512, "SHA512WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA3_224, "SHA3-224WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA3_256, "SHA3-256WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA3_384, "SHA3-384WITHRSAANDMGF1");
+      addHashAlgoNameMap(m1, m3, HashAlgo.SHA3_512, "SHA3-512WITHRSAANDMGF1");
       digestOidToMgf1SigNameMap = Collections.unmodifiableMap(m1);
       mgf1SigNameToDigestOidMap = Collections.unmodifiableMap(m3);
     }
@@ -434,7 +434,7 @@ public class AlgorithmUtil {
   }
 
   private static void addHashAlgoNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
-      Map<String, HashAlgoType> nameOidMap, HashAlgoType hashAlgo, String... names) {
+      Map<String, HashAlgo> nameOidMap, HashAlgo hashAlgo, String... names) {
     oidNameMap.put(hashAlgo.oid(), names[0].toUpperCase());
     nameOidMap.put(hashAlgo.oid().getId(), hashAlgo);
     for (String name : names) {
@@ -448,7 +448,7 @@ public class AlgorithmUtil {
   public static ASN1ObjectIdentifier getHashAlg(String hashAlgName)
       throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("hashAlgName", hashAlgName);
-    HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(hashAlgName.toUpperCase());
+    HashAlgo hashAlgo = HashAlgo.getInstance(hashAlgName.toUpperCase());
     if (hashAlgo == null) {
       throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgName);
     }
@@ -458,7 +458,7 @@ public class AlgorithmUtil {
   public static int getHashOutputSizeInOctets(ASN1ObjectIdentifier hashAlgo)
       throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-    HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
+    HashAlgo hashAlgoType = HashAlgo.getInstance(hashAlgo);
     if (hashAlgoType == null) {
       throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgo.getId());
     }
@@ -546,7 +546,7 @@ public class AlgorithmUtil {
 
     AlgorithmIdentifier signatureAlgId;
     if (algoS.contains("MGF1")) {
-      HashAlgoType ha = mgf1SigNameToDigestOidMap.get(algoS);
+      HashAlgo ha = mgf1SigNameToDigestOidMap.get(algoS);
       if (ha == null) {
         throw new NoSuchAlgorithmException("unknown algorithm " + algoS);
       }
@@ -572,7 +572,7 @@ public class AlgorithmUtil {
       return getSigAlgId(signerConf.getConfValue("algo"));
     } else {
       SignatureAlgoControl algoControl = signerConf.signatureAlgoControl();
-      HashAlgoType hashAlgo = signerConf.hashAlgo();
+      HashAlgo hashAlgo = signerConf.hashAlgo();
 
       if (pubKey instanceof RSAPublicKey) {
         boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
@@ -589,7 +589,7 @@ public class AlgorithmUtil {
     }
   }
 
-  public static AlgorithmIdentifier getSigAlgId(PublicKey pubKey, HashAlgoType hashAlgo,
+  public static AlgorithmIdentifier getSigAlgId(PublicKey pubKey, HashAlgo hashAlgo,
       SignatureAlgoControl algoControl) throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -703,7 +703,7 @@ public class AlgorithmUtil {
   }
 
   // CHECKSTYLE:SKIP
-  private static AlgorithmIdentifier getRSASigAlgId(HashAlgoType hashAlgo, boolean mgf1)
+  private static AlgorithmIdentifier getRSASigAlgId(HashAlgo hashAlgo, boolean mgf1)
       throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     if (mgf1) {
@@ -719,7 +719,7 @@ public class AlgorithmUtil {
   } // method getRSASigAlgId
 
   // CHECKSTYLE:SKIP
-  private static AlgorithmIdentifier getDSASigAlgId(HashAlgoType hashAlgo)
+  private static AlgorithmIdentifier getDSASigAlgId(HashAlgo hashAlgo)
       throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -732,7 +732,7 @@ public class AlgorithmUtil {
   } // method getDSASigAlgId
 
   // CHECKSTYLE:SKIP
-  private static AlgorithmIdentifier getECSigAlgId(HashAlgoType hashAlgo, boolean plainSignature,
+  private static AlgorithmIdentifier getECSigAlgId(HashAlgo hashAlgo, boolean plainSignature,
       boolean gm) throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     if (gm && plainSignature) {
@@ -764,9 +764,9 @@ public class AlgorithmUtil {
     return new AlgorithmIdentifier(sigAlgOid);
   } // method getECDSASigAlgId
 
-  public static HashAlgoType extractHashAlgoFromMacAlg(AlgorithmIdentifier macAlg) {
+  public static HashAlgo extractHashAlgoFromMacAlg(AlgorithmIdentifier macAlg) {
     ASN1ObjectIdentifier oid = macAlg.getAlgorithm();
-    HashAlgoType hashAlgo = macAlgOidToDigestMap.get(oid);
+    HashAlgo hashAlgo = macAlgOidToDigestMap.get(oid);
     if (hashAlgo == null) {
       throw new IllegalArgumentException("unknown algorithm identifier " + oid.getId());
     }
@@ -783,7 +783,7 @@ public class AlgorithmUtil {
       RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
       digestAlgOid = param.getHashAlgorithm().getAlgorithm();
     } else {
-      HashAlgoType digestAlg = sigAlgOidToDigestMap.get(algOid);
+      HashAlgo digestAlg = sigAlgOidToDigestMap.get(algOid);
       if (digestAlg == null) {
         throw new NoSuchAlgorithmException("unknown signature algorithm " + algOid.getId());
       }
@@ -850,14 +850,14 @@ public class AlgorithmUtil {
   }
 
   // CHECKSTYLE:SKIP
-  private static AlgorithmIdentifier buildRSAPSSAlgId(HashAlgoType digestAlg)
+  private static AlgorithmIdentifier buildRSAPSSAlgId(HashAlgo digestAlg)
       throws NoSuchAlgorithmException {
     RSASSAPSSparams params = createPSSRSAParams(digestAlg);
     return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
   }
 
   // CHECKSTYLE:SKIP
-  private static RSASSAPSSparams createPSSRSAParams(HashAlgoType digestAlg)
+  private static RSASSAPSSparams createPSSRSAParams(HashAlgo digestAlg)
       throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("digestAlg", digestAlg);
     int saltSize = digestAlg.length();

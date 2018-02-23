@@ -41,7 +41,7 @@ import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.P11DuplicateEntityException;
 import org.xipki.security.exception.P11PermissionException;
@@ -914,7 +914,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     sb.append("\n\t\t\tEnd time: ").append(cert.getNotAfter());
     sb.append("\n\t\t\tSHA1 Sum: ");
     try {
-      sb.append(HashAlgoType.SHA1.hexHash(cert.getEncoded()));
+      sb.append(HashAlgo.SHA1.hexHash(cert.getEncoded()));
     } catch (CertificateEncodingException ex) {
       sb.append("ERROR");
     }

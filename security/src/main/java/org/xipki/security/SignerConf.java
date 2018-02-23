@@ -37,7 +37,7 @@ public class SignerConf {
 
   private final ConfPairs confPairs;
 
-  private final HashAlgoType hashAlgo;
+  private final HashAlgo hashAlgo;
 
   private final SignatureAlgoControl signatureAlgoControl;
 
@@ -51,7 +51,7 @@ public class SignerConf {
     }
   }
 
-  public SignerConf(String confWithoutAlgo, HashAlgoType hashAlgo,
+  public SignerConf(String confWithoutAlgo, HashAlgo hashAlgo,
       SignatureAlgoControl signatureAlgoControl) {
     ParamUtil.requireNonBlank("confWithoutAlgo", confWithoutAlgo);
     this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -62,7 +62,7 @@ public class SignerConf {
     }
   }
 
-  public HashAlgoType hashAlgo() {
+  public HashAlgo hashAlgo() {
     return hashAlgo;
   }
 
@@ -139,7 +139,7 @@ public class SignerConf {
   }
 
   public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-      int parallelism, HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
+      int parallelism, HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
     ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
     ParamUtil.requireNonBlank("password", password);
     ParamUtil.requireMin("parallelism", parallelism, 1);
@@ -152,7 +152,7 @@ public class SignerConf {
   }
 
   public static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-      HashAlgoType hashAlgo, SignatureAlgoControl signatureAlgoControl) {
+      HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
     ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
     ParamUtil.requireNonBlank("password", password);
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -164,7 +164,7 @@ public class SignerConf {
   }
 
   public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-      Long slotId, String keyLabel, byte[] keyId, int parallelism, HashAlgoType hashAlgo,
+      Long slotId, String keyLabel, byte[] keyId, int parallelism, HashAlgo hashAlgo,
       SignatureAlgoControl signatureAlgoControl) {
     ParamUtil.requireMin("parallelism", parallelism, 1);
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);

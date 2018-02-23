@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -53,9 +53,9 @@ class P11SM2ContentSigner implements XiContentSigner {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11SM2ContentSigner.class);
 
-  private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
+  private static final Map<String, HashAlgo> sigAlgHashMap = new HashMap<>();
 
-  private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
+  private static final Map<HashAlgo, Long> hashMechMap = new HashMap<>();
 
   private final P11CryptService cryptService;
 
@@ -73,8 +73,8 @@ class P11SM2ContentSigner implements XiContentSigner {
   private final byte[] z;
 
   static {
-    sigAlgHashMap.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(), HashAlgoType.SM3);
-    hashMechMap.put(HashAlgoType.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
+    sigAlgHashMap.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(), HashAlgo.SM3);
+    hashMechMap.put(HashAlgo.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
   }
 
   P11SM2ContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
@@ -90,7 +90,7 @@ class P11SM2ContentSigner implements XiContentSigner {
     }
 
     String algOid = signatureAlgId.getAlgorithm().getId();
-    HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
+    HashAlgo hashAlgo = sigAlgHashMap.get(algOid);
     if (hashAlgo == null) {
       throw new XiSecurityException("unsupported signature algorithm " + algOid);
     }

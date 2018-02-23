@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
@@ -50,7 +50,7 @@ public class P11RSAPkcsPssParams implements P11Params {
 
   public P11RSAPkcsPssParams(RSASSAPSSparams asn1Params) {
     ASN1ObjectIdentifier asn1Oid = asn1Params.getHashAlgorithm().getAlgorithm();
-    HashAlgoType contentHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
+    HashAlgo contentHashAlgo = HashAlgo.getInstance(asn1Oid);
     if (contentHashAlgo == null) {
       throw new IllegalArgumentException("unsupported hash algorithm " + asn1Oid.getId());
     }
@@ -62,7 +62,7 @@ public class P11RSAPkcsPssParams implements P11Params {
     }
 
     asn1Oid = AlgorithmIdentifier.getInstance(mga.getParameters()).getAlgorithm();
-    HashAlgoType mgfHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
+    HashAlgo mgfHashAlgo = HashAlgo.getInstance(asn1Oid);
     if (mgfHashAlgo == null) {
       throw new IllegalArgumentException("unsupported MGF hash algorithm " + asn1Oid.getId());
     }

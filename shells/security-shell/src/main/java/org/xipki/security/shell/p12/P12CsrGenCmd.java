@@ -34,7 +34,7 @@ import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.shell.CsrGenAction;
@@ -90,7 +90,7 @@ public class P12CsrGenCmd extends CsrGenAction {
       throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
     }
     SignerConf conf = SignerConf.getKeystoreSignerConf(p12File, new String(pwd), 1,
-        HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+        HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS12", conf, (X509Certificate[]) null);
   }
 

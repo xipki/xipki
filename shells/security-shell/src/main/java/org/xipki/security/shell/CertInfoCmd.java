@@ -18,7 +18,6 @@
 package org.xipki.security.shell;
 
 import java.math.BigInteger;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -28,7 +27,7 @@ import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -95,7 +94,7 @@ public class CertInfoCmd extends SecurityAction {
       return toUtcTimeyyyyMMddhhmmssZ(cert.getEndDate().getDate());
     } else if (fingerprint != null && fingerprint) {
       byte[] encoded = cert.getEncoded();
-      return HashAlgoType.getHashAlgoType(hashAlgo).hexHash(encoded);
+      return HashAlgo.getInstance(hashAlgo).hexHash(encoded);
     }
 
     return null;

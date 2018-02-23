@@ -48,10 +48,8 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -68,7 +66,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.P11UnknownEntityException;
@@ -82,7 +80,6 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-
 import iaik.pkcs.pkcs11.Util;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
@@ -724,7 +721,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     String hexId = hex(id);
 
     String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n",
-        PROP_SHA1SUM, "=", HashAlgoType.SHA1.hexHash(value), "\n");
+        PROP_SHA1SUM, "=", HashAlgo.SHA1.hexHash(value), "\n");
 
     try {
       IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), str.getBytes());

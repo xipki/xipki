@@ -43,7 +43,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
  * @since 2.0.0
  */
 
-public enum HashAlgoType {
+public enum HashAlgo {
 
   SHA1(20, AlgorithmCode.SHA1, "1.3.14.3.2.26", "SHA1"),
   SHA224(28, AlgorithmCode.SHA224, "2.16.840.1.101.3.4.2.4", "SHA224"),
@@ -56,7 +56,7 @@ public enum HashAlgoType {
   SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
   SM3(32, AlgorithmCode.SM3, "1.2.156.10197.1.401", "SM3");
 
-  private static final Map<String, HashAlgoType> map = new HashMap<>();
+  private static final Map<String, HashAlgo> map = new HashMap<>();
 
   private final int length;
 
@@ -71,7 +71,7 @@ public enum HashAlgoType {
   private final byte[] encoded;
 
   static {
-    for (HashAlgoType type : HashAlgoType.values()) {
+    for (HashAlgo type : HashAlgo.values()) {
       map.put(type.oid.getId(), type);
       map.put(type.name, type);
     }
@@ -87,7 +87,7 @@ public enum HashAlgoType {
     map.put("SHA3512", SHA3_512);
   }
 
-  private HashAlgoType(int length, AlgorithmCode algorithmCode, String oid, String name) {
+  private HashAlgo(int length, AlgorithmCode algorithmCode, String oid, String name) {
     this.length = length;
     this.algorithmCode = algorithmCode;
     this.oid = new ASN1ObjectIdentifier(oid).intern();
@@ -117,9 +117,9 @@ public enum HashAlgoType {
     return name;
   }
 
-  public static HashAlgoType getHashAlgoType(ASN1ObjectIdentifier oid) {
+  public static HashAlgo getInstance(ASN1ObjectIdentifier oid) {
     ParamUtil.requireNonNull("oid", oid);
-    for (HashAlgoType hashAlgo : values()) {
+    for (HashAlgo hashAlgo : values()) {
       if (hashAlgo.oid.equals(oid)) {
         return hashAlgo;
       }
@@ -127,85 +127,85 @@ public enum HashAlgoType {
     return null;
   }
 
-  public static HashAlgoType getHashAlgoType(String nameOrOid) {
+  public static HashAlgo getInstance(String nameOrOid) {
     return map.get(nameOrOid.toUpperCase());
   }
 
-  public static HashAlgoType getNonNullHashAlgoType(ASN1ObjectIdentifier oid) {
-    HashAlgoType type = getHashAlgoType(oid);
+  public static HashAlgo getNonNullInstance(ASN1ObjectIdentifier oid) {
+    HashAlgo type = getInstance(oid);
     if (type == null) {
       throw new IllegalArgumentException("Unknown HashAlgo OID '" + oid.getId() + "'");
     }
     return type;
   }
 
-  public static HashAlgoType getNonNullHashAlgoType(String nameOrOid) {
-    HashAlgoType type = getHashAlgoType(nameOrOid);
+  public static HashAlgo getNonNullInstance(String nameOrOid) {
+    HashAlgo type = getInstance(nameOrOid);
     if (type == null) {
       throw new IllegalArgumentException("Unknown HashAlgo OID/name '" + nameOrOid + "'");
     }
     return type;
   }
 
-  public static HashAlgoType getInstanceForPkcs11HashMech(long hashMech) {
+  public static HashAlgo getInstanceForPkcs11HashMech(long hashMech) {
     if (hashMech == PKCS11Constants.CKM_SHA_1) {
-      return HashAlgoType.SHA1;
+      return HashAlgo.SHA1;
     } else if (hashMech == PKCS11Constants.CKM_SHA224) {
-      return HashAlgoType.SHA224;
+      return HashAlgo.SHA224;
     } else if (hashMech == PKCS11Constants.CKM_SHA256) {
-      return HashAlgoType.SHA256;
+      return HashAlgo.SHA256;
     } else if (hashMech == PKCS11Constants.CKM_SHA384) {
-      return HashAlgoType.SHA384;
+      return HashAlgo.SHA384;
     } else if (hashMech == PKCS11Constants.CKM_SHA512) {
-      return HashAlgoType.SHA512;
+      return HashAlgo.SHA512;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_224) {
-      return HashAlgoType.SHA3_224;
+      return HashAlgo.SHA3_224;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_256) {
-      return HashAlgoType.SHA3_256;
+      return HashAlgo.SHA3_256;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_384) {
-      return HashAlgoType.SHA3_384;
+      return HashAlgo.SHA3_384;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
-      return HashAlgoType.SHA3_512;
+      return HashAlgo.SHA3_512;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
-      return HashAlgoType.SHA3_512;
+      return HashAlgo.SHA3_512;
     } else if (hashMech == PKCS11VendorConstants.CKM_VENDOR_SM3) {
-      return HashAlgoType.SM3;
+      return HashAlgo.SM3;
     } else {
       return null;
     }
   }
 
-  public static HashAlgoType getInstanceForPkcs11MgfMech(long hashMech) {
+  public static HashAlgo getInstanceForPkcs11MgfMech(long hashMech) {
     if (hashMech == PKCS11Constants.CKG_MGF1_SHA1) {
-      return HashAlgoType.SHA1;
+      return HashAlgo.SHA1;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA224) {
-      return HashAlgoType.SHA224;
+      return HashAlgo.SHA224;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA256) {
-      return HashAlgoType.SHA256;
+      return HashAlgo.SHA256;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA384) {
-      return HashAlgoType.SHA384;
+      return HashAlgo.SHA384;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA512) {
-      return HashAlgoType.SHA512;
+      return HashAlgo.SHA512;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_224) {
-      return HashAlgoType.SHA3_224;
+      return HashAlgo.SHA3_224;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_256) {
-      return HashAlgoType.SHA3_256;
+      return HashAlgo.SHA3_256;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_384) {
-      return HashAlgoType.SHA3_384;
+      return HashAlgo.SHA3_384;
     } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_512) {
-      return HashAlgoType.SHA3_512;
+      return HashAlgo.SHA3_512;
     } else {
       // SM3 does not apply to RSAPSS signature
       return null;
     }
   }
 
-  public static HashAlgoType getInstanceForEncoded(byte[] encoded) {
+  public static HashAlgo getInstanceForEncoded(byte[] encoded) {
     return getInstanceForEncoded(encoded, 0, encoded.length);
   }
 
-  public static HashAlgoType getInstanceForEncoded(byte[] encoded, int offset, int len) {
-    for (HashAlgoType value : values()) {
+  public static HashAlgo getInstanceForEncoded(byte[] encoded, int offset, int len) {
+    for (HashAlgo value : values()) {
       byte[] ve = value.encoded;
       if (ve.length != len) {
         continue;
@@ -253,7 +253,7 @@ public enum HashAlgoType {
       case SM3:
         return new SM3Digest();
       default:
-        throw new RuntimeException("should not reach here, unknown HashAlgoType " + name());
+        throw new RuntimeException("should not reach here, unknown HashAlgo " + name());
     }
   }
 

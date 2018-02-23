@@ -27,7 +27,7 @@ import java.security.SignatureException;
 import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.DigestOutputStream;
@@ -56,7 +56,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA1 extends P11DSASignatureSpi {
 
     public SHA1() {
-      super(HashAlgoType.SHA1);
+      super(HashAlgo.SHA1);
     }
 
   } // class SHA1
@@ -65,7 +65,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA224 extends P11DSASignatureSpi {
 
     public SHA224() {
-      super(HashAlgoType.SHA224);
+      super(HashAlgo.SHA224);
     }
 
   } // class SHA224
@@ -74,7 +74,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA256 extends P11DSASignatureSpi {
 
     public SHA256() {
-      super(HashAlgoType.SHA256);
+      super(HashAlgo.SHA256);
     }
 
   } // class SHA256
@@ -83,7 +83,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA384 extends P11DSASignatureSpi {
 
     public SHA384() {
-      super(HashAlgoType.SHA384);
+      super(HashAlgo.SHA384);
     }
 
   } // class SHA384
@@ -92,7 +92,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA512 extends P11DSASignatureSpi {
 
     public SHA512() {
-      super(HashAlgoType.SHA512);
+      super(HashAlgo.SHA512);
     }
 
   } // class SHA512
@@ -101,7 +101,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA3_224 extends P11DSASignatureSpi {
 
     public SHA3_224() {
-      super(HashAlgoType.SHA3_224);
+      super(HashAlgo.SHA3_224);
     }
 
   }
@@ -110,7 +110,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA3_256 extends P11DSASignatureSpi {
 
     public SHA3_256() {
-      super(HashAlgoType.SHA3_256);
+      super(HashAlgo.SHA3_256);
     }
 
   }
@@ -119,7 +119,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA3_384 extends P11DSASignatureSpi {
 
     public SHA3_384() {
-      super(HashAlgoType.SHA3_384);
+      super(HashAlgo.SHA3_384);
     }
 
   }
@@ -128,12 +128,12 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   public static class SHA3_512 extends P11DSASignatureSpi {
 
     public SHA3_512() {
-      super(HashAlgoType.SHA3_512);
+      super(HashAlgo.SHA3_512);
     }
 
   }
 
-  private final HashAlgoType hashAlgo;
+  private final HashAlgo hashAlgo;
 
   private long mechanism;
 
@@ -141,7 +141,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   private P11PrivateKey signingKey;
 
-  private P11DSASignatureSpi(HashAlgoType hashAlgo) {
+  private P11DSASignatureSpi(HashAlgo hashAlgo) {
     this.hashAlgo = hashAlgo;
   }
 
@@ -170,31 +170,31 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
         outputStream = new DigestOutputStream(hashAlgo.createDigest());
       }
     } else {
-      if (hashAlgo == HashAlgoType.SHA1
+      if (hashAlgo == HashAlgo.SHA1
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA1)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA1;
-      } else if (hashAlgo == HashAlgoType.SHA224
+      } else if (hashAlgo == HashAlgo.SHA224
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA224)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA224;
-      } else if (hashAlgo == HashAlgoType.SHA256
+      } else if (hashAlgo == HashAlgo.SHA256
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA256)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA256;
-      } else if (hashAlgo == HashAlgoType.SHA384
+      } else if (hashAlgo == HashAlgo.SHA384
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA384)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA384;
-      } else if (hashAlgo == HashAlgoType.SHA512
+      } else if (hashAlgo == HashAlgo.SHA512
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA512)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA512;
-      } else if (hashAlgo == HashAlgoType.SHA3_224
+      } else if (hashAlgo == HashAlgo.SHA3_224
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_224)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_224;
-      } else if (hashAlgo == HashAlgoType.SHA3_256
+      } else if (hashAlgo == HashAlgo.SHA3_256
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_256)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_256;
-      } else if (hashAlgo == HashAlgoType.SHA3_384
+      } else if (hashAlgo == HashAlgo.SHA3_384
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_384)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_384;
-      } else if (hashAlgo == HashAlgoType.SHA3_512
+      } else if (hashAlgo == HashAlgo.SHA3_512
           && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_512)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_512;
       } else {

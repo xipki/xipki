@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.shell.CsrGenAction;
@@ -72,8 +72,8 @@ public class P11CsrGenCmd extends CsrGenAction {
       idBytes = Hex.decode(id);
     }
 
-    SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, label,
-        idBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+    SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, label, idBytes, 1,
+        HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS11", conf, (X509Certificate[]) null);
   }
 

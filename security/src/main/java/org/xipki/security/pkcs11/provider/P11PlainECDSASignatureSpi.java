@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 
 /**
  * TODO.
@@ -31,7 +31,7 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
   public static class SHA1 extends P11PlainECDSASignatureSpi {
 
     public SHA1() {
-      super(HashAlgoType.SHA1);
+      super(HashAlgo.SHA1);
     }
 
   } // class SHA1
@@ -49,7 +49,7 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
   public static class SHA224 extends P11PlainECDSASignatureSpi {
 
     public SHA224() {
-      super(HashAlgoType.SHA224);
+      super(HashAlgo.SHA224);
     }
 
   } // class SHA224
@@ -58,7 +58,7 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
   public static class SHA256 extends P11PlainECDSASignatureSpi {
 
     public SHA256() {
-      super(HashAlgoType.SHA256);
+      super(HashAlgo.SHA256);
     }
 
   } // class SHA256
@@ -67,7 +67,7 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
   static class SHA384 extends P11PlainECDSASignatureSpi {
 
     SHA384() {
-      super(HashAlgoType.SHA384);
+      super(HashAlgo.SHA384);
     }
 
   } // class SHA384
@@ -76,12 +76,12 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
   public static class SHA512 extends P11PlainECDSASignatureSpi {
 
     public SHA512() {
-      super(HashAlgoType.SHA512);
+      super(HashAlgo.SHA512);
     }
 
   } // class SHA512
 
-  private P11PlainECDSASignatureSpi(HashAlgoType hashAlgo) {
+  private P11PlainECDSASignatureSpi(HashAlgo hashAlgo) {
     super(hashAlgo, true);
   }
 

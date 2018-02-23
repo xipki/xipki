@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -57,18 +57,18 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 // CHECKSTYLE:SKIP
 class P11RSAPSSContentSigner implements XiContentSigner {
 
-  private static final Map<HashAlgoType, Long> hashAlgMecMap = new HashMap<>();
+  private static final Map<HashAlgo, Long> hashAlgMecMap = new HashMap<>();
 
   static {
-    hashAlgMecMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS);
-    hashAlgMecMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA512, PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA3_224, PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS);
+    hashAlgMecMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
   }
 
   // CHECKSTYLE:SKIP
@@ -151,7 +151,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
 
     RSASSAPSSparams asn1Params = RSASSAPSSparams.getInstance(signatureAlgId.getParameters());
     ASN1ObjectIdentifier digestAlgOid = asn1Params.getHashAlgorithm().getAlgorithm();
-    HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(digestAlgOid);
+    HashAlgo hashAlgo = HashAlgo.getInstance(digestAlgOid);
     if (hashAlgo == null) {
       throw new XiSecurityException("unsupported hash algorithm " + digestAlgOid.getId());
     }
@@ -179,7 +179,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
     } else {
       Long mech = hashAlgMecMap.get(hashAlgo);
       if (mech == null) {
-        throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
+        throw new RuntimeException("should not reach here, unknown HashAlgo " + hashAlgo);
       }
       this.mechanism = mech.longValue();
       if (!slot.supportsMechanism(this.mechanism)) {

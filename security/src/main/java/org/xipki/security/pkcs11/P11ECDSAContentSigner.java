@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -52,9 +52,9 @@ class P11ECDSAContentSigner implements XiContentSigner {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11ECDSAContentSigner.class);
 
-  private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
+  private static final Map<String, HashAlgo> sigAlgHashMap = new HashMap<>();
 
-  private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
+  private static final Map<HashAlgo, Long> hashMechMap = new HashMap<>();
 
   private final P11CryptService cryptService;
 
@@ -71,31 +71,31 @@ class P11ECDSAContentSigner implements XiContentSigner {
   private final boolean plain;
 
   static {
-    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA1.getId(), HashAlgoType.SHA1);
-    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA224.getId(), HashAlgoType.SHA224);
-    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA256.getId(), HashAlgoType.SHA256);
-    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA384.getId(), HashAlgoType.SHA384);
-    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA512.getId(), HashAlgoType.SHA512);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId(), HashAlgoType.SHA3_224);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(), HashAlgoType.SHA3_256);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(), HashAlgoType.SHA3_384);
-    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(), HashAlgoType.SHA3_512);
+    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA1.getId(), HashAlgo.SHA1);
+    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA224.getId(), HashAlgo.SHA224);
+    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA256.getId(), HashAlgo.SHA256);
+    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA384.getId(), HashAlgo.SHA384);
+    sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA512.getId(), HashAlgo.SHA512);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId(), HashAlgo.SHA3_224);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(), HashAlgo.SHA3_256);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(), HashAlgo.SHA3_384);
+    sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(), HashAlgo.SHA3_512);
 
-    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA1.getId(), HashAlgoType.SHA1);
-    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA224.getId(), HashAlgoType.SHA224);
-    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA256.getId(), HashAlgoType.SHA256);
-    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA384.getId(), HashAlgoType.SHA384);
-    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA512.getId(), HashAlgoType.SHA512);
+    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA1.getId(), HashAlgo.SHA1);
+    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA224.getId(), HashAlgo.SHA224);
+    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA256.getId(), HashAlgo.SHA256);
+    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA384.getId(), HashAlgo.SHA384);
+    sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA512.getId(), HashAlgo.SHA512);
 
-    hashMechMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_ECDSA_SHA1);
-    hashMechMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_ECDSA_SHA224);
-    hashMechMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_ECDSA_SHA256);
-    hashMechMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_ECDSA_SHA384);
-    hashMechMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_ECDSA_SHA512);
-    hashMechMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_ECDSA_SHA3_224);
-    hashMechMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_ECDSA_SHA3_256);
-    hashMechMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_ECDSA_SHA3_384);
-    hashMechMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_ECDSA_SHA3_512);
+    hashMechMap.put(HashAlgo.SHA1, PKCS11Constants.CKM_ECDSA_SHA1);
+    hashMechMap.put(HashAlgo.SHA224, PKCS11Constants.CKM_ECDSA_SHA224);
+    hashMechMap.put(HashAlgo.SHA256, PKCS11Constants.CKM_ECDSA_SHA256);
+    hashMechMap.put(HashAlgo.SHA384, PKCS11Constants.CKM_ECDSA_SHA384);
+    hashMechMap.put(HashAlgo.SHA512, PKCS11Constants.CKM_ECDSA_SHA512);
+    hashMechMap.put(HashAlgo.SHA3_224, PKCS11Constants.CKM_ECDSA_SHA3_224);
+    hashMechMap.put(HashAlgo.SHA3_256, PKCS11Constants.CKM_ECDSA_SHA3_256);
+    hashMechMap.put(HashAlgo.SHA3_384, PKCS11Constants.CKM_ECDSA_SHA3_384);
+    hashMechMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_ECDSA_SHA3_512);
   }
 
   P11ECDSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
@@ -112,7 +112,7 @@ class P11ECDSAContentSigner implements XiContentSigner {
     this.plain = plain;
 
     String algOid = signatureAlgId.getAlgorithm().getId();
-    HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
+    HashAlgo hashAlgo = sigAlgHashMap.get(algOid);
     if (hashAlgo == null) {
       throw new XiSecurityException("unsupported signature algorithm " + algOid);
     }

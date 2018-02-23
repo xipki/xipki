@@ -53,7 +53,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -267,24 +267,24 @@ public class P12KeyGenerator {
 
       builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
     } else if (key instanceof ECPrivateKey) {
-      HashAlgoType hashAlgo;
+      HashAlgo hashAlgo;
       ASN1ObjectIdentifier sigOid;
 
       int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
       if (keysize > 384) {
-        hashAlgo = HashAlgoType.SHA512;
+        hashAlgo = HashAlgo.SHA512;
         sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
       } else if (keysize > 256) {
-        hashAlgo = HashAlgoType.SHA384;
+        hashAlgo = HashAlgo.SHA384;
         sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
       } else if (keysize > 224) {
-        hashAlgo = HashAlgoType.SHA224;
+        hashAlgo = HashAlgo.SHA224;
         sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
       } else if (keysize > 160) {
-        hashAlgo = HashAlgoType.SHA256;
+        hashAlgo = HashAlgo.SHA256;
         sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
       } else {
-        hashAlgo = HashAlgoType.SHA1;
+        hashAlgo = HashAlgo.SHA1;
         sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
       }
 

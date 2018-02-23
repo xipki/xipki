@@ -38,11 +38,11 @@ class HashCalculator {
 
   private static final int PARALLELISM = 50;
 
-  private static final ConcurrentHashMap<HashAlgoType, ConcurrentBag<ConcurrentBagEntry<Digest>>>
+  private static final ConcurrentHashMap<HashAlgo, ConcurrentBag<ConcurrentBagEntry<Digest>>>
       MDS_MAP = new ConcurrentHashMap<>();
 
   static {
-    for (HashAlgoType ha : HashAlgoType.values()) {
+    for (HashAlgo ha : HashAlgo.values()) {
       MDS_MAP.put(ha, getMessageDigests(ha));
     }
   }
@@ -50,8 +50,7 @@ class HashCalculator {
   private HashCalculator() {
   }
 
-  private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMessageDigests(
-      HashAlgoType hashAlgo) {
+  private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMessageDigests(HashAlgo hashAlgo) {
     ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
     for (int i = 0; i < PARALLELISM; i++) {
       mds.add(new ConcurrentBagEntry<Digest>(hashAlgo.createDigest()));
@@ -60,85 +59,85 @@ class HashCalculator {
   }
 
   public static String base64Sha1(byte[] data) {
-    return Base64.encodeToString(hash(HashAlgoType.SHA1, data, 0, data.length));
+    return Base64.encodeToString(hash(HashAlgo.SHA1, data, 0, data.length));
   }
 
   public static String base64Sha1(byte[] data, int offset, int len) {
-    return Base64.encodeToString(hash(HashAlgoType.SHA1, data, offset, len));
+    return Base64.encodeToString(hash(HashAlgo.SHA1, data, offset, len));
   }
 
   public static String hexSha1(byte[] data) {
-    return Hex.encode(hash(HashAlgoType.SHA1, data, 0, data.length));
+    return Hex.encode(hash(HashAlgo.SHA1, data, 0, data.length));
   }
 
   public static String hexSha1(byte[] data, int offset, int len) {
-    return Hex.encode(hash(HashAlgoType.SHA1, data, offset, len));
+    return Hex.encode(hash(HashAlgo.SHA1, data, offset, len));
   }
 
   public static byte[] sha1(byte[] data) {
-    return hash(HashAlgoType.SHA1, data, 0, data.length);
+    return hash(HashAlgo.SHA1, data, 0, data.length);
   }
 
   public static byte[] sha1(byte[] data, int offset, int len) {
-    return hash(HashAlgoType.SHA1, data, offset, len);
+    return hash(HashAlgo.SHA1, data, offset, len);
   }
 
   public static String base64Sha256(byte[] data) {
-    return Base64.encodeToString(hash(HashAlgoType.SHA256, data, 0, data.length));
+    return Base64.encodeToString(hash(HashAlgo.SHA256, data, 0, data.length));
   }
 
   public static String base64Sha256(byte[] data, int offset, int len) {
-    return Base64.encodeToString(hash(HashAlgoType.SHA256, data, offset, len));
+    return Base64.encodeToString(hash(HashAlgo.SHA256, data, offset, len));
   }
 
   public static String hexSha256(byte[] data) {
-    return Hex.encode(hash(HashAlgoType.SHA256, data, 0, data.length));
+    return Hex.encode(hash(HashAlgo.SHA256, data, 0, data.length));
   }
 
   public static String hexSha256(byte[] data, int offset, int len) {
-    return Hex.encode(hash(HashAlgoType.SHA256, data, offset, len));
+    return Hex.encode(hash(HashAlgo.SHA256, data, offset, len));
   }
 
   public static byte[] sha256(byte[] data) {
-    return hash(HashAlgoType.SHA256, data, 0, data.length);
+    return hash(HashAlgo.SHA256, data, 0, data.length);
   }
 
   public static byte[] sha256(byte[] data, int offset, int len) {
-    return hash(HashAlgoType.SHA256, data, offset, len);
+    return hash(HashAlgo.SHA256, data, offset, len);
   }
 
-  public static String hexHash(HashAlgoType hashAlgoType, byte[] data) {
-    return Hex.encode(hash(hashAlgoType, data, 0, data.length));
+  public static String hexHash(HashAlgo hashAlgo, byte[] data) {
+    return Hex.encode(hash(hashAlgo, data, 0, data.length));
   }
 
-  public static String hexHash(HashAlgoType hashAlgoType, byte[] data, int offset, int len) {
-    return Hex.encode(hash(hashAlgoType, data, offset, len));
+  public static String hexHash(HashAlgo hashAlgo, byte[] data, int offset, int len) {
+    return Hex.encode(hash(hashAlgo, data, offset, len));
   }
 
-  public static String base64Hash(HashAlgoType hashAlgoType, byte[] data) {
-    return Base64.encodeToString(hash(hashAlgoType, data, 0, data.length));
+  public static String base64Hash(HashAlgo hashAlgo, byte[] data) {
+    return Base64.encodeToString(hash(hashAlgo, data, 0, data.length));
   }
 
-  public static String base64Hash(HashAlgoType hashAlgoType, byte[] data, int offset, int len) {
-    return Base64.encodeToString(hash(hashAlgoType, data, offset, len));
+  public static String base64Hash(HashAlgo hashAlgo, byte[] data, int offset, int len) {
+    return Base64.encodeToString(hash(hashAlgo, data, offset, len));
   }
 
-  public static byte[] hash(HashAlgoType hashAlgoType, byte[] data) {
-    return hash(hashAlgoType, data, 0, data.length);
+  public static byte[] hash(HashAlgo hashAlgo, byte[] data) {
+    return hash(hashAlgo, data, 0, data.length);
   }
 
-  public static byte[] hash(HashAlgoType hashAlgoType, byte[] data, int offset, int len) {
-    ParamUtil.requireNonNull("hashAlgoType", hashAlgoType);
+  public static byte[] hash(HashAlgo hashAlgo, byte[] data, int offset, int len) {
+    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     ParamUtil.requireNonNull("data", data);
     if (data.length - offset < len) {
       throw new IndexOutOfBoundsException("data.length - offset < len");
     }
 
-    if (!MDS_MAP.containsKey(hashAlgoType)) {
-      throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
+    if (!MDS_MAP.containsKey(hashAlgo)) {
+      throw new IllegalArgumentException("unknown hash algo " + hashAlgo);
     }
 
-    ConcurrentBag<ConcurrentBagEntry<Digest>> mds = MDS_MAP.get(hashAlgoType);
+    ConcurrentBag<ConcurrentBagEntry<Digest>> mds = MDS_MAP.get(hashAlgo);
 
     ConcurrentBagEntry<Digest> md0 = null;
     for (int i = 0; i < 3; i++) {

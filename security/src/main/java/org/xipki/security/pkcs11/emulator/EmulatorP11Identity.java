@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
@@ -163,7 +163,7 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
 
-    HashAlgoType hashAlgo = HashAlgoType.getInstanceForPkcs11HashMech(mechanism);
+    HashAlgo hashAlgo = HashAlgo.getInstanceForPkcs11HashMech(mechanism);
     if (hashAlgo == null) {
       throw new P11TokenException(
           "unknown mechanism " + Functions.mechanismCodeToString(mechanism));
@@ -177,107 +177,107 @@ public class EmulatorP11Identity extends P11Identity {
     if (PKCS11Constants.CKM_ECDSA == mechanism) {
       return dsaAndEcdsaSign(content, null);
     } else if (PKCS11Constants.CKM_ECDSA_SHA1 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA1);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA1);
     } else if (PKCS11Constants.CKM_ECDSA_SHA224 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA224);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA224);
     } else if (PKCS11Constants.CKM_ECDSA_SHA256 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA256);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA256);
     } else if (PKCS11Constants.CKM_ECDSA_SHA384 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA384);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA384);
     } else if (PKCS11Constants.CKM_ECDSA_SHA512 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA512);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA512);
     } else if (PKCS11Constants.CKM_ECDSA_SHA3_224 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_224);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_224);
     } else if (PKCS11Constants.CKM_ECDSA_SHA3_256 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_256);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_256);
     } else if (PKCS11Constants.CKM_ECDSA_SHA3_384 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_384);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_ECDSA_SHA3_512 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_512);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_512);
     } else if (PKCS11VendorConstants.CKM_VENDOR_SM2 == mechanism) {
       return sm2SignHash(content);
     } else if (PKCS11VendorConstants.CKM_VENDOR_SM2_SM3 == mechanism) {
-      return sm2Sign(parameters, content, HashAlgoType.SM3);
+      return sm2Sign(parameters, content, HashAlgo.SM3);
     } else if (PKCS11Constants.CKM_DSA == mechanism) {
       return dsaAndEcdsaSign(content, null);
     } else if (PKCS11Constants.CKM_DSA_SHA1 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA1);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA1);
     } else if (PKCS11Constants.CKM_DSA_SHA224 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA224);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA224);
     } else if (PKCS11Constants.CKM_DSA_SHA256 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA256);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA256);
     } else if (PKCS11Constants.CKM_DSA_SHA384 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA384);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA384);
     } else if (PKCS11Constants.CKM_DSA_SHA512 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA512);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA512);
     } else if (PKCS11Constants.CKM_DSA_SHA3_224 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_224);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_224);
     } else if (PKCS11Constants.CKM_DSA_SHA3_256 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_256);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_256);
     } else if (PKCS11Constants.CKM_DSA_SHA3_384 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_384);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_DSA_SHA3_512 == mechanism) {
-      return dsaAndEcdsaSign(content, HashAlgoType.SHA3_512);
+      return dsaAndEcdsaSign(content, HashAlgo.SHA3_512);
     } else if (PKCS11Constants.CKM_RSA_X_509 == mechanism) {
       return rsaX509Sign(content);
     } else if (PKCS11Constants.CKM_RSA_PKCS == mechanism) {
       return rsaPkcsSign(content, null);
     } else if (PKCS11Constants.CKM_SHA1_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA1);
+      return rsaPkcsSign(content, HashAlgo.SHA1);
     } else if (PKCS11Constants.CKM_SHA224_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA224);
+      return rsaPkcsSign(content, HashAlgo.SHA224);
     } else if (PKCS11Constants.CKM_SHA256_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA256);
+      return rsaPkcsSign(content, HashAlgo.SHA256);
     } else if (PKCS11Constants.CKM_SHA384_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA384);
+      return rsaPkcsSign(content, HashAlgo.SHA384);
     } else if (PKCS11Constants.CKM_SHA512_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA512);
+      return rsaPkcsSign(content, HashAlgo.SHA512);
     } else if (PKCS11Constants.CKM_SHA3_224_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA3_224);
+      return rsaPkcsSign(content, HashAlgo.SHA3_224);
     } else if (PKCS11Constants.CKM_SHA3_256_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA3_256);
+      return rsaPkcsSign(content, HashAlgo.SHA3_256);
     } else if (PKCS11Constants.CKM_SHA3_384_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA3_384);
+      return rsaPkcsSign(content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_SHA3_512_RSA_PKCS == mechanism) {
-      return rsaPkcsSign(content, HashAlgoType.SHA3_512);
+      return rsaPkcsSign(content, HashAlgo.SHA3_512);
     } else if (PKCS11Constants.CKM_RSA_PKCS_PSS == mechanism) {
       return rsaPkcsPssSign(parameters, content, null);
     } else if (PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA1);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA1);
     } else if (PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA224);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA224);
     } else if (PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA256);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA256);
     } else if (PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA384);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA384);
     } else if (PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA512);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA512);
     } else if (PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_224);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA3_224);
     } else if (PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_256);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA3_256);
     } else if (PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_384);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS == mechanism) {
-      return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_512);
+      return rsaPkcsPssSign(parameters, content, HashAlgo.SHA3_512);
     } else if (PKCS11Constants.CKM_SHA_1_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA1);
+      return hmac(content, HashAlgo.SHA1);
     } else if (PKCS11Constants.CKM_SHA224_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA224);
+      return hmac(content, HashAlgo.SHA224);
     } else if (PKCS11Constants.CKM_SHA256_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA256);
+      return hmac(content, HashAlgo.SHA256);
     } else if (PKCS11Constants.CKM_SHA384_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA384);
+      return hmac(content, HashAlgo.SHA384);
     } else if (PKCS11Constants.CKM_SHA512_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA512);
+      return hmac(content, HashAlgo.SHA512);
     } else if (PKCS11Constants.CKM_SHA3_224_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA3_224);
+      return hmac(content, HashAlgo.SHA3_224);
     } else if (PKCS11Constants.CKM_SHA3_256_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA3_256);
+      return hmac(content, HashAlgo.SHA3_256);
     } else if (PKCS11Constants.CKM_SHA3_384_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA3_384);
+      return hmac(content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_SHA3_512_HMAC == mechanism) {
-      return hmac(content, HashAlgoType.SHA3_512);
+      return hmac(content, HashAlgo.SHA3_512);
     } else if (PKCS11Constants.CKM_AES_GMAC == mechanism) {
       return aesGmac(parameters, content);
     } else {
@@ -286,7 +286,7 @@ public class EmulatorP11Identity extends P11Identity {
   }
 
   // TODO: check the correctness
-  private byte[] hmac(byte[] contentToSign, HashAlgoType hashAlgo) {
+  private byte[] hmac(byte[] contentToSign, HashAlgo hashAlgo) {
     HMac hmac = new HMac(hashAlgo.createDigest());
     hmac.init(new KeyParameter(signingKey.getEncoded()));
     hmac.update(contentToSign, 0, contentToSign.length);
@@ -319,21 +319,21 @@ public class EmulatorP11Identity extends P11Identity {
   }
 
   private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign,
-      HashAlgoType hashAlgo) throws P11TokenException {
+      HashAlgo hashAlgo) throws P11TokenException {
     if (!(parameters instanceof P11RSAPkcsPssParams)) {
       throw new P11TokenException("the parameters is not of "
           + P11RSAPkcsPssParams.class.getName());
     }
 
     P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
-    HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(pssParam.hashAlgorithm());
+    HashAlgo contentHash = HashAlgo.getInstanceForPkcs11HashMech(pssParam.hashAlgorithm());
     if (contentHash == null) {
       throw new P11TokenException("unsupported HashAlgorithm " + pssParam.hashAlgorithm());
     } else if (hashAlgo != null && contentHash != hashAlgo) {
       throw new P11TokenException("Invalid parameters: invalid hash algorithm");
     }
 
-    HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
+    HashAlgo mgfHash = HashAlgo.getInstanceForPkcs11MgfMech(
         pssParam.maskGenerationFunction());
     if (mgfHash == null) {
       throw new P11TokenException("unsupported MaskGenerationFunction " + pssParam.hashAlgorithm());
@@ -350,7 +350,7 @@ public class EmulatorP11Identity extends P11Identity {
     return rsaX509Sign(encodedHashValue);
   }
 
-  private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgoType hashAlgo) throws P11TokenException {
+  private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgo hashAlgo) throws P11TokenException {
     int modulusBitLen = signatureKeyBitLength();
     byte[] paddedHash;
     try {
@@ -390,7 +390,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   }
 
-  private byte[] dsaAndEcdsaSign(byte[] dataToSign, HashAlgoType hashAlgo)
+  private byte[] dsaAndEcdsaSign(byte[] dataToSign, HashAlgo hashAlgo)
       throws P11TokenException {
     byte[] hash = (hashAlgo == null) ? dataToSign : hashAlgo.hash(dataToSign);
 
@@ -444,7 +444,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   }
 
-  private byte[] sm2Sign(P11Params params, byte[] dataToSign, HashAlgoType hash)
+  private byte[] sm2Sign(P11Params params, byte[] dataToSign, HashAlgo hash)
       throws P11TokenException {
     if (params == null) {
       throw new P11TokenException("userId must not be null");

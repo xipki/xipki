@@ -42,7 +42,7 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.XiSecurityException;
 
 /**
@@ -55,21 +55,21 @@ import org.xipki.security.exception.XiSecurityException;
 
 public class SignerUtil {
 
-  private static final Map<HashAlgoType, byte[]> digestPkcsPrefix = new HashMap<>();
+  private static final Map<HashAlgo, byte[]> digestPkcsPrefix = new HashMap<>();
 
   static {
-    addDigestPkcsPrefix(HashAlgoType.SHA1, "3021300906052b0e03021a05000414");
-    addDigestPkcsPrefix(HashAlgoType.SHA224, "302d300d06096086480165030402040500041c");
-    addDigestPkcsPrefix(HashAlgoType.SHA256, "3031300d060960864801650304020105000420");
-    addDigestPkcsPrefix(HashAlgoType.SHA384, "3041300d060960864801650304020205000430");
-    addDigestPkcsPrefix(HashAlgoType.SHA512, "3051300d060960864801650304020305000440");
-    addDigestPkcsPrefix(HashAlgoType.SHA3_224, "302d300d06096086480165030402070500041c");
-    addDigestPkcsPrefix(HashAlgoType.SHA3_256, "3031300d060960864801650304020805000420");
-    addDigestPkcsPrefix(HashAlgoType.SHA3_384, "3041300d060960864801650304020905000430");
-    addDigestPkcsPrefix(HashAlgoType.SHA3_512, "3051300d060960864801650304020a05000440");
+    addDigestPkcsPrefix(HashAlgo.SHA1, "3021300906052b0e03021a05000414");
+    addDigestPkcsPrefix(HashAlgo.SHA224, "302d300d06096086480165030402040500041c");
+    addDigestPkcsPrefix(HashAlgo.SHA256, "3031300d060960864801650304020105000420");
+    addDigestPkcsPrefix(HashAlgo.SHA384, "3041300d060960864801650304020205000430");
+    addDigestPkcsPrefix(HashAlgo.SHA512, "3051300d060960864801650304020305000440");
+    addDigestPkcsPrefix(HashAlgo.SHA3_224, "302d300d06096086480165030402070500041c");
+    addDigestPkcsPrefix(HashAlgo.SHA3_256, "3031300d060960864801650304020805000420");
+    addDigestPkcsPrefix(HashAlgo.SHA3_384, "3041300d060960864801650304020905000430");
+    addDigestPkcsPrefix(HashAlgo.SHA3_512, "3051300d060960864801650304020a05000440");
   }
 
-  private static void addDigestPkcsPrefix(HashAlgoType algo, String prefix) {
+  private static void addDigestPkcsPrefix(HashAlgo algo, String prefix) {
     digestPkcsPrefix.put(algo, Hex.decode(prefix));
   }
 
@@ -137,7 +137,7 @@ public class SignerUtil {
 
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
-      HashAlgoType hashAlgo) throws XiSecurityException {
+      HashAlgo hashAlgo) throws XiSecurityException {
     ParamUtil.requireNonNull("hashValue", hashValue);
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -202,8 +202,8 @@ public class SignerUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static byte[] EMSA_PSS_ENCODE(HashAlgoType contentDigest, byte[] hashValue,
-      HashAlgoType mgfDigest, int saltLen, int modulusBitLength, SecureRandom random)
+  public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue,
+      HashAlgo mgfDigest, int saltLen, int modulusBitLength, SecureRandom random)
       throws XiSecurityException {
     final int hLen = contentDigest.length();
     final byte[] salt = new byte[saltLen];
@@ -256,7 +256,7 @@ public class SignerUtil {
   /**
    * mask generator function, as described in PKCS1v2.
    */
-  private static byte[] maskGeneratorFunction1(HashAlgoType mgfDigest,
+  private static byte[] maskGeneratorFunction1(HashAlgo mgfDigest,
       byte[] Z, // CHECKSTYLE:SKIP
       int length) {
     int mgfhLen = mgfDigest.length();
@@ -350,7 +350,7 @@ public class SignerUtil {
   }
 
   private static Digest getDigest(AlgorithmIdentifier hashAlgo) throws XiSecurityException {
-    HashAlgoType hat = HashAlgoType.getHashAlgoType(hashAlgo.getAlgorithm());
+    HashAlgo hat = HashAlgo.getInstance(hashAlgo.getAlgorithm());
     if (hat != null) {
       return hat.createDigest();
     } else {
@@ -358,7 +358,7 @@ public class SignerUtil {
     }
   }
 
-  public static byte[] getDigestPkcsPrefix(HashAlgoType hashAlgo) {
+  public static byte[] getDigestPkcsPrefix(HashAlgo hashAlgo) {
     byte[] bytes = digestPkcsPrefix.get(hashAlgo);
     return (bytes == null) ? null : Arrays.copyOf(bytes, bytes.length);
   }

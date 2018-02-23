@@ -22,7 +22,6 @@ import java.io.File;
 import java.security.cert.X509CRL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -36,7 +35,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
@@ -92,7 +91,7 @@ public class ExtractCertFromCrlCmd extends SecurityAction {
       }
 
       byte[] certBytes = cert.getEncoded();
-      String sha1FpCert = HashAlgoType.SHA1.hexHash(certBytes);
+      String sha1FpCert = HashAlgo.SHA1.hexHash(certBytes);
       ZipEntry certZipEntry = new ZipEntry(sha1FpCert + ".der");
       zip.putNextEntry(certZipEntry);
       try {

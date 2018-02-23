@@ -38,7 +38,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
@@ -126,7 +126,7 @@ public class SoftTokenMacContentSignerBuilder {
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
-    concurrentSigner.setSha1DigestOfMacKey(HashAlgoType.SHA1.hash(key.getEncoded()));
+    concurrentSigner.setSha1DigestOfMacKey(HashAlgo.SHA1.hash(key.getEncoded()));
 
     return concurrentSigner;
   } // createSigner

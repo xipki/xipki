@@ -39,7 +39,7 @@ import org.bouncycastle.math.ec.ECConstants;
 import org.bouncycastle.math.ec.ECMultiplier;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.FixedPointCombMultiplier;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.GMUtil;
 
 /**
@@ -80,7 +80,7 @@ class SM2Signer {
     this.pubPoint = new FixedPointCombMultiplier().multiply(ecParams.getG(),
         ((ECPrivateKeyParameters)ecKey).getD()).normalize();
 
-    this.digest = HashAlgoType.SM3.createDigest();
+    this.digest = HashAlgo.SM3.createDigest();
   }
 
   public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
