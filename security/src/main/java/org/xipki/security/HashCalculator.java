@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +24,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 
@@ -60,42 +60,79 @@ class HashCalculator {
   }
 
   public static String base64Sha1(byte[] data) {
-    return base64Hash(HashAlgoType.SHA1, data);
+    return Base64.encodeToString(hash(HashAlgoType.SHA1, data, 0, data.length));
+  }
+
+  public static String base64Sha1(byte[] data, int offset, int len) {
+    return Base64.encodeToString(hash(HashAlgoType.SHA1, data, offset, len));
   }
 
   public static String hexSha1(byte[] data) {
-    return hexHash(HashAlgoType.SHA1, data);
+    return Hex.encode(hash(HashAlgoType.SHA1, data, 0, data.length));
+  }
+
+  public static String hexSha1(byte[] data, int offset, int len) {
+    return Hex.encode(hash(HashAlgoType.SHA1, data, offset, len));
   }
 
   public static byte[] sha1(byte[] data) {
-    return hash(HashAlgoType.SHA1, data);
+    return hash(HashAlgoType.SHA1, data, 0, data.length);
+  }
+
+  public static byte[] sha1(byte[] data, int offset, int len) {
+    return hash(HashAlgoType.SHA1, data, offset, len);
   }
 
   public static String base64Sha256(byte[] data) {
-    return base64Hash(HashAlgoType.SHA256, data);
+    return Base64.encodeToString(hash(HashAlgoType.SHA256, data, 0, data.length));
+  }
+
+  public static String base64Sha256(byte[] data, int offset, int len) {
+    return Base64.encodeToString(hash(HashAlgoType.SHA256, data, offset, len));
   }
 
   public static String hexSha256(byte[] data) {
-    return hexHash(HashAlgoType.SHA256, data);
+    return Hex.encode(hash(HashAlgoType.SHA256, data, 0, data.length));
+  }
+
+  public static String hexSha256(byte[] data, int offset, int len) {
+    return Hex.encode(hash(HashAlgoType.SHA256, data, offset, len));
   }
 
   public static byte[] sha256(byte[] data) {
-    return hash(HashAlgoType.SHA256, data);
+    return hash(HashAlgoType.SHA256, data, 0, data.length);
+  }
+
+  public static byte[] sha256(byte[] data, int offset, int len) {
+    return hash(HashAlgoType.SHA256, data, offset, len);
   }
 
   public static String hexHash(HashAlgoType hashAlgoType, byte[] data) {
-    byte[] bytes = hash(hashAlgoType, data);
-    return (bytes == null) ? null : Hex.encode(bytes);
+    return Hex.encode(hash(hashAlgoType, data, 0, data.length));
+  }
+
+  public static String hexHash(HashAlgoType hashAlgoType, byte[] data, int offset, int len) {
+    return Hex.encode(hash(hashAlgoType, data, offset, len));
   }
 
   public static String base64Hash(HashAlgoType hashAlgoType, byte[] data) {
-    byte[] bytes = hash(hashAlgoType, data);
-    return (bytes == null) ? null : Base64.getEncoder().encodeToString(bytes);
+    return Base64.encodeToString(hash(hashAlgoType, data, 0, data.length));
+  }
+
+  public static String base64Hash(HashAlgoType hashAlgoType, byte[] data, int offset, int len) {
+    return Base64.encodeToString(hash(hashAlgoType, data, offset, len));
   }
 
   public static byte[] hash(HashAlgoType hashAlgoType, byte[] data) {
+    return hash(hashAlgoType, data, 0, data.length);
+  }
+
+  public static byte[] hash(HashAlgoType hashAlgoType, byte[] data, int offset, int len) {
     ParamUtil.requireNonNull("hashAlgoType", hashAlgoType);
     ParamUtil.requireNonNull("data", data);
+    if (data.length - offset < len) {
+      throw new IndexOutOfBoundsException("data.length - offset < len");
+    }
 
     if (!MDS_MAP.containsKey(hashAlgoType)) {
       throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
@@ -119,7 +156,7 @@ class HashCalculator {
     try {
       Digest md = md0.value();
       md.reset();
-      md.update(data, 0, data.length);
+      md.update(data, offset, len);
       byte[] bytes = new byte[md.getDigestSize()];
       md.doFinal(bytes, 0);
       return bytes;

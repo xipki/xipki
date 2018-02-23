@@ -32,7 +32,6 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
-import java.util.Base64;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -220,32 +219,7 @@ public class IoUtil {
   }
 
   public static String base64Encode(byte[] data, boolean withLineBreak) {
-
-    String b64Str = Base64.getEncoder().encodeToString(data);
-    if (!withLineBreak) {
-      return b64Str;
-    }
-
-    if (b64Str.length() < 64) {
-      return b64Str;
-    }
-
-    StringBuilder sb = new StringBuilder();
-    final int blockSize = 64;
-    final int size = b64Str.length();
-
-    final int nFullBlock = size / blockSize;
-
-    for (int i = 0; i < nFullBlock; i++) {
-      int offset = i * blockSize;
-      sb.append(b64Str.subSequence(offset, offset + blockSize)).append("\n");
-    }
-
-    if (size % blockSize != 0) {
-      sb.append(b64Str.substring(nFullBlock * blockSize)).append("\n");
-    }
-    sb.deleteCharAt(sb.length() - 1);
-    return sb.toString();
+    return Base64.encodeToString(data, withLineBreak);
   }
 
   public static HttpURLConnection openHttpConn(URL url) throws IOException {

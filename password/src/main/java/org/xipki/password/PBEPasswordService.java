@@ -21,8 +21,7 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Base64;
-
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
@@ -42,7 +41,7 @@ public class PBEPasswordService {
     ParamUtil.requireNonNull("masterPassword", masterPassword);
     ParamUtil.requireNonNull("passwordHint", passwordHint);
 
-    byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
+    byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()));
     int len = bytes.length;
     if (len <= 16 && len != 0) {
       throw new PasswordResolverException("invalid length of the encrypted password");
@@ -123,7 +122,7 @@ public class PBEPasswordService {
 
     // cipher text
     System.arraycopy(encrypted, 0, encryptedText, offset, encrypted.length);
-    return StringUtil.concat("PBE:", Base64.getEncoder().encodeToString(encryptedText));
+    return StringUtil.concat("PBE:", Base64.encodeToString(encryptedText));
   }
 
 }

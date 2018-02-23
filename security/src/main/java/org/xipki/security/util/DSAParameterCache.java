@@ -154,8 +154,8 @@ public final class DSAParameterCache {
     final int certainty = 80;
     SecureRandom tmpRandom = (random == null) ? new SecureRandom() : random;
     DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
-    DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-        plength, qlength, certainty, tmpRandom);
+    DSAParameterGenerationParameters genParams =
+        new DSAParameterGenerationParameters(plength, qlength, certainty, tmpRandom);
     paramGen.init(genParams);
     DSAParameters dsaParams = paramGen.generateParameters();
     return new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
