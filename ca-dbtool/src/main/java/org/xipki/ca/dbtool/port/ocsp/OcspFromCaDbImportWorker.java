@@ -20,9 +20,11 @@ package org.xipki.ca.dbtool.port.ocsp;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;

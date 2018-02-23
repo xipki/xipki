@@ -17,9 +17,8 @@
 
 package org.xipki.ca.server.api;
 
-import java.util.Map;
-
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * TODO.
