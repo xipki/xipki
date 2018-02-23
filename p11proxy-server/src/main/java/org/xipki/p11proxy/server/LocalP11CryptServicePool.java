@@ -22,10 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgoType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
@@ -98,7 +97,7 @@ public class LocalP11CryptServicePool {
   private static short deriveModuleId(String moduleName) throws XiSecurityException {
     byte[] hash;
     try {
-      hash = HashAlgoType.SHA1.hash(moduleName.getBytes("UTF-8"));
+      hash = HashAlgo.SHA1.hash(moduleName.getBytes("UTF-8"));
     } catch (UnsupportedEncodingException ex) {
       throw new XiSecurityException("Unsupported charset UTF-8");
     }
