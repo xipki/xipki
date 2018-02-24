@@ -70,7 +70,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
 
 /**
@@ -172,7 +172,7 @@ public class CaEmulator {
     BasicConstraints bc = new BasicConstraints(false);
     certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgoType.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
 
@@ -217,7 +217,7 @@ public class CaEmulator {
     crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
     crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber.getAndAdd(1)));
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgoType.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509CRLHolder crl = crlBuilder.build(contentSigner);
     return crl.toASN1Structure();

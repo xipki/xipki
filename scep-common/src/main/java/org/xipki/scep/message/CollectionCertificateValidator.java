@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
 
 /**
@@ -41,7 +41,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     for (X509Certificate cert : certs) {
       String hash;
       try {
-        hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
+        hash = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
       } catch (CertificateEncodingException ex) {
         throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
       }
@@ -55,7 +55,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     certHashes = new HashSet<String>(2);
     String hash;
     try {
-      hash = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
+      hash = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
     } catch (CertificateEncodingException ex) {
       throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
     }
@@ -68,7 +68,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
 
     String hash;
     try {
-      hash = ScepHashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
+      hash = ScepHashAlgo.SHA256.hexDigest(signerCert.getEncoded());
     } catch (CertificateEncodingException ex) {
       throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
     }

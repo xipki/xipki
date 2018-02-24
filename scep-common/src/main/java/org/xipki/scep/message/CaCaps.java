@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.util.ScepUtil;
 
@@ -116,15 +116,15 @@ public class CaCaps {
     return capabilities.contains(CaCapability.POSTPKIOperation);
   }
 
-  public ScepHashAlgoType mostSecureHashAlgo() {
+  public ScepHashAlgo mostSecureHashAlgo() {
     if (capabilities.contains(CaCapability.SHA512)) {
-      return ScepHashAlgoType.SHA512;
+      return ScepHashAlgo.SHA512;
     } else if (capabilities.contains(CaCapability.SHA256)) {
-      return ScepHashAlgoType.SHA256;
+      return ScepHashAlgo.SHA256;
     } else if (capabilities.contains(CaCapability.SHA1)) {
-      return ScepHashAlgoType.SHA1;
+      return ScepHashAlgo.SHA1;
     } else {
-      return ScepHashAlgoType.MD5;
+      return ScepHashAlgo.MD5;
     }
   }
 

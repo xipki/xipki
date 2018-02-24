@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
 
 /**
@@ -33,11 +33,11 @@ import org.xipki.scep.util.ScepUtil;
 
 public final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
-  private final ScepHashAlgoType hashAlgo;
+  private final ScepHashAlgo hashAlgo;
 
   private final Set<byte[]> hashValues;
 
-  public PreprovisionedHashCaCertValidator(ScepHashAlgoType hashAlgo, Set<byte[]> hashValues) {
+  public PreprovisionedHashCaCertValidator(ScepHashAlgo hashAlgo, Set<byte[]> hashValues) {
     this.hashAlgo = ScepUtil.requireNonNull("hashAlgo", hashAlgo);
     ScepUtil.requireNonEmpty("hashValues", hashValues);
 

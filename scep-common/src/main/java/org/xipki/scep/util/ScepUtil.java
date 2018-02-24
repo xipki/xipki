@@ -79,7 +79,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.crypto.KeyUsage;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 
 /**
  * TODO.
@@ -131,7 +131,7 @@ public class ScepUtil {
     }
 
     ContentSigner contentSigner = new JcaContentSignerBuilder(
-        getSignatureAlgorithm(privatekey, ScepHashAlgoType.SHA1)).build(privatekey);
+        getSignatureAlgorithm(privatekey, ScepHashAlgo.SHA1)).build(privatekey);
     return csrBuilder.build(contentSigner);
   }
 
@@ -198,7 +198,7 @@ public class ScepUtil {
           "could not generate self-signed certificate: " + ex.getMessage(), ex);
     }
 
-    String sigAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, ScepHashAlgoType.SHA1);
+    String sigAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, ScepHashAlgo.SHA1);
     ContentSigner contentSigner;
     try {
       contentSigner = new JcaContentSignerBuilder(sigAlgorithm).build(identityKey);
@@ -266,7 +266,7 @@ public class ScepUtil {
     }
   }
 
-  public static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgoType hashAlgo) {
+  public static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgo hashAlgo) {
     requireNonNull("key", key);
     requireNonNull("hashAlgo", hashAlgo);
     String algorithm = key.getAlgorithm();

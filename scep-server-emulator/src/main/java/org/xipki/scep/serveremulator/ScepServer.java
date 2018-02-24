@@ -34,7 +34,7 @@ import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.util.ScepUtil;
 
@@ -194,7 +194,7 @@ public class ScepServer {
     BasicConstraints bc = new BasicConstraints(0);
     certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, ScepHashAlgoType.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, ScepHashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
     return certGenerator.build(contentSigner).toASN1Structure();
   }

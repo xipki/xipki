@@ -21,7 +21,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
 
 /**
@@ -45,7 +45,7 @@ public final class CachingCertificateValidator implements CaCertValidator {
     ScepUtil.requireNonNull("cert", cert);
     String hexFp;
     try {
-      hexFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
+      hexFp = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
     } catch (CertificateEncodingException ex) {
       return false;
     }

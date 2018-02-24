@@ -20,7 +20,7 @@ package org.xipki.scep.client;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 
 /**
  * TODO.
@@ -29,21 +29,21 @@ import org.xipki.scep.crypto.ScepHashAlgoType;
 
 public abstract class FingerprintCertificateValidator implements CaCertValidator {
 
-  private static final ScepHashAlgoType DEFAULT_HASHALGO = ScepHashAlgoType.SHA256;
+  private static final ScepHashAlgo DEFAULT_HASHALGO = ScepHashAlgo.SHA256;
 
-  private ScepHashAlgoType hashAlgo;
+  private ScepHashAlgo hashAlgo;
 
-  public ScepHashAlgoType hashAlgo() {
+  public ScepHashAlgo hashAlgo() {
     return hashAlgo;
   }
 
-  public void setHashAlgo(ScepHashAlgoType hashAlgo) {
+  public void setHashAlgo(ScepHashAlgo hashAlgo) {
     this.hashAlgo = hashAlgo;
   }
 
   @Override
   public boolean isTrusted(X509Certificate cert) {
-    ScepHashAlgoType algo = (hashAlgo == null) ? DEFAULT_HASHALGO : hashAlgo;
+    ScepHashAlgo algo = (hashAlgo == null) ? DEFAULT_HASHALGO : hashAlgo;
     byte[] actual;
     try {
       actual = algo.digest(cert.getEncoded());
@@ -62,6 +62,6 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
    *          Hash value of the certificate to be checked. Must not be {@code null}.
    * @return whether the given certificate is trusted.
    */
-  protected abstract boolean isCertTrusted(ScepHashAlgoType hashAlgo, byte[] hashValue);
+  protected abstract boolean isCertTrusted(ScepHashAlgo hashAlgo, byte[] hashValue);
 
 }

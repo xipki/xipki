@@ -46,7 +46,7 @@ import org.bouncycastle.util.CollectionStore;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.scep.client.exception.ScepClientException;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.exception.MessageEncodingException;
 import org.xipki.scep.message.AuthorityCertStore;
@@ -436,8 +436,8 @@ public abstract class Client {
 
   private ContentInfo encryptThenSign(PkiMessage request, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
-    ScepHashAlgoType hashAlgo = caCaps.mostSecureHashAlgo();
-    if (hashAlgo == ScepHashAlgoType.MD5 && !useInsecureAlgorithms) {
+    ScepHashAlgo hashAlgo = caCaps.mostSecureHashAlgo();
+    if (hashAlgo == ScepHashAlgo.MD5 && !useInsecureAlgorithms) {
       throw new ScepClientException("Scep server supports only MD5 but it not permitted in client");
     }
     String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, hashAlgo);

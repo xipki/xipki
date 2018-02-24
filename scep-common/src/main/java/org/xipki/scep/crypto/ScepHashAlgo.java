@@ -30,7 +30,7 @@ import org.xipki.scep.util.ScepUtil;
  * @author Lijun Liao
  */
 
-public enum ScepHashAlgoType {
+public enum ScepHashAlgo {
 
   MD5(16, "1.2.840.113549.2.5", "MD5"),
   SHA1(20, "1.3.14.3.2.26", "SHA1"),
@@ -43,7 +43,7 @@ public enum ScepHashAlgoType {
 
   private final String name;
 
-  ScepHashAlgoType(int length, String oid, String name) {
+  private ScepHashAlgo(int length, String oid, String name) {
     this.length = length;
     this.oid = oid;
     this.name = name;
@@ -85,11 +85,11 @@ public enum ScepHashAlgoType {
     return ret;
   }
 
-  public static ScepHashAlgoType forNameOrOid(String nameOrOid) {
+  public static ScepHashAlgo forNameOrOid(String nameOrOid) {
 
     String tmpNameOrOid = nameOrOid;
 
-    for (ScepHashAlgoType hashAlgo : values()) {
+    for (ScepHashAlgo hashAlgo : values()) {
       if (hashAlgo.oid.equals(tmpNameOrOid)) {
         return hashAlgo;
       }

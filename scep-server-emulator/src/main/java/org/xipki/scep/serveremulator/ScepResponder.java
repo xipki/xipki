@@ -45,7 +45,7 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.DecodedPkiMessage;
@@ -156,7 +156,7 @@ public class ScepResponder {
     }
 
     String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(signingKey(),
-        ScepHashAlgoType.forNameOrOid(req.digestAlgorithm().getId()));
+        ScepHashAlgo.forNameOrOid(req.digestAlgorithm().getId()));
 
     try {
       X509Certificate jceSignerCert = ScepUtil.toX509Cert(signingCert());
@@ -224,26 +224,26 @@ public class ScepResponder {
 
     // check the digest algorithm
     String oid = req.digestAlgorithm().getId();
-    ScepHashAlgoType hashAlgoType = ScepHashAlgoType.forNameOrOid(oid);
-    if (hashAlgoType == null) {
+    ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(oid);
+    if (hashAlgo == null) {
       LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
       return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
     } // end if
 
     boolean supported = false;
-    if (hashAlgoType == ScepHashAlgoType.SHA1) {
+    if (hashAlgo == ScepHashAlgo.SHA1) {
       if (caCaps.containsCapability(CaCapability.SHA1)) {
         supported = true;
       }
-    } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
+    } else if (hashAlgo == ScepHashAlgo.SHA256) {
       if (caCaps.containsCapability(CaCapability.SHA256)) {
         supported = true;
       }
-    } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
+    } else if (hashAlgo == ScepHashAlgo.SHA512) {
       if (caCaps.containsCapability(CaCapability.SHA512)) {
         supported = true;
       }
-    } else if (hashAlgoType == ScepHashAlgoType.MD5) {
+    } else if (hashAlgo == ScepHashAlgo.MD5) {
       if (control.isUseInsecureAlg()) {
         supported = true;
       }
