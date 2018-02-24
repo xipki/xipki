@@ -78,7 +78,7 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.scep.crypto.ScepHashAlgoType;
+import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.exception.MessageEncodingException;
 import org.xipki.scep.message.CaCaps;
@@ -354,8 +354,8 @@ public class ScepImpl implements Scep {
 
     // check the digest algorithm
     String oid = req.digestAlgorithm().getId();
-    ScepHashAlgoType hashAlgoType = ScepHashAlgoType.forNameOrOid(oid);
-    if (hashAlgoType == null) {
+    ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(oid);
+    if (hashAlgo == null) {
       LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
       rep.setPkiStatus(PkiStatus.FAILURE);
       rep.setFailInfo(FailInfo.badAlg);
@@ -363,15 +363,15 @@ public class ScepImpl implements Scep {
     }
 
     boolean supported = false;
-    if (hashAlgoType == ScepHashAlgoType.SHA1) {
+    if (hashAlgo == ScepHashAlgo.SHA1) {
       if (caCaps.containsCapability(CaCapability.SHA1)) {
         supported = true;
       }
-    } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
+    } else if (hashAlgo == ScepHashAlgo.SHA256) {
       if (caCaps.containsCapability(CaCapability.SHA256)) {
         supported = true;
       }
-    } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
+    } else if (hashAlgo == ScepHashAlgo.SHA512) {
       if (caCaps.containsCapability(CaCapability.SHA512)) {
         supported = true;
       }
@@ -695,9 +695,9 @@ public class ScepImpl implements Scep {
   }
 
   private static String getSignatureAlgorithm(PrivateKey key, ASN1ObjectIdentifier digestOid) {
-    ScepHashAlgoType hashAlgo = ScepHashAlgoType.forNameOrOid(digestOid.getId());
+    ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(digestOid.getId());
     if (hashAlgo == null) {
-      hashAlgo = ScepHashAlgoType.SHA256;
+      hashAlgo = ScepHashAlgo.SHA256;
     }
     String algorithm = key.getAlgorithm();
     if ("RSA".equalsIgnoreCase(algorithm)) {
