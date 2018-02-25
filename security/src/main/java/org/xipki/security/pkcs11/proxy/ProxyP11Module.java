@@ -56,7 +56,7 @@ import org.xipki.security.pkcs11.proxy.msg.Asn1ServerCaps;
 
 public class ProxyP11Module extends AbstractP11Module {
 
-  public static final String PREFIX = "proxy:";
+  public static final String TYPE = "proxy";
 
   private static final Logger LOG = LoggerFactory.getLogger(ProxyP11Module.class);
 
@@ -80,14 +80,10 @@ public class ProxyP11Module extends AbstractP11Module {
     super(moduleConf);
 
     final String modulePath = moduleConf.nativeLibrary();
-    if (!StringUtil.startsWithIgnoreCase(modulePath, PREFIX)) {
-      throw new IllegalArgumentException("the module path does not starts with " + PREFIX
-          + ": " + modulePath);
-    }
 
     this.description = StringUtil.concat("PKCS#11 proxy", "\nPath: ", modulePath);
 
-    ConfPairs confPairs = new ConfPairs(modulePath.substring(PREFIX.length()));
+    ConfPairs confPairs = new ConfPairs(modulePath);
     String urlStr = confPairs.value("url");
     try {
       serverUrl = new URL(urlStr);

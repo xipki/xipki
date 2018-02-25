@@ -45,7 +45,7 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 
 public class EmulatorP11Module extends AbstractP11Module {
 
-  public static final String PREFIX = "emulator:";
+  public static final String TYPE = "emulator";
 
   private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Module.class);
 
@@ -55,12 +55,7 @@ public class EmulatorP11Module extends AbstractP11Module {
     super(moduleConf);
 
     final String modulePath = moduleConf.nativeLibrary();
-    if (!StringUtil.startsWithIgnoreCase(modulePath, PREFIX)) {
-      throw new IllegalArgumentException("the module path does not starts with " + PREFIX
-          + ": " + modulePath);
-    }
-
-    File baseDir = new File(IoUtil.expandFilepath(modulePath.substring(PREFIX.length())));
+    File baseDir = new File(IoUtil.expandFilepath(modulePath));
 
     this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ", modulePath);
 

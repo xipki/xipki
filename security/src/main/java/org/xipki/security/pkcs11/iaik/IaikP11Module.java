@@ -52,6 +52,8 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 public class IaikP11Module extends AbstractP11Module {
 
+  public static final String TYPE = "native";
+
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
   private Module module;

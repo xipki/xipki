@@ -85,14 +85,18 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     String nativeLib = conf.nativeLibrary();
+    String type = conf.type().toLowerCase();
+
     P11Module p11Module = modules.get(nativeLib);
     if (p11Module == null) {
-      if (StringUtil.startsWithIgnoreCase(nativeLib, ProxyP11Module.PREFIX)) {
+      if (type.equals(ProxyP11Module.TYPE)) {
         p11Module = ProxyP11Module.getInstance(conf);
-      } else if (StringUtil.startsWithIgnoreCase(nativeLib, EmulatorP11Module.PREFIX)) {
+      } else if (type.equals(EmulatorP11Module.TYPE)) {
         p11Module = EmulatorP11Module.getInstance(conf);
-      } else {
+      } else if (type.equalsIgnoreCase(IaikP11Module.TYPE)) {
         p11Module = IaikP11Module.getInstance(conf);
+      } else {
+        throw new XiSecurityException("Unknown module type " + type + "'");
       }
     }
 

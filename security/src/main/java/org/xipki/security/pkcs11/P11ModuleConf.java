@@ -54,6 +54,8 @@ public class P11ModuleConf {
 
   private final String name;
 
+  private final String type;
+
   private final String nativeLibrary;
 
   private final boolean readOnly;
@@ -78,6 +80,7 @@ public class P11ModuleConf {
     this.readOnly = moduleType.isReadonly();
     this.userType = moduleType.getUser().longValue();
     this.maxMessageSize = moduleType.getMaxMessageSize().intValue();
+    this.type = moduleType.getType();
     if (maxMessageSize < 128) {
       throw new InvalidConfException("invalid maxMessageSize (< 128): " + maxMessageSize);
     }
@@ -195,6 +198,10 @@ public class P11ModuleConf {
 
   public String name() {
     return name;
+  }
+
+  public String type() {
+    return type;
   }
 
   public String nativeLibrary() {
