@@ -3,15 +3,20 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-security" version="${xitk.version}" description="security">
-    <bundle>mvn:org.xipki.tk/common/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.tk/password/${xitk.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.tk/security/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.tk/shell-base/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.tk/security-shell/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.tk/security-speed-shell/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/security/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/pkcs11-emulator/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/pkcs11-iaik/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-common/${xip11proxy.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-client/${xip11proxy.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/shell-base/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/security-shell/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/security-speed-shell/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>
@@ -48,7 +53,7 @@
     <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-qa/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-qa-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ocsp-qa/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ocsp-qa-shell/${project.version}</bundle>
   </feature>
 </features>
