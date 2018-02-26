@@ -6,7 +6,7 @@
       <type>emulator</type>
       <nativeLibraries>
         <nativeLibrary>
-          <path>xipki/security/pkcs11-emulator</path>
+          <path></path>
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>
