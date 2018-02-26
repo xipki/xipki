@@ -40,6 +40,8 @@
     <pkcs11-wrapper.version>1.4.1-SNAPSHOT</pkcs11-wrapper.version>
   </properties>
   <modules>
+    <module>p11proxy-common</module>
+    <module>p11proxy-client</module>
     <module>p11proxy-server</module>
     <module>features</module>
   </modules>

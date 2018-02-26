@@ -3,9 +3,10 @@
   <modules>
     <!-- exactly one module must be named 'default' -->
     <module name="default">
+      <type>emulator</type>
       <nativeLibraries>
         <nativeLibrary>
-          <path>emulator:xipki/security/pkcs11-emulator</path>
+          <path>xipki/security/pkcs11-emulator</path>
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>

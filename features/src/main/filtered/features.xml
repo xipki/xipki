@@ -23,16 +23,20 @@
     <bundle start-level="70">mvn:org.xipki.tk/http-server/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-pkcs11-proxy" version="${project.version}" description="PKCS#11 proxy">
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.tk/common/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.tk/password/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.tk/security/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/security/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/pkcs11-emulator/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/pkcs11-iaik/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-common/${xip11proxy.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-client/${xip11proxy.version}</bundle>
     <bundle>mvn:org.xipki.p11proxy/p11proxy-server/${project.version}</bundle>
   </feature>
-  <feature name="xipki-security-shell" version="${xitk.version}"
-      description="PKCS#11 proxy shell">
+  <feature name="xipki-security-shell" version="${xitk.version}" description="PKCS#11 proxy shell">
     <feature prerequisite="true">xipki-pkcs11-proxy</feature>
     <bundle>mvn:org.xipki.tk/shell-base/${xitk.version}</bundle>
     <bundle>mvn:org.xipki.tk/security-shell/${xitk.version}</bundle>

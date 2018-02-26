@@ -38,6 +38,23 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.p11proxy.P11ProxyConstants;
+import org.xipki.p11proxy.msg.Asn1DigestSecretKeyTemplate;
+import org.xipki.p11proxy.msg.Asn1EntityIdAndCert;
+import org.xipki.p11proxy.msg.Asn1GenDSAKeypairParams;
+import org.xipki.p11proxy.msg.Asn1GenECKeypairParams;
+import org.xipki.p11proxy.msg.Asn1GenRSAKeypairParams;
+import org.xipki.p11proxy.msg.Asn1GenSM2KeypairParams;
+import org.xipki.p11proxy.msg.Asn1GenSecretKeyParams;
+import org.xipki.p11proxy.msg.Asn1ImportSecretKeyParams;
+import org.xipki.p11proxy.msg.Asn1P11EntityIdentifier;
+import org.xipki.p11proxy.msg.Asn1P11ObjectIdentifier;
+import org.xipki.p11proxy.msg.Asn1P11Params;
+import org.xipki.p11proxy.msg.Asn1P11SlotIdentifier;
+import org.xipki.p11proxy.msg.Asn1RSAPkcsPssParams;
+import org.xipki.p11proxy.msg.Asn1RemoveObjectsParams;
+import org.xipki.p11proxy.msg.Asn1ServerCaps;
+import org.xipki.p11proxy.msg.Asn1SignTemplate;
 import org.xipki.security.exception.BadAsn1ObjectException;
 import org.xipki.security.exception.P11DuplicateEntityException;
 import org.xipki.security.exception.P11TokenException;
@@ -53,23 +70,6 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.proxy.P11ProxyConstants;
-import org.xipki.security.pkcs11.proxy.msg.Asn1DigestSecretKeyTemplate;
-import org.xipki.security.pkcs11.proxy.msg.Asn1EntityIdAndCert;
-import org.xipki.security.pkcs11.proxy.msg.Asn1GenDSAKeypairParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1GenECKeypairParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1GenRSAKeypairParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1GenSM2KeypairParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1GenSecretKeyParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1ImportSecretKeyParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1P11EntityIdentifier;
-import org.xipki.security.pkcs11.proxy.msg.Asn1P11ObjectIdentifier;
-import org.xipki.security.pkcs11.proxy.msg.Asn1P11Params;
-import org.xipki.security.pkcs11.proxy.msg.Asn1P11SlotIdentifier;
-import org.xipki.security.pkcs11.proxy.msg.Asn1RSAPkcsPssParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1RemoveObjectsParams;
-import org.xipki.security.pkcs11.proxy.msg.Asn1ServerCaps;
-import org.xipki.security.pkcs11.proxy.msg.Asn1SignTemplate;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
@@ -347,19 +347,22 @@ class P11ProxyResponder {
 
           P11Params params = null;
 
-          switch (asn1Params.tagNo()) {
-            case Asn1P11Params.TAG_RSA_PKCS_PSS:
-              params = Asn1RSAPkcsPssParams.getInstance(asn1Params).pkcsPssParams();
-              break;
-            case Asn1P11Params.TAG_OPAQUE:
-              params = new P11ByteArrayParams(ASN1OctetString.getInstance(asn1Params).getOctets());
-              break;
-            case Asn1P11Params.TAG_IV:
-              params = new P11IVParams(ASN1OctetString.getInstance(asn1Params).getOctets());
-              break;
-            default:
-              throw new BadAsn1ObjectException(
-                  "unknown SignTemplate.params: unknown tag " + asn1Params.tagNo());
+          if (asn1Params != null) {
+            switch (asn1Params.tagNo()) {
+              case Asn1P11Params.TAG_RSA_PKCS_PSS:
+                params = Asn1RSAPkcsPssParams.getInstance(asn1Params).pkcsPssParams();
+                break;
+              case Asn1P11Params.TAG_OPAQUE:
+                params = new P11ByteArrayParams(
+                    ASN1OctetString.getInstance(asn1Params).getOctets());
+                break;
+              case Asn1P11Params.TAG_IV:
+                params = new P11IVParams(ASN1OctetString.getInstance(asn1Params).getOctets());
+                break;
+              default:
+                throw new BadAsn1ObjectException(
+                    "unknown SignTemplate.params: unknown tag " + asn1Params.tagNo());
+            }
           }
 
           byte[] message = signTemplate.message();
