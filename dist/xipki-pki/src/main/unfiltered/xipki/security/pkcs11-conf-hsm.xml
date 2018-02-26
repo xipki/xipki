@@ -3,6 +3,7 @@
   <modules>
     <!-- exactly one module must be named 'default' -->
     <module name="default">
+      <type>native</type>
       <nativeLibraries>
         <nativeLibrary>
           <!--path>/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so</path-->
@@ -42,6 +43,7 @@
       </mechanismFilters>
     </module>
     <!--module name="cknfast">
+      <type>native</type>
       <nativeLibraries>
         <nativeLibrary>
           <os>nix</os>

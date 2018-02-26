@@ -7,8 +7,13 @@
     <bundle start-level="70">mvn:org.xipki.tk/password/${xitk.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.tk/security/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/pkcs11-emulator/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.tk/pkcs11-iaik/${xitk.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-common/${xip11proxy.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-client/${xip11proxy.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" version="${xitk.version}" description="shall base">
     <feature>xipki-security</feature>
