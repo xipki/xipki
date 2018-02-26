@@ -19,12 +19,29 @@
   <bean id="providers" class="org.xipki.security.Providers"
       init-method="init" destroy-method="shutdown"/>
 
+
+  <bean id="p11ModuleFactoryRegister"
+       class="org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl"
+       destroy-method="shutdown">
+  </bean>
+
+  <service ref="p11ModuleFactoryRegister"
+       interface="org.xipki.security.pkcs11.P11ModuleFactoryRegister"/>
+  <reference-list id="p11ModuleFactories"
+       interface="org.xipki.security.pkcs11.P11ModuleFactory"
+       availability="optional">
+    <reference-listener ref="p11ModuleFactoryRegister" bind-method="bindService"
+         unbind-method="unbindService"/>
+  </reference-list>
+
   <bean id="p11CryptServiceFactory"
       class="org.xipki.security.pkcs11.P11CryptServiceFactoryImpl"
       init-method="init" destroy-method="shutdown">
     <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
     <property name="passwordResolver" ref="passwordResolver"/>
+    <property name="p11ModuleFactoryRegister" ref="p11ModuleFactoryRegister"/>
   </bean>
+
   <service ref="p11CryptServiceFactory"
       interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
 

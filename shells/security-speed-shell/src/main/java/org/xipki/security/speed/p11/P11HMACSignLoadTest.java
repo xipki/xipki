@@ -25,7 +25,7 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.p12.P12HMACSignLoadTest;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
  * TODO.

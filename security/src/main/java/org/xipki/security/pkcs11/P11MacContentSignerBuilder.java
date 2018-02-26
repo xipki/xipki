@@ -32,7 +32,7 @@ import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
  * TODO.

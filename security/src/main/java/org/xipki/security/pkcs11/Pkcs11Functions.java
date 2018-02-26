@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.constants.Functions;
 
 /**
  * TODO.

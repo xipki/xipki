@@ -26,14 +26,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.emulator.EmulatorP11Module;
-import org.xipki.security.pkcs11.iaik.IaikP11Module;
-import org.xipki.security.pkcs11.proxy.ProxyP11Module;
 
 /**
  * TODO.
@@ -47,13 +43,13 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private static final Map<String, P11CryptService> services = new HashMap<>();
 
-  private static final Map<String, P11Module> modules = new HashMap<>();
-
   private PasswordResolver passwordResolver;
 
   private P11Conf p11Conf;
 
   private String pkcs11ConfFile;
+
+  private P11ModuleFactoryRegister p11ModuleFactoryRegister;
 
   public synchronized void init() throws InvalidConfException, IOException {
     if (p11Conf != null) {
@@ -65,6 +61,10 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), passwordResolver);
+  }
+
+  public void setP11ModuleFactoryRegister(P11ModuleFactoryRegister p11ModuleFactoryRegister) {
+    this.p11ModuleFactoryRegister = p11ModuleFactoryRegister;
   }
 
   public synchronized P11CryptService getP11CryptService(String moduleName)
@@ -80,29 +80,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     P11CryptService instance = services.get(moduleName);
-    if (instance != null) {
-      return instance;
+    if (instance == null) {
+      P11Module p11Module = p11ModuleFactoryRegister.getP11Module(conf);
+      instance = new P11CryptService(p11Module);
+      services.put(moduleName, instance);
     }
-
-    String nativeLib = conf.nativeLibrary();
-    String type = conf.type().toLowerCase();
-
-    P11Module p11Module = modules.get(nativeLib);
-    if (p11Module == null) {
-      if (type.equals(ProxyP11Module.TYPE)) {
-        p11Module = ProxyP11Module.getInstance(conf);
-      } else if (type.equals(EmulatorP11Module.TYPE)) {
-        p11Module = EmulatorP11Module.getInstance(conf);
-      } else if (type.equalsIgnoreCase(IaikP11Module.TYPE)) {
-        p11Module = IaikP11Module.getInstance(conf);
-      } else {
-        throw new XiSecurityException("Unknown module type " + type + "'");
-      }
-    }
-
-    modules.put(nativeLib, p11Module);
-    instance = new P11CryptService(p11Module);
-    services.put(moduleName, instance);
 
     return instance;
   }
@@ -120,14 +102,6 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
   }
 
   public void shutdown() {
-    for (String pk11Lib : modules.keySet()) {
-      try {
-        modules.get(pk11Lib).close();
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not close PKCS11 Module " + pk11Lib);
-      }
-    }
-    modules.clear();
     services.clear();
   }
 

@@ -41,7 +41,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11VendorConstants;
+import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 
 /**
  * TODO.

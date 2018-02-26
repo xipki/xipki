@@ -49,6 +49,8 @@
     <module>database-tool</module>
     <module>password</module>
     <module>security</module>
+    <module>pkcs11-emulator</module>
+    <module>pkcs11-iaik</module>
     <module>servlet-api</module>
     <module>http-server</module>
     <module>demo-tlskeys</module>
@@ -75,6 +77,11 @@
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>
         <version>${bc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.iaik</groupId>
+        <artifactId>pkcs11-constants</artifactId>
+        <version>${pkcs11-wrapper.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xipki.iaik</groupId>

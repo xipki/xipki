@@ -33,7 +33,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.DigestOutputStream;
 import org.xipki.security.util.SignerUtil;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
  * TODO.
