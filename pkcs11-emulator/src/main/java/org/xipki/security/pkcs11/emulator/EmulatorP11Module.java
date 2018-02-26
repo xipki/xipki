@@ -18,6 +18,7 @@
 package org.xipki.security.pkcs11.emulator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -47,6 +48,9 @@ public class EmulatorP11Module extends AbstractP11Module {
 
   public static final String TYPE = "emulator";
 
+  public static final String DFLT_BASEDIR =
+      System.getProperty("java.io.tmpdir") + File.separator + "pkcs11-emulator";
+
   private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Module.class);
 
   private final String description;
@@ -54,8 +58,26 @@ public class EmulatorP11Module extends AbstractP11Module {
   private EmulatorP11Module(P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
 
+    File baseDir;
     final String modulePath = moduleConf.nativeLibrary();
-    File baseDir = new File(IoUtil.expandFilepath(modulePath));
+    if (modulePath.trim().isEmpty()) {
+      baseDir = new File(DFLT_BASEDIR);
+      if (!baseDir.exists()) {
+        try {
+          createExampleRepository(DFLT_BASEDIR, 2);
+        } catch (IOException ex) {
+          throw new P11TokenException(
+              "could not initialize the base direcotry: " + DFLT_BASEDIR, ex);
+        }
+
+        LOG.info("Create and use the default base directory: " + DFLT_BASEDIR);
+      } else {
+        LOG.info("Use existing default base directory: " + DFLT_BASEDIR);
+      }
+    } else {
+      baseDir = new File(IoUtil.expandFilepath(modulePath));
+      LOG.info("Use explicit base directory: " + baseDir.getPath());
+    }
 
     this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ", modulePath);
 
@@ -163,6 +185,16 @@ public class EmulatorP11Module extends AbstractP11Module {
   @Override
   public void close() {
     LOG.info("close", "close pkcs11 module: {}", getName());
+  }
+
+  private void createExampleRepository(String dir, int numSlots) throws IOException {
+    for (int i = 0; i < numSlots; i++) {
+      File slotDir = new File(dir, i + "-" + (800000 + i));
+      slotDir.mkdirs();
+
+      File slotInfoFile = new File(slotDir, "slot.info");
+      IoUtil.save(slotInfoFile, "namedCurveSupported=true\n".getBytes());
+    }
   }
 
 }
