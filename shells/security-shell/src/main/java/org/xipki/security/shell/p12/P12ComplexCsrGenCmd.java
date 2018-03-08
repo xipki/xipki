@@ -293,14 +293,14 @@ public class P12ComplexCsrGenCmd extends CsrGenAction {
     DERUTF8String placeOfBirth = new DERUTF8String("Berlin");
     attrs.add(new Attribute(ObjectIdentifiers.DN_PLACE_OF_BIRTH, new DERSet(placeOfBirth)));
 
-    String[] countryOfCitizenshipList = new String[]{"DE", "FR"};
+    String[] countryOfCitizenshipList = {"DE", "FR"};
     for (String country : countryOfCitizenshipList) {
       DERPrintableString val = new DERPrintableString(country);
       attrs.add(new Attribute(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP,
           new DERSet(val)));
     }
 
-    String[] countryOfResidenceList = new String[]{"DE"};
+    String[] countryOfResidenceList = {"DE"};
     for (String country : countryOfResidenceList) {
       DERPrintableString val = new DERPrintableString(country);
       attrs.add(new Attribute(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE,

@@ -70,9 +70,8 @@ import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.State;
 import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.Util;
+import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
@@ -383,8 +382,8 @@ class IaikP11Slot extends AbstractP11Slot {
     } else if (mechanism == PKCS11Constants.CKM_SHA512_HMAC
         || mechanism == PKCS11Constants.CKM_SHA3_512) {
       expectedSignatureLen = 64;
-    } else if (mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2
-        || mechanism == PKCS11VendorConstants.CKM_VENDOR_SM2_SM3) {
+    } else if (mechanism == PKCS11Constants.CKM_VENDOR_SM2
+        || mechanism == PKCS11Constants.CKM_VENDOR_SM2_SM3) {
       expectedSignatureLen = 32;
     } else {
       expectedSignatureLen = identity.expectedSignatureLen();
@@ -919,7 +918,8 @@ class IaikP11Slot extends AbstractP11Slot {
         || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
       mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
     } else {
-      throw new IllegalArgumentException("unsupported key type 0x" + Util.toFullHex((int)keyType));
+      throw new IllegalArgumentException(
+          "unsupported key type 0x" + Functions.toFullHex((int)keyType));
     }
 
     assertMechanismSupported(mech);
@@ -1068,12 +1068,12 @@ class IaikP11Slot extends AbstractP11Slot {
   @Override
   protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
       throws P11TokenException {
-    long mech = PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
+    long mech = PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
     assertMechanismSupported(mech);
 
     SM2PrivateKey privateKey = new SM2PrivateKey();
     SM2PublicKey publicKey = new SM2PublicKey();
-    setKeyAttributes(label, PKCS11VendorConstants.CKK_VENDOR_SM2, control, publicKey, privateKey);
+    setKeyAttributes(label, PKCS11Constants.CKK_VENDOR_SM2, control, publicKey, privateKey);
     return generateKeyPair(mech, privateKey, publicKey);
   }
 

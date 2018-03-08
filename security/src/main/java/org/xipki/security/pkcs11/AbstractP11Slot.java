@@ -53,7 +53,6 @@ import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 
 /**
  * TODO.
@@ -794,7 +793,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonBlank("label", label);
     assertWritable("generateSM2Keypair");
 
-    assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
+    assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
     if (getObjectIdForLabel(label) != null) {
       throw new P11DuplicateEntityException("identity with label " + label + " already exists");
     }

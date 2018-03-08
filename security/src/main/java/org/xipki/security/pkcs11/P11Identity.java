@@ -33,7 +33,6 @@ import org.xipki.security.exception.P11UnsupportedMechanismException;
 import org.xipki.security.exception.XiSecurityException;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 
 /**
  * TODO.
@@ -234,9 +233,9 @@ public abstract class P11Identity implements Comparable<P11Identity> {
           || PKCS11Constants.CKM_ECDSA_SHA256 == mechanism
           || PKCS11Constants.CKM_ECDSA_SHA384 == mechanism
           || PKCS11Constants.CKM_ECDSA_SHA512 == mechanism
-          || PKCS11VendorConstants.CKM_VENDOR_SM2 == mechanism) {
+          || PKCS11Constants.CKM_VENDOR_SM2 == mechanism) {
         return parameters == null;
-      } else if (PKCS11VendorConstants.CKM_VENDOR_SM2_SM3 == mechanism) {
+      } else if (PKCS11Constants.CKM_VENDOR_SM2_SM3 == mechanism) {
         return parameters instanceof P11ByteArrayParams;
       }
     }

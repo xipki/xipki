@@ -85,7 +85,6 @@ import org.xipki.security.util.X509Util;
 
 import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 
 /**
  * TODO.
@@ -211,9 +210,9 @@ class EmulatorP11Slot extends AbstractP11Slot {
     PKCS11Constants.CKM_ECDSA_SHA3_512,
 
     // SM2
-    PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
-    PKCS11VendorConstants.CKM_VENDOR_SM2_SM3,
-    PKCS11VendorConstants.CKM_VENDOR_SM2};
+    PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
+    PKCS11Constants.CKM_VENDOR_SM2_SM3,
+    PKCS11Constants.CKM_VENDOR_SM2};
 
   private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
@@ -874,7 +873,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
   @Override
   protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
       throws P11TokenException {
-    assertMechanismSupported(PKCS11VendorConstants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
+    assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
     return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
   }
 

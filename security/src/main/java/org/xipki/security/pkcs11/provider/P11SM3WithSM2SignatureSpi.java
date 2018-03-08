@@ -40,7 +40,7 @@ import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
+import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
  * TODO.
@@ -94,8 +94,8 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
 
     byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getID();
 
-    if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
-      mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
+    if (signingKey.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2)) {
+      mechanism = PKCS11Constants.CKM_VENDOR_SM2;
       outputStream = new DigestOutputStream(HashAlgo.SM3.createDigest());
       p11Params = null;
 
@@ -107,8 +107,8 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
       } catch (IOException ex) {
         throw new InvalidKeyException("could not compute Z of SM2");
       }
-    } else if (signingKey.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2_SM3)) {
-      mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2_SM3;
+    } else if (signingKey.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2_SM3)) {
+      mechanism = PKCS11Constants.CKM_VENDOR_SM2_SM3;
       outputStream = new ByteArrayOutputStream();
       p11Params = new P11ByteArrayParams(userId);
     } else {

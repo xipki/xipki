@@ -41,7 +41,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
+import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
  * TODO.
@@ -74,7 +74,7 @@ class P11SM2ContentSigner implements XiContentSigner {
 
   static {
     sigAlgHashMap.put(GMObjectIdentifiers.sm2sign_with_sm3.getId(), HashAlgo.SM3);
-    hashMechMap.put(HashAlgo.SM3, PKCS11VendorConstants.CKM_VENDOR_SM2_SM3);
+    hashMechMap.put(HashAlgo.SM3, PKCS11Constants.CKM_VENDOR_SM2_SM3);
   }
 
   P11SM2ContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
@@ -96,10 +96,10 @@ class P11SM2ContentSigner implements XiContentSigner {
     }
 
     P11Slot slot = cryptService.getSlot(identityId.slotId());
-    if (slot.supportsMechanism(PKCS11VendorConstants.CKM_VENDOR_SM2)) {
+    if (slot.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2)) {
       this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
 
-      this.mechanism = PKCS11VendorConstants.CKM_VENDOR_SM2;
+      this.mechanism = PKCS11Constants.CKM_VENDOR_SM2;
       Digest digest = hashAlgo.createDigest();
       this.outputStream = new DigestOutputStream(digest);
     } else {

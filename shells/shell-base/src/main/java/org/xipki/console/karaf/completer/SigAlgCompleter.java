@@ -30,8 +30,8 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 public class SigAlgCompleter extends AbstractEnumCompleter {
 
   public SigAlgCompleter() {
-    String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
-    String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
+    String[] encAlgs = {"RSA", "RSAandMGF1", "ECDSA", "DSA"};
+    String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
       "SHA3-224, SHA3-256, SHA3-384, SHA3-512"};
     StringBuilder enums = new StringBuilder(200);
     for (String encAlg : encAlgs) {

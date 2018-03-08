@@ -66,7 +66,6 @@ import org.xipki.security.util.SignerUtil;
 
 import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 
 /**
  * TODO.
@@ -194,9 +193,9 @@ public class EmulatorP11Identity extends P11Identity {
       return dsaAndEcdsaSign(content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_ECDSA_SHA3_512 == mechanism) {
       return dsaAndEcdsaSign(content, HashAlgo.SHA3_512);
-    } else if (PKCS11VendorConstants.CKM_VENDOR_SM2 == mechanism) {
+    } else if (PKCS11Constants.CKM_VENDOR_SM2 == mechanism) {
       return sm2SignHash(content);
-    } else if (PKCS11VendorConstants.CKM_VENDOR_SM2_SM3 == mechanism) {
+    } else if (PKCS11Constants.CKM_VENDOR_SM2_SM3 == mechanism) {
       return sm2Sign(parameters, content, HashAlgo.SM3);
     } else if (PKCS11Constants.CKM_DSA == mechanism) {
       return dsaAndEcdsaSign(content, null);

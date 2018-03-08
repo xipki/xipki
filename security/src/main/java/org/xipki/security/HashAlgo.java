@@ -35,7 +35,6 @@ import org.bouncycastle.crypto.digests.SM3Digest;
 import org.xipki.common.util.ParamUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-import iaik.pkcs.pkcs11.constants.PKCS11VendorConstants;
 
 /**
  * TODO.
@@ -168,7 +167,7 @@ public enum HashAlgo {
       return HashAlgo.SHA3_512;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
       return HashAlgo.SHA3_512;
-    } else if (hashMech == PKCS11VendorConstants.CKM_VENDOR_SM3) {
+    } else if (hashMech == PKCS11Constants.CKM_VENDOR_SM3) {
       return HashAlgo.SM3;
     } else {
       return null;
