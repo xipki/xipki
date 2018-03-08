@@ -500,7 +500,7 @@ public class CmpCaClient {
         new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
             new DERUTF8String("CERT-PROFILE?" + certProfile + "%"));
 
-    AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{certprofileInfo};
+    AttributeTypeAndValue[] atvs = {certprofileInfo};
     CertReqMsg certReqMsg = new CertReqMsg(certReq, popo, atvs);
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsg));

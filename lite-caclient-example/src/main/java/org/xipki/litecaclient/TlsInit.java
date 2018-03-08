@@ -86,7 +86,7 @@ public class TlsInit {
 
   public static void init() throws GeneralSecurityException {
     System.err.println("***** ONLY FOR TEST, DO NOT USE IT IN PRODUCTION ENVIRONMENT ******");
-    TrustManager[] trustManagers = new TrustManager[]{new InternX509TrustManager()};
+    TrustManager[] trustManagers = {new InternX509TrustManager()};
     SSLContext sc = SSLContext.getInstance("SSL");
     sc.init(null, trustManagers, new SecureRandom());
     HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
