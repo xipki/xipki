@@ -704,7 +704,7 @@ class IdentifiedX509Certprofile {
       }
     } else {
       // make sure the EE certificate does not contain CA-only usages
-      KeyUsage[] caOnlyUsages = new KeyUsage[] {KeyUsage.keyCertSign, KeyUsage.cRLSign};
+      KeyUsage[] caOnlyUsages = {KeyUsage.keyCertSign, KeyUsage.cRLSign};
 
       Set<KeyUsage> setUsages = new HashSet<>();
       for (KeyUsage caOnlyUsage : caOnlyUsages) {
