@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -49,6 +50,7 @@ import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
 import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
 import org.xipki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
+import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
 import org.xipki.ca.dbtool.port.DbPorter;
@@ -118,12 +120,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
   private final int numCertsPerCommit;
 
-  CaCertStoreDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller, String srcDir,
-      int numCertsPerCommit, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
-      throws Exception {
+  CaCertStoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
+      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
     super(datasource, srcDir, stopMe, evaluateOnly);
 
-    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
     this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
     this.resume = resume;
 
@@ -138,6 +138,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             + processLogFile.getPath() + " first");
       }
     }
+
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
   }
 
   public void importToDb() throws Exception {
@@ -220,8 +224,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
           idProcessedInLastProcess = null;
         }
 
-        CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CAUSER,
-          CaDbEntryType.CRL, CaDbEntryType.CERT,
+        CaDbEntryType[] types = {CaDbEntryType.CAUSER, CaDbEntryType.CRL, CaDbEntryType.CERT,
           CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
         for (CaDbEntryType type : types) {
@@ -257,10 +260,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     try {
       for (ToPublishType tbp : publishQueue.getTop()) {
         try {
-          int idx = 1;
-          ps.setLong(idx++, tbp.getCertId());
-          ps.setInt(idx++, tbp.getPubId());
-          ps.setInt(idx++, tbp.getCaId());
+          ps.setLong(1, tbp.getCertId());
+          ps.setInt(2, tbp.getPubId());
+          ps.setInt(3, tbp.getCaId());
           ps.execute();
         } catch (SQLException ex) {
           System.err.println("could not import PUBLISHQUEUE with CID="
@@ -284,10 +286,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
       long id = 1;
       for (DeltaCRLCacheEntryType entry : deltaCrlCache.getEntry()) {
         try {
-          int idx = 1;
-          ps.setLong(idx++, id++);
-          ps.setString(idx++, entry.getSerial());
-          ps.setInt(idx++, entry.getCaId());
+          ps.setLong(1, id++);
+          ps.setString(2, entry.getSerial());
+          ps.setInt(3, entry.getCaId());
           ps.execute();
         } catch (SQLException ex) {
           System.err.println("could not import DELTACRL_CACHE with caId=" + entry.getCaId()
@@ -355,8 +356,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
       final long remainingTotal = total - numProcessedBefore;
       final ProcessLog processLog = new ProcessLog(remainingTotal);
 
-      System.out.println(importingText() + "entries to " + tablesText + " from ID "
-          + minId);
+      System.out.println(importingText() + "entries to " + tablesText + " from ID " + minId);
       processLog.printHeader();
 
       DbPortFileNameIterator entriesFileIterator = null;
@@ -597,8 +597,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
             BigInteger baseCrlNumber = null;
-            octetString = x509crl.getExtensionValue(
-                Extension.deltaCRLIndicator.getId());
+            octetString = x509crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
             if (octetString != null) {
               extnValue = DEROctetString.getInstance(octetString).getOctets();
               baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
@@ -743,8 +742,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
           lastSuccessfulEntryId = id;
           processLog.addNumProcessed(numEntriesInBatch);
           numEntriesInBatch = 0;
-          echoToFile(type + ":" + (numProcessedInLastProcess
-              + processLog.numProcessed()) + ":"
+          echoToFile(type + ":" + (numProcessedInLastProcess + processLog.numProcessed()) + ":"
               + lastSuccessfulEntryId, processLogFile);
           processLog.printStatus();
         }

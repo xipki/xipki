@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.xipki.ca.dbtool.DbToolBase;
-import org.xipki.ca.dbtool.StopMe;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
@@ -78,7 +78,7 @@ class TargetDigestRetriever {
 
     @Override
     public void run() {
-      while (!stopMe.stopMe()) {
+      while (!stopMe.get()) {
         CertsBundle bundle = null;
         try {
           bundle = reader.nextCerts();
@@ -156,7 +156,7 @@ class TargetDigestRetriever {
 
   private final String inArrayCertsSql;
 
-  private final StopMe stopMe;
+  private final AtomicBoolean stopMe;
 
   private Exception exception;
 
@@ -172,7 +172,7 @@ class TargetDigestRetriever {
 
   public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
       DigestDiffReporter reporter, DataSourceWrapper datasource, DbControl dbControl,
-      HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, StopMe stopMe)
+      HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, AtomicBoolean stopMe)
       throws DataAccessException {
     this.processLog = ParamUtil.requireNonNull("processLog", processLog);
     this.numPerSelect = numPerSelect;

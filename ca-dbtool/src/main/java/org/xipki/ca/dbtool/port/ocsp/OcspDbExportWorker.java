@@ -22,15 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
@@ -54,10 +49,6 @@ public class OcspDbExportWorker extends DbPortWorker {
 
   private final DataSourceWrapper datasource;
 
-  private final Marshaller marshaller;
-
-  private final Unmarshaller unmarshaller;
-
   private final String destFolder;
 
   private final boolean resume;
@@ -80,16 +71,6 @@ public class OcspDbExportWorker extends DbPortWorker {
         new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
-
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    marshaller = jaxbContext.createMarshaller();
-    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-    Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
-    marshaller.setSchema(schema);
-
-    unmarshaller = jaxbContext.createUnmarshaller();
-    unmarshaller.setSchema(schema);
     this.evaluateOnly = evaluateOnly;
 
     File file = new File(destFolder);
@@ -122,8 +103,7 @@ public class OcspDbExportWorker extends DbPortWorker {
     try {
       // CertStore
       OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(datasource,
-          marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerSelect,
-          resume, stopMe, evaluateOnly);
+          destFolder, numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
       certStoreExporter.export();
       certStoreExporter.shutdown();
     } finally {

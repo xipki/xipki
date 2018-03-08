@@ -60,46 +60,40 @@ public class CaUsersReader extends DbiXmlReader {
 
       lastEvent = event;
 
-      switch (event) {
-        case XMLStreamConstants.START_ELEMENT:
-          if (RequestCertType.TAG_ROOT.equals(reader.getLocalName())) {
-            ret = new CaUserType();
-          }
-          break;
-        case XMLStreamConstants.CHARACTERS:
-          buffer.append(reader.getText());
-          break;
-        case XMLStreamConstants.END_ELEMENT:
-          if (ret == null) {
-            break;
-          }
+      if (event == XMLStreamConstants.START_ELEMENT) {
+        if (CaUserType.TAG_ROOT.equals(reader.getLocalName())) {
+          ret = new CaUserType();
+        }
+      } else if (event == XMLStreamConstants.CHARACTERS) {
+        buffer.append(reader.getText());
+      } else if (event == XMLStreamConstants.END_ELEMENT) {
+        if (ret == null) {
+          continue;
+        }
 
-          switch (reader.getLocalName()) {
-            case CaUserType.TAG_ROOT:
-              ret.validate();
-              return ret;
-            case CaUserType.TAG_CA_ID:
-              ret.setCaId(Integer.parseInt(tagContent));
-              break;
-            case CertType.TAG_ID:
-              ret.setId(Long.parseLong(tagContent));
-              break;
-            case CaUserType.TAG_UID:
-              ret.setUid(Integer.parseInt(tagContent));
-              break;
-            case CaUserType.TAG_PERMISSION:
-              ret.setPermission(Integer.parseInt(tagContent));
-              break;
-            case CaUserType.TAG_PROFILES:
-              ret.setProfiles(tagContent);
-              break;
-            default:
-              break;
-          } // end switch (reader.getLocalName())
-          break;
-        default:
-          break;
-      } // end switch (event)
+        switch (reader.getLocalName()) {
+          case CaUserType.TAG_ROOT:
+            ret.validate();
+            return ret;
+          case CaUserType.TAG_CA_ID:
+            ret.setCaId(parseInt(tagContent));
+            break;
+          case CertType.TAG_ID:
+            ret.setId(parseLong(tagContent));
+            break;
+          case CaUserType.TAG_UID:
+            ret.setUid(parseInt(tagContent));
+            break;
+          case CaUserType.TAG_PERMISSION:
+            ret.setPermission(parseInt(tagContent));
+            break;
+          case CaUserType.TAG_PROFILES:
+            ret.setProfiles(tagContent);
+            break;
+          default:
+            break;
+        }
+      }
     } // end while
 
     return null;

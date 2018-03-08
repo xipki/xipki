@@ -88,6 +88,18 @@ public abstract class DbiXmlReader {
     return ret;
   }
 
+  protected int parseInt(String str) {
+    return Integer.parseInt(str);
+  }
+
+  protected long parseLong(String str) {
+    return Long.parseLong(str);
+  }
+
+  protected boolean parseBoolean(String str) {
+    return Boolean.parseBoolean(str);
+  }
+
   protected abstract DbDataObject retrieveNext()
       throws InvalidDataObjectException, XMLStreamException;
 

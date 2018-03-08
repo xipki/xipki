@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -51,6 +52,7 @@ import org.xipki.ca.dbtool.jaxb.ca.CaaliasType;
 import org.xipki.ca.dbtool.jaxb.ca.CmpcontrolType;
 import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
 import org.xipki.ca.dbtool.jaxb.ca.EnvironmentType;
+import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
@@ -59,7 +61,6 @@ import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -76,10 +77,13 @@ class CaConfigurationDbImporter extends DbPorter {
 
   private final Unmarshaller unmarshaller;
 
-  CaConfigurationDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller,
-      String srcDir, AtomicBoolean stopMe, boolean evaluateOnly) throws DataAccessException {
+  CaConfigurationDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe,
+      boolean evaluateOnly) throws DataAccessException, JAXBException {
     super(datasource, srcDir, stopMe, evaluateOnly);
-    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
   }
 
   public void importToDb() throws Exception {
@@ -132,9 +136,8 @@ class CaConfigurationDbImporter extends DbPorter {
 
         for (CmpcontrolType control : controls.getCmpcontrol()) {
           try {
-            int idx = 1;
-            ps.setString(idx++, control.getName());
-            ps.setString(idx++, control.getConf());
+            ps.setString(1, control.getName());
+            ps.setString(2, control.getConf());
 
             ps.executeUpdate();
           } catch (SQLException ex) {
@@ -192,9 +195,8 @@ class CaConfigurationDbImporter extends DbPorter {
       ps = prepareStatement(sql);
       for (EnvironmentType environment : environments.getEnvironment()) {
         try {
-          int idx = 1;
-          ps.setString(idx++, environment.getName());
-          ps.setString(idx++, environment.getValue());
+          ps.setString(1, environment.getName());
+          ps.setString(2, environment.getValue());
           ps.executeUpdate();
         } catch (SQLException ex) {
           System.err.println("could not import ENVIRONMENT with NAME=" + environment.getName());
@@ -248,10 +250,9 @@ class CaConfigurationDbImporter extends DbPorter {
         byte[] certBytes = binary(requestor.getCert());
         String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
         try {
-          int idx = 1;
-          ps.setInt(idx++, requestor.getId());
-          ps.setString(idx++, requestor.getName());
-          ps.setString(idx++, b64Cert);
+          ps.setInt(1, requestor.getId());
+          ps.setString(2, requestor.getName());
+          ps.setString(3, b64Cert);
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -402,9 +403,9 @@ class CaConfigurationDbImporter extends DbPorter {
     try {
       for (CaaliasType caalias : caaliases.getCaalias()) {
         try {
-          int idx = 1;
-          ps.setString(idx++, caalias.getName());
-          ps.setInt(idx++, caalias.getCaId());
+          ps.setString(1, caalias.getName());
+          ps.setInt(2, caalias.getCaId());
+
           ps.executeUpdate();
         } catch (SQLException ex) {
           System.err.println("could not import CAALIAS with NAME=" + caalias.getName());
@@ -452,9 +453,9 @@ class CaConfigurationDbImporter extends DbPorter {
     try {
       for (CaHasPublisherType entry : caHasPublishers.getCaHasPublisher()) {
         try {
-          int idx = 1;
-          ps.setInt(idx++, entry.getCaId());
-          ps.setInt(idx++, entry.getPublisherId());
+          ps.setInt(1, entry.getCaId());
+          ps.setInt(2, entry.getPublisherId());
+
           ps.executeUpdate();
         } catch (SQLException ex) {
           System.err.println("could not import CA_HAS_PUBLISHER with CA_ID="
@@ -476,9 +477,9 @@ class CaConfigurationDbImporter extends DbPorter {
     try {
       for (CaHasProfileType entry : caHasCertprofiles.getCaHasProfile()) {
         try {
-          int idx = 1;
-          ps.setInt(idx++, entry.getCaId());
-          ps.setInt(idx++, entry.getProfileId());
+          ps.setInt(1, entry.getCaId());
+          ps.setInt(2, entry.getProfileId());
+
           ps.executeUpdate();
         } catch (SQLException ex) {
           System.err.println("could not import CA_HAS_PROFILE with CA_ID="

@@ -35,10 +35,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.StopMe;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
@@ -98,9 +98,9 @@ class DigestDiff {
       HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
       HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
-        throw new IllegalArgumentException("Could not compare OCSP datasources with"
-            + " different CERTHASH_ALGO: refDataSource (" + refAlgo
-            + ") and targetDataSource (" + targetAlgo + ")");
+        throw new IllegalArgumentException(StringUtil.concatObjects(
+            "Could not compare OCSP datasources with different CERTHASH_ALGO: refDataSource (",
+            refAlgo, ") and targetDataSource (", targetAlgo, ")"));
       }
       this.certhashAlgo = refAlgo;
     } else if (refDbControl == DbControl.XIPKI_CA_v3) {
@@ -166,7 +166,7 @@ class DigestDiff {
     final int numBlocksToRead = numTargetThreads * 3 / 2;
     for (Integer refCaId : refCaIds) {
       RefDigestReader refReader = RefDigestReader.getInstance(refDatasource, refDbControl,
-          certhashAlgo, refCaId, numBlocksToRead, numPerSelect, new StopMe(stopMe));
+          certhashAlgo, refCaId, numBlocksToRead, numPerSelect, stopMe);
       diffSingleCa(refReader, caIdCertMap);
     }
   } // method diff
@@ -223,7 +223,7 @@ class DigestDiff {
 
       target = new TargetDigestRetriever(revokedOnly, processLog, refReader, reporter,
           targetDatasource, targetDbControl, certhashAlgo, caId, numPerSelect,
-          numTargetThreads, new StopMe(stopMe));
+          numTargetThreads, stopMe);
 
       target.awaitTerminiation();
       processLog.printTrailer();

@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.DbToolBase;
-import org.xipki.ca.dbtool.StopMe;
 import org.xipki.common.EndOfQueue;
 import org.xipki.common.QueueEntry;
 import org.xipki.common.util.Base64;
@@ -65,7 +64,7 @@ class RefDigestReader {
 
   private final X509Certificate caCert;
 
-  private final StopMe stopMe;
+  private final AtomicBoolean stopMe;
 
   private final int totalAccount;
 
@@ -106,7 +105,7 @@ class RefDigestReader {
 
     @Override
     public void run() {
-      while (!endReached && !stopMe.stopMe()) {
+      while (!endReached && !stopMe.get()) {
         try {
           query();
         } catch (InterruptedException ex) {
@@ -162,8 +161,7 @@ class RefDigestReader {
             }
           }
 
-          DigestEntry cert = new DigestEntry(serial, revoked, revReason, revTime,
-              revInvTime, hash);
+          DigestEntry cert = new DigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
           result.addEntry(new IdentifiedDigestEntry(cert, id));
         }
       } catch (Exception ex) {
@@ -186,7 +184,7 @@ class RefDigestReader {
   } // class XipkiDbRetriever
 
   private RefDigestReader(DataSourceWrapper datasource, X509Certificate caCert, int totalAccount,
-      long minId, int numBlocksToRead, StopMe stopMe) throws Exception {
+      long minId, int numBlocksToRead, AtomicBoolean stopMe) throws Exception {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
     this.caCert = ParamUtil.requireNonNull("caCert", caCert);
     this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
@@ -240,7 +238,7 @@ class RefDigestReader {
   }
 
   public static RefDigestReader getInstance(DataSourceWrapper datasource, DbControl dbControl,
-      HashAlgo certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, StopMe stopMe)
+      HashAlgo certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe)
       throws Exception {
     ParamUtil.requireNonNull("datasource", datasource);
 
@@ -320,7 +318,7 @@ class RefDigestReader {
 
     QueueEntry next = null;
     while (next == null) {
-      if (stopMe.stopMe()) {
+      if (stopMe.get()) {
         return null;
       }
       next = outQueue.poll(1, TimeUnit.SECONDS);

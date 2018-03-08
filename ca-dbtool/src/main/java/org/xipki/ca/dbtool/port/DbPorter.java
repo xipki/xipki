@@ -142,12 +142,9 @@ public class DbPorter extends DbToolBase {
     super(datasource, baseDir, stopMe);
 
     this.evaulateOnly = evaluateOnly;
-
     this.dbSchemaInfo = new DbSchemaInfo(datasource);
-    String str = dbSchemaInfo.variableValue("VERSION");
-    this.dbSchemaVersion = Integer.parseInt(str);
-    str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
-    this.maxX500nameLen = Integer.parseInt(str);
+    this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
+    this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
   }
 
   protected FileOrValueType buildFileOrValue(String content, String fileName) throws IOException {

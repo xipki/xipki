@@ -22,13 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
@@ -52,8 +49,6 @@ public class CaDbImportWorker extends DbPortWorker {
 
   private final DataSourceWrapper datasource;
 
-  private final Unmarshaller unmarshaller;
-
   private final boolean resume;
 
   private final String srcFolder;
@@ -72,9 +67,6 @@ public class CaDbImportWorker extends DbPortWorker {
         new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    unmarshaller = jaxbContext.createUnmarshaller();
-    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
     this.resume = resume;
     this.srcFolder = IoUtil.expandFilepath(srcFolder);
     this.batchEntriesPerCommit = batchEntriesPerCommit;
@@ -100,14 +92,14 @@ public class CaDbImportWorker extends DbPortWorker {
       if (!resume) {
         // CAConfiguration
         CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(datasource,
-            unmarshaller, srcFolder, stopMe, evaluateOnly);
+            srcFolder, stopMe, evaluateOnly);
         caConfImporter.importToDb();
         caConfImporter.shutdown();
       }
 
       // CertStore
       CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(datasource,
-          unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+          srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();
     } finally {

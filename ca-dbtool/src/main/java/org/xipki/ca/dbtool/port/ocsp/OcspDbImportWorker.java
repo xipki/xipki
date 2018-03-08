@@ -21,13 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
@@ -50,8 +45,6 @@ public class OcspDbImportWorker extends DbPortWorker {
 
   private final DataSourceWrapper datasource;
 
-  private final Unmarshaller unmarshaller;
-
   private final boolean resume;
 
   private final String srcFolder;
@@ -62,7 +55,7 @@ public class OcspDbImportWorker extends DbPortWorker {
 
   public OcspDbImportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
-      boolean evaluateOnly) throws PasswordResolverException, IOException, JAXBException {
+      boolean evaluateOnly) throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
 
@@ -70,9 +63,6 @@ public class OcspDbImportWorker extends DbPortWorker {
         new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    unmarshaller = jaxbContext.createUnmarshaller();
-    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
     this.resume = resume;
     this.srcFolder = IoUtil.expandFilepath(srcFolder);
     this.batchEntriesPerCommit = batchEntriesPerCommit;
@@ -85,7 +75,7 @@ public class OcspDbImportWorker extends DbPortWorker {
     // CertStore
     try {
       OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(datasource,
-          unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+          srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();
     } finally {

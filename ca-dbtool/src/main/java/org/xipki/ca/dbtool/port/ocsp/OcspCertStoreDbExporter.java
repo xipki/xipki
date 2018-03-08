@@ -28,11 +28,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,15 +75,24 @@ class OcspCertStoreDbExporter extends DbPorter {
 
   private final boolean resume;
 
-  OcspCertStoreDbExporter(DataSourceWrapper datasource, Marshaller marshaller,
-      Unmarshaller unmarshaller, String baseDir, int numCertsInBundle, int numCertsPerSelect,
-      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
+  OcspCertStoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
+      throws Exception {
     super(datasource, baseDir, stopMe, evaluateOnly);
 
     this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
     this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
-    this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
-    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    marshaller = jaxbContext.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+    Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
+    marshaller.setSchema(schema);
+
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(schema);
+
     if (resume) {
       File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
       if (!processLogFile.exists()) {
@@ -138,8 +149,7 @@ class OcspCertStoreDbExporter extends DbPorter {
   private void exportHashAlgo(CertStoreType certstore) throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
-      throw new DataAccessException(
-          "CERTHASH_ALGO is not defined in table DBSCHEMA");
+      throw new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA");
     }
 
     certstore.setCerthashAlgo(certHashAlgoStr);
@@ -308,31 +318,23 @@ class OcspCertStoreDbExporter extends DbPorter {
 
           cert.setId(id);
 
-          int issuerId = rs.getInt("IID");
-          cert.setIid(issuerId);
-
-          String serial = rs.getString("SN");
-          cert.setSn(serial);
-
-          long update = rs.getLong("LUPDATE");
-          cert.setUpdate(update);
+          cert.setIid(rs.getInt("IID"));
+          cert.setSn(rs.getString("SN"));
+          cert.setUpdate(rs.getLong("LUPDATE"));
 
           boolean revoked = rs.getBoolean("REV");
           cert.setRev(revoked);
 
           if (revoked) {
-            int revReason = rs.getInt("RR");
-            long revTime = rs.getLong("RT");
-            long revInvalidityTime = rs.getLong("RIT");
-            cert.setRr(revReason);
-            cert.setRt(revTime);
-            if (revInvalidityTime != 0) {
-              cert.setRit(revInvalidityTime);
+            cert.setRr(rs.getInt("RR"));
+            cert.setRt(rs.getLong("RT"));
+            long rit = rs.getLong("RIT");
+            if (rit != 0) {
+              cert.setRit(rit);
             }
           }
 
-          String profile = rs.getString("PN");
-          cert.setProfile(profile);
+          cert.setProfile(rs.getString("PN"));
 
           String hash = rs.getString("HASH");
           if (hash != null) {

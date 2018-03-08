@@ -21,13 +21,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
@@ -50,8 +47,6 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
 
   private final DataSourceWrapper datasource;
 
-  private final Unmarshaller unmarshaller;
-
   private final String publisherName;
 
   private final boolean resume;
@@ -73,9 +68,6 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
         new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    unmarshaller = jaxbContext.createUnmarshaller();
-    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
     this.publisherName = publisherName;
     this.resume = resume;
     this.srcFolder = IoUtil.expandFilepath(srcFolder);
@@ -89,7 +81,7 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
     // CertStore
     try {
       OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-          datasource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit,
+          datasource, srcFolder, publisherName, batchEntriesPerCommit,
           resume, stopMe, evaluateOnly);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();

@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -57,7 +58,6 @@ import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.port.DbPorter;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -70,12 +70,16 @@ import org.xipki.datasource.DataSourceWrapper;
 
 class CaConfigurationDbExporter extends DbPorter {
 
-  private final Marshaller marshaller;
+  private Marshaller marshaller;
 
-  CaConfigurationDbExporter(DataSourceWrapper datasource, Marshaller marshaller, String destDir,
-      AtomicBoolean stopMe, boolean evaluateOnly) throws DataAccessException {
+  CaConfigurationDbExporter(DataSourceWrapper datasource, String destDir, AtomicBoolean stopMe,
+      boolean evaluateOnly) throws DataAccessException, JAXBException {
     super(datasource, destDir, stopMe, evaluateOnly);
-    this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
+
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    marshaller = jaxbContext.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
   }
 
   public void export() throws Exception {
@@ -122,13 +126,10 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
-        String conf = rs.getString("CONF");
-
         CmpcontrolType cmpcontrol = new CmpcontrolType();
         cmpcontrols.getCmpcontrol().add(cmpcontrol);
-        cmpcontrol.setName(name);
-        cmpcontrol.setConf(conf);
+        cmpcontrol.setName(rs.getString("NAME"));
+        cmpcontrol.setConf(rs.getString("CONF"));
       }
     } catch (SQLException ex) {
       throw translate(sql, ex);
@@ -151,12 +152,9 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
-        String value = rs.getString("VALUE2");
-
         EnvironmentType environment = new EnvironmentType();
-        environment.setName(name);
-        environment.setValue(value);
+        environment.setName(rs.getString("NAME"));
+        environment.setValue(rs.getString("VALUE2"));
         environments.getEnvironment().add(environment);
       }
     } catch (SQLException ex) {
@@ -169,8 +167,7 @@ class CaConfigurationDbExporter extends DbPorter {
     System.out.println(" exported table ENVIRONMENT");
   } // method exportEnvironment
 
-  private void exportCrlsigner(CAConfigurationType caconf)
-      throws DataAccessException, IOException {
+  private void exportCrlsigner(CAConfigurationType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table CRLSIGNER");
     Crlsigners crlsigners = new Crlsigners();
     String sql = "SELECT NAME,SIGNER_TYPE,SIGNER_CONF,SIGNER_CERT,CRL_CONTROL FROM CRLSIGNER";
@@ -183,19 +180,15 @@ class CaConfigurationDbExporter extends DbPorter {
 
       while (rs.next()) {
         String name = rs.getString("NAME");
-        String signerType = rs.getString("SIGNER_TYPE");
-        String signerConf = rs.getString("SIGNER_CONF");
-        String signerCert = rs.getString("SIGNER_CERT");
-        String crlControl = rs.getString("CRL_CONTROL");
 
         CrlsignerType crlsigner = new CrlsignerType();
         crlsigner.setName(name);
-        crlsigner.setSignerType(signerType);
-        crlsigner.setSignerConf(
-            buildFileOrValue(signerConf, "ca-conf/signerconf-crlsigner-" + name));
-        crlsigner.setSignerCert(
-            buildFileOrBase64Binary(signerCert, "ca-conf/signercert-crlsigner-" + name + ".der"));
-        crlsigner.setCrlControl(crlControl);
+        crlsigner.setSignerType(rs.getString("SIGNER_TYPE"));
+        crlsigner.setSignerConf(buildFileOrValue(
+            rs.getString("SIGNER_CONF"), "ca-conf/signerconf-crlsigner-" + name));
+        crlsigner.setSignerCert(buildFileOrBase64Binary(
+            rs.getString("SIGNER_CERT"), "ca-conf/signercert-crlsigner-" + name + ".der"));
+        crlsigner.setCrlControl(rs.getString("CRL_CONTROL"));
 
         crlsigners.getCrlsigner().add(crlsigner);
       }
@@ -221,12 +214,9 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
-        int caId = rs.getInt("CA_ID");
-
         CaaliasType caalias = new CaaliasType();
-        caalias.setName(name);
-        caalias.setCaId(caId);
+        caalias.setName(rs.getString("NAME"));
+        caalias.setCaId(rs.getInt("CA_ID"));
 
         caaliases.getCaalias().add(caalias);
       }
@@ -240,8 +230,7 @@ class CaConfigurationDbExporter extends DbPorter {
     System.out.println(" exported table CAALIAS");
   } // method exportCaalias
 
-  private void exportRequestor(CAConfigurationType caconf)
-      throws DataAccessException, IOException {
+  private void exportRequestor(CAConfigurationType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table REQUESTOR");
     Requestors requestors = new Requestors();
     final String sql = "SELECT ID,NAME,CERT FROM REQUESTOR";
@@ -253,13 +242,13 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int id = rs.getInt("ID");
         String name = rs.getString("NAME");
-        String cert = rs.getString("CERT");
+
         RequestorType requestor = new RequestorType();
-        requestor.setId(id);
+        requestor.setId(rs.getInt("ID"));
         requestor.setName(name);
-        requestor.setCert(buildFileOrBase64Binary(cert, "ca-conf/cert-requestor-" + name + ".der"));
+        requestor.setCert(buildFileOrBase64Binary(
+            rs.getString("CERT"), "ca-conf/cert-requestor-" + name + ".der"));
         requestors.getRequestor().add(requestor);
       }
     } catch (SQLException ex) {
@@ -272,11 +261,8 @@ class CaConfigurationDbExporter extends DbPorter {
     System.out.println(" exported table REQUESTOR");
   } // method exportRequestor
 
-  private void exportResponder(CAConfigurationType caconf)
-      throws DataAccessException, IOException {
+  private void exportResponder(CAConfigurationType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table RESPONDER");
-
-    System.out.println("exporting table CRLSIGNER");
     Responders responders = new Responders();
     final String sql = "SELECT NAME,TYPE,CONF,CERT FROM RESPONDER";
 
@@ -288,15 +274,13 @@ class CaConfigurationDbExporter extends DbPorter {
 
       while (rs.next()) {
         String name = rs.getString("NAME");
-        String type = rs.getString("TYPE");
-        String conf = rs.getString("CONF");
-        String cert = rs.getString("CERT");
 
         ResponderType responder = new ResponderType();
         responder.setName(name);
-        responder.setType(type);
-        responder.setConf(buildFileOrValue(conf, "ca-conf/conf-responder-" + name));
-        responder.setCert(buildFileOrBase64Binary(cert, "ca-conf/cert-responder-" + name + ".der"));
+        responder.setType(rs.getString("TYPE"));
+        responder.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-responder-" + name));
+        responder.setCert(buildFileOrBase64Binary(
+            rs.getString("CERT"), "ca-conf/cert-responder-" + name + ".der"));
         responders.getResponder().add(responder);
       }
     } catch (SQLException ex) {
@@ -309,8 +293,7 @@ class CaConfigurationDbExporter extends DbPorter {
     System.out.println(" exported table RESPONDER");
   } // method exportResponder
 
-  private void exportPublisher(CAConfigurationType caconf)
-      throws DataAccessException, IOException {
+  private void exportPublisher(CAConfigurationType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table PUBLISHER");
     Publishers publishers = new Publishers();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PUBLISHER";
@@ -322,16 +305,13 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int id = rs.getInt("ID");
         String name = rs.getString("NAME");
-        String type = rs.getString("TYPE");
-        String conf = rs.getString("CONF");
 
         PublisherType publisher = new PublisherType();
-        publisher.setId(id);
+        publisher.setId(rs.getInt("ID"));
         publisher.setName(name);
-        publisher.setType(type);
-        publisher.setConf(buildFileOrValue(conf, "ca-conf/conf-publisher-" + name));
+        publisher.setType(rs.getString("TYPE"));
+        publisher.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-publisher-" + name));
 
         publishers.getPublisher().add(publisher);
       }
@@ -357,18 +337,14 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int id = rs.getInt("ID");
         String name = rs.getString("NAME");
-        int art = rs.getInt("ART");
-        String type = rs.getString("TYPE");
-        String conf = rs.getString("CONF");
 
         ProfileType profile = new ProfileType();
-        profile.setId(id);
+        profile.setId(rs.getInt("ID"));
         profile.setName(name);
-        profile.setArt(art);
-        profile.setType(type);
-        profile.setConf(buildFileOrValue(conf, "ca-conf/certprofile-" + name));
+        profile.setArt(rs.getInt("ART"));
+        profile.setType(rs.getString("TYPE"));
+        profile.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/certprofile-" + name));
 
         profiles.getProfile().add(profile);
       }
@@ -397,71 +373,44 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int id = rs.getInt("ID");
         String name = rs.getString("NAME");
-        int art = rs.getInt("ART");
-        long nextCrlNo = rs.getLong("NEXT_CRLNO");
-        String responderName = rs.getString("RESPONDER_NAME");
-        String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
-        String caCertUris = rs.getString("CACERT_URIS");
-        String extraControl = rs.getString("EXTRA_CONTROL");
-        int serialSize = rs.getInt("SN_SIZE");
-        String status = rs.getString("STATUS");
-        String crlUris = rs.getString("CRL_URIS");
-        String deltaCrlUris = rs.getString("DELTACRL_URIS");
-        String ocspUris = rs.getString("OCSP_URIS");
-        String maxValidity = rs.getString("MAX_VALIDITY");
-        String cert = rs.getString("CERT");
-        String signerType = rs.getString("SIGNER_TYPE");
-        String signerConf = rs.getString("SIGNER_CONF");
-        String crlsignerName = rs.getString("CRLSIGNER_NAME");
-        int duplicateKey = rs.getInt("DUPLICATE_KEY");
-        int duplicateSubject = rs.getInt("DUPLICATE_SUBJECT");
-        int saveReq = rs.getInt("SAVE_REQ");
-        int permission = rs.getInt("PERMISSION");
-        int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
-        int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
-        String validityMode = rs.getString("VALIDITY_MODE");
 
         CaType ca = new CaType();
-        ca.setId(id);
+        ca.setId(rs.getInt("ID"));
         ca.setName(name);
-        ca.setArt(art);
-        ca.setSnSize(serialSize);
-        ca.setNextCrlNo(nextCrlNo);
-        ca.setStatus(status);
-        ca.setCrlUris(crlUris);
-        ca.setDeltacrlUris(deltaCrlUris);
-        ca.setOcspUris(ocspUris);
-        ca.setCacertUris(caCertUris);
-        ca.setMaxValidity(maxValidity);
-        ca.setCert(buildFileOrBase64Binary(cert, "ca-conf/cert-ca-" + name + ".der"));
-        ca.setSignerType(signerType);
-        ca.setSignerConf(buildFileOrValue(signerConf, "ca-conf/signerconf-ca-" + name));
-        ca.setCrlsignerName(crlsignerName);
-        ca.setResponderName(responderName);
-        ca.setCmpcontrolName(cmpcontrolName);
-        ca.setDuplicateKey(duplicateKey);
-        ca.setDuplicateSubject(duplicateSubject);
-        ca.setSaveReq(saveReq);
-        ca.setPermission(permission);
-        ca.setExpirationPeriod(expirationPeriod);
-        ca.setKeepExpiredCertDays(keepExpiredCertDays);
-        ca.setValidityMode(validityMode);
-        ca.setExtraControl(extraControl);
-
-        int numCrls = rs.getInt("NUM_CRLS");
-        ca.setNumCrls(numCrls);
+        ca.setArt(rs.getInt("ART"));
+        ca.setSnSize(rs.getInt("SN_SIZE"));
+        ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
+        ca.setStatus(rs.getString("STATUS"));
+        ca.setCrlUris(rs.getString("CRL_URIS"));
+        ca.setDeltacrlUris(rs.getString("DELTACRL_URIS"));
+        ca.setOcspUris(rs.getString("OCSP_URIS"));
+        ca.setCacertUris(rs.getString("CACERT_URIS"));
+        ca.setMaxValidity(rs.getString("MAX_VALIDITY"));
+        ca.setCert(buildFileOrBase64Binary(
+            rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
+        ca.setSignerType(rs.getString("SIGNER_TYPE"));
+        ca.setSignerConf(buildFileOrValue(
+            rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
+        ca.setCrlsignerName(rs.getString("CRLSIGNER_NAME"));
+        ca.setResponderName(rs.getString("RESPONDER_NAME"));
+        ca.setCmpcontrolName(rs.getString("CMPCONTROL_NAME"));
+        ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
+        ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
+        ca.setSaveReq(rs.getInt("SAVE_REQ"));
+        ca.setPermission(rs.getInt("PERMISSION"));
+        ca.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
+        ca.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
+        ca.setValidityMode(rs.getString("VALIDITY_MODE"));
+        ca.setExtraControl(rs.getString("EXTRA_CONTROL"));
+        ca.setNumCrls(rs.getInt("NUM_CRLS"));
 
         boolean revoked = rs.getBoolean("REV");
         ca.setRevoked(revoked);
         if (revoked) {
-          int reason = rs.getInt("RR");
-          long revTime = rs.getLong("RT");
-          long revInvalidityTime = rs.getLong("RIT");
-          ca.setRevReason(reason);
-          ca.setRevTime(revTime);
-          ca.setRevInvTime(revInvalidityTime);
+          ca.setRevReason(rs.getInt("RR"));
+          ca.setRevTime(rs.getLong("RT"));
+          ca.setRevInvTime(rs.getLong("RIT"));
         }
 
         cas.getCa().add(ca);
@@ -488,18 +437,12 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int caId = rs.getInt("CA_ID");
-        int requestorId = rs.getInt("REQUESTOR_ID");
-        boolean ra = rs.getBoolean("RA");
-        int permission = rs.getInt("PERMISSION");
-        String profiles = rs.getString("PROFILES");
-
         CaHasRequestorType caHasRequestor = new CaHasRequestorType();
-        caHasRequestor.setCaId(caId);
-        caHasRequestor.setRequestorId(requestorId);
-        caHasRequestor.setRa(ra);
-        caHasRequestor.setPermission(permission);
-        caHasRequestor.setProfiles(profiles);
+        caHasRequestor.setCaId(rs.getInt("CA_ID"));
+        caHasRequestor.setRequestorId(rs.getInt("REQUESTOR_ID"));
+        caHasRequestor.setRa(rs.getBoolean("RA"));
+        caHasRequestor.setPermission(rs.getInt("PERMISSION"));
+        caHasRequestor.setProfiles(rs.getString("PROFILES"));
 
         caHasRequestors.getCaHasRequestor().add(caHasRequestor);
       }
@@ -525,12 +468,9 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int caId = rs.getInt("CA_ID");
-        int publisherId = rs.getInt("PUBLISHER_ID");
-
         CaHasPublisherType caHasPublisher = new CaHasPublisherType();
-        caHasPublisher.setCaId(caId);
-        caHasPublisher.setPublisherId(publisherId);
+        caHasPublisher.setCaId(rs.getInt("CA_ID"));
+        caHasPublisher.setPublisherId(rs.getInt("PUBLISHER_ID"));
 
         caHasPublishers.getCaHasPublisher().add(caHasPublisher);
       }
@@ -559,25 +499,19 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
         int caId = rs.getInt("CA_ID");
-        int active = rs.getInt("ACTIVE");
-        String profiles = rs.getString("PROFILES");
-        String respType = rs.getString("RESPONDER_TYPE");
-        String respConf = rs.getString("RESPONDER_CONF");
-        String respCert = rs.getString("RESPONDER_CERT");
-        String control = rs.getString("CONTROL");
 
         ScepType scep = new ScepType();
-        scep.setName(name);
+        scep.setName(rs.getString("NAME"));
         scep.setCaId(caId);
-        scep.setActive(active);
-        scep.setProfiles(profiles);
-        scep.setResponderType(respType);
-        scep.setResponderConf(buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caId));
-        scep.setResponderCert(
-            buildFileOrBase64Binary(respCert, "ca-conf/respondercert-scep-" + caId + ".der"));
-        scep.setControl(control);
+        scep.setActive(rs.getInt("ACTIVE"));
+        scep.setProfiles(rs.getString("PROFILES"));
+        scep.setResponderType(rs.getString("RESPONDER_TYPE"));
+        scep.setResponderConf(buildFileOrValue(
+            rs.getString("RESPONDER_CONF"), "ca-conf/responderconf-scep-" + caId));
+        scep.setResponderCert(buildFileOrBase64Binary(
+            rs.getString("RESPONDER_CERT"), "ca-conf/respondercert-scep-" + caId + ".der"));
+        scep.setControl(rs.getString("CONTROL"));
         sceps.getScep().add(scep);
       }
     } catch (SQLException ex) {
@@ -601,12 +535,9 @@ class CaConfigurationDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        int caId = rs.getInt("CA_ID");
-        int profileId = rs.getInt("PROFILE_ID");
-
         CaHasProfileType caHasProfile = new CaHasProfileType();
-        caHasProfile.setCaId(caId);
-        caHasProfile.setProfileId(profileId);
+        caHasProfile.setCaId(rs.getInt("CA_ID"));
+        caHasProfile.setProfileId(rs.getInt("PROFILE_ID"));
 
         caHasProfiles.getCaHasProfile().add(caHasProfile);
       }

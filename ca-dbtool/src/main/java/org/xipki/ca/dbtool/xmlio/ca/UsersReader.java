@@ -58,43 +58,37 @@ public class UsersReader extends DbiXmlReader {
 
       lastEvent = event;
 
-      switch (event) {
-        case XMLStreamConstants.START_ELEMENT:
-          if (UserType.TAG_ROOT.equals(reader.getLocalName())) {
-            ret = new UserType();
-          }
-          break;
-        case XMLStreamConstants.CHARACTERS:
-          buffer.append(reader.getText());
-          break;
-        case XMLStreamConstants.END_ELEMENT:
-          if (ret == null) {
-            break;
-          }
+      if (event == XMLStreamConstants.START_ELEMENT) {
+        if (UserType.TAG_ROOT.equals(reader.getLocalName())) {
+          ret = new UserType();
+        }
+      } else if (event == XMLStreamConstants.CHARACTERS) {
+        buffer.append(reader.getText());
+      } else if (event == XMLStreamConstants.END_ELEMENT) {
+        if (ret == null) {
+          continue;
+        }
 
-          switch (reader.getLocalName()) {
-            case UserType.TAG_ROOT:
-              ret.validate();
-              return ret;
-            case UserType.TAG_ID:
-              ret.setId(Long.parseLong(tagContent));
-              break;
-            case UserType.TAG_NAME:
-              ret.setName(tagContent);
-              break;
-            case UserType.TAG_ACTIVE:
-              ret.setActive(Boolean.parseBoolean(tagContent));
-              break;
-            case UserType.TAG_PASSWORD:
-              ret.setPassword(tagContent);
-              break;
-            default:
-              break;
-          } // end switch (reader.getLocalName())
-          break;
-        default:
-          break;
-      } // end switch (event)
+        switch (reader.getLocalName()) {
+          case UserType.TAG_ROOT:
+            ret.validate();
+            return ret;
+          case UserType.TAG_ID:
+            ret.setId(parseLong(tagContent));
+            break;
+          case UserType.TAG_NAME:
+            ret.setName(tagContent);
+            break;
+          case UserType.TAG_ACTIVE:
+            ret.setActive(parseBoolean(tagContent));
+            break;
+          case UserType.TAG_PASSWORD:
+            ret.setPassword(tagContent);
+            break;
+          default:
+            break;
+        } // end switch (reader.getLocalName())
+      } // end if (event)
     } // end while
 
     return null;

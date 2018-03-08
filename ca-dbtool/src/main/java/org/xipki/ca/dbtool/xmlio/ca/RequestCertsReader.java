@@ -60,40 +60,34 @@ public class RequestCertsReader extends DbiXmlReader {
 
       lastEvent = event;
 
-      switch (event) {
-        case XMLStreamConstants.START_ELEMENT:
-          if (RequestCertType.TAG_ROOT.equals(reader.getLocalName())) {
-            ret = new RequestCertType();
-          }
-          break;
-        case XMLStreamConstants.CHARACTERS:
-          buffer.append(reader.getText());
-          break;
-        case XMLStreamConstants.END_ELEMENT:
-          if (ret == null) {
-            break;
-          }
+      if (event == XMLStreamConstants.START_ELEMENT) {
+        if (RequestCertType.TAG_ROOT.equals(reader.getLocalName())) {
+          ret = new RequestCertType();
+        }
+      } else if (event == XMLStreamConstants.CHARACTERS) {
+        buffer.append(reader.getText());
+      } else if (event == XMLStreamConstants.END_ELEMENT) {
+        if (ret == null) {
+          continue;
+        }
 
-          switch (reader.getLocalName()) {
-            case RequestCertType.TAG_ROOT:
-              ret.validate();
-              return ret;
-            case RequestCertType.TAG_ID:
-              ret.setId(Long.parseLong(tagContent));
-              break;
-            case RequestCertType.TAG_RID:
-              ret.setRid(Long.parseLong(tagContent));
-              break;
-            case RequestCertType.TAG_CID:
-              ret.setCid(Long.parseLong(tagContent));
-              break;
-            default:
-              break;
-          } // end switch (reader.getLocalName())
-          break;
-        default:
-          break;
-      } // end switch (event)
+        switch (reader.getLocalName()) {
+          case RequestCertType.TAG_ROOT:
+            ret.validate();
+            return ret;
+          case RequestCertType.TAG_ID:
+            ret.setId(parseLong(tagContent));
+            break;
+          case RequestCertType.TAG_RID:
+            ret.setRid(parseLong(tagContent));
+            break;
+          case RequestCertType.TAG_CID:
+            ret.setCid(parseLong(tagContent));
+            break;
+          default:
+            break;
+        } // end switch (reader.getLocalName())
+      } // end if (event)
     } // end while
 
     return null;

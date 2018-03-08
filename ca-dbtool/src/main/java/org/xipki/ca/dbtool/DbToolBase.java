@@ -105,8 +105,7 @@ public class DbToolBase {
     ParamUtil.requireNonBlank("tableName", tableName);
     ParamUtil.requireNonBlank("idColumn", idColumn);
 
-    String sql = StringUtil.concatObjects("DELETE FROM ", tableName, " WHERE ", idColumn, ">",
-        id);
+    String sql = StringUtil.concatObjects("DELETE FROM ", tableName, " WHERE ", idColumn, ">", id);
 
     Statement stmt;
     try {
@@ -238,8 +237,7 @@ public class DbToolBase {
     }
   }
 
-  protected static void setInt(PreparedStatement ps, int index, Integer value)
-      throws SQLException {
+  protected static void setInt(PreparedStatement ps, int index, Integer value) throws SQLException {
     ParamUtil.requireNonNull("ps", ps);
 
     if (value != null) {
@@ -301,8 +299,8 @@ public class DbToolBase {
     os.write('\n');
   }
 
-  public static String buildFilename(String prefix, String suffix,
-      long minIdOfCurrentFile, long maxIdOfCurrentFile, long maxId) {
+  public static String buildFilename(String prefix, String suffix, long minIdOfCurrentFile,
+      long maxIdOfCurrentFile, long maxId) {
     ParamUtil.requireNonNull("prefix", prefix);
     ParamUtil.requireNonNull("suffix", suffix);
 

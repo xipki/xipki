@@ -22,14 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
@@ -53,10 +49,6 @@ public class CaDbExportWorker extends DbPortWorker {
 
   private final DataSourceWrapper datasource;
 
-  private final Marshaller marshaller;
-
-  private final Unmarshaller unmarshaller;
-
   private final String destFolder;
 
   private final boolean resume;
@@ -79,8 +71,6 @@ public class CaDbExportWorker extends DbPortWorker {
         new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
-    this.marshaller = getMarshaller();
-    this.unmarshaller = getUnmarshaller();
     this.destFolder = IoUtil.expandFilepath(destFolder);
     this.resume = resume;
     this.numCertsInBundle = numCertsInBundle;
@@ -123,15 +113,14 @@ public class CaDbExportWorker extends DbPortWorker {
       if (!resume) {
         // CAConfiguration
         CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
-            datasource, marshaller, destFolder, stopMe, evaluateOnly);
+            datasource, destFolder, stopMe, evaluateOnly);
         caConfExporter.export();
         caConfExporter.shutdown();
       }
 
       // CertStore
-      CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(datasource,
-          marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerSelect,
-          resume, stopMe, evaluateOnly);
+      CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(datasource, destFolder,
+          numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
       certStoreExporter.export();
       certStoreExporter.shutdown();
     } finally {
@@ -144,20 +133,5 @@ public class CaDbExportWorker extends DbPortWorker {
       System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
     }
   } // method run0
-
-  private static Marshaller getMarshaller() throws JAXBException {
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    Marshaller marshaller = jaxbContext.createMarshaller();
-    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-    marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-    return marshaller;
-  }
-
-  private static Unmarshaller getUnmarshaller() throws JAXBException {
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-    return unmarshaller;
-  }
 
 }

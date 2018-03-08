@@ -60,40 +60,34 @@ public class RequestsReader extends DbiXmlReader {
 
       lastEvent = event;
 
-      switch (event) {
-        case XMLStreamConstants.START_ELEMENT:
-          if (RequestType.TAG_ROOT.equals(reader.getLocalName())) {
-            ret = new RequestType();
-          }
-          break;
-        case XMLStreamConstants.CHARACTERS:
-          buffer.append(reader.getText());
-          break;
-        case XMLStreamConstants.END_ELEMENT:
-          if (ret == null) {
-            break;
-          }
+      if (event == XMLStreamConstants.START_ELEMENT) {
+        if (RequestType.TAG_ROOT.equals(reader.getLocalName())) {
+          ret = new RequestType();
+        }
+      } else if (event == XMLStreamConstants.CHARACTERS) {
+        buffer.append(reader.getText());
+      } else if (event == XMLStreamConstants.END_ELEMENT) {
+        if (ret == null) {
+          continue;
+        }
 
-          switch (reader.getLocalName()) {
-            case RequestType.TAG_ROOT:
-              ret.validate();
-              return ret;
-            case RequestType.TAG_UPDATE:
-              ret.setUpdate(Long.parseLong(tagContent));
-              break;
-            case RequestType.TAG_FILE:
-              ret.setFile(tagContent);
-              break;
-            case RequestType.TAG_ID:
-              ret.setId(Long.parseLong(tagContent));
-              break;
-            default:
-              break;
-          } // end switch (reader.getLocalName())
-          break;
-        default:
-          break;
-      } // end switch (event)
+        switch (reader.getLocalName()) {
+          case RequestType.TAG_ROOT:
+            ret.validate();
+            return ret;
+          case RequestType.TAG_UPDATE:
+            ret.setUpdate(parseLong(tagContent));
+            break;
+          case RequestType.TAG_FILE:
+            ret.setFile(tagContent);
+            break;
+          case RequestType.TAG_ID:
+            ret.setId(parseLong(tagContent));
+            break;
+          default:
+            break;
+        } // end switch (reader.getLocalName())
+      } // end if (event)
     } // end while
 
     return null;

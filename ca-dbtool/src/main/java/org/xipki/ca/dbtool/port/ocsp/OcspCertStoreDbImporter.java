@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.ca.dbtool.jaxb.ocsp.IssuerType;
+import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.ca.dbtool.xmlio.ocsp.OcspCertType;
@@ -66,12 +68,14 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertStoreDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller, String srcDir,
-      int numCertsPerCommit, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
-      throws Exception {
+  OcspCertStoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
+      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
     super(datasource, srcDir, stopMe, evaluateOnly);
 
-    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
+
     this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     if (resume) {

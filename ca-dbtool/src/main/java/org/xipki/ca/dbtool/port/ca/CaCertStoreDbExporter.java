@@ -31,11 +31,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.validation.Schema;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
@@ -95,15 +97,24 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
   private final boolean resume;
 
-  CaCertStoreDbExporter(DataSourceWrapper datasource, Marshaller marshaller,
-      Unmarshaller unmarshaller, String baseDir, int numCertsInBundle, int numCertsPerSelect,
-      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws DataAccessException {
+  CaCertStoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
+          throws DataAccessException, JAXBException {
     super(datasource, baseDir, stopMe, evaluateOnly);
-    this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
-    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+
     this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
     this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
     this.resume = resume;
+
+    Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ca.xsd");
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+
+    marshaller = jaxbContext.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    marshaller.setSchema(schema);
+
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(schema);
   }
 
   @SuppressWarnings("unchecked")
@@ -158,8 +169,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         idProcessedInLastProcess = null;
       }
 
-      CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CAUSER, CaDbEntryType.CRL,
-          CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
+      CaDbEntryType[] types = {CaDbEntryType.CAUSER, CaDbEntryType.CRL, CaDbEntryType.CERT,
+          CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
       for (CaDbEntryType type : types) {
         if (exception == null
@@ -198,8 +209,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     FileOutputStream entriesFileOs = null;
     try {
-      entriesFileOs = new FileOutputStream(
-          new File(baseDir, type.dirName() + ".mf"), true);
+      entriesFileOs = new FileOutputStream(new File(baseDir, type.dirName() + ".mf"), true);
       exportEntries(type, certstore, processLogFile, entriesFileOs, idProcessedInLastProcess);
       return null;
     } catch (Exception ex) {
@@ -221,8 +231,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
       FileOutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
     final int numEntriesPerSelect = Math.max(1,
         Math.round(type.sqlBatchFactor() * numCertsPerSelect));
-    final int numEntriesPerZip = Math.max(1,
-        Math.round(type.sqlBatchFactor() * numCertsInBundle));
+    final int numEntriesPerZip = Math.max(1, Math.round(type.sqlBatchFactor() * numCertsInBundle));
     final File entriesDir = new File(baseDir, type.dirName());
     final String tableName = type.tableName();
 
@@ -346,36 +355,21 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
             CertType cert = new CertType();
             cert.setId(id);
-
-            int art = rs.getInt("ART");
-            cert.setArt(art);
-
-            int cainfoId = rs.getInt("CA_ID");
-            cert.setCaId(cainfoId);
-
-            boolean ee = rs.getBoolean("EE");
-            cert.setEe(ee);
-
+            cert.setArt(rs.getInt("ART"));
+            cert.setCaId(rs.getInt("CA_ID"));
+            cert.setEe(rs.getBoolean("EE"));
             cert.setFile(certFileName);
 
             long fpReqSubject = rs.getLong("FP_RS");
             if (fpReqSubject != 0) {
               cert.setFpRs(fpReqSubject);
-              String reqSubject = rs.getString("REQ_SUBJECT");
-              cert.setRs(reqSubject);
+              cert.setRs(rs.getString("REQ_SUBJECT"));
             }
 
-            int certprofileId = rs.getInt("PID");
-            cert.setPid(certprofileId);
-
-            int reqType = rs.getInt("RTYPE");
-            cert.setReqType(reqType);
-
-            int requestorinfoId = rs.getInt("RID");
-            cert.setRid(requestorinfoId);
-
-            String serial = rs.getString("SN");
-            cert.setSn(serial);
+            cert.setPid(rs.getInt("PID"));
+            cert.setReqType(rs.getInt("RTYPE"));
+            cert.setRid(rs.getInt("RID"));
+            cert.setSn(rs.getString("SN"));
 
             String str = rs.getString("TID");
             if (StringUtil.isNotBlank(str)) {
@@ -386,18 +380,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             if (userId != 0) {
               cert.setUid(userId);
             }
-            long lastUpdate = rs.getLong("LUPDATE");
-            cert.setUpdate(lastUpdate);
+            cert.setUpdate(rs.getLong("LUPDATE"));
 
             boolean revoked = rs.getBoolean("REV");
             cert.setRev(revoked);
 
             if (revoked) {
-              int revReason = rs.getInt("RR");
-              long revTime = rs.getLong("RT");
+              cert.setRr(rs.getInt("RR"));
+              cert.setRt(rs.getLong("RT"));
               long revInvTime = rs.getLong("RIT");
-              cert.setRr(revReason);
-              cert.setRt(revTime);
               if (revInvTime != 0) {
                 cert.setRit(revInvTime);
               }
@@ -411,13 +402,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             X509CRL x509Crl = null;
             try {
               x509Crl = X509Util.parseCrl(crlBytes);
+            } catch (CRLException ex) {
+              LogUtil.error(LOG, ex, "could not parse CRL with id " + id);
+              throw ex;
             } catch (Exception ex) {
               LogUtil.error(LOG, ex, "could not parse CRL with id " + id);
-              if (ex instanceof CRLException) {
-                throw (CRLException) ex;
-              } else {
-                throw new CRLException(ex.getMessage(), ex);
-              }
+              throw new CRLException(ex.getMessage(), ex);
             }
 
             byte[] octetString = x509Crl.getExtensionValue(Extension.cRLNumber.getId());
@@ -441,8 +431,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             CrlType crl = new CrlType();
             crl.setId(id);
 
-            int caId = rs.getInt("CA_ID");
-            crl.setCaId(caId);
+            crl.setCaId(rs.getInt("CA_ID"));
 
             byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
             BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
@@ -451,33 +440,20 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
             ((CrlsWriter) entriesInCurrentFile).add(crl);
           } else if (CaDbEntryType.USER == type) {
-            String name = rs.getString("NAME");
             UserType user = new UserType();
             user.setId(id);
-            user.setName(name);
-
-            boolean active = rs.getBoolean("ACTIVE");
-            user.setActive(active);
-
-            String password = rs.getString("PASSWORD");
-            user.setPassword(password);
+            user.setName(rs.getString("NAME"));
+            user.setActive(rs.getBoolean("ACTIVE"));
+            user.setPassword(rs.getString("PASSWORD"));
 
             ((UsersWriter) entriesInCurrentFile).add(user);
           } else if (CaDbEntryType.CAUSER == type) {
             CaUserType causer = new CaUserType();
             causer.setId(id);
-
-            int caId = rs.getInt("CA_ID");
-            causer.setCaId(caId);
-
-            int uid = rs.getInt("USER_ID");
-            causer.setUid(uid);
-
-            int permission = rs.getInt("PERMISSION");
-            causer.setPermission(permission);
-
-            String profiles = rs.getString("PROFILES");
-            causer.setProfiles(profiles);
+            causer.setCaId(rs.getInt("CA_ID"));
+            causer.setUid(rs.getInt("USER_ID"));
+            causer.setPermission(rs.getInt("PERMISSION"));
+            causer.setProfiles(rs.getString("PROFILES"));
 
             ((CaUsersWriter) entriesInCurrentFile).add(causer);
           } else if (CaDbEntryType.REQUEST == type) {
@@ -516,8 +492,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
           sum++;
 
           if (numEntriesInCurrentFile == numEntriesPerZip) {
-            String currentEntriesFilename = buildFilename(type.dirName() + "_",
-                ".zip", minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+            String currentEntriesFilename = buildFilename(type.dirName() + "_", ".zip",
+                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
             finalizeZip(currentEntriesZip, "overview.xml", entriesInCurrentFile);
             currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
 
@@ -606,14 +582,10 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         rs = ps.executeQuery();
 
         while (rs.next()) {
-          int certId = rs.getInt("CID");
-          int pubId = rs.getInt("PID");
-          int caId = rs.getInt("CA_ID");
-
           ToPublishType toPub = new ToPublishType();
-          toPub.setPubId(pubId);
-          toPub.setCertId(certId);
-          toPub.setCaId(caId);
+          toPub.setPubId(rs.getInt("PID"));
+          toPub.setCertId(rs.getInt("CID"));
+          toPub.setCaId(rs.getInt("CA_ID"));
           list.add(toPub);
         }
       }

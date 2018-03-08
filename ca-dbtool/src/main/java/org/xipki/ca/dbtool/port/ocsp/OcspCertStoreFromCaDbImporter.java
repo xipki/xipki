@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -46,6 +47,7 @@ import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
+import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
@@ -83,15 +85,18 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertStoreFromCaDbImporter(DataSourceWrapper datasource, Unmarshaller unmarshaller,
-      String srcDir, String publisherName, int numCertsPerCommit, boolean resume,
-      AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
+  OcspCertStoreFromCaDbImporter(DataSourceWrapper datasource,  String srcDir, String publisherName,
+      int numCertsPerCommit, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
+      throws Exception {
     super(datasource, srcDir, stopMe, evaluateOnly);
 
-    this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
     ParamUtil.requireNonBlank("publisherName", publisherName);
     this.publisherName = publisherName.toLowerCase();
     this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
+
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
     if (resume) {
