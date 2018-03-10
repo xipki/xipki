@@ -72,6 +72,7 @@ public class CurlCmd extends XiAction {
 
   @Option(name = "--data-file",
       description = "file contains the data to be sent in a POST request")
+  @Completion(FilePathCompleter.class)
   private String postDataFile;
 
   @Option(name = "--out",
@@ -81,7 +82,6 @@ public class CurlCmd extends XiAction {
 
   @Option(name = "--header", aliases = "-h", multiValued = true,
       description = "header in request")
-  @Completion(FilePathCompleter.class)
   private List<String> headers;
 
   @Option(name = "--user", aliases = "-u",
