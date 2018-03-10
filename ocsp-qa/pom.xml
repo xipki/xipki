@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki.sdk</groupId>
+    <artifactId>xisdk-parent</artifactId>
+    <version>3.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>ocsp-qa</artifactId>
+  <packaging>bundle</packaging>
+  <name>XiSDK :: ${project.artifactId}</name>
+  <properties>
+    <Import-Package>*,io.netty.channel.epoll;resolution:=optional;version="[4.1,5)",io.netty.channel.kqueue;resolution:=optional;version="[4.1,5)"</Import-Package>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ocsp-client-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.tk</groupId>
+      <artifactId>security</artifactId>
+      <version>${xitk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

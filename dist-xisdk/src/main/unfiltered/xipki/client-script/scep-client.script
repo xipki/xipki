@@ -1,0 +1,85 @@
+HASH = SHA256
+
+URL = http://localhost:8080/scep/scep1/tls/pkiclient.exe
+
+echo "#################################################################"
+echo "#               Enroll Certificate via SCEP                     #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+OUT_DIR=output/scep-${CUR_TIME}
+
+CACERT = ${OUT_DIR}/cacert.der
+
+echo "# Get CA certificate"
+
+xi:scep-cacert --url ${URL} --out ${CACERT}
+
+echo "=====SCEP: Enroll (self-signed identity cert) ====="
+
+CN = scep-tls-${CUR_TIME}
+
+# Must use the same CN as in the CSR
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+  --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+
+xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --challenge-password user1:password1 \
+  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
+
+echo "# Enroll certificate via PKCSReq"
+xi:scep-enroll --method pkcs --url ${URL} --ca-cert ${CACERT} \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
+
+echo "# Poll Cert"
+xi:scep-certpoll --url ${URL} --ca-cert ${CACERT} \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --csr ${OUT_DIR}/${CN}.csr \
+  --out ${OUT_DIR}/${CN}-certpoll.der
+
+echo "# Get Cert"
+
+SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}-certpoll.der)
+
+xi:scep-getcert --url ${URL} --ca-cert ${CACERT} \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/${CN}-getcert.der \
+  --serial ${SERIAL}
+
+echo "# Update the certificate in PKCS#12 file"
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
+
+echo "# Get CRL"
+xi:scep-getcrl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/myca1-scep.crl
+
+echo "# Renewal"
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
+
+xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+  --subject "CN=${CN}-2.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}-2.csr
+
+echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
+xi:scep-enroll --method renewal --url ${URL} --ca-cert ${CACERT} \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --csr ${OUT_DIR}/${CN}-2.csr --out ${OUT_DIR}/${CN}-2.der
+
+echo "# Update the certificate in PKCS#12 file"
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}-2.der --ca-cert ${CACERT}
+
+echo "# Renewal with different CommonName"
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=dummy"
+
+xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+  --subject "CN=${CN}-3.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}-3.csr
+
+echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
+xi:scep-enroll --method renewal --url ${URL} --ca-cert ${CACERT} --p12 ${OUT_DIR}/${CN}.p12 \
+  --password 1234 --csr ${OUT_DIR}/${CN}-3.csr --out ${OUT_DIR}/${CN}-3.der
+
+echo "# Update the certificate in PKCS#12 file"
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}-3.der --ca-cert ${CACERT}
+
