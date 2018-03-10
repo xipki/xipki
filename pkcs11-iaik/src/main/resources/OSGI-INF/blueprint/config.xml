@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <bean id="p11ModuleFactory"
+      class="org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory">
+  </bean>
+
+  <service ref="p11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
+</blueprint>
