@@ -233,12 +233,10 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 ## Enroll/Revoke Certificate
 
 * SCEP  
-  Any SCEP client. XiPKI provides also a SCEP client in
-  [xipki/xiscep](https://github.com/xipki/xiscep).
+  Any SCEP client. XiPKI provides also a SCEP client.
 
 * XiPKI SDK  
-  The SDK ([xipki/xisdk](https://github.com/xipki/xisdk))
-  provides both the full-featured CA client and the lite version to enroll and
+  XiPKI SDK provides both the full-featured CA client and the lite version to enroll and
   revoke certificates via CMP.
 
   The binary `xipki-sdk-<version>`.tar.gz contains several example scripts in the folder xipki/client-script.
@@ -353,6 +351,11 @@ Components
   - Database tool (export and import OCSP database) simplifies the switch of
     databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
   - Client to send OCSP request
+
+- SCEP
+  - Supported SCEP versions
+    - draft-gutmann-scep-00
+    - draft-nourse-scep-23
 
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
   - Generating keypairs of RSA, EC and DSA in token

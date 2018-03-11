@@ -2,51 +2,51 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <repository>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</repository>
+  <repository>mvn:org.xipki.features/pki/${project.version}/xml/features</repository>
   <feature name="xipki-custom-certprofiles" version="${project.version}" description="CA Custom Certificate Profiles">
     <feature>xipki-ca-base</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-demo/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/ca-certprofile-demo/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caclient" version="${xisdk.version}" description="CA client">
+  <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.pki/ca-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-api/${xisdk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-impl/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/cmp/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ca-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ca-client-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ca-client-impl/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caclient-shell" version="${xisdk.version}" description="CA client shell">
+  <feature name="xipki-caclient-shell" version="${project.version}" description="CA client shell">
     <feature>xipki-caclient</feature>
     <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-shell/${xisdk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-benchmark-shell/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/ca-client-benchmark-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-scepclient-shell" version="${xisdk.version}"
+  <feature name="xipki-scepclient-shell" version="${project.version}"
       description="SCEP client shell">
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.scep/scep-client/${xiscep.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/scep-client-shell/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/scep-common/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/scep-client/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/scep-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient" version="${xisdk.version}" description="OCSP client">
+  <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client">
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-client-api/${xisdk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-client-impl/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ocsp-client-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ocsp-client-impl/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient-shell" version="${xisdk.version}"
+  <feature name="xipki-ocspclient-shell" version="${project.version}"
       description="OCSP client shell">
     <feature>xipki-ocspclient</feature>
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-client-shell/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
     <feature prerequisite="true">xipki-camgmt-shell</feature>
-    <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.pki/ca-qa/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/ca-certprofile-xml/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ca-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/ca-qa-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-jscepclient-shell" version="${xisdk.version}"
+  <feature name="xipki-jscepclient-shell" version="${project.version}"
       description="SCEP client shell using JSCEP">
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80"><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
@@ -54,9 +54,9 @@
     <bundle start-level="80">mvn:commons-codec/commons-codec/1.7</bundle>
     <bundle start-level="80">mvn:commons-io/commons-io/2.4</bundle>
     <bundle start-level="80">mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/jscep-client-shell/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/jscep-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspqa-shell" version="${xisdk.version}" description="OCSP QA shell">
+  <feature name="xipki-ocspqa-shell" version="${project.version}" description="OCSP QA shell">
     <feature prerequisite="true">xipki-ocspclient-shell</feature>
     <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
@@ -65,7 +65,7 @@
     <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-qa/${xisdk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-qa-shell/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ocsp-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/ocsp-qa-shell/${project.version}</bundle>
   </feature>
 </features>

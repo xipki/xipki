@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.tk</groupId>
-    <artifactId>shells</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <groupId>org.xipki.shells</groupId>
+    <artifactId>shells-parent</artifactId>
+    <version>3.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>shell-base</artifactId>
   <packaging>bundle</packaging>
-  <name>XiTK :: ${project.artifactId}</name>
+  <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <Karaf-Commands>*</Karaf-Commands>
   </properties>
@@ -20,7 +20,7 @@
       <artifactId>org.apache.karaf.shell.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>

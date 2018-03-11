@@ -99,5 +99,11 @@
       <destName>karaf-LICENSE.txt</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.basedir}/../../commands.md</source>
+      <outputDirectory>xipki</outputDirectory>
+      <destName>commands.md</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 </component>

@@ -4,33 +4,33 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.pki</groupId>
+    <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>ca-server-api</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.tk</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>security</artifactId>
-      <version>${xitk.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.tk</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>audit</artifactId>
-      <version>${xitk.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ca-api</artifactId>
-      <version>${xitk.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.scep</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>scep-common</artifactId>
-      <version>${xiscep.version}</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
