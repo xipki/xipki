@@ -6,7 +6,7 @@
   <feature name="xipki-custom-certprofiles" version="${project.version}" description="CA Custom Certificate Profiles">
     <feature>xipki-ca-base</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="70">mvn:org.xipki/ca-certprofile-demo/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.examples/ca-certprofile-example/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>

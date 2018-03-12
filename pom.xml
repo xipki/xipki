@@ -49,7 +49,6 @@
     <module>scep-common</module>
     <module>scep-client</module>
     <module>scep-server-emulator</module>
-    <module>scep-example</module>
     <!-- Base components -->
     <module>common</module>
     <module>cmp</module>
@@ -63,13 +62,11 @@
     <module>pkcs11-iaik</module>
     <module>servlet-api</module>
     <module>http-server</module>
-    <module>demo-tlskeys</module>
     <!-- PKCS#11 Proxy -->
     <module>p11proxy-common</module>
     <module>p11proxy-client</module>
     <module>p11proxy-server</module>
     <!-- PKI Client -->
-    <module>lite-caclient-example</module>
     <module>ca-client-api</module>
     <module>ca-client-impl</module>
     <module>ocsp-client-api</module>
@@ -78,7 +75,6 @@
     <!-- PKI -->
     <module>ca-api</module>
     <module>ca-certprofile-xml</module>
-    <module>ca-certprofile-demo</module>
     <module>ca-qa</module>
     <module>ca-mgmt-api</module>
     <module>ca-server-api</module>
@@ -92,6 +88,7 @@
     <module>ocsp-server-netty</module>
     <module>shells</module>
     <module>features</module>
+    <module>examples</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
