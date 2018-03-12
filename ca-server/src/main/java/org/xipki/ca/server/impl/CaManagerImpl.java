@@ -2205,7 +2205,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     Integer caId = caAliases.get(aliasName);
     for (String name : x509cas.keySet()) {
       X509Ca ca = x509cas.get(name);
-      if (ca.caIdent().id() == caId) {
+      if (ca.caIdent().id().equals(caId)) {
         return ca.caIdent().name();
       }
     }
@@ -2225,7 +2225,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
     for (String alias : caAliases.keySet()) {
       Integer thisCaId = caAliases.get(alias);
-      if (thisCaId == caIdent.id()) {
+      if (caIdent.id().equals(thisCaId)) {
         aliases.add(alias);
       }
     }
@@ -2859,6 +2859,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     NameId caIdent = idNameMap.ca(dbEntry.caIdent().name());
     if (caIdent == null) {
       LOG.warn("CA {} does not exist", dbEntry.caIdent().name());
+      return false;
     }
 
     String conf = dbEntry.responderConf();

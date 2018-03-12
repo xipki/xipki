@@ -160,21 +160,16 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
       throws DataAccessException, CertificateException, IOException {
     try {
       String certFilename = issuer.getCertFile();
-      String b64Cert = new String(
-          IoUtil.read(new File(baseDir, certFilename)));
+      String b64Cert = new String(IoUtil.read(new File(baseDir, certFilename)));
       byte[] encodedCert = Base64.decode(b64Cert);
 
       Certificate cert;
       try {
         cert = Certificate.getInstance(encodedCert);
-      } catch (Exception ex) {
+      } catch (RuntimeException ex) {
         LOG.error("could not parse certificate of issuer {}", issuer.getId());
         LOG.debug("could not parse certificate of issuer " + issuer.getId(), ex);
-        if (ex instanceof CertificateException) {
-          throw (CertificateException) ex;
-        } else {
-          throw new CertificateException(ex.getMessage(), ex);
-        }
+        throw new CertificateException(ex.getMessage(), ex);
       }
 
       int idx = 1;

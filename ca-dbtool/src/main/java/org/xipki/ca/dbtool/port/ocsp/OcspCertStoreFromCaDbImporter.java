@@ -278,14 +278,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
       Certificate cert;
       try {
         cert = Certificate.getInstance(encodedCert);
-      } catch (Exception ex) {
+      } catch (RuntimeException ex) {
         String msg = "could not parse certificate of issuer " + issuer.getId();
         LogUtil.error(LOG, ex, msg);
-        if (ex instanceof CertificateException) {
-          throw (CertificateException) ex;
-        } else {
-          throw new CertificateException(ex.getMessage(), ex);
-        }
+        throw new CertificateException(ex.getMessage(), ex);
       }
 
       int idx = 1;

@@ -165,8 +165,6 @@ public enum HashAlgo {
       return HashAlgo.SHA3_384;
     } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
       return HashAlgo.SHA3_512;
-    } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
-      return HashAlgo.SHA3_512;
     } else if (hashMech == PKCS11Constants.CKM_VENDOR_SM3) {
       return HashAlgo.SM3;
     } else {

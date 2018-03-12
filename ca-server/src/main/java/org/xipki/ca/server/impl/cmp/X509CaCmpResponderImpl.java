@@ -280,7 +280,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
             eventType = CaAuditConstants.TYPE_CMP_cr;
           } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_kur;
-          } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
+          } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_p10Cr;
           } else if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_ccr;

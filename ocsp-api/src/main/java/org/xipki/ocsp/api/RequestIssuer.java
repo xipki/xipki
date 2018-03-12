@@ -111,6 +111,11 @@ public class RequestIssuer {
   }
 
   @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

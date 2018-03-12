@@ -24,9 +24,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.client.api.CaClient;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -42,9 +40,6 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
     description = "get CA certificate")
 @Service
 public class GetCaCertCmd extends ClientAction {
-
-  @Reference
-  protected CaClient caClient;
 
   @Option(name = "--ca",
       description = "CA name\n(required if multiple CAs are configured)")

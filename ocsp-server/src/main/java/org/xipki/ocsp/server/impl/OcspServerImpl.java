@@ -274,15 +274,15 @@ public class OcspServerImpl implements OcspServer {
     } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
       LOG.error("could not start OCSP responder", ex);
       throw ex;
+    } catch (Error ex) {
+      LOG.error("could not start OCSP responder", ex);
+      throw (Error) ex;
+    } catch (RuntimeException ex) {
+      LOG.error("could not start OCSP responder", ex);
+      throw (RuntimeException) ex;
     } catch (Throwable th) {
       LOG.error("could not start OCSP responder", th);
-      if (th instanceof RuntimeException) {
-        throw (RuntimeException) th;
-      } else if (th instanceof Error) {
-        throw (Error) th;
-      } else {
-        throw new RuntimeException(th);
-      }
+      throw new RuntimeException(th);
     }
   }
 

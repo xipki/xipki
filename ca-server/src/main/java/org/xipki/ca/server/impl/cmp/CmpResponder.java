@@ -156,7 +156,9 @@ abstract class CmpResponder {
       tid = new DEROctetString(randomBytes);
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
-    event.addEventData(CaAuditConstants.NAME_tid, tidStr);
+    if (event != null) {
+      event.addEventData(CaAuditConstants.NAME_tid, tidStr);
+    }
 
     int reqPvno = reqHeader.getPvno().getValue().intValue();
     if (reqPvno != PVNO_CMP2000) {

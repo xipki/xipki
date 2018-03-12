@@ -65,20 +65,15 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       PublicKey publicKey, X509Certificate[] certificateChain) {
     this.slot = ParamUtil.requireNonNull("slot", slot);
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-    if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
-        && publicKey == null) {
-      throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
-    }
 
-    this.certificateChain = CollectionUtil.isEmpty(certificateChain) ? null : certificateChain;
-    if (publicKey != null) {
+    if (certificateChain != null && certificateChain.length > 0 && certificateChain[0] != null) {
+      this.publicKey = certificateChain[0].getPublicKey();
+      this.certificateChain = certificateChain;
+    } else if (publicKey != null) {
       this.publicKey = publicKey;
+      this.certificateChain = null;
     } else {
-      if (certificateChain != null && certificateChain.length > 0) {
-        this.publicKey = certificateChain[0].getPublicKey();
-      } else {
-        this.publicKey = null;
-      }
+      throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
     }
 
     if (this.publicKey instanceof RSAPublicKey) {

@@ -60,10 +60,8 @@ public class CaCaps {
 
   public void addCapabilities(CaCapability... caps) {
     ScepUtil.requireNonNull("caps", caps);
-    if (caps != null) {
-      for (CaCapability m : caps) {
-        capabilities.add(m);
-      }
+    for (CaCapability m : caps) {
+      capabilities.add(m);
     }
     refresh();
   }
@@ -76,10 +74,8 @@ public class CaCaps {
 
   public void removeCapabilities(CaCapability... caps) {
     ScepUtil.requireNonNull("caps", caps);
-    if (caps != null) {
-      for (CaCapability m : caps) {
-        capabilities.remove(m);
-      }
+    for (CaCapability m : caps) {
+      capabilities.remove(m);
     }
     refresh();
   }

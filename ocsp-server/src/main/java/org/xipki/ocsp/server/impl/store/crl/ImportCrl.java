@@ -129,6 +129,8 @@ public class ImportCrl {
 
   private final X500Name caSubject;
 
+  private final X500Principal x500PrincipalCaSubject;
+
   private final byte[] caSpki;
 
   private final String certsDirName;
@@ -152,7 +154,8 @@ public class ImportCrl {
     this.useCrlUpdates = useCrlUpdates;
     this.crl = ParamUtil.requireNonNull("crl", crl);
     this.caCert = ParamUtil.requireNonNull("caCert", caCert);
-    this.caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+    this.x500PrincipalCaSubject = caCert.getSubjectX500Principal();
+    this.caSubject = X500Name.getInstance(x500PrincipalCaSubject.getEncoded());
     try {
       this.caSpki = X509Util.extractSki(caCert);
     } catch (CertificateEncodingException ex) {
@@ -165,7 +168,7 @@ public class ImportCrl {
     X500Principal issuer = crl.getIssuerX500Principal();
 
     boolean caAsCrlIssuer = true;
-    if (!caCert.getSubjectX500Principal().equals(issuer)) {
+    if (!x500PrincipalCaSubject.equals(issuer)) {
       caAsCrlIssuer = false;
       if (issuerCert == null) {
         throw new IllegalArgumentException("issuerCert must not be null");
@@ -406,8 +409,10 @@ public class ImportCrl {
         X500Principal issuer = c.getCertificateIssuer();
         BigInteger serial = c.getSerialNumber();
 
-        if (issuer != null && !caSubject.equals(issuer)) {
-          throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
+        if (issuer != null) {
+          if (!x500PrincipalCaSubject.equals(issuer)) {
+            throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
+          }
         }
 
         Date rt = c.getRevocationDate();
@@ -514,19 +519,23 @@ public class ImportCrl {
           }
         }
 
-        if (cert != null) {
-          if (!caSubject.equals(cert.getIssuer())) {
-            LOG.warn("issuer not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
-                LogUtil.formatCsn(serialNumber));
-          }
-
-          if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
-            LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
-                LogUtil.formatCsn(serialNumber));
-          }
+        if (cert == null) {
+          continue;
         }
 
-        String certLogId = "(issuer='" + cert.getIssuer().toString()
+        if (!caSubject.equals(cert.getIssuer())) {
+          LOG.warn("issuer not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
+              LogUtil.formatCsn(serialNumber));
+          continue;
+        }
+
+        if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
+          LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
+              LogUtil.formatCsn(serialNumber));
+          continue;
+        }
+
+        String certLogId = "(issuer='" + cert.getIssuer()
             + "', serialNumber=" + cert.getSerialNumber() + ")";
         addCertificate(maxId, caId, cert, profileName, certLogId);
       }

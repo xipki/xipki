@@ -17,6 +17,7 @@
 
 package org.xipki.ca.api;
 
+import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
@@ -61,7 +62,7 @@ public class NameId {
 
     NameId other = (NameId) obj;
 
-    return id == other.id && name.equals(other.name);
+    return CompareUtil.equalsObject(id, other.id) && name.equals(other.name);
   }
 
   @Override
