@@ -326,9 +326,7 @@ public class OcspQa {
       Occurrence certhashOccurrence, ASN1ObjectIdentifier certhashAlg) {
     if (expectedStatus == OcspCertStatus.unknown
         || expectedStatus == OcspCertStatus.issuerUnknown) {
-      if (certhashOccurrence != Occurrence.forbidden) {
-        certhashOccurrence = Occurrence.forbidden;
-      }
+      certhashOccurrence = Occurrence.forbidden;
     }
 
     List<ValidationIssue> issues = new LinkedList<>();
@@ -410,7 +408,7 @@ public class OcspQa {
         status = OcspCertStatus.rev_noreason;
       } // end if (revStatus.hasRevocationReason())
     } else if (singleCertStatus instanceof UnknownStatus) {
-      status = OcspCertStatus.issuerUnknown;
+      status = extendedRevoke ? OcspCertStatus.issuerUnknown : OcspCertStatus.unknown;
     } else {
       issue.setFailureMessage("unknown certstatus: " + singleCertStatus.getClass().getName());
     }
