@@ -89,6 +89,7 @@
     <module>shells</module>
     <module>features</module>
     <module>examples</module>
+    <module>bom</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
