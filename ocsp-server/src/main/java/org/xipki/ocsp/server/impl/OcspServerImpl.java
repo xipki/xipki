@@ -836,7 +836,6 @@ public class OcspServerImpl implements OcspServer {
           certStatus = bytes_certstatus_unknown;
         } else { // (ocspMode == OCSPMode.RFC6960)
           unknownAsRevoked = true;
-          repControl.includeExtendedRevokeExtension = true;
           certStatus = bytes_certstatus_rfc6960_unknown;
         }
         break;
@@ -854,6 +853,10 @@ public class OcspServerImpl implements OcspServer {
       default:
         throw new RuntimeException("unknown CertificateStatus:" + certStatusInfo.certStatus());
     } // end switch
+
+    if (responder.responderOption().mode() != OcspMode.RFC2560) {
+      repControl.includeExtendedRevokeExtension = true;
+    }
 
     byte[] certHash = certStatusInfo.certHash();
     if (certHash != null) {
