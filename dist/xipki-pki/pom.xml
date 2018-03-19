@@ -42,6 +42,20 @@
           <include>**/*</include>
         </includes>
       </resource>
+      <resource>
+        <directory>../shared/src/main/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>../shared/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>

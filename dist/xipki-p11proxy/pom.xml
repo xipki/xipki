@@ -41,6 +41,23 @@
           <include>**/*</include>
         </includes>
       </resource>
+      <resource>
+        <directory>../shared/src/main/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>../shared/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+        <excludes>
+          <exclude>xipki/security/pkcs11-conf-proxy.xml</exclude>
+        </excludes>
+      </resource>
     </resources>
     <plugins>
       <plugin>
