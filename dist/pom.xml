@@ -13,6 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
+    <module>xipki-toolkit</module>
     <module>xipki-pki</module>
     <module>xipki-sdk</module>
     <module>xipki-p11proxy</module>

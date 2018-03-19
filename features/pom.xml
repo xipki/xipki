@@ -18,6 +18,7 @@
     <module>qa</module>
     <module>qa-jetty</module>
     <module>sdk</module>
+    <module>toolkit</module>
     <module>p11proxy</module>
   </modules>
   <profiles>
