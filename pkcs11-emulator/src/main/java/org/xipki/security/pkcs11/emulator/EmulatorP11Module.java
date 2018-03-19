@@ -79,7 +79,7 @@ public class EmulatorP11Module extends AbstractP11Module {
       LOG.info("Use explicit base directory: " + baseDir.getPath());
     }
 
-    this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ", modulePath);
+    this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ", baseDir.getAbsolutePath());
 
     File[] children = baseDir.listFiles();
 
