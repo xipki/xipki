@@ -10,7 +10,7 @@
   </parent>
   <artifactId>tlskeys-example</artifactId>
   <packaging>pom</packaging>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <name>XiPKI :: example :: ${project.artifactId}</name>
   <build>
     <plugins>
       <plugin>

@@ -10,7 +10,7 @@
   </parent>
   <artifactId>ca-certprofile-example</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <name>XiPKI :: example :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>

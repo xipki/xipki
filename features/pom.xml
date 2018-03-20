@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.xipki.features</groupId>
   <artifactId>features-parent</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <name>XiPKI :: features :: ${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
     <module>pki</module>

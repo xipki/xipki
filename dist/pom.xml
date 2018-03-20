@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.xipki.dist</groupId>
   <artifactId>dist-parent</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <name>XiPKI :: dist :: ${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
     <module>xipki-toolkit</module>
