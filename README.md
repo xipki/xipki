@@ -84,11 +84,11 @@ follows.
     follows:
 
     ```sh
-    pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
+    pkcs11.confFile = xipki/security/pkcs11-hsm.xml
 
-    #pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
+    #pkcs11.confFile = xipki/security/pkcs11-emulator.xml
     ```
-  * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11
+  * In file xipki/security/pkcs11-hsm.xml, change the PKCS#11
     configuration.
 
 4. Configure how to handle SSL client certificate (optional)
