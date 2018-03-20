@@ -347,7 +347,7 @@ public class CanonicalizeCode {
    * replace tab by 4 spaces, delete white spaces at the end.
    */
   private static String canonicalizeTextLine(String line) {
-    return removeTrailingSpaces(line);
+    return removeTrailingSpaces(line).replaceAll("\t", "  ");
   } // end canonicalizeTextLine
 
   private static String removeTrailingSpaces(String line) {
