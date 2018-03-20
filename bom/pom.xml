@@ -138,7 +138,7 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>p11proxy-client</artifactId>
+        <artifactId>pkcs11-proxy</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

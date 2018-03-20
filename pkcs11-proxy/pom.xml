@@ -8,7 +8,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>3.1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>p11proxy-client</artifactId>
+  <artifactId>pkcs11-proxy</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>

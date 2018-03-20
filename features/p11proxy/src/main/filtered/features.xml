@@ -33,7 +33,7 @@
     <bundle start-level="70">mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/p11proxy-common/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/p11proxy-client/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/pkcs11-proxy/${project.version}</bundle>
     <bundle>mvn:org.xipki/p11proxy-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" description="PKCS#11 proxy shell">

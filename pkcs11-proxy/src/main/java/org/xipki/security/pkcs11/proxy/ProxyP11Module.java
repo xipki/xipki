@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.p11proxy.client;
+package org.xipki.security.pkcs11.proxy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

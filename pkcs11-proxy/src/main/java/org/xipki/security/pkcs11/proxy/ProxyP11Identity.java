@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.p11proxy.client;
+package org.xipki.security.pkcs11.proxy;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;

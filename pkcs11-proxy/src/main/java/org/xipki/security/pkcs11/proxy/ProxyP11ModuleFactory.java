@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.p11proxy.client;
+package org.xipki.security.pkcs11.proxy;
 
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.P11Module;
