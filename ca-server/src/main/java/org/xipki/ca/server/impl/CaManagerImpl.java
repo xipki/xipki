@@ -316,8 +316,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
   private final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
 
-  private final Map<String, Set<CaHasRequestorEntry>> caHasRequestors
-      = new ConcurrentHashMap<>();
+  private final Map<String, Set<CaHasRequestorEntry>> caHasRequestors = new ConcurrentHashMap<>();
 
   private final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
@@ -757,7 +756,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
             new CertsInQueuePublisher(), 120, 120, TimeUnit.SECONDS);
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
-            new UnreferencedRequstCleaner(), 60, 24 * 60 * 60, // 1 DAY
+            new UnreferencedRequstCleaner(), 60, 24L * 60 * 60, // 1 DAY
             TimeUnit.SECONDS);
       } else {
         sb.append(": no CA is configured");
@@ -1462,8 +1461,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method removePublisherFromCa
 
   @Override
-  public boolean addPublisherToCa(String publisherName, String caName)
-      throws CaMgmtException {
+  public boolean addPublisherToCa(String publisherName, String caName) throws CaMgmtException {
     publisherName = ParamUtil.requireNonBlank("publisherName", publisherName).toLowerCase();
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     asssertMasterMode();
@@ -1592,8 +1590,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method changeRequestor
 
   @Override
-  public boolean removeRequestorFromCa(String requestorName, String caName)
-      throws CaMgmtException {
+  public boolean removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
     requestorName = ParamUtil.requireNonBlank("requestorName", requestorName).toLowerCase();
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     asssertMasterMode();
@@ -1778,7 +1775,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     asssertMasterMode();
     String name = dbEntry.name();
-    if (crlSigners.containsKey(name)) {
+    if (responderDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Responder named ", name, " exists"));
     }
 
@@ -2274,8 +2271,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throw new CaMgmtException(concat("could not find CA named ", caName));
     }
 
-    List<String> upperPublisherNames = CollectionUtil.toLowerCaseList(publisherNames);
-    boolean successful = ca.republishCertificates(upperPublisherNames, numThreads);
+    publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
+    boolean successful = ca.republishCertificates(publisherNames, numThreads);
     if (!successful) {
       throw new CaMgmtException(concat("republishing certificates of CA ", caName, " failed"));
     }
@@ -2284,8 +2281,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method republishCertificates
 
   @Override
-  public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException {
+  public boolean revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("revocationInfo", revocationInfo);
     asssertMasterMode();
@@ -2393,10 +2389,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throws CaMgmtException {
     asssertMasterMode();
 
-    List<String> upperPublisherNames = CollectionUtil.toLowerCaseList(publisherNames);
+    publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
 
     if (caName == null) {
-      if (CollectionUtil.isNonEmpty(upperPublisherNames)) {
+      if (CollectionUtil.isNonEmpty(publisherNames)) {
         throw new IllegalArgumentException("non-empty publisherNames is not allowed");
       }
 
@@ -2414,7 +2410,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     if (ca == null) {
       throw new CaMgmtException(concat("could not find CA named ", caName));
     }
-    return ca.clearPublishQueue(upperPublisherNames);
+    return ca.clearPublishQueue(publisherNames);
   } // method clearPublishQueue
 
   private void shutdownScheduledThreadPoolExecutor() {
@@ -2434,8 +2430,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method shutdownScheduledThreadPoolExecutor
 
   @Override
-  public boolean revokeCertificate(String caName, BigInteger serialNumber,
-      CrlReason reason, Date invalidityTime) throws CaMgmtException {
+  public boolean revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
+      Date invalidityTime) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     asssertMasterMode();
@@ -2479,8 +2475,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method removeCertificate
 
   @Override
-  public X509Certificate generateCertificate(String caName, String profileName,
-      byte[] encodedCsr, Date notBefore, Date notAfter) throws CaMgmtException {
+  public X509Certificate generateCertificate(String caName, String profileName, byte[] encodedCsr,
+      Date notBefore, Date notAfter) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
     ParamUtil.requireNonNull("encodedCsr", encodedCsr);
@@ -2623,8 +2619,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     GenerateSelfSignedResult result;
     try {
       result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
-          caEntry.signerConf(), certprofile, csr, serialOfThisCert, cacertUris,
-          ocspUris, crlUris, deltaCrlUris, caEntry.extraControl());
+          caEntry.signerConf(), certprofile, csr, serialOfThisCert, cacertUris, ocspUris, crlUris,
+          deltaCrlUris, caEntry.extraControl());
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);
     }
@@ -2711,8 +2707,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     return ret;
   } // method createCmpResponder
 
-  X509CrlSignerEntryWrapper createX509CrlSigner(X509CrlSignerEntry dbEntry)
-      throws CaMgmtException {
+  X509CrlSignerEntryWrapper createX509CrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     X509CrlSignerEntryWrapper signer = new X509CrlSignerEntryWrapper();
     try {
@@ -2746,8 +2741,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       ret.validate();
       return ret;
     } catch (ObjectCreationException | CertprofileException ex) {
-      LogUtil.error(LOG, ex, "could not initialize Certprofile "
-          + dbEntry.ident() + ", ignore it");
+      LogUtil.error(LOG, ex, "could not initialize Certprofile " + dbEntry.ident() + ", ignore it");
       return null;
     }
   } // method createCertprofile
@@ -2764,6 +2758,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       } else {
         publisher = x509CertPublisherFactoryRegister.newPublisher(type);
       }
+
       ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
       ret.initialize(securityFactory.getPasswordResolver(), datasources);
       return ret;
@@ -3254,8 +3249,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
               signer = securityFactory.createSigner(entry.signerType(), signerConf,
                   (X509Certificate) null);
             } catch (ObjectCreationException ex) {
-              throw new CaMgmtException(
-                concat("could not create signer for CA ", caName), ex);
+              throw new CaMgmtException(concat("could not create signer for CA ", caName), ex);
             }
             entry.setCertificate(signer.getCertificate());
           }
@@ -3411,14 +3405,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   @Override
   public boolean exportConf(String zipFilename, List<String> caNames)
       throws CaMgmtException, IOException {
-    List<String> upperCaNames;
-    if (caNames == null) {
-      upperCaNames = null;
-    } else {
-      upperCaNames = new ArrayList<>(caNames.size());
+    if (caNames != null) {
+      List<String> tmpCaNames = new ArrayList<>(caNames.size());
       for (String name : caNames) {
-        upperCaNames.add(name);
+        tmpCaNames.add(name.toLowerCase());
       }
+      caNames = tmpCaNames;
     }
 
     File zipFile = new File(zipFilename);
@@ -3444,7 +3436,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
         List<CaType> list = new LinkedList<>();
 
         for (String name : x509cas.keySet()) {
-          if (upperCaNames != null && !upperCaNames.contains(name)) {
+          if (caNames != null && !caNames.contains(name)) {
             continue;
           }
           includeCaNames.add(name);
