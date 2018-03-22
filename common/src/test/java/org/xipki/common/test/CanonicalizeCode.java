@@ -50,6 +50,10 @@ public class CanonicalizeCode {
           "script", "xml-template", "script-template", "jxb", "info",
           "properties-db2", "properties-h2", "properties-hsqldb", "properties-mariadb",
           "properties-mysql", "properties-pgsql", "properties-oracle"));
+
+  private static final Set<String> excludeTextFiles =
+      new HashSet<>(Arrays.asList("draft-gutmann-scep-00.txt"));
+
   private static Throwable initializationError;
 
   private final String baseDir;
@@ -123,7 +127,7 @@ public class CanonicalizeCode {
 
         if ("java".equals(extension)) {
           canonicalizeFile(file);
-        } else if (textFileExtensions.contains(extension)) {
+        } else if (textFileExtensions.contains(extension) && !excludeTextFiles.contains(filename)) {
           canonicalizeTextFile(file);
         }
       }
