@@ -11,7 +11,7 @@ command `feature:list  | grep xipki` in OSGi console.
 For the usage of OSGi commands, just use the option `--help`. Most XiPKI commands can 
 auto-completing the options and arguments by the `TAB` key.
 
-Feature xipki-shell-base (started by default)
+Feature xipki-security (started by default)
 -----
 
    * `xi:confirm`
@@ -49,9 +49,6 @@ Feature xipki-shell-base (started by default)
    * `xi:curl`
 
      transfer a URL
-
-Feature xipki-security (started by default)
------
 
    * `xi:cert-info`
 
