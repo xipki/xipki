@@ -231,11 +231,11 @@ public class CmpCaClient {
     ASN1Sequence seq = ASN1Sequence.getInstance(asn1Value);
 
     final int size = seq.size();
-    Certificate[] cacerts = new Certificate[size];
+    Certificate[] caCerts = new Certificate[size];
     for (int i = 0; i < size; i++) {
-      cacerts[i] = CMPCertificate.getInstance(seq.getObjectAt(i)).getX509v3PKCert();
+      caCerts[i] = CMPCertificate.getInstance(seq.getObjectAt(i)).getX509v3PKCert();
     }
-    return cacerts;
+    return caCerts;
   }
 
   private ASN1Encodable extractGeneralRepContent(PKIMessage response,

@@ -56,7 +56,7 @@ public class CaCheckCmd extends CaUpdateCmd {
 
     // CA cert uris
     if (ey.getCaCertUris() != null) {
-      MgmtQaShellUtil.assertEquals("CA cert URIs", ey.getCaCertUris(), ca.getCacertUris());
+      MgmtQaShellUtil.assertEquals("CA cert URIs", ey.getCaCertUris(), ca.getCaCertUris());
     }
 
     // CA certificate

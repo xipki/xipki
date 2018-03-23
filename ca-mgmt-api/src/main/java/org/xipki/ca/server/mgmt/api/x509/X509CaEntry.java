@@ -49,7 +49,7 @@ public class X509CaEntry extends CaEntry {
 
   private List<String> ocspUris;
 
-  private List<String> cacertUris;
+  private List<String> caCertUris;
 
   private X509Certificate cert;
 
@@ -80,7 +80,7 @@ public class X509CaEntry extends CaEntry {
     this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
     this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
 
-    this.cacertUris = caUris.getCacertUris();
+    this.caCertUris = caUris.getCaCertUris();
     this.ocspUris = caUris.getOcspUris();
     this.crlUris = caUris.getCrlUris();
     this.deltaCrlUris = caUris.getDeltaCrlUris();
@@ -147,12 +147,12 @@ public class X509CaEntry extends CaEntry {
     return urisToString(ocspUris);
   }
 
-  public List<String> getCacertUris() {
-    return cacertUris;
+  public List<String> getCaCertUris() {
+    return caCertUris;
   }
 
-  public String getCacertUrisAsString() {
-    return urisToString(cacertUris);
+  public String getCaCertUrisAsString() {
+    return urisToString(caCertUris);
   }
 
   public X509Certificate getCert() {
@@ -177,7 +177,7 @@ public class X509CaEntry extends CaEntry {
         (superToStr.charAt(superToStr.length() - 1) == '\n' ? "" : "\n"),
         "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
         "\ndeltaCrlUris:", formatUris(deltaCrlUris), "\ncrlUris:", formatUris(crlUris),
-        "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(cacertUris),
+        "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(caCertUris),
         "\ncert: \n", InternUtil.formatCert(cert, verbose),
         "\ncrlSignerName: ", crlSignerName,
         "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), "\n");
@@ -250,7 +250,7 @@ public class X509CaEntry extends CaEntry {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(cacertUris, objB.cacertUris)) {
+    if (!CompareUtil.equalsObject(caCertUris, objB.caCertUris)) {
       return false;
     }
 

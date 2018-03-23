@@ -508,13 +508,13 @@ class CaManagerQueryExecutor {
         tmpOcspUris = StringUtil.splitByComma(ocspUris);
       }
 
-      String cacertUris = rs.getString("CACERT_URIS");
-      List<String> tmpCacertUris = null;
-      if (StringUtil.isNotBlank(cacertUris)) {
-        tmpCacertUris = StringUtil.splitByComma(cacertUris);
+      String caCertUris = rs.getString("CACERT_URIS");
+      List<String> tmpCaCertUris = null;
+      if (StringUtil.isNotBlank(caCertUris)) {
+        tmpCaCertUris = StringUtil.splitByComma(caCertUris);
       }
 
-      X509CaUris caUris = new X509CaUris(tmpCacertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
+      X509CaUris caUris = new X509CaUris(tmpCaCertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
 
       int id = rs.getInt("ID");
       int serialNoSize = rs.getInt("SN_SIZE");
@@ -756,7 +756,7 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, entry.getCrlUrisAsString());
       ps.setString(idx++, entry.getDeltaCrlUrisAsString());
       ps.setString(idx++, entry.getOcspUrisAsString());
-      ps.setString(idx++, entry.getCacertUrisAsString());
+      ps.setString(idx++, entry.getCaCertUrisAsString());
       ps.setString(idx++, entry.getMaxValidity().toString());
       byte[] encodedCert = entry.getCert().getEncoded();
       ps.setString(idx++, Base64.encodeToString(encodedCert));
@@ -1123,7 +1123,7 @@ class CaManagerQueryExecutor {
     List<String> crlUris = entry.getCrlUris();
     List<String> deltaCrlUris = entry.getDeltaCrlUris();
     List<String> ocspUris = entry.getOcspUris();
-    List<String> cacertUris = entry.getCaCertUris();
+    List<String> caCertUris = entry.getCaCertUris();
     CertValidity maxValidity = entry.getMaxValidity();
     String signerType = entry.getSignerType();
     String signerConf = entry.getSignerConf();
@@ -1210,7 +1210,7 @@ class CaManagerQueryExecutor {
     Integer idxCrlUris = addToSqlIfNotNull(sqlBuilder, index, crlUris, "CRL_URIS");
     Integer idxDeltaCrlUris = addToSqlIfNotNull(sqlBuilder, index, deltaCrlUris, "DELTACRL_URIS");
     Integer idxOcspUris = addToSqlIfNotNull(sqlBuilder, index, ocspUris, "OCSP_URIS");
-    Integer idxCacertUris = addToSqlIfNotNull(sqlBuilder, index, cacertUris, "CACERT_URIS");
+    Integer idxCaCertUris = addToSqlIfNotNull(sqlBuilder, index, caCertUris, "CACERT_URIS");
     Integer idxMaxValidity = addToSqlIfNotNull(sqlBuilder, index, maxValidity, "MAX_VALIDITY");
     Integer idxSignerType = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
     Integer idxCrlsignerName = addToSqlIfNotNull(sqlBuilder, index, crlsignerName,
@@ -1286,10 +1286,10 @@ class CaManagerQueryExecutor {
         ps.setString(idxOcspUris, txt);
       }
 
-      if (idxCacertUris != null) {
-        String txt = StringUtil.collectionAsStringByComma(cacertUris);
+      if (idxCaCertUris != null) {
+        String txt = StringUtil.collectionAsStringByComma(caCertUris);
         sb.append("caCertUri: '").append(txt).append("'; ");
-        ps.setString(idxCacertUris, txt);
+        ps.setString(idxCaCertUris, txt);
       }
 
       if (idxMaxValidity != null) {

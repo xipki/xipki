@@ -2584,7 +2584,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     List<String> crlUris = caEntry.getCrlUris();
     List<String> deltaCrlUris = caEntry.getDeltaCrlUris();
     List<String> ocspUris = caEntry.getOcspUris();
-    List<String> cacertUris = caEntry.getCacertUris();
+    List<String> caCertUris = caEntry.getCaCertUris();
     String signerType = caEntry.getSignerType();
 
     asssertMasterMode();
@@ -2619,7 +2619,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     GenerateSelfSignedResult result;
     try {
       result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
-          caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, cacertUris, ocspUris,
+          caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, caCertUris, ocspUris,
           crlUris, deltaCrlUris, caEntry.getExtraControl());
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);
@@ -2637,7 +2637,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       }
     }
 
-    X509CaUris caUris = new X509CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
+    X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
 
     String name = caEntry.getIdent().getName();
     long nextCrlNumber = caEntry.getNextCrlNumber();
@@ -3494,7 +3494,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
           X509CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
           X509CaInfoType ciJaxb = new X509CaInfoType();
-          ciJaxb.setCacertUris(createStrings(entry.getCacertUris()));
+          ciJaxb.setCacertUris(createStrings(entry.getCaCertUris()));
           byte[] certBytes;
           try {
             certBytes = entry.getCert().getEncoded();

@@ -105,7 +105,7 @@ public class X509CaInfo {
     }
     this.certInCmpFormat = new CMPCertificate(bcCert);
 
-    this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCacertUris(), caEntry.getOcspUris(),
+    this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaCertUris(), caEntry.getOcspUris(),
         caEntry.getCrlUris(), caEntry.getDeltaCrlUris(), caEntry.getExtraControl());
 
     this.noNewCertificateAfter =

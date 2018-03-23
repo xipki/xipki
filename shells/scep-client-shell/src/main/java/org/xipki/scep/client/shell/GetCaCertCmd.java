@@ -67,12 +67,12 @@ public class GetCaCertCmd extends XiAction {
 
     ScepClient client = new ScepClient(tmpCaId, caCertValidator);
     client.init();
-    X509Certificate cacert = client.getCaCert();
-    if (cacert == null) {
+    X509Certificate caCert = client.getCaCert();
+    if (caCert == null) {
       throw new CmdFailure("received no CA certficate from server");
     }
 
-    saveVerbose("saved certificate to file", new File(outFile), cacert.getEncoded());
+    saveVerbose("saved certificate to file", new File(outFile), caCert.getEncoded());
     return null;
   }
 

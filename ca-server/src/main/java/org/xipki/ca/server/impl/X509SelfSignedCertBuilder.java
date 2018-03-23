@@ -108,7 +108,7 @@ class X509SelfSignedCertBuilder {
 
   public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
       String signerType, String signerConf, IdentifiedX509Certprofile certprofile,
-      CertificationRequest csr, BigInteger serialNumber, List<String> cacertUris,
+      CertificationRequest csr, BigInteger serialNumber, List<String> caCertUris,
       List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
       ConfPairs extraControl) throws OperationException, InvalidConfException {
     ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -195,7 +195,7 @@ class X509SelfSignedCertBuilder {
     }
 
     X509Certificate newCert = generateCertificate(signer, certprofile, csr, serialNumber,
-        publicKeyInfo, cacertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
+        publicKeyInfo, caCertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
 
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
@@ -203,7 +203,7 @@ class X509SelfSignedCertBuilder {
   private static X509Certificate generateCertificate(ConcurrentContentSigner signer,
       IdentifiedX509Certprofile certprofile, CertificationRequest csr,
       BigInteger serialNumber, SubjectPublicKeyInfo publicKeyInfo,
-      List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
+      List<String> caCertUris, List<String> ocspUris, List<String> crlUris,
       List<String> deltaCrlUris, ConfPairs extraControl)
       throws OperationException {
 
@@ -255,7 +255,7 @@ class X509SelfSignedCertBuilder {
         serialNumber, notBefore, notAfter, grantedSubject, tmpPublicKeyInfo);
 
     PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, serialNumber, null, null,
-        cacertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
+        caCertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
 
     Extensions extensions = null;
     ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();

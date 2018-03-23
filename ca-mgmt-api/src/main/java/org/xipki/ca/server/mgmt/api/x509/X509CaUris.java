@@ -28,21 +28,21 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class X509CaUris {
-  private final List<String> cacertUris;
+  private final List<String> caCertUris;
   private final List<String> ocspUris;
   private final List<String> crlUris;
   private final List<String> deltaCrlUris;
 
-  public X509CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
+  public X509CaUris(List<String> caCertUris, List<String> ocspUris, List<String> crlUris,
       List<String> deltaCrlUris) {
-    this.cacertUris = cacertUris;
+    this.caCertUris = caCertUris;
     this.ocspUris = ocspUris;
     this.crlUris = crlUris;
     this.deltaCrlUris = deltaCrlUris;
   }
 
-  public List<String> getCacertUris() {
-    return CollectionUtil.unmodifiableList(cacertUris);
+  public List<String> getCaCertUris() {
+    return CollectionUtil.unmodifiableList(caCertUris);
   }
 
   public List<String> getOcspUris() {

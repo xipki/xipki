@@ -76,18 +76,18 @@ public class GetCaCertCmd extends ClientAction {
       }
     }
 
-    Certificate cacert;
+    Certificate caCert;
     try {
-      cacert = caClient.getCaCert(caName);
+      caCert = caClient.getCaCert(caName);
     } catch (Exception ex) {
       throw new CmdFailure("Error while retrieving CA certificate: " + ex.getMessage());
     }
 
-    if (cacert == null) {
+    if (caCert == null) {
       throw new CmdFailure("received no CA certificate");
     }
 
-    saveVerbose("saved CA certificate to file", new File(outFile), cacert.getEncoded());
+    saveVerbose("saved CA certificate to file", new File(outFile), caCert.getEncoded());
     return null;
   } // method execute0
 
