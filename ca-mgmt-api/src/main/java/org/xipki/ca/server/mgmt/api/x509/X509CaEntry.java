@@ -107,7 +107,7 @@ public class X509CaEntry extends CaEntry {
     }
   }
 
-  public int getserialNoBitLen() {
+  public int getSerialNoBitLen() {
     return serialNoBitLen;
   }
 

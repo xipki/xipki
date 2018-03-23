@@ -2614,7 +2614,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     }
 
     BigInteger serialOfThisCert = (serialNumber != null) ? serialNumber
-        : RandomSerialNumberGenerator.getInstance().nextSerialNumber(caEntry.getserialNoBitLen());
+        : RandomSerialNumberGenerator.getInstance().nextSerialNumber(caEntry.getSerialNoBitLen());
 
     GenerateSelfSignedResult result;
     try {
@@ -2643,7 +2643,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     long nextCrlNumber = caEntry.getNextCrlNumber();
     CaStatus status = caEntry.getStatus();
 
-    X509CaEntry entry = new X509CaEntry(new NameId(null, name), caEntry.getserialNoBitLen(),
+    X509CaEntry entry = new X509CaEntry(new NameId(null, name), caEntry.getSerialNoBitLen(),
         nextCrlNumber, signerType, signerConf, caUris, numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControlName(caEntry.getCmpControlName());
@@ -3030,6 +3030,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   @Override
   public boolean loadConf(CaConf conf) throws CaMgmtException {
     ParamUtil.requireNonNull("conf", conf);
+
+    if (!caSystemSetuped) {
+      throw new CaMgmtException("CA system is not initialized yet.");
+    }
+
     for (String name : conf.getCmpControlNames()) {
       CmpControlEntry entry = conf.getCmpControl(name);
       CmpControlEntry entryB = cmpControlDbEntries.get(name);
@@ -3407,6 +3412,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   @Override
   public boolean exportConf(String zipFilename, List<String> caNames)
       throws CaMgmtException, IOException {
+    ParamUtil.requireNonBlank("zipFilename", zipFilename);
+    if (!caSystemSetuped) {
+      throw new CaMgmtException("CA system is not initialized yet.");
+    }
+
+    zipFilename = IoUtil.expandFilepath(zipFilename);
     if (caNames != null) {
       List<String> tmpCaNames = new ArrayList<>(caNames.size());
       for (String name : caNames) {
@@ -3508,9 +3519,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
           ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
           ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
           ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
-          ciJaxb.setExtraControl(
-              createFileOrValue(zipStream, entry.getExtraControl().getEncoded(),
-                  concat("files/ca-", name, "-extracontrol.conf")));
+          if (entry.getExtraControl() != null) {
+            ciJaxb.setExtraControl(
+                createFileOrValue(zipStream, entry.getExtraControl().getEncoded(),
+                    concat("files/ca-", name, "-extracontrol.conf")));
+          }
           ciJaxb.setKeepExpiredCertDays(entry.getKeepExpiredCertInDays());
           ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
           ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
@@ -3525,7 +3538,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
           ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               concat("files/ca-", name, "-signerconf.conf")));
           ciJaxb.setSignerType(entry.getSignerType());
-          ciJaxb.setSnSize(entry.getserialNoBitLen());
+          ciJaxb.setSnSize(entry.getSerialNoBitLen());
           ciJaxb.setStatus(entry.getStatus().getStatus());
           ciJaxb.setValidityMode(entry.getValidityMode().name());
 

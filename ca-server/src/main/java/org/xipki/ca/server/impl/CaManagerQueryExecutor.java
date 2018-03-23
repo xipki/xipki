@@ -750,7 +750,7 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, entry.getIdent().getName());
       ps.setInt(idx++, CertArt.X509PKC.getCode());
       ps.setString(idx++, entry.getSubject());
-      ps.setInt(idx++, entry.getserialNoBitLen());
+      ps.setInt(idx++, entry.getSerialNoBitLen());
       ps.setLong(idx++, entry.getNextCrlNumber());
       ps.setString(idx++, entry.getStatus().getStatus());
       ps.setString(idx++, entry.getCrlUrisAsString());

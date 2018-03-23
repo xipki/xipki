@@ -124,16 +124,45 @@ public class CaConf {
 
   public CaConf(String confFilename, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
-    ParamUtil.requireNonBlank("confFilename", confFilename);
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
+  }
 
+  public CaConf(File confFile, SecurityFactory securityFactory)
+      throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
+    ParamUtil.requireNonNull("confFile", confFile);
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    init(confFile, securityFactory);
+  }
+
+  public static void marshal(CAConfType jaxb, OutputStream out)
+      throws JAXBException, SAXException {
+    ParamUtil.requireNonNull("jaxb", jaxb);
+    ParamUtil.requireNonNull("out", out);
+
+    try {
+      JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+
+      SchemaFactory schemaFact = SchemaFactory.newInstance(
+          javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      URL url = CaConf.class.getResource("/xsd/caconf.xsd");
+      Marshaller jaxbMarshaller = context.createMarshaller();
+      jaxbMarshaller.setSchema(schemaFact.newSchema(url));
+
+      jaxbMarshaller.marshal(new ObjectFactory().createCAConf(jaxb), out);
+    } catch (JAXBException ex) {
+      throw XmlUtil.convert(ex);
+    }
+  }
+
+  private void init(File confFile, SecurityFactory securityFactory)
+      throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
+    confFile = IoUtil.expandFilepath(confFile);
+
+    String confFilename = confFile.getName();
     int fileExtIndex = confFilename.lastIndexOf('.');
     String fileExt = null;
     if (fileExtIndex != -1) {
       fileExt = confFilename.substring(fileExtIndex + 1);
     }
-
-    File confFile = new File(confFilename);
 
     ZipFile zipFile = null;
     InputStream caConfStream = null;
@@ -189,26 +218,6 @@ public class CaConf {
           LOG.info("could not clonse zipFile", ex.getMessage());
         }
       }
-    }
-  }
-
-  public static void marshal(CAConfType jaxb, OutputStream out)
-      throws JAXBException, SAXException {
-    ParamUtil.requireNonNull("jaxb", jaxb);
-    ParamUtil.requireNonNull("out", out);
-
-    try {
-      JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-
-      SchemaFactory schemaFact = SchemaFactory.newInstance(
-          javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      URL url = CaConf.class.getResource("/xsd/caconf.xsd");
-      Marshaller jaxbMarshaller = context.createMarshaller();
-      jaxbMarshaller.setSchema(schemaFact.newSchema(url));
-
-      jaxbMarshaller.marshal(new ObjectFactory().createCAConf(jaxb), out);
-    } catch (JAXBException ex) {
-      throw XmlUtil.convert(ex);
     }
   }
 

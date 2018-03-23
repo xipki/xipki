@@ -308,7 +308,7 @@ public class X509CaInfo {
   }
 
   public BigInteger nextSerial() throws OperationException {
-    return randomSnGenerator.nextSerialNumber(caEntry.getserialNoBitLen());
+    return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoBitLen());
   }
 
   public BigInteger nextCrlNumber() throws OperationException {

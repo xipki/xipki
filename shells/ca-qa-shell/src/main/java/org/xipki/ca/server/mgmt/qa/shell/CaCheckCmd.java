@@ -68,7 +68,7 @@ public class CaCheckCmd extends CaUpdateCmd {
 
     // SN size
     if (ey.getSerialNoBitLen() != null) {
-      assertObjEquals("serial number bit length", ey.getSerialNoBitLen(), ca.getserialNoBitLen());
+      assertObjEquals("serial number bit length", ey.getSerialNoBitLen(), ca.getSerialNoBitLen());
     }
 
     // CMP control name

@@ -70,7 +70,7 @@ public class RestResponse {
 
   public byte[] getBody() {
     return body;
-    
+
   }
 
   public void setBody(byte[] body) {
