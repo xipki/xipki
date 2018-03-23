@@ -132,7 +132,7 @@ public class CertType extends IdentifidDbObjectType {
 
   private String rs;
 
-  public Integer art() {
+  public Integer getArt() {
     return art;
   }
 
@@ -140,7 +140,7 @@ public class CertType extends IdentifidDbObjectType {
     this.art = art;
   }
 
-  public Integer caId() {
+  public Integer getCaId() {
     return caId;
   }
 
@@ -148,7 +148,7 @@ public class CertType extends IdentifidDbObjectType {
     this.caId = caId;
   }
 
-  public String sn() {
+  public String getSn() {
     return sn;
   }
 
@@ -164,7 +164,7 @@ public class CertType extends IdentifidDbObjectType {
     this.ee = ee;
   }
 
-  public Integer pid() {
+  public Integer getPid() {
     return pid;
   }
 
@@ -172,7 +172,7 @@ public class CertType extends IdentifidDbObjectType {
     this.pid = pid;
   }
 
-  public Integer rid() {
+  public Integer getRid() {
     return rid;
   }
 
@@ -180,7 +180,7 @@ public class CertType extends IdentifidDbObjectType {
     this.rid = rid;
   }
 
-  public Long update() {
+  public Long getUpdate() {
     return update;
   }
 
@@ -188,7 +188,7 @@ public class CertType extends IdentifidDbObjectType {
     this.update = update;
   }
 
-  public Boolean rev() {
+  public Boolean getRev() {
     return rev;
   }
 
@@ -196,7 +196,7 @@ public class CertType extends IdentifidDbObjectType {
     this.rev = rev;
   }
 
-  public Integer rr() {
+  public Integer getRr() {
     return rr;
   }
 
@@ -204,7 +204,7 @@ public class CertType extends IdentifidDbObjectType {
     this.rr = rr;
   }
 
-  public Long rt() {
+  public Long getRt() {
     return rt;
   }
 
@@ -212,7 +212,7 @@ public class CertType extends IdentifidDbObjectType {
     this.rt = rt;
   }
 
-  public Long rit() {
+  public Long getRit() {
     return rit;
   }
 
@@ -220,7 +220,7 @@ public class CertType extends IdentifidDbObjectType {
     this.rit = rit;
   }
 
-  public String tid() {
+  public String getTid() {
     return tid;
   }
 
@@ -228,7 +228,7 @@ public class CertType extends IdentifidDbObjectType {
     this.tid = tid;
   }
 
-  public Integer reqType() {
+  public Integer getReqType() {
     return reqType;
   }
 
@@ -236,7 +236,7 @@ public class CertType extends IdentifidDbObjectType {
     this.reqType = reqType;
   }
 
-  public Long fpRs() {
+  public Long getFpRs() {
     return fpRs;
   }
 
@@ -244,7 +244,7 @@ public class CertType extends IdentifidDbObjectType {
     this.fpRs = fpRs;
   }
 
-  public String rs() {
+  public String getRs() {
     return rs;
   }
 
@@ -252,12 +252,20 @@ public class CertType extends IdentifidDbObjectType {
     this.rs = rs;
   }
 
-  public String file() {
+  public String getFile() {
     return file;
   }
 
   public void setFile(String file) {
     this.file = file;
+  }
+
+  public Integer getUid() {
+    return uid;
+  }
+
+  public void setUid(Integer uid) {
+    this.uid = uid;
   }
 
   @Override
@@ -280,14 +288,6 @@ public class CertType extends IdentifidDbObjectType {
     }
   }
 
-  public Integer uid() {
-    return uid;
-  }
-
-  public void setUid(Integer uid) {
-    this.uid = uid;
-  }
-
   @Override
   public void writeTo(DbiXmlWriter writer) throws InvalidDataObjectException, XMLStreamException {
     ParamUtil.requireNonNull("writer", writer);
@@ -295,7 +295,7 @@ public class CertType extends IdentifidDbObjectType {
     validate();
 
     writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ID, getId());
     writeIfNotNull(writer, TAG_ART, art);
     writeIfNotNull(writer, TAG_CAID, caId);
     writeIfNotNull(writer, TAG_SN, sn);

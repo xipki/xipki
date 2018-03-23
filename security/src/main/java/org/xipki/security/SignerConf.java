@@ -62,11 +62,11 @@ public class SignerConf {
     }
   }
 
-  public HashAlgo hashAlgo() {
+  public HashAlgo getHashAlgo() {
     return hashAlgo;
   }
 
-  public SignatureAlgoControl signatureAlgoControl() {
+  public SignatureAlgoControl getSignatureAlgoControl() {
     return signatureAlgoControl;
   }
 

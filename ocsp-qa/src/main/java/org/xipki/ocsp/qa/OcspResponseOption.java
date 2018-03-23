@@ -47,7 +47,7 @@ public class OcspResponseOption {
   public OcspResponseOption() {
   }
 
-  public X509Certificate respIssuer() {
+  public X509Certificate getRespIssuer() {
     return respIssuer;
   }
 
@@ -55,7 +55,7 @@ public class OcspResponseOption {
     this.respIssuer = respIssuer;
   }
 
-  public Occurrence nonceOccurrence() {
+  public Occurrence getNonceOccurrence() {
     return nonceOccurrence;
   }
 
@@ -63,7 +63,7 @@ public class OcspResponseOption {
     this.nonceOccurrence = nonceOccurrence;
   }
 
-  public Occurrence certhashOccurrence() {
+  public Occurrence getCerthashOccurrence() {
     return certhashOccurrence;
   }
 
@@ -71,7 +71,7 @@ public class OcspResponseOption {
     this.certhashOccurrence = certhashOccurrence;
   }
 
-  public Occurrence nextUpdateOccurrence() {
+  public Occurrence getNextUpdateOccurrence() {
     return nextUpdateOccurrence;
   }
 
@@ -79,7 +79,7 @@ public class OcspResponseOption {
     this.nextUpdateOccurrence = nextUpdateOccurrence;
   }
 
-  public ASN1ObjectIdentifier certhashAlgId() {
+  public ASN1ObjectIdentifier getCerthashAlgId() {
     return certhashAlgId;
   }
 
@@ -87,7 +87,7 @@ public class OcspResponseOption {
     this.certhashAlgId = certhashAlgId;
   }
 
-  public String signatureAlgName() {
+  public String getSignatureAlgName() {
     return signatureAlgName;
   }
 

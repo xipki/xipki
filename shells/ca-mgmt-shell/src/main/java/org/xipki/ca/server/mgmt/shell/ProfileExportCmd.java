@@ -55,11 +55,11 @@ public class ProfileExportCmd extends CaAction {
       throw new IllegalCmdParamException("no certificate profile named " + name + " is defined");
     }
 
-    if (StringUtil.isBlank(entry.conf())) {
+    if (StringUtil.isBlank(entry.getConf())) {
       println("cert profile does not have conf");
     } else {
       saveVerbose("saved cert profile configuration to", new File(confFile),
-          entry.conf().getBytes("UTF-8"));
+          entry.getConf().getBytes("UTF-8"));
     }
     return null;
   }

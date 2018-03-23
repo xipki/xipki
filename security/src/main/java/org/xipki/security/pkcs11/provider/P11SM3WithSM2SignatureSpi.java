@@ -78,11 +78,11 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
     }
 
     this.signingKey = (P11PrivateKey) privateKey;
-    if (!(signingKey.publicKey() instanceof ECPublicKey)) {
+    if (!(signingKey.getPublicKey() instanceof ECPublicKey)) {
       throw new InvalidKeyException("only EC key is allowed");
     }
 
-    ECPublicKey pubKey = (ECPublicKey) signingKey.publicKey();
+    ECPublicKey pubKey = (ECPublicKey) signingKey.getPublicKey();
     if (!GMUtil.isSm2primev2Curve(pubKey.getParams().getCurve())) {
       throw new InvalidKeyException("only EC key of curve sm2primev2 is allowed");
     }
@@ -92,7 +92,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
       throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
     }
 
-    byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getID();
+    byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getId();
 
     if (signingKey.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2)) {
       mechanism = PKCS11Constants.CKM_VENDOR_SM2;

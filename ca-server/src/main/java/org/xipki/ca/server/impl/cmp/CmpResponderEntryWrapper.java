@@ -50,14 +50,14 @@ public class CmpResponderEntryWrapper {
   public void setDbEntry(CmpResponderEntry dbEntry) {
     this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
     signer = null;
-    if (dbEntry.certificate() != null) {
+    if (dbEntry.getCertificate() != null) {
       subjectAsX500Name = X500Name.getInstance(
-          dbEntry.certificate().getSubjectX500Principal().getEncoded());
+          dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
       subjectAsGeneralName = new GeneralName(subjectAsX500Name);
     }
   }
 
-  public ConcurrentContentSigner signer() {
+  public ConcurrentContentSigner getSigner() {
     return signer;
   }
 
@@ -71,23 +71,23 @@ public class CmpResponderEntryWrapper {
       throw new ObjectCreationException("dbEntry is null");
     }
 
-    X509Certificate responderCert = dbEntry.certificate();
+    X509Certificate responderCert = dbEntry.getCertificate();
     dbEntry.setConfFaulty(true);
-    signer = securityFactory.createSigner(dbEntry.type(), new SignerConf(dbEntry.conf()),
+    signer = securityFactory.createSigner(dbEntry.getType(), new SignerConf(dbEntry.getConf()),
         responderCert);
     if (signer.getCertificate() == null) {
       throw new ObjectCreationException("signer without certificate is not allowed");
     }
     dbEntry.setConfFaulty(false);
 
-    if (dbEntry.base64Cert() == null) {
+    if (dbEntry.getBase64Cert() == null) {
       dbEntry.setCertificate(signer.getCertificate());
       subjectAsX500Name = X500Name.getInstance(signer.getBcCertificate().getSubject());
       subjectAsGeneralName = new GeneralName(subjectAsX500Name);
     }
   } // method initSigner
 
-  public CmpResponderEntry dbEntry() {
+  public CmpResponderEntry getDbEntry() {
     return dbEntry;
   }
 
@@ -95,11 +95,11 @@ public class CmpResponderEntryWrapper {
     return (signer == null) ? false : signer.isHealthy();
   }
 
-  public GeneralName subjectAsGeneralName() {
+  public GeneralName getSubjectAsGeneralName() {
     return subjectAsGeneralName;
   }
 
-  public X500Name subjectAsX500Name() {
+  public X500Name getSubjectAsX500Name() {
     return subjectAsX500Name;
   }
 

@@ -38,7 +38,7 @@ public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
   @Override
   protected Set<String> getEnums() {
-    return caClient.caNames();
+    return caClient.getCaNames();
   }
 
 }

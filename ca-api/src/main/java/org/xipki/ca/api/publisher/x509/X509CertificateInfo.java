@@ -76,23 +76,23 @@ public class X509CertificateInfo {
     return subjectPublicKey;
   }
 
-  public X509CertWithDbId cert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 
-  public NameId issuer() {
+  public NameId getIssuer() {
     return issuer;
   }
 
-  public X509Cert issuerCert() {
+  public X509Cert getIssuerCert() {
     return issuerCert;
   }
 
-  public NameId profile() {
+  public NameId getProfile() {
     return profile;
   }
 
-  public String warningMessage() {
+  public String getWarningMessage() {
     return warningMessage;
   }
 
@@ -100,11 +100,11 @@ public class X509CertificateInfo {
     this.warningMessage = warningMessage;
   }
 
-  public NameId requestor() {
+  public NameId getRequestor() {
     return requestor;
   }
 
-  public Integer user() {
+  public Integer getUser() {
     return user;
   }
 
@@ -116,7 +116,7 @@ public class X509CertificateInfo {
     return revocationInfo != null;
   }
 
-  public CertRevocationInfo revocationInfo() {
+  public CertRevocationInfo getRevocationInfo() {
     return revocationInfo;
   }
 
@@ -132,23 +132,23 @@ public class X509CertificateInfo {
     this.alreadyIssued = alreadyIssued;
   }
 
-  public RequestType reqType() {
+  public RequestType getReqType() {
     return reqType;
-  }
-
-  public byte[] transactionId() {
-    return transactionId;
   }
 
   public void setReqType(RequestType reqType) {
     this.reqType = reqType;
   }
 
+  public byte[] getTransactionId() {
+    return transactionId;
+  }
+
   public void setTransactionId(byte[] transactionId) {
     this.transactionId = transactionId;
   }
 
-  public X500Name requestedSubject() {
+  public X500Name getRequestedSubject() {
     return requestedSubject;
   }
 

@@ -102,11 +102,11 @@ public class ProxyP11Slot extends AbstractP11Slot {
     List<P11ObjectIdentifier> keyIds =
         getObjectIdsFromServer(P11ProxyConstants.ACTION_GET_IDENTITY_IDS);
     for (P11ObjectIdentifier keyId : keyIds) {
-      byte[] id = keyId.id();
+      byte[] id = keyId.getId();
       java.security.PublicKey pubKey = null;
       X509Cert cert = refreshResult.getCertForId(id);
       if (cert != null) {
-        pubKey = cert.cert().getPublicKey();
+        pubKey = cert.getCert().getPublicKey();
       } else {
         pubKey = getPublicKey(keyId);
       }
@@ -116,7 +116,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
       if (pubKey == null) {
         identity = new ProxyP11Identity(this, entityId);
       } else {
-        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.cert()};
+        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
         identity = new ProxyP11Identity(this, entityId, pubKey, certs);
       }
       refreshResult.addIdentity(identity);
@@ -261,12 +261,12 @@ public class ProxyP11Slot extends AbstractP11Slot {
           "invalid ASN1 object Asn1P11EntityIdentifier: " + ex.getMessage(), ex);
     }
 
-    if (!slotId.equals(ei.slotId().slotId())) {
+    if (!slotId.equals(ei.getSlotId().getSlotId())) {
       throw new P11TokenException("");
     }
 
-    P11EntityIdentifier entityId = ei.entityId();
-    PublicKey publicKey = getPublicKey(entityId.objectId());
+    P11EntityIdentifier entityId = ei.getEntityId();
+    PublicKey publicKey = getPublicKey(entityId.getObjectId());
     return new ProxyP11Identity(this, entityId, publicKey, null);
   }
 
@@ -281,10 +281,10 @@ public class ProxyP11Slot extends AbstractP11Slot {
       throw new P11TokenException(
           "invalid ASN1 object Asn1P11EntityIdentifier: " + ex.getMessage(), ex);
     }
-    if (!slotId.equals(ei.slotId().slotId())) {
+    if (!slotId.equals(ei.getSlotId().getSlotId())) {
       throw new P11TokenException("");
     }
-    P11EntityIdentifier entityId = ei.entityId();
+    P11EntityIdentifier entityId = ei.getEntityId();
     return new ProxyP11Identity(this, entityId);
   }
 
@@ -317,14 +317,14 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
     List<Asn1P11ObjectIdentifier> asn1ObjectIds;
     try {
-      asn1ObjectIds = Asn1P11ObjectIdentifiers.getInstance(resp).objectIds();
+      asn1ObjectIds = Asn1P11ObjectIdentifiers.getInstance(resp).getObjectIds();
     } catch (BadAsn1ObjectException ex) {
       throw new P11TokenException("bad ASN1 object: " + ex.getMessage(), ex);
     }
 
     List<P11ObjectIdentifier> objectIds = new ArrayList<>(asn1ObjectIds.size());
     for (Asn1P11ObjectIdentifier asn1Id : asn1ObjectIds) {
-      objectIds.add(asn1Id.objectId());
+      objectIds.add(asn1Id.getObjectId());
     }
     return objectIds;
   }
@@ -337,7 +337,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
   }
 
-  ProxyP11Module module() {
+  ProxyP11Module getModule() {
     return module;
   }
 

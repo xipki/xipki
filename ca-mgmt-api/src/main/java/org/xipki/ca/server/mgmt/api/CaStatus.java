@@ -36,7 +36,7 @@ public enum CaStatus {
     this.status = status;
   }
 
-  public String status() {
+  public String getStatus() {
     return status;
   }
 

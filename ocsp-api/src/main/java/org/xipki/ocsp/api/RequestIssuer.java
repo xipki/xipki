@@ -41,14 +41,14 @@ public class RequestIssuer {
 
   private final int nameHashFrom;
 
-  private final int len;
+  private final int length;
 
   public RequestIssuer(HashAlgo hashAlgo, byte[] hashData) {
-    int algIdLen = 2 + hashAlgo.encodedLength() + 2;
+    int algIdLen = 2 + hashAlgo.getEncodedLength() + 2;
     data = new byte[algIdLen + hashData.length];
     int offset = 0;
     data[offset++] = 0x30;
-    data[offset++] = (byte) (hashAlgo.encodedLength() + 2);
+    data[offset++] = (byte) (hashAlgo.getEncodedLength() + 2);
     offset += hashAlgo.write(data, offset);
     data[offset++] = 0x05;
     data[offset++] = 0x00;
@@ -56,7 +56,7 @@ public class RequestIssuer {
     this.nameHashFrom = offset;
     offset += ASN1Type.arraycopy(hashData, data, offset);
     this.from = 0;
-    this.len = offset;
+    this.length = offset;
     this.hashAlgo = hashAlgo;
   }
 
@@ -64,10 +64,10 @@ public class RequestIssuer {
     this(data, 0, data.length);
   }
 
-  public RequestIssuer(byte[] data, int from, int len) {
+  public RequestIssuer(byte[] data, int from, int length) {
     this.data = data;
     this.from = from;
-    this.len = len;
+    this.length = length;
     this.hashAlgo = HashAlgo.getInstanceForEncoded(data, from + 2, 2 + data[from + 3]);
 
     int hashAlgoFieldLen = 0xFF & data[from + 1];
@@ -81,7 +81,7 @@ public class RequestIssuer {
   // CHECKSTYLE:SKIP
   public String hashAlgorithmOID() {
     if (hashAlgo != null) {
-      return hashAlgo.oid().getId();
+      return hashAlgo.getOid().getId();
     } else {
       final int start = from + 2;
       byte[] bytes = Arrays.copyOfRange(data, start, start + 2 + (0xFF & data[from + 3]));
@@ -89,25 +89,25 @@ public class RequestIssuer {
     }
   }
 
-  public int from() {
+  public int getFrom() {
     return from;
   }
 
-  public byte[] data() {
+  public byte[] getData() {
     return data;
   }
 
-  public int nameHashFrom() {
+  public int getNameHashFrom() {
     return nameHashFrom;
   }
 
-  public int length() {
-    return len;
+  public int getLength() {
+    return length;
   }
 
   public int write(byte[] out, int offset) {
-    System.arraycopy(data, from, out, offset, len);
-    return len;
+    System.arraycopy(data, from, out, offset, length);
+    return length;
   }
 
   @Override
@@ -126,16 +126,16 @@ public class RequestIssuer {
     }
 
     RequestIssuer other = (RequestIssuer) obj;
-    if (this.len != other.len) {
+    if (this.length != other.length) {
       return false;
     }
 
-    return CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.len);
+    return CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.length);
   }
 
   @Override
   public String toString() {
-    return Hex.encode(Arrays.copyOfRange(data, from, from + len));
+    return Hex.encode(Arrays.copyOfRange(data, from, from + length));
   }
 
 }

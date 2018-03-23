@@ -31,33 +31,33 @@ import org.xipki.common.util.ParamUtil;
 
 public class CertWithEncoded {
 
-  private final X509Certificate certificate;
+  private final X509Certificate cert;
 
   private final String className;
 
   private final byte[] encoded;
 
   public CertWithEncoded(X509Certificate cert) throws CertificateEncodingException {
-    this.certificate = ParamUtil.requireNonNull("cert", cert);
+    this.cert = ParamUtil.requireNonNull("cert", cert);
     this.className = cert.getClass().getName();
     this.encoded = cert.getEncoded();
   }
 
-  public X509Certificate certificate() {
-    return certificate;
+  public X509Certificate getCert() {
+    return cert;
   }
 
   public boolean equalsCert(X509Certificate cert) {
     if (cert == null) {
       return false;
     }
-    if (certificate == cert) {
+    if (this.cert == cert) {
       return true;
     }
 
     if (className.equals(cert.getClass().getName())) {
-      return certificate.equals(cert);
-    } else if (certificate.equals(cert)) {
+      return this.cert.equals(cert);
+    } else if (this.cert.equals(cert)) {
       return true;
     } else {
       byte[] encodedCert;

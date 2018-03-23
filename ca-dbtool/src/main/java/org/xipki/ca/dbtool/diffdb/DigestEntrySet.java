@@ -44,7 +44,7 @@ class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
     this.exception = exception;
   }
 
-  public Exception exception() {
+  public Exception getException() {
     return exception;
   }
 
@@ -52,11 +52,11 @@ class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
     entries.add(entry);
   }
 
-  public long startId() {
+  public long getStartId() {
     return startId;
   }
 
-  public List<IdentifiedDigestEntry> entries() {
+  public List<IdentifiedDigestEntry> getEntries() {
     return entries;
   }
 

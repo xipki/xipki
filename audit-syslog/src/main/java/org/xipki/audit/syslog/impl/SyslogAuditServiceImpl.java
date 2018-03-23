@@ -117,24 +117,24 @@ public class SyslogAuditServiceImpl extends AuditService {
       sb.append(prefix);
     }
 
-    AuditStatus status = event.status();
+    AuditStatus status = event.getStatus();
     if (status == null) {
       status = AuditStatus.UNDEFINED;
     }
 
     sb.append("\tstatus: ").append(status.name());
 
-    long duration = event.duration();
+    long duration = event.getDuration();
     if (duration >= 0) {
       sb.append("\tduration: ").append(Long.toString(duration));
     }
 
-    List<AuditEventData> eventDataArray = event.eventDatas();
+    List<AuditEventData> eventDataArray = event.getEventDatas();
     for (AuditEventData m : eventDataArray) {
-      if (duration >= 0 && "duration".equalsIgnoreCase(m.name())) {
+      if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
         continue;
       }
-      sb.append("\t").append(m.name()).append(": ").append(m.value());
+      sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
     }
 
     final int n = sb.size();
@@ -149,15 +149,15 @@ public class SyslogAuditServiceImpl extends AuditService {
     if (notEmpty(localname)) {
       sm.setHostname(localname);
     }
-    sm.setAppName(event.applicationName());
-    sm.setSeverity(getSeverity(event.level()));
+    sm.setAppName(event.getApplicationName());
+    sm.setSeverity(getSeverity(event.getLevel()));
 
-    Date timestamp = event.timestamp();
+    Date timestamp = event.getTimestamp();
     if (timestamp != null) {
       sm.setTimestamp(timestamp);
     }
 
-    sm.setMsgId(event.name());
+    sm.setMsgId(event.getName());
     sm.setMsg(sb);
 
     try {
@@ -189,7 +189,7 @@ public class SyslogAuditServiceImpl extends AuditService {
       sm.setHostname(localname);
     }
 
-    sm.setSeverity(getSeverity(event.level()));
+    sm.setSeverity(getSeverity(event.getLevel()));
     sm.setMsg(msg);
 
     try {

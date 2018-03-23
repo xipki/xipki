@@ -73,9 +73,9 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
     Asn1Util.requireRange(seq, 4, 5);
     final int size = seq.size();
     int idx = 0;
-    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
     label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
     keysize = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
     ParamUtil.requireMin("keysize", keysize, 1);
 
@@ -114,23 +114,23 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
     return new DERSequence(vector);
   }
 
-  public P11SlotIdentifier slotId() {
+  public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public String label() {
+  public String getLabel() {
     return label;
   }
 
-  public P11NewKeyControl control() {
+  public P11NewKeyControl getControl() {
     return control;
   }
 
-  public int keysize() {
+  public int getKeysize() {
     return keysize;
   }
 
-  public BigInteger publicExponent() {
+  public BigInteger getPublicExponent() {
     return publicExponent;
   }
 

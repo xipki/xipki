@@ -131,7 +131,7 @@ public class SoftTokenMacContentSignerBuilder {
     return concurrentSigner;
   } // createSigner
 
-  public SecretKey key() {
+  public SecretKey getKey() {
     return key;
   }
 

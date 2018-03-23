@@ -38,11 +38,11 @@ public class ChangeUserEntry {
     this.ident = ParamUtil.requireNonNull("ident", ident);
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public Boolean active() {
+  public Boolean getActive() {
     return active;
   }
 
@@ -50,12 +50,12 @@ public class ChangeUserEntry {
     this.active = active;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
+  public String getPassword() {
+    return password;
   }
 
-  public String password() {
-    return password;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
 }

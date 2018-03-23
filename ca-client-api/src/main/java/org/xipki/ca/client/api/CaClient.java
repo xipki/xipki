@@ -43,7 +43,7 @@ import org.xipki.common.RequestResponseDebug;
 
 public interface CaClient {
 
-  Set<String> caNames();
+  Set<String> getCaNames();
 
   /**
    * TODO.

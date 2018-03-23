@@ -40,15 +40,15 @@ public class CertprofileInfo {
     this.conf = StringUtil.isBlank(conf) ? null : conf;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
-  public String conf() {
+  public String getConf() {
     return conf;
   }
 

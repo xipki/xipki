@@ -204,7 +204,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
     sb.append(txt);
 
     if (verbose.booleanValue()) {
-      for (ValidationIssue issue : result.validationIssues()) {
+      for (ValidationIssue issue : result.getValidationIssues()) {
         sb.append("\n");
         format(issue, "    ", sb);
       }
@@ -219,12 +219,12 @@ public class OcspQaStatusCmd extends BaseOcspStatusAction {
 
   static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
     sb.append(prefix);
-    sb.append(issue.code());
-    sb.append(", ").append(issue.description());
+    sb.append(issue.getCode());
+    sb.append(", ").append(issue.getDescription());
     sb.append(", ");
     sb.append(issue.isFailed() ? "failed" : "successful");
-    if (issue.failureMessage() != null) {
-      sb.append(", ").append(issue.failureMessage());
+    if (issue.getFailureMessage() != null) {
+      sb.append(", ").append(issue.getFailureMessage());
     }
   }
 

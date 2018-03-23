@@ -342,11 +342,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     CaDbEntryType type = CaDbEntryType.CERT;
 
     DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
-        baseDir + File.separator + type.dirName() + ".mf");
+        baseDir + File.separator + type.getDirName() + ".mf");
 
     try {
       while (certsFileIterator.hasNext()) {
-        String certsFile = baseDir + File.separator + type.dirName() + File.separator
+        String certsFile = baseDir + File.separator + type.getDirName() + File.separator
             + certsFileIterator.next();
         // extract the toId from the filename
         int fromIdx = certsFile.indexOf('-');
@@ -421,7 +421,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         CertType cert = (CertType) certs.next();
 
-        long id = cert.id();
+        long id = cert.getId();
         lastSuccessfulCertId = id;
         if (id < minId) {
           continue;
@@ -429,12 +429,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         numProcessedEntriesInBatch++;
 
-        if (!revokedOnly || cert.rev().booleanValue()) {
-          int caId = cert.caId();
+        if (!revokedOnly || cert.getRev().booleanValue()) {
+          int caId = cert.getCaId();
           if (caIds.contains(caId)) {
             numImportedEntriesInBatch++;
 
-            String filename = cert.file();
+            String filename = cert.getFile();
 
             // rawcert
             ZipEntry certZipEnty = zipFile.getEntry(filename);
@@ -460,15 +460,15 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
               psCert.setLong(idx++, id);
               psCert.setInt(idx++, caId);
               psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
-              psCert.setLong(idx++, cert.update());
+              psCert.setLong(idx++, cert.getUpdate());
               psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
               psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
-              setBoolean(psCert, idx++, cert.rev());
-              setInt(psCert, idx++, cert.rr());
-              setLong(psCert, idx++, cert.rt());
-              setLong(psCert, idx++, cert.rit());
+              setBoolean(psCert, idx++, cert.getRev());
+              setInt(psCert, idx++, cert.getRr());
+              setLong(psCert, idx++, cert.getRt());
+              setLong(psCert, idx++, cert.getRit());
 
-              int certprofileId = cert.pid();
+              int certprofileId = cert.getPid();
               String certprofileName = profileMap.get(certprofileId);
               psCert.setString(idx++, certprofileName);
               psCert.setString(idx++, certhash);
@@ -537,7 +537,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
   private HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
-    String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
+    String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
       throw new DataAccessException(
           "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");

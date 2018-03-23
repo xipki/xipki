@@ -53,7 +53,7 @@ public class ExtendedExtension extends Extension {
   private final int extnValueLength;
 
   public ExtendedExtension(OID extnType, boolean critical, byte[] extnValue) {
-    int bodyLen = extnType.encodedLength();
+    int bodyLen = extnType.getEncodedLength();
     if (critical) {
       bodyLen += 3;
     }
@@ -124,8 +124,13 @@ public class ExtendedExtension extends Extension {
         extnValueFrom, extnValueLength);
   }
 
+  @Override
+  public int getEncodedLength() {
+    return encodedLength;
+  }
+
   public static int getEncodedLength(OID extnType, boolean critical, int extnValueLength) {
-    int bodyLen = extnType.encodedLength();
+    int bodyLen = extnType.getEncodedLength();
     if (critical) {
       bodyLen += 3;
     }
@@ -137,17 +142,12 @@ public class ExtendedExtension extends Extension {
     return critical;
   }
 
-  public OID extnType() {
+  public OID getExtnType() {
     return extnType;
   }
 
-  public int extnValueLength() {
+  public int getExtnValueLength() {
     return extnValueLength;
-  }
-
-  @Override
-  public int encodedLength() {
-    return encodedLength;
   }
 
   public InputStream getExtnValueStream() {

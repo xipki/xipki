@@ -103,8 +103,8 @@ public class HttpScepServlet extends AbstractHttpServlet {
 
     String scepName = null;
     String certProfileName = null;
-    if (servletUri.path().length() > 1) {
-      String scepPath = servletUri.path();
+    if (servletUri.getPath().length() > 1) {
+      String scepPath = servletUri.getPath();
       if (scepPath.endsWith(CGI_PROGRAM)) {
         // skip also the first char (which is always '/')
         String path = scepPath.substring(1, scepPath.length() - CGI_PROGRAM_LEN);
@@ -153,7 +153,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
         return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
       }
 
-      String operation = servletUri.parameter("operation");
+      String operation = servletUri.getParameter("operation");
       event.addEventData(CaAuditConstants.NAME_SCEP_operation, operation);
 
       if ("PKIOperation".equalsIgnoreCase(operation)) {
@@ -164,7 +164,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
           if (viaPost) {
             content = readContent(request);
           } else {
-            String b64 = servletUri.parameter("message");
+            String b64 = servletUri.getParameter("message");
             content = Base64.decode(b64);
           }
 
@@ -187,7 +187,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
           auditStatus = AuditStatus.FAILED;
           return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
         } catch (OperationException ex) {
-          ErrorCode code = ex.errorCode();
+          ErrorCode code = ex.getErrorCode();
 
           HttpResponseStatus httpCode;
           switch (code) {
@@ -228,15 +228,15 @@ public class HttpScepServlet extends AbstractHttpServlet {
 
         byte[] bodyBytes = ci.getEncoded();
         return createOKResponse(version, CT_RESPONSE, bodyBytes);
-      } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] caCapsBytes = responder.caCaps().bytes();
+        byte[] caCapsBytes = responder.getCaCaps().getBytes();
         return createOKResponse(version, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
-      } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] respBytes = responder.caCertResp().bytes();
+        byte[] respBytes = responder.getCaCertResp().getBytes();
         return createOKResponse(version, ScepConstants.CT_X509_CA_RA_CERT, respBytes);
-      } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         auditMessage = "SCEP operation '" + operation + "' is not permitted";
         auditStatus = AuditStatus.FAILED;
         return createErrorResponse(version, HttpResponseStatus.FORBIDDEN);

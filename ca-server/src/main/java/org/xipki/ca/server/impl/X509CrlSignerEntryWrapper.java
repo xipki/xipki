@@ -62,7 +62,7 @@ class X509CrlSignerEntryWrapper {
     this.crlControl = new CrlControl(dbEntry.crlControl());
   }
 
-  public CrlControl crlControl() {
+  public CrlControl getCrlControl() {
     return crlControl;
   }
 
@@ -77,16 +77,16 @@ class X509CrlSignerEntryWrapper {
       throw new XiSecurityException("dbEntry is null");
     }
 
-    if ("CA".equals(dbEntry.type())) {
+    if ("CA".equals(dbEntry.getType())) {
       return;
     }
 
     dbEntry.setConfFaulty(true);
 
-    X509Certificate responderCert = dbEntry.certificate();
+    X509Certificate responderCert = dbEntry.getCert();
     try {
-      signer = securityFactory.createSigner(dbEntry.type(),
-          new SignerConf(dbEntry.conf()), responderCert);
+      signer = securityFactory.createSigner(dbEntry.getType(),
+          new SignerConf(dbEntry.getConf()), responderCert);
     } catch (ObjectCreationException ex1) {
       throw new XiSecurityException("signer without certificate is not allowed");
     }
@@ -96,8 +96,8 @@ class X509CrlSignerEntryWrapper {
       throw new XiSecurityException("signer without certificate is not allowed");
     }
 
-    if (dbEntry.base64Cert() == null) {
-      dbEntry.setCertificate(signerCert);
+    if (dbEntry.getBase64Cert() == null) {
+      dbEntry.setCert(signerCert);
     }
 
     byte[] encodedSkiValue = signerCert.getExtensionValue(
@@ -122,20 +122,20 @@ class X509CrlSignerEntryWrapper {
     dbEntry.setConfFaulty(false);
   } // method initSigner
 
-  public X509CrlSignerEntry dbEntry() {
+  public X509CrlSignerEntry getDbEntry() {
     return dbEntry;
   }
 
-  public X509Certificate cert() {
-    return (signer == null) ? dbEntry.certificate() : signer.getCertificate();
+  public X509Certificate getCert() {
+    return (signer == null) ? dbEntry.getCert() : signer.getCertificate();
   }
 
-  public byte[] subjectKeyIdentifier() {
+  public byte[] getSubjectKeyIdentifier() {
     return (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
   }
 
-  public ConcurrentContentSigner signer() {
+  public ConcurrentContentSigner getSigner() {
     return signer;
   }
 

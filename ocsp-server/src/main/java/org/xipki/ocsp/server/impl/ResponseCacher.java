@@ -204,7 +204,7 @@ class ResponseCacher {
 
   Integer getIssuerId(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
-    return (issuer == null) ? null : issuer.id();
+    return (issuer == null) ? null : issuer.getId();
   }
 
   synchronized Integer storeIssuer(X509Certificate issuerCert)
@@ -213,8 +213,8 @@ class ResponseCacher {
       throw new IllegalStateException("storeIssuer is not permitted in slave mode");
     }
 
-    for (Integer id : issuerStore.ids()) {
-      if (issuerStore.getIssuerForId(id).cert().equals(issuerCert)) {
+    for (Integer id : issuerStore.getIds()) {
+      if (issuerStore.getIssuerForId(id).getCert().equals(issuerCert)) {
         return id;
       }
     }
@@ -442,7 +442,7 @@ class ResponseCacher {
       ps = null;
       rs = null;
 
-      Set<Integer> currentIds = issuerStore.ids();
+      Set<Integer> currentIds = issuerStore.getIds();
 
       for (Integer id : ids) {
         if (currentIds.contains(id)) {
@@ -555,7 +555,7 @@ class ResponseCacher {
   private static byte[] buildIdent(BigInteger serialNumber, AlgorithmCode sigAlg) {
     byte[] snBytes = serialNumber.toByteArray();
     byte[] bytes = new byte[1 + snBytes.length];
-    bytes[0] = sigAlg.code();
+    bytes[0] = sigAlg.getCode();
     System.arraycopy(snBytes, 0, bytes, 1, snBytes.length);
     return bytes;
   }

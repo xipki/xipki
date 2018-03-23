@@ -49,11 +49,11 @@ public enum ScepHashAlgo {
     this.name = name;
   }
 
-  public int length() {
+  public int getLength() {
     return length;
   }
 
-  public String oid() {
+  public String getOid() {
     return oid;
   }
 

@@ -44,7 +44,7 @@ public class P11CryptService {
   public synchronized void refresh() throws P11TokenException {
     LOG.info("refreshing PKCS#11 module {}", module.getName());
 
-    List<P11SlotIdentifier> slotIds = module.slotIdentifiers();
+    List<P11SlotIdentifier> slotIds = module.getSlotIds();
     for (P11SlotIdentifier slotId : slotIds) {
       P11Slot slot;
       try {
@@ -63,7 +63,7 @@ public class P11CryptService {
     LOG.info("refreshed PKCS#11 module {}", module.getName());
   } // method refresh
 
-  public P11Module module() throws P11TokenException {
+  public P11Module getModule() throws P11TokenException {
     return module;
   }
 
@@ -73,7 +73,7 @@ public class P11CryptService {
 
   public P11Identity getIdentity(P11EntityIdentifier identityId) throws P11TokenException {
     ParamUtil.requireNonNull("identityId", identityId);
-    return module.getSlot(identityId.slotId()).getIdentity(identityId.objectId());
+    return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
   }
 
   @Override

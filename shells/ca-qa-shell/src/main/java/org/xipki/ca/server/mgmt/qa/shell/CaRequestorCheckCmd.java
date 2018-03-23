@@ -85,7 +85,7 @@ public class CaRequestorCheckCmd extends CaAction {
     CaHasRequestorEntry entry = null;
     String upRequestorName = requestorName.toLowerCase();
     for (CaHasRequestorEntry m : entries) {
-      if (m.requestorIdent().name().equals(upRequestorName)) {
+      if (m.getRequestorIdent().getName().equals(upRequestorName)) {
         entry = m;
         break;
       }
@@ -96,7 +96,7 @@ public class CaRequestorCheckCmd extends CaAction {
     }
 
     boolean ra = isEnabled(raS, false, "ra");
-    boolean bo = entry.ra();
+    boolean bo = entry.isRa();
     if (ra != bo) {
       throw new CmdFailure("ra: is '" + bo + "', expected '" + ra + "'");
     }
@@ -104,8 +104,8 @@ public class CaRequestorCheckCmd extends CaAction {
     if (permissions != null) {
       int intPermission = ShellUtil.getPermission(permissions);
 
-      if (intPermission != entry.permission()) {
-        throw new CmdFailure("permissions: is '" + entry.permission()
+      if (intPermission != entry.getPermission()) {
+        throw new CmdFailure("permissions: is '" + entry.getPermission()
             + "', but expected '" + intPermission + "'");
       }
     }
@@ -117,8 +117,8 @@ public class CaRequestorCheckCmd extends CaAction {
         }
       }
 
-      if (!profiles.equals(entry.profiles())) {
-        throw new CmdFailure("profiles: is '" + entry.profiles()
+      if (!profiles.equals(entry.getProfiles())) {
+        throw new CmdFailure("profiles: is '" + entry.getProfiles()
             + "', but expected '" + profiles + "'");
       }
     }

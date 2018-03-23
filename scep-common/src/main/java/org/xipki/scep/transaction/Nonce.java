@@ -47,7 +47,7 @@ public class Nonce {
     this(bytes, true);
   }
 
-  public byte[] bytes() {
+  public byte[] getBytes() {
     return Arrays.copyOf(bytes, bytes.length);
   }
 

@@ -37,11 +37,11 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
     this.id = ParamUtil.requireMin("id", id, 0);
   }
 
-  public int index() {
+  public int getIndex() {
     return index;
   }
 
-  public long id() {
+  public long getId() {
     return id;
   }
 

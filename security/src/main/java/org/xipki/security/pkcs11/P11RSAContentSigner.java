@@ -116,7 +116,7 @@ class P11RSAContentSigner implements XiContentSigner {
       throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
     }
 
-    P11SlotIdentifier slotId = identityId.slotId();
+    P11SlotIdentifier slotId = identityId.getSlotId();
     P11Slot slot = cryptService.getSlot(slotId);
     if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS)) {
       this.mechanism = PKCS11Constants.CKM_RSA_PKCS;
@@ -142,7 +142,7 @@ class P11RSAContentSigner implements XiContentSigner {
       this.outputStream = new ByteArrayOutputStream();
     }
 
-    RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getIdentity(identityId).publicKey();
+    RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getIdentity(identityId).getPublicKey();
     this.modulusBitLen = rsaPubKey.getModulus().bitLength();
   }
 

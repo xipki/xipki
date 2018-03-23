@@ -38,11 +38,11 @@ public class QaAuthorizationTemplate extends QaExtension {
     this.accessRights = jaxb.getAccessRights().getValue();
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
-  public byte[] accessRights() {
+  public byte[] getAccessRights() {
     return accessRights;
   }
 

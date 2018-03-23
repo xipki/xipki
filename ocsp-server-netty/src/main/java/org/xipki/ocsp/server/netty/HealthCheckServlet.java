@@ -81,12 +81,12 @@ public class HealthCheckServlet extends AbstractHttpServlet {
         return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
       }
 
-      ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.path());
+      ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.getPath());
       if (responderAndPath == null) {
         return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
       }
 
-      HealthCheckResult healthResult = server.healthCheck(responderAndPath.responder());
+      HealthCheckResult healthResult = server.healthCheck(responderAndPath.getResponder());
       HttpResponseStatus status = healthResult.isHealthy()
           ? HttpResponseStatus.OK : HttpResponseStatus.INTERNAL_SERVER_ERROR;
 

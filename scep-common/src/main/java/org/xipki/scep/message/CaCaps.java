@@ -102,7 +102,7 @@ public class CaCaps {
 
     StringBuilder sb = new StringBuilder();
     for (CaCapability cap : capabilities) {
-      sb.append(cap.text()).append("\n");
+      sb.append(cap.getText()).append("\n");
     }
     sb.deleteCharAt(sb.length() - 1);
     return sb.toString();
@@ -139,7 +139,7 @@ public class CaCaps {
     return capabilities.equals(((CaCaps) obj).capabilities);
   }
 
-  public byte[] bytes() {
+  public byte[] getBytes() {
     return Arrays.copyOf(bytes, bytes.length);
   }
 

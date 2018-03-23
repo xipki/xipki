@@ -83,7 +83,7 @@ public class BiometricInfoOption {
     return hashAlgorithms.contains(hashAlgorithm);
   }
 
-  public TripleState sourceDataUriOccurrence() {
+  public TripleState getSourceDataUriOccurrence() {
     return sourceDataUriOccurrence;
   }
 

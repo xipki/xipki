@@ -55,11 +55,11 @@ public class CaIdentifier {
     this.profile = profile;
   }
 
-  public String url() {
+  public String getUrl() {
     return url;
   }
 
-  public String profile() {
+  public String getProfile() {
     return profile;
   }
 
@@ -71,7 +71,7 @@ public class CaIdentifier {
   public String buildGetUrl(Operation operation, String message) {
     ScepUtil.requireNonNull("operation", operation);
     StringBuilder ub = new StringBuilder(url);
-    ub.append('?').append("operation=").append(operation.code());
+    ub.append('?').append("operation=").append(operation.getCode());
 
     if (message != null && !message.isEmpty()) {
       String urlMessage;
@@ -88,7 +88,7 @@ public class CaIdentifier {
   public String buildPostUrl(Operation operation) {
     ScepUtil.requireNonNull("operation", operation);
     StringBuilder ub = new StringBuilder(url);
-    ub.append('?').append("operation=").append(operation.code());
+    ub.append('?').append("operation=").append(operation.getCode());
     return ub.toString();
   }
 

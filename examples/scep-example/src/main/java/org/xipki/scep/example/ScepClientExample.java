@@ -91,7 +91,7 @@ public class ScepClientExample extends CaClientExample {
         throw new Exception("server returned 'pending'");
       }
 
-      X509Certificate cert = resp.certificates().get(0);
+      X509Certificate cert = resp.getCertificates().get(0);
       printCert("SCEP (RSA, Self-Signed Identity Cert)", cert);
 
       // Use the CA signed identity certificate
@@ -111,7 +111,7 @@ public class ScepClientExample extends CaClientExample {
         throw new Exception("server returned 'pending'");
       }
 
-      cert = resp.certificates().get(0);
+      cert = resp.getCertificates().get(0);
       printCert("SCEP (RSA, CA issued identity Cert)", cert);
 
       client.destroy();

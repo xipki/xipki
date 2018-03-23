@@ -38,14 +38,14 @@ public class CmpRequestorEntryWrapper {
 
   public void setDbEntry(CmpRequestorEntry dbEntry) {
     this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-    this.cert = new X509CertWithDbId(dbEntry.cert());
+    this.cert = new X509CertWithDbId(dbEntry.getCert());
   }
 
-  public X509CertWithDbId cert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 
-  public CmpRequestorEntry dbEntry() {
+  public CmpRequestorEntry getDbEntry() {
     return dbEntry;
   }
 

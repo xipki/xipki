@@ -106,7 +106,7 @@ public class ScepUpdateCmd extends CaAction {
       if (entry == null) {
         throw new IllegalCmdParamException("please specify the responderType");
       }
-      tmpRespType = entry.responderType();
+      tmpRespType = entry.getResponderType();
     }
 
     return ShellUtil.canonicalizeSignerConf(tmpRespType, responderConf, passwordResolver,

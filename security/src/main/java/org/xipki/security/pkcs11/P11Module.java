@@ -38,7 +38,7 @@ public interface P11Module {
 
   boolean isReadOnly();
 
-  List<P11SlotIdentifier> slotIdentifiers();
+  List<P11SlotIdentifier> getSlotIds();
 
   /**
    * Returns slot for the given {@code slotId}.

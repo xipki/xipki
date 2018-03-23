@@ -73,14 +73,14 @@ public class CertificateStore {
   public boolean addCertificate(X509CertificateInfo certInfo) {
     ParamUtil.requireNonNull("certInfo", certInfo);
     try {
-      queryExecutor.addCert(certInfo.issuer(), certInfo.cert(),
-          certInfo.subjectPublicKey(), certInfo.profile(),
-          certInfo.requestor(), certInfo.user(), certInfo.reqType(),
-          certInfo.transactionId(), certInfo.requestedSubject());
+      queryExecutor.addCert(certInfo.getIssuer(), certInfo.getCert(),
+          certInfo.subjectPublicKey(), certInfo.getProfile(),
+          certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
+          certInfo.getTransactionId(), certInfo.getRequestedSubject());
     } catch (Exception ex) {
       LOG.error("could not save certificate {}: {}. Message: {}",
-          new Object[]{certInfo.cert().subject(),
-              Base64.encodeToString(certInfo.cert().encodedCert(), true), ex.getMessage()});
+          new Object[]{certInfo.getCert().getSubject(),
+              Base64.encodeToString(certInfo.getCert().getEncodedCert(), true), ex.getMessage()});
       LOG.debug("error", ex);
       return false;
     }
@@ -157,9 +157,9 @@ public class CertificateStore {
           revInfo, force, publishToDeltaCrlCache, idNameMap);
       if (revokedCert == null) {
         LOG.info("could not revoke non-existing certificate CA={}, serialNumber={}",
-            ca.name(), LogUtil.formatCsn(serialNumber));
+            ca.getName(), LogUtil.formatCsn(serialNumber));
       } else {
-        LOG.info("revoked certificate CA={}, serialNumber={}", ca.name(),
+        LOG.info("revoked certificate CA={}, serialNumber={}", ca.getName(),
             LogUtil.formatCsn(serialNumber));
       }
 
@@ -181,10 +181,10 @@ public class CertificateStore {
           serialNumber, reason, publishToDeltaCrlCache, idNameMap);
       if (revokedCert == null) {
         LOG.info("could not revoke non-existing certificate CA={}, serialNumber={}",
-            ca.name(), LogUtil.formatCsn(serialNumber));
+            ca.getName(), LogUtil.formatCsn(serialNumber));
       } else {
         LOG.info("revoked suspended certificate CA={}, serialNumber={}",
-            ca.name(), LogUtil.formatCsn(serialNumber));
+            ca.getName(), LogUtil.formatCsn(serialNumber));
       }
 
       return revokedCert;
@@ -204,9 +204,9 @@ public class CertificateStore {
           publishToDeltaCrlCache, idNameMap);
       if (unrevokedCert == null) {
         LOG.info("could not unrevoke non-existing certificate CA={}, serialNumber={}",
-            ca.name(), LogUtil.formatCsn(serialNumber));
+            ca.getName(), LogUtil.formatCsn(serialNumber));
       } else {
-        LOG.info("unrevoked certificate CA={}, serialNumber={}", ca.name(),
+        LOG.info("unrevoked certificate CA={}, serialNumber={}", ca.getName(),
             LogUtil.formatCsn(serialNumber));
       }
 
@@ -251,7 +251,7 @@ public class CertificateStore {
       return true;
     } catch (Exception ex) {
       LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
-          ca.name(), crl.getThisUpdate(), ex.getMessage());
+          ca.getName(), crl.getThisUpdate(), ex.getMessage());
       LOG.debug("Exception", ex);
       return false;
     }
@@ -297,7 +297,7 @@ public class CertificateStore {
     try {
       return queryExecutor.getEncodedCrl(ca, crlNumber);
     } catch (Exception ex) {
-      LOG.error("could not get CRL ca={}: error message: {}", ca.name(), ex.getMessage());
+      LOG.error("could not get CRL ca={}: error message: {}", ca.getName(), ex.getMessage());
       LOG.debug("Exception", ex);
       return null;
     }
@@ -307,7 +307,7 @@ public class CertificateStore {
     try {
       return queryExecutor.cleanupCrls(ca, numCrls);
     } catch (Exception ex) {
-      LOG.error("could not cleanup CRLs ca={}: error message: {}", ca.name(),
+      LOG.error("could not cleanup CRLs ca={}: error message: {}", ca.getName(),
           ex.getMessage());
       LOG.debug("Exception", ex);
       return 0;

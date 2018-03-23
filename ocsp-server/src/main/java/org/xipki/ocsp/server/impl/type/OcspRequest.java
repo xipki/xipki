@@ -275,15 +275,15 @@ public class OcspRequest {
     return content;
   }
 
-  public int version() {
+  public int getVersion() {
     return version;
   }
 
-  public List<CertID> requestList() {
+  public List<CertID> getRequestList() {
     return requestList;
   }
 
-  public List<ExtendedExtension> extensions() {
+  public List<ExtendedExtension> getExtensions() {
     return extensions;
   }
 

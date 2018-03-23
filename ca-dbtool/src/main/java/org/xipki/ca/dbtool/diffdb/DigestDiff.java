@@ -114,7 +114,7 @@ class DigestDiff {
     }
 
     // number of threads
-    this.numTargetThreads = Math.min(numThreads, targetDatasource.maximumPoolSize() - 1);
+    this.numTargetThreads = Math.min(numThreads, targetDatasource.getMaximumPoolSize() - 1);
 
     if (this.numTargetThreads != numThreads) {
       LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
@@ -122,7 +122,7 @@ class DigestDiff {
     }
   } // constuctor
 
-  public Set<byte[]> includeCaCerts() {
+  public Set<byte[]> isIncludeCaCerts() {
     return includeCaCerts;
   }
 
@@ -173,7 +173,7 @@ class DigestDiff {
 
   private void diffSingleCa(RefDigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
       throws CertificateException, IOException, InterruptedException {
-    X509Certificate caCert = refReader.caCert();
+    X509Certificate caCert = refReader.getCaCert();
     byte[] caCertBytes = caCert.getEncoded();
 
     if (includeCaCerts != null && !includeCaCerts.isEmpty()) {
@@ -185,7 +185,7 @@ class DigestDiff {
         }
       }
       if (!include) {
-        System.out.println("skipped CA " + refReader.caSubjectName());
+        System.out.println("skipped CA " + refReader.getCaSubjectName());
       }
     }
 
@@ -217,8 +217,9 @@ class DigestDiff {
 
     try {
       reporter.start();
-      ProcessLog processLog = new ProcessLog(refReader.totalAccount());
-      System.out.println("Processing certificates of CA \n\t'" + refReader.caSubjectName() + "'");
+      ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
+      System.out.println(
+          "Processing certificates of CA \n\t'" + refReader.getCaSubjectName() + "'");
       processLog.printHeader();
 
       target = new TargetDigestRetriever(revokedOnly, processLog, refReader, reporter,

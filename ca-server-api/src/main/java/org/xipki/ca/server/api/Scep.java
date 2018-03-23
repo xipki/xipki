@@ -34,9 +34,9 @@ public interface Scep {
 
   boolean isOnService();
 
-  CaCaps caCaps();
+  CaCaps getCaCaps();
 
-  ScepCaCertRespBytes caCertResp() throws OperationException;
+  ScepCaCertRespBytes getCaCertResp() throws OperationException;
 
   boolean supportsCertProfile(String profileName);
 

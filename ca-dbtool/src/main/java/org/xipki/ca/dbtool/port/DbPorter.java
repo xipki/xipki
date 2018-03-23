@@ -61,15 +61,15 @@ public class DbPorter extends DbToolBase {
       this.sqlBatchFactor = sqlBatchFactor;
     }
 
-    public String dirName() {
+    public String getDirName() {
       return dirName;
     }
 
-    public String tableName() {
+    public String getTableName() {
       return tableName;
     }
 
-    public float sqlBatchFactor() {
+    public float getSqlBatchFactor() {
       return sqlBatchFactor;
     }
 
@@ -95,15 +95,15 @@ public class DbPorter extends DbToolBase {
       this.sqlBatchFactor = sqlBatchFactor;
     }
 
-    public String dirName() {
+    public String getDirName() {
       return dirName;
     }
 
-    public String tableName() {
+    public String getTableName() {
       return tableName;
     }
 
-    public float sqlBatchFactor() {
+    public float getSqlBatchFactor() {
       return sqlBatchFactor;
     }
 
@@ -143,8 +143,8 @@ public class DbPorter extends DbToolBase {
 
     this.evaulateOnly = evaluateOnly;
     this.dbSchemaInfo = new DbSchemaInfo(datasource);
-    this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
-    this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
+    this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.getVariableValue("VERSION"));
+    this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.getVariableValue("X500NAME_MAXLEN"));
   }
 
   protected FileOrValueType buildFileOrValue(String content, String fileName) throws IOException {

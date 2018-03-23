@@ -82,7 +82,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
   protected BaseX509Certprofile() {
   }
 
-  public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms();
+  public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
   protected String[] sortRdns(RdnControl control, String[] values) {
     ParamUtil.requireNonNull("values", values);
@@ -91,7 +91,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       return values;
     }
 
-    List<Pattern> patterns = control.patterns();
+    List<Pattern> patterns = control.getPatterns();
     if (CollectionUtil.isEmpty(patterns)) {
       return values;
     }
@@ -118,7 +118,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
    *
    * @return the SubjectControl, must not be <code>null</code>.
    */
-  protected abstract SubjectControl subjectControl();
+  protected abstract SubjectControl getSubjectControl();
 
   @Override
   public Date getNotBefore(Date notBefore) {
@@ -134,11 +134,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     verifySubjectDnOccurence(requestedSubject);
 
     RDN[] requstedRdns = requestedSubject.getRDNs();
-    SubjectControl scontrol = subjectControl();
+    SubjectControl scontrol = getSubjectControl();
 
     List<RDN> rdns = new LinkedList<>();
 
-    for (ASN1ObjectIdentifier type : scontrol.types()) {
+    for (ASN1ObjectIdentifier type : scontrol.getTypes()) {
       RdnControl control = scontrol.getControl(type);
       if (control == null) {
         continue;
@@ -199,7 +199,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       } // if
     } // for
 
-    Set<String> subjectDnGroups = scontrol.groups();
+    Set<String> subjectDnGroups = scontrol.getGroups();
     if (CollectionUtil.isNonEmpty(subjectDnGroups)) {
       Set<String> consideredGroups = new HashSet<>();
       final int n = rdns.size();
@@ -250,7 +250,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       throws BadCertTemplateException {
     ParamUtil.requireNonNull("publicKey", publicKey);
 
-    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = keyAlgorithms();
+    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
     if (CollectionUtil.isEmpty(keyAlgorithms)) {
       return publicKey;
     }
@@ -362,7 +362,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       throws BadCertTemplateException {
     ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
-    SubjectControl occurences = subjectControl();
+    SubjectControl occurences = getSubjectControl();
     if (occurences == null) {
       return;
     }
@@ -376,23 +376,23 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
       }
 
       RDN[] rdns = requestedSubject.getRDNs(type);
-      if (rdns.length > occu.maxOccurs() || rdns.length < occu.minOccurs()) {
+      if (rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs()) {
         throw new BadCertTemplateException(String.format(
             "occurrence of subject DN of type %s not within the allowed range. "
             + "%d is not within [%d, %d]", oidToDisplayName(type),  rdns.length,
-            occu.minOccurs(), occu.maxOccurs()));
+            occu.getMinOccurs(), occu.getMaxOccurs()));
       }
     }
 
-    for (ASN1ObjectIdentifier m : occurences.types()) {
+    for (ASN1ObjectIdentifier m : occurences.getTypes()) {
       RdnControl occurence = occurences.getControl(m);
-      if (occurence.minOccurs() == 0) {
+      if (occurence.getMinOccurs() == 0) {
         continue;
       }
 
       boolean present = false;
       for (ASN1ObjectIdentifier type : types) {
-        if (occurence.type().equals(type)) {
+        if (occurence.getType().equals(type)) {
           present = true;
           break;
         }
@@ -400,7 +400,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
       if (!present) {
         throw new BadCertTemplateException(String.format(
-            "required subject DN of type %s is not present", oidToDisplayName(occurence.type())));
+            "required subject DN of type %s is not present",
+            oidToDisplayName(occurence.getType())));
       }
     }
   } // method verifySubjectDnOccurence
@@ -496,9 +497,9 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     StringType stringType = null;
 
     if (option != null) {
-      stringType = option.stringType();
-      String prefix = option.prefix();
-      String suffix = option.suffix();
+      stringType = option.getStringType();
+      String prefix = option.getPrefix();
+      String suffix = option.getSuffix();
 
       if (prefix != null || suffix != null) {
         String locTmpText = tmpText.toLowerCase();
@@ -512,7 +513,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         }
       }
 
-      List<Pattern> patterns = option.patterns();
+      List<Pattern> patterns = option.getPatterns();
       if (patterns != null) {
         Pattern pattern = patterns.get(index);
         if (!pattern.matcher(tmpText).matches()) {
@@ -526,8 +527,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
           (suffix != null ? suffix : ""));
 
       int len = tmpText.length();
-      Range range = option.stringLengthRange();
-      Integer minLen = (range == null) ? null : range.min();
+      Range range = option.getStringLengthRange();
+      Integer minLen = (range == null) ? null : range.getMin();
 
       if (minLen != null && len < minLen) {
         throw new BadCertTemplateException(
@@ -535,7 +536,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             ObjectIdentifiers.oidToDisplayName(type), tmpText, len, minLen));
       }
 
-      Integer maxLen = (range == null) ? null : range.max();
+      Integer maxLen = (range == null) ? null : range.getMax();
 
       if (maxLen != null && len > maxLen) {
         throw new BadCertTemplateException(

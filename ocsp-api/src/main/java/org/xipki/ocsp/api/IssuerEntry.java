@@ -73,7 +73,7 @@ public class IssuerEntry {
 
     Map<HashAlgo, byte[]> hashes = new HashMap<>();
     for (HashAlgo ha : HashAlgo.values()) {
-      int hlen = ha.length();
+      int hlen = ha.getLength();
       byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
       int offset = 0;
       nameAndKeyHash[offset++] = 0x04;
@@ -91,7 +91,7 @@ public class IssuerEntry {
     return hashes;
   }
 
-  public int id() {
+  public int getId() {
     return id;
   }
 
@@ -106,8 +106,8 @@ public class IssuerEntry {
       return false;
     }
 
-    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
-        reqIssuer.nameHashFrom(), issuerHash.length);
+    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
+        reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Date revocationTime) {
@@ -120,19 +120,19 @@ public class IssuerEntry {
     this.crlInfo = crlInfo;
   }
 
-  public CrlInfo crlInfo() {
+  public CrlInfo getCrlInfo() {
     return crlInfo;
   }
 
-  public CertRevocationInfo revocationInfo() {
+  public CertRevocationInfo getRevocationInfo() {
     return revocationInfo;
   }
 
-  public Date notBefore() {
+  public Date getNotBefore() {
     return notBefore;
   }
 
-  public X509Certificate cert() {
+  public X509Certificate getCert() {
     return cert;
   }
 

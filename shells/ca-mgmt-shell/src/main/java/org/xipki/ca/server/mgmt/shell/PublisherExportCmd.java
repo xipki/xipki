@@ -57,11 +57,11 @@ public class PublisherExportCmd extends CaAction {
       throw new IllegalCmdParamException("no publisher named " + name + " is defined");
     }
 
-    if (StringUtil.isBlank(entry.conf())) {
+    if (StringUtil.isBlank(entry.getConf())) {
       println("publisher does not have conf");
     } else {
       saveVerbose("saved publisher configuration to", new File(confFile),
-          entry.conf().getBytes("UTF-8"));
+          entry.getConf().getBytes("UTF-8"));
     }
     return null;
   }

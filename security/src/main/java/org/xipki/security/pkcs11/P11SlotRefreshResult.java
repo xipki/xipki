@@ -42,21 +42,21 @@ public class P11SlotRefreshResult {
   public P11SlotRefreshResult() {
   }
 
-  public Map<P11ObjectIdentifier, P11Identity> identities() {
+  public Map<P11ObjectIdentifier, P11Identity> getIdentities() {
     return identities;
   }
 
-  public Map<P11ObjectIdentifier, X509Cert> certificates() {
+  public Map<P11ObjectIdentifier, X509Cert> getCertificates() {
     return certificates;
   }
 
-  public Set<Long> mechanisms() {
+  public Set<Long> getMechanisms() {
     return mechanisms;
   }
 
   public void addIdentity(P11Identity identity) {
     ParamUtil.requireNonNull("identity", identity);
-    this.identities.put(identity.identityId().objectId(), identity);
+    this.identities.put(identity.getIdentityId().getObjectId(), identity);
   }
 
   public void addMechanism(long mechanism) {

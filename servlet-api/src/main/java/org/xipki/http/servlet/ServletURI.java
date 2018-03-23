@@ -61,19 +61,19 @@ public class ServletURI {
     this.path = (path == null || path.isEmpty()) ? "/" : path;
   }
 
-  public String path() {
+  public String getPath() {
     return path;
   }
 
-  public String query() {
+  public String getQuery() {
     return query;
   }
 
-  public String fragement() {
+  public String getFragement() {
     return fragement;
   }
 
-  public String parameter(String name) {
+  public String getParameter(String name) {
     if (query == null) {
       return null;
     }

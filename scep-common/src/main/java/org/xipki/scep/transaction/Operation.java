@@ -37,7 +37,7 @@ public enum Operation {
     this.code = code;
   }
 
-  public String code() {
+  public String getCode() {
     return code;
   }
 

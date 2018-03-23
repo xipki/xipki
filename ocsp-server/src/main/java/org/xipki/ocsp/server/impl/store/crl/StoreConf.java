@@ -118,11 +118,11 @@ class StoreConf {
     }
   }
 
-  String crlFile() {
+  String getCrFile() {
     return crlFile;
   }
 
-  String crlUrl() {
+  String getCrlUrl() {
     return crlUrl;
   }
 
@@ -130,15 +130,15 @@ class StoreConf {
     return useUpdateDatesFromCrl;
   }
 
-  String caCertFile() {
+  String getCaCertFile() {
     return caCertFile;
   }
 
-  String issuerCertFile() {
+  String getIssuerCertFile() {
     return issuerCertFile;
   }
 
-  String certsDir() {
+  String getCertsDir() {
     return certsDir;
   }
 

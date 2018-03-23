@@ -62,7 +62,7 @@ public abstract class SecurityAction extends XiAction {
     if (p11Service == null) {
       throw new IllegalCmdParamException("undefined module " + moduleName);
     }
-    return p11Service.module();
+    return p11Service.getModule();
   }
 
   protected String toUtcTimeyyyyMMddhhmmssZ(Date date) {

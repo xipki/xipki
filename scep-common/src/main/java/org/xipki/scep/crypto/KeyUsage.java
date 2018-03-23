@@ -49,11 +49,11 @@ public enum KeyUsage {
     this.names = names;
   }
 
-  public int bit() {
+  public int getBit() {
     return bit;
   }
 
-  public int bcUsage() {
+  public int getBcUsage() {
     return bcUsage;
   }
 

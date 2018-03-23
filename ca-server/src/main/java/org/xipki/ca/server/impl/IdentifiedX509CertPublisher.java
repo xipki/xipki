@@ -53,7 +53,7 @@ class IdentifiedX509CertPublisher {
 
   public void initialize(PasswordResolver passwordResolver,
       Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
-    certPublisher.initialize(entry.conf(), passwordResolver, datasources);
+    certPublisher.initialize(entry.getConf(), passwordResolver, datasources);
   }
 
   public void setEnvParameterResolver(EnvParameterResolver parameterResolver) {
@@ -77,12 +77,12 @@ class IdentifiedX509CertPublisher {
     return certPublisher.crlAdded(caCert, crl);
   }
 
-  public PublisherEntry dbEntry() {
+  public PublisherEntry getDbEntry() {
     return entry;
   }
 
-  public NameId ident() {
-    return entry.ident();
+  public NameId getIdent() {
+    return entry.getIdent();
   }
 
   public boolean isHealthy() {

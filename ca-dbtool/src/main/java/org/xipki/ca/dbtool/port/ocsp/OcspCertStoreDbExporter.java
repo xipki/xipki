@@ -147,7 +147,7 @@ class OcspCertStoreDbExporter extends DbPorter {
   } // method export
 
   private void exportHashAlgo(CertStoreType certstore) throws DataAccessException {
-    String certHashAlgoStr = dbSchemaInfo.variableValue("CERTHASH_ALGO");
+    String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
       throw new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA");
     }
@@ -207,14 +207,14 @@ class OcspCertStoreDbExporter extends DbPorter {
   } // method exportIssuer
 
   private Exception exportCert(CertStoreType certstore, File processLogFile) {
-    final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
+    final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
     entriesDir.mkdirs();
 
     FileOutputStream certsFileOs = null;
 
     try {
       certsFileOs = new FileOutputStream(
-          new File(baseDir, OcspDbEntryType.CERT.dirName() + ".mf"), true);
+          new File(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"), true);
       exportCert0(certstore, processLogFile, certsFileOs);
       return null;
     } catch (Exception ex) {
@@ -231,7 +231,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
   private void exportCert0(CertStoreType certstore, File processLogFile,
       FileOutputStream certsFileOs) throws Exception {
-    File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
+    File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
     Long minId = null;
     if (processLogFile.exists()) {
       byte[] content = IoUtil.read(processLogFile);

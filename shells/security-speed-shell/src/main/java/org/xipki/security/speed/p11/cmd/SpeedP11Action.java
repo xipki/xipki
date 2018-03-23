@@ -56,7 +56,7 @@ public abstract class SpeedP11Action extends SingleSpeedAction {
     if (p11Service == null) {
       throw new IllegalCmdParamException("undefined module " + moduleName);
     }
-    P11Module module = p11Service.module();
+    P11Module module = p11Service.getModule();
     P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
     return module.getSlot(slotId);
   }

@@ -58,7 +58,7 @@ public class P11TokenInfoCmd extends SecurityAction {
     P11Module module = getP11Module(moduleName);
     println("module: " + moduleName);
     println(module.getDescription());
-    List<P11SlotIdentifier> slots = module.slotIdentifiers();
+    List<P11SlotIdentifier> slots = module.getSlotIds();
     if (slotIndex == null) {
       output(slots);
       return null;
@@ -84,7 +84,7 @@ public class P11TokenInfoCmd extends SecurityAction {
     }
 
     for (P11SlotIdentifier slotId : slots) {
-      println("\tslot[" + slotId.index() + "]: " + slotId.id());
+      println("\tslot[" + slotId.getIndex() + "]: " + slotId.getId());
     }
   }
 

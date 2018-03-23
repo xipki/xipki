@@ -125,7 +125,7 @@ public class RestImpl implements Rest {
         ca = responderManager.getX509CaResponder(caName).getCa();
       }
 
-      if (caName == null || ca == null || ca.caInfo().status() != CaStatus.ACTIVE) {
+      if (caName == null || ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
         String message;
         if (caName == null) {
           message = "no CA is specified";
@@ -139,7 +139,7 @@ public class RestImpl implements Rest {
             AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      event.addEventData(CaAuditConstants.NAME_ca, ca.caIdent().name());
+      event.addEventData(CaAuditConstants.NAME_ca, ca.getCaIdent().getName());
       event.addEventType(command);
 
       RequestorInfo requestor;
@@ -188,14 +188,14 @@ public class RestImpl implements Rest {
         throw new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified");
       }
 
-      event.addEventData(CaAuditConstants.NAME_requestor, requestor.ident().name());
+      event.addEventData(CaAuditConstants.NAME_requestor, requestor.getIdent().getName());
 
       String respCt = null;
       byte[] respBytes = null;
 
       if (RestAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
         respCt = RestAPIConstants.CT_pkix_cert;
-        respBytes = ca.caInfo().certificate().encodedCert();
+        respBytes = ca.getCaInfo().getCert().getEncodedCert();
       } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
         String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
         if (StringUtil.isBlank(profile)) {
@@ -248,12 +248,12 @@ public class RestImpl implements Rest {
         X509CertificateInfo certInfo = ca.generateCertificate(certTemplate,
             requestor, RequestType.REST, null, msgId);
 
-        if (ca.caInfo().saveRequest()) {
+        if (ca.getCaInfo().isSaveRequest()) {
           long dbId = ca.addRequest(encodedCsr);
-          ca.addRequestCert(dbId, certInfo.cert().certId());
+          ca.addRequestCert(dbId, certInfo.getCert().getCertId());
         }
 
-        X509Cert cert = certInfo.cert();
+        X509Cert cert = certInfo.getCert();
         if (cert == null) {
           String message = "could not generate certificate";
           LOG.warn(message);
@@ -261,7 +261,7 @@ public class RestImpl implements Rest {
               null, message, AuditLevel.INFO, AuditStatus.FAILED);
         }
         respCt = RestAPIConstants.CT_pkix_cert;
-        respBytes = cert.encodedCert();
+        respBytes = cert.getEncodedCert();
       } else if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
           || RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
         int permission;
@@ -378,10 +378,10 @@ public class RestImpl implements Rest {
       headers.put(RestAPIConstants.HEADER_PKISTATUS, RestAPIConstants.PKISTATUS_accepted);
       return new RestResponse(HttpResponseStatus.OK, respCt, headers, respBytes);
     } catch (OperationException ex) {
-      ErrorCode code = ex.errorCode();
+      ErrorCode code = ex.getErrorCode();
       if (LOG.isWarnEnabled()) {
         String msg = StringUtil.concat("generate certificate, OperationException: code=",
-            code.name(), ", message=", ex.errorMessage());
+            code.name(), ", message=", ex.getErrorMessage());
         LOG.warn(msg);
         LOG.debug(msg, ex);
       }
@@ -452,7 +452,7 @@ public class RestImpl implements Rest {
           auditMessage = code.name();
           break;
         default:
-          auditMessage = code.name() + ": " + ex.errorMessage();
+          auditMessage = code.name() + ": " + ex.getErrorMessage();
           break;
       } // end switch code
 
@@ -464,10 +464,10 @@ public class RestImpl implements Rest {
       }
       return new RestResponse(sc, null, headers, null);
     } catch (HttpRespAuditException ex) {
-      auditStatus = ex.auditStatus();
-      auditLevel = ex.auditLevel();
-      auditMessage = ex.auditMessage();
-      return new RestResponse(ex.httpStatus(), null, null, null);
+      auditStatus = ex.getAuditStatus();
+      auditLevel = ex.getAuditLevel();
+      auditMessage = ex.getAuditMessage();
+      return new RestResponse(ex.getHttpStatus(), null, null, null);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");

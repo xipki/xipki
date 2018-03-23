@@ -69,7 +69,7 @@ public abstract class DbiXmlReader {
     this.next = retrieveNext();
   }
 
-  public String rootElementName() {
+  public String getRootElementName() {
     return rootElementName;
   }
 

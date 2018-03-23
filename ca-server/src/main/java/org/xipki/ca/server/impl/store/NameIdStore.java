@@ -76,7 +76,7 @@ class NameIdStore {
     return entries.get(name);
   }
 
-  public String table() {
+  public String getTable() {
     return table;
   }
 

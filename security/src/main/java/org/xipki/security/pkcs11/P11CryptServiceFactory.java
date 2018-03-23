@@ -45,7 +45,7 @@ public interface P11CryptServiceFactory {
   P11CryptService getP11CryptService(String moduleName)
       throws P11TokenException, XiSecurityException;
 
-  Set<String> moduleNames();
+  Set<String> getModuleNames();
 
   void shutdown();
 

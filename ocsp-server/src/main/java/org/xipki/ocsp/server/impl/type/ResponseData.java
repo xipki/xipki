@@ -59,7 +59,7 @@ public class ResponseData extends ASN1Type {
     if (version != 0) {
       len += 5;
     }
-    len += responderId.encodedLength();
+    len += responderId.getEncodedLength();
 
     // producedAt
     len += 17;
@@ -67,13 +67,13 @@ public class ResponseData extends ASN1Type {
     // responses
     int responsesBodyLen = 0;
     for (SingleResponse sr : responses) {
-      responsesBodyLen += sr.encodedLength();
+      responsesBodyLen += sr.getEncodedLength();
     }
     len += getLen(responsesBodyLen);
 
     // extensions
     if (extensions != null) {
-      len += getLen(extensions.encodedLength()); // explicit tag
+      len += getLen(extensions.getEncodedLength()); // explicit tag
     }
 
     this.bodyLength = len;
@@ -81,7 +81,7 @@ public class ResponseData extends ASN1Type {
   }
 
   @Override
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encodedLength;
   }
 
@@ -103,7 +103,7 @@ public class ResponseData extends ASN1Type {
     // responses
     int responsesBodyLen = 0;
     for (SingleResponse sr : responses) {
-      responsesBodyLen += sr.encodedLength();
+      responsesBodyLen += sr.getEncodedLength();
     }
     idx += writeHeader((byte) 0x30, responsesBodyLen, out, idx);
     for (SingleResponse sr : responses) {
@@ -111,7 +111,7 @@ public class ResponseData extends ASN1Type {
     }
 
     if (extensions != null) {
-      idx += writeHeader((byte) 0xa1, extensions.encodedLength(), out, idx);
+      idx += writeHeader((byte) 0xa1, extensions.getEncodedLength(), out, idx);
       idx += extensions.write(out, idx);
     }
 

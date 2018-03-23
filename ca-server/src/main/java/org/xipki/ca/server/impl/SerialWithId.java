@@ -36,11 +36,11 @@ public class SerialWithId {
     this.serial = serial;
   }
 
-  public BigInteger serial() {
+  public BigInteger getSerial() {
     return serial;
   }
 
-  public long id() {
+  public long getId() {
     return id;
   }
 

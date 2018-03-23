@@ -37,11 +37,11 @@ public class SubjectInfo {
     this.warning = warning;
   }
 
-  public X500Name grantedSubject() {
+  public X500Name getGrantedSubject() {
     return grantedSubject;
   }
 
-  public String warning() {
+  public String getWarning() {
     return warning;
   }
 

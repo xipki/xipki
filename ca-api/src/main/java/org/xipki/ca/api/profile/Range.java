@@ -35,11 +35,11 @@ public class Range {
     setRange(min, max);
   }
 
-  public Integer min() {
+  public Integer getMin() {
     return min;
   }
 
-  public Integer max() {
+  public Integer getMax() {
     return max;
   }
 

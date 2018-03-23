@@ -106,11 +106,11 @@ public class CaEntry {
     return signerConfs;
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public CertValidity maxValidity() {
+  public CertValidity getMaxValidity() {
     return maxValidity;
   }
 
@@ -118,7 +118,7 @@ public class CaEntry {
     this.maxValidity = maxValidity;
   }
 
-  public int keepExpiredCertInDays() {
+  public int getKeepExpiredCertInDays() {
     return keepExpiredCertInDays;
   }
 
@@ -130,11 +130,11 @@ public class CaEntry {
     this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
   }
 
-  public String signerConf() {
+  public String getSignerConf() {
     return signerConf;
   }
 
-  public CaStatus status() {
+  public CaStatus getStatus() {
     return status;
   }
 
@@ -142,7 +142,7 @@ public class CaEntry {
     this.status = status;
   }
 
-  public String signerType() {
+  public String getSignerType() {
     return signerType;
   }
 
@@ -150,11 +150,11 @@ public class CaEntry {
     this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
   }
 
-  public String cmpControlName() {
+  public String getCmpControlName() {
     return cmpControlName;
   }
 
-  public String responderName() {
+  public String getResponderName() {
     return responderName;
   }
 
@@ -162,7 +162,7 @@ public class CaEntry {
     this.responderName = (responderName == null) ? null : responderName.toLowerCase();
   }
 
-  public boolean duplicateKeyPermitted() {
+  public boolean isDuplicateKeyPermitted() {
     return duplicateKeyPermitted;
   }
 
@@ -170,7 +170,7 @@ public class CaEntry {
     this.duplicateKeyPermitted = duplicateKeyPermitted;
   }
 
-  public boolean duplicateSubjectPermitted() {
+  public boolean isDuplicateSubjectPermitted() {
     return duplicateSubjectPermitted;
   }
 
@@ -178,7 +178,7 @@ public class CaEntry {
     this.duplicateSubjectPermitted = duplicateSubjectPermitted;
   }
 
-  public boolean saveRequest() {
+  public boolean isSaveRequest() {
     return saveRequest;
   }
 
@@ -186,7 +186,7 @@ public class CaEntry {
     this.saveRequest = saveRequest;
   }
 
-  public ValidityMode validityMode() {
+  public ValidityMode getValidityMode() {
     return validityMode;
   }
 
@@ -194,7 +194,7 @@ public class CaEntry {
     this.validityMode = ParamUtil.requireNonNull("mode", mode);
   }
 
-  public int permission() {
+  public int getPermission() {
     return permission;
   }
 
@@ -202,11 +202,11 @@ public class CaEntry {
     this.permission = permission;
   }
 
-  public int expirationPeriod() {
+  public int getExpirationPeriod() {
     return expirationPeriod;
   }
 
-  public ConfPairs extraControl() {
+  public ConfPairs getExtraControl() {
     return extraControl;
   }
 
@@ -234,8 +234,8 @@ public class CaEntry {
       }
     }
 
-    return StringUtil.concatObjectsCap(500, "id: ", ident.id(), "\nname: ", ident.name(),
-        "\nstatus: ", (status == null ? "null" : status.status()),
+    return StringUtil.concatObjectsCap(500, "id: ", ident.getId(), "\nname: ", ident.getName(),
+        "\nstatus: ", (status == null ? "null" : status.getStatus()),
         "\nmaxValidity: ", maxValidity,
         "\nexpirationPeriod: ", expirationPeriod, " days",
         "\nsignerType: ", signerType,

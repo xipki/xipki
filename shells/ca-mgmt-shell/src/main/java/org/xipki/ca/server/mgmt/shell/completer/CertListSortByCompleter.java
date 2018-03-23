@@ -34,7 +34,7 @@ public class CertListSortByCompleter extends AbstractEnumCompleter {
     StringBuilder enums = new StringBuilder();
 
     for (CertListOrderBy sort : CertListOrderBy.values()) {
-      enums.append(sort.text()).append(",");
+      enums.append(sort.getText()).append(",");
     }
     enums.deleteCharAt(enums.length() - 1);
     setTokens(enums.toString());

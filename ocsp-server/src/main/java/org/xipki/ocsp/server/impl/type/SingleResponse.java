@@ -51,7 +51,7 @@ public class SingleResponse extends ASN1Type {
     this.nextUpdate = nextUpdate;
     this.extensions = extensions;
 
-    int len = certId.encodedLength();
+    int len = certId.getEncodedLength();
     len += certStatus.length;
     len += 17; // thisUpdate
     if (nextUpdate != null) {
@@ -60,7 +60,7 @@ public class SingleResponse extends ASN1Type {
     }
 
     if (extensions != null) {
-      len += getLen(extensions.encodedLength()); // explicit tag
+      len += getLen(extensions.getEncodedLength()); // explicit tag
     }
 
     this.bodyLength = len;
@@ -68,7 +68,7 @@ public class SingleResponse extends ASN1Type {
   }
 
   @Override
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encodedLength;
   }
 
@@ -85,7 +85,7 @@ public class SingleResponse extends ASN1Type {
     }
 
     if (extensions != null) {
-      idx += writeHeader((byte) 0xa1, extensions.encodedLength(), out, idx);
+      idx += writeHeader((byte) 0xa1, extensions.getEncodedLength(), out, idx);
       idx += extensions.write(out, idx);
     }
     return idx - offset;

@@ -49,22 +49,22 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
     }
 
     if (CaManager.NULL.equalsIgnoreCase(certFile)) {
-      if (cr.base64Cert() != null) {
+      if (cr.getBase64Cert() != null) {
         throw new CmdFailure("Cert: is configured but expected is none");
       }
     } else if (certFile != null) {
       byte[] ex = IoUtil.read(certFile);
-      if (cr.base64Cert() == null) {
+      if (cr.getBase64Cert() == null) {
         throw new CmdFailure("Cert: is not configured explicitly as expected");
       }
-      if (!Arrays.equals(ex, Base64.decode(cr.base64Cert()))) {
+      if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
         throw new CmdFailure("Cert: the expected one and the actual one differ");
       }
     }
 
     String signerConf = getSignerConf();
     if (signerConf != null) {
-      MgmtQaShellUtil.assertEquals("conf", signerConf, cr.conf());
+      MgmtQaShellUtil.assertEquals("conf", signerConf, cr.getConf());
     }
 
     println(" checked responder " + name);

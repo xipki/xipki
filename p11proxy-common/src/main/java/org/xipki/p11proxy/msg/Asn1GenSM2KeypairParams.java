@@ -61,9 +61,9 @@ public class Asn1GenSM2KeypairParams extends ASN1Object {
   private Asn1GenSM2KeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     Asn1Util.requireRange(seq, 3, 3);
     int idx = 0;
-    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
     label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
   }
 
   public static Asn1GenSM2KeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
@@ -93,15 +93,15 @@ public class Asn1GenSM2KeypairParams extends ASN1Object {
     return new DERSequence(vector);
   }
 
-  public P11SlotIdentifier slotId() {
+  public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public String label() {
+  public String getLabel() {
     return label;
   }
 
-  public P11NewKeyControl control() {
+  public P11NewKeyControl getControl() {
     return control;
   }
 

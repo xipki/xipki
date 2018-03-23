@@ -74,7 +74,7 @@ public class SubjectChecker {
     // collect subject attribute types to check
     Set<ASN1ObjectIdentifier> oids = new HashSet<>();
 
-    for (ASN1ObjectIdentifier oid : subjectControl.types()) {
+    for (ASN1ObjectIdentifier oid : subjectControl.getTypes()) {
       oids.add(oid);
     }
 
@@ -86,8 +86,8 @@ public class SubjectChecker {
 
     ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
     result.add(issue);
-    if (CollectionUtil.isNonEmpty(subjectControl.groups())) {
-      Set<String> groups = new HashSet<>(subjectControl.groups());
+    if (CollectionUtil.isNonEmpty(subjectControl.getGroups())) {
+      Set<String> groups = new HashSet<>(subjectControl.getGroups());
       for (String g : groups) {
         boolean toBreak = false;
         RDN rdn = null;
@@ -148,8 +148,8 @@ public class SubjectChecker {
 
     // control
     RdnControl rdnControl = subjectControl.getControl(type);
-    int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
-    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
+    int minOccurs = (rdnControl == null) ? 0 : rdnControl.getMinOccurs();
+    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.getMaxOccurs();
 
     RDN[] rdns = subject.getRDNs(type);
     int rdnsSize = (rdns == null) ? 0 : rdns.length;
@@ -175,7 +175,7 @@ public class SubjectChecker {
     // check the encoding
     StringType stringType = null;
     if (rdnControl != null) {
-      stringType = rdnControl.stringType();
+      stringType = rdnControl.getStringType();
     }
 
     List<String> requestedCoreAtvTextValues = new LinkedList<>();
@@ -185,9 +185,9 @@ public class SubjectChecker {
         requestedCoreAtvTextValues.add(textValue);
       }
 
-      if (rdnControl != null && rdnControl.patterns() != null) {
+      if (rdnControl != null && rdnControl.getPatterns() != null) {
         // sort the requestedRDNs
-        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.patterns());
+        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
       }
     }
 
@@ -249,7 +249,7 @@ public class SubjectChecker {
     // check the encoding
     StringType stringType = null;
     if (rdnControl != null) {
-      stringType = rdnControl.stringType();
+      stringType = rdnControl.getStringType();
     }
     List<String> requestedCoreAtvTextValues = new LinkedList<>();
     if (requestedRdns != null) {
@@ -258,9 +258,9 @@ public class SubjectChecker {
         requestedCoreAtvTextValues.add(textValue);
       }
 
-      if (rdnControl != null && rdnControl.patterns() != null) {
+      if (rdnControl != null && rdnControl.getPatterns() != null) {
         // sort the requestedRDNs
-        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.patterns());
+        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
       }
     }
 
@@ -280,8 +280,8 @@ public class SubjectChecker {
 
     final int atvsSize = atvs.size();
 
-    int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
-    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
+    int minOccurs = (rdnControl == null) ? 0 : rdnControl.getMinOccurs();
+    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.getMaxOccurs();
 
     if (atvsSize < minOccurs || atvsSize > maxOccurs) {
       issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize
@@ -320,7 +320,7 @@ public class SubjectChecker {
             "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
       }
     } else if (rdnControl != null) {
-      String prefix = rdnControl.prefix();
+      String prefix = rdnControl.getPrefix();
       if (prefix != null) {
         if (!tmpAtvTextValue.startsWith(prefix)) {
           failureMsg.append(name).append(" '").append(tmpAtvTextValue)
@@ -331,7 +331,7 @@ public class SubjectChecker {
         }
       }
 
-      String suffix = rdnControl.suffix();
+      String suffix = rdnControl.getSuffix();
       if (suffix != null) {
         if (!tmpAtvTextValue.endsWith(suffix)) {
           failureMsg.append(name).append(" '").append(tmpAtvTextValue)
@@ -343,7 +343,7 @@ public class SubjectChecker {
         }
       }
 
-      List<Pattern> patterns = rdnControl.patterns();
+      List<Pattern> patterns = rdnControl.getPatterns();
       if (patterns != null) {
         Pattern pattern = patterns.get(index);
         boolean matches = pattern.matcher(tmpAtvTextValue).matches();

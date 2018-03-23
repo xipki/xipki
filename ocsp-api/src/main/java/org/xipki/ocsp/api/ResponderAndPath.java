@@ -34,11 +34,11 @@ public class ResponderAndPath {
     this.responder = responder;
   }
 
-  public String servletPath() {
+  public String getServletPath() {
     return servletPath;
   }
 
-  public Responder responder() {
+  public Responder getResponder() {
     return responder;
   }
 

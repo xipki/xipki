@@ -93,7 +93,7 @@ public class OCSPRespBuilder {
     ResponseData responseData = new ResponseData(0,
         responderId, producedAt, list, responseExtensions);
 
-    byte[] tbs = new byte[responseData.encodedLength()];
+    byte[] tbs = new byte[responseData.getEncodedLength()];
     responseData.write(tbs, 0);
 
     ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
@@ -125,7 +125,7 @@ public class OCSPRespBuilder {
     // BasicOCSPResponse
     int basicResponseBodyLen = tbs.length + sigAlgId.length + signatureLen;
     if (taggedCertSequence != null) {
-      basicResponseBodyLen += taggedCertSequence.encodedLength();
+      basicResponseBodyLen += taggedCertSequence.getEncodedLength();
     }
     int basicResponseLen = getLen(basicResponseBodyLen);
 

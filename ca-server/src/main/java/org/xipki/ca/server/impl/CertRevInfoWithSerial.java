@@ -51,11 +51,11 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
     this.serial = ParamUtil.requireNonNull("serial", serial);
   }
 
-  public BigInteger serial() {
+  public BigInteger getSerial() {
     return serial;
   }
 
-  public long id() {
+  public long getId() {
     return id;
   }
 

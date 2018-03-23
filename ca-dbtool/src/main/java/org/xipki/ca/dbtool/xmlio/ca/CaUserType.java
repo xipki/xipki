@@ -52,7 +52,7 @@ public class CaUserType extends IdentifidDbObjectType {
 
   private String profiles;
 
-  public Integer caId() {
+  public Integer getCaId() {
     return caId;
   }
 
@@ -60,7 +60,7 @@ public class CaUserType extends IdentifidDbObjectType {
     this.caId = caId;
   }
 
-  public Integer uid() {
+  public Integer getUid() {
     return uid;
   }
 
@@ -68,7 +68,7 @@ public class CaUserType extends IdentifidDbObjectType {
     this.uid = uid;
   }
 
-  public Integer permission() {
+  public Integer getPermission() {
     return permission;
   }
 
@@ -76,7 +76,7 @@ public class CaUserType extends IdentifidDbObjectType {
     this.permission = permission;
   }
 
-  public String profiles() {
+  public String getProfiles() {
     return profiles;
   }
 
@@ -97,7 +97,7 @@ public class CaUserType extends IdentifidDbObjectType {
     validate();
 
     writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ID, getId());
     writeIfNotNull(writer, TAG_CA_ID, caId);
     writeIfNotNull(writer, TAG_UID, uid);
     writeIfNotNull(writer, TAG_PERMISSION, permission);

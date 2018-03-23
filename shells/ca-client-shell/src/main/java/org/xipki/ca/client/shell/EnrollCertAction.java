@@ -370,9 +370,9 @@ public abstract class EnrollCertAction extends ClientAction {
 
     X509Certificate cert = null;
     if (result != null) {
-      String id = result.allIds().iterator().next();
+      String id = result.getAllIds().iterator().next();
       CertOrError certOrError = result.getCertOrError(id);
-      cert = (X509Certificate) certOrError.certificate();
+      cert = (X509Certificate) certOrError.getCertificate();
     }
 
     if (cert == null) {

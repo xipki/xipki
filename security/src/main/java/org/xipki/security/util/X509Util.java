@@ -411,7 +411,7 @@ public class X509Util {
 
     int usage = 0;
     for (KeyUsage keyUsage : usages) {
-      usage |= keyUsage.bcUsage();
+      usage |= keyUsage.getBcUsage();
     }
 
     return new org.bouncycastle.asn1.x509.KeyUsage(usage);
@@ -457,8 +457,8 @@ public class X509Util {
   public static boolean hasKeyusage(X509Certificate cert, KeyUsage usage) {
     ParamUtil.requireNonNull("cert", cert);
     boolean[] keyusage = cert.getKeyUsage();
-    if (keyusage != null && keyusage.length > usage.bit()) {
-      return keyusage[usage.bit()];
+    if (keyusage != null && keyusage.length > usage.getBit()) {
+      return keyusage[usage.getBit()];
     }
     return false;
   }

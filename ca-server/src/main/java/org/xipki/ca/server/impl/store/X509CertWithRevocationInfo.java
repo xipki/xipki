@@ -38,7 +38,7 @@ public class X509CertWithRevocationInfo {
   public X509CertWithRevocationInfo() {
   }
 
-  public X509CertWithDbId cert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 
@@ -46,7 +46,7 @@ public class X509CertWithRevocationInfo {
     return revInfo != null;
   }
 
-  public CertRevocationInfo revInfo() {
+  public CertRevocationInfo getRevInfo() {
     return revInfo;
   }
 
@@ -58,7 +58,7 @@ public class X509CertWithRevocationInfo {
     this.revInfo = revInfo;
   }
 
-  public String certprofile() {
+  public String getCertprofile() {
     return certprofile;
   }
 
@@ -68,7 +68,7 @@ public class X509CertWithRevocationInfo {
 
   public CertWithStatusInfo toCertWithStatusInfo() {
     CertWithStatusInfo ret = new CertWithStatusInfo();
-    ret.setCert(cert.cert());
+    ret.setCert(cert.getCert());
     ret.setCertprofile(certprofile);
     ret.setRevocationInfo(revInfo);
     return ret;

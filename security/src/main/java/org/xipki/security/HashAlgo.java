@@ -100,15 +100,15 @@ public enum HashAlgo {
     }
   }
 
-  public int length() {
+  public int getLength() {
     return length;
   }
 
-  public AlgorithmCode algorithmCode() {
+  public AlgorithmCode getAlgorithmCode() {
     return algorithmCode;
   }
 
-  public ASN1ObjectIdentifier oid() {
+  public ASN1ObjectIdentifier getOid() {
     return oid;
   }
 
@@ -223,7 +223,7 @@ public enum HashAlgo {
     return null;
   }
 
-  public AlgorithmIdentifier algorithmIdentifier() {
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
     return algId;
   }
 
@@ -278,7 +278,7 @@ public enum HashAlgo {
     return HashCalculator.hash(this, data, offset, len);
   }
 
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encoded.length;
   }
 

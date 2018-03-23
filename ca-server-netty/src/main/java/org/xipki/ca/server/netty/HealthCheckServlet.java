@@ -85,9 +85,9 @@ public class HealthCheckServlet extends AbstractHttpServlet {
       String caName = null;
       X509CaCmpResponder responder = null;
 
-      if (servletUri.path().length() > 1) {
+      if (servletUri.getPath().length() > 1) {
         // skip the first char which is always '/'
-        String caAlias = servletUri.path().substring(1);
+        String caAlias = servletUri.getPath().substring(1);
         caName = responderManager.getCaNameForAlias(caAlias);
         if (caName == null) {
           caName = caAlias.toLowerCase();

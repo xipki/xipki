@@ -129,11 +129,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   protected abstract byte[] digestSecretKey0(long mechanism) throws P11TokenException;
 
-  public P11EntityIdentifier identityId() {
+  public P11EntityIdentifier getIdentityId() {
     return identityId;
   }
 
-  public X509Certificate certificate() {
+  public X509Certificate getCertificate() {
     return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
   }
 
@@ -142,7 +142,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         : Arrays.copyOf(certificateChain, certificateChain.length);
   }
 
-  public PublicKey publicKey() {
+  public PublicKey getPublicKey() {
     return publicKey;
   }
 
@@ -166,7 +166,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return identityId.match(slotId, keyLabel);
   }
 
-  public int signatureKeyBitLength() {
+  public int getSignatureKeyBitLength() {
     return signatureKeyBitLength;
   }
 

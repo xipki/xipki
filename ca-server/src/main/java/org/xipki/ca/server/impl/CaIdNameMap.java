@@ -47,75 +47,75 @@ public class CaIdNameMap {
   private final Map<String, NameId> nameCaMap = new HashMap<>();
 
   public void addCertprofile(NameId nameId) {
-    idCertprofileMap.put(nameId.id(), nameId);
-    nameCertprofileMap.put(nameId.name(), nameId);
+    idCertprofileMap.put(nameId.getId(), nameId);
+    nameCertprofileMap.put(nameId.getName(), nameId);
   }
 
   public void addPublisher(NameId nameId) {
-    idPublisherMap.put(nameId.id(), nameId);
-    namePublisherMap.put(nameId.name(), nameId);
+    idPublisherMap.put(nameId.getId(), nameId);
+    namePublisherMap.put(nameId.getName(), nameId);
   }
 
   public void addRequestor(NameId nameId) {
-    idRequestorMap.put(nameId.id(), nameId);
-    nameRequestorMap.put(nameId.name(), nameId);
+    idRequestorMap.put(nameId.getId(), nameId);
+    nameRequestorMap.put(nameId.getName(), nameId);
   }
 
   public void addCa(NameId nameId) {
-    idCaMap.put(nameId.id(), nameId);
-    nameCaMap.put(nameId.name(), nameId);
+    idCaMap.put(nameId.getId(), nameId);
+    nameCaMap.put(nameId.getName(), nameId);
   }
 
-  public NameId certprofile(int id) {
+  public NameId getCertprofile(int id) {
     return idCertprofileMap.get(id);
   }
 
-  public NameId certprofile(String name) {
+  public NameId getCertprofile(String name) {
     return nameCertprofileMap.get(name.toLowerCase());
   }
 
-  public NameId publisher(int id) {
+  public NameId getPublisher(int id) {
     return idPublisherMap.get(id);
   }
 
-  public NameId publisher(String name) {
+  public NameId getPublisher(String name) {
     return namePublisherMap.get(name.toLowerCase());
   }
 
-  public NameId requestor(int id) {
+  public NameId getRequestor(int id) {
     return idRequestorMap.get(id);
   }
 
-  public NameId requestor(String name) {
+  public NameId getRequestor(String name) {
     return nameRequestorMap.get(name.toLowerCase());
   }
 
-  public NameId ca(int id) {
+  public NameId getCa(int id) {
     return idCaMap.get(id);
   }
 
-  public NameId ca(String name) {
+  public NameId getCa(String name) {
     return nameCaMap.get(name.toLowerCase());
   }
 
-  public String certprofileName(int id) {
+  public String getCertprofileName(int id) {
     NameId nid = idCertprofileMap.get(id);
-    return (nid == null) ? null : nid.name();
+    return (nid == null) ? null : nid.getName();
   }
 
-  public String publisherName(int id) {
+  public String getPublisherName(int id) {
     NameId nid = idPublisherMap.get(id);
-    return (nid == null) ? null : nid.name();
+    return (nid == null) ? null : nid.getName();
   }
 
-  public String requestorName(int id) {
+  public String getRequestorName(int id) {
     NameId nid = idRequestorMap.get(id);
-    return (nid == null) ? null : nid.name();
+    return (nid == null) ? null : nid.getName();
   }
 
-  public String caName(int id) {
+  public String getCaName(int id) {
     NameId nid = idCaMap.get(id);
-    return (nid == null) ? null : nid.name();
+    return (nid == null) ? null : nid.getName();
   }
 
   public void clearCertprofile() {
@@ -141,7 +141,7 @@ public class CaIdNameMap {
   public NameId removeCertprofile(int id) {
     NameId ident = idCertprofileMap.remove(id);
     if (ident != null) {
-      nameCertprofileMap.remove(ident.name());
+      nameCertprofileMap.remove(ident.getName());
     }
     return ident;
   }
@@ -149,7 +149,7 @@ public class CaIdNameMap {
   public NameId removeCertprofile(String name) {
     NameId ident = nameCertprofileMap.remove(name.toLowerCase());
     if (ident != null) {
-      idCertprofileMap.remove(ident.id());
+      idCertprofileMap.remove(ident.getId());
     }
     return ident;
   }
@@ -157,7 +157,7 @@ public class CaIdNameMap {
   public NameId removePublisher(int id) {
     NameId ident = idPublisherMap.remove(id);
     if (ident != null) {
-      namePublisherMap.remove(ident.name());
+      namePublisherMap.remove(ident.getName());
     }
     return ident;
   }
@@ -165,7 +165,7 @@ public class CaIdNameMap {
   public NameId removePublisher(String name) {
     NameId ident = namePublisherMap.remove(name.toLowerCase());
     if (ident != null) {
-      idPublisherMap.remove(ident.id());
+      idPublisherMap.remove(ident.getId());
     }
     return ident;
   }
@@ -173,7 +173,7 @@ public class CaIdNameMap {
   public NameId removeRequestor(int id) {
     NameId ident = idRequestorMap.remove(id);
     if (ident != null) {
-      nameRequestorMap.remove(ident.name());
+      nameRequestorMap.remove(ident.getName());
     }
     return ident;
   }
@@ -181,7 +181,7 @@ public class CaIdNameMap {
   public NameId removeRequestor(String name) {
     NameId ident = nameRequestorMap.remove(name.toLowerCase());
     if (ident != null) {
-      idRequestorMap.remove(ident.id());
+      idRequestorMap.remove(ident.getId());
     }
     return ident;
   }
@@ -189,7 +189,7 @@ public class CaIdNameMap {
   public NameId removeCa(int id) {
     NameId ident = idCaMap.remove(id);
     if (ident != null) {
-      nameCaMap.remove(ident.name());
+      nameCaMap.remove(ident.getName());
     }
     return ident;
   }
@@ -197,7 +197,7 @@ public class CaIdNameMap {
   public NameId removeCa(String name) {
     NameId ident = nameCaMap.remove(name.toLowerCase());
     if (ident != null) {
-      idCaMap.remove(ident.id());
+      idCaMap.remove(ident.getId());
     }
     return ident;
   }

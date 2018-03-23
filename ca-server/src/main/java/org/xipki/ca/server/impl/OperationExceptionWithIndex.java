@@ -34,22 +34,22 @@ public class OperationExceptionWithIndex extends OperationException {
   private final int index;
 
   public OperationExceptionWithIndex(int index, OperationException underlying) {
-    super(underlying.errorCode());
+    super(underlying.getErrorCode());
     this.index = index;
     this.underlying = underlying;
   }
 
   @Override
-  public ErrorCode errorCode() {
-    return underlying.errorCode();
+  public ErrorCode getErrorCode() {
+    return underlying.getErrorCode();
   }
 
   @Override
-  public String errorMessage() {
-    return underlying.errorMessage();
+  public String getErrorMessage() {
+    return underlying.getErrorMessage();
   }
 
-  public int index() {
+  public int getIndex() {
     return index;
   }
 

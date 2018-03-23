@@ -142,7 +142,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public AlgorithmCode algorithmCode() {
+  public AlgorithmCode getAlgorithmCode() {
     return algorithmCode;
   }
 

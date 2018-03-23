@@ -92,10 +92,10 @@ class TargetDigestRetriever {
         }
 
         try {
-          Map<BigInteger, DigestEntry> refCerts = bundle.certs();
+          Map<BigInteger, DigestEntry> refCerts = bundle.getCerts();
           Map<BigInteger, DigestEntry> resp = query(bundle);
 
-          List<BigInteger> serialNumbers = bundle.serialNumbers();
+          List<BigInteger> serialNumbers = bundle.getSerialNumbers();
           int size = serialNumbers.size();
 
           for (BigInteger serialNumber : serialNumbers) {
@@ -133,9 +133,9 @@ class TargetDigestRetriever {
     } // method run
 
     private Map<BigInteger, DigestEntry> query(CertsBundle bundle) throws DataAccessException {
-      List<BigInteger> serialNumbers = bundle.serialNumbers();
+      List<BigInteger> serialNumbers = bundle.getSerialNumbers();
       int size = serialNumbers.size();
-      boolean batchSupported = datasource.databaseType() != DatabaseType.H2;
+      boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
 
       return (batchSupported && size == numPerSelect)
         ? getCertsViaInArraySelectInB(inArraySelectStmt, serialNumbers)

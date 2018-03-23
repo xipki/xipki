@@ -30,7 +30,7 @@ import java.util.Date;
 // CHECKSTYLE:SKIP
 public abstract class ASN1Type {
 
-  public abstract int encodedLength();
+  public abstract int getEncodedLength();
 
   public abstract int write(byte[] out, int offset);
 

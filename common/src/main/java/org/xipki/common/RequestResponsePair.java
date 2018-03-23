@@ -29,7 +29,7 @@ public class RequestResponsePair {
 
   private byte[] response;
 
-  public byte[] request() {
+  public byte[] getRequest() {
     return request;
   }
 
@@ -37,7 +37,7 @@ public class RequestResponsePair {
     this.request = request;
   }
 
-  public byte[] response() {
+  public byte[] getResponse() {
     return response;
   }
 

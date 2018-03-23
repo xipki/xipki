@@ -40,15 +40,15 @@ public class BigIntegerRange {
     this.diff = to.subtract(from);
   }
 
-  public BigInteger from() {
+  public BigInteger getFrom() {
     return from;
   }
 
-  public BigInteger to() {
+  public BigInteger getTo() {
     return to;
   }
 
-  public BigInteger diff() {
+  public BigInteger getDiff() {
     return diff;
   }
 

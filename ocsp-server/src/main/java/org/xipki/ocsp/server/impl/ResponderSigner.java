@@ -48,13 +48,13 @@ class ResponderSigner {
 
   private final List<ConcurrentContentSigner> signers;
 
-  private final TaggedCertSequence sequenceOfCertificate;
+  private final TaggedCertSequence sequenceOfCert;
 
-  private final X509Certificate certificate;
+  private final X509Certificate cert;
 
-  private final TaggedCertSequence sequenceOfCertificateChain;
+  private final TaggedCertSequence sequenceOfCertChain;
 
-  private final X509Certificate[] certificateChain;
+  private final X509Certificate[] certChain;
 
   private final ResponderID responderIdByName;
 
@@ -69,41 +69,41 @@ class ResponderSigner {
 
     if (this.macSigner) {
       this.responderIdByName = null;
-      this.certificate = null;
-      this.certificateChain = null;
-      this.sequenceOfCertificate = null;
-      this.sequenceOfCertificateChain = null;
+      this.cert = null;
+      this.certChain = null;
+      this.sequenceOfCert = null;
+      this.sequenceOfCertChain = null;
 
       byte[] keySha1 = firstSigner.getSha1OfMacKey();
       this.responderIdByKey = new ResponderID(keySha1);
     } else {
-      X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();
-      if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
+      X509Certificate[] tmpCertChain = firstSigner.getCertificateChain();
+      if (tmpCertChain == null || tmpCertChain.length == 0) {
         throw new CertificateException("no certificate is bound with the signer");
       }
-      int len = tmpCertificateChain.length;
+      int len = tmpCertChain.length;
       if (len > 1) {
-        X509Certificate cert = tmpCertificateChain[len - 1];
+        X509Certificate cert = tmpCertChain[len - 1];
         if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
           len--;
         }
       }
-      this.certificateChain = new X509Certificate[len];
-      System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
+      this.certChain = new X509Certificate[len];
+      System.arraycopy(tmpCertChain, 0, this.certChain, 0, len);
 
-      this.certificate = certificateChain[0];
+      this.cert = certChain[0];
 
-      byte[] encodedCertificate = this.certificate.getEncoded();
-      this.sequenceOfCertificate = new TaggedCertSequence(encodedCertificate);
+      byte[] encodedCert = this.cert.getEncoded();
+      this.sequenceOfCert = new TaggedCertSequence(encodedCert);
 
-      byte[][] encodedCertificateChain = new byte[this.certificateChain.length][];
-      encodedCertificateChain[0] = encodedCertificate;
-      for (int i = 1; i < certificateChain.length; i++) {
-        encodedCertificateChain[i] = this.certificateChain[i].getEncoded();
+      byte[][] encodedCertChain = new byte[this.certChain.length][];
+      encodedCertChain[0] = encodedCert;
+      for (int i = 1; i < certChain.length; i++) {
+        encodedCertChain[i] = this.certChain[i].getEncoded();
       }
-      this.sequenceOfCertificateChain = new TaggedCertSequence(encodedCertificateChain);
+      this.sequenceOfCertChain = new TaggedCertSequence(encodedCertChain);
 
-      Certificate bcCertificate = Certificate.getInstance(encodedCertificate);
+      Certificate bcCertificate = Certificate.getInstance(encodedCert);
       this.responderIdByName = new ResponderID(bcCertificate.getSubject());
       byte[] keySha1 = HashAlgo.SHA1.hash(
           bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
@@ -121,7 +121,7 @@ class ResponderSigner {
     return macSigner;
   }
 
-  public ConcurrentContentSigner firstSigner() {
+  public ConcurrentContentSigner getFirstSigner() {
     return signers.get(0);
   }
 
@@ -144,20 +144,20 @@ class ResponderSigner {
     return byName ? responderIdByName :  responderIdByKey;
   }
 
-  public X509Certificate certificate() {
-    return certificate;
+  public X509Certificate getCert() {
+    return cert;
   }
 
-  public X509Certificate[] certificateChain() {
-    return certificateChain;
+  public X509Certificate[] getCertChain() {
+    return certChain;
   }
 
-  public TaggedCertSequence sequenceOfCertificate() {
-    return sequenceOfCertificate;
+  public TaggedCertSequence getSequenceOfCert() {
+    return sequenceOfCert;
   }
 
-  public TaggedCertSequence sequenceOfCertificateChain() {
-    return sequenceOfCertificateChain;
+  public TaggedCertSequence getSequenceOfCertChain() {
+    return sequenceOfCertChain;
   }
 
   public boolean isHealthy() {

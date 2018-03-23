@@ -46,11 +46,11 @@ public class IssuerSerialEntry extends ResultEntry {
     this.issuer = ParamUtil.requireNonNull("issuer", issuer);
   }
 
-  public X500Name issuer() {
+  public X500Name getIssuer() {
     return issuer;
   }
 
-  public BigInteger serialNumber() {
+  public BigInteger getSerialNumber() {
     return serialNumber;
   }
 

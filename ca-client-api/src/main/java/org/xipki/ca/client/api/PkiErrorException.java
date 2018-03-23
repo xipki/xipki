@@ -57,15 +57,15 @@ public class PkiErrorException extends Exception {
     this.statusMessage = null;
   }
 
-  public int status() {
+  public int getStatus() {
     return status;
   }
 
-  public int pkiFailureInfo() {
+  public int getPkiFailureInfo() {
     return pkiFailureInfo;
   }
 
-  public String statusMessage() {
+  public String getStatusMessage() {
     return statusMessage;
   }
 

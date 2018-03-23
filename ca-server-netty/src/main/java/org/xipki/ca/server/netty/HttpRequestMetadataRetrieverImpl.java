@@ -57,7 +57,7 @@ class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
 
   @Override
   public String getParameter(String paramName) {
-    return servletUri.parameter(paramName);
+    return servletUri.getParameter(paramName);
   }
 
   @Override

@@ -114,7 +114,7 @@ public class CrlInfo {
     return pairs.getEncoded();
   }
 
-  public BigInteger crlNumber() {
+  public BigInteger getCrlNumber() {
     return crlNumber;
   }
 
@@ -122,7 +122,7 @@ public class CrlInfo {
     this.crlNumber = ParamUtil.requireNonNull("crlNumber", crlNumber);
   }
 
-  public BigInteger baseCrlNumber() {
+  public BigInteger getBaseCrlNumber() {
     return baseCrlNumber;
   }
 
@@ -130,7 +130,7 @@ public class CrlInfo {
     this.baseCrlNumber = baseCrlNumber;
   }
 
-  public Date thisUpdate() {
+  public Date getThisUpdate() {
     return thisUpdate;
   }
 
@@ -138,7 +138,7 @@ public class CrlInfo {
     this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
   }
 
-  public Date nextUpdate() {
+  public Date getNextUpdate() {
     return nextUpdate;
   }
 
@@ -154,7 +154,7 @@ public class CrlInfo {
     this.useCrlUpdates = useCrlUpdates;
   }
 
-  public CrlID crlId() {
+  public CrlID getCrlId() {
     return crlId;
   }
 

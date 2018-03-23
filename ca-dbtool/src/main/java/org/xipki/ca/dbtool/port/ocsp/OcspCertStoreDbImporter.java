@@ -225,10 +225,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     OcspDbEntryType type = OcspDbEntryType.CERT;
 
     DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
-        baseDir + File.separator + type.dirName() + ".mf");
+        baseDir + File.separator + type.getDirName() + ".mf");
     try {
       while (certsFileIterator.hasNext()) {
-        String certsFile = baseDir + File.separator + type.dirName() + File.separator
+        String certsFile = baseDir + File.separator + type.getDirName() + File.separator
             + certsFileIterator.next();
 
         // extract the toId from the filename
@@ -301,7 +301,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
         OcspCertType cert = (OcspCertType) certs.next();
 
-        long id = cert.id();
+        long id = cert.getId();
         if (id < minId) {
           continue;
         }
@@ -312,18 +312,18 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         try {
           int idx = 1;
           psCert.setLong(idx++, id);
-          psCert.setInt(idx++, cert.iid());
-          psCert.setString(idx++, cert.sn());
-          psCert.setLong(idx++, cert.update());
-          psCert.setLong(idx++, cert.nbefore());
-          psCert.setLong(idx++, cert.nafter());
-          setBoolean(psCert, idx++, cert.rev().booleanValue());
-          setInt(psCert, idx++, cert.rr());
-          setLong(psCert, idx++, cert.rt());
-          setLong(psCert, idx++, cert.rit());
-          psCert.setString(idx++, cert.profile());
-          psCert.setString(idx++, cert.hash());
-          psCert.setString(idx++, cert.subject());
+          psCert.setInt(idx++, cert.getIid());
+          psCert.setString(idx++, cert.getSn());
+          psCert.setLong(idx++, cert.getUpdate());
+          psCert.setLong(idx++, cert.getNbefore());
+          psCert.setLong(idx++, cert.getNafter());
+          setBoolean(psCert, idx++, cert.getRev().booleanValue());
+          setInt(psCert, idx++, cert.getRr());
+          setLong(psCert, idx++, cert.getRt());
+          setLong(psCert, idx++, cert.getRit());
+          psCert.setString(idx++, cert.getProfile());
+          psCert.setString(idx++, cert.getHash());
+          psCert.setString(idx++, cert.getSubject());
           psCert.addBatch();
         } catch (SQLException ex) {
           throw translate(SQL_ADD_CERT, ex);

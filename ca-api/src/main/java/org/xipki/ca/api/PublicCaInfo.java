@@ -57,9 +57,9 @@ public class PublicCaInfo {
 
   private final BigInteger serialNumber;
 
-  private final X509Cert caCertificate;
+  private final X509Cert caCert;
 
-  private X509Certificate crlSignerCertificate;
+  private X509Certificate crlSignerCert;
 
   private final List<String> caCertUris;
 
@@ -71,18 +71,18 @@ public class PublicCaInfo {
 
   private final ConfPairs extraControl;
 
-  public PublicCaInfo(X509Certificate caCertificate, List<String> caCertUris, List<String> ocspUris,
+  public PublicCaInfo(X509Certificate caCert, List<String> caCertUris, List<String> ocspUris,
       List<String> crlUris, List<String> deltaCrlUris, ConfPairs extraControl)
       throws OperationException {
-    ParamUtil.requireNonNull("caCertificate", caCertificate);
+    ParamUtil.requireNonNull("caCert", caCert);
 
-    this.caCertificate = new X509Cert(caCertificate);
-    this.serialNumber = caCertificate.getSerialNumber();
-    this.subject = caCertificate.getSubjectX500Principal();
+    this.caCert = new X509Cert(caCert);
+    this.serialNumber = caCert.getSerialNumber();
+    this.subject = caCert.getSubjectX500Principal();
     this.x500Subject = X500Name.getInstance(subject.getEncoded());
     this.c14nSubject = X509Util.canonicalizName(x500Subject);
     try {
-      this.subjectKeyIdentifier = X509Util.extractSki(caCertificate);
+      this.subjectKeyIdentifier = X509Util.extractSki(caCert);
     } catch (CertificateEncodingException ex) {
       throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
     }
@@ -92,7 +92,7 @@ public class PublicCaInfo {
     this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
     this.extraControl = extraControl;
 
-    byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
+    byte[] encodedSubjectAltName = caCert.getExtensionValue(
         Extension.subjectAlternativeName.getId());
     if (encodedSubjectAltName == null) {
       subjectAltName = null;
@@ -114,7 +114,7 @@ public class PublicCaInfo {
     this.x500Subject = ParamUtil.requireNonNull("subject", subject);
     this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    this.caCertificate = null;
+    this.caCert = null;
     this.c14nSubject = X509Util.canonicalizName(subject);
     try {
       this.subject = new X500Principal(subject.getEncoded());
@@ -134,64 +134,64 @@ public class PublicCaInfo {
     this.extraControl = extraControl;
   } // constructor
 
-  public List<String> caCertUris() {
+  public List<String> getCaCertUris() {
     return caCertUris;
   }
 
-  public List<String> ocspUris() {
+  public List<String> getOcspUris() {
     return ocspUris;
   }
 
-  public List<String> crlUris() {
+  public List<String> getCrlUris() {
     return crlUris;
   }
 
-  public List<String> deltaCrlUris() {
+  public List<String> getDeltaCrlUris() {
     return deltaCrlUris;
   }
 
-  public X509Certificate crlSignerCertificate() {
-    return crlSignerCertificate;
+  public X509Certificate getCrlSignerCert() {
+    return crlSignerCert;
   }
 
-  public void setCrlSignerCertificate(X509Certificate crlSignerCert) {
-    this.crlSignerCertificate = caCertificate.cert().equals(crlSignerCert) ? null : crlSignerCert;
+  public void setCrlSignerCert(X509Certificate crlSignerCert) {
+    this.crlSignerCert = caCert.getCert().equals(crlSignerCert) ? null : crlSignerCert;
   }
 
-  public X500Principal subject() {
+  public X500Principal getSubject() {
     return subject;
   }
 
-  public X500Name x500Subject() {
+  public X500Name getX500Subject() {
     return x500Subject;
   }
 
-  public String c14nSubject() {
+  public String getC14nSubject() {
     return c14nSubject;
   }
 
-  public GeneralNames subjectAltName() {
+  public GeneralNames getSubjectAltName() {
     return subjectAltName;
   }
 
-  public byte[] subjectKeyIdentifer() {
-    if (caCertificate != null) {
-      return caCertificate.subjectKeyIdentifier();
+  public byte[] getSubjectKeyIdentifer() {
+    if (caCert != null) {
+      return caCert.getSubjectKeyIdentifier();
     } else {
       return (subjectKeyIdentifier == null) ? null
           : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
     }
   }
 
-  public BigInteger serialNumber() {
+  public BigInteger getSerialNumber() {
     return serialNumber;
   }
 
-  public X509Cert caCertificate() {
-    return caCertificate;
+  public X509Cert getCaCert() {
+    return caCert;
   }
 
-  public ConfPairs extraControl() {
+  public ConfPairs getExtraControl() {
     return extraControl;
   }
 

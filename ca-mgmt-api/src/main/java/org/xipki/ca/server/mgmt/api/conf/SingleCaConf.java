@@ -56,7 +56,7 @@ public class SingleCaConf {
       }
 
       if (caEntry instanceof X509CaEntry) {
-        if (((X509CaEntry) caEntry).certificate() != null) {
+        if (((X509CaEntry) caEntry).getCert() != null) {
           throw new IllegalArgumentException(
               "caEntry.cert must not be null if genSelfIssued is non-null");
         }
@@ -71,31 +71,31 @@ public class SingleCaConf {
     this.publisherNames = publisherNames;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public CaEntry caEntry() {
+  public CaEntry getCaEntry() {
     return caEntry;
   }
 
-  public List<String> aliases() {
+  public List<String> getAliases() {
     return aliases;
   }
 
-  public GenSelfIssued genSelfIssued() {
+  public GenSelfIssued getGenSelfIssued() {
     return genSelfIssued;
   }
 
-  public List<String> profileNames() {
+  public List<String> getProfileNames() {
     return profileNames;
   }
 
-  public List<CaHasRequestorEntry> requestors() {
+  public List<CaHasRequestorEntry> getRequestors() {
     return requestors;
   }
 
-  public List<String> publisherNames() {
+  public List<String> getPublisherNames() {
     return publisherNames;
   }
 

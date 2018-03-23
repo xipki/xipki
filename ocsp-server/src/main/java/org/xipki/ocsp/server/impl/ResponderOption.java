@@ -81,31 +81,31 @@ class ResponderOption {
     this.servletPaths = Collections.unmodifiableList(list);
   } // constructor
 
-  public OcspMode mode() {
+  public OcspMode getMode() {
     return mode;
   }
 
-  public boolean inheritCaRevocation() {
+  public boolean isInheritCaRevocation() {
     return inheritCaRevocation;
   }
 
-  public String signerName() {
+  public String getSignerName() {
     return signerName;
   }
 
-  public String requestOptionName() {
+  public String getRequestOptionName() {
     return requestOptionName;
   }
 
-  public String responseOptionName() {
+  public String getResponseOptionName() {
     return responseOptionName;
   }
 
-  public List<String> storeNames() {
+  public List<String> getStoreNames() {
     return storeNames;
   }
 
-  public List<String> servletPaths() {
+  public List<String> getServletPaths() {
     return servletPaths;
   }
 

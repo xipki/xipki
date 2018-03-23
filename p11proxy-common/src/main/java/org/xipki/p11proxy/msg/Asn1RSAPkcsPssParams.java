@@ -81,13 +81,13 @@ public class Asn1RSAPkcsPssParams extends ASN1Object {
   @Override
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    vector.add(new ASN1Integer(pkcsPssParams.hashAlgorithm()));
-    vector.add(new ASN1Integer(pkcsPssParams.maskGenerationFunction()));
-    vector.add(new ASN1Integer(pkcsPssParams.saltLength()));
+    vector.add(new ASN1Integer(pkcsPssParams.getHashAlgorithm()));
+    vector.add(new ASN1Integer(pkcsPssParams.getMaskGenerationFunction()));
+    vector.add(new ASN1Integer(pkcsPssParams.getSaltLength()));
     return new DERSequence(vector);
   }
 
-  public P11RSAPkcsPssParams pkcsPssParams() {
+  public P11RSAPkcsPssParams getPkcsPssParams() {
     return pkcsPssParams;
   }
 

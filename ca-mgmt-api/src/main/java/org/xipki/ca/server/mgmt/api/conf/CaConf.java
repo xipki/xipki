@@ -389,7 +389,7 @@ public class CaConf {
               caCert = signer.getCertificate();
             }
 
-            caEntry.setCertificate(caCert);
+            caEntry.setCert(caCert);
           }
         }
 
@@ -438,7 +438,7 @@ public class CaConf {
 
   public void addCmpControl(CmpControlEntry cmpControl) {
     ParamUtil.requireNonNull("cmpControl", cmpControl);
-    this.cmpControls.put(cmpControl.name(), cmpControl);
+    this.cmpControls.put(cmpControl.getName(), cmpControl);
   }
 
   public Set<String> getCmpControlNames() {
@@ -451,7 +451,7 @@ public class CaConf {
 
   public void addResponder(CmpResponderEntry responder) {
     ParamUtil.requireNonNull("responder", responder);
-    this.responders.put(responder.name(), responder);
+    this.responders.put(responder.getName(), responder);
   }
 
   public Set<String> getResponderNames() {
@@ -478,7 +478,7 @@ public class CaConf {
 
   public void addCrlSigner(X509CrlSignerEntry crlSigner) {
     ParamUtil.requireNonNull("crlSigner", crlSigner);
-    this.crlSigners.put(crlSigner.name(), crlSigner);
+    this.crlSigners.put(crlSigner.getName(), crlSigner);
   }
 
   public Set<String> getCrlSignerNames() {
@@ -491,7 +491,7 @@ public class CaConf {
 
   public void addRequestor(CmpRequestorEntry requestor) {
     ParamUtil.requireNonNull("requestor", requestor);
-    this.requestors.put(requestor.ident().name(), requestor);
+    this.requestors.put(requestor.getIdent().getName(), requestor);
   }
 
   public Set<String> getRequestorNames() {
@@ -504,7 +504,7 @@ public class CaConf {
 
   public void addPublisher(PublisherEntry publisher) {
     ParamUtil.requireNonNull("publisher", publisher);
-    this.publishers.put(publisher.ident().name(), publisher);
+    this.publishers.put(publisher.getIdent().getName(), publisher);
   }
 
   public Set<String> getPublisherNames() {
@@ -517,7 +517,7 @@ public class CaConf {
 
   public void addProfile(CertprofileEntry profile) {
     ParamUtil.requireNonNull("profile", profile);
-    this.certprofiles.put(profile.ident().name(), profile);
+    this.certprofiles.put(profile.getIdent().getName(), profile);
   }
 
   public Set<String> getCertProfileNames() {
@@ -530,7 +530,7 @@ public class CaConf {
 
   public void addSingleCa(SingleCaConf singleCa) {
     ParamUtil.requireNonNull("singleCa", singleCa);
-    this.cas.put(singleCa.name(), singleCa);
+    this.cas.put(singleCa.getName(), singleCa);
   }
 
   public Set<String> getCaNames() {
@@ -543,7 +543,7 @@ public class CaConf {
 
   public void addScep(ScepEntry scep) {
     ParamUtil.requireNonNull("scep", scep);
-    this.sceps.put(scep.name(), scep);
+    this.sceps.put(scep.getName(), scep);
   }
 
   public Set<String> getScepNames() {

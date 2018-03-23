@@ -38,7 +38,7 @@ public class Extensions extends ASN1Type {
   public Extensions(List<Extension> extensions) {
     int len = 0;
     for (Extension m : extensions) {
-      len += m.encodedLength();
+      len += m.getEncodedLength();
     }
 
     this.bodyLen = len;
@@ -47,7 +47,7 @@ public class Extensions extends ASN1Type {
   }
 
   @Override
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encodedLen;
   }
 

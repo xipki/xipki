@@ -52,23 +52,23 @@ public class LiquibaseDatabaseConf {
     this.schema = schema;
   }
 
-  public String driver() {
+  public String getDriver() {
     return driver;
   }
 
-  public String username() {
+  public String getUsername() {
     return username;
   }
 
-  public String password() {
+  public String getPassword() {
     return password;
   }
 
-  public String url() {
+  public String getUrl() {
     return url;
   }
 
-  public String schema() {
+  public String getSchema() {
     return schema;
   }
 

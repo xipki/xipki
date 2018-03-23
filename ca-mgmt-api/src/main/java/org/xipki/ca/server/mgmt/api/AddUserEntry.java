@@ -41,21 +41,21 @@ public class AddUserEntry {
     this.password = ParamUtil.requireNonBlank("password", password);
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public boolean active() {
+  public boolean isActive() {
     return active;
   }
 
-  public String password() {
+  public String getPassword() {
     return password;
   }
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+    return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nactive: ", active, "\npassword: ", password, "\n");
   }
 

@@ -60,7 +60,7 @@ class DigestEntry {
     this.revInvTime = revInvTime;
   }
 
-  public BigInteger serialNumber() {
+  public BigInteger getSerialNumber() {
     return serialNumber;
   }
 
@@ -68,19 +68,19 @@ class DigestEntry {
     return revoked;
   }
 
-  public int revReason() {
+  public int getRevReason() {
     return revReason;
   }
 
-  public Long revTime() {
+  public Long getRevTime() {
     return revTime;
   }
 
-  public Long revInvTime() {
+  public Long getRevInvTime() {
     return revInvTime;
   }
 
-  public String base64HashValue() {
+  public String getBase64HashValue() {
     return base64HashValue;
   }
 

@@ -50,7 +50,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     this.idHex = Hex.encode(id);
   }
 
-  public byte[] id() {
+  public byte[] getId() {
     return id;
   }
 
@@ -58,15 +58,15 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     return Arrays.equals(id, this.id);
   }
 
-  public String idHex() {
+  public String getIdHex() {
     return idHex;
   }
 
-  public String label() {
+  public String getLabel() {
     return label;
   }
 
-  public char[] labelChars() {
+  public char[] getLabelChars() {
     return label.toCharArray();
   }
 

@@ -111,7 +111,7 @@ abstract class CmpRequestor {
     X500Name x500Name = X500Name.getInstance(requestorCert.getSubjectX500Principal().getEncoded());
     this.sender = new GeneralName(x500Name);
 
-    X500Name subject = X500Name.getInstance(responder.cert().getSubjectX500Principal()
+    X500Name subject = X500Name.getInstance(responder.getCert().getSubjectX500Principal()
         .getEncoded());
     this.recipient = new GeneralName(subject);
     this.recipientName = subject;
@@ -130,7 +130,7 @@ abstract class CmpRequestor {
         .getEncoded());
     this.sender = new GeneralName(x500Name);
 
-    X500Name subject = X500Name.getInstance(responder.cert().getSubjectX500Principal()
+    X500Name subject = X500Name.getInstance(responder.getCert().getSubjectX500Principal()
         .getEncoded());
     this.recipient = new GeneralName(subject);
     this.recipientName = subject;
@@ -252,7 +252,7 @@ abstract class CmpRequestor {
       checkProtection(response);
     }
 
-    PKIBody respBody = response.pkiMessage().getBody();
+    PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();
 
     if (PKIBody.TYPE_ERROR == bodyType) {
@@ -430,7 +430,7 @@ abstract class CmpRequestor {
     }
 
     AlgorithmIdentifier protectionAlgo = protectedMsg.getHeader().getProtectionAlg();
-    if (!responder.sigAlgoValidator().isAlgorithmPermitted(protectionAlgo)) {
+    if (!responder.getSigAlgoValidator().isAlgorithmPermitted(protectionAlgo)) {
       String algoName;
       try {
         algoName = AlgorithmUtil.getSignatureAlgoName(protectionAlgo);
@@ -441,7 +441,7 @@ abstract class CmpRequestor {
       return new ProtectionVerificationResult(null, ProtectionResult.INVALID);
     }
 
-    X509Certificate cert = responder.cert();
+    X509Certificate cert = responder.getCert();
     ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(cert);
     if (verifierProvider == null) {
       LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
@@ -490,10 +490,10 @@ abstract class CmpRequestor {
     }
 
     ProtectionVerificationResult protectionVerificationResult =
-        response.protectionVerificationResult();
+        response.getProtectionVerificationResult();
 
     if (protectionVerificationResult == null
-        || protectionVerificationResult.protectionResult() != ProtectionResult.VALID) {
+        || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID) {
       throw new PkiErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
           PKIFailureInfo.badMessageCheck, "message check of the response failed");
     }

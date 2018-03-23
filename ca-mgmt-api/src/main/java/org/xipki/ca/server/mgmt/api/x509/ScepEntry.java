@@ -57,7 +57,7 @@ public class ScepEntry {
 
   private String responderConf;
 
-  private X509Certificate certificate;
+  private X509Certificate cert;
 
   private boolean certFaulty;
 
@@ -78,40 +78,40 @@ public class ScepEntry {
 
     if (this.base64Cert != null) {
       try {
-        this.certificate = X509Util.parseBase64EncodedCert(base64Cert);
+        this.cert = X509Util.parseBase64EncodedCert(base64Cert);
       } catch (Throwable th) {
-        LOG.debug("could not parse the certificate of SCEP responder for CA '"
+        LOG.debug("could not parse the cert of SCEP responder for CA '"
             + caIdent + "'");
         certFaulty = true;
       }
     }
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public boolean active() {
+  public boolean isActive() {
     return active;
   }
 
-  public X509Certificate certificate() {
-    return certificate;
+  public X509Certificate getCert() {
+    return cert;
   }
 
-  public String base64Cert() {
+  public String getBase64Cert() {
     return base64Cert;
   }
 
-  public Set<String> certProfiles() {
+  public Set<String> getCertProfiles() {
     return certProfiles;
   }
 
-  public String control() {
+  public String getControl() {
     return control;
   }
 
-  public String responderType() {
+  public String getResponderType() {
     return responderType;
   }
 
@@ -119,11 +119,11 @@ public class ScepEntry {
     this.responderConf = conf;
   }
 
-  public String responderConf() {
+  public String getResponderConf() {
     return responderConf;
   }
 
-  public boolean faulty() {
+  public boolean isFaulty() {
     return certFaulty || confFaulty;
   }
 
@@ -131,15 +131,15 @@ public class ScepEntry {
     this.confFaulty = faulty;
   }
 
-  public NameId caIdent() {
+  public NameId getCaIdent() {
     return caIdent;
   }
 
-  public void setCertificate(X509Certificate certificate) {
+  public void setCert(X509Certificate cert) {
     if (base64Cert != null) {
-      throw new IllegalStateException("certificate is already by specified by base64Cert");
+      throw new IllegalStateException("cert is already specified by base64Cert");
     }
-    this.certificate = certificate;
+    this.cert = cert;
   }
 
   @Override
@@ -153,11 +153,11 @@ public class ScepEntry {
 
   public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
     return StringUtil.concatObjects("ca: ", caIdent, "\nactive: ", active,
-        "\nfaulty: ", faulty(), "\nresponderType: ", responderType,
+        "\nfaulty: ", isFaulty(), "\nresponderType: ", responderType,
         "\nresponderConf: ", (responderConf == null ? "null"
             : SignerConf.toString(responderConf, verbose, ignoreSensitiveInfo)),
         "\ncontrol: ", control,
-        "\ncert\n", InternUtil.formatCert(certificate, verbose));
+        "\ncert\n", InternUtil.formatCert(cert, verbose));
   } // method toString
 
   @Override

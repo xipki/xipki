@@ -48,9 +48,9 @@ class CertBasedIdentityStore {
     ParamUtil.requireNonNull("entry", entry);
 
     for (CertBasedIdentityEntry existingEntry : entries) {
-      if (existingEntry.id() == entry.id()) {
+      if (existingEntry.getId() == entry.getId()) {
         throw new IllegalArgumentException(String.format(
-            "%s with the same id %d already available", table, entry.id()));
+            "%s with the same id %d already available", table, entry.getId()));
       }
     }
 
@@ -59,8 +59,8 @@ class CertBasedIdentityStore {
 
   Integer getCaIdForSubject(String subject) {
     for (CertBasedIdentityEntry entry : entries) {
-      if (entry.subject().equals(subject)) {
-        return entry.id();
+      if (entry.getSubject().equals(subject)) {
+        return entry.getId();
       }
     }
 
@@ -70,7 +70,7 @@ class CertBasedIdentityStore {
   Integer getCaIdForSha1Fp(byte[] sha1FpCert) {
     for (CertBasedIdentityEntry entry : entries) {
       if (entry.matchSha1Fp(sha1FpCert)) {
-        return entry.id();
+        return entry.getId();
       }
     }
 
@@ -80,14 +80,14 @@ class CertBasedIdentityStore {
   Integer getCaIdForCert(byte[] encodedCert) {
     for (CertBasedIdentityEntry entry : entries) {
       if (entry.matchCert(encodedCert)) {
-        return entry.id();
+        return entry.getId();
       }
     }
 
     return null;
   }
 
-  String table() {
+  String getTable() {
     return table;
   }
 

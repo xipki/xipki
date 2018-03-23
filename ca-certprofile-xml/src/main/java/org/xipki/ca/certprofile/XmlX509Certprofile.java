@@ -541,7 +541,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
           GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(attrType);
           boolean allowed = false;
           for (GeneralNameMode m : subjectAltNameModes) {
-            if (m.tag() == nameTag) {
+            if (m.getTag() == nameTag) {
               allowed = true;
               break;
             }
@@ -1001,10 +1001,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (QcStatementOption m : qcStatementsOption) {
-      if (m.statement() == null) {
+      if (m.getStatement() == null) {
         throw new RuntimeException("should not reach here");
       }
-      vec.add(m.statement());
+      vec.add(m.getStatement());
     }
     ASN1Sequence seq = new DERSequence(vec);
     qcStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
@@ -1177,12 +1177,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public CertValidity validity() {
+  public CertValidity getValidity() {
     return validity;
   }
 
   @Override
-  public String parameter(String paramName) {
+  public String setParameter(String paramName) {
     return (parameters == null) ? null : parameters.get(paramName);
   }
 
@@ -1292,7 +1292,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
       }
 
       Vector<Attribute> attrs = new Vector<>();
-      for (ASN1ObjectIdentifier attrType : subjectDirAttrsControl.types()) {
+      for (ASN1ObjectIdentifier attrType : subjectDirAttrsControl.getTypes()) {
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
           if (dateOfBirth != null) {
             String timeStirng = dateOfBirth.getTimeString();
@@ -1428,10 +1428,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             reqNums.add(reqNum);
           }
         }
-        values.addExtension(type, admission.extensionValue(reqRegNumsList));
+        values.addExtension(type, admission.getExtensionValue(reqRegNumsList));
         occurences.remove(type);
       } else {
-        values.addExtension(type, admission.extensionValue(null));
+        values.addExtension(type, admission.getExtensionValue(null));
         occurences.remove(type);
       }
     }
@@ -1520,13 +1520,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         for (QcStatementOption m : qcStatementsOption) {
-          if (m.statement() != null) {
-            vec.add(m.statement());
+          if (m.getStatement() != null) {
+            vec.add(m.getStatement());
             continue;
           }
 
-          MonetaryValueOption monetaryOption = m.monetaryValueOption();
-          String currencyS = monetaryOption.currencyString();
+          MonetaryValueOption monetaryOption = m.getMonetaryValueOption();
+          String currencyS = monetaryOption.getCurrencyString();
           int[] limit = qcEuLimits.get(currencyS);
           if (limit == null) {
             throw new BadCertTemplateException(
@@ -1534,22 +1534,22 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
           }
 
           int amount = limit[0];
-          Range2Type range = monetaryOption.amountRange();
+          Range2Type range = monetaryOption.getAmountRange();
           if (amount < range.getMin() || amount > range.getMax()) {
             throw new BadCertTemplateException("amount for currency '" + currencyS
                 + "' is not within [" + range.getMin() + ", " + range.getMax() + "]");
           }
 
           int exponent = limit[1];
-          range = monetaryOption.exponentRange();
+          range = monetaryOption.getExponentRange();
           if (exponent < range.getMin() || exponent > range.getMax()) {
             throw new BadCertTemplateException("exponent for currency '" + currencyS
                 + "' is not within [" + range.getMin() + ", " + range.getMax() + "]");
           }
 
-          MonetaryValue monetaryVale = new MonetaryValue(monetaryOption.currency(), amount,
+          MonetaryValue monetaryVale = new MonetaryValue(monetaryOption.getCurrency(), amount,
               exponent);
-          QCStatement qcStatment = new QCStatement(m.statementId(), monetaryVale);
+          QCStatement qcStatment = new QCStatement(m.getStatementId(), monetaryVale);
           vec.add(qcStatment);
         }
 
@@ -1608,7 +1608,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         DERIA5String sourceDataUri = bd.getSourceDataUri();
-        switch (biometricInfo.sourceDataUriOccurrence()) {
+        switch (biometricInfo.getSourceDataUriOccurrence()) {
           case FORBIDDEN:
             sourceDataUri = null;
             break;
@@ -1677,7 +1677,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     ExtensionValues extraExtensions = getExtraExtensions(extensionOccurences, requestedSubject,
         grantedSubject, requestedExtensions, notBefore, notAfter, caInfo);
     if (extraExtensions != null) {
-      for (ASN1ObjectIdentifier m : extraExtensions.extensionTypes()) {
+      for (ASN1ObjectIdentifier m : extraExtensions.getExtensionTypes()) {
         values.addExtension(m, extraExtensions.getExtensionValue(m));
       }
     }
@@ -1731,7 +1731,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             case iPAddress:
             case directoryName:
             case registeredID:
-              grantedNames.add(new GeneralName(tag.tag(), rdnValue));
+              grantedNames.add(new GeneralName(tag.getTag(), rdnValue));
               break;
             default:
               throw new RuntimeException(
@@ -1755,27 +1755,27 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public Set<KeyUsageControl> keyUsage() {
+  public Set<KeyUsageControl> getKeyUsage() {
     return keyusages;
   }
 
   @Override
-  public Set<ExtKeyUsageControl> extendedKeyUsages() {
+  public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
     return extendedKeyusages;
   }
 
   @Override
-  public X509CertLevel certLevel() {
+  public X509CertLevel getCertLevel() {
     return certLevel;
   }
 
   @Override
-  public Integer pathLenBasicConstraint() {
+  public Integer getPathLenBasicConstraint() {
     return pathLen;
   }
 
   @Override
-  public AuthorityInfoAccessControl aiaControl() {
+  public AuthorityInfoAccessControl getAiaControl() {
     return aiaControl;
   }
 
@@ -1785,7 +1785,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls() {
+  public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
     return extensionControls;
   }
 
@@ -1795,22 +1795,22 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public int maxCertSize() {
-    return (maxSize == null) ? super.maxCertSize() : maxSize;
+  public int getMaxCertSize() {
+    return (maxSize == null) ? super.getMaxCertSize() : maxSize;
   }
 
   @Override
-  public boolean includeIssuerAndSerialInAki() {
+  public boolean includesIssuerAndSerialInAki() {
     return includeIssuerAndSerialInAki;
   }
 
   @Override
-  public SubjectControl subjectControl() {
+  public SubjectControl getSubjectControl() {
     return subjectControl;
   }
 
   @Override
-  public SpecialX509CertprofileBehavior specialCertprofileBehavior() {
+  public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
     return specialBehavior;
   }
 
@@ -1830,22 +1830,22 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms() {
+  public Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms() {
     return keyAlgorithms;
   }
 
   @Override
-  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
+  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
     return subjectInfoAccessModes;
   }
 
   @Override
-  public X509CertVersion version() {
+  public X509CertVersion getVersion() {
     return version;
   }
 
   @Override
-  public List<String> signatureAlgorithms() {
+  public List<String> getSignatureAlgorithms() {
     return signatureAlgorithms;
   }
 
@@ -1854,39 +1854,39 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     return incSerialNoIfSubjectExists;
   }
 
-  public ExtensionValue additionalInformation() {
+  public ExtensionValue getAdditionalInformation() {
     return additionalInformation;
   }
 
-  public AdmissionSyntaxOption admission() {
+  public AdmissionSyntaxOption getAdmission() {
     return admission;
   }
 
-  public Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes() {
+  public Map<ASN1ObjectIdentifier, GeneralNameTag> getSubjectToSubjectAltNameModes() {
     return subjectToSubjectAltNameModes;
   }
 
-  public Set<GeneralNameMode> subjectAltNameModes() {
+  public Set<GeneralNameMode> getSubjectAltNameModes() {
     return subjectAltNameModes;
   }
 
-  public ExtensionValue authorizationTemplate() {
+  public ExtensionValue getAuthorizationTemplate() {
     return authorizationTemplate;
   }
 
-  public BiometricInfoOption biometricInfo() {
+  public BiometricInfoOption getBiometricInfo() {
     return biometricInfo;
   }
 
-  public ExtensionValue certificatePolicies() {
+  public ExtensionValue getCertificatePolicies() {
     return certificatePolicies;
   }
 
-  public Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions() {
+  public Map<ASN1ObjectIdentifier, ExtensionValue> getConstantExtensions() {
     return constantExtensions;
   }
 
-  public Set<ExtKeyUsageControl> extendedKeyusages() {
+  public Set<ExtKeyUsageControl> getExtendedKeyusages() {
     return extendedKeyusages;
   }
 
@@ -1898,19 +1898,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     return incSerialNoIfSubjectExists;
   }
 
-  public ExtensionValue inhibitAnyPolicy() {
+  public ExtensionValue getInhibitAnyPolicy() {
     return inhibitAnyPolicy;
   }
 
-  public Set<KeyUsageControl> keyusages() {
+  public Set<KeyUsageControl> getKeyusages() {
     return keyusages;
   }
 
-  public Integer maxSize() {
+  public Integer getMaxSize() {
     return maxSize;
   }
 
-  public ExtensionValue nameConstraints() {
+  public ExtensionValue getNameConstraints() {
     return nameConstraints;
   }
 
@@ -1918,31 +1918,31 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     return notBeforeMidnight;
   }
 
-  public Map<String, String> parameters() {
+  public Map<String, String> getParameters() {
     return parameters;
   }
 
-  public Integer pathLen() {
+  public Integer getPathLen() {
     return pathLen;
   }
 
-  public ExtensionValue policyConstraints() {
+  public ExtensionValue getPolicyConstraints() {
     return policyConstraints;
   }
 
-  public ExtensionValue policyMappings() {
+  public ExtensionValue getPolicyMappings() {
     return policyMappings;
   }
 
-  public CertValidity privateKeyUsagePeriod() {
+  public CertValidity getPrivateKeyUsagePeriod() {
     return privateKeyUsagePeriod;
   }
 
-  public ExtensionValue qcStatments() {
+  public ExtensionValue getQcStatments() {
     return qcStatments;
   }
 
-  public List<QcStatementOption> qcStatementsOption() {
+  public List<QcStatementOption> getQcStatementsOption() {
     return qcStatementsOption;
   }
 
@@ -1950,27 +1950,27 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     return raOnly;
   }
 
-  public ExtensionValue restriction() {
+  public ExtensionValue getRestriction() {
     return restriction;
   }
 
-  public ExtensionValue smimeCapabilities() {
+  public ExtensionValue getSmimeCapabilities() {
     return smimeCapabilities;
   }
 
-  public SpecialX509CertprofileBehavior specialBehavior() {
+  public SpecialX509CertprofileBehavior getSpecialBehavior() {
     return specialBehavior;
   }
 
-  public ExtensionValue tlsFeature() {
+  public ExtensionValue getTlsFeature() {
     return tlsFeature;
   }
 
-  public ExtensionValue validityModel() {
+  public ExtensionValue getValidityModel() {
     return validityModel;
   }
 
-  public SubjectDirectoryAttributesControl subjectDirAttrsControl() {
+  public SubjectDirectoryAttributesControl getSubjectDirAttrsControl() {
     return subjectDirAttrsControl;
   }
 

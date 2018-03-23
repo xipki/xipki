@@ -101,12 +101,16 @@ public class DecodedPkiMessage extends PkiMessage {
     super(transactionId, messageType, senderNonce);
   }
 
-  public X509Certificate signatureCert() {
+  public X509Certificate getSignatureCert() {
     return signatureCert;
   }
 
   public void setSignatureCert(X509Certificate signatureCert) {
     this.signatureCert = signatureCert;
+  }
+
+  public ASN1ObjectIdentifier getDigestAlgorithm() {
+    return digestAlgorithm;
   }
 
   public void setDigestAlgorithm(ASN1ObjectIdentifier digestAlgorithm) {
@@ -117,15 +121,11 @@ public class DecodedPkiMessage extends PkiMessage {
     this.signatureValid = signatureValid;
   }
 
-  public ASN1ObjectIdentifier digestAlgorithm() {
-    return digestAlgorithm;
-  }
-
   public void setContentEncryptionAlgorithm(ASN1ObjectIdentifier encryptionAlgorithm) {
     this.contentEncryptionAlgorithm = encryptionAlgorithm;
   }
 
-  public String failureMessage() {
+  public String getFailureMessage() {
     return failureMessage;
   }
 
@@ -133,7 +133,7 @@ public class DecodedPkiMessage extends PkiMessage {
     this.failureMessage = failureMessage;
   }
 
-  public ASN1ObjectIdentifier contentEncryptionAlgorithm() {
+  public ASN1ObjectIdentifier getContentEncryptionAlgorithm() {
     return contentEncryptionAlgorithm;
   }
 
@@ -149,7 +149,7 @@ public class DecodedPkiMessage extends PkiMessage {
     return signatureValid;
   }
 
-  public Date signingTime() {
+  public Date getSigningTime() {
     return signingTime;
   }
 
@@ -219,7 +219,7 @@ public class DecodedPkiMessage extends PkiMessage {
     Integer intValue = getIntegerPrintStringAttrValue(signedAttrs,
         ScepObjectIdentifiers.ID_MESSAGE_TYPE);
     if (intValue == null) {
-      throw new MessageDecodingException("tid " + transactionId.id()
+      throw new MessageDecodingException("tid " + transactionId.getId()
               + ": missing required SCEP attribute messageType");
     }
 
@@ -227,14 +227,14 @@ public class DecodedPkiMessage extends PkiMessage {
     try {
       messageType = MessageType.forValue(intValue);
     } catch (IllegalArgumentException ex) {
-      throw new MessageDecodingException("tid " + transactionId.id()
+      throw new MessageDecodingException("tid " + transactionId.getId()
         + ": invalid messageType '" + intValue + "'");
     }
 
     // senderNonce
     Nonce senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.ID_SENDER_NONCE);
     if (senderNonce == null) {
-      throw new MessageDecodingException("tid " + transactionId.id()
+      throw new MessageDecodingException("tid " + transactionId.getId()
         + ": missing required SCEP attribute senderNonce");
     }
 

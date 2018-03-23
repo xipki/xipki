@@ -37,7 +37,7 @@ public class KeyUsageControl {
     this.required = required;
   }
 
-  public KeyUsage keyUsage() {
+  public KeyUsage getKeyUsage() {
     return keyUsage;
   }
 

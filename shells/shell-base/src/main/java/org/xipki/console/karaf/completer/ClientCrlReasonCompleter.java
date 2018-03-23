@@ -34,7 +34,7 @@ public class ClientCrlReasonCompleter extends AbstractEnumCompleter {
     StringBuilder enums = new StringBuilder();
 
     for (CrlReason reason : CrlReason.PERMITTED_CLIENT_CRLREASONS) {
-      enums.append(reason.description()).append(",");
+      enums.append(reason.getDescription()).append(",");
     }
     enums.deleteCharAt(enums.length() - 1);
     setTokens(enums.toString());

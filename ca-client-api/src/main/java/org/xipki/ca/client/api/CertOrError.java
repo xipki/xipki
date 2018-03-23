@@ -44,11 +44,11 @@ public class CertOrError {
     this.error = ParamUtil.requireNonNull("error", error);
   }
 
-  public Certificate certificate() {
+  public Certificate getCertificate() {
     return certificate;
   }
 
-  public PkiStatusInfo error() {
+  public PkiStatusInfo getError() {
     return error;
   }
 

@@ -55,7 +55,7 @@ public class CaPublisherInfoCmd extends CaAction {
       StringBuilder sb = new StringBuilder();
       sb.append("publishers for CA ").append(caName).append("\n");
       for (PublisherEntry entry : entries) {
-        sb.append("\t").append(entry.ident().name()).append("\n");
+        sb.append("\t").append(entry.getIdent().getName()).append("\n");
       }
       println(sb.toString());
     } else {

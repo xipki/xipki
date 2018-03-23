@@ -356,8 +356,8 @@ public class ScepUtil {
 
   public static boolean hasKeyusage(X509Certificate cert, KeyUsage usage) {
     boolean[] keyusage = cert.getKeyUsage();
-    if (keyusage != null && keyusage.length > usage.bit()) {
-      return keyusage[usage.bit()];
+    if (keyusage != null && keyusage.length > usage.getBit()) {
+      return keyusage[usage.getBit()];
     }
     return false;
   }

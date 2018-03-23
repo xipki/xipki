@@ -51,7 +51,7 @@ public class ChangeScepEntry {
     this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
@@ -59,11 +59,11 @@ public class ChangeScepEntry {
     this.caIdent = caIdent;
   }
 
-  public NameId caIdent() {
+  public NameId getCaIdent() {
     return caIdent;
   }
 
-  public Boolean active() {
+  public Boolean getActive() {
     return active;
   }
 
@@ -71,7 +71,7 @@ public class ChangeScepEntry {
     this.active = active;
   }
 
-  public String responderType() {
+  public String getResponderType() {
     return responderType;
   }
 
@@ -79,7 +79,7 @@ public class ChangeScepEntry {
     this.responderType = responderType;
   }
 
-  public String responderConf() {
+  public String getResponderConf() {
     return responderConf;
   }
 
@@ -87,7 +87,7 @@ public class ChangeScepEntry {
     this.responderConf = responderConf;
   }
 
-  public String base64Cert() {
+  public String getBase64Cert() {
     return base64Cert;
   }
 
@@ -95,7 +95,7 @@ public class ChangeScepEntry {
     this.base64Cert = base64Cert;
   }
 
-  public Set<String> certProfiles() {
+  public Set<String> getCertProfiles() {
     return certProfiles;
   }
 
@@ -108,7 +108,7 @@ public class ChangeScepEntry {
     }
   }
 
-  public String control() {
+  public String getControl() {
     return control;
   }
 

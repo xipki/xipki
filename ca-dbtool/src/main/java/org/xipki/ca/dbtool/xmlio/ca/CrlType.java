@@ -45,7 +45,7 @@ public class CrlType extends IdentifidDbObjectType {
 
   private String file;
 
-  public Integer caId() {
+  public Integer getCaId() {
     return caId;
   }
 
@@ -53,7 +53,7 @@ public class CrlType extends IdentifidDbObjectType {
     this.caId = caId;
   }
 
-  public String crlNo() {
+  public String getCrlNo() {
     return crlNo;
   }
 
@@ -61,7 +61,7 @@ public class CrlType extends IdentifidDbObjectType {
     this.crlNo = crlNo;
   }
 
-  public String file() {
+  public String getFile() {
     return file;
   }
 
@@ -82,7 +82,7 @@ public class CrlType extends IdentifidDbObjectType {
     validate();
 
     writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ID, getId());
     writeIfNotNull(writer, TAG_CAID, caId);
     writeIfNotNull(writer, TAG_CRLNO, crlNo);
     writeIfNotNull(writer, TAG_FILE, file);

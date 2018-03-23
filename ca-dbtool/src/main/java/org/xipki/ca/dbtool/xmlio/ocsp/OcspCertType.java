@@ -120,7 +120,7 @@ public class OcspCertType extends IdentifidDbObjectType {
 
   private Long update;
 
-  public String hash() {
+  public String getHash() {
     return hash;
   }
 
@@ -128,7 +128,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.hash = hash;
   }
 
-  public Integer iid() {
+  public Integer getIid() {
     return iid;
   }
 
@@ -136,7 +136,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.iid = iid;
   }
 
-  public Long nafter() {
+  public Long getNafter() {
     return nafter;
   }
 
@@ -144,7 +144,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.nafter = nafter;
   }
 
-  public Long nbefore() {
+  public Long getNbefore() {
     return nbefore;
   }
 
@@ -152,7 +152,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.nbefore = nbefore;
   }
 
-  public String profile() {
+  public String getProfile() {
     return profile;
   }
 
@@ -160,7 +160,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.profile = profile;
   }
 
-  public Boolean rev() {
+  public Boolean getRev() {
     return rev;
   }
 
@@ -168,7 +168,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.rev = rev;
   }
 
-  public Long rit() {
+  public Long getRit() {
     return rit;
   }
 
@@ -176,7 +176,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.rit = rit;
   }
 
-  public Integer rr() {
+  public Integer getRr() {
     return rr;
   }
 
@@ -184,7 +184,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.rr = rr;
   }
 
-  public Long rt() {
+  public Long getRt() {
     return rt;
   }
 
@@ -192,7 +192,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.rt = rt;
   }
 
-  public String sn() {
+  public String getSn() {
     return sn;
   }
 
@@ -200,7 +200,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.sn = sn;
   }
 
-  public String subject() {
+  public String getSubject() {
     return subject;
   }
 
@@ -208,7 +208,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     this.subject = subject;
   }
 
-  public Long update() {
+  public Long getUpdate() {
     return update;
   }
 
@@ -238,7 +238,7 @@ public class OcspCertType extends IdentifidDbObjectType {
     validate();
 
     writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ID, getId());
     writeIfNotNull(writer, TAG_IID, iid);
     writeIfNotNull(writer, TAG_SN, sn);
     writeIfNotNull(writer, TAG_UPDATE, update);

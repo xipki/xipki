@@ -38,11 +38,11 @@ public class RaEmulator {
     this.raCert = ScepUtil.requireNonNull("raCert", raCert);
   }
 
-  public PrivateKey raKey() {
+  public PrivateKey getRaKey() {
     return raKey;
   }
 
-  public Certificate raCert() {
+  public Certificate getRaCert() {
     return raCert;
   }
 

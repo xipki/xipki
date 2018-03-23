@@ -47,11 +47,11 @@ public class IssuerAndSubject extends ASN1Object {
     this.subject = ScepUtil.requireNonNull("subject", subject);
   }
 
-  public X500Name issuer() {
+  public X500Name getIssuer() {
     return issuer;
   }
 
-  public X500Name subject() {
+  public X500Name getSubject() {
     return subject;
   }
 

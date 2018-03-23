@@ -213,12 +213,12 @@ public class OcspStatusCmd extends BaseOcspStatusAction {
 
         if (revStatus.hasRevocationReason()) {
           int reason = revStatus.getRevocationReason();
-          if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code()
+          if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode()
               && revTime.getTime() == 0) {
             status = "unknown (RFC6960)";
           } else {
             status = StringUtil.concatObjects("revoked, reason = ",
-                CrlReason.forReasonCode(reason).description(), ", revocationTime = ", revTime,
+                CrlReason.forReasonCode(reason).getDescription(), ", revocationTime = ", revTime,
                 (invTime == null ? "" : ", invalidityTime = " + invTime));
           }
         } else {

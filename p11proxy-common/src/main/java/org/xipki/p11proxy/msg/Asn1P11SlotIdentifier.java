@@ -78,12 +78,12 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
   @Override
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    vector.add(new ASN1Integer(slotId.id()));
-    vector.add(new ASN1Integer(slotId.index()));
+    vector.add(new ASN1Integer(slotId.getId()));
+    vector.add(new ASN1Integer(slotId.getIndex()));
     return new DERSequence(vector);
   }
 
-  public P11SlotIdentifier slotId() {
+  public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 

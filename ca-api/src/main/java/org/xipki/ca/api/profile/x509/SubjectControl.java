@@ -55,12 +55,12 @@ public class SubjectControl {
     List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
     if (keepRdnOrder) {
       for (RdnControl m : controls) {
-        sortedOids.add(m.type());
+        sortedOids.add(m.getType());
       }
     } else {
       Set<ASN1ObjectIdentifier> oidSet = new HashSet<>();
       for (RdnControl m : controls) {
-        oidSet.add(m.type());
+        oidSet.add(m.getType());
       }
 
       List<ASN1ObjectIdentifier> oids = SubjectDnSpec.getForwardDNs();
@@ -85,9 +85,9 @@ public class SubjectControl {
     this.controls = new HashMap<>();
 
     for (RdnControl control : controls) {
-      ASN1ObjectIdentifier type = control.type();
+      ASN1ObjectIdentifier type = control.getType();
       this.controls.put(type, control);
-      String group = control.group();
+      String group = control.getGroup();
       if (StringUtil.isBlank(group)) {
         continue;
       }
@@ -120,11 +120,11 @@ public class SubjectControl {
     return groupTypes.get(group);
   }
 
-  public Set<String> groups() {
+  public Set<String> getGroups() {
     return groups;
   }
 
-  public List<ASN1ObjectIdentifier> types() {
+  public List<ASN1ObjectIdentifier> getTypes() {
     return types;
   }
 

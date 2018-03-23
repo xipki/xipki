@@ -53,11 +53,11 @@ public class ProfileCheckCmd extends ProfileUpdateCmd {
       throw new CmdFailure("certificate profile named '" + name + "' is not configured");
     }
 
-    if (cp.type() != null) {
-      MgmtQaShellUtil.assertEquals("type", type, cp.type());
+    if (cp.getType() != null) {
+      MgmtQaShellUtil.assertEquals("type", type, cp.getType());
     }
 
-    MgmtQaShellUtil.assertEquals("conf", conf, cp.conf());
+    MgmtQaShellUtil.assertEquals("conf", conf, cp.getConf());
 
     println(" checked profile " + name);
     return null;

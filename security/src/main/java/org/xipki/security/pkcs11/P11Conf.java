@@ -79,7 +79,7 @@ public class P11Conf {
       Map<String, P11ModuleConf> confs = new HashMap<>();
       for (ModuleType moduleType : modulesType.getModule()) {
         P11ModuleConf conf = new P11ModuleConf(moduleType, mechanismSets, passwordResolver);
-        confs.put(conf.name(), conf);
+        confs.put(conf.getName(), conf);
       }
 
       if (!confs.containsKey(P11CryptServiceFactory.DEFAULT_P11MODULE_NAME)) {
@@ -98,11 +98,11 @@ public class P11Conf {
     }
   }
 
-  public Set<String> moduleNames() {
+  public Set<String> getModuleNames() {
     return moduleNames;
   }
 
-  public P11ModuleConf moduleConf(String moduleName) {
+  public P11ModuleConf getModuleConf(String moduleName) {
     return moduleConfs.get(moduleName);
   }
 

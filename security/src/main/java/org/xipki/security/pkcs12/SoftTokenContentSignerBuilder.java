@@ -361,15 +361,15 @@ public class SoftTokenContentSignerBuilder {
     return concurrentSigner;
   } // createSigner
 
-  public X509Certificate certificate() {
+  public X509Certificate getCertificate() {
     return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
   }
 
-  public X509Certificate[] certificateChain() {
+  public X509Certificate[] getCertificateChain() {
     return certificateChain;
   }
 
-  public PrivateKey key() {
+  public PrivateKey getKey() {
     return key;
   }
 

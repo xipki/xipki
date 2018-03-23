@@ -35,6 +35,6 @@ public interface EnvParameterResolver {
    *          Name of the parameter.
    * @return the value of parameter.
    */
-  String parameter(String parameterName);
+  String getParameter(String parameterName);
 
 }

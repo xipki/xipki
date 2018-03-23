@@ -45,8 +45,8 @@ public class ScepServerContainer {
     server.setHandler(handler);
 
     for (ScepServer m : scepServers) {
-      ServletHolder servletHolder = new ServletHolder(m.name(), m.getServlet());
-      handler.addServletWithMapping(servletHolder, "/" + m.name() + "/pkiclient.exe");
+      ServletHolder servletHolder = new ServletHolder(m.getName(), m.getServlet());
+      handler.addServletWithMapping(servletHolder, "/" + m.getName() + "/pkiclient.exe");
     }
 
     server.join();

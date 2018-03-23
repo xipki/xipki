@@ -55,11 +55,11 @@ public enum OID {
     }
   }
 
-  public String id() {
+  public String getId() {
     return id;
   }
 
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encoded.length;
   }
 

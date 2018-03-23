@@ -66,8 +66,8 @@ public class CaInfoCmd extends CaAction {
       if (entry == null) {
         throw new CmdFailure("could not find CA '" + name + "'");
       } else {
-        if (CaStatus.ACTIVE == entry.status()) {
-          boolean started = caManager.getSuccessfulCaNames().contains(entry.ident().name());
+        if (CaStatus.ACTIVE == entry.getStatus()) {
+          boolean started = caManager.getSuccessfulCaNames().contains(entry.getIdent().getName());
           sb.append("started: ").append(started).append("\n");
         }
         Set<String> aliases = caManager.getAliasesForCa(name);

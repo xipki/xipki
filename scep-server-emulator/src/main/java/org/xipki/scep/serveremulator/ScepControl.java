@@ -45,7 +45,7 @@ public class ScepControl {
     this.useInsecureAlg = useInsecureAlg;
   }
 
-  public boolean sendCaCert() {
+  public boolean isSendCaCert() {
     return sendCaCert;
   }
 
@@ -61,7 +61,7 @@ public class ScepControl {
     return sendSignerCert;
   }
 
-  public String secret() {
+  public String getSecret() {
     return secret;
   }
 

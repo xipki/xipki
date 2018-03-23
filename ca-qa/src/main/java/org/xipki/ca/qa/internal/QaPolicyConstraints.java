@@ -43,11 +43,11 @@ public class QaPolicyConstraints extends QaExtension {
     this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
   }
 
-  public Integer requireExplicitPolicy() {
+  public Integer getRequireExplicitPolicy() {
     return requireExplicitPolicy;
   }
 
-  public Integer inhibitPolicyMapping() {
+  public Integer getInhibitPolicyMapping() {
     return inhibitPolicyMapping;
   }
 

@@ -32,7 +32,7 @@ public class RevokeCertResultType {
 
   private List<ResultEntry> resultEntries;
 
-  public List<ResultEntry> resultEntries() {
+  public List<ResultEntry> getResultEntries() {
     return resultEntries;
   }
 

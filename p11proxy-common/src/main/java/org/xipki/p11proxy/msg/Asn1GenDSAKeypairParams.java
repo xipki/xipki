@@ -76,9 +76,9 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
   private Asn1GenDSAKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     Asn1Util.requireRange(seq, 6, 6);
     int idx = 0;
-    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
     label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
     p = Asn1Util.getInteger(seq.getObjectAt(idx++));
     q = Asn1Util.getInteger(seq.getObjectAt(idx++));
     g = Asn1Util.getInteger(seq.getObjectAt(idx++));
@@ -114,30 +114,27 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
     return new DERSequence(vector);
   }
 
-  public P11SlotIdentifier slotId() {
+  public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public String label() {
+  public String getLabel() {
     return label;
   }
 
-  public P11NewKeyControl control() {
+  public P11NewKeyControl getControl() {
     return control;
   }
 
-  // CHECKSTYLE:SKIP
-  public BigInteger p() {
+  public BigInteger getP() {
     return p;
   }
 
-  // CHECKSTYLE:SKIP
-  public BigInteger q() {
+  public BigInteger getQ() {
     return q;
   }
 
-  // CHECKSTYLE:SKIP
-  public BigInteger g() {
+  public BigInteger getG() {
     return g;
   }
 

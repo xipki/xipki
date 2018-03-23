@@ -141,7 +141,7 @@ public class SignerUtil {
     ParamUtil.requireNonNull("hashValue", hashValue);
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
-    final int hashLen = hashAlgo.length();
+    final int hashLen = hashAlgo.getLength();
     ParamUtil.requireRange("hashValue.length", hashValue.length, hashLen, hashLen);
 
     int blockSize = (modulusBigLength + 7) / 8;
@@ -205,7 +205,7 @@ public class SignerUtil {
   public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue,
       HashAlgo mgfDigest, int saltLen, int modulusBitLength, SecureRandom random)
       throws XiSecurityException {
-    final int hLen = contentDigest.length();
+    final int hLen = contentDigest.getLength();
     final byte[] salt = new byte[saltLen];
     final byte[] mDash = new byte[8 + saltLen + hLen];
     final byte trailer = (byte)0xBC;
@@ -259,7 +259,7 @@ public class SignerUtil {
   private static byte[] maskGeneratorFunction1(HashAlgo mgfDigest,
       byte[] Z, // CHECKSTYLE:SKIP
       int length) {
-    int mgfhLen = mgfDigest.length();
+    int mgfhLen = mgfDigest.getLength();
     byte[] mask = new byte[length];
     int counter = 0;
 

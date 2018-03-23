@@ -41,13 +41,13 @@ public class IssuerStore {
 
     for (IssuerEntry entry : entries) {
       for (IssuerEntry existingEntry : this.entries) {
-        if (existingEntry.id() == entry.id()) {
+        if (existingEntry.getId() == entry.getId()) {
           throw new IllegalArgumentException(
-              "issuer with the same id " + entry.id() + " already available");
+              "issuer with the same id " + entry.getId() + " already available");
         }
       }
       this.entries.add(entry);
-      idSet.add(entry.id());
+      idSet.add(entry.getId());
     }
 
     this.ids = Collections.unmodifiableSet(idSet);
@@ -57,18 +57,18 @@ public class IssuerStore {
     return ids.size();
   }
 
-  public Set<Integer> ids() {
+  public Set<Integer> getIds() {
     return ids;
   }
 
   public Integer getIssuerIdForFp(RequestIssuer reqIssuer) {
     IssuerEntry issuerEntry = getIssuerForFp(reqIssuer);
-    return (issuerEntry == null) ? null : issuerEntry.id();
+    return (issuerEntry == null) ? null : issuerEntry.getId();
   }
 
   public IssuerEntry getIssuerForId(int id) {
     for (IssuerEntry entry : entries) {
-      if (entry.id() == id) {
+      if (entry.getId() == id) {
         return entry;
       }
     }
@@ -89,7 +89,7 @@ public class IssuerStore {
   public void addIssuer(IssuerEntry issuer) {
     this.entries.add(issuer);
     Set<Integer> newIds = new HashSet<>(this.ids);
-    newIds.add(issuer.id());
+    newIds.add(issuer.getId());
     this.ids = Collections.unmodifiableSet(newIds);
   }
 

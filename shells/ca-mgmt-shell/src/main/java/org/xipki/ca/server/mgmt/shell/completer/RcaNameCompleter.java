@@ -43,7 +43,7 @@ public class RcaNameCompleter extends MgmtNameCompleter {
         continue;
       }
 
-      X509Certificate cert = ((X509CaEntry) caEntry).certificate();
+      X509Certificate cert = ((X509CaEntry) caEntry).getCert();
       if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
         ret.add(name);
       }

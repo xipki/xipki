@@ -173,7 +173,7 @@ class RefDigestReader {
         releaseResources(null, rs);
       }
 
-      if (result.entries().isEmpty()) {
+      if (result.getEntries().isEmpty()) {
         endReached = true;
         outQueue.put(EndOfQueue.INSTANCE);
       } else {
@@ -233,7 +233,7 @@ class RefDigestReader {
 
   }
 
-  public int caId() {
+  public int getCaId() {
     return caId;
   }
 
@@ -297,15 +297,15 @@ class RefDigestReader {
     }
   } // method getInstance
 
-  public X509Certificate caCert() {
+  public X509Certificate getCaCert() {
     return caCert;
   }
 
-  public String caSubjectName() {
+  public String getCaSubjectName() {
     return caSubjectName;
   }
 
-  public int totalAccount() {
+  public int getTotalAccount() {
     return totalAccount;
   }
 
@@ -332,16 +332,16 @@ class RefDigestReader {
     }
 
     certSet = (DigestEntrySet) next;
-    if (certSet.exception() != null) {
-      throw certSet.exception();
+    if (certSet.getException() != null) {
+      throw certSet.getException();
     }
 
     List<BigInteger> serialNumbers = new LinkedList<>();
     Map<BigInteger, DigestEntry> certsMap = new HashMap<>();
-    for (IdentifiedDigestEntry m : certSet.entries()) {
-      BigInteger sn = m.content().serialNumber();
+    for (IdentifiedDigestEntry m : certSet.getEntries()) {
+      BigInteger sn = m.getContent().getSerialNumber();
       serialNumbers.add(sn);
-      certsMap.put(sn, m.content());
+      certsMap.put(sn, m.getContent());
     }
 
     return new CertsBundle(certsMap, serialNumbers);

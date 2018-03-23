@@ -44,19 +44,19 @@ public class PublisherEntry {
     this.conf = conf;
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
-  public String conf() {
+  public String getConf() {
     return conf;
   }
 
-  public boolean faulty() {
+  public boolean isFaulty() {
     return faulty;
   }
 
@@ -66,7 +66,7 @@ public class PublisherEntry {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+    return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ", conf);
   }
 

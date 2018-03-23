@@ -156,7 +156,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
       throw new XiSecurityException("unsupported hash algorithm " + digestAlgOid.getId());
     }
 
-    P11SlotIdentifier slotId = identityId.slotId();
+    P11SlotIdentifier slotId = identityId.getSlotId();
     P11Slot slot = cryptService.getSlot(slotId);
     if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_PSS)) {
       this.mechanism = PKCS11Constants.CKM_RSA_PKCS_PSS;

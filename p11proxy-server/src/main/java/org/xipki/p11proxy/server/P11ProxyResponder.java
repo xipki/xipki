@@ -204,72 +204,73 @@ class P11ProxyResponder {
       switch (action) {
         case P11ProxyConstants.ACTION_ADD_CERT: {
           Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.entityId());
-          X509Certificate cert = X509Util.toX509Cert(asn1.certificate());
-          slot.addCert(asn1.entityId().objectId().objectId(), cert);
+          P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
+          X509Certificate cert = X509Util.toX509Cert(asn1.getCertificate());
+          slot.addCert(asn1.getEntityId().getObjectId().getObjectId(), cert);
           return getSuccessResp(version, transactionId, action, (byte[]) null);
         }
         case P11ProxyConstants.ACTION_DIGEST_SECRETKEY: {
           Asn1DigestSecretKeyTemplate template = Asn1DigestSecretKeyTemplate.getInstance(content);
-          long mechanism = template.mechanism().mechanism();
-          P11Identity identity = p11CryptService.getIdentity(template.identityId().entityId());
+          long mechanism = template.getMechanism().getMechanism();
+          P11Identity identity =
+              p11CryptService.getIdentity(template.getIdentityId().getEntityId());
           byte[] hashValue = identity.digestSecretKey(mechanism);
           ASN1Object obj = new DEROctetString(hashValue);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GEN_KEYPAIR_DSA: {
           Asn1GenDSAKeypairParams asn1 = Asn1GenDSAKeypairParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          P11ObjectIdentifier keyId = slot.generateDSAKeypair(asn1.p(), asn1.q(), asn1.g(),
-              asn1.label(), asn1.control());
-          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.slotId(), keyId);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11ObjectIdentifier keyId = slot.generateDSAKeypair(asn1.getP(), asn1.getQ(), asn1.getG(),
+              asn1.getLabel(), asn1.getControl());
+          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.getSlotId(), keyId);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GEN_KEYPAIR_EC: {
           Asn1GenECKeypairParams asn1 = Asn1GenECKeypairParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          P11ObjectIdentifier keyId = slot.generateECKeypair(asn1.curveId().getId(),
-              asn1.label(), asn1.control());
-          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.slotId(), keyId);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11ObjectIdentifier keyId = slot.generateECKeypair(asn1.getCurveId().getId(),
+              asn1.getLabel(), asn1.getControl());
+          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.getSlotId(), keyId);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GEN_KEYPAIR_RSA: {
           Asn1GenRSAKeypairParams asn1 = Asn1GenRSAKeypairParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          P11ObjectIdentifier keyId = slot.generateRSAKeypair(asn1.keysize(),
-              asn1.publicExponent(), asn1.label(), asn1.control());
-          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.slotId(), keyId);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11ObjectIdentifier keyId = slot.generateRSAKeypair(asn1.getKeysize(),
+              asn1.getPublicExponent(), asn1.getLabel(), asn1.getControl());
+          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.getSlotId(), keyId);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2: {
           Asn1GenSM2KeypairParams asn1 = Asn1GenSM2KeypairParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          P11ObjectIdentifier keyId = slot.generateSM2Keypair(asn1.label(), asn1.control());
-          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.slotId(), keyId);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11ObjectIdentifier keyId = slot.generateSM2Keypair(asn1.getLabel(), asn1.getControl());
+          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.getSlotId(), keyId);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GEN_SECRET_KEY: {
           Asn1GenSecretKeyParams asn1 = Asn1GenSecretKeyParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          P11ObjectIdentifier keyId = slot.generateSecretKey(asn1.keyType(), asn1.keysize(),
-              asn1.label(), asn1.control());
-          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.slotId(), keyId);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11ObjectIdentifier keyId = slot.generateSecretKey(asn1.getKeyType(), asn1.getKeysize(),
+              asn1.getLabel(), asn1.getControl());
+          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.getSlotId(), keyId);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GET_CERT: {
-          P11EntityIdentifier entityId = Asn1P11EntityIdentifier.getInstance(content).entityId();
-          X509Certificate cert = p11CryptService.getIdentity(entityId).certificate();
+          P11EntityIdentifier entityId = Asn1P11EntityIdentifier.getInstance(content).getEntityId();
+          X509Certificate cert = p11CryptService.getIdentity(entityId).getCertificate();
           return getSuccessResp(version, transactionId, action, cert.getEncoded());
         }
         case P11ProxyConstants.ACTION_GET_CERT_IDS:
         case P11ProxyConstants.ACTION_GET_IDENTITY_IDS: {
           Asn1P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(content);
-          P11Slot slot = p11CryptService.module().getSlot(slotId.slotId());
+          P11Slot slot = p11CryptService.getModule().getSlot(slotId.getSlotId());
           Set<P11ObjectIdentifier> objectIds;
           if (P11ProxyConstants.ACTION_GET_CERT_IDS == action) {
-            objectIds = slot.certIdentifiers();
+            objectIds = slot.getCertIdentifiers();
           } else {
-            objectIds = slot.identityIdentifiers();
+            objectIds = slot.getIdentityIdentifiers();
           }
           ASN1EncodableVector vec = new ASN1EncodableVector();
           for (P11ObjectIdentifier objectId : objectIds) {
@@ -279,8 +280,8 @@ class P11ProxyResponder {
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GET_MECHANISMS: {
-          P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(content).slotId();
-          Set<Long> mechs = p11CryptService.getSlot(slotId).mechanisms();
+          P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(content).getSlotId();
+          Set<Long> mechs = p11CryptService.getSlot(slotId).getMechanisms();
           ASN1EncodableVector vec = new ASN1EncodableVector();
           for (Long mech : mechs) {
             vec.add(new ASN1Integer(mech));
@@ -289,8 +290,9 @@ class P11ProxyResponder {
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GET_PUBLICKEY: {
-          P11EntityIdentifier identityId = Asn1P11EntityIdentifier.getInstance(content).entityId();
-          PublicKey pubKey = p11CryptService.getIdentity(identityId).publicKey();
+          P11EntityIdentifier identityId =
+              Asn1P11EntityIdentifier.getInstance(content).getEntityId();
+          PublicKey pubKey = p11CryptService.getIdentity(identityId).getPublicKey();
           if (pubKey == null) {
             throw new P11UnknownEntityException(identityId);
           }
@@ -299,12 +301,12 @@ class P11ProxyResponder {
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GET_SERVER_CAPS: {
-          boolean readOnly = p11CryptService.module().isReadOnly();
+          boolean readOnly = p11CryptService.getModule().isReadOnly();
           ASN1Object obj = new Asn1ServerCaps(readOnly, versions);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_GET_SLOT_IDS: {
-          List<P11SlotIdentifier> slotIds = p11CryptService.module().slotIdentifiers();
+          List<P11SlotIdentifier> slotIds = p11CryptService.getModule().getSlotIds();
 
           ASN1EncodableVector vector = new ASN1EncodableVector();
           for (P11SlotIdentifier slotId : slotIds) {
@@ -315,42 +317,42 @@ class P11ProxyResponder {
         }
         case P11ProxyConstants.ACTION_IMPORT_SECRET_KEY: {
           Asn1ImportSecretKeyParams asn1 = Asn1ImportSecretKeyParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          P11ObjectIdentifier keyId = slot.importSecretKey(asn1.keyType(),
-              asn1.keyValue(), asn1.label(), asn1.control());
-          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.slotId(), keyId);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11ObjectIdentifier keyId = slot.importSecretKey(asn1.getKeyType(),
+              asn1.getKeyValue(), asn1.getLabel(), asn1.getControl());
+          ASN1Object obj = new Asn1P11EntityIdentifier(asn1.getSlotId(), keyId);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_REMOVE_CERTS: {
           Asn1P11EntityIdentifier asn1 = Asn1P11EntityIdentifier.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1);
-          slot.removeCerts(asn1.objectId().objectId());
+          slot.removeCerts(asn1.getObjectId().getObjectId());
           return getSuccessResp(version, transactionId, action, (byte[])null);
         }
         case P11ProxyConstants.ACTION_REMOVE_IDENTITY: {
           Asn1P11EntityIdentifier asn1 = Asn1P11EntityIdentifier.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1);
-          slot.removeIdentity(asn1.objectId().objectId());
+          slot.removeIdentity(asn1.getObjectId().getObjectId());
           return getSuccessResp(version, transactionId, action, (byte[])null);
         }
         case P11ProxyConstants.ACTION_REMOVE_OBJECTS: {
           Asn1RemoveObjectsParams asn1 = Asn1RemoveObjectsParams.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.slotId());
-          int num = slot.removeObjects(asn1.ojectId(), asn1.objectLabel());
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          int num = slot.removeObjects(asn1.getOjectId(), asn1.getObjectLabel());
           ASN1Object obj = new ASN1Integer(num);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_SIGN: {
           Asn1SignTemplate signTemplate = Asn1SignTemplate.getInstance(content);
-          long mechanism = signTemplate.mechanism().mechanism();
-          Asn1P11Params asn1Params = signTemplate.mechanism().params();
+          long mechanism = signTemplate.getMechanism().getMechanism();
+          Asn1P11Params asn1Params = signTemplate.getMechanism().getParams();
 
           P11Params params = null;
 
           if (asn1Params != null) {
-            switch (asn1Params.tagNo()) {
+            switch (asn1Params.getTagNo()) {
               case Asn1P11Params.TAG_RSA_PKCS_PSS:
-                params = Asn1RSAPkcsPssParams.getInstance(asn1Params).pkcsPssParams();
+                params = Asn1RSAPkcsPssParams.getInstance(asn1Params).getPkcsPssParams();
                 break;
               case Asn1P11Params.TAG_OPAQUE:
                 params = new P11ByteArrayParams(
@@ -361,21 +363,22 @@ class P11ProxyResponder {
                 break;
               default:
                 throw new BadAsn1ObjectException(
-                    "unknown SignTemplate.params: unknown tag " + asn1Params.tagNo());
+                    "unknown SignTemplate.params: unknown tag " + asn1Params.getTagNo());
             }
           }
 
-          byte[] message = signTemplate.message();
-          P11Identity identity = p11CryptService.getIdentity(signTemplate.identityId().entityId());
+          byte[] message = signTemplate.getMessage();
+          P11Identity identity =
+              p11CryptService.getIdentity(signTemplate.getIdentityId().getEntityId());
           byte[] signature = identity.sign(mechanism, params, message);
           ASN1Object obj = new DEROctetString(signature);
           return getSuccessResp(version, transactionId, action, obj);
         }
         case P11ProxyConstants.ACTION_UPDATE_CERT: {
           Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(content);
-          P11Slot slot = getSlot(p11CryptService, asn1.entityId());
-          slot.updateCertificate(asn1.entityId().objectId().objectId(),
-              X509Util.toX509Cert(asn1.certificate()));
+          P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
+          slot.updateCertificate(asn1.getEntityId().getObjectId().getObjectId(),
+              X509Util.toX509Cert(asn1.getCertificate()));
           return getSuccessResp(version, transactionId, action, (byte[])null);
         }
         default: {
@@ -417,12 +420,12 @@ class P11ProxyResponder {
 
   private P11Slot getSlot(P11CryptService p11Service, Asn1P11EntityIdentifier entityId)
       throws P11TokenException {
-    return p11Service.module().getSlot(entityId.slotId().slotId());
+    return p11Service.getModule().getSlot(entityId.getSlotId().getSlotId());
   }
 
   private P11Slot getSlot(P11CryptService p11Service, P11SlotIdentifier slotId)
       throws P11TokenException {
-    return p11Service.module().getSlot(slotId);
+    return p11Service.getModule().getSlot(slotId);
   }
 
   private static byte[] getResp(short version, byte[] transactionId, short rc, short action) {

@@ -36,7 +36,7 @@ public class DfltEnvParameterResolver implements EnvParameterResolver {
   }
 
   @Override
-  public String parameter(String parameterName) {
+  public String getParameter(String parameterName) {
     ParamUtil.requireNonNull("parameterName", parameterName);
     return envParameters.get(parameterName);
   }

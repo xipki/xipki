@@ -1674,7 +1674,7 @@ public class ProfileConfCreatorDemo {
     // hash algorithm
     HashAlgo[] hashAlgos = new HashAlgo[]{HashAlgo.SHA256, HashAlgo.SHA384};
     for (HashAlgo hashAlgo : hashAlgos) {
-      extValue.getHashAlgorithm().add(createOidType(hashAlgo.oid(), hashAlgo.getName()));
+      extValue.getHashAlgorithm().add(createOidType(hashAlgo.getOid(), hashAlgo.getName()));
     }
 
     extValue.setIncludeSourceDataUri(TripleState.REQUIRED);
@@ -1990,8 +1990,8 @@ public class ProfileConfCreatorDemo {
     TlsFeature tlsFeature = new TlsFeature();
     for (TlsExtensionType m : exts) {
       IntWithDescType ints = new IntWithDescType();
-      ints.setValue(m.code());
-      ints.setDescription(m.name());
+      ints.setValue(m.getCode());
+      ints.setDescription(m.getName());
       tlsFeature.getFeature().add(ints);
     }
     return createExtensionValueType(tlsFeature);

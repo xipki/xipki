@@ -77,22 +77,23 @@ public class RevokeCertCmd extends UnRevRemoveCertAction {
       X509Certificate cert = X509Util.parseCert(certFile);
       RequestResponseDebug debug = getRequestResponseDebug();
       try {
-        certIdOrError = caClient.revokeCert(caName, cert, crlReason.code(), invalidityDate, debug);
+        certIdOrError = caClient.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
+            debug);
       } finally {
         saveRequestResponse(debug);
       }
     } else {
       RequestResponseDebug debug = getRequestResponseDebug();
       try {
-        certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.code(),
+        certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
             invalidityDate, debug);
       } finally {
         saveRequestResponse(debug);
       }
     }
 
-    if (certIdOrError.error() != null) {
-      PkiStatusInfo error = certIdOrError.error();
+    if (certIdOrError.getError() != null) {
+      PkiStatusInfo error = certIdOrError.getError();
       throw new CmdFailure("revocation failed: " + error);
     } else {
       println("revoked certificate");

@@ -74,7 +74,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     final String name = getModuleName(moduleName);
-    P11ModuleConf conf = p11Conf.moduleConf(name);
+    P11ModuleConf conf = p11Conf.getModuleConf(name);
     if (conf == null) {
       throw new XiSecurityException("PKCS#11 module " + name + " is not defined");
     }
@@ -106,11 +106,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
   }
 
   @Override
-  public Set<String> moduleNames() {
+  public Set<String> getModuleNames() {
     if (p11Conf == null) {
       throw new IllegalStateException("pkcs11ConfFile is not set");
     }
-    return p11Conf.moduleNames();
+    return p11Conf.getModuleNames();
   }
 
 }

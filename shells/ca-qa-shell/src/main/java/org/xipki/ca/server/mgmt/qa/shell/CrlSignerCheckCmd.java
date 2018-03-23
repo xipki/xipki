@@ -39,7 +39,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
   @Override
   protected Object execute0() throws Exception {
     X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
-    String name = ey.name();
+    String name = ey.getName();
     println("checking CRL signer " + name);
 
     X509CrlSignerEntry cs = caManager.getCrlSigner(name);
@@ -47,16 +47,16 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
       throw new CmdFailure("CRL signer named '" + name + "' is not configured");
     }
 
-    if (ey.signerType() != null) {
-      MgmtQaShellUtil.assertEquals("signer type", ey.signerType(), cs.type());
+    if (ey.getSignerType() != null) {
+      MgmtQaShellUtil.assertEquals("signer type", ey.getSignerType(), cs.getType());
     }
 
-    if (ey.signerConf() != null) {
-      MgmtQaShellUtil.assertEquals("signer conf", ey.signerConf(), cs.conf());
+    if (ey.getSignerConf() != null) {
+      MgmtQaShellUtil.assertEquals("signer conf", ey.getSignerConf(), cs.getConf());
     }
 
-    if (ey.crlControl() != null) {
-      CrlControl ex = new CrlControl(ey.crlControl());
+    if (ey.getCrlControl() != null) {
+      CrlControl ex = new CrlControl(ey.getCrlControl());
       CrlControl is = new CrlControl(cs.crlControl());
 
       if (!ex.equals(is)) {
@@ -65,8 +65,8 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
       }
     }
 
-    if (ey.base64Cert() != null) {
-      MgmtQaShellUtil.assertEquals("certificate", ey.base64Cert(), cs.base64Cert());
+    if (ey.getBase64Cert() != null) {
+      MgmtQaShellUtil.assertEquals("certificate", ey.getBase64Cert(), cs.getBase64Cert());
     }
 
     println(" checked CRL signer " + name);

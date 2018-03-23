@@ -59,7 +59,7 @@ public class EmulatorP11Module extends AbstractP11Module {
     super(moduleConf);
 
     File baseDir;
-    final String modulePath = moduleConf.nativeLibrary();
+    final String modulePath = moduleConf.getNativeLibrary();
     if (modulePath.trim().isEmpty()) {
       baseDir = new File(DFLT_BASEDIR);
       if (!baseDir.exists()) {
@@ -144,12 +144,12 @@ public class EmulatorP11Module extends AbstractP11Module {
     for (P11SlotIdentifier slotId : slotIds) {
       List<char[]> pwd;
       try {
-        pwd = moduleConf.passwordRetriever().getPassword(slotId);
+        pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
       } catch (PasswordResolverException ex) {
         throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
       }
 
-      File slotDir = new File(baseDir, slotId.index() + "-" + slotId.id());
+      File slotDir = new File(baseDir, slotId.getIndex() + "-" + slotId.getId());
 
       if (pwd == null) {
         throw new P11TokenException("no password is configured");
@@ -163,8 +163,8 @@ public class EmulatorP11Module extends AbstractP11Module {
       PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(firstPwd);
 
       int maxSessions = 20;
-      P11Slot slot = new EmulatorP11Slot(moduleConf.name(), slotDir, slotId,
-          moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.p11MechanismFilter(),
+      P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
+          moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.getP11MechanismFilter(),
           maxSessions);
       slots.add(slot);
     }

@@ -45,15 +45,15 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
     this.objectId = ParamUtil.requireNonNull("objectId", objectId);
   }
 
-  public P11CryptService p11CryptService() {
+  public P11CryptService getP11CryptService() {
     return p11CryptService;
   }
 
-  public P11SlotIdentifier slot() {
+  public P11SlotIdentifier getSlot() {
     return slot;
   }
 
-  public P11ObjectIdentifier objectId() {
+  public P11ObjectIdentifier getObjectId() {
     return objectId;
   }
 

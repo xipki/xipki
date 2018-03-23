@@ -75,11 +75,11 @@ public class ResponseOption {
     return includeCerthash;
   }
 
-  public Long cacheMaxAge() {
+  public Long getCacheMaxAge() {
     return cacheMaxAge;
   }
 
-  public EmbedCertsMode embedCertsMode() {
+  public EmbedCertsMode getEmbedCertsMode() {
     return embedCertsMode;
   }
 

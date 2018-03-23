@@ -306,7 +306,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
   private Exception importEntries(CaDbEntryType type, CertStoreType certstore,
       File processLogFile, Integer numProcessedInLastProcess, Long idProcessedInLastProcess) {
     String tablesText = (CaDbEntryType.CERT == type)
-        ? "tables CERT and CRAW" : "table " + type.tableName();
+        ? "tables CERT and CRAW" : "table " + type.getTableName();
 
     try {
       int numProcessedBefore = 0;
@@ -316,7 +316,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         numProcessedBefore = numProcessedInLastProcess;
       }
 
-      deleteFromTableWithLargerId(type.tableName(), "ID", minId - 1, LOG);
+      deleteFromTableWithLargerId(type.getTableName(), "ID", minId - 1, LOG);
       if (type == CaDbEntryType.CERT) {
         deleteFromTableWithLargerId("CRAW", "CID", minId - 1, LOG);
       }
@@ -364,7 +364,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
       try {
         entriesFileIterator = new DbPortFileNameIterator(
-            baseDir + File.separator + type.dirName() + ".mf");
+            baseDir + File.separator + type.getDirName() + ".mf");
 
         statements = new PreparedStatement[sqls.length];
         for (int i = 0; i < sqls.length; i++) {
@@ -372,7 +372,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         while (entriesFileIterator.hasNext()) {
-          String entriesFile = baseDir + File.separator + type.dirName()
+          String entriesFile = baseDir + File.separator + type.getDirName()
               + File.separator + entriesFileIterator.next();
 
           // extract the toId from the filename
@@ -434,7 +434,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
       PreparedStatement[] statements, String[] sqls) throws Exception {
     final int numEntriesPerCommit = Math.max(1,
-        Math.round(type.sqlBatchFactor() * numCertsPerCommit));
+        Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
 
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
     ZipEntry entriesXmlEntry = zipFile.getEntry("overview.xml");
@@ -464,7 +464,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         IdentifidDbObjectType entry = (IdentifidDbObjectType) entries.next();
-        long id = entry.id();
+        long id = entry.getId();
         if (id < minId) {
           continue;
         }
@@ -473,9 +473,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         if (CaDbEntryType.CERT == type) {
           CertType cert = (CertType) entry;
-          int certArt = (cert.art() == null) ? 1 : cert.art();
+          int certArt = (cert.getArt() == null) ? 1 : cert.getArt();
 
-          String filename = cert.file();
+          String filename = cert.getFile();
           // rawcert
           ZipEntry certZipEnty = zipFile.getEntry(filename);
           // rawcert
@@ -506,30 +506,30 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
             psCert.setLong(idx++, id);
             psCert.setInt(idx++, certArt);
-            psCert.setLong(idx++, cert.update());
+            psCert.setLong(idx++, cert.getUpdate());
             psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
 
             psCert.setString(idx++, subjectText);
             long fpSubject = X509Util.fpCanonicalizedName(tbsCert.getSubject());
             psCert.setLong(idx++, fpSubject);
 
-            if (cert.fpRs() != null) {
-              psCert.setLong(idx++, cert.fpRs());
+            if (cert.getFpRs() != null) {
+              psCert.setLong(idx++, cert.getFpRs());
             } else {
               psCert.setNull(idx++, Types.BIGINT);
             }
 
             psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
             psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
-            setBoolean(psCert, idx++, cert.rev());
-            setInt(psCert, idx++, cert.rr());
-            setLong(psCert, idx++, cert.rt());
-            setLong(psCert, idx++, cert.rit());
-            setInt(psCert, idx++, cert.pid());
-            setInt(psCert, idx++, cert.caId());
+            setBoolean(psCert, idx++, cert.getRev());
+            setInt(psCert, idx++, cert.getRr());
+            setLong(psCert, idx++, cert.getRt());
+            setLong(psCert, idx++, cert.getRit());
+            setInt(psCert, idx++, cert.getPid());
+            setInt(psCert, idx++, cert.getCaId());
 
-            setInt(psCert, idx++, cert.rid());
-            setInt(psCert, idx++, cert.uid());
+            setInt(psCert, idx++, cert.getRid());
+            setInt(psCert, idx++, cert.getUid());
             psCert.setLong(idx++, FpIdCalculator.hash(encodedKey));
             Extension extension = tbsCert.getExtensions().getExtension(Extension.basicConstraints);
             boolean ee = true;
@@ -539,10 +539,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
 
             psCert.setInt(idx++, ee ? 1 : 0);
-            psCert.setInt(idx++, cert.reqType());
+            psCert.setInt(idx++, cert.getReqType());
             String tidS = null;
-            if (cert.tid() != null) {
-              tidS = cert.tid();
+            if (cert.getTid() != null) {
+              tidS = cert.getTid();
             }
             psCert.setString(idx++, tidS);
             psCert.addBatch();
@@ -552,9 +552,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           try {
             int idx = 1;
-            psRawcert.setLong(idx++, cert.id());
+            psRawcert.setLong(idx++, cert.getId());
             psRawcert.setString(idx++, b64Sha1FpCert);
-            psRawcert.setString(idx++, cert.rs());
+            psRawcert.setString(idx++, cert.getRs());
             psRawcert.setString(idx++, Base64.encodeToString(encodedCert));
             psRawcert.addBatch();
           } catch (SQLException ex) {
@@ -565,7 +565,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           CrlType crl = (CrlType) entry;
 
-          String filename = crl.file();
+          String filename = crl.getFile();
 
           // CRL
           ZipEntry zipEnty = zipFile.getEntry(filename);
@@ -604,8 +604,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
 
             int idx = 1;
-            psAddCrl.setLong(idx++, crl.id());
-            psAddCrl.setInt(idx++, crl.caId());
+            psAddCrl.setLong(idx++, crl.getId());
+            psAddCrl.setInt(idx++, crl.getCaId());
             psAddCrl.setLong(idx++, crlNumber.longValue());
             psAddCrl.setLong(idx++, x509crl.getThisUpdate().getTime() / 1000);
             if (x509crl.getNextUpdate() != null) {
@@ -627,7 +627,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
             psAddCrl.addBatch();
           } catch (SQLException ex) {
-            System.err.println("could not import CRL with ID=" + crl.id()
+            System.err.println("could not import CRL with ID=" + crl.getId()
                 + ", message: " + ex.getMessage());
             throw ex;
           }
@@ -637,14 +637,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           try {
             int idx = 1;
-            psAddUser.setLong(idx++, user.id());
-            psAddUser.setString(idx++, user.name());
-            setBoolean(psAddUser, idx++, user.active());
-            psAddUser.setString(idx++, user.password());
+            psAddUser.setLong(idx++, user.getId());
+            psAddUser.setString(idx++, user.getName());
+            setBoolean(psAddUser, idx++, user.getActive());
+            psAddUser.setString(idx++, user.getPassword());
             psAddUser.addBatch();
           } catch (SQLException ex) {
             System.err.println("could not import TUSER with ID="
-                + user.id() + ", message: " + ex.getMessage());
+                + user.getId() + ", message: " + ex.getMessage());
             throw ex;
           }
         } else if (CaDbEntryType.CAUSER == type) {
@@ -653,15 +653,15 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           try {
             int idx = 1;
-            psAddCaUser.setLong(idx++, causer.id());
-            psAddCaUser.setInt(idx++, causer.caId());
-            psAddCaUser.setInt(idx++, causer.uid());
-            psAddCaUser.setInt(idx++, causer.permission());
-            psAddCaUser.setString(idx++, causer.profiles());
+            psAddCaUser.setLong(idx++, causer.getId());
+            psAddCaUser.setInt(idx++, causer.getCaId());
+            psAddCaUser.setInt(idx++, causer.getUid());
+            psAddCaUser.setInt(idx++, causer.getPermission());
+            psAddCaUser.setString(idx++, causer.getProfiles());
             psAddCaUser.addBatch();
           } catch (SQLException ex) {
             System.err.println("could not import CA_HAS_USER with ID="
-                + causer.id() + ", message: " + ex.getMessage());
+                + causer.getId() + ", message: " + ex.getMessage());
             throw ex;
           }
         } else if (CaDbEntryType.REQUEST == type) {
@@ -669,19 +669,19 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           RequestType request = (RequestType) entry;
 
-          String filename = request.file();
+          String filename = request.getFile();
 
           ZipEntry zipEnty = zipFile.getEntry(filename);
           byte[] encodedRequest = IoUtil.read(zipFile.getInputStream(zipEnty));
 
           try {
             int idx = 1;
-            psAddRequest.setLong(idx++, request.id());
-            psAddRequest.setLong(idx++, request.update());
+            psAddRequest.setLong(idx++, request.getId());
+            psAddRequest.setLong(idx++, request.getUpdate());
             psAddRequest.setString(idx++, Base64.encodeToString(encodedRequest));
             psAddRequest.addBatch();
           } catch (SQLException ex) {
-            System.err.println("could not import REQUEST with ID=" + request.id()
+            System.err.println("could not import REQUEST with ID=" + request.getId()
                 + ", message: " + ex.getMessage());
             throw ex;
           }
@@ -692,12 +692,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
           try {
             int idx = 1;
-            psAddReqCert.setLong(idx++, reqCert.id());
-            psAddReqCert.setLong(idx++, reqCert.rid());
-            psAddReqCert.setLong(idx++, reqCert.cid());
+            psAddReqCert.setLong(idx++, reqCert.getId());
+            psAddReqCert.setLong(idx++, reqCert.getRid());
+            psAddReqCert.setLong(idx++, reqCert.getCid());
             psAddReqCert.addBatch();
           } catch (SQLException ex) {
-            System.err.println("could not import REQUEST with ID=" + reqCert.id()
+            System.err.println("could not import REQUEST with ID=" + reqCert.getId()
                 + ", message: " + ex.getMessage());
             throw ex;
           }
@@ -725,7 +725,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
               commit("(commit import to CA)");
             } catch (Throwable th) {
               rollback();
-              deleteFromTableWithLargerId(type.tableName(), "ID", id, LOG);
+              deleteFromTableWithLargerId(type.getTableName(), "ID", id, LOG);
               if (CaDbEntryType.CERT == type) {
                 deleteFromTableWithLargerId("CRAW", "CID", id, LOG);
               }

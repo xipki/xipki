@@ -260,7 +260,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
         saltLength, trailer);
 
     P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
-        signingKey.p11CryptService(), signingKey.identityId());
+        signingKey.getP11CryptService(), signingKey.getIdentityId());
     if (random == null) {
       pss.init(true, p11KeyParam);
     } else {

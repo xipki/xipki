@@ -294,7 +294,7 @@ class IaikP11Slot extends AbstractP11Slot {
     java.security.PublicKey pubKey = null;
     X509Cert cert = refreshResult.getCertForId(id);
     if (cert != null) {
-      pubKey = cert.cert().getPublicKey();
+      pubKey = cert.getCert().getPublicKey();
     } else {
       PublicKey p11PublicKey = getPublicKeyObject(session, id, null);
       if (p11PublicKey == null) {
@@ -308,7 +308,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, toString(privKey.getLabel()));
 
-    X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.cert()};
+    X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
     IaikP11Identity identity = new IaikP11Identity(this,
         new P11EntityIdentifier(slotId, objectId), privKey, pubKey, certs);
     refreshResult.addIdentity(identity);
@@ -317,7 +317,7 @@ class IaikP11Slot extends AbstractP11Slot {
   byte[] digestKey(long mechanism, IaikP11Identity identity) throws P11TokenException {
     ParamUtil.requireNonNull("identity", identity);
     assertMechanismSupported(mechanism);
-    Key signingKey = identity.signingKey();
+    Key signingKey = identity.getSigningKey();
     if (!(signingKey instanceof SecretKey)) {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
@@ -386,7 +386,7 @@ class IaikP11Slot extends AbstractP11Slot {
         || mechanism == PKCS11Constants.CKM_VENDOR_SM2_SM3) {
       expectedSignatureLen = 32;
     } else {
-      expectedSignatureLen = identity.expectedSignatureLen();
+      expectedSignatureLen = identity.getExpectedSignatureLen();
     }
 
     ConcurrentBagEntry<Session> session0 = borrowSession();
@@ -397,7 +397,7 @@ class IaikP11Slot extends AbstractP11Slot {
         return singleSign(session, mechanism, parameters, content, identity);
       }
 
-      Key signingKey = identity.signingKey();
+      Key signingKey = identity.getSigningKey();
       Mechanism mechanismObj = getMechanism(mechanism, parameters);
       if (LOG.isTraceEnabled()) {
         LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
@@ -421,7 +421,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
   private byte[] singleSign(Session session, long mechanism, P11Params parameters, byte[] content,
       IaikP11Identity identity) throws P11TokenException {
-    Key signingKey = identity.signingKey();
+    Key signingKey = identity.getSigningKey();
     Mechanism mechanismObj = getMechanism(mechanism, parameters);
     if (LOG.isTraceEnabled()) {
       LOG.debug("sign with signing key:\n{}", signingKey);
@@ -451,8 +451,8 @@ class IaikP11Slot extends AbstractP11Slot {
     Params paramObj;
     if (parameters instanceof P11RSAPkcsPssParams) {
       P11RSAPkcsPssParams param = (P11RSAPkcsPssParams) parameters;
-      paramObj = new RSAPkcsPssParams(Mechanism.get(param.hashAlgorithm()),
-          param.maskGenerationFunction(), param.saltLength());
+      paramObj = new RSAPkcsPssParams(Mechanism.get(param.getHashAlgorithm()),
+          param.getMaskGenerationFunction(), param.getSaltLength());
     } else if (parameters instanceof P11ByteArrayParams) {
       paramObj = new OpaqueParams(((P11ByteArrayParams) parameters).getBytes());
     } else if (parameters instanceof P11IVParams) {
@@ -861,8 +861,8 @@ class IaikP11Slot extends AbstractP11Slot {
     Session session = borrowWritableSession();
 
     try {
-      X509PublicKeyCertificate[] existingCerts = getCertificateObjects(session, objectId.id(),
-          objectId.labelChars());
+      X509PublicKeyCertificate[] existingCerts = getCertificateObjects(session, objectId.getId(),
+          objectId.getLabelChars());
       if (existingCerts == null || existingCerts.length == 0) {
         LOG.warn("could not find certificates " + objectId);
         return;
@@ -882,7 +882,7 @@ class IaikP11Slot extends AbstractP11Slot {
   protected void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
       throws P11TokenException {
     X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
-        new X509Cert(cert), objectId.id(), objectId.labelChars());
+        new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
     Session session = borrowWritableSession();
     try {
       session.createObject(newCaCertTemp);
@@ -1139,10 +1139,11 @@ class IaikP11Slot extends AbstractP11Slot {
     newCertTemp.getLabel().setCharArrayValue(label);
     newCertTemp.getToken().setBooleanValue(true);
     newCertTemp.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
-    newCertTemp.getSubject().setByteArrayValue(cert.cert().getSubjectX500Principal().getEncoded());
-    newCertTemp.getIssuer().setByteArrayValue(cert.cert().getIssuerX500Principal().getEncoded());
-    newCertTemp.getSerialNumber().setByteArrayValue(cert.cert().getSerialNumber().toByteArray());
-    newCertTemp.getValue().setByteArrayValue(cert.encodedCert());
+    newCertTemp.getSubject().setByteArrayValue(
+        cert.getCert().getSubjectX500Principal().getEncoded());
+    newCertTemp.getIssuer().setByteArrayValue(cert.getCert().getIssuerX500Principal().getEncoded());
+    newCertTemp.getSerialNumber().setByteArrayValue(cert.getCert().getSerialNumber().toByteArray());
+    newCertTemp.getValue().setByteArrayValue(cert.getEncodedCert());
     return newCertTemp;
   }
 
@@ -1178,7 +1179,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     X509PublicKeyCertificate newCertTemp = createPkcs11Template(new X509Cert(newCert),
-        objectId.id(), objectId.labelChars());
+        objectId.getId(), objectId.getLabelChars());
 
     Session session = borrowWritableSession();
     try {
@@ -1219,8 +1220,8 @@ class IaikP11Slot extends AbstractP11Slot {
   protected void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException {
     Session session = borrowWritableSession();
     try {
-      byte[] id = objectId.id();
-      char[] label = objectId.labelChars();
+      byte[] id = objectId.getId();
+      char[] label = objectId.getLabelChars();
       SecretKey secretKey = getSecretKeyObject(session, id, label);
       if (secretKey != null) {
         try {

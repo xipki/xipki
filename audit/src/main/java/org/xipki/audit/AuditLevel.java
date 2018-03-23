@@ -41,7 +41,7 @@ public enum AuditLevel {
     this.alignedText = alignedText;
   }
 
-  public int value() {
+  public int getValue() {
     return value;
   }
 
@@ -57,14 +57,14 @@ public enum AuditLevel {
 
   public static AuditLevel forValue(int value) {
     for (AuditLevel v : values()) {
-      if (v.value() == value) {
+      if (v.getValue() == value) {
         return v;
       }
     }
     throw new IllegalArgumentException("invalid AuditLevel code " + value);
   }
 
-  public String alignedText() {
+  public String getAlignedText() {
     return alignedText;
   }
 

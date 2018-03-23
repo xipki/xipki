@@ -211,7 +211,7 @@ public class OcspServerImpl implements OcspServer {
         continue;
       }
       OCSPResponse resp = new OCSPResponse(
-          new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.status()), null);
+          new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null);
       byte[] encoded;
       try {
         encoded = resp.getEncoded();
@@ -224,7 +224,7 @@ public class OcspServerImpl implements OcspServer {
 
     ExtendedExtension ext = new ExtendedExtension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE,
         true, DERNullBytes);
-    byte[] encoded = new byte[ext.encodedLength()];
+    byte[] encoded = new byte[ext.getEncodedLength()];
     ext.write(encoded, 0);
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
   }
@@ -444,17 +444,17 @@ public class OcspServerImpl implements OcspServer {
     for (ResponderType m : conf.getResponders().getResponder()) {
       ResponderOption option = new ResponderOption(m);
 
-      String optName = option.signerName();
+      String optName = option.getSignerName();
       if (!signers.containsKey(optName)) {
         throw new InvalidConfException("no signer named '" + optName + "' is defined");
       }
 
-      String reqOptName = option.requestOptionName();
+      String reqOptName = option.getRequestOptionName();
       if (!requestOptions.containsKey(reqOptName)) {
         throw new InvalidConfException("no requestOption named '" + reqOptName + "' is defined");
       }
 
-      String respOptName = option.responseOptionName();
+      String respOptName = option.getResponseOptionName();
       if (!responseOptions.containsKey(respOptName)) {
         throw new InvalidConfException("no responseOption named '" + respOptName + "' is defined");
       }
@@ -479,27 +479,27 @@ public class OcspServerImpl implements OcspServer {
     for (String name : responderOptions.keySet()) {
       ResponderOption option = responderOptions.get(name);
 
-      List<OcspStore> statusStores = new ArrayList<>(option.storeNames().size());
-      for (String storeName : option.storeNames()) {
+      List<OcspStore> statusStores = new ArrayList<>(option.getStoreNames().size());
+      for (String storeName : option.getStoreNames()) {
         statusStores.add(stores.get(storeName));
       }
 
-      ResponseOption responseOption = responseOptions.get(option.responseOptionName());
-      ResponderSigner signer = signers.get(option.signerName());
+      ResponseOption responseOption = responseOptions.get(option.getResponseOptionName());
+      ResponderSigner signer = signers.get(option.getSignerName());
       if (signer.isMacSigner()) {
         if (responseOption.isResponderIdByName()) {
           throw new InvalidConfException(
-              "could not use ResponderIdByName for signer " + option.signerName());
+              "could not use ResponderIdByName for signer " + option.getSignerName());
         }
 
-        if (EmbedCertsMode.NONE != responseOption.embedCertsMode()) {
+        if (EmbedCertsMode.NONE != responseOption.getEmbedCertsMode()) {
           throw new InvalidConfException(
-              "could not embed certifcate in response for signer " + option.signerName());
+              "could not embed certifcate in response for signer " + option.getSignerName());
         }
       }
 
       ResponderImpl responder = new ResponderImpl(option,
-          requestOptions.get(option.requestOptionName()),
+          requestOptions.get(option.getRequestOptionName()),
           responseOption, signer, statusStores);
       responders.put(name, responder);
     } // end for
@@ -509,7 +509,7 @@ public class OcspServerImpl implements OcspServer {
     for (String name : responderOptions.keySet()) {
       ResponderImpl responder = responders.get(name);
       ResponderOption option = responderOptions.get(name);
-      List<String> strs = option.servletPaths();
+      List<String> strs = option.getServletPaths();
       for (String path : strs) {
         tmpList.add(new SizeComparableString(path));
         path2responderMap.put(path, responder);
@@ -536,7 +536,7 @@ public class OcspServerImpl implements OcspServer {
       try {
         store.shutdown();
       } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, "shutdown store " + store.name());
+        LogUtil.warn(LOG, ex, "shutdown store " + store.getName());
       }
     }
   }
@@ -544,7 +544,7 @@ public class OcspServerImpl implements OcspServer {
   @Override
   public OcspRespWithCacheInfo answer(Responder responder2, byte[] request, boolean viaGet) {
     ResponderImpl responder = (ResponderImpl) responder2;
-    RequestOption reqOpt = responder.requestOption();
+    RequestOption reqOpt = responder.getRequestOption();
 
     int version;
     try {
@@ -561,8 +561,8 @@ public class OcspServerImpl implements OcspServer {
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
     }
 
-    ResponderSigner signer = responder.signer();
-    ResponseOption repOpt = responder.responseOption();
+    ResponderSigner signer = responder.getSigner();
+    ResponseOption repOpt = responder.getResponseOption();
 
     try {
       Object reqOrRrrorResp = checkSignature(request, reqOpt);
@@ -572,11 +572,11 @@ public class OcspServerImpl implements OcspServer {
 
       OcspRequest req = (OcspRequest) reqOrRrrorResp;
 
-      List<CertID> requestList = req.requestList();
+      List<CertID> requestList = req.getRequestList();
       int requestsSize = requestList.size();
-      if (requestsSize > reqOpt.maxRequestListCount()) {
+      if (requestsSize > reqOpt.getMaxRequestListCount()) {
         String message = requestsSize + " entries in RequestList, but maximal "
-            + reqOpt.maxRequestListCount() + " is allowed";
+            + reqOpt.getMaxRequestListCount() + " is allowed";
         LOG.warn(message);
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
       }
@@ -584,19 +584,19 @@ public class OcspServerImpl implements OcspServer {
       OcspRespControl repControl = new OcspRespControl();
       repControl.canCacheInfo = true;
 
-      List<ExtendedExtension> reqExtensions = req.extensions();
+      List<ExtendedExtension> reqExtensions = req.getExtensions();
       List<Extension> respExtensions = new LinkedList<>();
 
       ExtendedExtension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
       if (nonceExtn != null) {
-        if (reqOpt.nonceOccurrence() == TripleState.FORBIDDEN) {
+        if (reqOpt.getNonceOccurrence() == TripleState.FORBIDDEN) {
           LOG.warn("nonce forbidden, but is present in the request");
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
 
-        int len = nonceExtn.extnValueLength();
-        int min = reqOpt.nonceMinLen();
-        int max = reqOpt.nonceMaxLen();
+        int len = nonceExtn.getExtnValueLength();
+        int min = reqOpt.getNonceMinLen();
+        int max = reqOpt.getNonceMaxLen();
 
         if (len < min || len > max) {
           LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
@@ -606,14 +606,14 @@ public class OcspServerImpl implements OcspServer {
         repControl.canCacheInfo = false;
         respExtensions.add(nonceExtn);
       } else {
-        if (reqOpt.nonceOccurrence() == TripleState.REQUIRED) {
+        if (reqOpt.getNonceOccurrence() == TripleState.REQUIRED) {
           LOG.warn("nonce required, but is not present in the request");
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
       }
 
       ConcurrentContentSigner concurrentSigner = null;
-      if (responder.responderOption().mode() != OcspMode.RFC2560) {
+      if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
         ExtendedExtension extn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_PREFSIGALGS);
         if (extn != null) {
           ASN1InputStream asn1Stream = new ASN1InputStream(extn.getExtnValueStream());
@@ -647,7 +647,7 @@ public class OcspServerImpl implements OcspServer {
             List<OID> oids = new LinkedList<>();
             for (ExtendedExtension m : reqExtensions) {
               if (m.isCritical()) {
-                oids.add(m.extnType());
+                oids.add(m.getExtnType());
               }
             }
             LOG.warn("could not process critial request extensions: {}", oids);
@@ -658,7 +658,7 @@ public class OcspServerImpl implements OcspServer {
       }
 
       if (concurrentSigner == null) {
-        concurrentSigner = signer.firstSigner();
+        concurrentSigner = signer.getFirstSigner();
       }
 
       AlgorithmCode cacheDbSigAlgCode = null;
@@ -670,17 +670,17 @@ public class OcspServerImpl implements OcspServer {
       if (canCacheDb) {
         // try to find the cached response
         CertID certId = requestList.get(0);
-        HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
+        HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
         if (!reqOpt.allows(reqHashAlgo)) {
           LOG.warn("CertID.hashAlgorithm {} not allowed",
-              reqHashAlgo != null ? reqHashAlgo : certId.issuer().hashAlgorithmOID());
+              reqHashAlgo != null ? reqHashAlgo : certId.getIssuer().hashAlgorithmOID());
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
 
-        cacheDbSigAlgCode = concurrentSigner.algorithmCode();
+        cacheDbSigAlgCode = concurrentSigner.getAlgorithmCode();
 
-        cacheDbIssuerId = responseCacher.getIssuerId(certId.issuer());
-        cacheDbSerialNumber = certId.serialNumber();
+        cacheDbIssuerId = responseCacher.getIssuerId(certId.getIssuer());
+        cacheDbSerialNumber = certId.getSerialNumber();
 
         if (cacheDbIssuerId != null) {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
@@ -691,8 +691,8 @@ public class OcspServerImpl implements OcspServer {
         } else if (master) {
           // store the issuer certificate in cache database.
           X509Certificate issuerCert = null;
-          for (OcspStore store : responder.stores()) {
-            issuerCert = store.getIssuerCert(certId.issuer());
+          for (OcspStore store : responder.getStores()) {
+            issuerCert = store.getIssuerCert(certId.getIssuer());
             if (issuerCert != null) {
               break;
             }
@@ -730,14 +730,14 @@ public class OcspServerImpl implements OcspServer {
       }
 
       TaggedCertSequence certsInResp;
-      EmbedCertsMode certsMode = repOpt.embedCertsMode();
+      EmbedCertsMode certsMode = repOpt.getEmbedCertsMode();
       if (certsMode == EmbedCertsMode.SIGNER) {
-        certsInResp = signer.sequenceOfCertificate();
+        certsInResp = signer.getSequenceOfCert();
       } else if (certsMode == EmbedCertsMode.NONE) {
         certsInResp = null;
       } else {
         // certsMode == EmbedCertsMode.SIGNER_AND_CA
-        certsInResp = signer.sequenceOfCertificateChain();
+        certsInResp = signer.getSequenceOfCertChain();
       }
 
       byte[] encodeOcspResponse;
@@ -777,7 +777,7 @@ public class OcspServerImpl implements OcspServer {
   private OcspRespWithCacheInfo processCertReq(CertID certId, OCSPRespBuilder builder,
       ResponderImpl responder, RequestOption reqOpt, ResponseOption repOpt,
       OcspRespControl repControl) throws IOException {
-    HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
+    HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
@@ -786,20 +786,20 @@ public class OcspServerImpl implements OcspServer {
     CertStatusInfo certStatusInfo = null;
     boolean exceptionOccurs = false;
 
-    BigInteger serial = certId.serialNumber();
+    BigInteger serial = certId.getSerialNumber();
 
     Date now = new Date();
-    for (OcspStore store : responder.stores()) {
+    for (OcspStore store : responder.getStores()) {
       try {
-        certStatusInfo = store.getCertStatus(now, certId.issuer(), serial,
+        certStatusInfo = store.getCertStatus(now, certId.getIssuer(), serial,
             repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
-            responder.responderOption().inheritCaRevocation());
+            responder.getResponderOption().isInheritCaRevocation());
         if (certStatusInfo != null) {
           break;
         }
       } catch (OcspStoreException ex) {
         exceptionOccurs = true;
-        LogUtil.error(LOG, ex, "getCertStatus() of CertStatusStore " + store.name());
+        LogUtil.error(LOG, ex, "getCertStatus() of CertStatusStore " + store.getName());
       }
     }
 
@@ -812,16 +812,16 @@ public class OcspServerImpl implements OcspServer {
     } // end if
 
     // certStatusInfo must not be null in any case, since at least one store is configured
-    Date thisUpdate = certStatusInfo.thisUpdate();
+    Date thisUpdate = certStatusInfo.getThisUpdate();
     if (thisUpdate == null) {
       thisUpdate = new Date();
     }
-    Date nextUpdate = certStatusInfo.nextUpdate();
+    Date nextUpdate = certStatusInfo.getNextUpdate();
 
     List<Extension> extensions = new LinkedList<>();
     boolean unknownAsRevoked = false;
     byte[] certStatus;
-    switch (certStatusInfo.certStatus()) {
+    switch (certStatusInfo.getCertStatus()) {
       case GOOD:
         certStatus = bytes_certstatus_good;
         break;
@@ -832,7 +832,7 @@ public class OcspServerImpl implements OcspServer {
       case UNKNOWN:
       case IGNORE:
         repControl.canCacheInfo = false;
-        if (responder.responderOption().mode() == OcspMode.RFC2560) {
+        if (responder.getResponderOption().getMode() == OcspMode.RFC2560) {
           certStatus = bytes_certstatus_unknown;
         } else { // (ocspMode == OCSPMode.RFC6960)
           unknownAsRevoked = true;
@@ -840,31 +840,31 @@ public class OcspServerImpl implements OcspServer {
         }
         break;
       case REVOKED:
-        CertRevocationInfo revInfo = certStatusInfo.revocationInfo();
+        CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
         certStatus = Template.getEncodeRevokedInfo(
-            repOpt.isIncludeRevReason() ? revInfo.reason() : null, revInfo.revocationTime());
+            repOpt.isIncludeRevReason() ? revInfo.getReason() : null, revInfo.getRevocationTime());
 
-        Date invalidityDate = revInfo.invalidityTime();
+        Date invalidityDate = revInfo.getInvalidityTime();
         if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
-            && !invalidityDate.equals(revInfo.revocationTime())) {
+            && !invalidityDate.equals(revInfo.getRevocationTime())) {
           extensions.add(Template.getInvalidityDateExtension(invalidityDate));
         }
         break;
       default:
-        throw new RuntimeException("unknown CertificateStatus:" + certStatusInfo.certStatus());
+        throw new RuntimeException("unknown CertificateStatus:" + certStatusInfo.getCertStatus());
     } // end switch
 
-    if (responder.responderOption().mode() != OcspMode.RFC2560) {
+    if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
       repControl.includeExtendedRevokeExtension = true;
     }
 
-    byte[] certHash = certStatusInfo.certHash();
+    byte[] certHash = certStatusInfo.getCertHash();
     if (certHash != null) {
-      extensions.add(Template.getCertHashExtension(certStatusInfo.certHashAlgo(), certHash));
+      extensions.add(Template.getCertHashExtension(certStatusInfo.getCertHashAlgo(), certHash));
     }
 
-    if (certStatusInfo.archiveCutOff() != null) {
-      extensions.add(Template.getArchiveOffExtension(certStatusInfo.archiveCutOff()));
+    if (certStatusInfo.getArchiveCutOff() != null) {
+      extensions.add(Template.getArchiveOffExtension(certStatusInfo.getArchiveCutOff()));
     }
 
     if (LOG.isDebugEnabled()) {
@@ -879,8 +879,8 @@ public class OcspServerImpl implements OcspServer {
         certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
       }
 
-      String msg = StringUtil.concatObjectsCap(250, "issuer: ", certId.issuer(),
-          ", serialNumber: ", LogUtil.formatCsn(certId.serialNumber()),
+      String msg = StringUtil.concatObjectsCap(250, "issuer: ", certId.getIssuer(),
+          ", serialNumber: ", LogUtil.formatCsn(certId.getSerialNumber()),
           ", certStatus: ", certStatusText, ", thisUpdate: ", thisUpdate,
           ", nextUpdate: ", nextUpdate);
 
@@ -912,16 +912,16 @@ public class OcspServerImpl implements OcspServer {
     HealthCheckResult result = new HealthCheckResult("OCSPResponder");
     boolean healthy = true;
 
-    for (OcspStore store : responder.stores()) {
+    for (OcspStore store : responder.getStores()) {
       boolean storeHealthy = store.isHealthy();
       healthy &= storeHealthy;
 
-      HealthCheckResult storeHealth = new HealthCheckResult("CertStatusStore." + store.name());
+      HealthCheckResult storeHealth = new HealthCheckResult("CertStatusStore." + store.getName());
       storeHealth.setHealthy(storeHealthy);
       result.addChildCheck(storeHealth);
     }
 
-    boolean signerHealthy = responder.signer().isHealthy();
+    boolean signerHealthy = responder.getSigner().isHealthy();
     healthy &= signerHealthy;
 
     HealthCheckResult signerHealth = new HealthCheckResult("Signer");
@@ -1099,9 +1099,9 @@ public class OcspServerImpl implements OcspServer {
     }
     Set<Certificate> certstore = new HashSet<>();
 
-    Set<CertWithEncoded> trustAnchors = requestOption.trustAnchors();
+    Set<CertWithEncoded> trustAnchors = requestOption.getTrustAnchors();
     for (CertWithEncoded m : trustAnchors) {
-      certstore.add(m.certificate());
+      certstore.add(m.getCert());
     }
 
     final int n = certsInReq.length;
@@ -1117,13 +1117,13 @@ public class OcspServerImpl implements OcspServer {
       }
     }
 
-    Set<X509Certificate> configuredCerts = requestOption.certs();
+    Set<X509Certificate> configuredCerts = requestOption.getCerts();
     if (CollectionUtil.isNonEmpty(configuredCerts)) {
-      certstore.addAll(requestOption.certs());
+      certstore.addAll(requestOption.getCerts());
     }
 
     X509Certificate[] certpath = X509Util.buildCertPath(target, certstore);
-    CertpathValidationModel model = requestOption.certpathValidationModel();
+    CertpathValidationModel model = requestOption.getCertpathValidationModel();
 
     Date now = new Date();
     if (model == null || model == CertpathValidationModel.PKIX) {
@@ -1215,7 +1215,7 @@ public class OcspServerImpl implements OcspServer {
       OID extnType) {
     ExtendedExtension extn = null;
     for (ExtendedExtension m : extensions) {
-      if (extnType == m.extnType()) {
+      if (extnType == m.getExtnType()) {
         extn = m;
         break;
       }

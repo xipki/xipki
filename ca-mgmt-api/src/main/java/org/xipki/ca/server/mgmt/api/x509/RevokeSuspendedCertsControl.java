@@ -64,18 +64,18 @@ public class RevokeSuspendedCertsControl {
     }
   } // constructor
 
-  public CrlReason targetReason() {
+  public CrlReason getTargetReason() {
     return targetReason;
   }
 
-  public CertValidity unchangedSince() {
+  public CertValidity getUnchangedSince() {
     return unchangedSince;
   }
 
   @Override
   public String toString() {
     ConfPairs pairs = new ConfPairs();
-    pairs.putPair(KEY_REVOCATION_REASON, targetReason.description());
+    pairs.putPair(KEY_REVOCATION_REASON, targetReason.getDescription());
     pairs.putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
     return pairs.getEncoded();
   }

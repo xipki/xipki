@@ -186,7 +186,7 @@ public class HttpScepServlet extends HttpServlet {
           sendError(resp, HttpServletResponse.SC_BAD_REQUEST);
           return;
         } catch (OperationException ex) {
-          ErrorCode code = ex.errorCode();
+          ErrorCode code = ex.getErrorCode();
 
           int httpCode;
           switch (code) {
@@ -229,15 +229,15 @@ public class HttpScepServlet extends HttpServlet {
         byte[] bodyBytes = ci.getEncoded();
 
         sendOKResponse(resp, CT_RESPONSE, bodyBytes);
-      } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] caCapsBytes = responder.caCaps().bytes();
+        byte[] caCapsBytes = responder.getCaCaps().getBytes();
         sendOKResponse(resp, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
-      } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] respBytes = responder.caCertResp().bytes();
+        byte[] respBytes = responder.getCaCertResp().getBytes();
         sendOKResponse(resp, ScepConstants.CT_X509_CA_RA_CERT, respBytes);
-      } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         auditMessage = "SCEP operation '" + operation + "' is not permitted";
         auditStatus = AuditStatus.FAILED;
         sendError(resp, HttpServletResponse.SC_FORBIDDEN);
@@ -312,8 +312,8 @@ public class HttpScepServlet extends HttpServlet {
   }
 
   // CHECKSTYLE:SKIP
-  private static void sendOKResponse(HttpServletResponse resp, String contentType,
-      byte[] content) throws IOException {
+  private static void sendOKResponse(HttpServletResponse resp, String contentType, byte[] content)
+      throws IOException {
     resp.setStatus(HttpServletResponse.SC_OK);
     resp.setContentType(contentType);
     resp.setContentLength(content.length);

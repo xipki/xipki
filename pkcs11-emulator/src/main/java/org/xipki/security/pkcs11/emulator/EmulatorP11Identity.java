@@ -325,24 +325,25 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
-    HashAlgo contentHash = HashAlgo.getInstanceForPkcs11HashMech(pssParam.hashAlgorithm());
+    HashAlgo contentHash = HashAlgo.getInstanceForPkcs11HashMech(pssParam.getHashAlgorithm());
     if (contentHash == null) {
-      throw new P11TokenException("unsupported HashAlgorithm " + pssParam.hashAlgorithm());
+      throw new P11TokenException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
     } else if (hashAlgo != null && contentHash != hashAlgo) {
       throw new P11TokenException("Invalid parameters: invalid hash algorithm");
     }
 
     HashAlgo mgfHash = HashAlgo.getInstanceForPkcs11MgfMech(
-        pssParam.maskGenerationFunction());
+        pssParam.getMaskGenerationFunction());
     if (mgfHash == null) {
-      throw new P11TokenException("unsupported MaskGenerationFunction " + pssParam.hashAlgorithm());
+      throw new P11TokenException(
+          "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
     }
 
     byte[] hashValue = (hashAlgo == null) ? contentToSign : hashAlgo.hash(contentToSign);
     byte[] encodedHashValue;
     try {
       encodedHashValue = SignerUtil.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
-          (int) pssParam.saltLength(), signatureKeyBitLength(), random);
+          (int) pssParam.getSaltLength(), getSignatureKeyBitLength(), random);
     } catch (XiSecurityException ex) {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
     }
@@ -350,7 +351,7 @@ public class EmulatorP11Identity extends P11Identity {
   }
 
   private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgo hashAlgo) throws P11TokenException {
-    int modulusBitLen = signatureKeyBitLength();
+    int modulusBitLen = getSignatureKeyBitLength();
     byte[] paddedHash;
     try {
       if (hashAlgo == null) {
@@ -408,7 +409,7 @@ public class EmulatorP11Identity extends P11Identity {
       Signature sig = sig0.value();
       sig.update(hash);
       byte[] x962Signature = sig.sign();
-      return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
+      return SignerUtil.dsaSigX962ToPlain(x962Signature, getSignatureKeyBitLength());
     } catch (SignatureException ex) {
       throw new P11TokenException("SignatureException: " + ex.getMessage(), ex);
     } catch (XiSecurityException ex) {
@@ -433,7 +434,7 @@ public class EmulatorP11Identity extends P11Identity {
     try {
       SM2Signer sig = sig0.value();
       byte[] x962Signature = sig.generateSignatureForHash(hash);
-      return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
+      return SignerUtil.dsaSigX962ToPlain(x962Signature, getSignatureKeyBitLength());
     } catch (CryptoException ex) {
       throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
     } catch (XiSecurityException ex) {
@@ -471,7 +472,7 @@ public class EmulatorP11Identity extends P11Identity {
       SM2Signer sig = sig0.value();
 
       byte[] x962Signature = sig.generateSignatureForMessage(userId, dataToSign);
-      return SignerUtil.dsaSigX962ToPlain(x962Signature, signatureKeyBitLength());
+      return SignerUtil.dsaSigX962ToPlain(x962Signature, getSignatureKeyBitLength());
     } catch (CryptoException ex) {
       throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
     } catch (XiSecurityException ex) {
@@ -481,7 +482,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   }
 
-  Key signingKey() {
+  Key getSigningKey() {
     return signingKey;
   }
 

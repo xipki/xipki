@@ -38,11 +38,11 @@ class IdentifiedDigestEntry {
     this.id = id;
   }
 
-  public long id() {
+  public long getId() {
     return id;
   }
 
-  public DigestEntry content() {
+  public DigestEntry getContent() {
     return content;
   }
 
@@ -50,7 +50,7 @@ class IdentifiedDigestEntry {
     this.caId = caId;
   }
 
-  public Integer caId() {
+  public Integer getCaId() {
     return caId;
   }
 

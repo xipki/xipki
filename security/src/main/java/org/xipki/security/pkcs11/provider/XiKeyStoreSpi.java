@@ -132,7 +132,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
   public void engineLoad(InputStream stream, char[] password) {
     this.creationDate = new Date();
 
-    Set<String> moduleNames = p11CryptServiceFactory.moduleNames();
+    Set<String> moduleNames = p11CryptServiceFactory.getModuleNames();
     for (String moduleName : moduleNames) {
       try {
         engineLoad(moduleName);
@@ -148,12 +148,12 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
   private void engineLoad(String moduleName) throws P11TokenException, XiSecurityException {
     P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-    P11Module module = p11Service.module();
-    List<P11SlotIdentifier> slotIds = module.slotIdentifiers();
+    P11Module module = p11Service.getModule();
+    List<P11SlotIdentifier> slotIds = module.getSlotIds();
 
     for (P11SlotIdentifier slotId: slotIds) {
       P11Slot slot = module.getSlot(slotId);
-      Set<P11ObjectIdentifier> identityIds = slot.identityIdentifiers();
+      Set<P11ObjectIdentifier> identityIds = slot.getIdentityIdentifiers();
       for (P11ObjectIdentifier objId : identityIds) {
         P11Identity identity = slot.getIdentity(objId);
         X509Certificate[] chain = identity.certificateChain();
@@ -161,16 +161,16 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
           continue;
         }
 
-        P11PrivateKey key = new P11PrivateKey(p11Service, identity.identityId());
+        P11PrivateKey key = new P11PrivateKey(p11Service, identity.getIdentityId());
         KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
-        keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keyid-"
-            + objId.idHex(), keyCertEntry);
-        keyCerts.put(moduleName + "#slotid-" + slotId.id() + "#keylabel-"
-            + objId.label(), keyCertEntry);
-        keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keyid-"
-            + objId.idHex(), keyCertEntry);
-        keyCerts.put(moduleName + "#slotindex-" + slotId.index() + "#keylabel-"
-            + objId.label(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keyid-"
+            + objId.getIdHex(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keylabel-"
+            + objId.getLabel(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keyid-"
+            + objId.getIdHex(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keylabel-"
+            + objId.getLabel(), keyCertEntry);
       }
     }
   } // method engineLoad

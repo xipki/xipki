@@ -44,7 +44,7 @@ public class RestResponse {
     this.body = body;
   }
 
-  public int statusCode() {
+  public int getStatusCode() {
     return statusCode;
   }
 
@@ -52,7 +52,7 @@ public class RestResponse {
     this.statusCode = statusCode;
   }
 
-  public String contentType() {
+  public String getContentType() {
     return contentType;
   }
 
@@ -60,7 +60,7 @@ public class RestResponse {
     this.contentType = contentType;
   }
 
-  public Map<String, String> headers() {
+  public Map<String, String> getHeaders() {
     return headers;
   }
 
@@ -68,8 +68,9 @@ public class RestResponse {
     this.headers = headers;
   }
 
-  public byte[] body() {
+  public byte[] getBody() {
     return body;
+    
   }
 
   public void setBody(byte[] body) {

@@ -145,7 +145,7 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
   }
 
   protected P11RSADigestSignatureSpi(HashAlgo digestAlg) {
-    this.digestAlgId = digestAlg.algorithmIdentifier();
+    this.digestAlgId = digestAlg.getAlgorithmIdentifier();
     this.digest = digestAlg.createDigest();
   }
 

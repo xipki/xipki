@@ -44,15 +44,15 @@ public class AdmissionsOption {
     this.professionInfos = ParamUtil.requireNonEmpty("professionInfos", professionInfos);
   }
 
-  public GeneralName admissionAuthority() {
+  public GeneralName getAdmissionAuthority() {
     return admissionAuthority;
   }
 
-  public NamingAuthority namingAuthority() {
+  public NamingAuthority getNamingAuthority() {
     return namingAuthority;
   }
 
-  public List<ProfessionInfoOption> professionInfos() {
+  public List<ProfessionInfoOption> getProfessionInfos() {
     return professionInfos;
   }
 

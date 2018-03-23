@@ -46,7 +46,7 @@ public class CaHasRequestorEntry {
     this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
   }
 
-  public boolean ra() {
+  public boolean isRa() {
     return ra;
   }
 
@@ -54,7 +54,7 @@ public class CaHasRequestorEntry {
     this.ra = ra;
   }
 
-  public int permission() {
+  public int getPermission() {
     return permission;
   }
 
@@ -62,7 +62,7 @@ public class CaHasRequestorEntry {
     this.permission = permission;
   }
 
-  public NameId requestorIdent() {
+  public NameId getRequestorIdent() {
     return requestorIdent;
   }
 
@@ -74,7 +74,7 @@ public class CaHasRequestorEntry {
     }
   }
 
-  public Set<String> profiles() {
+  public Set<String> getProfiles() {
     return profiles;
   }
 

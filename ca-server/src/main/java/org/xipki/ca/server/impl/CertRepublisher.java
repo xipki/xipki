@@ -80,8 +80,8 @@ class CertRepublisher {
           serials = certstore.getCertSerials(ca, startId, numEntries, onlyRevokedCerts);
           long maxId = 1;
           for (SerialWithId sid : serials) {
-            if (sid.id() > maxId) {
-              maxId = sid.id();
+            if (sid.getId() > maxId) {
+              maxId = sid.getId();
             }
             queue.put(new SerialWithIdQueueEntry(sid));
           }
@@ -143,7 +143,7 @@ class CertRepublisher {
         X509CertificateInfo certInfo;
 
         try {
-          certInfo = certstore.getCertificateInfoForId(ca, caCert, sid.id(), caIdNameMap);
+          certInfo = certstore.getCertificateInfoForId(ca, caCert, sid.getId(), caIdNameMap);
         } catch (OperationException | CertificateException ex) {
           LogUtil.error(LOG, ex);
           failed = true;
@@ -159,7 +159,7 @@ class CertRepublisher {
           boolean successful = publisher.certificateAdded(certInfo);
           if (!successful) {
             LOG.error("republish certificate serial={} to publisher {} failed",
-                LogUtil.formatCsn(sid.serial()), publisher.ident());
+                LogUtil.formatCsn(sid.getSerial()), publisher.getIdent());
             allSucc = false;
           }
         }

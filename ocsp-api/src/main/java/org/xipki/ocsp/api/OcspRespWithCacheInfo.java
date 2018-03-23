@@ -35,7 +35,7 @@ public class OcspRespWithCacheInfo {
       this.thisUpdate = thisUpdate;
     }
 
-    public long thisUpdate() {
+    public long getThisUpdate() {
       return thisUpdate;
     }
 
@@ -43,7 +43,7 @@ public class OcspRespWithCacheInfo {
       this.nextUpdate = nextUpdate;
     }
 
-    public Long nextUpdate() {
+    public Long getNextUpdate() {
       return nextUpdate;
     }
 
@@ -58,11 +58,11 @@ public class OcspRespWithCacheInfo {
     this.cacheInfo = cacheInfo;
   }
 
-  public byte[] response() {
+  public byte[] getResponse() {
     return response;
   }
 
-  public ResponseCacheInfo cacheInfo() {
+  public ResponseCacheInfo getCacheInfo() {
     return cacheInfo;
   }
 

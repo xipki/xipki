@@ -87,7 +87,7 @@ public class EnrollCertCmd extends ClientAction {
       throw new CmdFailure("server returned 'pending'");
     }
 
-    X509Certificate cert = resp.certificates().get(0);
+    X509Certificate cert = resp.getCertificates().get(0);
     saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
     return null;
   }

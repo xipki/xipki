@@ -62,13 +62,13 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
   public Asn1P11EntityIdentifier(Asn1P11SlotIdentifier slotId, Asn1P11ObjectIdentifier objectId) {
     this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     this.objectId = ParamUtil.requireNonNull("objectId", objectId);
-    this.entityId = new P11EntityIdentifier(slotId.slotId(), objectId.objectId());
+    this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
   }
 
   public Asn1P11EntityIdentifier(P11EntityIdentifier entityId) {
     this.entityId = ParamUtil.requireNonNull("entityId", entityId);
-    this.slotId = new Asn1P11SlotIdentifier(entityId.slotId());
-    this.objectId = new Asn1P11ObjectIdentifier(entityId.objectId());
+    this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
+    this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
   }
 
   private Asn1P11EntityIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
@@ -76,7 +76,7 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
     int idx = 0;
     this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
     this.objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
-    this.entityId = new P11EntityIdentifier(slotId.slotId(), objectId.objectId());
+    this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
   }
 
   public static Asn1P11EntityIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
@@ -105,15 +105,15 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
     return new DERSequence(vector);
   }
 
-  public Asn1P11SlotIdentifier slotId() {
+  public Asn1P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public Asn1P11ObjectIdentifier objectId() {
+  public Asn1P11ObjectIdentifier getObjectId() {
     return objectId;
   }
 
-  public P11EntityIdentifier entityId() {
+  public P11EntityIdentifier getEntityId() {
     return entityId;
   }
 

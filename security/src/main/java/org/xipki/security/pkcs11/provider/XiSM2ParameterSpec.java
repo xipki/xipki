@@ -48,8 +48,7 @@ public class XiSM2ParameterSpec implements AlgorithmParameterSpec {
    *
    * @return the ID string.
    */
-  // CHECKSTYLE:SKIP
-  public byte[] getID() {
+  public byte[] getId() {
     return Arrays.clone(id);
   }
 }

@@ -76,16 +76,16 @@ public class HttpRestServlet extends HttpServlet {
       byte[] requestBytes = IoUtil.read(req.getInputStream());
       RestResponse response = rest.service(path, event, requestBytes, httpRetriever);
 
-      resp.setStatus(response.statusCode());
+      resp.setStatus(response.getStatusCode());
       if (resp.getContentType() != null) {
         resp.setContentType(resp.getContentType());
       }
 
-      for (String headerName : response.headers().keySet()) {
-        resp.setHeader(headerName, response.headers().get(headerName));
+      for (String headerName : response.getHeaders().keySet()) {
+        resp.setHeader(headerName, response.getHeaders().get(headerName));
       }
 
-      byte[] respBody = response.body();
+      byte[] respBody = response.getBody();
       if (respBody == null) {
         resp.setContentLength(0);
       } else {

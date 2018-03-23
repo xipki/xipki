@@ -41,7 +41,7 @@ public enum GeneralNameTag {
     this.tag = tag;
   }
 
-  public int tag() {
+  public int getTag() {
     return tag;
   }
 

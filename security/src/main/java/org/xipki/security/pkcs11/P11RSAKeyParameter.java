@@ -50,15 +50,15 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
     this.keysize = modulus.bitLength();
   }
 
-  int keysize() {
+  int getKeysize() {
     return keysize;
   }
 
-  P11CryptService p11CryptService() {
+  P11CryptService getP11CryptService() {
     return p11CryptService;
   }
 
-  P11EntityIdentifier identityId() {
+  P11EntityIdentifier getIdentityId() {
     return identityId;
   }
 
@@ -69,7 +69,7 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
     RSAPublicKey key;
     try {
-      key = (RSAPublicKey) p11CryptService.getIdentity(identityId).publicKey();
+      key = (RSAPublicKey) p11CryptService.getIdentity(identityId).getPublicKey();
     } catch (P11TokenException ex) {
       throw new InvalidKeyException(ex.getMessage(), ex);
     }

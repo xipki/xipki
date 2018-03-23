@@ -42,7 +42,7 @@ public enum CaCapability {
     this.text = text;
   }
 
-  public String text() {
+  public String getText() {
     return text;
   }
 

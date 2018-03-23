@@ -35,7 +35,7 @@ public abstract class QaPolicyQualifierInfo {
       this.cpsUri = ParamUtil.requireNonBlank("cpsUri", cpsUri);
     }
 
-    public String cpsUri() {
+    public String getCpsUri() {
       return cpsUri;
     }
 
@@ -49,7 +49,7 @@ public abstract class QaPolicyQualifierInfo {
       this.userNotice = ParamUtil.requireNonBlank("userNotice", userNotice);
     }
 
-    public String userNotice() {
+    public String getUserNotice() {
       return userNotice;
     }
 

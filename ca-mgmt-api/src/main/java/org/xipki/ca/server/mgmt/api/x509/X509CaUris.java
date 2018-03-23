@@ -41,19 +41,19 @@ public class X509CaUris {
     this.deltaCrlUris = deltaCrlUris;
   }
 
-  public List<String> cacertUris() {
+  public List<String> getCacertUris() {
     return CollectionUtil.unmodifiableList(cacertUris);
   }
 
-  public List<String> ocspUris() {
+  public List<String> getOcspUris() {
     return CollectionUtil.unmodifiableList(ocspUris);
   }
 
-  public List<String> crlUris() {
+  public List<String> getCrlUris() {
     return CollectionUtil.unmodifiableList(crlUris);
   }
 
-  public List<String> deltaCrlUris() {
+  public List<String> getDeltaCrlUris() {
     return CollectionUtil.unmodifiableList(deltaCrlUris);
   }
 

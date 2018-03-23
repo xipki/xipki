@@ -44,19 +44,19 @@ public class CertListInfo {
     this.subject = ParamUtil.requireNonNull("subject", subject);
   }
 
-  public BigInteger serialNumber() {
+  public BigInteger getSerialNumber() {
     return serialNumber;
   }
 
-  public Date notBefore() {
+  public Date getNotBefore() {
     return notBefore;
   }
 
-  public Date notAfter() {
+  public Date getNotAfter() {
     return notAfter;
   }
 
-  public String subject() {
+  public String getSubject() {
     return subject;
   }
 

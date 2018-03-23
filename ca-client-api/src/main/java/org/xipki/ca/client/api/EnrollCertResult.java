@@ -40,7 +40,7 @@ public class EnrollCertResult {
     this.caCert = caCert;
   }
 
-  public Certificate caCert() {
+  public Certificate getCaCert() {
     return caCert;
   }
 
@@ -49,7 +49,7 @@ public class EnrollCertResult {
     return certsOrErrors.get(id);
   }
 
-  public Set<String> allIds() {
+  public Set<String> getAllIds() {
     return certsOrErrors.keySet();
   }
 

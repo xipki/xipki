@@ -41,7 +41,7 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
     this.hashAlgo = ScepUtil.requireNonNull("hashAlgo", hashAlgo);
     ScepUtil.requireNonEmpty("hashValues", hashValues);
 
-    final int hLen = hashAlgo.length();
+    final int hLen = hashAlgo.getLength();
     for (byte[] m : hashValues) {
       if (m.length != hLen) {
         throw new IllegalArgumentException("invalid the length of hashValue: "

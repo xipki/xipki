@@ -95,7 +95,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
       SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
     HttpVersion version = request.protocolVersion();
 
-    ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.path());
+    ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.getPath());
     if (responderAndPath == null) {
       return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
     }
@@ -107,23 +107,23 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
       }
 
-      Responder responder = responderAndPath.responder();
+      Responder responder = responderAndPath.getResponder();
 
       int contentLen = request.content().readableBytes();
       // request too long
-      if (contentLen > responder.maxRequestSize()) {
+      if (contentLen > responder.getMaxRequestSize()) {
         return createErrorResponse(version,
             HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
       }
 
       OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder,
           readContent(request), false);
-      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
+      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         LOG.error("processRequest returned null, this should not happen");
         return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
       }
 
-      byte[] encodedOcspResp = ocspRespWithCacheInfo.response();
+      byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
       return createOKResponse(version, CT_RESPONSE, encodedOcspResp);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
@@ -139,14 +139,14 @@ public class HttpOcspServlet extends AbstractHttpServlet {
       SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
     HttpVersion version = request.protocolVersion();
 
-    ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.path());
+    ResponderAndPath responderAndPath = server.getResponderForPath(servletUri.getPath());
     if (responderAndPath == null) {
       return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
     }
 
-    String path = servletUri.path();
-    String servletPath = responderAndPath.servletPath();
-    Responder responder = responderAndPath.responder();
+    String path = servletUri.getPath();
+    String servletPath = responderAndPath.getServletPath();
+    Responder responder = responderAndPath.getResponder();
 
     if (!responder.supportsHttpGet()) {
       return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
@@ -160,7 +160,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
       if (path.charAt(offset) == '/') {
         offset++;
       }
-      b64OcspReq = servletUri.path().substring(offset);
+      b64OcspReq = servletUri.getPath().substring(offset);
     } else {
       return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
     }
@@ -168,36 +168,36 @@ public class HttpOcspServlet extends AbstractHttpServlet {
     try {
       // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
       // POST, we support GET for longer requests anyway.
-      if (b64OcspReq.length() > responder.maxRequestSize()) {
+      if (b64OcspReq.length() > responder.getMaxRequestSize()) {
         return createErrorResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
       }
 
       OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder,
           Base64.decode(b64OcspReq), true);
-      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
+      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
       }
 
-      byte[] encodedOcspResp = ocspRespWithCacheInfo.response();
+      byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
 
       FullHttpResponse response = createOKResponse(version, CT_RESPONSE, encodedOcspResp);
 
-      OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.cacheInfo();
+      OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
       if (cacheInfo != null) {
-        encodedOcspResp = ocspRespWithCacheInfo.response();
+        encodedOcspResp = ocspRespWithCacheInfo.getResponse();
         HttpHeaders headers = response.headers();
         // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
         // the HTTP response.
         headers.add("Date", new Date());
         // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
         // last modified the response.
-        headers.add("Last-Modified", new Date(cacheInfo.thisUpdate()));
+        headers.add("Last-Modified", new Date(cacheInfo.getThisUpdate()));
         // RFC 5019 6.2: Expires: This date and time will be the same as the
         // nextUpdate time-stamp in the OCSP
         // response itself.
         // This is overridden by max-age on HTTP/1.1 compatible components
-        if (cacheInfo.nextUpdate() != null) {
-          headers.add("Expires", new Date(cacheInfo.nextUpdate()));
+        if (cacheInfo.getNextUpdate() != null) {
+          headers.add("Expires", new Date(cacheInfo.getNextUpdate()));
         }
         // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
         // HEX representation of the SHA1 hash of the OCSPResponse structure.
@@ -206,14 +206,14 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         // Max age must be in seconds in the cache-control header
 
         long maxAge;
-        if (responder.cacheMaxAge() != null) {
-          maxAge = responder.cacheMaxAge().longValue();
+        if (responder.getCacheMaxAge() != null) {
+          maxAge = responder.getCacheMaxAge().longValue();
         } else {
           maxAge = DFLT_CACHE_MAX_AGE;
         }
 
-        if (cacheInfo.nextUpdate() != null) {
-          maxAge = Math.min(maxAge, (cacheInfo.nextUpdate() - cacheInfo.thisUpdate()) / 1000);
+        if (cacheInfo.getNextUpdate() != null) {
+          maxAge = Math.min(maxAge, (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
         }
 
         headers.add("Cache-Control",

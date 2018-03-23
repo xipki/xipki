@@ -64,27 +64,27 @@ public class RdnControl {
     this.maxOccurs = maxOccurs;
   }
 
-  public int minOccurs() {
+  public int getMinOccurs() {
     return minOccurs;
   }
 
-  public int maxOccurs() {
+  public int getMaxOccurs() {
     return maxOccurs;
   }
 
-  public ASN1ObjectIdentifier type() {
+  public ASN1ObjectIdentifier getType() {
     return type;
   }
 
-  public StringType stringType() {
+  public StringType getStringType() {
     return stringType;
   }
 
-  public List<Pattern> patterns() {
+  public List<Pattern> getPatterns() {
     return patterns;
   }
 
-  public Range stringLengthRange() {
+  public Range getStringLengthRange() {
     return stringLengthRange;
   }
 
@@ -100,7 +100,7 @@ public class RdnControl {
     this.patterns = patterns;
   }
 
-  public String prefix() {
+  public String getPrefix() {
     return prefix;
   }
 
@@ -108,7 +108,7 @@ public class RdnControl {
     this.prefix = prefix;
   }
 
-  public String suffix() {
+  public String getSuffix() {
     return suffix;
   }
 
@@ -116,7 +116,7 @@ public class RdnControl {
     this.suffix = suffix;
   }
 
-  public String group() {
+  public String getGroup() {
     return group;
   }
 

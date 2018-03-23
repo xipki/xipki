@@ -27,7 +27,7 @@ import java.util.Set;
 
 public interface QaSystemManager {
 
-  Set<String> issuerNames();
+  Set<String> getIssuerNames();
 
   /**
    * Returns the issuer information.
@@ -37,7 +37,7 @@ public interface QaSystemManager {
    */
   X509IssuerInfo getIssuer(String issuerName);
 
-  Set<String> certprofileNames();
+  Set<String> getCertprofileNames();
 
   /**
    * TODO.

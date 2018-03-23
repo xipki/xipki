@@ -56,7 +56,7 @@ public enum FailInfo {
     this.code = code;
   }
 
-  public int code() {
+  public int getCode() {
     return code;
   }
 

@@ -80,26 +80,26 @@ public class X509CaEntry extends CaEntry {
     this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
     this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
 
-    this.cacertUris = caUris.cacertUris();
-    this.ocspUris = caUris.ocspUris();
-    this.crlUris = caUris.crlUris();
-    this.deltaCrlUris = caUris.deltaCrlUris();
+    this.cacertUris = caUris.getCacertUris();
+    this.ocspUris = caUris.getOcspUris();
+    this.crlUris = caUris.getCrlUris();
+    this.deltaCrlUris = caUris.getDeltaCrlUris();
   }
 
-  public void setCertificate(X509Certificate certificate) throws CaMgmtException {
-    if (certificate == null) {
+  public void setCert(X509Certificate cert) throws CaMgmtException {
+    if (cert == null) {
       this.cert = null;
       this.subject = null;
       this.hexSha1OfCert = null;
     } else {
-      if (!X509Util.hasKeyusage(certificate, KeyUsage.keyCertSign)) {
+      if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign)) {
         throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
       }
-      this.cert = certificate;
-      this.subject = X509Util.getRfc4519Name(certificate.getSubjectX500Principal());
+      this.cert = cert;
+      this.subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
       byte[] encodedCert;
       try {
-        encodedCert = certificate.getEncoded();
+        encodedCert = cert.getEncoded();
       } catch (CertificateEncodingException ex) {
         throw new CaMgmtException("could not encoded certificate", ex);
       }
@@ -107,7 +107,7 @@ public class X509CaEntry extends CaEntry {
     }
   }
 
-  public int serialNoBitLen() {
+  public int getserialNoBitLen() {
     return serialNoBitLen;
   }
 
@@ -115,7 +115,7 @@ public class X509CaEntry extends CaEntry {
     this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
   }
 
-  public long nextCrlNumber() {
+  public long getNextCrlNumber() {
     return nextCrlNumber;
   }
 
@@ -123,47 +123,47 @@ public class X509CaEntry extends CaEntry {
     this.nextCrlNumber = crlNumber;
   }
 
-  public List<String> crlUris() {
+  public List<String> getCrlUris() {
     return crlUris;
   }
 
-  public String crlUrisAsString() {
+  public String getCrlUrisAsString() {
     return urisToString(crlUris);
   }
 
-  public List<String> deltaCrlUris() {
+  public List<String> getDeltaCrlUris() {
     return deltaCrlUris;
   }
 
-  public String deltaCrlUrisAsString() {
+  public String getDeltaCrlUrisAsString() {
     return urisToString(deltaCrlUris);
   }
 
-  public List<String> ocspUris() {
+  public List<String> getOcspUris() {
     return ocspUris;
   }
 
-  public String ocspUrisAsString() {
+  public String getOcspUrisAsString() {
     return urisToString(ocspUris);
   }
 
-  public List<String> cacertUris() {
+  public List<String> getCacertUris() {
     return cacertUris;
   }
 
-  public String cacertUrisAsString() {
+  public String getCacertUrisAsString() {
     return urisToString(cacertUris);
   }
 
-  public X509Certificate certificate() {
+  public X509Certificate getCert() {
     return cert;
   }
 
-  public int numCrls() {
+  public int getNumCrls() {
     return numCrls;
   }
 
-  public String crlSignerName() {
+  public String getCrlSignerName() {
     return crlSignerName;
   }
 
@@ -187,11 +187,11 @@ public class X509CaEntry extends CaEntry {
     }
 
     return StringUtil.concatObjectsCap(str.length() + 30,  str,
-        "\treason: ", revocationInfo.reason().description(),
-        "\n\trevoked at ", revocationInfo.revocationTime(), "\n");
+        "\treason: ", revocationInfo.getReason().getDescription(),
+        "\n\trevoked at ", revocationInfo.getRevocationTime(), "\n");
   } // method toString
 
-  public CertRevocationInfo revocationInfo() {
+  public CertRevocationInfo getRevocationInfo() {
     return revocationInfo;
   }
 
@@ -199,15 +199,15 @@ public class X509CaEntry extends CaEntry {
     this.revocationInfo = revocationInfo;
   }
 
-  public Date crlBaseTime() {
+  public Date getCrlBaseTime() {
     return (cert == null) ? null : cert.getNotBefore();
   }
 
-  public String subject() {
+  public String getSubject() {
     return subject;
   }
 
-  public String hexSha1OfCert() {
+  public String getHexSha1OfCert() {
     return hexSha1OfCert;
   }
 
@@ -279,7 +279,7 @@ public class X509CaEntry extends CaEntry {
 
   @Override
   public int hashCode() {
-    return ident().hashCode();
+    return getIdent().hashCode();
   }
 
   private static String formatUris(List<String> uris) {

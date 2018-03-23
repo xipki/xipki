@@ -52,7 +52,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     this.algoNames = Collections.unmodifiableSet(canonicalizedNames);
   }
 
-  public Set<String> algoNames() {
+  public Set<String> getAlgoNames() {
     return algoNames;
   }
 

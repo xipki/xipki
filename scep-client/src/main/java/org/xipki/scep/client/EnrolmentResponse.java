@@ -46,17 +46,17 @@ public final class EnrolmentResponse {
 
   public EnrolmentResponse(PkiMessage pkcsRep) throws ScepClientException {
     ScepUtil.requireNonNull("pkcsRep", pkcsRep);
-    MessageType messageType = pkcsRep.messageType();
+    MessageType messageType = pkcsRep.getMessageType();
     if (MessageType.CertRep != messageType) {
       throw new ScepClientException("messageType must not be other than CertRep: " + messageType);
     }
     this.pkcsRep = pkcsRep;
 
-    if (PkiStatus.SUCCESS != pkcsRep.pkiStatus()) {
+    if (PkiStatus.SUCCESS != pkcsRep.getPkiStatus()) {
       return;
     }
 
-    ASN1Encodable messageData = pkcsRep.messageData();
+    ASN1Encodable messageData = pkcsRep.getMessageData();
     if (!(messageData instanceof ContentInfo)) {
       throw new ScepClientException("pkcsRep is not a ContentInfo");
     }
@@ -83,32 +83,32 @@ public final class EnrolmentResponse {
    * @return <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
    */
   public boolean isPending() {
-    return pkcsRep.pkiStatus() == PkiStatus.PENDING;
+    return pkcsRep.getPkiStatus() == PkiStatus.PENDING;
   }
 
   public boolean isFailure() {
-    return pkcsRep.pkiStatus() == PkiStatus.FAILURE;
+    return pkcsRep.getPkiStatus() == PkiStatus.FAILURE;
   }
 
   public boolean isSuccess() {
-    return pkcsRep.pkiStatus() == PkiStatus.SUCCESS;
+    return pkcsRep.getPkiStatus() == PkiStatus.SUCCESS;
   }
 
-  public List<X509Certificate> certificates() {
+  public List<X509Certificate> getCertificates() {
     if (isSuccess()) {
       return certificates;
     }
     throw new IllegalStateException();
   }
 
-  public FailInfo failInfo() {
+  public FailInfo getFailInfo() {
     if (isFailure()) {
-      return pkcsRep.failInfo();
+      return pkcsRep.getFailInfo();
     }
     throw new IllegalStateException();
   }
 
-  public PkiMessage pkcsRep() {
+  public PkiMessage getPkcsRep() {
     return pkcsRep;
   }
 

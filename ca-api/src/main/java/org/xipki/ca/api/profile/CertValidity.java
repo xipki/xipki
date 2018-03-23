@@ -43,7 +43,7 @@ public class CertValidity implements Comparable<CertValidity> {
       this.suffix = suffix;
     }
 
-    public String suffix() {
+    public String getSuffix() {
       return suffix;
     }
 
@@ -97,11 +97,11 @@ public class CertValidity implements Comparable<CertValidity> {
     return new CertValidity(validity, unit);
   } // method getInstance
 
-  public int validity() {
+  public int getValidity() {
     return validity;
   }
 
-  public Unit unit() {
+  public Unit getUnit() {
     return unit;
   }
 

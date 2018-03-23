@@ -401,15 +401,15 @@ public abstract class DataSourceWrapper {
     this.cacheSeqNameSqls = new LruCache<>(100);
   }
 
-  public final String datasourceName() {
+  public final String getName() {
     return name;
   }
 
-  public final DatabaseType databaseType() {
+  public final DatabaseType getDatabaseType() {
     return this.databaseType;
   }
 
-  public final int maximumPoolSize() {
+  public final int getMaximumPoolSize() {
     return service.getMaximumPoolSize();
   }
 

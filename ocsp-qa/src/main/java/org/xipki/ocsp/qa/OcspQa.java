@@ -123,9 +123,9 @@ public class OcspQa {
     ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
     resultIssues.add(issue);
     if (expectedOcspError != null) {
-      if (status != expectedOcspError.status()) {
+      if (status != expectedOcspError.getStatus()) {
         issue.setFailureMessage("is '" + status + "', but expected '"
-            + expectedOcspError.status() + "'");
+            + expectedOcspError.getStatus() + "'");
       }
     } else {
       if (status != 0) {
@@ -184,7 +184,7 @@ public class OcspQa {
       issue = new ValidationIssue("OCSP.SIG.ALG", "signature algorithm");
       resultIssues.add(issue);
 
-      String expectedSigalgo = responseOption.signatureAlgName();
+      String expectedSigalgo = responseOption.getSignatureAlgName();
       if (expectedSigalgo != null) {
         AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
         try {
@@ -259,7 +259,7 @@ public class OcspQa {
           }
         } // end for
 
-        X509Certificate respIssuer = responseOption.respIssuer();
+        X509Certificate respIssuer = responseOption.getRespIssuer();
         if (!issue.isFailed() && respIssuer != null) {
           X509Certificate jceRespSigner;
           try {
@@ -292,7 +292,7 @@ public class OcspQa {
     // nonce
     Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
     resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn,
-        responseOption.nonceOccurrence()));
+        responseOption.getNonceOccurrence()));
 
     boolean extendedRevoke = basicResp.getExtension(
         ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;
@@ -312,8 +312,8 @@ public class OcspQa {
       }
 
       List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash, expectedStatus,
-          encodedCert, expectedRevTime, extendedRevoke, responseOption.nextUpdateOccurrence(),
-          responseOption.certhashOccurrence(), responseOption.certhashAlgId());
+          encodedCert, expectedRevTime, extendedRevoke, responseOption.getNextUpdateOccurrence(),
+          responseOption.getCerthashOccurrence(), responseOption.getCerthashAlgId());
       resultIssues.addAll(issues);
     } // end for
 
@@ -362,7 +362,7 @@ public class OcspQa {
 
       if (revStatus.hasRevocationReason()) {
         int reason = revStatus.getRevocationReason();
-        if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code() && revTimeSec == 0) {
+        if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode() && revTimeSec == 0) {
           status = OcspCertStatus.unknown;
           revTimeSec = null;
         } else {

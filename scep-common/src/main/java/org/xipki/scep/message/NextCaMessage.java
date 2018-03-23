@@ -58,7 +58,7 @@ public class NextCaMessage {
   public NextCaMessage() {
   }
 
-  public X509Certificate caCert() {
+  public X509Certificate getCaCert() {
     return caCert;
   }
 
@@ -66,7 +66,7 @@ public class NextCaMessage {
     this.caCert = caCert;
   }
 
-  public List<X509Certificate> raCerts() {
+  public List<X509Certificate> getRaCerts() {
     return raCerts;
   }
 

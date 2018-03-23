@@ -47,15 +47,16 @@ public class CertStatusCmd extends UnRevRmCertAction {
   @Override
   protected Object execute0() throws Exception {
     CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
-    X509Certificate cert = (X509Certificate) certInfo.cert();
+    X509Certificate cert = (X509Certificate) certInfo.getCert();
 
     if (cert == null) {
       System.out.println("certificate unknown");
       return null;
     }
 
-    String msg = StringUtil.concat("certificate profile: ", certInfo.certprofile(), "\nstatus: ",
-        (certInfo.revocationInfo() == null ? "good" : "revoked with " + certInfo.revocationInfo()));
+    String msg = StringUtil.concat("certificate profile: ", certInfo.getCertprofile(), "\nstatus: ",
+        (certInfo.getRevocationInfo() == null
+            ? "good" : "revoked with " + certInfo.getRevocationInfo()));
     println(msg);
     if (outputFile != null) {
       saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());

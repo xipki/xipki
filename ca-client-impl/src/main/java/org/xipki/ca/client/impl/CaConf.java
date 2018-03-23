@@ -75,15 +75,15 @@ class CaConf {
     this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String url() {
+  public String getUrl() {
     return url;
   }
 
-  public String healthUrl() {
+  public String getHealthUrl() {
     return healthUrl;
   }
 
@@ -100,20 +100,20 @@ class CaConf {
     } else {
       this.profiles = new HashMap<>();
       for (CertprofileInfo m : certProfiles) {
-        this.profiles.put(m.name(), m);
+        this.profiles.put(m.getName(), m);
       }
     }
   }
 
-  public X509Certificate cert() {
+  public X509Certificate getCert() {
     return cert;
   }
 
-  public X500Name subject() {
+  public X500Name getSubject() {
     return subject;
   }
 
-  public Set<String> profileNames() {
+  public Set<String> getProfileNames() {
     return profiles.keySet();
   }
 
@@ -122,7 +122,7 @@ class CaConf {
     return profiles.containsKey(profileName.toLowerCase());
   }
 
-  public CertprofileInfo profile(String profileName) {
+  public CertprofileInfo getProfile(String profileName) {
     ParamUtil.requireNonNull("profileName", profileName);
     return profiles.get(profileName.toLowerCase());
   }
@@ -131,7 +131,7 @@ class CaConf {
     return cert != null;
   }
 
-  public CmpResponder responder() {
+  public CmpResponder getResponder() {
     return responder;
   }
 
@@ -155,11 +155,11 @@ class CaConf {
     this.requestor = requestor;
   }
 
-  public String requestorName() {
+  public String getRequestorName() {
     return requestorName;
   }
 
-  public X509CmpRequestor requestor() {
+  public X509CmpRequestor getRequestor() {
     return requestor;
   }
 
@@ -175,11 +175,11 @@ class CaConf {
     this.cmpControl = cmpControl;
   }
 
-  public ClientCmpControl cmpControl() {
+  public ClientCmpControl getCmpControl() {
     return cmpControl;
   }
 
-  public byte[] subjectKeyIdentifier() {
+  public byte[] getSubjectKeyIdentifier() {
     return (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
   }

@@ -44,19 +44,19 @@ public class SubjectKeyProfileBundle {
     this.revoked = revoked;
   }
 
-  public int certId() {
+  public int getCertId() {
     return certId;
   }
 
-  public long subjectFp() {
+  public long getSubjectFp() {
     return subjectFp;
   }
 
-  public long keyFp() {
+  public long getKeyFp() {
     return keyFp;
   }
 
-  public String profile() {
+  public String getProfile() {
     return profile;
   }
 

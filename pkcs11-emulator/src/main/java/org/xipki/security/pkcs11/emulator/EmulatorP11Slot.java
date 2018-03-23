@@ -362,7 +362,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
           P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
           X509Cert cert = ret.getCertForId(id);
           java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
-              : cert.cert().getPublicKey();
+              : cert.getCert().getPublicKey();
 
           if (publicKey == null) {
             LOG.warn("Neither public key nor certificate is associated with private key {}",
@@ -375,7 +375,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
           PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
           PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
-          X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.cert()};
+          X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
               new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
@@ -474,8 +474,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   private boolean removePkcs11Entry(File dir, P11ObjectIdentifier objectId)
       throws P11TokenException {
-    byte[] id = objectId.id();
-    String label = objectId.label();
+    byte[] id = objectId.getId();
+    String label = objectId.getLabel();
     if (id != null) {
       String hextId = hex(id);
       File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
@@ -759,13 +759,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   @Override
   protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
-    deletePkcs11Entry(certDir, objectId.id());
+    deletePkcs11Entry(certDir, objectId.getId());
   }
 
   @Override
   protected void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
       throws P11TokenException, CertificateException {
-    savePkcs11Cert(objectId.id(), objectId.label(), cert);
+    savePkcs11Cert(objectId.getId(), objectId.getLabel(), cert);
   }
 
   @Override

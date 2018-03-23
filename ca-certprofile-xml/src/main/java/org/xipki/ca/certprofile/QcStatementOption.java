@@ -49,15 +49,15 @@ class QcStatementOption {
         monetaryValueOption);
   }
 
-  public QCStatement statement() {
+  public QCStatement getStatement() {
     return statement;
   }
 
-  public ASN1ObjectIdentifier statementId() {
+  public ASN1ObjectIdentifier getStatementId() {
     return statementId;
   }
 
-  public MonetaryValueOption monetaryValueOption() {
+  public MonetaryValueOption getMonetaryValueOption() {
     return monetaryValueOption;
   }
 

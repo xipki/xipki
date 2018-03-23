@@ -196,19 +196,19 @@ public class P11ModuleConf {
     this.nativeLibrary = nativeLibraryPath;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
-  public String nativeLibrary() {
+  public String getNativeLibrary() {
     return nativeLibrary;
   }
 
-  public int maxMessageSize() {
+  public int getMaxMessageSize() {
     return maxMessageSize;
   }
 
@@ -216,11 +216,11 @@ public class P11ModuleConf {
     return readOnly;
   }
 
-  public long userType() {
+  public long getUserType() {
     return userType;
   }
 
-  public P11PasswordsRetriever passwordRetriever() {
+  public P11PasswordsRetriever getPasswordRetriever() {
     return passwordRetriever;
   }
 
@@ -256,7 +256,7 @@ public class P11ModuleConf {
     return true;
   }
 
-  public P11MechanismFilter p11MechanismFilter() {
+  public P11MechanismFilter getP11MechanismFilter() {
     return mechanismFilter;
   }
 

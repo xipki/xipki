@@ -95,19 +95,19 @@ class OcspBenchRequestor {
     ParamUtil.requireNonNull("responseHandler", responseHandler);
     this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
 
-    HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.hashAlgorithmId());
+    HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
     if (hashAlgo == null) {
       throw new OcspRequestorException("unknown HashAlgo "
-          + requestOptions.hashAlgorithmId().getId());
+          + requestOptions.getHashAlgorithmId().getId());
     }
 
-    this.issuerhashAlg = hashAlgo.algorithmIdentifier();
+    this.issuerhashAlg = hashAlgo.getAlgorithmIdentifier();
     this.issuerNameHash = new DEROctetString(hashAlgo.hash(
             issuerCert.getSubject().getEncoded()));
     this.issuerKeyHash = new DEROctetString(hashAlgo.hash(
             issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
-    List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
+    List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
     if (prefSigAlgs == null || prefSigAlgs.size() == 0) {
       this.extensions = null;
     } else {
@@ -187,7 +187,7 @@ class OcspBenchRequestor {
       List<Extension> extns = new ArrayList<>(2);
       if (requestOptions.isUseNonce()) {
         Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-            new DEROctetString(nextNonce(requestOptions.nonceLen())));
+            new DEROctetString(nextNonce(requestOptions.getNonceLen())));
         extns.add(extn);
       }
 

@@ -43,15 +43,15 @@ class CaInfo {
     this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
   }
 
-  X509Certificate cert() {
+  X509Certificate getCert() {
     return cert;
   }
 
-  ClientCmpControl cmpControl() {
+  ClientCmpControl getCmpControl() {
     return cmpControl;
   }
 
-  Set<CertprofileInfo> certprofiles() {
+  Set<CertprofileInfo> getCertprofiles() {
     return certprofiles;
   }
 

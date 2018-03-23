@@ -45,11 +45,11 @@ class IssuerEntry {
     this.cert = Base64.decode(b64Cert);
   }
 
-  int id() {
+  int getId() {
     return id;
   }
 
-  String subject() {
+  String getSubject() {
     return subject;
   }
 

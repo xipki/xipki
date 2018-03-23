@@ -83,7 +83,7 @@ public class CheckCertCmd extends XiAction {
 
   @Override
   protected Object execute0() throws Exception {
-    Set<String> issuerNames = qaSystemManager.issuerNames();
+    Set<String> issuerNames = qaSystemManager.getIssuerNames();
     if (isEmpty(issuerNames)) {
       throw new IllegalCmdParamException("no issuer is configured");
     }
@@ -130,7 +130,7 @@ public class CheckCertCmd extends XiAction {
     sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
     if (verbose.booleanValue()) {
-      for (ValidationIssue issue : result.validationIssues()) {
+      for (ValidationIssue issue : result.getValidationIssues()) {
         sb.append("\n");
         format(issue, "    ", sb);
       }
@@ -144,11 +144,11 @@ public class CheckCertCmd extends XiAction {
   } // method execute0
 
   private static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
-    sb.append(prefix).append(issue.code());
-    sb.append(", ").append(issue.description());
+    sb.append(prefix).append(issue.getCode());
+    sb.append(", ").append(issue.getDescription());
     sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
-    if (issue.failureMessage() != null) {
-      sb.append(", ").append(issue.failureMessage());
+    if (issue.getFailureMessage() != null) {
+      sb.append(", ").append(issue.getFailureMessage());
     }
   }
 

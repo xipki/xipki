@@ -74,7 +74,7 @@ public abstract class ClientAction extends XiAction {
     for (int i = 0; i < n; i++) {
       RequestResponsePair reqResp = debug.get(i);
       if (saveReq) {
-        byte[] bytes = reqResp.request();
+        byte[] bytes = reqResp.getRequest();
         if (bytes != null) {
           String fn = (n == 1) ? reqout : appendIndex(reqout, i);
           try {
@@ -86,7 +86,7 @@ public abstract class ClientAction extends XiAction {
       }
 
       if (saveResp) {
-        byte[] bytes = reqResp.response();
+        byte[] bytes = reqResp.getResponse();
         if (bytes != null) {
           String fn = (n == 1) ? respout : appendIndex(respout, i);
           try {

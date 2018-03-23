@@ -56,7 +56,7 @@ public class AuditEvent {
     this.level = AuditLevel.INFO;
   }
 
-  public AuditLevel level() {
+  public AuditLevel getLevel() {
     return level;
   }
 
@@ -64,7 +64,7 @@ public class AuditEvent {
     this.level = level;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
@@ -72,7 +72,7 @@ public class AuditEvent {
     this.name = name;
   }
 
-  public Map<String, String> eventDatas() {
+  public Map<String, String> getEventDatas() {
     return Collections.unmodifiableMap(eventDatas);
   }
 

@@ -81,16 +81,16 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     public boolean match(IssuerEntry issuer) {
-      if (id != issuer.id()) {
+      if (id != issuer.getId()) {
         return false;
       }
 
       if (revocationTimeMs == null) {
-        return issuer.revocationInfo() == null;
+        return issuer.getRevocationInfo() == null;
       }
 
-      return (issuer.revocationInfo() == null) ? false
-          : revocationTimeMs == issuer.revocationInfo().revocationTime().getTime();
+      return (issuer.getRevocationInfo() == null) ? false
+          : revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
     }
 
   } // class SimpleIssuerEntry
@@ -165,7 +165,7 @@ public class DbCertStatusStore extends OcspStore {
 
           // no change in the issuerStore
           Set<Integer> newIds = newIssuers.keySet();
-          Set<Integer> ids = (issuerStore != null) ? issuerStore.ids()
+          Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds()
               : Collections.emptySet();
 
           boolean issuersUnchanged = (ids.size() == newIds.size())
@@ -277,17 +277,17 @@ public class DbCertStatusStore extends OcspStore {
         sql = includeRit ? sqlCs : sqlCsNoRit;
       }
 
-      CrlInfo crlInfo = issuer.crlInfo();
+      CrlInfo crlInfo = issuer.getCrlInfo();
 
       Date thisUpdate;
       Date nextUpdate = null;
 
       if (crlInfo != null && crlInfo.isUseCrlUpdates()) {
-        thisUpdate = crlInfo.thisUpdate();
+        thisUpdate = crlInfo.getThisUpdate();
 
         // this.nextUpdate is still in the future (10 seconds buffer)
-        if (crlInfo.nextUpdate().getTime() - System.currentTimeMillis() > 10 * 1000) {
-          nextUpdate = crlInfo.nextUpdate();
+        if (crlInfo.getNextUpdate().getTime() - System.currentTimeMillis() > 10 * 1000) {
+          nextUpdate = crlInfo.getNextUpdate();
         }
       } else {
         thisUpdate = new Date();
@@ -308,7 +308,7 @@ public class DbCertStatusStore extends OcspStore {
       PreparedStatement ps = datasource.prepareStatement(datasource.getConnection(), sql);
 
       try {
-        ps.setInt(1, issuer.id());
+        ps.setInt(1, issuer.getId());
         ps.setString(2, serialNumber.toString(16));
         rs = ps.executeQuery();
 
@@ -378,7 +378,7 @@ public class DbCertStatusStore extends OcspStore {
       }
 
       if (includeCrlId && crlInfo != null) {
-        certStatusInfo.setCrlId(crlInfo.crlId());
+        certStatusInfo.setCrlId(crlInfo.getCrlId());
       }
 
       if (includeArchiveCutoff) {
@@ -386,10 +386,10 @@ public class DbCertStatusStore extends OcspStore {
           Date date;
           // expired certificate remains in status store for ever
           if (retentionInterval < 0) {
-            date = issuer.notBefore();
+            date = issuer.getNotBefore();
           } else {
             long nowInMs = System.currentTimeMillis();
-            long dateInMs = Math.max(issuer.notBefore().getTime(),
+            long dateInMs = Math.max(issuer.getNotBefore().getTime(),
                 nowInMs - DAY * retentionInterval);
             date = new Date(dateInMs);
           }
@@ -398,32 +398,34 @@ public class DbCertStatusStore extends OcspStore {
         }
       }
 
-      if ((!inheritCaRevocation) || issuer.revocationInfo() == null) {
+      if ((!inheritCaRevocation) || issuer.getRevocationInfo() == null) {
         return certStatusInfo;
       }
 
-      CertRevocationInfo caRevInfo = issuer.revocationInfo();
-      CertStatus certStatus = certStatusInfo.certStatus();
+      CertRevocationInfo caRevInfo = issuer.getRevocationInfo();
+      CertStatus certStatus = certStatusInfo.getCertStatus();
       boolean replaced = false;
       if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
         replaced = true;
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.revocationInfo().revocationTime().after(caRevInfo.revocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
+              caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }
 
       if (replaced) {
         CertRevocationInfo newRevInfo;
-        if (caRevInfo.reason() == CrlReason.CA_COMPROMISE) {
+        if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
           newRevInfo = caRevInfo;
         } else {
           newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-              caRevInfo.revocationTime(), caRevInfo.invalidityTime());
+              caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
         }
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(), certStatusInfo.thisUpdate(),
-            certStatusInfo.nextUpdate(), certStatusInfo.certprofile());
+            certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
+            certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
+            certStatusInfo.getCertprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {
@@ -500,12 +502,12 @@ public class DbCertStatusStore extends OcspStore {
       Set<X509Certificate> includeIssuers = null;
       Set<X509Certificate> excludeIssuers = null;
 
-      if (CollectionUtil.isNonEmpty(storeConf.caCertsIncludes())) {
-        includeIssuers = parseCerts(storeConf.caCertsIncludes());
+      if (CollectionUtil.isNonEmpty(storeConf.getCaCertsIncludes())) {
+        includeIssuers = parseCerts(storeConf.getCaCertsIncludes());
       }
 
-      if (CollectionUtil.isNonEmpty(storeConf.caCertsExcludes())) {
-        excludeIssuers = parseCerts(storeConf.caCertsExcludes());
+      if (CollectionUtil.isNonEmpty(storeConf.getCaCertsExcludes())) {
+        excludeIssuers = parseCerts(storeConf.getCaCertsExcludes());
       }
 
       this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
@@ -557,7 +559,7 @@ public class DbCertStatusStore extends OcspStore {
   @Override
   public X509Certificate getIssuerCert(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
-    return (issuer == null) ? null : issuer.cert();
+    return (issuer == null) ? null : issuer.getCert();
   }
 
   protected boolean isInitialized() {

@@ -91,7 +91,7 @@ public class ScepServlet extends HttpServlet {
     String auditMessage = null;
 
     try {
-      CaCaps caCaps = responder.caCaps();
+      CaCaps caCaps = responder.getCaCaps();
       if (post && !caCaps.containsCapability(CaCapability.POSTPKIOperation)) {
         auditMessage = "HTTP POST is not supported";
         auditLevel = AuditLevel.ERROR;
@@ -133,26 +133,26 @@ public class ScepServlet extends HttpServlet {
         }
         byte[] respBytes = ci.getEncoded();
         sendToResponse(resp, CT_RESPONSE, respBytes);
-      } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] caCapsBytes = responder.caCaps().bytes();
+        byte[] caCapsBytes = responder.getCaCaps().getBytes();
         sendToResponse(resp, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
-      } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
         byte[] respBytes;
         String ct;
-        if (responder.raEmulator() == null) {
+        if (responder.getRaEmulator() == null) {
           ct = ScepConstants.CT_X509_CA_CERT;
-          respBytes = responder.caEmulator().caCertBytes();
+          respBytes = responder.getCaEmulator().getCaCertBytes();
         } else {
           ct = ScepConstants.CT_X509_CA_RA_CERT;
           CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
           try {
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                responder.caEmulator().caCert()));
+                responder.getCaEmulator().getCaCert()));
             ct = ScepConstants.CT_X509_CA_RA_CERT;
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                responder.raEmulator().raCert()));
+                responder.getRaEmulator().getRaCert()));
             CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
                 new CMSAbsentContent());
             respBytes = degenerateSignedData.getEncoded();
@@ -165,8 +165,8 @@ public class ScepServlet extends HttpServlet {
         }
 
         sendToResponse(resp, ct, respBytes);
-      } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
-        if (responder.nextCaAndRa() == null) {
+      } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
+        if (responder.getNextCaAndRa() == null) {
           auditMessage = "SCEP operation '" + operation + "' is not permitted";
           auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -175,9 +175,9 @@ public class ScepServlet extends HttpServlet {
 
         try {
           NextCaMessage nextCaMsg = new NextCaMessage();
-          nextCaMsg.setCaCert(ScepUtil.toX509Cert(responder.nextCaAndRa().caCert()));
-          if (responder.nextCaAndRa().raCert() != null) {
-            X509Certificate raCert = ScepUtil.toX509Cert(responder.nextCaAndRa().raCert());
+          nextCaMsg.setCaCert(ScepUtil.toX509Cert(responder.getNextCaAndRa().getCaCert()));
+          if (responder.getNextCaAndRa().getRaCert() != null) {
+            X509Certificate raCert = ScepUtil.toX509Cert(responder.getNextCaAndRa().getRaCert());
             nextCaMsg.setRaCerts(Arrays.asList(raCert));
           }
 
@@ -203,7 +203,7 @@ public class ScepServlet extends HttpServlet {
       auditMessage = "internal error";
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } finally {
-      if (event.level() != AuditLevel.ERROR) {
+      if (event.getLevel() != AuditLevel.ERROR) {
         event.setLevel(auditLevel);
       }
 

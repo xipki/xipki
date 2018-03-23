@@ -141,10 +141,10 @@ public class HttpCmpServlet extends HttpServlet {
       resp.setContentLength(encodedPkiResp.length);
       resp.getOutputStream().write(encodedPkiResp);
     } catch (HttpRespAuditException ex) {
-      auditStatus = ex.auditStatus();
-      auditLevel = ex.auditLevel();
-      auditMessage = ex.auditMessage();
-      sendError(resp, ex.httpStatus());
+      auditStatus = ex.getAuditStatus();
+      auditLevel = ex.getAuditLevel();
+      auditMessage = ex.getAuditMessage();
+      sendError(resp, ex.getHttpStatus());
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");

@@ -110,7 +110,7 @@ public enum AlgorithmCode {
     this.code = code;
   }
 
-  public byte code() {
+  public byte getCode() {
     return code;
   }
 

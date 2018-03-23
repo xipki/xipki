@@ -121,7 +121,7 @@ class X509SelfSignedCertBuilder {
           "serialNumber must not be non-positive: " + serialNumber);
     }
 
-    X509CertLevel level = certprofile.certLevel();
+    X509CertLevel level = certprofile.getCertLevel();
     if (X509CertLevel.RootCA != level) {
       throw new IllegalArgumentException("certprofile is not of level " + X509CertLevel.RootCA);
     }
@@ -142,7 +142,7 @@ class X509SelfSignedCertBuilder {
     ConcurrentContentSigner signer;
     try {
       List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
-      List<String> restrictedSigAlgos = certprofile.signatureAlgorithms();
+      List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
       String thisSignerConf = null;
       if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
@@ -230,26 +230,26 @@ class X509SelfSignedCertBuilder {
       subjectInfo = certprofile.getSubject(requestedSubject);
     } catch (CertprofileException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.ident());
+          "exception in cert profile " + certprofile.getIdent());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.getSubject", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }
 
-    Date notBefore = certprofile.notBefore(null);
+    Date notBefore = certprofile.getNotBefore(null);
     if (notBefore == null) {
       notBefore = new Date();
     }
 
-    CertValidity validity = certprofile.validity();
+    CertValidity validity = certprofile.getValidity();
     if (validity == null) {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-          "no validity specified in the profile " + certprofile.ident());
+          "no validity specified in the profile " + certprofile.getIdent());
     }
 
     Date notAfter = validity.add(notBefore);
 
-    X500Name grantedSubject = subjectInfo.grantedSubject();
+    X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject,
         serialNumber, notBefore, notAfter, grantedSubject, tmpPublicKeyInfo);
@@ -298,9 +298,9 @@ class X509SelfSignedCertBuilder {
       return;
     }
 
-    for (ASN1ObjectIdentifier extType : extensionTuples.extensionTypes()) {
+    for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes()) {
       ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
-      certBuilder.addExtension(extType, extValue.isCritical(), extValue.value());
+      certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
     }
   } // method addExtensions
 

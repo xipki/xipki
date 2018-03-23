@@ -42,7 +42,7 @@ public class WritableOnlyExtension extends Extension {
   }
 
   @Override
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encodedLength;
   }
 

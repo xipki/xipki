@@ -34,11 +34,11 @@ public class AuthorityInfoAccessControl {
     this.includesOcsp = includesOcsp;
   }
 
-  public boolean includesCaIssuers() {
+  public boolean isIncludesCaIssuers() {
     return includesCaIssuers;
   }
 
-  public boolean includesOcsp() {
+  public boolean isIncludesOcsp() {
     return includesOcsp;
   }
 

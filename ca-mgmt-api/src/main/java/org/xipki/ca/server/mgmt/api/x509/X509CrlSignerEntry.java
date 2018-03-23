@@ -73,7 +73,7 @@ public class X509CrlSignerEntry {
     }
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
@@ -89,27 +89,27 @@ public class X509CrlSignerEntry {
     return certFaulty || confFaulty;
   }
 
-  public String type() {
+  public String getType() {
     return signerType;
   }
 
-  public String conf() {
+  public String getConf() {
     return signerConf;
   }
 
-  public String base64Cert() {
+  public String getBase64Cert() {
     return base64Cert;
   }
 
-  public X509Certificate certificate() {
+  public X509Certificate getCert() {
     return cert;
   }
 
-  public void setCertificate(X509Certificate certificate) {
+  public void setCert(X509Certificate cert) {
     if (base64Cert != null) {
       throw new IllegalStateException("certificate is already by specified by base64Cert");
     }
-    this.cert = certificate;
+    this.cert = cert;
   }
 
   public String crlControl() {

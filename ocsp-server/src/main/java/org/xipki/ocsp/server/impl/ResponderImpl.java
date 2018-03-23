@@ -50,29 +50,29 @@ public class ResponderImpl implements Responder {
     this.stores = ParamUtil.requireNonEmpty("stores", stores);
   }
 
-  public ResponderOption responderOption() {
+  public ResponderOption getResponderOption() {
     return responderOption;
   }
 
-  public RequestOption requestOption() {
+  public RequestOption getRequestOption() {
     return requestOption;
   }
 
-  public ResponseOption responseOption() {
+  public ResponseOption getResponseOption() {
     return responseOption;
   }
 
-  public ResponderSigner signer() {
+  public ResponderSigner getSigner() {
     return signer;
   }
 
-  public List<OcspStore> stores() {
+  public List<OcspStore> getStores() {
     return stores;
   }
 
   @Override
-  public int maxRequestSize() {
-    return requestOption.maxRequestSize();
+  public int getMaxRequestSize() {
+    return requestOption.getMaxRequestSize();
   }
 
   @Override
@@ -81,8 +81,8 @@ public class ResponderImpl implements Responder {
   }
 
   @Override
-  public Long cacheMaxAge() {
-    return responseOption.cacheMaxAge();
+  public Long getCacheMaxAge() {
+    return responseOption.getCacheMaxAge();
   }
 
 }

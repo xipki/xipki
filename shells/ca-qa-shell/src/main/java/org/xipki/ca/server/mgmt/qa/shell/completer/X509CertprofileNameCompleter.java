@@ -38,7 +38,7 @@ public class X509CertprofileNameCompleter extends AbstractDynamicEnumCompleter {
 
   @Override
   protected Set<String> getEnums() {
-    return qaSystemManager.certprofileNames();
+    return qaSystemManager.getCertprofileNames();
   }
 
 }

@@ -34,7 +34,7 @@ public class P11KeypairGenerationResult extends KeypairGenerationResult {
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);
   }
 
-  public P11EntityIdentifier idntityId() {
+  public P11EntityIdentifier getIdentityId() {
     return identityId;
   }
 

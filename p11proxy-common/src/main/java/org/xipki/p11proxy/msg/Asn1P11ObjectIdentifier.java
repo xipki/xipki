@@ -79,12 +79,12 @@ public class Asn1P11ObjectIdentifier extends ASN1Object {
   @Override
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vec = new ASN1EncodableVector();
-    vec.add(new DEROctetString(objectId.id()));
-    vec.add(new DERUTF8String(objectId.label()));
+    vec.add(new DEROctetString(objectId.getId()));
+    vec.add(new DERUTF8String(objectId.getLabel()));
     return new DERSequence(vec);
   }
 
-  public P11ObjectIdentifier objectId() {
+  public P11ObjectIdentifier getObjectId() {
     return objectId;
   }
 

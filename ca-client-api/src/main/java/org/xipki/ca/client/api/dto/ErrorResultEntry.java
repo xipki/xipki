@@ -45,7 +45,7 @@ public class ErrorResultEntry extends ResultEntry {
     this.statusInfo = new PkiStatusInfo(status);
   }
 
-  public PkiStatusInfo statusInfo() {
+  public PkiStatusInfo getStatusInfo() {
     return statusInfo;
   }
 

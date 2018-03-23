@@ -42,22 +42,22 @@ public class CmpRequestorInfo implements RequestorInfo {
     this.cert = ParamUtil.requireNonNull("cert", cert);
   }
 
-  public CaHasRequestorEntry caHasRequestor() {
+  public CaHasRequestorEntry getCaHasRequestor() {
     return caHasRequestor;
   }
 
-  public X509CertWithDbId cert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 
   @Override
-  public NameId ident() {
-    return caHasRequestor.requestorIdent();
+  public NameId getIdent() {
+    return caHasRequestor.getRequestorIdent();
   }
 
   @Override
   public boolean isRa() {
-    return caHasRequestor.ra();
+    return caHasRequestor.isRa();
   }
 
   @Override

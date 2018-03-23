@@ -71,7 +71,7 @@ public class ScepControl {
     this.supportGetCrl = getBoolean(props, KEY_SUPPORT_GETCRL, false);
   }
 
-  public String conf() {
+  public String getConf() {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
     pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
@@ -79,7 +79,7 @@ public class ScepControl {
     return pairs.getEncoded();
   }
 
-  public boolean includeCaCert() {
+  public boolean isIncludeCaCert() {
     return includeCaCert;
   }
 
@@ -87,7 +87,7 @@ public class ScepControl {
     this.includeCaCert = includeCaCert;
   }
 
-  public boolean includeSignerCert() {
+  public boolean isIncludeSignerCert() {
     return includeSignerCert;
   }
 
@@ -95,7 +95,7 @@ public class ScepControl {
     this.includeSignerCert = includeSignerCert;
   }
 
-  public boolean supportGetCrl() {
+  public boolean isSupportGetCrl() {
     return supportGetCrl;
   }
 
@@ -105,7 +105,7 @@ public class ScepControl {
 
   @Override
   public String toString() {
-    return conf();
+    return getConf();
   }
 
   @Override

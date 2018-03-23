@@ -37,7 +37,7 @@ public class ExtKeyUsageControl {
     this.required = required;
   }
 
-  public ASN1ObjectIdentifier extKeyUsage() {
+  public ASN1ObjectIdentifier getExtKeyUsage() {
     return extKeyUsage;
   }
 

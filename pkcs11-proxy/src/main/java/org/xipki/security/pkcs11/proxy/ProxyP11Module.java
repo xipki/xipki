@@ -80,7 +80,7 @@ public class ProxyP11Module extends AbstractP11Module {
   private ProxyP11Module(P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
 
-    final String modulePath = moduleConf.nativeLibrary();
+    final String modulePath = moduleConf.getNativeLibrary();
 
     this.description = StringUtil.concat("PKCS#11 proxy", "\nPath: ", modulePath);
 
@@ -131,7 +131,7 @@ public class ProxyP11Module extends AbstractP11Module {
       throw new P11TokenException("response is a valid Asn1ServerCaps", ex);
     }
 
-    if (!caps.versions().contains(version)) {
+    if (!caps.getVersions().contains(version)) {
       throw new P11TokenException("Server does not support any version supported by the client");
     }
     this.readOnly = caps.isReadOnly();
@@ -157,7 +157,7 @@ public class ProxyP11Module extends AbstractP11Module {
         throw new P11TokenException(ex.getMessage(), ex);
       }
 
-      P11SlotIdentifier slotId = asn1SlotId.slotId();
+      P11SlotIdentifier slotId = asn1SlotId.getSlotId();
       if (!conf.isSlotIncluded(slotId)) {
         continue;
       }
@@ -168,7 +168,7 @@ public class ProxyP11Module extends AbstractP11Module {
       }
 
       P11Slot slot = new ProxyP11Slot(this, slotId, conf.isReadOnly(),
-          conf.p11MechanismFilter());
+          conf.getP11MechanismFilter());
       slots.add(slot);
     }
     setSlots(slots);
@@ -181,7 +181,7 @@ public class ProxyP11Module extends AbstractP11Module {
 
   @Override
   public void close() {
-    for (P11SlotIdentifier slotId : slotIdentifiers()) {
+    for (P11SlotIdentifier slotId : getSlotIds()) {
       try {
         getSlot(slotId).close();
       } catch (Throwable th) {

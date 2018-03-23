@@ -48,7 +48,7 @@ public class TransactionId {
     this.id = Hex.toHexString(bytes);
   }
 
-  public String id() {
+  public String getId() {
     return id;
   }
 

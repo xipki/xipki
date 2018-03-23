@@ -40,11 +40,11 @@ public class PkiResponse {
     return pkiMessage.hasProtection();
   }
 
-  public GeneralPKIMessage pkiMessage() {
+  public GeneralPKIMessage getPkiMessage() {
     return pkiMessage;
   }
 
-  public ProtectionVerificationResult protectionVerificationResult() {
+  public ProtectionVerificationResult getProtectionVerificationResult() {
     return protectionVerificationResult;
   }
 

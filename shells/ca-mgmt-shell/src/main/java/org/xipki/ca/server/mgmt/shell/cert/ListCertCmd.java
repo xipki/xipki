@@ -114,9 +114,9 @@ public class ListCertCmd extends CaAction {
 
   private String format(int index, CertListInfo info) {
     return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
-        StringUtil.formatText(info.serialNumber().toString(16), 20), " | ",
-        DateUtil.toUtcTimeyyyyMMddhhmmss(info.notBefore()), " | ",
-        DateUtil.toUtcTimeyyyyMMddhhmmss(info.notAfter()), " | ", info.subject());
+        StringUtil.formatText(info.getSerialNumber().toString(16), 20), " | ",
+        DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotBefore()), " | ",
+        DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotAfter()), " | ", info.getSubject());
   }
 
   private Date getDate(String str) throws IllegalCmdParamException {

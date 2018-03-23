@@ -83,11 +83,11 @@ public class Asn1DigestSecretKeyTemplate extends ASN1Object {
     return new DERSequence(vector);
   }
 
-  public Asn1P11EntityIdentifier identityId() {
+  public Asn1P11EntityIdentifier getIdentityId() {
     return identityId;
   }
 
-  public Asn1Mechanism mechanism() {
+  public Asn1Mechanism getMechanism() {
     return mechanism;
   }
 }

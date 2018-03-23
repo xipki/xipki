@@ -53,7 +53,7 @@ public final class EnvelopedDataDecryptor {
     RecipientInformation recipientInfo = null;
     EnvelopedDataDecryptorInstance decryptor = null;
     for (EnvelopedDataDecryptorInstance m : decryptors) {
-      recipientInfo = recipientInfos.get(m.recipientId());
+      recipientInfo = recipientInfos.get(m.getRecipientId());
       if (recipientInfo != null) {
         decryptor = m;
         break;
@@ -65,7 +65,7 @@ public final class EnvelopedDataDecryptor {
     }
 
     try {
-      return recipientInfo.getContent(decryptor.recipient());
+      return recipientInfo.getContent(decryptor.getRecipient());
     } catch (CMSException ex) {
       throw new MessageDecodingException("could not decrypt the envelopedData");
     }

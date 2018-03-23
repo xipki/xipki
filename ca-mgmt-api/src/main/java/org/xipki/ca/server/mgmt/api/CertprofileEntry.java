@@ -42,20 +42,20 @@ public class CertprofileEntry {
     this.ident = ParamUtil.requireNonNull("ident", ident);
     this.type = ParamUtil.requireNonBlank("type", type);
     this.conf = conf;
-    if ("all".equalsIgnoreCase(ident.name()) || "null".equalsIgnoreCase(ident.name())) {
+    if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
       throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
     }
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
-  public String conf() {
+  public String getConf() {
     return conf;
   }
 
@@ -74,7 +74,7 @@ public class CertprofileEntry {
 
   public String toString(boolean verbose) {
     boolean bo = (verbose || conf == null || conf.length() < 301);
-    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+    return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ",
         (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
   }

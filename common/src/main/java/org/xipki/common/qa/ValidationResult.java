@@ -63,15 +63,15 @@ public class ValidationResult {
     return CollectionUtil.isEmpty(failedValidationIssues);
   }
 
-  public List<ValidationIssue> validationIssues() {
+  public List<ValidationIssue> getValidationIssues() {
     return validationIssues;
   }
 
-  public List<ValidationIssue> failedValidationIssues() {
+  public List<ValidationIssue> getFailedValidationIssues() {
     return failedValidationIssues;
   }
 
-  public List<ValidationIssue> successfulValidationIssues() {
+  public List<ValidationIssue> getSuccessfulValidationIssues() {
     return successfulValidationIssues;
   }
 

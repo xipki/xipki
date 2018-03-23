@@ -77,7 +77,7 @@ public class HealthCheckServlet extends HttpServlet {
         return;
       }
 
-      HealthCheckResult healthResult = server.healthCheck(responderAndPath.responder());
+      HealthCheckResult healthResult = server.healthCheck(responderAndPath.getResponder());
       int status = healthResult.isHealthy()
           ? HttpServletResponse.SC_OK : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 

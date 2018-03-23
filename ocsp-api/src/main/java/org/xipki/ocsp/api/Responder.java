@@ -25,9 +25,9 @@ package org.xipki.ocsp.api;
 
 public interface Responder {
 
-  int maxRequestSize();
+  int getMaxRequestSize();
 
   boolean supportsHttpGet();
 
-  Long cacheMaxAge();
+  Long getCacheMaxAge();
 }

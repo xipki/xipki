@@ -105,7 +105,7 @@ public abstract class OcspStore {
     this.name = ParamUtil.requireNonBlank("name", name);
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
@@ -125,7 +125,7 @@ public abstract class OcspStore {
     this.includeArchiveCutoff = includeArchiveCutoff;
   }
 
-  public int retentionInterval() {
+  public int getRetentionInterval() {
     return retentionInterval;
   }
 

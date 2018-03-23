@@ -58,9 +58,9 @@ class Template {
   static {
     // CertHash
     for (HashAlgo h : HashAlgo.values()) {
-      int hlen = h.length();
+      int hlen = h.getLength();
 
-      AlgorithmIdentifier algId = new AlgorithmIdentifier(h.oid(), DERNull.INSTANCE);
+      AlgorithmIdentifier algId = new AlgorithmIdentifier(h.getOid(), DERNull.INSTANCE);
       byte[] encoded;
       try {
         CertHash certHash = new CertHash(algId, new byte[hlen]);
@@ -75,16 +75,16 @@ class Template {
     }
 
     Extension extension = new ExtendedExtension(OID.ID_INVALIDITY_DATE, false, new byte[17]);
-    extnInvalidityDate = new byte[extension.encodedLength()];
+    extnInvalidityDate = new byte[extension.getEncodedLength()];
     extension.write(extnInvalidityDate, 0);
 
     extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF, false, new byte[17]);
-    extnArchiveCutof = new byte[extension.encodedLength()];
+    extnArchiveCutof = new byte[extension.getEncodedLength()];
     extension.write(extnArchiveCutof, 0);
   }
 
   public static WritableOnlyExtension getCertHashExtension(HashAlgo hashAlgo, byte[] certHash) {
-    if (hashAlgo.length() != certHash.length) {
+    if (hashAlgo.getLength() != certHash.length) {
       throw new IllegalArgumentException("hashAlgo and certHash do not match");
     }
 
@@ -123,7 +123,7 @@ class Template {
       System.arraycopy(revokedInfoWithReasonPrefix, 0, encoded, 0, 2);
       ASN1Type.writeGeneralizedTime(revocationTime, encoded, 2);
       System.arraycopy(reasonPrefix, 0, encoded, 19, 4);
-      encoded[23] = (byte) reason.code();
+      encoded[23] = (byte) reason.getCode();
       return encoded;
     }
   }

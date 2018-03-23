@@ -42,11 +42,11 @@ public class NameId {
     this.id = id;
   }
 
-  public Integer id() {
+  public Integer getId() {
     return id;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 

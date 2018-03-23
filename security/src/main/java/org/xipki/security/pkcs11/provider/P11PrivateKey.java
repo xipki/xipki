@@ -55,7 +55,7 @@ public class P11PrivateKey implements PrivateKey {
     this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
     this.identityId = ParamUtil.requireNonNull("entityId", identityId);
 
-    this.publicKey = p11CryptService.getIdentity(identityId).publicKey();
+    this.publicKey = p11CryptService.getIdentity(identityId).getPublicKey();
 
     if (this.publicKey instanceof RSAPublicKey) {
       algorithm = "RSA";
@@ -73,7 +73,7 @@ public class P11PrivateKey implements PrivateKey {
 
   boolean supportsMechanism(long mechanism) {
     try {
-      return p11CryptService.getSlot(identityId.slotId()).supportsMechanism(mechanism);
+      return p11CryptService.getSlot(identityId.getSlotId()).supportsMechanism(mechanism);
     } catch (P11TokenException ex) {
       return false;
     }
@@ -94,11 +94,11 @@ public class P11PrivateKey implements PrivateKey {
     return algorithm;
   }
 
-  public int keysize() {
+  public int getKeysize() {
     return keysize;
   }
 
-  public PublicKey publicKey() {
+  public PublicKey getPublicKey() {
     return publicKey;
   }
 
@@ -121,11 +121,11 @@ public class P11PrivateKey implements PrivateKey {
     return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
   }
 
-  P11CryptService p11CryptService() {
+  P11CryptService getP11CryptService() {
     return p11CryptService;
   }
 
-  P11EntityIdentifier identityId() {
+  P11EntityIdentifier getIdentityId() {
     return identityId;
   }
 

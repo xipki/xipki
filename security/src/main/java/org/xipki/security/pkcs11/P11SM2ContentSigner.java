@@ -95,7 +95,7 @@ class P11SM2ContentSigner implements XiContentSigner {
       throw new XiSecurityException("unsupported signature algorithm " + algOid);
     }
 
-    P11Slot slot = cryptService.getSlot(identityId.slotId());
+    P11Slot slot = cryptService.getSlot(identityId.getSlotId());
     if (slot.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2)) {
       this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
 

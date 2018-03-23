@@ -48,7 +48,7 @@ public class UserType extends IdentifidDbObjectType {
 
   private String password;
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
@@ -56,7 +56,7 @@ public class UserType extends IdentifidDbObjectType {
     this.name = name;
   }
 
-  public Boolean active() {
+  public Boolean getActive() {
     return active;
   }
 
@@ -64,7 +64,7 @@ public class UserType extends IdentifidDbObjectType {
     this.active = active;
   }
 
-  public String password() {
+  public String getPassword() {
     return password;
   }
 
@@ -86,7 +86,7 @@ public class UserType extends IdentifidDbObjectType {
     validate();
 
     writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ID, getId());
     writeIfNotNull(writer, TAG_ACTIVE, active);
     writeIfNotNull(writer, TAG_NAME, name);
     writeIfNotNull(writer, TAG_PASSWORD, password);

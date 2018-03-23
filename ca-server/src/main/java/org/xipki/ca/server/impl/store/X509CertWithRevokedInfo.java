@@ -37,7 +37,7 @@ public class X509CertWithRevokedInfo {
     this.revoked = revoked;
   }
 
-  public X509CertWithDbId cert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 

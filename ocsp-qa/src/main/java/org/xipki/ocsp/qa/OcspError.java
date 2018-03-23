@@ -39,7 +39,7 @@ public enum OcspError {
     this.status = status;
   }
 
-  public int status() {
+  public int getStatus() {
     return status;
   }
 

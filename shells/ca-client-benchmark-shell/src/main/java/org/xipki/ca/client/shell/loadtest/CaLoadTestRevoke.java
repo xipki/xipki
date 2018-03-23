@@ -108,7 +108,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
       for (BigInteger serialNumber : serialNumbers) {
         CrlReason reason = REASONS[Math.abs(serialNumber.intValue()) % REASONS.length];
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry(Integer.toString(id++),
-                caSubject, serialNumber, reason.code(), null);
+                caSubject, serialNumber, reason.getCode(), null);
         request.addRequestEntry(entry);
       }
 
@@ -129,7 +129,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
       int numSuccess = 0;
       for (CertIdOrError entry : result.values()) {
-        if (entry.certId() != null) {
+        if (entry.getCertId() != null) {
           numSuccess++;
         }
       }

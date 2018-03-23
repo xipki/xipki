@@ -74,9 +74,9 @@ public class Asn1ImportSecretKeyParams extends ASN1Object {
   private Asn1ImportSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     Asn1Util.requireRange(seq, 5, 5);
     int idx = 0;
-    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
+    slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
     label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
+    control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
     keyType = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
     keyValue = ASN1OctetString.getInstance(seq.getObjectAt(idx++)).getOctets();
   }
@@ -109,23 +109,23 @@ public class Asn1ImportSecretKeyParams extends ASN1Object {
     return new DERSequence(vector);
   }
 
-  public P11SlotIdentifier slotId() {
+  public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public String label() {
+  public String getLabel() {
     return label;
   }
 
-  public P11NewKeyControl control() {
+  public P11NewKeyControl getControl() {
     return control;
   }
 
-  public long keyType() {
+  public long getKeyType() {
     return keyType;
   }
 
-  public byte[] keyValue() {
+  public byte[] getKeyValue() {
     return Arrays.copyOf(keyValue, keyValue.length);
   }
 

@@ -62,9 +62,9 @@ public class AdmissionSyntaxOption {
 
     boolean bo = false;
     for (AdmissionsOption ao : admissionsList) {
-      for (ProfessionInfoOption pio : ao.professionInfos()) {
-        if (pio.registrationNumberOption() != null
-            && pio.registrationNumberOption().regex() != null) {
+      for (ProfessionInfoOption pio : ao.getProfessionInfos()) {
+        if (pio.getRegistrationNumberOption() != null
+            && pio.getRegistrationNumberOption().getRegex() != null) {
           bo = true;
           break;
         }
@@ -81,44 +81,44 @@ public class AdmissionSyntaxOption {
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (AdmissionsOption ao : admissionsList) {
-      List<ProfessionInfoOption> piList = ao.professionInfos();
+      List<ProfessionInfoOption> piList = ao.getProfessionInfos();
       ProfessionInfo[] pis = new ProfessionInfo[piList.size()];
 
       for (int i = 0; i < pis.length; i++) {
         ProfessionInfoOption pio = piList.get(i);
         DirectoryString[] professionItems = null;
-        int size = pio.professionItems().size();
+        int size = pio.getProfessionItems().size();
         professionItems = new DirectoryString[size];
         for (int j = 0; j < size; j++) {
-          professionItems[j] = new DirectoryString(pio.professionItems().get(j));
+          professionItems[j] = new DirectoryString(pio.getProfessionItems().get(j));
         }
 
         ASN1OctetString addProfessionInfo = null;
-        if (pio.addProfessionalInfo() != null) {
-          addProfessionInfo = new DEROctetString(pio.addProfessionalInfo());
+        if (pio.getAddProfessionalInfo() != null) {
+          addProfessionInfo = new DEROctetString(pio.getAddProfessionalInfo());
         }
 
         String registrationNumber = null;
-        if (pio.registrationNumberOption() != null) {
-          registrationNumber = pio.registrationNumberOption().constant();
+        if (pio.getRegistrationNumberOption() != null) {
+          registrationNumber = pio.getRegistrationNumberOption().getConstant();
         }
-        pis[i] = new ProfessionInfo(pio.namingAuthority(), professionItems,
-            pio.professionOids().toArray(new ASN1ObjectIdentifier[0]), registrationNumber,
+        pis[i] = new ProfessionInfo(pio.getNamingAuthority(), professionItems,
+            pio.getProfessionOids().toArray(new ASN1ObjectIdentifier[0]), registrationNumber,
             addProfessionInfo);
       }
 
-      vec.add(new Admissions(ao.admissionAuthority(), ao.namingAuthority(), pis));
+      vec.add(new Admissions(ao.getAdmissionAuthority(), ao.getNamingAuthority(), pis));
     }
 
     extensionValue = new ExtensionValue(critical,
         new AdmissionSyntax(admissionAuthority, new DERSequence(vec)));
   }
 
-  public GeneralName admissionAuthority() {
+  public GeneralName getAdmissionAuthority() {
     return admissionAuthority;
   }
 
-  public List<AdmissionsOption> admissionsList() {
+  public List<AdmissionsOption> getAdmissionsList() {
     return admissionsList;
   }
 
@@ -126,7 +126,7 @@ public class AdmissionSyntaxOption {
     return inputFromRequestRequired;
   }
 
-  public ExtensionValue extensionValue(List<List<String>> registrationNumbersList)
+  public ExtensionValue getExtensionValue(List<List<String>> registrationNumbersList)
       throws BadCertTemplateException {
     if (!this.inputFromRequestRequired) {
       return this.extensionValue;
@@ -146,7 +146,7 @@ public class AdmissionSyntaxOption {
     List<List<String>> newRegNumbersList = new ArrayList<>(this.admissionsList.size());
     for (int i = 0; i < n; i++) {
       AdmissionsOption ao = this.admissionsList.get(i);
-      List<ProfessionInfoOption> pi = ao.professionInfos();
+      List<ProfessionInfoOption> pi = ao.getProfessionInfos();
       List<String> registrationNumbers = registrationNumbersList.get(i);
       final int k = registrationNumbers.size();
       if (k != pi.size()) {
@@ -157,12 +157,12 @@ public class AdmissionSyntaxOption {
       List<String> newRegNumbers = new ArrayList<>(k);
       newRegNumbersList.add(newRegNumbers);
       for (int j = 0; j < k; j++) {
-        RegistrationNumberOption option = pi.get(j).registrationNumberOption();
-        if (option == null || option.constant() != null) {
+        RegistrationNumberOption option = pi.get(j).getRegistrationNumberOption();
+        if (option == null || option.getConstant() != null) {
           continue;
         }
 
-        Pattern regex = option.regex();
+        Pattern regex = option.getRegex();
         String regNum = registrationNumbers.get(j);
         if (regNum == null || !regex.matcher(regNum).matches()) {
           throw new BadCertTemplateException("invalid registrationNumber[" + i + "][" + j
@@ -175,39 +175,39 @@ public class AdmissionSyntaxOption {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (int i = 0; i < this.admissionsList.size(); i++) {
       AdmissionsOption ao = this.admissionsList.get(i);
-      List<ProfessionInfoOption> piList = ao.professionInfos();
+      List<ProfessionInfoOption> piList = ao.getProfessionInfos();
       ProfessionInfo[] pis = new ProfessionInfo[piList.size()];
 
       for (int j = 0; j < pis.length; j++) {
         ProfessionInfoOption pio = piList.get(j);
         DirectoryString[] professionItems = null;
-        int size = pio.professionItems().size();
+        int size = pio.getProfessionItems().size();
         professionItems = new DirectoryString[size];
         for (int k = 0; k < size; k++) {
-          professionItems[k] = new DirectoryString(pio.professionItems().get(k));
+          professionItems[k] = new DirectoryString(pio.getProfessionItems().get(k));
         }
 
         ASN1OctetString addProfessionInfo = null;
-        if (pio.addProfessionalInfo() != null) {
-          addProfessionInfo = new DEROctetString(pio.addProfessionalInfo());
+        if (pio.getAddProfessionalInfo() != null) {
+          addProfessionInfo = new DEROctetString(pio.getAddProfessionalInfo());
         }
 
-        RegistrationNumberOption regNumOption = pio.registrationNumberOption();
+        RegistrationNumberOption regNumOption = pio.getRegistrationNumberOption();
         String registrationNumber = null;
         if (regNumOption != null) {
-          if (regNumOption.constant() != null) {
-            registrationNumber = regNumOption.constant();
+          if (regNumOption.getConstant() != null) {
+            registrationNumber = regNumOption.getConstant();
           } else {
             registrationNumber = newRegNumbersList.get(i).get(j);
           }
         }
 
-        pis[i] = new ProfessionInfo(pio.namingAuthority(), professionItems,
-            pio.professionOids().toArray(new ASN1ObjectIdentifier[0]),
+        pis[i] = new ProfessionInfo(pio.getNamingAuthority(), professionItems,
+            pio.getProfessionOids().toArray(new ASN1ObjectIdentifier[0]),
             registrationNumber, addProfessionInfo);
       }
 
-      vec.add(new Admissions(ao.admissionAuthority(), ao.namingAuthority(), pis));
+      vec.add(new Admissions(ao.getAdmissionAuthority(), ao.getNamingAuthority(), pis));
     }
 
     return new ExtensionValue(critical,

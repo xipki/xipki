@@ -47,11 +47,11 @@ public class RegistrationNumberOption {
     }
   }
 
-  public Pattern regex() {
+  public Pattern getRegex() {
     return regex;
   }
 
-  public String constant() {
+  public String getConstant() {
     return constant;
   }
 

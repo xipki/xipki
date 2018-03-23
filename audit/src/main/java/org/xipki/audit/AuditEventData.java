@@ -45,11 +45,11 @@ public class AuditEventData {
     }
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String value() {
+  public String getValue() {
     return value;
   }
 

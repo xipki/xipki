@@ -42,7 +42,7 @@ public class RequestType extends IdentifidDbObjectType {
 
   private String file;
 
-  public Long update() {
+  public Long getUpdate() {
     return update;
   }
 
@@ -50,7 +50,7 @@ public class RequestType extends IdentifidDbObjectType {
     this.update = update;
   }
 
-  public String file() {
+  public String getFile() {
     return file;
   }
 
@@ -72,7 +72,7 @@ public class RequestType extends IdentifidDbObjectType {
     validate();
 
     writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_ID, id());
+    writeIfNotNull(writer, TAG_ID, getId());
     writeIfNotNull(writer, TAG_UPDATE, update);
     writeIfNotNull(writer, TAG_FILE, file);
     writer.writeEndElement();

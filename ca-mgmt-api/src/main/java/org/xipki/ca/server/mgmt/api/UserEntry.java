@@ -41,21 +41,21 @@ public class UserEntry {
     this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public boolean active() {
+  public boolean isActive() {
     return active;
   }
 
-  public String hashedPassword() {
+  public String getHashedPassword() {
     return hashedPassword;
   }
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "id: ", ident.id(), "\nname: ", ident.name(),
+    return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nactive: ", active, "\npassword: *****\n");
   }
 

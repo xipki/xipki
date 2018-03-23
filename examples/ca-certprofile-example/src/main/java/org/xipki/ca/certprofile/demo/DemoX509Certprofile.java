@@ -127,7 +127,7 @@ public class DemoX509Certprofile extends XmlX509Certprofile {
       ASN1ObjectIdentifier type = id_demo_ca_extra_control;
       ExtensionControl extnControl = extensionOccurences.get(type);
       if (extnControl != null) {
-        ConfPairs caExtraControl = caInfo.extraControl();
+        ConfPairs caExtraControl = caInfo.getExtraControl();
         String name = "name-a";
         String value = null;
         if (caExtraControl != null) {

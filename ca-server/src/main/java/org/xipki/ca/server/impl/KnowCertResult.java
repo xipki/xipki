@@ -40,7 +40,7 @@ public class KnowCertResult {
     return known;
   }
 
-  public Integer userId() {
+  public Integer getUserId() {
     return userId;
   }
 

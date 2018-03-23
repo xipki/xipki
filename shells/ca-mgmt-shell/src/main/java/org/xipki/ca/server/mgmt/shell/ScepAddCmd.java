@@ -98,7 +98,7 @@ public class ScepAddCmd extends CaAction {
 
     ScepEntry entry = new ScepEntry(name, new NameId(null, caName), !inactive, responderType,
         responderConf, base64Cert, profiles, scepControl);
-    if (entry.faulty()) {
+    if (entry.isFaulty()) {
       throw new InvalidConfException("certificate is invalid");
     }
 

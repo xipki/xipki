@@ -54,15 +54,15 @@ public abstract class X509Certprofile {
   public void shutdown() {
   }
 
-  public X509CertVersion version() {
+  public X509CertVersion getVersion() {
     return X509CertVersion.v3;
   }
 
-  public List<String> signatureAlgorithms() {
+  public List<String> getSignatureAlgorithms() {
     return null;
   }
 
-  public SpecialX509CertprofileBehavior specialCertprofileBehavior() {
+  public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
     return null;
   }
 
@@ -73,11 +73,11 @@ public abstract class X509Certprofile {
    * @return whether include subject and serial number of the issuer certificate in the
    *         AuthorityKeyIdentifier extension.
    */
-  public boolean includeIssuerAndSerialInAki() {
+  public boolean includesIssuerAndSerialInAki() {
     return false;
   }
 
-  public AuthorityInfoAccessControl aiaControl() {
+  public AuthorityInfoAccessControl getAiaControl() {
     return null;
   }
 
@@ -126,7 +126,7 @@ public abstract class X509Certprofile {
    *          Parameter name. Must not be {@code null}.
    * @return parameter value.
    */
-  public String parameter(String paramName) {
+  public String setParameter(String paramName) {
     return null;
   }
 
@@ -134,11 +134,11 @@ public abstract class X509Certprofile {
     return false;
   }
 
-  public TimeZone timezone() {
+  public TimeZone getTimezone() {
     return timeZone;
   }
 
-  public Set<ExtKeyUsageControl> extendedKeyUsages() {
+  public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
     return null;
   }
 
@@ -148,11 +148,11 @@ public abstract class X509Certprofile {
    *
    * @return the SubjectInfoAccess modes.
    */
-  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
+  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
     return null;
   }
 
-  public abstract Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls();
+  public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
   /**
    * Initializes this object.
@@ -164,11 +164,11 @@ public abstract class X509Certprofile {
    */
   public abstract void initialize(String data) throws CertprofileException;
 
-  public abstract X509CertLevel certLevel();
+  public abstract X509CertLevel getCertLevel();
 
-  public abstract Set<KeyUsageControl> keyUsage();
+  public abstract Set<KeyUsageControl> getKeyUsage();
 
-  public abstract Integer pathLenBasicConstraint();
+  public abstract Integer getPathLenBasicConstraint();
 
   /**
    * Sets the {{@link EnvParameterResolver}.
@@ -187,7 +187,7 @@ public abstract class X509Certprofile {
    */
   public abstract Date getNotBefore(Date notBefore);
 
-  public abstract CertValidity validity();
+  public abstract CertValidity getValidity();
 
   /**
    * Checks the public key. If the check passes, returns the canonicalized public key.
@@ -251,7 +251,7 @@ public abstract class X509Certprofile {
    * @return maximal size in bytes of the certificate, 0 or negative value
    *         indicates accepting all sizes.
    */
-  public int maxCertSize() {
+  public int getMaxCertSize() {
     return 0;
   }
 

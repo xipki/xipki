@@ -202,14 +202,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
   private Exception exportEntries(CaDbEntryType type, CertStoreType certstore,
       File processLogFile, Long idProcessedInLastProcess) {
     String tablesText = (CaDbEntryType.CERT == type)
-        ? "tables CERT and CRAW" : "table " + type.tableName();
+        ? "tables CERT and CRAW" : "table " + type.getTableName();
 
-    File dir = new File(baseDir, type.dirName());
+    File dir = new File(baseDir, type.getDirName());
     dir.mkdirs();
 
     FileOutputStream entriesFileOs = null;
     try {
-      entriesFileOs = new FileOutputStream(new File(baseDir, type.dirName() + ".mf"), true);
+      entriesFileOs = new FileOutputStream(new File(baseDir, type.getDirName() + ".mf"), true);
       exportEntries(type, certstore, processLogFile, entriesFileOs, idProcessedInLastProcess);
       return null;
     } catch (Exception ex) {
@@ -230,10 +230,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
   private void exportEntries(CaDbEntryType type, CertStoreType certstore, File processLogFile,
       FileOutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
     final int numEntriesPerSelect = Math.max(1,
-        Math.round(type.sqlBatchFactor() * numCertsPerSelect));
-    final int numEntriesPerZip = Math.max(1, Math.round(type.sqlBatchFactor() * numCertsInBundle));
-    final File entriesDir = new File(baseDir, type.dirName());
-    final String tableName = type.tableName();
+        Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
+    final int numEntriesPerZip =
+        Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
+    final File entriesDir = new File(baseDir, type.getDirName());
+    final String tableName = type.getTableName();
 
     int numProcessedBefore;
     String coreSql;
@@ -272,7 +273,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         : min(tableName, "ID");
 
     String tablesText = (CaDbEntryType.CERT == type)
-        ? "tables " + tableName + " and CRAW" : "table " + type.tableName();
+        ? "tables " + tableName + " and CRAW" : "table " + type.getTableName();
     System.out.println(exportingText() + tablesText + " from ID " + minId);
 
     final long maxId = max(tableName, "ID");
@@ -290,7 +291,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     int sum = 0;
     File currentEntriesZipFile = new File(baseDir,
-        "tmp-" + type.dirName() + "-" + System.currentTimeMillis() + ".zip");
+        "tmp-" + type.getDirName() + "-" + System.currentTimeMillis() + ".zip");
     ZipOutputStream currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
 
     long minIdOfCurrentFile = -1;
@@ -492,7 +493,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
           sum++;
 
           if (numEntriesInCurrentFile == numEntriesPerZip) {
-            String currentEntriesFilename = buildFilename(type.dirName() + "_", ".zip",
+            String currentEntriesFilename = buildFilename(type.getDirName() + "_", ".zip",
                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
             finalizeZip(currentEntriesZip, "overview.xml", entriesInCurrentFile);
             currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
@@ -509,7 +510,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             numEntriesInCurrentFile = 0;
             minIdOfCurrentFile = -1;
             maxIdOfCurrentFile = -1;
-            currentEntriesZipFile = new File(baseDir, "tmp-" + type.dirName() + "-"
+            currentEntriesZipFile = new File(baseDir, "tmp-" + type.getDirName() + "-"
                 + System.currentTimeMillis() + ".zip");
             currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
           }
@@ -526,7 +527,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
       if (numEntriesInCurrentFile > 0) {
         finalizeZip(currentEntriesZip, "overview.xml", entriesInCurrentFile);
 
-        String currentEntriesFilename = buildFilename(type.dirName() + "_", ".zip",
+        String currentEntriesFilename = buildFilename(type.getDirName() + "_", ".zip",
             minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
         currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
 

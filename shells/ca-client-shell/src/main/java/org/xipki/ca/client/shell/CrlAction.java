@@ -56,7 +56,7 @@ public abstract class CrlAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    Set<String> caNames = caClient.caNames();
+    Set<String> caNames = caClient.getCaNames();
     if (isEmpty(caNames)) {
       throw new CmdFailure("no CA is configured");
     }

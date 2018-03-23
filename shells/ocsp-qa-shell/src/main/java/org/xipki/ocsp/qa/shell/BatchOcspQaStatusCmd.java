@@ -224,7 +224,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
     RequestOptions requestOptions = getRequestOptions();
 
     IssuerHash issuerHash = new IssuerHash(
-        HashAlgo.getNonNullInstance(requestOptions.hashAlgorithmId()),
+        HashAlgo.getNonNullInstance(requestOptions.getHashAlgorithmId()),
         Certificate.getInstance(issuerCert.getEncoded()));
 
     OutputStream resultOut = new FileOutputStream(new File(outDir, "overview.txt"));
@@ -413,14 +413,14 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
         String filename = serialNumber.toString(16);
 
         if (saveReq) {
-          byte[] bytes = reqResp.request();
+          byte[] bytes = reqResp.getRequest();
           if (bytes != null) {
             IoUtil.save(new File(messageDir, filename + FILE_SEP + "request.der"), bytes);
           }
         }
 
         if (saveResp) {
-          byte[] bytes = reqResp.response();
+          byte[] bytes = reqResp.getResponse();
           if (bytes != null) {
             IoUtil.save(new File(messageDir, filename + FILE_SEP + "response.der"), bytes);
           }
@@ -448,7 +448,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
     sb.append("OCSP response for ").append(serialNumber).append(" (0x").append(hexSerial)
       .append(") is ").append(validity);
 
-    for (ValidationIssue issue : ret.validationIssues()) {
+    for (ValidationIssue issue : ret.getValidationIssues()) {
       sb.append("\n");
       OcspQaStatusCmd.format(issue, "    ", sb);
     }

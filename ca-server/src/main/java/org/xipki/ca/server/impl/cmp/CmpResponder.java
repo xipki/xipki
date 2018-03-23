@@ -192,12 +192,12 @@ abstract class CmpResponder {
       failureCode = PKIFailureInfo.badRequest;
       statusText = "I am not the intended recipient";
     } else if (messageTime == null) {
-      if (cmpControl.messageTimeRequired()) {
+      if (cmpControl.isMessageTimeRequired()) {
         failureCode = PKIFailureInfo.missingTimeStamp;
         statusText = "missing time-stamp";
       }
     } else {
-      long messageTimeBias = cmpControl.messageTimeBias();
+      long messageTimeBias = cmpControl.getMessageTimeBias();
       if (messageTimeBias < 0) {
         messageTimeBias *= -1;
       }
@@ -232,7 +232,7 @@ abstract class CmpResponder {
       try {
         ProtectionVerificationResult verificationResult = verifyProtection(tidStr,
             message, cmpControl);
-        ProtectionResult pr = verificationResult.protectionResult();
+        ProtectionResult pr = verificationResult.getProtectionResult();
         switch (pr) {
           case VALID:
             errorStatus = null;
@@ -253,7 +253,7 @@ abstract class CmpResponder {
           default:
             throw new RuntimeException("should not reach here, unknown ProtectionResult " + pr);
         } // end switch
-        requestor = (CmpRequestorInfo) verificationResult.requestor();
+        requestor = (CmpRequestorInfo) verificationResult.getRequestor();
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not verify the signature");
         errorStatus = "request has invalid signature based protection";
@@ -264,7 +264,7 @@ abstract class CmpResponder {
 
       requestor = getRequestor(reqHeader);
       if (requestor != null) {
-        if (tlsClientCert.equals(requestor.cert().cert())) {
+        if (tlsClientCert.equals(requestor.getCert().getCert())) {
           authorized = true;
         }
       }
@@ -321,7 +321,7 @@ abstract class CmpResponder {
 
     PKIHeader header = protectedMsg.getHeader();
     AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
-    if (!cmpControl.sigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
+    if (!cmpControl.getSigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
       LOG.warn("SIG_ALGO_FORBIDDEN: {}",
           pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
       return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);
@@ -334,7 +334,7 @@ abstract class CmpResponder {
     }
 
     ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
-        requestor.cert().cert());
+        requestor.getCert().getCert());
     if (verifierProvider == null) {
       LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
       return new ProtectionVerificationResult(requestor,
@@ -349,7 +349,7 @@ abstract class CmpResponder {
   private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent event) {
     try {
       return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
-          getCmpControl().sendResponderCert());
+          getCmpControl().isSendResponderCert());
     } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not add protection to the PKI message");
       PKIStatusInfo status = generateRejectionStatus(

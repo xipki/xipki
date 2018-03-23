@@ -45,7 +45,7 @@ public class ValidationIssue {
     return failed;
   }
 
-  public String failureMessage() {
+  public String getFailureMessage() {
     return failureMessage;
   }
 
@@ -54,11 +54,11 @@ public class ValidationIssue {
     this.failed = true;
   }
 
-  public String code() {
+  public String getCode() {
     return code;
   }
 
-  public String description() {
+  public String getDescription() {
     return description;
   }
 

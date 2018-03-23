@@ -108,9 +108,9 @@ public class HttpCmpServlet extends AbstractHttpServlet {
 
       String caName = null;
       X509CaCmpResponder responder = null;
-      if (servletUri.path().length() > 1) {
+      if (servletUri.getPath().length() > 1) {
         // skip the first char which is always '/'
-        String caAlias = servletUri.path().substring(1);
+        String caAlias = servletUri.getPath().substring(1);
         caName = responderManager.getCaNameForAlias(caAlias);
         if (caName == null) {
           caName = caAlias.toLowerCase();
@@ -148,10 +148,10 @@ public class HttpCmpServlet extends AbstractHttpServlet {
       byte[] encodedPkiResp = pkiResp.getEncoded();
       return createOKResponse(httpVersion, CT_RESPONSE, encodedPkiResp);
     } catch (HttpRespAuditException ex) {
-      auditStatus = ex.auditStatus();
-      auditLevel = ex.auditLevel();
-      auditMessage = ex.auditMessage();
-      return createErrorResponse(httpVersion, ex.httpStatus());
+      auditStatus = ex.getAuditStatus();
+      auditLevel = ex.getAuditLevel();
+      auditMessage = ex.getAuditMessage();
+      return createErrorResponse(httpVersion, ex.getHttpStatus());
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");

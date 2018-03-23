@@ -46,7 +46,7 @@ public class ResponderID extends ASN1Type {
   }
 
   @Override
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encodedLength;
   }
 

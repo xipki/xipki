@@ -88,40 +88,40 @@ public abstract class AuditService {
 
   protected static String createMessage(AuditEvent event) {
     Objects.requireNonNull(event, "event must not be null");
-    String applicationName = event.applicationName();
+    String applicationName = event.getApplicationName();
     if (applicationName == null) {
       applicationName = "undefined";
     }
 
-    String name = event.name();
+    String name = event.getName();
     if (name == null) {
       name = "undefined";
     }
 
     StringBuilder sb = new StringBuilder(150);
 
-    sb.append(event.level().alignedText()).append(" | ");
+    sb.append(event.getLevel().getAlignedText()).append(" | ");
     sb.append(applicationName).append(" - ").append(name);
 
-    AuditStatus status = event.status();
+    AuditStatus status = event.getStatus();
     if (status == null) {
       status = AuditStatus.UNDEFINED;
     }
     sb.append(":\tstatus: ").append(status.name());
-    List<AuditEventData> eventDataArray = event.eventDatas();
+    List<AuditEventData> eventDataArray = event.getEventDatas();
 
-    long duration = event.duration();
+    long duration = event.getDuration();
     if (duration >= 0) {
       sb.append("\tduration: ").append(duration);
     }
 
     if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
       for (AuditEventData m : eventDataArray) {
-        if (duration >= 0 && "duration".equalsIgnoreCase(m.name())) {
+        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
           continue;
         }
 
-        sb.append("\t").append(m.name()).append(": ").append(m.value());
+        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
       }
     }
 

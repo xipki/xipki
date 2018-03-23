@@ -37,11 +37,11 @@ public class CsrEnrollCertEntry {
     this.profile = ParamUtil.requireNonNull("profile", profile);
   }
 
-  public CertificationRequest csr() {
+  public CertificationRequest getCsr() {
     return csr;
   }
 
-  public String profile() {
+  public String getProfile() {
     return profile;
   }
 

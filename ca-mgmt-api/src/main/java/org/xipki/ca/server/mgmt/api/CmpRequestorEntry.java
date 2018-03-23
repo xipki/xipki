@@ -46,8 +46,8 @@ public class CmpRequestorEntry {
 
   public CmpRequestorEntry(NameId ident, String base64Cert) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
-    if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(ident.name())
-        || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(ident.name())) {
+    if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(ident.getName())
+        || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(ident.getName())) {
       throw new IllegalArgumentException("Requestor name could not be "
           + RequestorInfo.NAME_BY_USER);
     }
@@ -60,15 +60,15 @@ public class CmpRequestorEntry {
     }
   }
 
-  public NameId ident() {
+  public NameId getIdent() {
     return ident;
   }
 
-  public String base64Cert() {
+  public String getBase64Cert() {
     return base64Cert;
   }
 
-  public X509Certificate cert() {
+  public X509Certificate getCert() {
     return cert;
   }
 
@@ -79,8 +79,8 @@ public class CmpRequestorEntry {
 
   public String toString(boolean verbose) {
     StringBuilder sb = new StringBuilder(500);
-    sb.append("id: ").append(ident.id()).append('\n');
-    sb.append("name: ").append(ident.name()).append('\n');
+    sb.append("id: ").append(ident.getId()).append('\n');
+    sb.append("name: ").append(ident.getName()).append('\n');
     sb.append("faulty: ").append(cert == null).append('\n');
 
     if (cert != null) {

@@ -39,7 +39,7 @@ public class CmpControlEntry {
     this.conf = ParamUtil.requireNonBlank("conf", conf);
   }
 
-  public boolean faulty() {
+  public boolean isFaulty() {
     return faulty;
   }
 
@@ -47,11 +47,11 @@ public class CmpControlEntry {
     this.faulty = faulty;
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String conf() {
+  public String getConf() {
     return conf;
   }
 

@@ -98,7 +98,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
         for (Integer certId : certRequests.keySet()) {
           String id = "id-" + certId;
           EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(id,
-              loadtestEntry.certprofile(), certRequests.get(certId), RA_VERIFIED);
+              loadtestEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
           request.addRequestEntry(requestEntry);
         }
 
@@ -115,11 +115,11 @@ public class CaLoadTestEnroll extends LoadExecutor {
         return false;
       }
 
-      Set<String> ids = result.allIds();
+      Set<String> ids = result.getAllIds();
       int numSuccess = 0;
       for (String id : ids) {
         CertOrError certOrError = result.getCertOrError(id);
-        X509Certificate cert = (X509Certificate) certOrError.certificate();
+        X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
         if (cert != null) {
           numSuccess++;

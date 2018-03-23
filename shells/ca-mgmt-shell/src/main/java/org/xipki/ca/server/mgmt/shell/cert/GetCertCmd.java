@@ -57,7 +57,7 @@ public class GetCertCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     CertWithStatusInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
-    X509Certificate cert = (X509Certificate) certInfo.cert();
+    X509Certificate cert = (X509Certificate) certInfo.getCert();
 
     if (cert == null) {
       System.out.println("certificate unknown");

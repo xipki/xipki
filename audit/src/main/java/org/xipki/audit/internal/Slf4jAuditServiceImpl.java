@@ -41,7 +41,7 @@ public class Slf4jAuditServiceImpl extends AuditService {
 
   @Override
   protected void logEvent0(AuditEvent event) {
-    switch (event.level()) {
+    switch (event.getLevel()) {
       case DEBUG:
         if (LOG.isDebugEnabled()) {
           LOG.debug("{}", createMessage(event));
@@ -58,16 +58,16 @@ public class Slf4jAuditServiceImpl extends AuditService {
   @Override
   protected void logEvent0(PciAuditEvent event) {
     CharArrayWriter msg = event.toCharArrayWriter("");
-    AuditLevel al = event.level();
+    AuditLevel al = event.getLevel();
     switch (al) {
       case DEBUG:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("{} | {}", al.alignedText(), msg);
+          LOG.debug("{} | {}", al.getAlignedText(), msg);
         }
         break;
       default:
         if (LOG.isInfoEnabled()) {
-          LOG.info("{} | {}", al.alignedText(), msg);
+          LOG.info("{} | {}", al.getAlignedText(), msg);
         }
         break;
     } // end switch

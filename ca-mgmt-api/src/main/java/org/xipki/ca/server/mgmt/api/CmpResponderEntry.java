@@ -66,11 +66,11 @@ public class CmpResponderEntry {
     }
   }
 
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
@@ -78,11 +78,11 @@ public class CmpResponderEntry {
     this.conf = conf;
   }
 
-  public String conf() {
+  public String getConf() {
     return conf;
   }
 
-  public X509Certificate certificate() {
+  public X509Certificate getCertificate() {
     return certificate;
   }
 
@@ -93,11 +93,11 @@ public class CmpResponderEntry {
     this.certificate = certificate;
   }
 
-  public String base64Cert() {
+  public String getBase64Cert() {
     return base64Cert;
   }
 
-  public boolean faulty() {
+  public boolean isFaulty() {
     return confFaulty || certFaulty;
   }
 
@@ -117,7 +117,7 @@ public class CmpResponderEntry {
   public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
     StringBuilder sb = new StringBuilder(1000);
     sb.append("name: ").append(name).append('\n');
-    sb.append("faulty: ").append(faulty()).append('\n');
+    sb.append("faulty: ").append(isFaulty()).append('\n');
     sb.append("type: ").append(type).append('\n');
     sb.append("conf: ");
     if (conf == null) {

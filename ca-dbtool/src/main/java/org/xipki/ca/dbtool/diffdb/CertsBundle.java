@@ -40,11 +40,11 @@ class CertsBundle {
     this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
   }
 
-  public Map<BigInteger, DigestEntry> certs() {
+  public Map<BigInteger, DigestEntry> getCerts() {
     return certs;
   }
 
-  public List<BigInteger> serialNumbers() {
+  public List<BigInteger> getSerialNumbers() {
     return serialNumbers;
   }
 

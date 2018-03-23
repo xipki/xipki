@@ -63,8 +63,8 @@ public class UnrevokeCertCmd extends UnRevRemoveCertAction {
       }
     }
 
-    if (certIdOrError.error() != null) {
-      PkiStatusInfo error = certIdOrError.error();
+    if (certIdOrError.getError() != null) {
+      PkiStatusInfo error = certIdOrError.getError();
       throw new CmdFailure("releasing revocation failed: " + error);
     } else {
       println("unrevoked certificate");

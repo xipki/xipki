@@ -37,7 +37,7 @@ public enum X509CertVersion {
     this.versionNumber = versionNumber;
   }
 
-  public int versionNumber() {
+  public int getVersionNumber() {
     return versionNumber;
   }
 

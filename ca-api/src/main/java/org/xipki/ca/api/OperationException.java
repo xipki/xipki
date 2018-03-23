@@ -66,11 +66,11 @@ public class OperationException extends Exception {
     this(errorCode, getMessage(throwable));
   }
 
-  public ErrorCode errorCode() {
+  public ErrorCode getErrorCode() {
     return errorCode;
   }
 
-  public String errorMessage() {
+  public String getErrorMessage() {
     return errorMessage;
   }
 

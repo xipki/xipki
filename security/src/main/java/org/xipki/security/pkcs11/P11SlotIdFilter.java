@@ -39,13 +39,13 @@ class P11SlotIdFilter {
 
   boolean match(P11SlotIdentifier slotId) {
     if (index != null) {
-      if (index.intValue() != slotId.index()) {
+      if (index.intValue() != slotId.getIndex()) {
         return false;
       }
     }
 
     if (id != null) {
-      if (id.longValue() != slotId.id()) {
+      if (id.longValue() != slotId.getId()) {
         return false;
       }
     }

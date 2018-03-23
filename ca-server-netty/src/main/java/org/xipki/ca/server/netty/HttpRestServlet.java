@@ -73,13 +73,14 @@ public class HttpRestServlet extends AbstractHttpServlet {
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(
           request, servletUri, sslSession, sslReverseProxyMode);
       byte[] requestBytes = readContent(request);
-      RestResponse response = rest.service(servletUri.path(), event, requestBytes, httpRetriever);
+      RestResponse response =
+          rest.service(servletUri.getPath(), event, requestBytes, httpRetriever);
 
-      HttpResponseStatus status = HttpResponseStatus.valueOf(response.statusCode());
-      FullHttpResponse resp = createResponse(version, status, response.contentType(),
-          response.body());
-      for (String headerName : response.headers().keySet()) {
-        resp.headers().add(headerName, response.headers().get(headerName));
+      HttpResponseStatus status = HttpResponseStatus.valueOf(response.getStatusCode());
+      FullHttpResponse resp = createResponse(version, status, response.getContentType(),
+          response.getBody());
+      for (String headerName : response.getHeaders().keySet()) {
+        resp.headers().add(headerName, response.getHeaders().get(headerName));
       }
       return resp;
     } finally {

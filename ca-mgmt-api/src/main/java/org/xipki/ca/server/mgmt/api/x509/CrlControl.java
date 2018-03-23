@@ -132,11 +132,11 @@ public class CrlControl {
       this.minute = ParamUtil.requireRange("minute", minute, 0, 59);
     }
 
-    public int hour() {
+    public int getHour() {
       return hour;
     }
 
-    public int minute() {
+    public int getMinute() {
       return minute;
     }
 
@@ -347,67 +347,67 @@ public class CrlControl {
     return getConf();
   }
 
-  public UpdateMode updateMode() {
+  public UpdateMode getUpdateMode() {
     return updateMode;
   }
 
-  public boolean xipkiCertsetIncluded() {
+  public boolean isXipkiCertsetIncluded() {
     return xipkiCertsetIncluded;
   }
 
-  public boolean xipkiCertsetCertIncluded() {
+  public boolean isXipkiCertsetCertIncluded() {
     return xipkiCertsetCertIncluded;
   }
 
-  public boolean xipkiCertsetProfilenameIncluded() {
+  public boolean isXipkiCertsetProfilenameIncluded() {
     return xipkiCertsetProfilenameIncluded;
   }
 
-  public boolean includeExpiredCerts() {
+  public boolean isIncludeExpiredCerts() {
     return includeExpiredCerts;
   }
 
-  public int fullCrlIntervals() {
+  public int getFullCrlIntervals() {
     return fullCrlIntervals;
   }
 
-  public int deltaCrlIntervals() {
+  public int getDeltaCrlIntervals() {
     return deltaCrlIntervals;
   }
 
-  public int overlapMinutes() {
+  public int getOverlapMinutes() {
     return overlapMinutes;
   }
 
-  public Integer intervalMinutes() {
+  public Integer getIntervalMinutes() {
     return intervalMinutes;
   }
 
-  public HourMinute intervalDayTime() {
+  public HourMinute getIntervalDayTime() {
     return intervalDayTime;
   }
 
-  public Set<String> extensionOids() {
+  public Set<String> getExtensionOids() {
     return extensionOids;
   }
 
-  public boolean extendedNextUpdate() {
+  public boolean isExtendedNextUpdate() {
     return extendedNextUpdate;
   }
 
-  public boolean onlyContainsUserCerts() {
+  public boolean isOnlyContainsUserCerts() {
     return onlyContainsUserCerts;
   }
 
-  public boolean onlyContainsCaCerts() {
+  public boolean isOnlyContainsCaCerts() {
     return onlyContainsCaCerts;
   }
 
-  public boolean excludeReason() {
+  public boolean isExcludeReason() {
     return excludeReason;
   }
 
-  public TripleState invalidityDateMode() {
+  public TripleState getInvalidityDateMode() {
     return invalidityDateMode;
   }
 

@@ -55,7 +55,7 @@ public class ScepCaCertRespBytes {
     }
   }
 
-  public byte[] bytes() {
+  public byte[] getBytes() {
     return Arrays.copyOf(bytes, bytes.length);
   }
 

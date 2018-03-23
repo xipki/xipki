@@ -105,7 +105,7 @@ public class P11PasswordsRetriever {
     return null;
   }
 
-  public PasswordResolver passwordResolver() {
+  public PasswordResolver getPasswordResolver() {
     return passwordResolver;
   }
 

@@ -60,7 +60,7 @@ public class HealthCheckResult {
     this.statuses.clear();
   }
 
-  public Object status(String statusName) {
+  public Object getStatus(String statusName) {
     return (statusName == null) ? null : statuses.get(statusName);
   }
 
@@ -73,7 +73,7 @@ public class HealthCheckResult {
     this.childChecks.add(childCheck);
   }
 
-  public Set<String> statusNames() {
+  public Set<String> getStatusNames() {
     return statuses.keySet();
   }
 
@@ -81,7 +81,7 @@ public class HealthCheckResult {
     return healthy;
   }
 
-  public Map<String, Object> statuses() {
+  public Map<String, Object> getStatuses() {
     return Collections.unmodifiableMap(statuses);
   }
 

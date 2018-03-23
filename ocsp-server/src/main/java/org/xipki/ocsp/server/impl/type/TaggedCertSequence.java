@@ -54,7 +54,7 @@ public class TaggedCertSequence extends ASN1Type {
   }
 
   @Override
-  public int encodedLength() {
+  public int getEncodedLength() {
     return encodedLen;
   }
 

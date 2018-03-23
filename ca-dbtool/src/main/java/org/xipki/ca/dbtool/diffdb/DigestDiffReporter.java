@@ -91,7 +91,7 @@ class DigestDiffReporter {
     startTime = new Date();
   }
 
-  public String reportDirname() {
+  public String getReportDirname() {
     return reportDirname;
   }
 
@@ -114,13 +114,13 @@ class DigestDiffReporter {
     ParamUtil.requireNonNull("refCert", refCert);
     ParamUtil.requireNonNull("targetCert", targetCert);
 
-    if (refCert.serialNumber().equals(targetCert.serialNumber())) {
+    if (refCert.getSerialNumber().equals(targetCert.getSerialNumber())) {
       throw new IllegalArgumentException(
           "refCert and targetCert do not have the same serialNumber");
     }
 
     numDiff.incrementAndGet();
-    String msg = StringUtil.concat(refCert.serialNumber().toString(16),
+    String msg = StringUtil.concat(refCert.getSerialNumber().toString(16),
         "\t", refCert.encodedOmitSeriaNumber(), "\t", targetCert.encodedOmitSeriaNumber(), "\n");
     synchronized (diffWriter) {
       diffWriter.write(msg);
