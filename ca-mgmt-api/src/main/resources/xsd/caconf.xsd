@@ -101,6 +101,13 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="users" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="user" type="userType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:all>
     <xs:attribute name="version" type="xs:int" use="required"/>
   </xs:complexType>
@@ -140,6 +147,18 @@
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
+  <xs:complexType name="userType">
+    <xs:sequence>
+      <!-- default to true -->
+      <xs:element name="active" type="xs:boolean" minOccurs="0"/>
+      <xs:choice>
+        <xs:element name="password" type="xs:string"/>
+        <!-- hashed password -->
+        <xs:element name="hashedPassword" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
   <xs:complexType name="publisherType">
     <xs:all>
       <xs:element name="type" type="xs:string"/>
@@ -153,6 +172,17 @@
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
     </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="scepType">
+    <xs:sequence>
+      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="responderType" type="xs:string"/>
+      <xs:element name="responderConf" type="fileOrValueType"/>
+      <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>
+      <xs:element name="profiles" type="stringsType"/>
+      <xs:element name="control" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="caType">
@@ -170,6 +200,13 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="requestor" type="caHasRequestorType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="users" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="user" type="caHasUserType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -236,15 +273,11 @@
       <xs:element name="profiles" type="stringsType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="scepType">
+  <xs:complexType name="caHasUserType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="caName" type="xs:string"/>
-      <xs:element name="responderType" type="xs:string"/>
-      <xs:element name="responderConf" type="fileOrValueType"/>
-      <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>
-      <xs:element name="profiles" type="stringsType"/>
-      <xs:element name="control" type="xs:string" minOccurs="0"/>
+      <xs:element name="userName" type="xs:string"/>
+      <xs:element name="permission" type="xs:int"/>
+      <xs:element name="profiles" type="stringsType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="stringsType">

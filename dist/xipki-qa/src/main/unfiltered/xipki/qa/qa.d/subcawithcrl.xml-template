@@ -76,6 +76,15 @@
           </profiles>
         </requestor>
       </requestors>
+      <users>
+        <user>
+          <userName>user1</userName>
+          <permission>255</permission>
+          <profiles>
+            <str>all</str>
+          </profiles>
+        </user>
+      </users>
     </ca>
   </cas>
 </CAConf>

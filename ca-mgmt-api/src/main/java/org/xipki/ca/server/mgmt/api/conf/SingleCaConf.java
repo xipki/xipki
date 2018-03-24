@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.common.util.ParamUtil;
 
@@ -44,11 +45,13 @@ public class SingleCaConf {
 
   private final List<CaHasRequestorEntry> requestors;
 
+  private final List<CaHasUserEntry> users;
+
   private final List<String> publisherNames;
 
   public SingleCaConf(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
       List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
-      List<String> publisherNames) {
+      List<CaHasUserEntry> users, List<String> publisherNames) {
     this.name = ParamUtil.requireNonBlank("name", name);
     if (genSelfIssued != null) {
       if (caEntry == null) {
@@ -68,6 +71,7 @@ public class SingleCaConf {
     this.aliases = aliases;
     this.profileNames = profileNames;
     this.requestors = requestors;
+    this.users = users;
     this.publisherNames = publisherNames;
   }
 
@@ -93,6 +97,10 @@ public class SingleCaConf {
 
   public List<CaHasRequestorEntry> getRequestors() {
     return requestors;
+  }
+
+  public List<CaHasUserEntry> getUsers() {
+    return users;
   }
 
   public List<String> getPublisherNames() {

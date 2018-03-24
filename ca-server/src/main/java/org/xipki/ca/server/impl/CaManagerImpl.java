@@ -96,6 +96,7 @@ import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
+import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
@@ -121,6 +122,7 @@ import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
 import org.xipki.ca.server.mgmt.api.conf.SingleCaConf;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CAConfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CmpcontrolType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
@@ -133,6 +135,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
 import org.xipki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.ca.server.mgmt.api.x509.ChangeScepEntry;
@@ -593,6 +596,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId,
         System.currentTimeMillis() / 1000L);
     queryExecutor.changeSystemEvent(newLockInfo);
+    caLockedByMe = true;
   } // method lockCa
 
   @Override
@@ -1663,8 +1667,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   @Override
   public Map<String, CaHasUserEntry> getCaHasUsersForUser(String user) throws CaMgmtException {
     ParamUtil.requireNonBlank("user", user);
-    // TODO
-    return queryExecutor.getCaHasUsers(user, idNameMap);
+    return queryExecutor.getCaHasUsersForUser(user, idNameMap);
   }
 
   @Override
@@ -2966,122 +2969,107 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throw new CaMgmtException("CA system is not initialized yet.");
     }
 
+    // CMP control
     for (String name : conf.getCmpControlNames()) {
       CmpControlEntry entry = conf.getCmpControl(name);
       CmpControlEntry entryB = cmpControlDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed CMP control {}", name);
+          continue;
         } else {
           String msg = concat("CMP control ", name, " existed, could not re-added it");
           LOG.error(msg);
           throw new CaMgmtException(msg);
         }
-      } else {
-        try {
-          addCmpControl(entry);
-          LOG.info("added CMP control {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add CMP control ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
+      }
+
+      try {
+        addCmpControl(entry);
+        LOG.info("added CMP control {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add CMP control ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
       }
     }
 
+    // Responder
     for (String name : conf.getResponderNames()) {
       CmpResponderEntry entry = conf.getResponder(name);
       CmpResponderEntry entryB = responderDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed CMP responder {}", name);
+          continue;
         } else {
           String msg = concat("CMP responder ", name, " existed, could not re-added it");
           LOG.error(msg);
           throw new CaMgmtException(msg);
         }
-      } else {
-        try {
-          addResponder(entry);
-          LOG.info("added CMP responder {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add CMP responder ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
+      }
+
+      try {
+        addResponder(entry);
+        LOG.info("added CMP responder {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add CMP responder ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
       }
     }
 
+    // Environment
     for (String name : conf.getEnvironmentNames()) {
       String entry = conf.getEnvironment(name);
       String entryB = envParameterResolver.getParameter(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed environment parameter {}", name);
+          continue;
         } else {
-          String msg = concat("environment parameter ", name,
-              " existed, could not re-added it");
+          String msg = concat("environment parameter ", name, " existed, could not re-added it");
           LOG.error(msg);
           throw new CaMgmtException(msg);
         }
-      } else {
-        try {
-          addEnvParam(name, entry);
-          LOG.info("could not add environment parameter {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add environment parameter ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
+      }
+
+      try {
+        addEnvParam(name, entry);
+        LOG.info("could not add environment parameter {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add environment parameter ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
       }
     }
 
+    // CRL signer
     for (String name : conf.getCrlSignerNames()) {
       X509CrlSignerEntry entry = conf.getCrlSigner(name);
       X509CrlSignerEntry entryB = crlSignerDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed CRL signer {}", name);
+          continue;
         } else {
           String msg = concat("CRL signer ", name, " existed, could not re-added it");
           LOG.error(msg);
           throw new CaMgmtException(msg);
         }
-      } else {
-        try {
-          addCrlSigner(entry);
-          LOG.info("added CRL signer {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add CRL signer ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
+      }
+
+      try {
+        addCrlSigner(entry);
+        LOG.info("added CRL signer {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add CRL signer ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
       }
     }
 
-    for (String name : conf.getCrlSignerNames()) {
-      X509CrlSignerEntry entry = conf.getCrlSigner(name);
-      X509CrlSignerEntry entryB = crlSignerDbEntries.get(name);
-      if (entryB != null) {
-        if (entry.equals(entryB)) {
-          LOG.info("ignore existed CRL signer {}", name);
-        } else {
-          String msg = concat("CRL signer ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
-        }
-      } else {
-        try {
-          addCrlSigner(entry);
-          LOG.info("added CRL signer {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add CRL signer ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
-      }
-    }
-
+    // Requestor
     for (String name : conf.getRequestorNames()) {
       CmpRequestorEntry entry = conf.getRequestor(name);
       CmpRequestorEntry entryB = requestorDbEntries.get(name);
@@ -3106,6 +3094,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       }
     }
 
+    // Publisher
     for (String name : conf.getPublisherNames()) {
       PublisherEntry entry = conf.getPublisher(name);
       PublisherEntry entryB = publisherDbEntries.get(name);
@@ -3130,52 +3119,71 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       }
     }
 
+    // CertProfile
     for (String name : conf.getCertProfileNames()) {
       CertprofileEntry entry = conf.getCertProfile(name);
       CertprofileEntry entryB = certprofileDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed certProfile {}", name);
+          continue;
         } else {
           String msg = concat("certProfile ", name, " existed, could not re-added it");
           LOG.error(msg);
           throw new CaMgmtException(msg);
         }
-      } else {
-        try {
-          addCertprofile(entry);
-          LOG.info("added certProfile {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add certProfile ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
+      }
+
+      try {
+        addCertprofile(entry);
+        LOG.info("added certProfile {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add certProfile ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
       }
     }
 
-    for (String name : conf.getCertProfileNames()) {
-      CertprofileEntry entry = conf.getCertProfile(name);
-      CertprofileEntry entryB = certprofileDbEntries.get(name);
+    // User
+    for (String name : conf.getUserNames()) {
+      Object obj = conf.getUser(name);
+      UserEntry entryB = queryExecutor.getUser(name, true);
+
       if (entryB != null) {
-        if (entry.equals(entryB)) {
-          LOG.info("ignore existed certProfile {}", name);
+        boolean equals = false;
+        if (obj instanceof UserEntry) {
+          UserEntry entry = (UserEntry) obj;
+          equals = entry.equals(entryB);
         } else {
-          String msg = concat("certProfile ", name, " existed, could not re-added it");
+          AddUserEntry entry = (AddUserEntry) obj;
+          equals = PasswordHash.validatePassword(entry.getPassword(), entryB.getHashedPassword());
+        }
+
+        if (equals) {
+          LOG.info("ignore existed user {}", name);
+          continue;
+        } else {
+          String msg = concat("user ", name, " existed, could not re-added it");
           LOG.error(msg);
           throw new CaMgmtException(msg);
         }
-      } else {
-        try {
-          addCertprofile(entry);
-          LOG.info("added certProfile {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add certProfile ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
+      }
+
+      try {
+        if (obj instanceof UserEntry) {
+          queryExecutor.addUser((UserEntry) obj);
+        } else {
+          queryExecutor.addUser((AddUserEntry) obj);
         }
+        LOG.info("added user {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add user ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
       }
     }
 
+    // CA
     for (String caName : conf.getCaNames()) {
       SingleCaConf scc = conf.getCa(caName);
       GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
@@ -3321,15 +3329,52 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
               addRequestorToCa(requestor, caName);
               LOG.info("added publisher {} to CA {}", requestorName, caName);
             } catch (CaMgmtException ex) {
-              String msg = concat("could not add publisher ", requestorName, " to CA ", caName);
+              String msg = concat("could not add requestor ", requestorName, " to CA ", caName);
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
           }
         }
       } // scc.getRequestors()
+
+      if (scc.getUsers() != null) {
+        List<CaHasUserEntry> usersB = queryExecutor.getCaHasUsersForCa(caName, idNameMap);
+
+        for (CaHasUserEntry user : scc.getUsers()) {
+          String userName = user.getUserIdent().getName();
+          CaHasUserEntry userB = null;
+          if (usersB != null) {
+            for (CaHasUserEntry m : usersB) {
+              if (m.getUserIdent().getName().equals(userName)) {
+                userB = m;
+                break;
+              }
+            }
+          }
+
+          if (userB != null) {
+            if (user.equals(userB)) {
+              LOG.info("ignored adding user {} to CA {}", userName, caName);
+            } else {
+              String msg = concat("could not add user ", userName, " to CA", caName);
+              LOG.error(msg);
+              throw new CaMgmtException(msg);
+            }
+          } else {
+            try {
+              addUserToCa(user, caName);
+              LOG.info("added user {} to CA {}", userName, caName);
+            } catch (CaMgmtException ex) {
+              String msg = concat("could not add user ", userName, " to CA ", caName);
+              LogUtil.error(LOG, ex, msg);
+              throw new CaMgmtException(msg);
+            }
+          }
+        }
+      } // scc.getUsers()
     } // cas
 
+    // SCEP
     for (String name : conf.getScepNames()) {
       ScepEntry entry = conf.getScep(name);
       ScepEntry entryB = scepDbEntries.get(name);
@@ -3367,7 +3412,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     if (caNames != null) {
       List<String> tmpCaNames = new ArrayList<>(caNames.size());
       for (String name : caNames) {
-        tmpCaNames.add(name.toLowerCase());
+        name = name.toLowerCase();
+        if (x509cas.containsKey(name)) {
+          tmpCaNames.add(name);
+        }
+      }
+      caNames = tmpCaNames;
+    } else {
+      List<String> tmpCaNames = new ArrayList<>(x509cas.size());
+      for (String name : x509cas.keySet()) {
+        tmpCaNames.add(name);
       }
       caNames = tmpCaNames;
     }
@@ -3377,28 +3431,36 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throw new IOException(concat("File ", zipFilename, " exists."));
     }
 
+    File parentFile = zipFile.getParentFile();
+    if (parentFile != null && !parentFile.exists()) {
+      parentFile.mkdirs();
+    }
+
     CAConfType root = new CAConfType();
     root.setVersion(1);
 
     ZipOutputStream zipStream = getZipOutputStream(zipFile);
     try {
-      Set<String> includeCaNames = new HashSet<>();
       Set<String> includeCmpControlNames = new HashSet<>();
       Set<String> includeResponderNames = new HashSet<>();
       Set<String> includeRequestorNames = new HashSet<>();
       Set<String> includeProfileNames = new HashSet<>();
       Set<String> includePublisherNames = new HashSet<>();
       Set<String> includeCrlSignerNames = new HashSet<>();
+      Set<String> includeUserNames = new HashSet<>();
+
+      // users
+      root.setUsers(new CAConfType.Users());
+      List<UserType> users = root.getUsers().getUser();
 
       // cas
-      if (CollectionUtil.isNonEmpty(x509cas)) {
+      if (CollectionUtil.isNonEmpty(caNames)) {
         List<CaType> list = new LinkedList<>();
 
         for (String name : x509cas.keySet()) {
-          if (caNames != null && !caNames.contains(name)) {
+          if (!caNames.contains(name)) {
             continue;
           }
-          includeCaNames.add(name);
 
           CaType jaxb = new CaType();
           jaxb.setName(name);
@@ -3420,6 +3482,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
             jaxb.setPublishers(createStrings(strs));
           }
 
+          // CaHasRequestors
           Set<CaHasRequestorEntry> requestors = caHasRequestors.get(name);
           if (CollectionUtil.isNonEmpty(requestors)) {
             jaxb.setRequestors(new CaType.Requestors());
@@ -3435,6 +3498,37 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
               jaxb2.setPermission(m.getPermission());
 
               jaxb.getRequestors().getRequestor().add(jaxb2);
+            }
+          }
+
+          // CaHasUsers
+          List<CaHasUserEntry> caHasUsers = queryExecutor.getCaHasUsersForCa(name, idNameMap);
+          if (CollectionUtil.isNonEmpty(caHasUsers)) {
+            jaxb.setUsers(new CaType.Users());
+            List<CaHasUserType> list2 = jaxb.getUsers().getUser();
+            for (CaHasUserEntry m : caHasUsers) {
+              String username = m.getUserIdent().getName();
+              CaHasUserType jaxb2 = new CaHasUserType();
+              jaxb2.setUserName(username);
+              jaxb2.setPermission(m.getPermission());
+              jaxb2.setProfiles(createStrings(m.getProfiles()));
+              list2.add(jaxb2);
+
+              if (includeUserNames.contains(username)) {
+                continue;
+              }
+
+              // add also the user to the users
+              UserEntry userEntry = queryExecutor.getUser(username);
+              UserType jaxb3 = new UserType();
+              if (!userEntry.isActive()) {
+                jaxb3.setActive(Boolean.FALSE);
+              }
+              jaxb3.setName(username);
+              jaxb3.setHashedPassword(userEntry.getHashedPassword());
+              users.add(jaxb3);
+
+              includeUserNames.add(username);
             }
           }
 
@@ -3498,6 +3592,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
           root.setCas(new CAConfType.Cas());
           root.getCas().getCa().addAll(list);
         }
+      }
+
+      // clear the users if the list is empty
+      if (users.isEmpty()) {
+        root.setUsers(null);
       }
 
       // cmp controls
@@ -3674,7 +3773,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
         for (String name : scepDbEntries.keySet()) {
           ScepEntry entry = scepDbEntries.get(name);
           String caName = entry.getCaIdent().getName();
-          if (!includeCaNames.contains(caName)) {
+          if (!caNames.contains(caName)) {
             continue;
           }
 

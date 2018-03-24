@@ -236,10 +236,4 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
 
 ca:load-conf --conf-file xipki/qa/qa.d/subcawithcrl.xml
 
-## add user to system
-ca:user-add --name user1 --password password1
-
-## Add user to CA subcawithcrl
-ca:causer-add --user user1 --ca subcawithcrl1 --profile all --permission all
-
 source file:./xipki/qa/qa.d/scep-server.script

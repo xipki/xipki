@@ -99,7 +99,7 @@ curl ${OPTS} \
 echo "Current OCSP status"
 
 openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem -respout ${OUT_DIR}/ocsp-revoked-${CN}.der
 
 echo "generate new CRL"
 

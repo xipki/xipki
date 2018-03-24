@@ -54,7 +54,7 @@ public class UserInfoCmd extends CaAction {
     for (String ca : caHasUsers.keySet()) {
       CaHasUserEntry entry = caHasUsers.get(ca);
       sb.append("\n----- CA ").append(ca).append("-----");
-      sb.append("\nprofiles: ").append(entry.getProfiles()).append("\n");
+      sb.append("\nprofiles: ").append(entry.getProfiles());
       sb.append("\npermission: ").append(entry.getPermission());
     }
     println(sb.toString());

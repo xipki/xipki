@@ -97,7 +97,7 @@ class SQLs {
         "ID FROM TUSER WHERE NAME=?");
 
     this.sqlSelectUser = datasource.buildSelectFirstSql(1,
-        "ID,ACTIVE,PASSWORD FROM TUSER WHERE ID=?");
+        "ID,ACTIVE,PASSWORD FROM TUSER WHERE NAME=?");
 
   }
 

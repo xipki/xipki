@@ -52,6 +52,11 @@
       </cert>
     </requestor>
   </requestors>
+  <users>
+    <user name="user1">
+      <password>password1</password>
+    </user>
+  </users>
   <publishers>
     <publisher name="ocsp-publisher">
       <type>OCSP</type>

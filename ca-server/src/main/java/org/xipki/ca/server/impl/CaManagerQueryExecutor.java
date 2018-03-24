@@ -2238,13 +2238,7 @@ class CaManagerQueryExecutor {
       int idx = 1;
       ps.setString(idx++, dbEntry.getName());
       ps.setString(idx++, dbEntry.getType());
-
-      String b64Cert = null;
-      X509Certificate cert = dbEntry.getCertificate();
-      if (cert != null) {
-        b64Cert = Base64.encodeToString(dbEntry.getCertificate().getEncoded());
-      }
-      ps.setString(idx++, b64Cert);
+      ps.setString(idx++, dbEntry.getBase64Cert());
       ps.setString(idx++, dbEntry.getConf());
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add responder " + dbEntry.getName());
@@ -2253,8 +2247,6 @@ class CaManagerQueryExecutor {
       LOG.info("added responder: {}", dbEntry.toString(false, true));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
-    } catch (CertificateEncodingException ex) {
-      throw new CaMgmtException(ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
@@ -2388,14 +2380,20 @@ class CaManagerQueryExecutor {
 
   void addUser(AddUserEntry userEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("userEntry", userEntry);
-    final String name = userEntry.getIdent().getName();
+    String hashedPassword = PasswordHash.createHash(userEntry.getPassword());
+    addUser(userEntry.getIdent().getName(), userEntry.isActive(), hashedPassword);
+  } // method addUser
+
+  void addUser(UserEntry userEntry) throws CaMgmtException {
+    ParamUtil.requireNonNull("userEntry", userEntry);
+    addUser(userEntry.getIdent().getName(), userEntry.isActive(), userEntry.getHashedPassword());
+  }
+
+  private void addUser(String name, boolean active, String hashedPassword) throws CaMgmtException {
     Integer existingId = getIdForName(sqls.sqlSelectUserId, name);
     if (existingId != null) {
       throw new CaMgmtException(concat("user named '", name, " ' already exists"));
     }
-    userEntry.getIdent().setId(existingId);
-
-    String hashedPassword = PasswordHash.createHash(userEntry.getPassword());
 
     long id;
     try {
@@ -2414,10 +2412,10 @@ class CaManagerQueryExecutor {
       int idx = 1;
       ps.setLong(idx++, id);
       ps.setString(idx++, name);
-      setBoolean(ps, idx++, userEntry.isActive());
+      setBoolean(ps, idx++, active);
       ps.setString(idx++, hashedPassword);
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add user " + userEntry.getIdent());
+        throw new CaMgmtException("could not add user " + name);
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -2589,7 +2587,7 @@ class CaManagerQueryExecutor {
     }
   } // method addUserToCa
 
-  Map<String, CaHasUserEntry> getCaHasUsers(String user, CaIdNameMap idNameMap)
+  Map<String, CaHasUserEntry> getCaHasUsersForUser(String user, CaIdNameMap idNameMap)
       throws CaMgmtException {
     Integer existingId = getIdForName(sqls.sqlSelectUserId, user);
     if (existingId == null) {
@@ -2625,9 +2623,50 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }  // method getCaHasUsers
+  }  // method getCaHasUsersForUser
+
+  List<CaHasUserEntry> getCaHasUsersForCa(String caName, CaIdNameMap idNameMap)
+      throws CaMgmtException {
+    NameId caIdent = idNameMap.getCa(caName);
+    if (caIdent == null) {
+      throw new CaMgmtException("unknown CA " + caName);
+    }
+
+    final String sql = "SELECT NAME,PERMISSION,PROFILES FROM CA_HAS_USER INNER JOIN TUSER"
+        + " ON CA_ID=? AND TUSER.ID=CA_HAS_USER.USER_ID";
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+      ps = prepareStatement(sql);
+      ps.setInt(1, caIdent.getId().intValue());
+      rs = ps.executeQuery();
+
+      List<CaHasUserEntry> ret = new LinkedList<>();
+      while (rs.next()) {
+        String username = rs.getString("NAME");
+        int permission = rs.getInt("PERMISSION");
+        String str = rs.getString("PROFILES");
+        List<String> list = StringUtil.splitByComma(str);
+        Set<String> profiles = (list == null) ? null : new HashSet<>(list);
+        CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, username));
+        caHasUser.setPermission(permission);
+        caHasUser.setProfiles(profiles);
+
+        ret.add(caHasUser);
+      }
+      return ret;
+    } catch (SQLException ex) {
+      throw new CaMgmtException(datasource, sql, ex);
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+  } // method getCaHasUsersForCa
 
   UserEntry getUser(String username) throws CaMgmtException {
+    return getUser(username, false);
+  }
+
+  UserEntry getUser(String username, boolean nullable) throws CaMgmtException {
     ParamUtil.requireNonNull("username", username);
     NameId ident = new NameId(null, username);
 
@@ -2641,7 +2680,11 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, ident.getName());
       rs = ps.executeQuery();
       if (!rs.next()) {
-        throw new CaMgmtException("unknown user " + username);
+        if (nullable) {
+          return null;
+        } else {
+          throw new CaMgmtException("unknown user " + username);
+        }
       }
 
       int id = rs.getInt("ID");

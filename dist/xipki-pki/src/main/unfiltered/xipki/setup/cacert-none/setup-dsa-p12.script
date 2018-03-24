@@ -67,11 +67,6 @@ xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
 
 source xipki/setup/cacert-none/configure-ca.script
 
-echo "# add user"
-ca:user-add --name user1 --password password1
-
-ca:causer-add --user user1 --ca myca1 --profile all --permission all
-
 echo "create initial CRL"
 ca:gencrl --ca myca1
 

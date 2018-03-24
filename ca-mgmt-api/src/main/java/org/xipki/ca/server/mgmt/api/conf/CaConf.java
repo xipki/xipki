@@ -49,8 +49,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
@@ -58,9 +60,11 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CAConfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CmpcontrolType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
@@ -74,6 +78,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
@@ -113,6 +118,8 @@ public class CaConf {
   private final Map<String, X509CrlSignerEntry> crlSigners = new HashMap<>();
 
   private final Map<String, CmpRequestorEntry> requestors = new HashMap<>();
+
+  private final Map<String, Object> users = new HashMap<>();
 
   private final Map<String, PublisherEntry> publishers = new HashMap<>();
 
@@ -275,12 +282,28 @@ public class CaConf {
       }
     }
 
-    // Requesters
+    // Requestors
     if (jaxb.getRequestors() != null) {
       for (RequestorType m : jaxb.getRequestors().getRequestor()) {
         CmpRequestorEntry en = new CmpRequestorEntry(new NameId(null, m.getName()),
             getBase64Binary(m.getCert(), zipFile));
         addRequestor(en);
+      }
+    }
+
+    // Users
+    if (jaxb.getUsers() != null) {
+      for (UserType m : jaxb.getUsers().getUser()) {
+        boolean active = (m.isActive() != null) ? m.isActive() : true;
+        String password = m.getPassword();
+        if (password != null) {
+          AddUserEntry en = new AddUserEntry(new NameId(null, m.getName()), active, password);
+          addUser(en);
+        } else {
+          UserEntry en = new UserEntry(new NameId(null, m.getName()), active,
+              m.getHashedPassword());
+          addUser(en);
+        }
       }
     }
 
@@ -409,8 +432,8 @@ public class CaConf {
         if (m.getRequestors() != null) {
           caHasRequestors = new LinkedList<>();
           for (CaHasRequestorType req : m.getRequestors().getRequestor()) {
-            CaHasRequestorEntry en = new CaHasRequestorEntry(
-                new NameId(null, req.getRequestorName()));
+            CaHasRequestorEntry en =
+                new CaHasRequestorEntry(new NameId(null, req.getRequestorName()));
             en.setRa(req.isRa());
 
             List<String> strs = getStrings(req.getProfiles());
@@ -423,12 +446,26 @@ public class CaConf {
           }
         }
 
+        List<CaHasUserEntry> caHasUsers = null;
+        if (m.getUsers() != null) {
+          caHasUsers = new LinkedList<>();
+          for (CaHasUserType req : m.getUsers().getUser()) {
+            CaHasUserEntry en = new CaHasUserEntry(new NameId(null, req.getUserName()));
+            en.setPermission(req.getPermission());
+            List<String> strs = getStrings(req.getProfiles());
+            if (strs != null) {
+              en.setProfiles(new HashSet<>(strs));
+            }
+            caHasUsers.add(en);
+          }
+        }
+
         List<String> aliases = getStrings(m.getAliases());
         List<String> profileNames = getStrings(m.getProfiles());
         List<String> publisherNames = getStrings(m.getPublishers());
 
         SingleCaConf singleCa = new SingleCaConf(name, genSelfIssued, caEntry, aliases,
-            profileNames, caHasRequestors, publisherNames);
+            profileNames, caHasRequestors, caHasUsers, publisherNames);
         addSingleCa(singleCa);
       }
     }
@@ -506,12 +543,30 @@ public class CaConf {
     this.requestors.put(requestor.getIdent().getName(), requestor);
   }
 
+  public void addUser(UserEntry user) {
+    ParamUtil.requireNonNull("user", user);
+    this.users.put(user.getIdent().getName(), user);
+  }
+
+  public void addUser(AddUserEntry user) {
+    ParamUtil.requireNonNull("user", user);
+    this.users.put(user.getIdent().getName(), user);
+  }
+
   public Set<String> getRequestorNames() {
     return Collections.unmodifiableSet(requestors.keySet());
   }
 
   public CmpRequestorEntry getRequestor(String name) {
     return requestors.get(ParamUtil.requireNonNull("name", name));
+  }
+
+  public Set<String> getUserNames() {
+    return Collections.unmodifiableSet(users.keySet());
+  }
+
+  public Object getUser(String name) {
+    return users.get(ParamUtil.requireNonNull("name", name));
   }
 
   public void addPublisher(PublisherEntry publisher) {

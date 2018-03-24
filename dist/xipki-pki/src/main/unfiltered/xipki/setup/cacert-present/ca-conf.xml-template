@@ -50,6 +50,11 @@
       </cert>
     </requestor>
   </requestors>
+  <users>
+    <user name="user1">
+      <password>password1</password>
+    </user>
+  </users>
   <publishers>
     <publisher name="ocsp-publisher">
       <type>OCSP</type>
@@ -134,14 +139,22 @@
           </profiles>
         </requestor>
       </requestors>
+      <users>
+        <user>
+          <userName>user1</userName>
+          <permission>255</permission>
+          <profiles>
+            <str>all</str>
+          </profiles>
+        </user>
+      </users>
       <publishers>
         <str>ocsp-publisher</str>
       </publishers>
     </ca>
   </cas>
   <sceps>
-    <scep>
-      <name>scep1</name>
+    <scep name="scep1">
       <caName>myca1</caName>
       <responderType>PKCS12</responderType>
       <responderConf>

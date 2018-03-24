@@ -156,6 +156,26 @@
       <column name="CONF" type="CLOB" remarks="profile data, depends on the type"/>
     </createTable>
     <addUniqueConstraint tableName="PROFILE" columnNames="NAME" constraintName="CONST_PROFILE_NAME"/>
+    <!-- table TUSER -->
+    <createTable tableName="TUSER">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ACTIVE" type="SMALLINT" remarks="whether the user is activated">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PASSWORD" type="VARCHAR(150)" remarks="salted hashed password in hex">
+        <constraints nullable="false"/>
+        <!-- byte 1: identifies hash algorithm,
+             byte 2: identifies length of salt,
+             byte 3 and 4: specifies the iteration,
+             further bytes: salt and hash value-->
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="TUSER" columnNames="NAME" constraintName="CONST_USER_NAME"/>
     <!-- table CA -->
     <createTable tableName="CA">
       <column name="ID" type="SMALLINT">
@@ -272,26 +292,6 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
     </createTable>
-    <!-- table TUSER -->
-    <createTable tableName="TUSER">
-      <column name="ID" type="INT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="NAME" type="VARCHAR(100)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="ACTIVE" type="SMALLINT" remarks="whether the user is activated">
-        <constraints nullable="false"/>
-      </column>
-      <column name="PASSWORD" type="VARCHAR(150)" remarks="salted hashed password in hex">
-        <constraints nullable="false"/>
-        <!-- byte 1: identifies hash algorithm,
-             byte 2: identifies length of salt,
-             byte 3 and 4: specifies the iteration,
-             further bytes: salt and hash value-->
-      </column>
-    </createTable>
-    <addUniqueConstraint tableName="TUSER" columnNames="NAME" constraintName="CONST_USER_NAME"/>
     <!-- table CA_HAS_USER -->
     <createTable tableName="CA_HAS_USER">
       <column name="ID" type="BIGINT">
@@ -303,7 +303,9 @@
       <column name="USER_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="PERMISSION" type="INT"/>
+      <column name="PERMISSION" type="INT">
+        <constraints nullable="false"/>
+      </column>
       <column name="PROFILES" type="VARCHAR(200)"/>
     </createTable>
     <addUniqueConstraint tableName="CA_HAS_USER" columnNames="CA_ID, USER_ID"
