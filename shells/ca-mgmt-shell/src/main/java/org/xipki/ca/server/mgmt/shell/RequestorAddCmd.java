@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -51,7 +51,7 @@ public class RequestorAddCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-    CmpRequestorEntry entry = new CmpRequestorEntry(new NameId(null, name), base64Cert);
+    RequestorEntry entry = new RequestorEntry(new NameId(null, name), base64Cert);
 
     String msg = "CMP requestor " + name;
     if (entry.getCert() == null) {

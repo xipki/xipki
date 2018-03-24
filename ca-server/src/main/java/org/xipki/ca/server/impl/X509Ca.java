@@ -103,7 +103,7 @@ import org.xipki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
+import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
@@ -447,7 +447,7 @@ public class X509Ca {
 
     if (caInfo.isSignerRequired()) {
       try {
-        caInfo.initSigner(caManager.securityFactory());
+        caInfo.initSigner(caManager.getSecurityFactory());
       } catch (XiSecurityException ex) {
         LogUtil.error(LOG, ex, "security.createSigner caSigner for CA " + caIdent);
         throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -457,7 +457,7 @@ public class X509Ca {
     X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner != null) {
       // CA signs the CRL
-      if (caManager.crlSignerWrapper(caInfo.getCrlSignerName()) == null
+      if (caManager.getCrlSignerWrapper(caInfo.getCrlSignerName()) == null
           && !X509Util.hasKeyusage(caCert.getCert(), KeyUsage.cRLSign)) {
         final String msg = "CRL signer does not have keyusage cRLSign";
         LOG.error(msg);
@@ -537,7 +537,7 @@ public class X509Ca {
 
   public void checkCsr(CertificationRequest csr) throws OperationException {
     ParamUtil.requireNonNull("csr", csr);
-    if (!caManager.securityFactory().verifyPopo(csr, getCmpControl().getPopoAlgoValidator())) {
+    if (!caManager.getSecurityFactory().verifyPopo(csr, getCmpControl().getPopoAlgoValidator())) {
       LOG.warn("could not validate POP for the pkcs#10 requst");
       throw new OperationException(ErrorCode.BAD_POP);
     }
@@ -1636,7 +1636,7 @@ public class X509Ca {
   }
 
   private List<IdentifiedX509CertPublisher> publishers() {
-    return caManager.identifiedPublishersForCa(caIdent.getName());
+    return caManager.getIdentifiedPublishersForCa(caIdent.getName());
   }
 
   public List<X509CertificateInfo> generateCertificates(List<CertTemplateData> certTemplates,
@@ -2219,7 +2219,7 @@ public class X509Ca {
 
     Set<String> profileNames = caManager.getCertprofilesForCa(caIdent.getName());
     return (profileNames == null || !profileNames.contains(certprofileName))
-        ? null : caManager.identifiedCertprofile(certprofileName);
+        ? null : caManager.getIdentifiedCertprofile(certprofileName);
   } // method getX509Certprofile
 
   public boolean supportsCertProfile(String certprofileName) {
@@ -2239,8 +2239,8 @@ public class X509Ca {
     }
 
     for (CaHasRequestorEntry m : requestorEntries) {
-      CmpRequestorEntryWrapper entry =
-          caManager.cmpRequestorWrapper(m.getRequestorIdent().getName());
+      RequestorEntryWrapper entry =
+          caManager.getRequestorWrapper(m.getRequestorIdent().getName());
       if (entry.getCert().getSubjectAsX500Name().equals(requestorSender)) {
         return new CmpRequestorInfo(m, entry.getCert());
       }
@@ -2260,8 +2260,8 @@ public class X509Ca {
     }
 
     for (CaHasRequestorEntry m : requestorEntries) {
-      CmpRequestorEntryWrapper entry =
-          caManager.cmpRequestorWrapper(m.getRequestorIdent().getName());
+      RequestorEntryWrapper entry =
+          caManager.getRequestorWrapper(m.getRequestorIdent().getName());
       if (entry.getCert().getCert().equals(requestorCert)) {
         return new CmpRequestorInfo(m, entry.getCert());
       }
@@ -2520,7 +2520,7 @@ public class X509Ca {
   private X509CrlSignerEntryWrapper getCrlSigner() {
     String crlSignerName = caInfo.getCrlSignerName();
     X509CrlSignerEntryWrapper crlSigner = (crlSignerName == null) ? null
-        : caManager.crlSignerWrapper(crlSignerName);
+        : caManager.getCrlSignerWrapper(crlSignerName);
     return crlSigner;
   }
 

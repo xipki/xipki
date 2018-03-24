@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -78,7 +78,7 @@ public class ResponderAddCmd extends CaAction {
       signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
           securityFactory);
     }
-    CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
+    ResponderEntry entry = new ResponderEntry(name, signerType, signerConf, base64Cert);
 
     String msg = "CMP responder " + name;
     try {

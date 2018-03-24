@@ -33,7 +33,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class CmpResponderEntry {
+public class ResponderEntry {
 
   private final String name;
 
@@ -49,7 +49,7 @@ public class CmpResponderEntry {
 
   private X509Certificate certificate;
 
-  public CmpResponderEntry(String name, String type, String conf, String base64Cert) {
+  public ResponderEntry(String name, String type, String conf, String base64Cert) {
     this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     this.type = ParamUtil.requireNonBlank("type", type);
     this.conf = conf;
@@ -152,11 +152,11 @@ public class CmpResponderEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CmpResponderEntry)) {
+    if (!(obj instanceof ResponderEntry)) {
       return false;
     }
 
-    CmpResponderEntry objB = (CmpResponderEntry) obj;
+    ResponderEntry objB = (ResponderEntry) obj;
     if (!name.equals(objB.name)) {
       return false;
     }

@@ -177,7 +177,7 @@ public class ScepImpl implements Scep {
       // ResponderConf does not contain algo.
       SignerConf signerConf = new SignerConf(dbEntry.getResponderConf(), HashAlgo.SHA256,
           new SignatureAlgoControl());
-      privKeyAndCert = caManager.securityFactory().createPrivateKeyAndCert(
+      privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
           dbEntry.getResponderType(), signerConf, dbEntry.getCert());
     } catch (ObjectCreationException ex) {
       throw new CaMgmtException(ex);
@@ -237,7 +237,7 @@ public class ScepImpl implements Scep {
     if (certProfiles.contains("all") || certProfiles.contains(profileName.toLowerCase())) {
       X509Ca ca;
       try {
-        ca = caManager.x509Ca(caIdent);
+        ca = caManager.getX509Ca(caIdent);
       } catch (CaMgmtException ex) {
         LogUtil.warn(LOG, ex);
         return false;
@@ -258,7 +258,7 @@ public class ScepImpl implements Scep {
       return CaStatus.INACTIVE;
     }
     try {
-      return caManager.x509Ca(caIdent).getCaInfo().getStatus();
+      return caManager.getX509Ca(caIdent).getCaInfo().getStatus();
     } catch (CaMgmtException ex) {
       LogUtil.error(LOG, ex);
       return CaStatus.INACTIVE;
@@ -410,7 +410,7 @@ public class ScepImpl implements Scep {
 
     X509Ca ca;
     try {
-      ca = caManager.x509Ca(caIdent);
+      ca = caManager.getX509Ca(caIdent);
     } catch (CaMgmtException ex) {
       LogUtil.error(LOG, ex, tid + "=" + tid + ",could not get X509CA");
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -765,7 +765,7 @@ public class ScepImpl implements Scep {
 
   private void refreshCa() throws OperationException {
     try {
-      X509Ca ca = caManager.x509Ca(caIdent);
+      X509Ca ca = caManager.getX509Ca(caIdent);
       X509Cert currentCaCert = ca.getCaInfo().getCert();
       if (currentCaCert.equals(caCert)) {
         return;

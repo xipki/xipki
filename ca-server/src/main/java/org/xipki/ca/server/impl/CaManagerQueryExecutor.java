@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
-import org.xipki.ca.server.impl.cmp.CmpResponderEntryWrapper;
+import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
+import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.util.PasswordHash;
@@ -62,8 +62,8 @@ import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -372,7 +372,7 @@ class CaManagerQueryExecutor {
     }
   }
 
-  CmpRequestorEntry createRequestor(String name) throws CaMgmtException {
+  RequestorEntry createRequestor(String name) throws CaMgmtException {
     final String sql = sqls.sqlSelectRequestor;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -388,7 +388,7 @@ class CaManagerQueryExecutor {
 
       int id = rs.getInt("ID");
       String b64Cert = rs.getString("CERT");
-      return new CmpRequestorEntry(new NameId(id, name), b64Cert);
+      return new RequestorEntry(new NameId(id, name), b64Cert);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -447,7 +447,7 @@ class CaManagerQueryExecutor {
     }
   } // method createCmpControl
 
-  CmpResponderEntry createResponder(String name) throws CaMgmtException {
+  ResponderEntry createResponder(String name) throws CaMgmtException {
     final String sql = sqls.sqlSelectResponder;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -464,7 +464,7 @@ class CaManagerQueryExecutor {
       String type = rs.getString("TYPE");
       String conf = rs.getString("CONF");
       String b64Cert = rs.getString("CERT");
-      return new CmpResponderEntry(name, type, conf, b64Cert);
+      return new ResponderEntry(name, type, conf, b64Cert);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -905,7 +905,7 @@ class CaManagerQueryExecutor {
     }
   } // method addCmpControl
 
-  void addRequestor(CmpRequestorEntry dbEntry) throws CaMgmtException {
+  void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
 
     try {
@@ -937,7 +937,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method addCmpRequestor
+  } // method addRequestor
 
   void addRequestorIfNeeded(String requestorName) throws CaMgmtException {
     String sql = sqls.sqlSelectRequestorId;
@@ -1004,7 +1004,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method addCmpRequestorToCa
+  } // method addRequestorToCa
 
   void addCrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
@@ -1587,12 +1587,12 @@ class CaManagerQueryExecutor {
     }
   } // method changeCmpControl
 
-  CmpRequestorEntryWrapper changeRequestor(NameId nameId, String base64Cert)
+  RequestorEntryWrapper changeRequestor(NameId nameId, String base64Cert)
       throws CaMgmtException {
     ParamUtil.requireNonNull("nameId", nameId);
 
-    CmpRequestorEntry newDbEntry = new CmpRequestorEntry(nameId, base64Cert);
-    CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+    RequestorEntry newDbEntry = new RequestorEntry(nameId, base64Cert);
+    RequestorEntryWrapper requestor = new RequestorEntryWrapper();
     requestor.setDbEntry(newDbEntry);
 
     final String sql = "UPDATE REQUESTOR SET CERT=? WHERE ID=?";
@@ -1622,9 +1622,9 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method changeCmpRequestor
+  } // method changeRequestor
 
-  CmpResponderEntryWrapper changeResponder(String name, String type, String conf,
+  ResponderEntryWrapper changeResponder(String name, String type, String conf,
       String base64Cert, CaManagerImpl caManager, SecurityFactory securityFactory)
       throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
@@ -1644,7 +1644,7 @@ class CaManagerQueryExecutor {
       throw new IllegalArgumentException("nothing to change");
     }
 
-    CmpResponderEntry dbEntry = createResponder(name);
+    ResponderEntry dbEntry = createResponder(name);
 
     String tmpType = (type != null) ? type : dbEntry.getType();
     String tmpConf;
@@ -1661,9 +1661,9 @@ class CaManagerQueryExecutor {
       tmpBase64Cert = base64Cert;
     }
 
-    CmpResponderEntry newDbEntry = new CmpResponderEntry(name, tmpType,
+    ResponderEntry newDbEntry = new ResponderEntry(name, tmpType,
         tmpConf, tmpBase64Cert);
-    CmpResponderEntryWrapper responder = caManager.createCmpResponder(newDbEntry);
+    ResponderEntryWrapper responder = caManager.createResponder(newDbEntry);
 
     final String sql = sqlBuilder.toString();
 
@@ -1717,7 +1717,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method changeCmpResponder
+  } // method changeResponder
 
   X509CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf,
       String base64Cert, String crlControl, CaManagerImpl caManager,
@@ -2176,7 +2176,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method removeCmpRequestorFromCa
+  } // method removeRequestorFromCa
 
   void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
     ParamUtil.requireNonBlank("publisherName", publisherName);
@@ -2228,7 +2228,7 @@ class CaManagerQueryExecutor {
     }
   } // method revokeCa
 
-  void addResponder(CmpResponderEntry dbEntry) throws CaMgmtException {
+  void addResponder(ResponderEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     final String sql = "INSERT INTO RESPONDER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
@@ -2250,7 +2250,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method addCmpResponder
+  } // method addResponder
 
   void unlockCa() throws CaMgmtException {
     final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
@@ -2538,7 +2538,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method removeCmpRequestorFromCa
+  } // method removeRequestorFromCa
 
   void addUserToCa(CaHasUserEntry user, NameId ca) throws CaMgmtException {
     ParamUtil.requireNonNull("user", user);

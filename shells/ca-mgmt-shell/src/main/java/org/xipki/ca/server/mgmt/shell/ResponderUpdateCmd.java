@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
@@ -76,7 +76,7 @@ public class ResponderUpdateCmd extends CaAction {
     }
     String tmpSignerType = signerType;
     if (tmpSignerType == null) {
-      CmpResponderEntry entry = caManager.getResponder(name);
+      ResponderEntry entry = caManager.getResponder(name);
       if (entry == null) {
         throw new IllegalCmdParamException("please specify the signerType");
       }

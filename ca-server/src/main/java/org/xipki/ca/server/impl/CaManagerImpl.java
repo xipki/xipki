@@ -83,13 +83,13 @@ import org.xipki.ca.api.publisher.x509.X509CertPublisher;
 import org.xipki.ca.api.publisher.x509.X509CertPublisherFactoryRegister;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.Rest;
 import org.xipki.ca.server.api.Scep;
 import org.xipki.ca.server.api.X509CaCmpResponder;
 import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
-import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
-import org.xipki.ca.server.impl.cmp.CmpResponderEntryWrapper;
+import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
+import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
 import org.xipki.ca.server.impl.ocsp.OcspCertPublisher;
 import org.xipki.ca.server.impl.rest.RestImpl;
@@ -112,8 +112,8 @@ import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.mgmt.api.UserEntry;
@@ -174,7 +174,7 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-public class CaManagerImpl implements CaManager, CmpResponderManager {
+public class CaManagerImpl implements CaManager, ResponderManager {
 
   private class CertsInQueuePublisher implements Runnable {
 
@@ -289,9 +289,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
   private final Map<String, X509CaInfo> caInfos = new ConcurrentHashMap<>();
 
-  private Map<String, CmpResponderEntryWrapper> responders = new ConcurrentHashMap<>();
+  private Map<String, ResponderEntryWrapper> responders = new ConcurrentHashMap<>();
 
-  private Map<String, CmpResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
+  private Map<String, ResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, IdentifiedX509Certprofile> certprofiles = new ConcurrentHashMap<>();
 
@@ -305,9 +305,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
   private final Map<String, CmpControlEntry> cmpControlDbEntries = new ConcurrentHashMap<>();
 
-  private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
+  private final Map<String, RequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
 
-  private final Map<String, CmpRequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
+  private final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
 
@@ -413,7 +413,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     this.rest = new RestImpl(this);
   } // constructor
 
-  public SecurityFactory securityFactory() {
+  public SecurityFactory getSecurityFactory() {
     return securityFactory;
   }
 
@@ -421,7 +421,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     this.securityFactory = securityFactory;
   }
 
-  public DataSourceFactory dataSourceFactory() {
+  public DataSourceFactory getDataSourceFactory() {
     return datasourceFactory;
   }
 
@@ -988,14 +988,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
         byUserRequestorId = new NameId(id, name);
         idNameMap.addRequestor(byUserRequestorId);
       } else {
-        CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
+        RequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
         if (requestorDbEntry == null) {
           continue;
         }
 
         idNameMap.addRequestor(requestorDbEntry.getIdent());
         requestorDbEntries.put(name, requestorDbEntry);
-        CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+        RequestorEntryWrapper requestor = new RequestorEntryWrapper();
         requestor.setDbEntry(requestorDbEntry);
         requestors.put(name, requestor);
       }
@@ -1013,7 +1013,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
     List<String> names = queryExecutor.namesFromTable("RESPONDER");
     for (String name : names) {
-      CmpResponderEntry dbEntry = queryExecutor.createResponder(name);
+      ResponderEntry dbEntry = queryExecutor.createResponder(name);
       if (dbEntry == null) {
         LOG.error("could not initialize Responder '{}'", name);
         continue;
@@ -1022,7 +1022,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       dbEntry.setConfFaulty(true);
       responderDbEntries.put(name, dbEntry);
 
-      CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
+      ResponderEntryWrapper responder = createResponder(dbEntry);
       if (responder != null) {
         dbEntry.setConfFaulty(false);
         responders.put(name, responder);
@@ -1493,16 +1493,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   }
 
   @Override
-  public CmpRequestorEntry getRequestor(String name) {
+  public RequestorEntry getRequestor(String name) {
     return requestorDbEntries.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
   }
 
-  public CmpRequestorEntryWrapper cmpRequestorWrapper(String name) {
+  public RequestorEntryWrapper getRequestorWrapper(String name) {
     return requestors.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
   }
 
   @Override
-  public void addRequestor(CmpRequestorEntry dbEntry) throws CaMgmtException {
+  public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     asssertMasterMode();
     String name = dbEntry.getIdent().getName();
@@ -1510,7 +1510,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
     }
 
-    CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+    RequestorEntryWrapper requestor = new RequestorEntryWrapper();
     requestor.setDbEntry(dbEntry);
 
     queryExecutor.addRequestor(dbEntry);
@@ -1562,7 +1562,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throw new CaMgmtException(msg);
     }
 
-    CmpRequestorEntryWrapper requestor = queryExecutor.changeRequestor(ident, base64Cert);
+    RequestorEntryWrapper requestor = queryExecutor.changeRequestor(ident, base64Cert);
 
     requestorDbEntries.remove(name);
     requestors.remove(name);
@@ -1654,7 +1654,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     asssertMasterMode();
 
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     if (ca == null) {
       String msg = concat("unknown CA ", caName);
       LOG.warn(msg);
@@ -1751,7 +1751,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method addCertprofile
 
   @Override
-  public void addResponder(CmpResponderEntry dbEntry) throws CaMgmtException {
+  public void addResponder(ResponderEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     asssertMasterMode();
     String name = dbEntry.getName();
@@ -1767,7 +1767,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       }
     }
 
-    CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
+    ResponderEntryWrapper responder = createResponder(dbEntry);
     queryExecutor.addResponder(dbEntry);
     responders.put(name, responder);
     responderDbEntries.put(name, dbEntry);
@@ -1803,7 +1803,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throw new IllegalArgumentException("nothing to change");
     }
 
-    CmpResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
+    ResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
         base64Cert, this, securityFactory);
 
     responders.remove(name);
@@ -1813,12 +1813,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   } // method changeResponder
 
   @Override
-  public CmpResponderEntry getResponder(String name) {
+  public ResponderEntry getResponder(String name) {
     ParamUtil.requireNonBlank("name", name);
     return responderDbEntries.get(name.toLowerCase());
   }
 
-  public CmpResponderEntryWrapper cmpResponderWrapper(String name) {
+  public ResponderEntryWrapper getResponderWrapper(String name) {
     ParamUtil.requireNonBlank("name", name);
     return responders.get(name.toLowerCase());
   }
@@ -1893,7 +1893,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     return crlSignerDbEntries.get(name);
   }
 
-  public X509CrlSignerEntryWrapper crlSignerWrapper(String name) {
+  public X509CrlSignerEntryWrapper getCrlSignerWrapper(String name) {
     name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     return crlSigners.get(name);
   }
@@ -2044,7 +2044,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     cmpControls.put(name, newCmpControl);
   } // method changeCmpControl
 
-  public EnvParameterResolver envParameterResolver() {
+  public EnvParameterResolver getEnvParameterResolver() {
     return envParameterResolver;
   }
 
@@ -2101,7 +2101,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     envParameterResolver.addParameter(name, value);
   } // method changeEnvParam
 
-  public String caConfFile() {
+  public String getCaConfFile() {
     return caConfFile;
   }
 
@@ -2366,7 +2366,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     asssertMasterMode();
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       if (ca.revokeCertificate(serialNumber, reason, invalidityTime,
           CaAuditConstants.MSGID_ca_mgmt) == null) {
@@ -2382,7 +2382,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       if (ca.unrevokeCertificate(serialNumber, CaAuditConstants.MSGID_ca_mgmt) == null) {
         throw new CaMgmtException("could not unrevoke non-existing certificate");
@@ -2397,7 +2397,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     asssertMasterMode();
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     if (ca == null) {
       String msg = concat("unknown CA ", caName);
       LOG.warn(msg);
@@ -2425,7 +2425,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     event.setName(CaAuditConstants.NAME_PERF);
     event.addEventType("CAMGMT_CRL_GEN_ONDEMAND");
 
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     CertificationRequest csr;
     try {
       csr = CertificationRequest.getInstance(encodedCsr);
@@ -2474,7 +2474,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     return certInfo.getCert().getCert();
   } // method generateCertificate
 
-  public X509Ca x509Ca(String name) throws CaMgmtException {
+  public X509Ca getX509Ca(String name) throws CaMgmtException {
     name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     X509Ca ca = x509cas.get(name);
     if (ca == null) {
@@ -2483,7 +2483,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     return ca;
   }
 
-  public X509Ca x509Ca(NameId ident) throws CaMgmtException {
+  public X509Ca getX509Ca(NameId ident) throws CaMgmtException {
     ParamUtil.requireNonNull("ident", ident);
     X509Ca ca = x509cas.get(ident.getName());
     if (ca == null) {
@@ -2492,12 +2492,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     return ca;
   }
 
-  public IdentifiedX509Certprofile identifiedCertprofile(String profileName) {
+  public IdentifiedX509Certprofile getIdentifiedCertprofile(String profileName) {
     profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
     return certprofiles.get(profileName);
   }
 
-  public List<IdentifiedX509CertPublisher> identifiedPublishersForCa(String caName) {
+  public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName) {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
     Set<String> publisherNames = caHasPublishers.get(caName);
@@ -2547,7 +2547,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       return null;
     }
 
-    IdentifiedX509Certprofile certprofile = identifiedCertprofile(profileName);
+    IdentifiedX509Certprofile certprofile = getIdentifiedCertprofile(profileName);
     if (certprofile == null) {
       throw new CaMgmtException(concat("unknown certprofile ", profileName));
     }
@@ -2632,9 +2632,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
     }
   } // method shutdownPublisher
 
-  CmpResponderEntryWrapper createCmpResponder(CmpResponderEntry dbEntry) throws CaMgmtException {
+  ResponderEntryWrapper createResponder(ResponderEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
-    CmpResponderEntryWrapper ret = new CmpResponderEntryWrapper();
+    ResponderEntryWrapper ret = new ResponderEntryWrapper();
     ret.setDbEntry(dbEntry);
     try {
       ret.initSigner(securityFactory);
@@ -2743,7 +2743,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   public X509CRL generateCrlOnDemand(String caName) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
 
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       return ca.generateCrlOnDemand(CaAuditConstants.MSGID_ca_mgmt);
     } catch (OperationException ex) {
@@ -2755,7 +2755,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   public X509CRL getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("crlNumber", crlNumber);
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       X509CRL crl = ca.getCrl(crlNumber);
       if (crl == null) {
@@ -2770,7 +2770,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   @Override
   public X509CRL getCurrentCrl(String caName) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       X509CRL crl = ca.getCurrentCrl();
       if (crl == null) {
@@ -2926,7 +2926,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   public CertWithStatusInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     X509CertWithRevocationInfo certInfo;
     try {
       certInfo = ca.getCertWithRevocationInfo(serialNumber);
@@ -2940,7 +2940,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   public byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       return ca.getCertRequest(serialNumber);
     } catch (OperationException ex) {
@@ -2953,7 +2953,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
       Date validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireRange("numEntries", numEntries, 1, 1000);
-    X509Ca ca = x509Ca(caName);
+    X509Ca ca = getX509Ca(caName);
     try {
       return ca.listCertificates(subjectPattern, validFrom, validTo, orderBy, numEntries);
     } catch (OperationException ex) {
@@ -2996,8 +2996,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
     // Responder
     for (String name : conf.getResponderNames()) {
-      CmpResponderEntry entry = conf.getResponder(name);
-      CmpResponderEntry entryB = responderDbEntries.get(name);
+      ResponderEntry entry = conf.getResponder(name);
+      ResponderEntry entryB = responderDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed CMP responder {}", name);
@@ -3071,8 +3071,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
 
     // Requestor
     for (String name : conf.getRequestorNames()) {
-      CmpRequestorEntry entry = conf.getRequestor(name);
-      CmpRequestorEntry entryB = requestorDbEntries.get(name);
+      RequestorEntry entry = conf.getRequestor(name);
+      RequestorEntry entryB = requestorDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed CMP requestor {}", name);
@@ -3631,7 +3631,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
             continue;
           }
 
-          CmpResponderEntry entry = responderDbEntries.get(name);
+          ResponderEntry entry = responderDbEntries.get(name);
           ResponderType jaxb = new ResponderType();
           jaxb.setName(name);
           jaxb.setType(entry.getType());
@@ -3708,7 +3708,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
             continue;
           }
 
-          CmpRequestorEntry entry = requestorDbEntries.get(name);
+          RequestorEntry entry = requestorDbEntries.get(name);
           RequestorType jaxb = new RequestorType();
           jaxb.setName(name);
           jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),

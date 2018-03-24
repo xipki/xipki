@@ -23,7 +23,7 @@ package org.xipki.ca.server.api;
  * @since 3.0.1
  */
 
-public interface CmpResponderManager {
+public interface ResponderManager {
 
   /**
    * Returns the CA name for the alias {@code caAlias}.

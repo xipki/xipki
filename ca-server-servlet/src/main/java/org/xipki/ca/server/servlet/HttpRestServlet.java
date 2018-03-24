@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
-import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.api.Rest;
 import org.xipki.ca.server.api.RestResponse;
@@ -45,7 +45,7 @@ public class HttpRestServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
 
-  private CmpResponderManager responderManager;
+  private ResponderManager responderManager;
 
   private AuditServiceRegister auditServiceRegister;
 
@@ -98,7 +98,7 @@ public class HttpRestServlet extends HttpServlet {
     }
   } // method service
 
-  public void setResponderManager(CmpResponderManager responderManager) {
+  public void setResponderManager(ResponderManager responderManager) {
     this.responderManager = responderManager;
   }
 

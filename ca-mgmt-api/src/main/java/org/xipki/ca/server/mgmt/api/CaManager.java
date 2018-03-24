@@ -249,7 +249,7 @@ public interface CaManager {
    *          Requestor name. Must not be {@code null}.
    * @return the requestor.
    */
-  CmpRequestorEntry getRequestor(String name);
+  RequestorEntry getRequestor(String name);
 
   /**
    * Adds requstor.
@@ -258,7 +258,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestor(CmpRequestorEntry dbEntry) throws CaMgmtException;
+  void addRequestor(RequestorEntry dbEntry) throws CaMgmtException;
 
   /**
    * Removes requestor named {@code requestorName}.
@@ -380,7 +380,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addResponder(CmpResponderEntry dbEntry) throws CaMgmtException;
+  void addResponder(ResponderEntry dbEntry) throws CaMgmtException;
 
   /**
    * Removes the responder named {@code name}.
@@ -397,7 +397,7 @@ public interface CaManager {
    *          Responder name. Must not be {@code null}.
    * @return the responder.
    */
-  CmpResponderEntry getResponder(String name);
+  ResponderEntry getResponder(String name);
 
   /**
    * Changes the responder {@code name}.

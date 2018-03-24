@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.api.CmpResponderManager;
+import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.X509CaCmpResponder;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.LogUtil;
@@ -48,12 +48,12 @@ public class HealthCheckServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/json";
 
-  private CmpResponderManager responderManager;
+  private ResponderManager responderManager;
 
   public HealthCheckServlet() {
   }
 
-  public void setResponderManager(CmpResponderManager responderManager) {
+  public void setResponderManager(ResponderManager responderManager) {
     this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
   }
 

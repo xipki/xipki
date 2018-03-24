@@ -22,7 +22,7 @@ import java.util.Arrays;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.shell.ResponderUpdateCmd;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
@@ -43,7 +43,7 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
   protected Object execute0() throws Exception {
     println("checking responder " + name);
 
-    CmpResponderEntry cr = caManager.getResponder(name);
+    ResponderEntry cr = caManager.getResponder(name);
     if (cr == null) {
       throw new CmdFailure("responder named '" + name + "' is not configured");
     }

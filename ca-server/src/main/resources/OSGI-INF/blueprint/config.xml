@@ -48,7 +48,7 @@
   <service ref="caManager">
     <interfaces>
       <value>org.xipki.ca.server.mgmt.api.CaManager</value>
-      <value>org.xipki.ca.server.api.CmpResponderManager</value>
+      <value>org.xipki.ca.server.api.ResponderManager</value>
     </interfaces>
   </service>
 </blueprint>

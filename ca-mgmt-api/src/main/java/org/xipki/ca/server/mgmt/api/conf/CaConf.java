@@ -57,8 +57,8 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -111,13 +111,13 @@ public class CaConf {
 
   private final Map<String, CmpControlEntry> cmpControls = new HashMap<>();
 
-  private final Map<String, CmpResponderEntry> responders = new HashMap<>();
+  private final Map<String, ResponderEntry> responders = new HashMap<>();
 
   private final Map<String, String> environments = new HashMap<>();
 
   private final Map<String, X509CrlSignerEntry> crlSigners = new HashMap<>();
 
-  private final Map<String, CmpRequestorEntry> requestors = new HashMap<>();
+  private final Map<String, RequestorEntry> requestors = new HashMap<>();
 
   private final Map<String, Object> users = new HashMap<>();
 
@@ -259,7 +259,7 @@ public class CaConf {
     // Responders
     if (jaxb.getResponders() != null) {
       for (ResponderType m : jaxb.getResponders().getResponder()) {
-        CmpResponderEntry en = new CmpResponderEntry(m.getName(), expandConf(m.getType()),
+        ResponderEntry en = new ResponderEntry(m.getName(), expandConf(m.getType()),
             getValue(m.getConf(), zipFile), getBase64Binary(m.getCert(), zipFile));
         addResponder(en);
       }
@@ -285,7 +285,7 @@ public class CaConf {
     // Requestors
     if (jaxb.getRequestors() != null) {
       for (RequestorType m : jaxb.getRequestors().getRequestor()) {
-        CmpRequestorEntry en = new CmpRequestorEntry(new NameId(null, m.getName()),
+        RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()),
             getBase64Binary(m.getCert(), zipFile));
         addRequestor(en);
       }
@@ -498,7 +498,7 @@ public class CaConf {
     return cmpControls.get(ParamUtil.requireNonNull("name", name));
   }
 
-  public void addResponder(CmpResponderEntry responder) {
+  public void addResponder(ResponderEntry responder) {
     ParamUtil.requireNonNull("responder", responder);
     this.responders.put(responder.getName(), responder);
   }
@@ -507,7 +507,7 @@ public class CaConf {
     return Collections.unmodifiableSet(responders.keySet());
   }
 
-  public CmpResponderEntry getResponder(String name) {
+  public ResponderEntry getResponder(String name) {
     return responders.get(ParamUtil.requireNonNull("name", name));
   }
 
@@ -538,7 +538,7 @@ public class CaConf {
     return crlSigners.get(ParamUtil.requireNonNull("name", name));
   }
 
-  public void addRequestor(CmpRequestorEntry requestor) {
+  public void addRequestor(RequestorEntry requestor) {
     ParamUtil.requireNonNull("requestor", requestor);
     this.requestors.put(requestor.getIdent().getName(), requestor);
   }
@@ -557,7 +557,7 @@ public class CaConf {
     return Collections.unmodifiableSet(requestors.keySet());
   }
 
-  public CmpRequestorEntry getRequestor(String name) {
+  public RequestorEntry getRequestor(String name) {
     return requestors.get(ParamUtil.requireNonNull("name", name));
   }
 

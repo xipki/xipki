@@ -34,9 +34,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class CmpRequestorEntry {
+public class RequestorEntry {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CmpRequestorEntry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RequestorEntry.class);
 
   private final NameId ident;
 
@@ -44,7 +44,7 @@ public class CmpRequestorEntry {
 
   private X509Certificate cert;
 
-  public CmpRequestorEntry(NameId ident, String base64Cert) {
+  public RequestorEntry(NameId ident, String base64Cert) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
     if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(ident.getName())
         || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(ident.getName())) {
@@ -108,11 +108,11 @@ public class CmpRequestorEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CmpRequestorEntry)) {
+    if (!(obj instanceof RequestorEntry)) {
       return false;
     }
 
-    CmpRequestorEntry objB = (CmpRequestorEntry) obj;
+    RequestorEntry objB = (RequestorEntry) obj;
     if (!ident.equals(objB.ident)) {
       return false;
     }

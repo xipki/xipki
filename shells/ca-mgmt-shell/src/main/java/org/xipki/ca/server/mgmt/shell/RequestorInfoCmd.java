@@ -27,7 +27,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
@@ -73,7 +73,7 @@ public class RequestorInfoCmd extends CaAction {
         sb.append("\t").append(entry).append("\n");
       }
     } else {
-      CmpRequestorEntry entry = caManager.getRequestor(name);
+      RequestorEntry entry = caManager.getRequestor(name);
       if (entry == null) {
         throw new CmdFailure("could not find CMP requestor '" + name + "'");
       } else {

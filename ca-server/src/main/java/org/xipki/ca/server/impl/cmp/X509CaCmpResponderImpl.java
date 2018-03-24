@@ -185,7 +185,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
   }
 
   public X509CaCmpResponderImpl(CaManagerImpl caManager, String caName) {
-    super(caManager.securityFactory());
+    super(caManager.getSecurityFactory());
 
     this.caManager = caManager;
     this.pendingCertPool = new PendingCertificatePool();
@@ -198,7 +198,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
   public X509Ca getCa() {
     try {
-      return caManager.x509Ca(caName);
+      return caManager.getX509Ca(caName);
     } catch (CaMgmtException ex) {
       throw new IllegalStateException(ex.getMessage(), ex);
     }
@@ -222,7 +222,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
     boolean healthy = result.isHealthy();
 
-    boolean responderHealthy = caManager.cmpResponderWrapper(
+    boolean responderHealthy = caManager.getResponderWrapper(
         getResponderName()).getSigner().isHealthy();
     healthy &= responderHealthy;
 
@@ -1245,12 +1245,12 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
   @Override
   protected ConcurrentContentSigner getSigner() {
     String name = getResponderName();
-    return caManager.cmpResponderWrapper(name).getSigner();
+    return caManager.getResponderWrapper(name).getSigner();
   }
 
   @Override
   protected GeneralName getSender() {
-    return caManager.cmpResponderWrapper(getResponderName()).getSubjectAsGeneralName();
+    return caManager.getResponderWrapper(getResponderName()).getSubjectAsGeneralName();
   }
 
   @Override
@@ -1266,7 +1266,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
     if (requestRecipient.getTagNo() == GeneralName.directoryName) {
       X500Name x500Name = X500Name.getInstance(requestRecipient.getName());
       if (x500Name.equals(
-          caManager.cmpResponderWrapper(getResponderName()).getSubjectAsX500Name())) {
+          caManager.getResponderWrapper(getResponderName()).getSubjectAsX500Name())) {
         return true;
       }
     }

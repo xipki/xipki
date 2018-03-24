@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.shell.RequestorUpdateCmd;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
@@ -42,7 +42,7 @@ public class RequestorCheckCmd extends RequestorUpdateCmd {
   protected Object execute0() throws Exception {
     println("checking requestor " + name);
 
-    CmpRequestorEntry cr = caManager.getRequestor(name);
+    RequestorEntry cr = caManager.getRequestor(name);
     if (cr == null) {
       throw new CmdFailure("requestor named '" + name + "' is not configured");
     }

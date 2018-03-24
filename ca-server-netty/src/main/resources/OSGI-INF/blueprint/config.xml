@@ -20,7 +20,7 @@
       interface="org.xipki.audit.AuditServiceRegister"/>
 
   <reference id="responderManager"
-      interface="org.xipki.ca.server.api.CmpResponderManager"/>
+      interface="org.xipki.ca.server.api.ResponderManager"/>
 
   <!-- CMP servlet -->
   <bean id="cmpServlet" class="org.xipki.ca.server.netty.HttpCmpServlet">
