@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -40,9 +42,14 @@ public class CaAliasRemoveCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.removeCaAlias(caAlias);
-    output(bo, "removed", "could not remove", "CA alias " + caAlias);
-    return null;
+    String msg = "CA alias " + caAlias;
+    try {
+      caManager.removeCaAlias(caAlias);
+      println("removed " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

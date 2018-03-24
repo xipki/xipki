@@ -25,9 +25,11 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -66,9 +68,14 @@ public class CaUserAddCmd extends CaAction {
     int intPermission = ShellUtil.getPermission(permissions);
     entry.setPermission(intPermission);
 
-    boolean bo = caManager.addUserToCa(entry, caName);
-    output(bo, "added", "could not add", "user " + userName + " to CA " + caName);
-    return null;
+    String msg = "user " + userName + " to CA " + caName;
+    try {
+      caManager.addUserToCa(entry, caName);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

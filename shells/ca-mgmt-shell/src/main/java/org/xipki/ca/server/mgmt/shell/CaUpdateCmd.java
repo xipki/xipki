@@ -31,6 +31,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
@@ -44,6 +45,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.SignerTypeCompleter;
@@ -269,9 +271,14 @@ public class CaUpdateCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.changeCa(getChangeCaEntry());
-    output(bo, "updated", "could not update", "CA " + caName);
-    return null;
+    String msg = "CA " + caName;
+    try {
+      caManager.changeCa(getChangeCaEntry());
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
   private static List<String> getUris(List<String> uris) {

@@ -22,8 +22,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -51,9 +53,18 @@ public class RequestorAddCmd extends CaAction {
     String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
     CmpRequestorEntry entry = new CmpRequestorEntry(new NameId(null, name), base64Cert);
 
-    boolean bo = (entry.getCert() == null) ? false : caManager.addRequestor(entry);
-    output(bo, "added", "could not add", "CMP requestor " + name);
-    return null;
+    String msg = "CMP requestor " + name;
+    if (entry.getCert() == null) {
+      throw new CmdFailure("could not add " + msg + ", error: could not get requestor certificate");
+    }
+
+    try {
+      caManager.addRequestor(entry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

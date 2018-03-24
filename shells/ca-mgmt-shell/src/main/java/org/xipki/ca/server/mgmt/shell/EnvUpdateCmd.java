@@ -20,6 +20,8 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -42,10 +44,14 @@ public class EnvUpdateCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.changeEnvParam(name, value);
-    output(bo, "updated", "could not update",
-        "the environment " + name + "=" + getRealString(value));
-    return null;
+    String msg = "the environment " + name + "=" + getRealString(value);
+    try {
+      caManager.changeEnvParam(name, value);
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

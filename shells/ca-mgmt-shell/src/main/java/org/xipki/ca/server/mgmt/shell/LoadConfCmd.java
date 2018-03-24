@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -43,9 +45,14 @@ public class LoadConfCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     CaConf caConf = new CaConf(confFile, securityFactory);
-    boolean bo = caManager.loadConf(caConf);
-    output(bo, "loaded", "could not load", "configuration " + confFile);
-    return null;
+    String msg = "configuration " + confFile;
+    try {
+      caManager.loadConf(caConf);
+      println("loaded " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not load " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

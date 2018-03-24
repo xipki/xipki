@@ -49,9 +49,9 @@ public interface CaManager {
 
   CaSystemStatus getCaSystemStatus();
 
-  boolean unlockCa();
+  void unlockCa() throws CaMgmtException;
 
-  boolean notifyCaChange() throws CaMgmtException;
+  void notifyCaChange() throws CaMgmtException;
 
   /**
    * Republishes certificates of the CA {@code caName} to the publishers {@code publisherNames}.
@@ -62,12 +62,11 @@ public interface CaManager {
    *          Publisher names. Could be {@code null}.
    * @param numThreads
    *          Number of threads
-   * @return whether the publish is successful
    * @throws CaMgmtException
    *          if error occurs.
    *
    */
-  boolean republishCertificates(String caName, List<String> publisherNames, int numThreads)
+  void republishCertificates(String caName, List<String> publisherNames, int numThreads)
       throws CaMgmtException;
 
   /**
@@ -77,24 +76,22 @@ public interface CaManager {
    *          CA name. Could be {@code null}.
    * @param publisherNames
    *          Publisher names. Could be {@code null}.
-   * @return whether the cleanup is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException;
+  void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException;
 
   /**
    * Removes the CA {@code caName} from the system.
    *
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the remove is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCa(String caName) throws CaMgmtException;
+  void removeCa(String caName) throws CaMgmtException;
 
-  boolean restartCaSystem();
+  void restartCaSystem() throws CaMgmtException;
 
   /**
    * Adds the alias {@code aliasName} to the given CA {@code caName}.
@@ -103,22 +100,20 @@ public interface CaManager {
    *          CA alias name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the addition is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCaAlias(String aliasName, String caName) throws CaMgmtException;
+  void addCaAlias(String aliasName, String caName) throws CaMgmtException;
 
   /**
    * Remove the alias {@code aliasName}.
    *
    * @param aliasName
    *          Alias name. Must not be {@code null}.
-   * @return whether the remove is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCaAlias(String aliasName) throws CaMgmtException;
+  void removeCaAlias(String aliasName) throws CaMgmtException;
 
   /**
    * Gets the aliases of the given CA {@code caName}.
@@ -164,11 +159,10 @@ public interface CaManager {
    * Adds a CA.
    * @param caEntry
    *          CA to be added. Must not be {@code null}.
-   * @return whether the addition is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCa(CaEntry caEntry) throws CaMgmtException;
+  void addCa(CaEntry caEntry) throws CaMgmtException;
 
   /**
    * Gets the CA named {@code caName}.
@@ -183,11 +177,10 @@ public interface CaManager {
    *
    * @param changeCAentry
    *          ChangeCA entry. Must not be {@code null}.
-   * @return whether the change is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeCa(ChangeCaEntry changeCAentry) throws CaMgmtException;
+  void changeCa(ChangeCaEntry changeCAentry) throws CaMgmtException;
 
   /**
    * Removes the support of the certProfile {@code profileName} from the CA {@code caName}.
@@ -196,11 +189,10 @@ public interface CaManager {
    *          Profile name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the remove is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException;
+  void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException;
 
   /**
    * Add the certificate profile {@code profileName} the the CA {@code caName}.
@@ -208,11 +200,10 @@ public interface CaManager {
    *          Profile name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the addition is successful
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCertprofileToCa(String profileName, String caName) throws CaMgmtException;
+  void addCertprofileToCa(String profileName, String caName) throws CaMgmtException;
 
   /**
    * Removes publisher {@code publisherName} from the CA {@code caName}.
@@ -220,11 +211,10 @@ public interface CaManager {
    *          Publisher name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removePublisherFromCa(String publisherName, String caName) throws CaMgmtException;
+  void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException;
 
   /**
    * Adds publisher {@code publisherName} to CA {@code caName}.
@@ -232,11 +222,10 @@ public interface CaManager {
    *          Publisher name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addPublisherToCa(String publisherName, String caName) throws CaMgmtException;
+  void addPublisherToCa(String publisherName, String caName) throws CaMgmtException;
 
   /**
    * Returns the CertProfile names supported by the CA {@code caName}.
@@ -266,21 +255,19 @@ public interface CaManager {
    * Adds requstor.
    * @param dbEntry
    *          Requestor entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addRequestor(CmpRequestorEntry dbEntry) throws CaMgmtException;
+  void addRequestor(CmpRequestorEntry dbEntry) throws CaMgmtException;
 
   /**
    * Removes requestor named {@code requestorName}.
    * @param requestorName
    *          Requestor name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeRequestor(String requestorName) throws CaMgmtException;
+  void removeRequestor(String requestorName) throws CaMgmtException;
 
   /**
    * Chagnes the requestor {@code name}.
@@ -289,11 +276,10 @@ public interface CaManager {
    * @param base64Cert
    *          Base64 encoded certificate of the requestor's certificate.
    *          Must not be {@code null}.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeRequestor(String name, String base64Cert) throws CaMgmtException;
+  void changeRequestor(String name, String base64Cert) throws CaMgmtException;
 
   /**
    * Removes the requestor {@code requestorName} from the CA {@code caName}.
@@ -301,11 +287,10 @@ public interface CaManager {
    *          Requestor name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException;
+  void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException;
 
   /**
    * Adds the requestor {@code requestorName} to the CA {@code caName}.
@@ -313,11 +298,10 @@ public interface CaManager {
    *          Requestor name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException;
+  void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException;
 
   /**
    * Removes the user {@code userName} from the CA {@code caName}.
@@ -325,11 +309,10 @@ public interface CaManager {
    *          User name. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeUserFromCa(String userName, String caName) throws CaMgmtException;
+  void removeUserFromCa(String userName, String caName) throws CaMgmtException;
 
   /**
    * Adds the user {@code userName} from the CA {@code caName}.
@@ -337,11 +320,10 @@ public interface CaManager {
    *          User entry. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException;
+  void addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException;
 
   /**
    * Returns map between CA name an CaHasUserEntry for given user.
@@ -364,11 +346,10 @@ public interface CaManager {
    * Removes the certificate profile {@code profileName}.
    * @param profileName
    *          certificate profile name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCertprofile(String profileName) throws CaMgmtException;
+  void removeCertprofile(String profileName) throws CaMgmtException;
 
   /**
    * Changes the certificate profile {@code name}.
@@ -378,41 +359,37 @@ public interface CaManager {
    *          Type to be changed. {@code null} indicates no change.
    * @param conf
    *          Configuration to be changed. {@code null} indicates no change.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeCertprofile(String name, String type, String conf) throws CaMgmtException;
+  void changeCertprofile(String name, String type, String conf) throws CaMgmtException;
 
   /**
    * Adds a certificate profile.
    * @param dbEntry
    *          Certificate profile entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException;
+  void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException;
 
   /**
    * Adds a responder.
    * @param dbEntry
    *          Responder entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addResponder(CmpResponderEntry dbEntry) throws CaMgmtException;
+  void addResponder(CmpResponderEntry dbEntry) throws CaMgmtException;
 
   /**
    * Removes the responder named {@code name}.
    * @param name
    *          Responder name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeResponder(String name) throws CaMgmtException;
+  void removeResponder(String name) throws CaMgmtException;
 
   /**
    * Returns the responder named {@code name}.
@@ -432,42 +409,38 @@ public interface CaManager {
    *          Configuration to be changed. {@code null} indicates no change.
    * @param base64Cert
    *          Base64 encoded certificate of the responder. {@code null} indicates no change.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeResponder(String name, String type, String conf, String base64Cert)
+  void changeResponder(String name, String type, String conf, String base64Cert)
       throws CaMgmtException;
 
   /**
    * Adds a CRL signer.
    * @param dbEntry
    *          CRL signer entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException;
+  void addCrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException;
 
   /**
    * Remove the CRL signer {@code crlSignerName}.
    * @param crlSignerName
    *          Name of the CRL signer. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCrlSigner(String crlSignerName) throws CaMgmtException;
+  void removeCrlSigner(String crlSignerName) throws CaMgmtException;
 
   /**
    * Changes the CRL signer.
    * @param dbEntry
    *          CRL signer entry. Must not be {@code null}.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeCrlSigner(X509ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
+  void changeCrlSigner(X509ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
 
   /**
    * Returns the CRL signer named {@code name}.
@@ -481,11 +454,10 @@ public interface CaManager {
    * Adds a publisher.
    * @param dbEntry
    *          Publisher entry.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addPublisher(PublisherEntry dbEntry) throws CaMgmtException;
+  void addPublisher(PublisherEntry dbEntry) throws CaMgmtException;
 
   /**
    * Returns publishers for the CA {@code caName}.
@@ -507,11 +479,10 @@ public interface CaManager {
    * Removes the publisher {@code publisherName}.
    * @param publisherName
    *          Publisher name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removePublisher(String publisherName) throws CaMgmtException;
+  void removePublisher(String publisherName) throws CaMgmtException;
 
   /**
    * Changes the publisher {@code name}.
@@ -521,11 +492,10 @@ public interface CaManager {
    *          Type to be changed. {@code null} indicates no change.
    * @param conf
    *          Configuration to be changed. {@code null} indicates no change.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changePublisher(String name, String type, String conf) throws CaMgmtException;
+  void changePublisher(String name, String type, String conf) throws CaMgmtException;
 
   /**
    * Returns the CMP control.
@@ -539,21 +509,19 @@ public interface CaManager {
    * Adds a SCEP contrl.
    * @param dbEntry
    *          CMP control entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addCmpControl(CmpControlEntry dbEntry) throws CaMgmtException;
+  void addCmpControl(CmpControlEntry dbEntry) throws CaMgmtException;
 
   /**
    * Remove the CMP control {@code name}.
    * @param name
    *          CMP control name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCmpControl(String name) throws CaMgmtException;
+  void removeCmpControl(String name) throws CaMgmtException;
 
   /**
    * Changes the CMP control {@code name}.
@@ -561,11 +529,10 @@ public interface CaManager {
    *          name of the CMP control to be changed. Must not be {@code null}.
    * @param conf
    *          Configuration to be changed. Must not be {@code null}.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeCmpControl(String name, String conf) throws CaMgmtException;
+  void changeCmpControl(String name, String conf) throws CaMgmtException;
 
   Set<String> getEnvParamNames();
 
@@ -583,21 +550,19 @@ public interface CaManager {
    *          Environment name. Must not be {@code null}.
    * @param value
    *          Environment value. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addEnvParam(String name, String value) throws CaMgmtException;
+  void addEnvParam(String name, String value) throws CaMgmtException;
 
   /**
    * Removes the environment parameter {@code envParamName}.
    * @param envParamName
    *          Environment name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeEnvParam(String envParamName) throws CaMgmtException;
+  void removeEnvParam(String envParamName) throws CaMgmtException;
 
   /**
    * Changes the environment parameter {@code name}.
@@ -605,11 +570,10 @@ public interface CaManager {
    *          name of the CMP control to be changed. Must not be {@code null}.
    * @param value
    *          Environment value to be changed. Must not be {@code null}.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeEnvParam(String name, String value) throws CaMgmtException;
+  void changeEnvParam(String name, String value) throws CaMgmtException;
 
   /**
    * Revokes the CA {@code caName}.
@@ -617,21 +581,19 @@ public interface CaManager {
    *          CA name. Must not be {@code null}.
    * @param revocationInfo
    *          Revocation information. Must not be {@code null}.
-   * @return whether the revoke is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException;
+  void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException;
 
   /**
    * Unrevokes the CA {@code caName}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return whether the unrevoke is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean unrevokeCa(String caName) throws CaMgmtException;
+  void unrevokeCa(String caName) throws CaMgmtException;
 
   /**
    * Revokes a certificate with the serial number {@code serialNumber}, and
@@ -644,11 +606,10 @@ public interface CaManager {
    *          Revocation reason. Must not be {@code null}.
    * @param invalidityTime
    *          Invalidity time. Could be {@code null}.
-   * @return whether the revoke is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
+  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
       Date invalidityTime) throws CaMgmtException;
 
   /**
@@ -659,11 +620,10 @@ public interface CaManager {
    *          CA name. Must not be {@code null}.
    * @param serialNumber
    *          Serial number. Must not be {@code null}.
-   * @return whether the unrevoke is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
+  void unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Removes a certificate with the serial number {@code serialNumber}, and
@@ -673,11 +633,10 @@ public interface CaManager {
    *          CA name. Must not be {@code null}.
    * @param serialNumber
    *          Serial number. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
+  void removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * CA {@code caName} issues a new certificate.
@@ -720,31 +679,28 @@ public interface CaManager {
    * Adds a user.
    * @param userEntry
    *          AddUser entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addUser(AddUserEntry userEntry) throws CaMgmtException;
+  void addUser(AddUserEntry userEntry) throws CaMgmtException;
 
   /**
    * Change the user.
    * @param userEntry
    *          User change entry. Must not be {@code null}.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeUser(ChangeUserEntry userEntry) throws CaMgmtException;
+  void changeUser(ChangeUserEntry userEntry) throws CaMgmtException;
 
   /**
    * Remove the name {@code username}.
    * @param username
    *          User name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeUser(String username) throws CaMgmtException;
+  void removeUser(String username) throws CaMgmtException;
 
   /**
    * Returns the user {@code username}.
@@ -792,31 +748,28 @@ public interface CaManager {
    * Add a SCEP.
    * @param scepEntry
    *          SCEP entry. Must not be {@code null}.
-   * @return whether the add is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean addScep(ScepEntry scepEntry) throws CaMgmtException;
+  void addScep(ScepEntry scepEntry) throws CaMgmtException;
 
   /**
    * Retmove the SCEP {@code name}.
    * @param name
    *          SCEP name. Must not be {@code null}.
-   * @return whether the remove is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean removeScep(String name) throws CaMgmtException;
+  void removeScep(String name) throws CaMgmtException;
 
   /**
    * Changes the SCEP.
    * @param scepEntry
    *          SCEP change information. Must not be {@code null}.
-   * @return whether the change is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean changeScep(ChangeScepEntry scepEntry) throws CaMgmtException;
+  void changeScep(ChangeScepEntry scepEntry) throws CaMgmtException;
 
   Set<String> getScepNames();
 
@@ -847,11 +800,10 @@ public interface CaManager {
    * Loads the CA system configuration.
    * @param conf
    *          Configuration of the CA system. Must not be {@code null}.
-   * @return whether the load is successful.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  boolean loadConf(CaConf conf) throws CaMgmtException;
+  void loadConf(CaConf conf) throws CaMgmtException;
 
   /**
    * Exports the CA system configuration.
@@ -859,13 +811,12 @@ public interface CaManager {
    *          Where to save the exported ZIP file. Must be {@code null}.
    * @param caNames
    *          List of the names of CAs to be exported. {@code null} to export all CAs.
-   * @return whether the export is successful.
    * @throws IOException
    *          If read the ZIP file fails.
    * @throws CaMgmtException
    *          if non-IO error occurs.
    */
-  boolean exportConf(String zipFilename, List<String> caNames) throws CaMgmtException, IOException;
+  void exportConf(String zipFilename, List<String> caNames) throws CaMgmtException, IOException;
 
   /**
    * Returns a sorted list of certificate meta information.

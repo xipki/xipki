@@ -20,6 +20,8 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -38,9 +40,14 @@ public class UserRemoveCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.removeUser(name);
-    output(bo, "removed", "could not remove", "user " + name);
-    return null;
+    String msg = "user " + name;
+    try {
+      caManager.removeUser(name);
+      println("removed " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

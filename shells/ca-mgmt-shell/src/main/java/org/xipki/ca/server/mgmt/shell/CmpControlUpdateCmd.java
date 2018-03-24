@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -45,9 +47,14 @@ public class CmpControlUpdateCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.changeCmpControl(name, conf);
-    output(bo, "updated", "could not update", "CMP control " + name);
-    return null;
+    String msg = "CMP control " + name;
+    try {
+      caManager.changeCmpControl(name, conf);
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

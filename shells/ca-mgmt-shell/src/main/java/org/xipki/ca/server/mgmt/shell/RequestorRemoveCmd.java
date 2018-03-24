@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -41,9 +43,14 @@ public class RequestorRemoveCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.removeRequestor(name);
-    output(bo, "removed", "could not remove", "CMP requestor " + name);
-    return null;
+    String msg = "CMP requestor " + name;
+    try {
+      caManager.removeRequestor(name);
+      println("removed " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

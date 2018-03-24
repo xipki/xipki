@@ -23,7 +23,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -50,9 +52,14 @@ public class ExportConfCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.exportConf(confFile, caNames);
-    output(bo, "exported", "could not export", "configuration to file " + confFile);
-    return null;
+    String msg = "configuration to file " + confFile;
+    try {
+      caManager.exportConf(confFile, caNames);
+      println("exported " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not export " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

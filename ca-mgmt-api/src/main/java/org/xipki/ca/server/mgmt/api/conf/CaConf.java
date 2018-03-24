@@ -124,6 +124,9 @@ public class CaConf {
 
   public CaConf(String confFilename, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
+    ParamUtil.requireNonNull("confFilename", confFilename);
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    init(new File(confFilename), securityFactory);
   }
 
   public CaConf(File confFile, SecurityFactory securityFactory)

@@ -21,8 +21,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
@@ -65,9 +67,14 @@ public class PublisherUpdateCmd extends CaAction {
       conf = new String(IoUtil.read(confFile));
     }
 
-    boolean bo = caManager.changePublisher(name, type, conf);
-    output(bo, "updated", "could not update", "publisher " + name);
-    return null;
+    String msg = "publisher " + name;
+    try {
+      caManager.changePublisher(name, type, conf);
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

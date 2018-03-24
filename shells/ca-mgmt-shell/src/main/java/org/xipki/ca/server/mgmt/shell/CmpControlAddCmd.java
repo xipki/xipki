@@ -20,7 +20,9 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -44,9 +46,14 @@ public class CmpControlAddCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     CmpControlEntry entry = new CmpControlEntry(name, conf);
-    boolean bo = caManager.addCmpControl(entry);
-    output(bo, "added", "could not add", "CMP control " + name);
-    return null;
+    String msg = "CMP control " + name;
+    try {
+      caManager.addCmpControl(entry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.x509.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -35,6 +36,7 @@ import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.SignerTypeCompleter;
@@ -169,9 +171,14 @@ public class ScepUpdateCmd extends CaAction {
       entry.setControl(control);
     }
 
-    boolean bo = caManager.changeScep(entry);
-    output(bo, "updated", "could not update", "SCEP responder " + name);
-    return null;
+    String msg = "SCEP responder " + name;
+    try {
+      caManager.changeScep(entry);
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   } // method execute0
 
 }

@@ -25,10 +25,12 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.SignerTypeCompleter;
@@ -96,9 +98,14 @@ public class ResponderUpdateCmd extends CaAction {
       cert = Base64.encodeToString(certBytes);
     }
 
-    boolean bo = caManager.changeResponder(name, signerType, getSignerConf(), cert);
-    output(bo, "updated", "could not update", "CMP responder " + name);
-    return null;
+    String msg = "CMP responder " + name;
+    try {
+      caManager.changeResponder(name, signerType, getSignerConf(), cert);
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

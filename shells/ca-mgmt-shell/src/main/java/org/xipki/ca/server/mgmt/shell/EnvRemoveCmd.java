@@ -20,6 +20,8 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -38,9 +40,14 @@ public class EnvRemoveCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.removeEnvParam(name);
-    output(bo, "removed", "could not remove", "environment parameter " + name);
-    return null;
+    String msg = "environment parameter " + name;
+    try {
+      caManager.removeEnvParam(name);
+      println("removed " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

@@ -23,7 +23,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
@@ -51,9 +53,14 @@ public class CaAddCmd extends CaAddOrGenAction {
       caEntry.setCert(caCert);
     }
 
-    boolean bo = caManager.addCa(caEntry);
-    output(bo, "added", "could not add", "CA " + caEntry.getIdent().getName());
-    return null;
+    String msg = "CA " + caEntry.getIdent().getName();
+    try {
+      caManager.addCa(caEntry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

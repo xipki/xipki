@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
@@ -78,9 +80,14 @@ public class UserUpdateCmd extends CaAction {
       entry.setPassword(password);
     }
 
-    boolean bo = caManager.changeUser(entry);
-    output(bo, "changed", "could not change", "user " + name);
-    return null;
+    String msg = "user " + name;
+    try {
+      caManager.changeUser(entry);
+      println("changed " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not change " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

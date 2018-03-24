@@ -19,6 +19,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -34,15 +35,13 @@ public class CaSystemUnlockCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean unlocked = caManager.unlockCa();
-
-    if (unlocked) {
+    try {
+      caManager.unlockCa();
       println("unlocked CA system, calling ca:restart to restart CA system");
-    } else {
-      throw new CmdFailure("could not unlock CA system");
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not unlock CA system, error: " + ex.getMessage(), ex);
     }
-
-    return null;
   }
 
 }

@@ -22,6 +22,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -52,9 +54,14 @@ public class UserAddCmd extends CaAction {
       password = new String(readPassword());
     }
     AddUserEntry userEntry = new AddUserEntry(new NameId(null, name), !inactive, password);
-    boolean bo = caManager.addUser(userEntry);
-    output(bo, "added", "could not add", "user " + name);
-    return null;
+    String msg = "user " + name;
+    try {
+      caManager.addUser(userEntry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

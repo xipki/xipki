@@ -27,9 +27,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaCrlReasonCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.DateUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
@@ -92,9 +94,14 @@ public class CaRevokeCmd extends CaAction {
     }
 
     CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate, invalidityDate);
-    boolean bo = caManager.revokeCa(caName, revInfo);
-    output(bo, "revoked", "could not revoke", "CA " + caName);
-    return null;
+    String msg = "CA " + caName;
+    try {
+      caManager.revokeCa(caName, revInfo);
+      println("revoked " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not revoke " + msg + ", error: " + ex.getMessage(), ex);
+    }
   } // method execute0
 
 }

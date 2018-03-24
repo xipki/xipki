@@ -22,8 +22,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -61,9 +63,14 @@ public class PublisherAddCmd extends CaAction {
     }
 
     PublisherEntry entry = new PublisherEntry(new NameId(null, name), type, conf);
-    boolean bo = caManager.addPublisher(entry);
-    output(bo, "added", "could not add", "publisher " + name);
-    return null;
+    String msg = "publisher " + name;
+    try {
+      caManager.addPublisher(entry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

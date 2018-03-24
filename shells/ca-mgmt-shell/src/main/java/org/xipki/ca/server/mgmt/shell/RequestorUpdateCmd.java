@@ -23,8 +23,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
@@ -53,9 +55,14 @@ public class RequestorUpdateCmd extends CaAction {
     // check if the certificate is valid
     byte[] certBytes = IoUtil.read(certFile);
     X509Util.parseCert(new ByteArrayInputStream(certBytes));
-    boolean bo = caManager.changeRequestor(name, Base64.encodeToString(certBytes));
-    output(bo, "updated", "could not update", "CMP requestor " + name);
-    return null;
+    String msg = "CMP requestor " + name;
+    try {
+      caManager.changeRequestor(name, Base64.encodeToString(certBytes));
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

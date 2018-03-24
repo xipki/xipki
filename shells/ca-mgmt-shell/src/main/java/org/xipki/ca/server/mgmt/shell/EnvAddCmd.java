@@ -20,6 +20,8 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -42,9 +44,14 @@ public class EnvAddCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.addEnvParam(name, value);
-    output(bo, "added", "could not add", "environment parameter " + name);
-    return null;
+    String msg = "environment parameter " + name;
+    try {
+      caManager.addEnvParam(name, value);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

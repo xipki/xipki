@@ -17,14 +17,17 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.DateUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.ClientCrlReasonCompleter;
 import org.xipki.security.CrlReason;
 
@@ -62,11 +65,15 @@ public class RevokeCertCmd extends UnRevRmCertAction {
       invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
     }
 
-    boolean successful = caManager.revokeCertificate(caName, getSerialNumber(), crlReason,
-        invalidityDate);
-    output(successful, "revoked", "could not revoke", "certificate");
-
-    return null;
+    BigInteger serialNo = getSerialNumber();
+    String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
+    try {
+      caManager.revokeCertificate(caName, serialNo, crlReason, invalidityDate);
+      println("revoked " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not revoke " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

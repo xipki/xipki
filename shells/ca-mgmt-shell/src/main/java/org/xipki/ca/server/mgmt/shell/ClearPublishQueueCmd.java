@@ -23,8 +23,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -68,10 +70,14 @@ public class ClearPublishQueueCmd extends CaAction {
       caName = null;
     }
 
-    boolean bo = caManager.clearPublishQueue(caName, publisherNames);
-    output(bo, "cleared", "could not clear",
-        "publish queue of CA " + caName + " for publishers " + toString(publisherNames));
-    return null;
+    String msg = "publish queue of CA " + caName + " for publishers " + toString(publisherNames);
+    try {
+      caManager.clearPublishQueue(caName, publisherNames);
+      println("cleared " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not clear " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

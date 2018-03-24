@@ -19,6 +19,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -34,9 +35,10 @@ public class CaSystemRestartCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean successful = caManager.restartCaSystem();
-    if (!successful) {
-      throw new CmdFailure("could not restart CA system");
+    try {
+      caManager.restartCaSystem();
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not restart CA system, error: " + ex.getMessage(), ex);
     }
 
     StringBuilder sb = new StringBuilder("restarted CA system\n");

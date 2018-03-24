@@ -17,8 +17,12 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.math.BigInteger;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -33,9 +37,15 @@ public class RemoveCertCmd extends UnRevRmCertAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean successful = caManager.removeCertificate(caName, getSerialNumber());
-    output(successful, "removed", "could not remove", "certificate");
-    return null;
+    BigInteger serialNo = getSerialNumber();
+    String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
+    try {
+      caManager.removeCertificate(caName, serialNo);
+      println("removed " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

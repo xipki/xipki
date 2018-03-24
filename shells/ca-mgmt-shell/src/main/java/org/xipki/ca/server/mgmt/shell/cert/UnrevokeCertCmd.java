@@ -17,8 +17,12 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.math.BigInteger;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -33,10 +37,15 @@ public class UnrevokeCertCmd extends UnRevRmCertAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
-    output(successful, "unrevoked", "could not unrevoke", "certificate");
-
-    return null;
+    BigInteger serialNo = getSerialNumber();
+    String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
+    try {
+      caManager.unrevokeCertificate(caName, serialNo);
+      println("unrevoked " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not unrevoke " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

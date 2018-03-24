@@ -23,8 +23,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -50,9 +52,15 @@ public class CaPublisherAddCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     for (String publisherName : publisherNames) {
-      boolean bo = caManager.addPublisherToCa(publisherName, caName);
-      output(bo, "added", "could not add", "publisher " + publisherName + " to CA " + caName);
+      String msg = "publisher " + publisherName + " to CA " + caName;
+      try {
+        caManager.addPublisherToCa(publisherName, caName);
+        println("added " + msg);
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+      }
     }
+
     return null;
   }
 

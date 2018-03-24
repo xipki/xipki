@@ -22,8 +22,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
@@ -61,9 +63,14 @@ public class ProfileAddCmd extends CaAction {
     }
 
     CertprofileEntry entry = new CertprofileEntry(new NameId(null, name), type, conf);
-    boolean bo = caManager.addCertprofile(entry);
-    output(bo, "added", "could not add", "certificate profile " + name);
-    return null;
+    String msg = "certificate profile " + name;
+    try {
+      caManager.addCertprofile(entry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

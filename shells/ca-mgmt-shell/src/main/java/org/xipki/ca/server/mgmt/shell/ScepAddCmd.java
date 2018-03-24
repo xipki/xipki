@@ -25,11 +25,13 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
@@ -102,9 +104,14 @@ public class ScepAddCmd extends CaAction {
       throw new InvalidConfException("certificate is invalid");
     }
 
-    boolean bo = caManager.addScep(entry);
-    output(bo, "added", "could not add", "SCEP responder " + name);
-    return null;
+    String msg = "SCEP " + name;
+    try {
+      caManager.addScep(entry);
+      println("added " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

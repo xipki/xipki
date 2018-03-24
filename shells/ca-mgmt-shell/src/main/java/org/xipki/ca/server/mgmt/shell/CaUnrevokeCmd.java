@@ -21,7 +21,9 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
@@ -46,9 +48,14 @@ public class CaUnrevokeCmd extends CaAction {
       throw new IllegalCmdParamException("invalid CA name " + caName);
     }
 
-    boolean bo = caManager.unrevokeCa(caName);
-    output(bo, "unrevoked", "could not unrevoke", "CA " + caName);
-    return null;
+    String msg = "CA " + caName;
+    try {
+      caManager.unrevokeCa(caName);
+      println("unrevoked " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not unrevoke " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

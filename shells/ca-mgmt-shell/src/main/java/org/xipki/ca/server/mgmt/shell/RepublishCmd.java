@@ -23,8 +23,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -72,9 +74,14 @@ public class RepublishCmd extends CaAction {
       caName = null;
     }
 
-    boolean bo = caManager.republishCertificates(caName, publisherNames, numThreads);
-    output(bo, "republished", "could not republish", "certificates");
-    return null;
+    String msg = "certificates";
+    try {
+      caManager.republishCertificates(caName, publisherNames, numThreads);
+      println("republished " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not republish " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

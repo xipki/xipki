@@ -17,12 +17,16 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -40,15 +44,23 @@ public class CaRequestorRemoveCmd extends CaAction {
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--requestor", required = true,
-      description = "requestor name\n(required)")
+  @Option(name = "--requestor", required = true, multiValued = true,
+      description = "requestor name\n(required, multi-valued)")
   @Completion(RequestorNameCompleter.class)
-  private String requestorName;
+  private List<String> requestorNames;
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.removeRequestorFromCa(requestorName, caName);
-    output(bo, "removed", "could not remove", "requestor " + requestorName + " from CA " + caName);
+    for (String requestorName : requestorNames) {
+      String msg = "requestor " + requestorName + " from CA " + caName;
+      try {
+        caManager.removeRequestorFromCa(requestorName, caName);
+        println("removed " + msg);
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      }
+    }
+
     return null;
   }
 

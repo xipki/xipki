@@ -23,8 +23,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -50,10 +52,15 @@ public class CaPublisherRemoveCmd extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     for (String publisherName : publisherNames) {
-      boolean bo = caManager.removePublisherFromCa(publisherName, caName);
-      output(bo, "removed", "could not remove",
-          "publisher " + publisherName + " from CA " + caName);
+      String msg = "publisher " + publisherName + " from CA " + caName;
+      try {
+        caManager.removePublisherFromCa(publisherName, caName);
+        println("removed " + msg);
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      }
     }
+
     return null;
   }
 

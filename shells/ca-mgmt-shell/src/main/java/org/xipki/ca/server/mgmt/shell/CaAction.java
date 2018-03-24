@@ -23,7 +23,6 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
 
@@ -64,15 +63,6 @@ public abstract class CaAction extends XiAction {
     }
     sb.append("}");
     return sb.toString();
-  }
-
-  protected void output(boolean successful, String posPrefix, String negPrefix, String message)
-      throws CmdFailure {
-    if (successful) {
-      println(posPrefix + " " + message);
-    } else {
-      throw new CmdFailure(negPrefix + " " + message);
-    }
   }
 
   protected void printCaNames(StringBuilder sb, Set<String> caNames, String prefix) {

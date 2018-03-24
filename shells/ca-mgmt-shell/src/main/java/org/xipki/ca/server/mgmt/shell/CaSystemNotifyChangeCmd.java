@@ -19,6 +19,8 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -33,9 +35,14 @@ public class CaSystemNotifyChangeCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.notifyCaChange();
-    output(bo, "notified", "could not notify", "the change of CA system");
-    return null;
+    String msg = "the change of CA system";
+    try {
+      caManager.notifyCaChange();
+      println("notified " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not notify " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }

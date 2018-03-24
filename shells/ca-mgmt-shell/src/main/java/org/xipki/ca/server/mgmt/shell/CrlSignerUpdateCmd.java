@@ -25,12 +25,14 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.PasswordResolver;
@@ -107,9 +109,14 @@ public class CrlSignerUpdateCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean bo = caManager.changeCrlSigner(getCrlSignerChangeEntry());
-    output(bo, "updated", "could not update", "CRL signer " + name);
-    return null;
+    String msg = "CRL signer " + name;
+    try {
+      caManager.changeCrlSigner(getCrlSignerChangeEntry());
+      println("updated " + msg);
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+    }
   }
 
 }
