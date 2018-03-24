@@ -420,10 +420,6 @@ Feature xipki-camgmt-shell (started by default)
 
      add user to CA
 
-   * `ca:causer-info`
-
-     show information of user in CA
-
    * `ca:causer-rm`
 
      remove user from CA

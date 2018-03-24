@@ -1661,8 +1661,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager {
   }
 
   @Override
-  public Map<String, CaHasUserEntry> getCaHasUsers(String user) throws CaMgmtException {
+  public Map<String, CaHasUserEntry> getCaHasUsersForUser(String user) throws CaMgmtException {
     ParamUtil.requireNonBlank("user", user);
+    // TODO
     return queryExecutor.getCaHasUsers(user, idNameMap);
   }
 

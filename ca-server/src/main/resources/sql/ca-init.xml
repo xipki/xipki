@@ -272,9 +272,6 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
     </createTable>
-  </changeSet>
-  <!-- CertStore :: create table -->
-  <changeSet author="xipki" id="2">
     <!-- table TUSER -->
     <createTable tableName="TUSER">
       <column name="ID" type="INT">
@@ -311,6 +308,9 @@
     </createTable>
     <addUniqueConstraint tableName="CA_HAS_USER" columnNames="CA_ID, USER_ID"
         constraintName="CONST_CA_USER"/>
+  </changeSet>
+  <!-- CertStore :: create table -->
+  <changeSet author="xipki" id="2">
     <!-- table CRL -->
     <createTable tableName="CRL">
       <column name="ID" type="INT">

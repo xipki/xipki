@@ -332,7 +332,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  Map<String, CaHasUserEntry> getCaHasUsers(String user) throws CaMgmtException;
+  Map<String, CaHasUserEntry> getCaHasUsersForUser(String user) throws CaMgmtException;
 
   /**
    * Returns the certificate profile named {@code profileName}.

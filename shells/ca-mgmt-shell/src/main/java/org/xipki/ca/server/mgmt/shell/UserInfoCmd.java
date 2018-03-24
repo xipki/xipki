@@ -50,7 +50,7 @@ public class UserInfoCmd extends CaAction {
     StringBuilder sb = new StringBuilder();
     sb.append(userEntry);
 
-    Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsers(name);
+    Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsersForUser(name);
     for (String ca : caHasUsers.keySet()) {
       CaHasUserEntry entry = caHasUsers.get(ca);
       sb.append("\n----- CA ").append(ca).append("-----");
