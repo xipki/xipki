@@ -57,8 +57,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.ca.dbtool.xmlio.DbiXmlReader;
 import org.xipki.ca.dbtool.xmlio.IdentifidDbObjectType;
 import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
-import org.xipki.ca.dbtool.xmlio.ca.CaUserType;
-import org.xipki.ca.dbtool.xmlio.ca.CaUsersReader;
 import org.xipki.ca.dbtool.xmlio.ca.CertType;
 import org.xipki.ca.dbtool.xmlio.ca.CertsReader;
 import org.xipki.ca.dbtool.xmlio.ca.CrlType;
@@ -67,8 +65,6 @@ import org.xipki.ca.dbtool.xmlio.ca.RequestCertType;
 import org.xipki.ca.dbtool.xmlio.ca.RequestCertsReader;
 import org.xipki.ca.dbtool.xmlio.ca.RequestType;
 import org.xipki.ca.dbtool.xmlio.ca.RequestsReader;
-import org.xipki.ca.dbtool.xmlio.ca.UserType;
-import org.xipki.ca.dbtool.xmlio.ca.UsersReader;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
@@ -101,12 +97,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
   private static final String SQL_ADD_CRL =
       "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
       + " VALUES (?,?,?,?,?,?,?,?)";
-
-  private static final String SQL_ADD_USER =
-      "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
-
-  private static final String SQL_ADD_CAUSER =
-      "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
 
   private static final String SQL_ADD_REQUEST =
       "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
@@ -184,18 +174,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
       boolean entriesFinished = false;
       // finished for the given type
-      if (typeProcessedInLastProcess != null && idProcessedInLastProcess != null
-          && idProcessedInLastProcess == -1) {
+      if (typeProcessedInLastProcess != null && (idProcessedInLastProcess != null
+          && idProcessedInLastProcess == -1)) {
         numProcessedInLastProcess = 0;
         idProcessedInLastProcess = 0L;
 
         switch (typeProcessedInLastProcess) {
-          case USER:
-            typeProcessedInLastProcess = CaDbEntryType.CAUSER;
-            break;
-          case CAUSER:
-            typeProcessedInLastProcess = CaDbEntryType.CRL;
-            break;
           case CRL:
             typeProcessedInLastProcess = CaDbEntryType.CERT;
             break;
@@ -215,17 +199,16 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
       if (!entriesFinished) {
         Exception exception = null;
-        if (CaDbEntryType.USER == typeProcessedInLastProcess
+        if (CaDbEntryType.CRL == typeProcessedInLastProcess
             || typeProcessedInLastProcess == null) {
-          exception = importEntries(CaDbEntryType.USER, certstore, processLogFile,
+          exception = importEntries(CaDbEntryType.CRL, certstore, processLogFile,
               numProcessedInLastProcess, idProcessedInLastProcess);
           typeProcessedInLastProcess = null;
           numProcessedInLastProcess = null;
           idProcessedInLastProcess = null;
         }
 
-        CaDbEntryType[] types = {CaDbEntryType.CAUSER, CaDbEntryType.CRL, CaDbEntryType.CERT,
-          CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
+        CaDbEntryType[] types = {CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
         for (CaDbEntryType type : types) {
           if (exception == null
@@ -332,14 +315,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         case CRL:
           total = certstore.getCountCrls();
           sqls = new String[] {SQL_ADD_CRL};
-          break;
-        case USER:
-          total = certstore.getCountUsers();
-          sqls = new String[] {SQL_ADD_USER};
-          break;
-        case CAUSER:
-          total = certstore.getCountCaUsers();
-          sqls = new String[] {SQL_ADD_CAUSER};
           break;
         case REQUEST:
           total = certstore.getCountRequests();
@@ -631,39 +606,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 + ", message: " + ex.getMessage());
             throw ex;
           }
-        } else if (CaDbEntryType.USER == type) {
-          PreparedStatement psAddUser = statements[0];
-          UserType user = (UserType) entry;
-
-          try {
-            int idx = 1;
-            psAddUser.setLong(idx++, user.getId());
-            psAddUser.setString(idx++, user.getName());
-            setBoolean(psAddUser, idx++, user.getActive());
-            psAddUser.setString(idx++, user.getPassword());
-            psAddUser.addBatch();
-          } catch (SQLException ex) {
-            System.err.println("could not import TUSER with ID="
-                + user.getId() + ", message: " + ex.getMessage());
-            throw ex;
-          }
-        } else if (CaDbEntryType.CAUSER == type) {
-          PreparedStatement psAddCaUser = statements[0];
-          CaUserType causer = (CaUserType) entry;
-
-          try {
-            int idx = 1;
-            psAddCaUser.setLong(idx++, causer.getId());
-            psAddCaUser.setInt(idx++, causer.getCaId());
-            psAddCaUser.setInt(idx++, causer.getUid());
-            psAddCaUser.setInt(idx++, causer.getPermission());
-            psAddCaUser.setString(idx++, causer.getProfiles());
-            psAddCaUser.addBatch();
-          } catch (SQLException ex) {
-            System.err.println("could not import CA_HAS_USER with ID="
-                + causer.getId() + ", message: " + ex.getMessage());
-            throw ex;
-          }
         } else if (CaDbEntryType.REQUEST == type) {
           PreparedStatement psAddRequest = statements[0];
 
@@ -763,10 +705,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         return new CertsReader(is);
       case CRL:
         return new CrlsReader(is);
-      case USER:
-        return new UsersReader(is);
-      case CAUSER:
-        return new CaUsersReader(is);
       case REQUEST:
         return new RequestsReader(is);
       case REQCERT:

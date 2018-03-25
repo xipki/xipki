@@ -52,8 +52,6 @@ import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.ca.dbtool.xmlio.DbiXmlWriter;
-import org.xipki.ca.dbtool.xmlio.ca.CaUserType;
-import org.xipki.ca.dbtool.xmlio.ca.CaUsersWriter;
 import org.xipki.ca.dbtool.xmlio.ca.CertType;
 import org.xipki.ca.dbtool.xmlio.ca.CertsWriter;
 import org.xipki.ca.dbtool.xmlio.ca.CrlType;
@@ -62,8 +60,6 @@ import org.xipki.ca.dbtool.xmlio.ca.RequestCertType;
 import org.xipki.ca.dbtool.xmlio.ca.RequestCertsWriter;
 import org.xipki.ca.dbtool.xmlio.ca.RequestType;
 import org.xipki.ca.dbtool.xmlio.ca.RequestsWriter;
-import org.xipki.ca.dbtool.xmlio.ca.UserType;
-import org.xipki.ca.dbtool.xmlio.ca.UsersWriter;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
@@ -162,15 +158,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
       }
 
-      if (CaDbEntryType.USER == typeProcessedInLastProcess || typeProcessedInLastProcess == null) {
-        exception = exportEntries(CaDbEntryType.USER, certstore, processLogFile,
+      if (CaDbEntryType.CRL == typeProcessedInLastProcess || typeProcessedInLastProcess == null) {
+        exception = exportEntries(CaDbEntryType.CRL, certstore, processLogFile,
             idProcessedInLastProcess);
         typeProcessedInLastProcess = null;
         idProcessedInLastProcess = null;
       }
 
-      CaDbEntryType[] types = {CaDbEntryType.CAUSER, CaDbEntryType.CRL, CaDbEntryType.CERT,
-          CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
+      CaDbEntryType[] types = {CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
       for (CaDbEntryType type : types) {
         if (exception == null
@@ -248,14 +243,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
       case CRL:
         numProcessedBefore = certstore.getCountCrls();
         coreSql = "ID,CA_ID,CRL FROM CRL WHERE ID>=?";
-        break;
-      case USER:
-        numProcessedBefore = certstore.getCountUsers();
-        coreSql = "ID,NAME,ACTIVE,PASSWORD FROM TUSER WHERE ID>=?";
-        break;
-      case CAUSER:
-        numProcessedBefore = certstore.getCountCaUsers();
-        coreSql = "ID,CA_ID,USER_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE ID>=?";
         break;
       case REQUEST:
         numProcessedBefore = certstore.getCountRequests();
@@ -440,23 +427,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             crl.setFile(crlFilename);
 
             ((CrlsWriter) entriesInCurrentFile).add(crl);
-          } else if (CaDbEntryType.USER == type) {
-            UserType user = new UserType();
-            user.setId(id);
-            user.setName(rs.getString("NAME"));
-            user.setActive(rs.getBoolean("ACTIVE"));
-            user.setPassword(rs.getString("PASSWORD"));
-
-            ((UsersWriter) entriesInCurrentFile).add(user);
-          } else if (CaDbEntryType.CAUSER == type) {
-            CaUserType causer = new CaUserType();
-            causer.setId(id);
-            causer.setCaId(rs.getInt("CA_ID"));
-            causer.setUid(rs.getInt("USER_ID"));
-            causer.setPermission(rs.getInt("PERMISSION"));
-            causer.setProfiles(rs.getString("PROFILES"));
-
-            ((CaUsersWriter) entriesInCurrentFile).add(causer);
           } else if (CaDbEntryType.REQUEST == type) {
             long update = rs.getLong("LUPDATE");
             String b64Data = rs.getString("DATA");
@@ -652,10 +622,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         return new CertsWriter();
       case CRL:
         return new CrlsWriter();
-      case USER:
-        return new UsersWriter();
-      case CAUSER:
-        return new CaUsersWriter();
       case REQUEST:
         return new RequestsWriter();
       case REQCERT:
@@ -672,12 +638,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         break;
       case CRL:
         certstore.setCountCrls(num);
-        break;
-      case USER:
-        certstore.setCountUsers(num);
-        break;
-      case CAUSER:
-        certstore.setCountCaUsers(num);
         break;
       case REQUEST:
         certstore.setCountRequests(num);

@@ -33,6 +33,7 @@ import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasRequestors;
+import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Cas;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Cmpcontrols;
@@ -43,9 +44,11 @@ import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Requestors;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Sceps;
+import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasRequestorType;
+import org.xipki.ca.dbtool.jaxb.ca.CaHasUserType;
 import org.xipki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.ca.dbtool.jaxb.ca.CaaliasType;
 import org.xipki.ca.dbtool.jaxb.ca.CmpcontrolType;
@@ -57,6 +60,7 @@ import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
+import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
@@ -93,11 +97,13 @@ class CaConfigurationDbExporter extends DbPorter {
     exportEnvironment(caconf);
     exportCrlsigner(caconf);
     exportRequestor(caconf);
+    exportUser(caconf);
     exportPublisher(caconf);
     exportCa(caconf);
     exportProfile(caconf);
     exportCaalias(caconf);
     exportCaHasRequestor(caconf);
+    exportCaHasUser(caconf);
     exportCaHasPublisher(caconf);
     exportCaHasProfile(caconf);
     exportScep(caconf);
@@ -260,6 +266,35 @@ class CaConfigurationDbExporter extends DbPorter {
     caconf.setRequestors(requestors);
     System.out.println(" exported table REQUESTOR");
   } // method exportRequestor
+
+  private void exportUser(CAConfigurationType caconf) throws DataAccessException, IOException {
+    System.out.println("exporting table TUSER");
+    Users users = new Users();
+    final String sql = "SELECT ID,NAME,ACTIVE,PASSWORD FROM TUSER";
+
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = createStatement();
+      rs = stmt.executeQuery(sql);
+
+      while (rs.next()) {
+        UserType user = new UserType();
+        user.setId(rs.getInt("ID"));
+        user.setName(rs.getString("NAME"));
+        user.setActive(rs.getInt("ACTIVE"));
+        user.setPassword(rs.getString("PASSWORD"));
+        users.getUser().add(user);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    caconf.setUsers(users);
+    System.out.println(" exported table TUSER");
+  } // method exportUser
 
   private void exportResponder(CAConfigurationType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table RESPONDER");
@@ -454,6 +489,37 @@ class CaConfigurationDbExporter extends DbPorter {
 
     caconf.setCaHasRequestors(caHasRequestors);
     System.out.println(" exported table CA_HAS_REQUESTOR");
+  } // method exportCaHasRequestor
+
+  private void exportCaHasUser(CAConfigurationType caconf) throws DataAccessException {
+    System.out.println("exporting table CA_HAS_USER");
+    CaHasUsers caHasUsers = new CaHasUsers();
+    final String sql = "SELECT ID,CA_ID,USER_ID,PERMISSION,PROFILES FROM CA_HAS_USER";
+
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = createStatement();
+      rs = stmt.executeQuery(sql);
+
+      while (rs.next()) {
+        CaHasUserType caHasUser = new CaHasUserType();
+        caHasUser.setId(rs.getInt("ID"));
+        caHasUser.setCaId(rs.getInt("CA_ID"));
+        caHasUser.setUserId(rs.getInt("USER_ID"));
+        caHasUser.setPermission(rs.getInt("PERMISSION"));
+        caHasUser.setProfiles(rs.getString("PROFILES"));
+
+        caHasUsers.getCaHasUser().add(caHasUser);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    caconf.setCaHasUsers(caHasUsers);
+    System.out.println(" exported table CA_HAS_USER");
   } // method exportCaHasRequestor
 
   private void exportCaHasPublisher(CAConfigurationType caconf) throws DataAccessException {

@@ -34,6 +34,7 @@ import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasRequestors;
+import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Cas;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Cmpcontrols;
@@ -44,9 +45,11 @@ import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Requestors;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Sceps;
+import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasRequestorType;
+import org.xipki.ca.dbtool.jaxb.ca.CaHasUserType;
 import org.xipki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.ca.dbtool.jaxb.ca.CaaliasType;
 import org.xipki.ca.dbtool.jaxb.ca.CmpcontrolType;
@@ -58,6 +61,7 @@ import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
+import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
@@ -108,12 +112,14 @@ class CaConfigurationDbImporter extends DbPorter {
       importResponder(caconf.getResponders());
       importEnvironment(caconf.getEnvironments());
       importRequestor(caconf.getRequestors());
+      importUser(caconf.getUsers());
       importPublisher(caconf.getPublishers());
       importProfile(caconf.getProfiles());
       importCrlsigner(caconf.getCrlsigners());
       importCa(caconf.getCas());
       importCaalias(caconf.getCaaliases());
       importCaHasRequestor(caconf.getCaHasRequestors());
+      importCaHasUser(caconf.getCaHasUsers());
       importCaHasPublisher(caconf.getCaHasPublishers());
       importCaHasCertprofile(caconf.getCaHasProfiles());
       importScep(caconf.getSceps());
@@ -265,6 +271,32 @@ class CaConfigurationDbImporter extends DbPorter {
     }
     System.out.println(" imported table REQUESTOR");
   } // method importRequestor
+
+  private void importUser(Users users) throws DataAccessException, IOException {
+    System.out.println("importing table TUSER");
+    final String sql = "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (UserType user : users.getUser()) {
+        try {
+          ps.setInt(1, user.getId());
+          ps.setString(2, user.getName());
+          ps.setInt(3, user.getActive());
+          ps.setString(4, user.getPassword());
+
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import TUSER with NAME=" + user.getName());
+          throw translate(sql, ex);
+        }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table TUSER");
+  } // method importUser
 
   private void importPublisher(Publishers publishers) throws DataAccessException, IOException {
     System.out.println("importing table PUBLISHER");
@@ -444,6 +476,34 @@ class CaConfigurationDbImporter extends DbPorter {
       releaseResources(ps, null);
     }
     System.out.println(" imported table CA_HAS_REQUESTOR");
+  } // method importCaHasRequestor
+
+  private void importCaHasUser(CaHasUsers caHasUsers) throws DataAccessException {
+    System.out.println("importing table CA_HAS_USER");
+    final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,PERMISSION,PROFILES)"
+        + " VALUES (?,?,?,?,?)";
+    PreparedStatement ps = prepareStatement(sql);
+    try {
+      for (CaHasUserType entry : caHasUsers.getCaHasUser()) {
+        try {
+          int idx = 1;
+          ps.setInt(idx++, entry.getId());
+          ps.setInt(idx++, entry.getCaId());
+          ps.setInt(idx++, entry.getUserId());
+          ps.setInt(idx++, entry.getPermission());
+          ps.setString(idx++, entry.getProfiles());
+
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import CA_HAS_USER with CA_ID="
+              + entry.getCaId() + " and USER_ID=" + entry.getUserId());
+          throw translate(sql, ex);
+        }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CA_HAS_USER");
   } // method importCaHasRequestor
 
   private void importCaHasPublisher(CaHasPublishers caHasPublishers) throws Exception {
