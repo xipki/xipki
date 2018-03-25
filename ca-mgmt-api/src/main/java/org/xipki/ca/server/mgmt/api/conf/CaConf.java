@@ -475,10 +475,9 @@ public class CaConf {
       for (ScepType m : jaxb.getSceps().getScep()) {
         String name = m.getName();
         NameId caIdent = new NameId(null, m.getCaName());
-        String responderConf = getValue(m.getResponderConf(), zipFile);
         List<String> certProfiles = getStrings(m.getProfiles());
-        ScepEntry dbEntry = new ScepEntry(name, caIdent, true, m.getResponderType(),
-            responderConf, null, new HashSet<>(certProfiles), m.getControl());
+        ScepEntry dbEntry = new ScepEntry(name, caIdent, true, m.getResponderName(),
+            new HashSet<>(certProfiles), m.getControl());
         sceps.put(name, dbEntry);
       }
     }

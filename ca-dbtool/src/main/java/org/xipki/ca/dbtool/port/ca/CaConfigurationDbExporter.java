@@ -489,8 +489,7 @@ class CaConfigurationDbExporter extends DbPorter {
     Sceps sceps = new Sceps();
     caconf.setSceps(sceps);
 
-    final String sql = "SELECT NAME,CA_ID,ACTIVE,PROFILES,RESPONDER_TYPE,"
-        + "RESPONDER_CONF,RESPONDER_CERT,CONTROL FROM SCEP";
+    final String sql = "SELECT NAME,CA_ID,ACTIVE,PROFILES,RESPONDER_NAME,CONTROL FROM SCEP";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -506,11 +505,7 @@ class CaConfigurationDbExporter extends DbPorter {
         scep.setCaId(caId);
         scep.setActive(rs.getInt("ACTIVE"));
         scep.setProfiles(rs.getString("PROFILES"));
-        scep.setResponderType(rs.getString("RESPONDER_TYPE"));
-        scep.setResponderConf(buildFileOrValue(
-            rs.getString("RESPONDER_CONF"), "ca-conf/responderconf-scep-" + caId));
-        scep.setResponderCert(buildFileOrBase64Binary(
-            rs.getString("RESPONDER_CERT"), "ca-conf/respondercert-scep-" + caId + ".der"));
+        scep.setResponderName(rs.getString("RESPONDER_NAME"));
         scep.setControl(rs.getString("CONTROL"));
         sceps.getScep().add(scep);
       }

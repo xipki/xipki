@@ -28,12 +28,9 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
 
 /**
@@ -60,19 +57,10 @@ public class ScepAddCmd extends CaAction {
       description = "do not activate this SCEP")
   private Boolean inactive = Boolean.FALSE;
 
-  @Option(name = "--resp-type", required = true,
-      description = "type of the responder\n(required)")
-  @Completion(SignerTypeCompleter.class)
-  private String responderType;
-
-  @Option(name = "--resp-conf", required = true,
-      description = "conf of the responder\n(required)")
-  private String responderConf;
-
-  @Option(name = "--resp-cert",
-      description = "responder certificate file")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+  @Option(name = "--responder", required = true,
+      description = "Responder name\n(required)")
+  @Completion(ResponderNameCompleter.class)
+  private String responderName;
 
   @Option(name = "--control",
       description = "SCEP control")
@@ -88,21 +76,8 @@ public class ScepAddCmd extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    String base64Cert = null;
-    if (certFile != null) {
-      base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-    }
-
-    if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
-      responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
-          passwordResolver, securityFactory);
-    }
-
-    ScepEntry entry = new ScepEntry(name, new NameId(null, caName), !inactive, responderType,
-        responderConf, base64Cert, profiles, scepControl);
-    if (entry.isFaulty()) {
-      throw new InvalidConfException("certificate is invalid");
-    }
+    ScepEntry entry = new ScepEntry(name, new NameId(null, caName), !inactive, responderName,
+        profiles, scepControl);
 
     String msg = "SCEP " + name;
     try {

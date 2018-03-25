@@ -1844,10 +1844,9 @@ class CaManagerQueryExecutor {
     }
   } // method changeCrlSigner
 
-  ScepImpl changeScep(String name, NameId caIdent, Boolean active, String responderType,
-      String responderConf, String responderBase64Cert, Set<String> certProfiles,
-      String control, CaManagerImpl caManager, final SecurityFactory securityFactory)
-      throws CaMgmtException {
+  ScepImpl changeScep(String name, NameId caIdent, Boolean active, String responderName,
+      Set<String> certProfiles, String control, CaManagerImpl caManager,
+      final SecurityFactory securityFactory) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("caManager", caManager);
 
@@ -1857,11 +1856,9 @@ class CaManagerQueryExecutor {
     AtomicInteger index = new AtomicInteger(1);
     Integer idxCa = addToSqlIfNotNull(sqlBuilder, index, caIdent, "CA_ID");
     Integer idxActive = addToSqlIfNotNull(sqlBuilder, index, active, "ACTIVE");
-    Integer idxType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
-    Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert, "RESPONDER_CERT");
+    Integer idxName = addToSqlIfNotNull(sqlBuilder, index, responderName, "RESPONDER_NAME");
     Integer idxProfiles = addToSqlIfNotNull(sqlBuilder, index, certProfiles, "PROFILES");
     Integer idxControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
-    Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
     sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
     sqlBuilder.append(" WHERE NAME=?");
 
@@ -1873,20 +1870,8 @@ class CaManagerQueryExecutor {
 
     boolean tmpActive = (active == null) ? dbEntry.isActive() : active;
 
-    String tmpResponderType = (responderType ==  null)
-        ? dbEntry.getResponderType() : responderType;
-
-    String tmpResponderConf;
-
-    if (responderConf == null) {
-      tmpResponderConf = dbEntry.getResponderConf();
-    } else {
-      tmpResponderConf = CaManagerImpl.canonicalizeSignerConf(tmpResponderType,
-          responderConf, null, securityFactory);
-    }
-
-    String tmpResponderBase64Cert = (responderBase64Cert == null)
-        ? dbEntry.getBase64Cert() : responderBase64Cert;
+    String tmpResponderName = (responderName ==  null)
+        ? dbEntry.getResponderName() : responderName;
 
     NameId tmpCaIdent;
     if (caIdent == null) {
@@ -1913,8 +1898,8 @@ class CaManagerQueryExecutor {
 
     ScepEntry newDbEntry;
     try {
-      newDbEntry = new ScepEntry(name, tmpCaIdent, tmpActive, tmpResponderType,
-          tmpResponderConf, tmpResponderBase64Cert, tmpCertProfiles, tmpControl);
+      newDbEntry = new ScepEntry(name, tmpCaIdent, tmpActive, tmpResponderName, tmpCertProfiles,
+          tmpControl);
     } catch (InvalidConfException ex) {
       throw new CaMgmtException(ex);
     }
@@ -1935,34 +1920,10 @@ class CaManagerQueryExecutor {
         ps.setInt(idxCa, caIdent.getId());
       }
 
-      if (idxType != null) {
-        String txt = tmpResponderType;
-        ps.setString(idxType, txt);
+      if (idxName != null) {
+        String txt = getRealString(tmpResponderName);
+        ps.setString(idxName, txt);
         sb.append("responder type: '").append(txt).append("'; ");
-      }
-
-      if (idxConf != null) {
-        String txt = getRealString(tmpResponderConf);
-        sb.append("responder conf: '").append(SignerConf.toString(txt, false, true));
-        ps.setString(idxConf, txt);
-      }
-
-      if (idxCert != null) {
-        String txt = getRealString(tmpResponderBase64Cert);
-        sb.append("responder cert: '");
-        if (txt == null) {
-          sb.append("null");
-        } else {
-          try {
-            String subject = canonicalizName(
-                X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
-            sb.append(subject);
-          } catch (CertificateException ex) {
-            sb.append("ERROR");
-          }
-        }
-        sb.append("'; ");
-        ps.setString(idxCert, txt);
       }
 
       if (idxProfiles != null) {
@@ -2294,8 +2255,8 @@ class CaManagerQueryExecutor {
 
   void addScep(ScepEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
-    final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,CONTROL,RESPONDER_TYPE"
-        + ",RESPONDER_CERT,RESPONDER_CONF) VALUES (?,?,?,?,?,?,?,?)";
+    final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,CONTROL,RESPONDER_NAME)"
+        + " VALUES (?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -2306,9 +2267,7 @@ class CaManagerQueryExecutor {
       setBoolean(ps, idx++, dbEntry.isActive());
       ps.setString(idx++, StringUtil.collectionAsStringByComma(dbEntry.getCertProfiles()));
       ps.setString(idx++, dbEntry.getControl());
-      ps.setString(idx++, dbEntry.getResponderType());
-      ps.setString(idx++, dbEntry.getBase64Cert());
-      ps.setString(idx++, dbEntry.getResponderConf());
+      ps.setString(idx++, dbEntry.getResponderName());
 
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add SCEP " + dbEntry.getName());
@@ -2358,17 +2317,10 @@ class CaManagerQueryExecutor {
       boolean active = rs.getBoolean("ACTIVE");
       String profilesText = rs.getString("PROFILES");
       String control = rs.getString("CONTROL");
-      String type = rs.getString("RESPONDER_TYPE");
-      String conf = rs.getString("RESPONDER_CONF");
-      String cert = rs.getString("RESPONDER_CERT");
-      if (StringUtil.isBlank(cert)) {
-        cert = null;
-      }
-
+      String responderName = rs.getString("RESPONDER_NAME");
       Set<String> profiles = StringUtil.splitByCommaAsSet(profilesText);
 
-      return new ScepEntry(name, idNameMap.getCa(caId), active, type, conf, cert, profiles,
-          control);
+      return new ScepEntry(name, idNameMap.getCa(caId), active, responderName, profiles, control);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } catch (InvalidConfException ex) {

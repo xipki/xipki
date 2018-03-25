@@ -249,9 +249,7 @@
       <xs:element name="active" type="xs:int"/>
       <xs:element name="caId" type="xs:int"/>
       <xs:element name="profiles" type="xs:string" minOccurs="0"/>
-      <xs:element name="responderType" type="xs:string"/>
-      <xs:element name="responderConf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>
+      <xs:element name="responderName" type="xs:string"/>
       <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>

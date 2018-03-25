@@ -19,6 +19,7 @@ package org.xipki.ca.server.impl.scep;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -65,6 +66,7 @@ import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.X509Ca;
+import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
@@ -72,7 +74,6 @@ import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.x509.ScepControl;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.common.InvalidConfException;
-import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
@@ -93,10 +94,7 @@ import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.KeyCertPair;
-import org.xipki.security.SignatureAlgoControl;
-import org.xipki.security.SignerConf;
+import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 
@@ -167,28 +165,23 @@ public class ScepImpl implements Scep {
         this.caIdent, this.control.isIncludeCaCert(), this.control.isIncludeSignerCert(),
         this.control.isSupportGetCrl());
 
-    String type = dbEntry.getResponderType();
-    if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type)) {
-      throw new CaMgmtException("unsupported SCEP responder type '" + type + "'");
+    String responderName = dbEntry.getResponderName();
+    ResponderEntryWrapper responder = caManager.getResponderWrapper(responderName);
+    if (responder == null) {
+      throw new CaMgmtException("Unknown responder " + responderName);
     }
 
-    KeyCertPair privKeyAndCert;
-    try {
-      // ResponderConf does not contain algo.
-      SignerConf signerConf = new SignerConf(dbEntry.getResponderConf(), HashAlgo.SHA256,
-          new SignatureAlgoControl());
-      privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
-          dbEntry.getResponderType(), signerConf, dbEntry.getCert());
-    } catch (ObjectCreationException ex) {
-      throw new CaMgmtException(ex);
-    }
+    ConcurrentContentSigner signer = responder.getSigner();
 
-    this.responderKey = privKeyAndCert.getPrivateKey();
-    this.responderCert = privKeyAndCert.getCertificate();
+    Key signingKey = signer.getSigningKey();
+    if (!(signingKey instanceof PrivateKey)) {
+      throw new CaMgmtException("Unsupported signer type: the signing key is not a PrivateKey");
+    }
+    this.responderKey = (PrivateKey) signingKey;
+    this.responderCert = signer.getCertificate();
 
     if (!(responderCert.getPublicKey() instanceof RSAPublicKey)) {
-      throw new IllegalArgumentException(
-          "The responder key is not RSA key for CA " + caIdent);
+      throw new IllegalArgumentException("The responder key is not RSA key for SCEP " + name);
     }
 
     // CACaps
@@ -254,9 +247,10 @@ public class ScepImpl implements Scep {
   }
 
   public CaStatus getStatus() {
-    if (!dbEntry.isActive() || dbEntry.isFaulty()) {
+    if (!dbEntry.isActive()) {
       return CaStatus.INACTIVE;
     }
+
     try {
       return caManager.getX509Ca(caIdent).getCaInfo().getStatus();
     } catch (CaMgmtException ex) {

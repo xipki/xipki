@@ -495,23 +495,19 @@ class CaConfigurationDbImporter extends DbPorter {
 
   private void importScep(Sceps sceps) throws DataAccessException, IOException {
     System.out.println("importing table SCEP");
-    final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,RESPONDER_TYPE,"
-        + "RESPONDER_CERT,CONTROL,RESPONDER_CONF) VALUES (?,?,?,?,?,?,?,?)";
+    final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,RESPONDER_NAME,CONTROL)"
+        + " VALUES (?,?,?,?,?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (ScepType entry : sceps.getScep()) {
-        byte[] certBytes = binary(entry.getResponderCert());
-        String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
         try {
           int idx = 1;
           ps.setString(idx++, entry.getName());
           ps.setInt(idx++, entry.getCaId());
           ps.setInt(idx++, entry.getActive());
           ps.setString(idx++, entry.getProfiles());
-          ps.setString(idx++, entry.getResponderType());
-          ps.setString(idx++, b64Cert);
+          ps.setString(idx++, entry.getResponderName());
           ps.setString(idx++, entry.getControl());
-          ps.setString(idx++, value(entry.getResponderConf()));
           ps.executeUpdate();
         } catch (SQLException ex) {
           System.err.println("could not import SCEP with ID=" + entry.getCaId());

@@ -37,11 +37,7 @@ public class ChangeScepEntry {
 
   private Boolean active;
 
-  private String responderType;
-
-  private String responderConf;
-
-  private String base64Cert;
+  private String responderName;
 
   private Set<String> certProfiles;
 
@@ -71,28 +67,12 @@ public class ChangeScepEntry {
     this.active = active;
   }
 
-  public String getResponderType() {
-    return responderType;
+  public String getResponderName() {
+    return responderName;
   }
 
-  public void setResponderType(String responderType) {
-    this.responderType = responderType;
-  }
-
-  public String getResponderConf() {
-    return responderConf;
-  }
-
-  public void setResponderConf(String responderConf) {
-    this.responderConf = responderConf;
-  }
-
-  public String getBase64Cert() {
-    return base64Cert;
-  }
-
-  public void setBase64Cert(String base64Cert) {
-    this.base64Cert = base64Cert;
+  public void setResponderName(String responderName) {
+    this.responderName = responderName;
   }
 
   public Set<String> getCertProfiles() {

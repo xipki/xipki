@@ -17,31 +17,22 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.ByteArrayInputStream;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.x509.ChangeScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
-import org.xipki.password.PasswordResolver;
-import org.xipki.security.util.X509Util;
 
 /**
  * TODO.
@@ -72,19 +63,10 @@ public class ScepUpdateCmd extends CaAction {
       description = "deactivate this SCEP")
   private Boolean inactive;
 
-  @Option(name = "--resp-type",
-      description = "type of the responder")
-  @Completion(SignerTypeCompleter.class)
-  private String responderType;
-
-  @Option(name = "--resp-conf",
-      description = "conf of the responder")
-  private String responderConf;
-
-  @Option(name = "--resp-cert",
-      description = "responder certificate file or 'null'")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+  @Option(name = "--responder",
+      description = "Responder name")
+  @Completion(ResponderNameCompleter.class)
+  private String responderName;
 
   @Option(name = "--profile", multiValued = true,
       description = "profile name or 'all' for all profiles\n(multi-valued)")
@@ -94,26 +76,6 @@ public class ScepUpdateCmd extends CaAction {
   @Option(name = "--control",
       description = "SCEP control or 'null'")
   private String control;
-
-  @Reference
-  private PasswordResolver passwordResolver;
-
-  private String getResponderConf() throws Exception {
-    if (responderConf == null) {
-      return responderConf;
-    }
-    String tmpRespType = responderType;
-    if (tmpRespType == null) {
-      ScepEntry entry = caManager.getScepEntry(name);
-      if (entry == null) {
-        throw new IllegalCmdParamException("please specify the responderType");
-      }
-      tmpRespType = entry.getResponderType();
-    }
-
-    return ShellUtil.canonicalizeSignerConf(tmpRespType, responderConf, passwordResolver,
-        securityFactory);
-  }
 
   @Override
   protected Object execute0() throws Exception {
@@ -130,15 +92,6 @@ public class ScepUpdateCmd extends CaAction {
       realActive = null;
     }
 
-    String certConf = null;
-    if (CaManager.NULL.equalsIgnoreCase(certFile)) {
-      certConf = CaManager.NULL;
-    } else if (certFile != null) {
-      byte[] certBytes = IoUtil.read(certFile);
-      X509Util.parseCert(new ByteArrayInputStream(certBytes));
-      certConf = Base64.encodeToString(certBytes);
-    }
-
     ChangeScepEntry entry = new ChangeScepEntry(name);
     if (realActive != null) {
       entry.setActive(realActive);
@@ -148,17 +101,8 @@ public class ScepUpdateCmd extends CaAction {
       entry.setCa(new NameId(null, caName));
     }
 
-    if (responderType != null) {
-      entry.setResponderType(responderType);
-    }
-
-    String conf = getResponderConf();
-    if (conf != null) {
-      entry.setResponderConf(conf);
-    }
-
-    if (certConf != null) {
-      entry.setBase64Cert(certConf);
+    if (responderName != null) {
+      entry.setResponderName(responderName);
     }
 
     if (CollectionUtil.isNonEmpty(profiles)) {

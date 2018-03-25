@@ -177,9 +177,7 @@
   <xs:complexType name="scepType">
     <xs:sequence>
       <xs:element name="caName" type="xs:string"/>
-      <xs:element name="responderType" type="xs:string"/>
-      <xs:element name="responderConf" type="fileOrValueType"/>
-      <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>
+      <xs:element name="responderName" type="xs:string"/>
       <xs:element name="profiles" type="stringsType"/>
       <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>

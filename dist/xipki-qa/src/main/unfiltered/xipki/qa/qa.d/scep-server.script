@@ -26,8 +26,10 @@ ca:enroll-cert --ca subcawithcrl1 --csr output/scep1.csr --out output/scep1.der 
 
 xi:update-cert-p12 --p12 output/scep1.p12 --password 1234 --cert output/scep1.der
 
+ca:responder-add --name scep-responder1 --signer-type PKCS12 \
+  --signer-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/scep1.p12,algo=SHA256withRSA
+
 # with encrypted password 1234
-ca:scep-add --name scep1 --ca subcawithcrl1 --profile all --resp-type PKCS12 \
-  --resp-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/scep1.p12 \
+ca:scep-add --name scep1 --ca subcawithcrl1 --profile all --responder scep-responder1 \
   --control cacert.included=false,signercert.included=true,support.getcrl=true
 

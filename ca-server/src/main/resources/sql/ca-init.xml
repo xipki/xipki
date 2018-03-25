@@ -92,14 +92,10 @@
       <column name="CA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
+      <column name="RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="PROFILES" type="VARCHAR(200)"/>
       <!-- CONTROL is reserved for future, will currently not be used -->
       <column name="CONTROL" type="VARCHAR(400)"/>
-      <column name="RESPONDER_TYPE" type="VARCHAR(100)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="RESPONDER_CERT" type="VARCHAR(4000)"/>
-      <column name="RESPONDER_CONF" type="CLOB"/>
     </createTable>
     <!-- table ENVIRONMENT -->
     <createTable tableName="ENVIRONMENT">
@@ -552,6 +548,11 @@
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="SCEP"
       referencedColumnNames="ID" referencedTableName="CA"/>
+    <addForeignKeyConstraint constraintName="FK_SCEP_RESPONDER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="RESPONDER_NAME" baseTableName="SCEP"
+      referencedColumnNames="NAME" referencedTableName="RESPONDER"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="4">

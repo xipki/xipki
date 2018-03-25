@@ -35,6 +35,12 @@
         <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server.p12,algo=SHA256withRSA</value>
       </conf>
     </responder>
+    <responder name="scep-responder1">
+      <type>PKCS12</type>
+      <conf>
+        <value>password=1234,keystore=file:xipki/setup/keycerts/scep1.p12,algo=SHA256withRSA</value>
+      </conf>
+    </responder>
   </responders>
   <crlsigners>
     <crlsigner name="casign-crlsigner">
@@ -156,10 +162,7 @@
   <sceps>
     <scep name="scep1">
       <caName>myca1</caName>
-      <responderType>PKCS12</responderType>
-      <responderConf>
-        <value>password=1234,keystore=file:xipki/setup/keycerts/scep1.p12</value>
-      </responderConf>
+      <responderName>scep-responder1</responderName>
       <profiles>
         <str>all</str>
       </profiles>

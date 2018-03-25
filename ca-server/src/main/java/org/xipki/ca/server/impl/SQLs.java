@@ -87,8 +87,7 @@ class SQLs {
         "NEXT_CRLNO FROM CA WHERE ID=?");
 
     this.sqlSelectScep = datasource.buildSelectFirstSql(1,
-        "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF"
-        + " FROM SCEP WHERE NAME=?");
+        "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_NAME FROM SCEP WHERE NAME=?");
 
     this.sqlSelectSystemEvent = datasource.buildSelectFirstSql(1,
         "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");

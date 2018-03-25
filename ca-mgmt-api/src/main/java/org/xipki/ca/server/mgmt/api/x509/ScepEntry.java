@@ -17,19 +17,14 @@
 
 package org.xipki.ca.server.mgmt.api.x509;
 
-import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.SignerConf;
-import org.xipki.security.util.X509Util;
 
 /**
  * TODO.
@@ -38,8 +33,6 @@ import org.xipki.security.util.X509Util;
  */
 
 public class ScepEntry {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ScepEntry.class);
 
   private final String name;
 
@@ -51,40 +44,17 @@ public class ScepEntry {
 
   private final String control;
 
-  private final String responderType;
+  private final String responderName;
 
-  private final String base64Cert;
-
-  private String responderConf;
-
-  private X509Certificate cert;
-
-  private boolean certFaulty;
-
-  private boolean confFaulty;
-
-  public ScepEntry(String name, NameId caIdent, boolean active, String responderType,
-      String responderConf, String base64Cert, Set<String> certProfiles, String control)
-      throws InvalidConfException {
+  public ScepEntry(String name, NameId caIdent, boolean active, String responderName,
+      Set<String> certProfiles, String control) throws InvalidConfException {
     this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     this.caIdent = ParamUtil.requireNonNull("caIdent", caIdent);
     this.active = active;
-    this.responderType = ParamUtil.requireNonBlank("responderType", responderType);
+    this.responderName = ParamUtil.requireNonBlank("responderName", responderName);
     this.certProfiles = CollectionUtil.unmodifiableSet(
         CollectionUtil.toLowerCaseSet(certProfiles));
-    this.base64Cert = base64Cert;
-    this.responderConf = responderConf;
     this.control = control;
-
-    if (this.base64Cert != null) {
-      try {
-        this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-      } catch (Throwable th) {
-        LOG.debug("could not parse the cert of SCEP responder for CA '"
-            + caIdent + "'");
-        certFaulty = true;
-      }
-    }
   }
 
   public String getName() {
@@ -95,14 +65,6 @@ public class ScepEntry {
     return active;
   }
 
-  public X509Certificate getCert() {
-    return cert;
-  }
-
-  public String getBase64Cert() {
-    return base64Cert;
-  }
-
   public Set<String> getCertProfiles() {
     return certProfiles;
   }
@@ -111,57 +73,30 @@ public class ScepEntry {
     return control;
   }
 
-  public String getResponderType() {
-    return responderType;
-  }
-
-  public void setResponderConf(String conf) {
-    this.responderConf = conf;
-  }
-
-  public String getResponderConf() {
-    return responderConf;
-  }
-
-  public boolean isFaulty() {
-    return certFaulty || confFaulty;
-  }
-
-  public void setConfFaulty(boolean faulty) {
-    this.confFaulty = faulty;
+  public String getResponderName() {
+    return responderName;
   }
 
   public NameId getCaIdent() {
     return caIdent;
   }
 
-  public void setCert(X509Certificate cert) {
-    if (base64Cert != null) {
-      throw new IllegalStateException("cert is already specified by base64Cert");
-    }
-    this.cert = cert;
-  }
-
   @Override
   public String toString() {
-    return toString(false);
+    return toString(true);
   }
 
-  public String toString(boolean verbose) {
-    return toString(verbose, true);
-  }
-
-  public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
+  public String toString(boolean ignoreSensitiveInfo) {
     return StringUtil.concatObjects("ca: ", caIdent, "\nactive: ", active,
-        "\nfaulty: ", isFaulty(), "\nresponderType: ", responderType,
-        "\nresponderConf: ", (responderConf == null ? "null"
-            : SignerConf.toString(responderConf, verbose, ignoreSensitiveInfo)),
-        "\ncontrol: ", control,
-        "\ncert\n", InternUtil.formatCert(cert, verbose));
+        "\nresponderName: ", responderName, "\ncontrol: ", control);
   } // method toString
 
   @Override
   public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+
     if (!(obj instanceof ScepEntry)) {
       return false;
     }
@@ -175,11 +110,7 @@ public class ScepEntry {
       return false;
     }
 
-    if (!responderType.equals(objB.responderType)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(responderConf, objB.responderConf)) {
+    if (!responderName.equals(objB.responderName)) {
       return false;
     }
 
@@ -187,11 +118,7 @@ public class ScepEntry {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(base64Cert, objB.base64Cert)) {
-      return false;
-    }
-
-    return false;
+    return true;
   }
 
   @Override

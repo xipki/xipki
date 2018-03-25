@@ -1196,12 +1196,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         continue;
       }
 
-      scepDb.setConfFaulty(true);
       scepDbEntries.put(name, scepDb);
 
       try {
         ScepImpl scep = new ScepImpl(scepDb, this);
-        scepDb.setConfFaulty(false);
         sceps.put(name, scep);
       } catch (CaMgmtException ex) {
         LogUtil.error(LOG, ex, concat("could not initialize SCEP entry ", name, ", ignore it"));
@@ -1805,6 +1803,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     ResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
         base64Cert, this, securityFactory);
+
+    // Update SCEP
 
     responders.remove(name);
     responderDbEntries.remove(name);
@@ -2799,15 +2799,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new CaMgmtException(msg);
     }
 
-    String conf = dbEntry.getResponderConf();
-    if (conf != null) {
-      String newConf = canonicalizeSignerConf(dbEntry.getResponderType(), conf, null,
-          securityFactory);
-      if (!conf.equals(newConf)) {
-        dbEntry.setResponderConf(newConf);
-      }
-    }
-
     dbEntry.getCaIdent().setId(caIdent.getId());
 
     ScepImpl scep = new ScepImpl(dbEntry, this);
@@ -2832,12 +2823,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     String name = scepEntry.getName();
     NameId caId = scepEntry.getCaIdent();
     Boolean active = scepEntry.getActive();
-    String type = scepEntry.getResponderType();
-    String conf = scepEntry.getResponderConf();
-    String base64Cert = scepEntry.getBase64Cert();
+    String responderName = scepEntry.getResponderName();
     String control = scepEntry.getControl();
 
-    if (caId == null && type == null && conf == null && base64Cert == null && control == null) {
+    if (caId == null && responderName == null && control == null) {
       throw new IllegalArgumentException("nothing to change or SCEP " + name);
     }
 
@@ -2849,7 +2838,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    ScepImpl scep = queryExecutor.changeScep(name, caId, active, type, conf, base64Cert,
+    ScepImpl scep = queryExecutor.changeScep(name, caId, active, responderName,
         scepEntry.getCertProfiles(), control, this, securityFactory);
     if (scep == null) {
       throw new CaMgmtException("could not chagne SCEP " + name);
@@ -3622,33 +3611,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
       }
 
-      // responders
-      if (CollectionUtil.isNonEmpty(responderDbEntries)) {
-        List<ResponderType> list = new LinkedList<>();
-
-        for (String name : responderDbEntries.keySet()) {
-          if (!includeResponderNames.contains(name)) {
-            continue;
-          }
-
-          ResponderEntry entry = responderDbEntries.get(name);
-          ResponderType jaxb = new ResponderType();
-          jaxb.setName(name);
-          jaxb.setType(entry.getType());
-          jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/responder-", name, ".conf")));
-          jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
-              concat("files/responder-", name, ".der")));
-
-          list.add(jaxb);
-        }
-
-        if (!list.isEmpty()) {
-          root.setResponders(new CAConfType.Responders());
-          root.getResponders().getResponder().addAll(list);
-        }
-      }
-
       // environments
       Set<String> names = envParameterResolver.allParameterNames();
       if (CollectionUtil.isNonEmpty(names)) {
@@ -3777,14 +3739,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             continue;
           }
 
+          String responderName = entry.getResponderName();
+          includeResponderNames.add(responderName);
+
           ScepType jaxb = new ScepType();
           jaxb.setName(name);
           jaxb.setCaName(caName);
-          jaxb.setResponderType(entry.getResponderType());
-          jaxb.setResponderConf(createFileOrValue(zipStream, entry.getResponderConf(),
-              concat("files/scep-", name, ".conf")));
-          jaxb.setResponderCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
-              concat("files/scep-", name, ".der")));
+          jaxb.setResponderName(responderName);
           jaxb.setProfiles(createStrings(entry.getCertProfiles()));
           jaxb.setControl(entry.getControl());
 
@@ -3794,6 +3755,33 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         if (!list.isEmpty()) {
           root.setSceps(new CAConfType.Sceps());
           root.getSceps().getScep().addAll(list);
+        }
+      }
+
+      // responders
+      if (CollectionUtil.isNonEmpty(responderDbEntries)) {
+        List<ResponderType> list = new LinkedList<>();
+
+        for (String name : responderDbEntries.keySet()) {
+          if (!includeResponderNames.contains(name)) {
+            continue;
+          }
+
+          ResponderEntry entry = responderDbEntries.get(name);
+          ResponderType jaxb = new ResponderType();
+          jaxb.setName(name);
+          jaxb.setType(entry.getType());
+          jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+              concat("files/responder-", name, ".conf")));
+          jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
+              concat("files/responder-", name, ".der")));
+
+          list.add(jaxb);
+        }
+
+        if (!list.isEmpty()) {
+          root.setResponders(new CAConfType.Responders());
+          root.getResponders().getResponder().addAll(list);
         }
       }
 

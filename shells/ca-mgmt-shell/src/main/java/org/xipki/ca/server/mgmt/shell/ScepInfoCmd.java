@@ -20,7 +20,6 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
@@ -43,10 +42,6 @@ public class ScepInfoCmd extends CaAction {
   @Completion(ScepNameCompleter.class)
   private String name;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show CA information verbosely")
-  private Boolean verbose = Boolean.FALSE;
-
   @Override
   protected Object execute0() throws Exception {
     if (name == null) {
@@ -56,7 +51,7 @@ public class ScepInfoCmd extends CaAction {
       if (scep == null) {
         throw new CmdFailure("could not find SCEP '" + name + "'");
       }
-      println(scep.toString(verbose.booleanValue()));
+      println(scep.toString());
     }
 
     return null;
