@@ -721,8 +721,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     datasource.dropIndex(null, "CERT", "IDX_CA_FPS");
     datasource.dropIndex(null, "CERT", "IDX_CA_FPRS");
 
-    datasource.dropUniqueConstrain(null, "CONST_USER_NAME", "TUSER");
-
     datasource.dropForeignKeyConstraint(null, "FK_CERT_CA1", "CERT");
     datasource.dropForeignKeyConstraint(null, "FK_CERT_USER1", "CERT");
 
@@ -734,15 +732,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     datasource.dropForeignKeyConstraint(null, "FK_REQCERT_REQ1", "REQCERT");
     datasource.dropForeignKeyConstraint(null, "FK_REQCERT_CERT1", "REQCERT");
 
-    datasource.dropForeignKeyConstraint(null, "FK_CA_HAS_USER_USER1", "CA_HAS_USER");
-    datasource.dropForeignKeyConstraint(null, "FK_CA_HAS_USER_CA1", "CA_HAS_USER");
-
     datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
     datasource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
     datasource.dropPrimaryKey(null, "PK_REQUEST", "REQUEST");
     datasource.dropPrimaryKey(null, "PK_REQCERT", "REQCERT");
-    datasource.dropPrimaryKey(null, "PK_TUSER", "TUSER");
-    datasource.dropPrimaryKey(null, "PK_CA_HAS_USER", "CA_HAS_USER");
 
     long duration = (System.currentTimeMillis() - start) / 1000;
     System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
@@ -754,8 +747,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
     datasource.addPrimaryKey(null, "PK_REQUEST", "REQUEST", "ID");
     datasource.addPrimaryKey(null, "PK_REQCERT", "REQCERT", "ID");
-    datasource.addPrimaryKey(null, "PK_TUSER", "TUSER", "ID");
-    datasource.addPrimaryKey(null, "PK_CA_HAS_USER", "CA_HAS_USER", "ID");
 
     datasource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
         "CID", "CERT", "ID", "CASCADE", "NO ACTION");
@@ -776,14 +767,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         "CID", "CERT", "ID", "CASCADE", "NO ACTION");
 
     datasource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
-
-    datasource.addForeignKeyConstraint(null, "FK_CA_HAS_USER_USER1", "CA_HAS_USER",
-        "USER_ID", "TUSER", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addForeignKeyConstraint(null, "FK_CA_HAS_USER_CA1", "CA_HAS_USER",
-        "CA_ID", "CA", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addUniqueConstrain(null, "CONST_USER_NAME", "TUSER", "NAME");
 
     datasource.createIndex(null, "IDX_CA_FPK", "CERT", "CA_ID", "FP_K");
     datasource.createIndex(null, "IDX_CA_FPS", "CERT", "CA_ID", "FP_S");
