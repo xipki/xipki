@@ -22,12 +22,13 @@
   <reference id="responderManager"
       interface="org.xipki.ca.server.api.ResponderManager"/>
 
-  <!-- CMP servlet -->
-  <bean id="cmpServlet" class="org.xipki.ca.server.servlet.HttpCmpServlet">
+  <bean id="servletHelper" class="org.xipki.ca.server.servlet.ServletHelper">
     <property name="responderManager" ref="responderManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
 
+  <!-- CMP servlet -->
+  <bean id="cmpServlet" class="org.xipki.ca.server.servlet.HttpCmpServlet"/>
   <service ref="cmpServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="/cmp/*"/>
@@ -35,10 +36,7 @@
   </service>
 
   <!-- REST servlet -->
-  <bean id="restServlet" class="org.xipki.ca.server.servlet.HttpRestServlet">
-    <property name="responderManager" ref="responderManager"/>
-    <property name="auditServiceRegister" ref="auditServiceRegister"/>
-  </bean>
+  <bean id="restServlet" class="org.xipki.ca.server.servlet.HttpRestServlet"/>
   <service ref="restServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="/rest/*"/>
@@ -46,10 +44,7 @@
   </service>
 
   <!-- SCEP servlet -->
-  <bean id="scepServlet" class="org.xipki.ca.server.servlet.HttpScepServlet">
-    <property name="responderManager" ref="responderManager"/>
-    <property name="auditServiceRegister" ref="auditServiceRegister"/>
-  </bean>
+  <bean id="scepServlet" class="org.xipki.ca.server.servlet.HttpScepServlet"/>
   <service ref="scepServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="/scep/*"/>
@@ -57,9 +52,7 @@
   </service>
 
   <!-- Health servlet -->
-  <bean id="healthServlet" class="org.xipki.ca.server.servlet.HealthCheckServlet">
-    <property name="responderManager" ref="responderManager"/>
-  </bean>
+  <bean id="healthServlet" class="org.xipki.ca.server.servlet.HealthCheckServlet"/>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="/health/*"/>

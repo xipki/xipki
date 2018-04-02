@@ -59,16 +59,26 @@ public class HttpCmpServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/pkixcmp";
 
-  private ResponderManager responderManager;
-
-  private AuditServiceRegister auditServiceRegister;
-
   public HttpCmpServlet() {
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+    AuditServiceRegister auditServiceRegister = ServletHelper.getAuditServiceRegister();
+    if (auditServiceRegister == null) {
+      LOG.error("ServletHelper.auditServiceRegister not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    ResponderManager responderManager = ServletHelper.getResponderManager();
+    if (responderManager == null) {
+      LOG.error("ServletHelper.responderManager not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
     X509Certificate clientCert = ClientCertCache.getTlsClientCert(req);
     AuditService auditService = auditServiceRegister.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
@@ -80,13 +90,6 @@ public class HttpCmpServlet extends HttpServlet {
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;
     try {
-      if (responderManager == null) {
-        String message = "responderManager in servlet not configured";
-        LOG.error(message);
-        throw new HttpRespAuditException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-            message, AuditLevel.ERROR, AuditStatus.FAILED);
-      }
-
       String reqContentType = req.getHeader("Content-Type");
       if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
         String message = "unsupported media type " + reqContentType;
@@ -160,14 +163,6 @@ public class HttpCmpServlet extends HttpServlet {
       audit(auditService, event, auditLevel, auditStatus, auditMessage);
     }
   } // method service
-
-  public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager = responderManager;
-  }
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = auditServiceRegister;
-  }
 
   private static void audit(AuditService auditService, AuditEvent event,
       AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {

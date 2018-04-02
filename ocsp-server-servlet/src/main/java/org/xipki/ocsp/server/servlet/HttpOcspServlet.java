@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspServer;
@@ -56,19 +55,21 @@ public class HttpOcspServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/ocsp-response";
 
-  private OcspServer server;
-
   public HttpOcspServlet() {
-  }
-
-  public void setServer(OcspServer server) {
-    this.server = ParamUtil.requireNonNull("server", server);
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+    OcspServer server = ServletHelper.getServer();
+
     try {
+      if (server == null) {
+        LOG.error("ServletHelper.server not configured");
+        sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        return;
+      }
+
       String path = StringUtil.getRelativeRequestUri(req.getServletPath(),
           req.getRequestURI());
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
@@ -120,6 +121,13 @@ public class HttpOcspServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+    OcspServer server = ServletHelper.getServer();
+    if (server == null) {
+      LOG.error("server in servlet not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
     String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
     ResponderAndPath responderAndPath = server.getResponderForPath(path);
     if (responderAndPath == null) {

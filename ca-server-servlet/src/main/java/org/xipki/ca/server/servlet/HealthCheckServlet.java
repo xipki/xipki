@@ -31,7 +31,6 @@ import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.X509CaCmpResponder;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -48,13 +47,7 @@ public class HealthCheckServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/json";
 
-  private ResponderManager responderManager;
-
   public HealthCheckServlet() {
-  }
-
-  public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
   }
 
   @Override
@@ -62,13 +55,14 @@ public class HealthCheckServlet extends HttpServlet {
       throws ServletException, IOException {
     resp.setHeader("Access-Control-Allow-Origin", "*");
 
-    try {
-      if (responderManager == null) {
-        LOG.error("responderManager in servlet is not configured");
-        sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        return;
-      }
+    ResponderManager responderManager = ServletHelper.getResponderManager();
+    if (responderManager == null) {
+      LOG.error("ServletHelper.responderManager not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
 
+    try {
       String caName = null;
       X509CaCmpResponder responder = null;
 

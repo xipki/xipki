@@ -72,10 +72,6 @@ public class HttpScepServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
-  private AuditServiceRegister auditServiceRegister;
-
-  private ResponderManager responderManager;
-
   public HttpScepServlet() {
   }
 
@@ -93,6 +89,20 @@ public class HttpScepServlet extends HttpServlet {
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws ServletException, IOException {
+    AuditServiceRegister auditServiceRegister = ServletHelper.getAuditServiceRegister();
+    if (auditServiceRegister == null) {
+      LOG.error("ServletHelper.auditServiceRegister not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    ResponderManager responderManager = ServletHelper.getResponderManager();
+    if (responderManager == null) {
+      LOG.error("ServletHelper.responderManager not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
     String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
 
     String scepName = null;
@@ -130,15 +140,6 @@ public class HttpScepServlet extends HttpServlet {
     String auditMessage = null;
 
     try {
-      if (responderManager == null) {
-        auditMessage = "responderManager in servlet not configured";
-        LOG.error(auditMessage);
-        auditLevel = AuditLevel.ERROR;
-        auditStatus = AuditStatus.FAILED;
-        sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        return;
-      }
-
       Scep responder = responderManager.getScep(scepName);
       if (responder == null || !responder.isOnService()
           || !responder.supportsCertProfile(certProfileName)) {
@@ -281,14 +282,6 @@ public class HttpScepServlet extends HttpServlet {
       }
     }
   } // method generatePKIMessage
-
-  public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager = responderManager;
-  }
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = auditServiceRegister;
-  }
 
   private static void audit(AuditService auditService, AuditEvent event,
       AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {

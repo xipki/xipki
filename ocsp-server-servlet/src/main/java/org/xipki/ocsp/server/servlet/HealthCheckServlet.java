@@ -47,27 +47,23 @@ public class HealthCheckServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/json";
 
-  private OcspServer server;
-
   public HealthCheckServlet() {
-  }
-
-  public void setServer(final OcspServer server) {
-    this.server = server;
   }
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException {
     resp.setHeader("Access-Control-Allow-Origin", "*");
-    try {
-      if (server == null) {
-        LOG.error("server in servlet not configured");
-        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        resp.setContentLength(0);
-        return;
-      }
 
+    OcspServer server = ServletHelper.getServer();
+    if (server == null) {
+      LOG.error("ServletHelper.server not configured");
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      resp.setContentLength(0);
+      return;
+    }
+
+    try {
       String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
 
       ResponderAndPath responderAndPath = server.getResponderForPath(path);

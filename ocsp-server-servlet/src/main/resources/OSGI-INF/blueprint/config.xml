@@ -18,10 +18,12 @@
 
   <reference id="ocspServer" interface="org.xipki.ocsp.api.OcspServer"/>
 
-  <!-- OCSP servlet -->
-  <bean id="ocspServlet" class="org.xipki.ocsp.server.servlet.HttpOcspServlet">
+  <bean id="servletHelper" class="org.xipki.ocsp.server.servlet.ServletHelper">
     <property name="server" ref="ocspServer"/>
   </bean>
+
+  <!-- OCSP servlet -->
+  <bean id="ocspServlet" class="org.xipki.ocsp.server.servlet.HttpOcspServlet"/>
   <service ref="ocspServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="/ocsp/*"/>
@@ -29,9 +31,7 @@
   </service>
 
   <!-- Health servlet -->
-  <bean id="healthServlet" class="org.xipki.ocsp.server.servlet.HealthCheckServlet">
-    <property name="server" ref="ocspServer"/>
-  </bean>
+  <bean id="healthServlet" class="org.xipki.ocsp.server.servlet.HealthCheckServlet"/>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="/ocsphealth/*"/>

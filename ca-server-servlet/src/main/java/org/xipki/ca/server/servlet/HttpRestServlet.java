@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
@@ -42,12 +44,9 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class HttpRestServlet extends HttpServlet {
+  private static Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
   private static final long serialVersionUID = 1L;
-
-  private ResponderManager responderManager;
-
-  private AuditServiceRegister auditServiceRegister;
 
   public HttpRestServlet() {
   }
@@ -66,6 +65,20 @@ public class HttpRestServlet extends HttpServlet {
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws IOException {
+    AuditServiceRegister auditServiceRegister = ServletHelper.getAuditServiceRegister();
+    if (auditServiceRegister == null) {
+      LOG.error("ServletHelper.auditServiceRegister not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    ResponderManager responderManager = ServletHelper.getResponderManager();
+    if (responderManager == null) {
+      LOG.error("ServletHelper.responderManager not configured");
+      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+
     AuditService auditService = auditServiceRegister.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     try {
@@ -98,12 +111,9 @@ public class HttpRestServlet extends HttpServlet {
     }
   } // method service
 
-  public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager = responderManager;
-  }
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = auditServiceRegister;
+  private static void sendError(HttpServletResponse resp, int status) {
+    resp.setStatus(status);
+    resp.setContentLength(0);
   }
 
 }
