@@ -54,7 +54,7 @@ import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
 
 /**
- * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.ext
+ * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
  *
  * @author Lijun Liao
  * @since 3.0.1
