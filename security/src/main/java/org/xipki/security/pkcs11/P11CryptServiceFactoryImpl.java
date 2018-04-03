@@ -26,6 +26,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.exception.P11TokenException;
@@ -94,7 +95,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
   }
 
   public void setPkcs11ConfFile(String confFile) {
-    this.pkcs11ConfFile = StringUtil.isBlank(confFile) ? null : confFile;
+    if (StringUtil.isBlank(confFile)) {
+      this.pkcs11ConfFile = null;
+    } else {
+      this.pkcs11ConfFile = IoUtil.expandFilepath(confFile);
+    }
   }
 
   public void setPasswordResolver(PasswordResolver passwordResolver) {
