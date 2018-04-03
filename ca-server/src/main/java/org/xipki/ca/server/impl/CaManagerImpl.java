@@ -339,7 +339,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private final RestImpl rest;
 
-  private String caConfFile;
+  private Properties caConfProperties;
 
   private boolean caSystemSetuped;
 
@@ -442,18 +442,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     if (x509CertPublisherFactoryRegister == null) {
       throw new IllegalStateException("x509CertPublisherFactoryRegister is not set");
     }
-    if (caConfFile == null) {
-      throw new IllegalStateException("caConfFile is not set");
+    if (caConfProperties == null) {
+      throw new IllegalStateException("caConfProperties is not set");
     }
 
-    Properties caConfProps = new Properties();
-    try {
-      caConfProps.load(new FileInputStream(IoUtil.expandFilepath(caConfFile)));
-    } catch (IOException ex) {
-      throw new CaMgmtException("could not parse CA configuration" + caConfFile, ex);
-    }
-
-    String caModeStr = caConfProps.getProperty("ca.mode");
+    String caModeStr = caConfProperties.getProperty("ca.mode");
     if (caModeStr != null) {
       if ("slave".equalsIgnoreCase(caModeStr)) {
         masterMode = false;
@@ -467,7 +460,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     int shardId;
-    String shardIdStr = caConfProps.getProperty("ca.shardId");
+    String shardIdStr = caConfProperties.getProperty("ca.shardId");
     if (StringUtil.isBlank(shardIdStr)) {
       throw new CaMgmtException("ca.shardId is not set");
     }
@@ -485,13 +478,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     if (this.datasources == null) {
       this.datasources = new ConcurrentHashMap<>();
-      for (Object objKey : caConfProps.keySet()) {
+      for (Object objKey : caConfProperties.keySet()) {
         String key = (String) objKey;
         if (!StringUtil.startsWithIgnoreCase(key, "datasource.")) {
           continue;
         }
 
-        String datasourceFile = caConfProps.getProperty(key);
+        String datasourceFile = caConfProperties.getProperty(key);
         try {
           String datasourceName = key.substring("datasource.".length());
           DataSourceWrapper datasource = datasourceFactory.createDataSourceForFile(
@@ -2101,12 +2094,24 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     envParameterResolver.addParameter(name, value);
   } // method changeEnvParam
 
-  public String getCaConfFile() {
-    return caConfFile;
+  public Properties getCaConfProperties() {
+    return caConfProperties;
+  }
+
+  public void setCaConfProperties(Properties caConfProperties) {
+    this.caConfProperties = ParamUtil.requireNonNull("caConfProperties", caConfProperties);
   }
 
   public void setCaConfFile(String caConfFile) {
-    this.caConfFile = caConfFile;
+    ParamUtil.requireNonBlank("caConfFile", caConfFile);
+
+    Properties caConfProps = new Properties();
+    try {
+      caConfProps.load(new FileInputStream(IoUtil.expandFilepath(caConfFile)));
+    } catch (IOException ex) {
+      throw new IllegalArgumentException("could not parse CA configuration" + caConfFile, ex);
+    }
+    this.caConfProperties = caConfProps;
   }
 
   @Override
