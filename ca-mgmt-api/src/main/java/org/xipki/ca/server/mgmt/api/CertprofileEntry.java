@@ -85,16 +85,19 @@ public class CertprofileEntry {
       return false;
     }
 
-    CertprofileEntry objB = (CertprofileEntry) obj;
-    if (!ident.equals(objB.ident)) {
+    return equals((CertprofileEntry) obj, false);
+  }
+
+  public boolean equals(CertprofileEntry obj, boolean ignoreId) {
+    if (!ident.equals(obj.ident, ignoreId)) {
       return false;
     }
 
-    if (!type.equals(objB.type)) {
+    if (!type.equals(obj.type)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(conf, objB.conf)) {
+    if (!CompareUtil.equalsObject(conf, obj.conf)) {
       return false;
     }
 

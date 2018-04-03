@@ -277,60 +277,63 @@ public class CaEntry {
       return false;
     }
 
-    CaEntry objB = (CaEntry) obj;
-    if (!ident.equals(objB.ident)) {
+    return equals((CaEntry) obj);
+  }
+
+  public boolean equals(CaEntry obj, boolean ignoreDynamicFields, boolean ignoreId) {
+    if (!ident.equals(obj.ident, ignoreId)) {
       return false;
     }
 
-    if (!signerType.equals(objB.signerType)) {
+    if (!signerType.equals(obj.signerType)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(status, objB.status)) {
+    if (!CompareUtil.equalsObject(status, obj.status)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(maxValidity, objB.maxValidity)) {
+    if (!CompareUtil.equalsObject(maxValidity, obj.maxValidity)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(cmpControlName, objB.cmpControlName)) {
+    if (!CompareUtil.equalsObject(cmpControlName, obj.cmpControlName)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(responderName, objB.responderName)) {
+    if (!CompareUtil.equalsObject(responderName, obj.responderName)) {
       return false;
     }
 
-    if (duplicateKeyPermitted != objB.duplicateKeyPermitted) {
+    if (duplicateKeyPermitted != obj.duplicateKeyPermitted) {
       return false;
     }
 
-    if (duplicateSubjectPermitted != objB.duplicateSubjectPermitted) {
+    if (duplicateSubjectPermitted != obj.duplicateSubjectPermitted) {
       return false;
     }
 
-    if (saveRequest != objB.saveRequest) {
+    if (saveRequest != obj.saveRequest) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(validityMode, objB.validityMode)) {
+    if (!CompareUtil.equalsObject(validityMode, obj.validityMode)) {
       return false;
     }
 
-    if (permission != objB.permission) {
+    if (permission != obj.permission) {
       return false;
     }
 
-    if (expirationPeriod != objB.expirationPeriod) {
+    if (expirationPeriod != obj.expirationPeriod) {
       return false;
     }
 
-    if (keepExpiredCertInDays != objB.keepExpiredCertInDays) {
+    if (keepExpiredCertInDays != obj.keepExpiredCertInDays) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(extraControl, objB.extraControl)) {
+    if (!CompareUtil.equalsObject(extraControl, obj.extraControl)) {
       return false;
     }
 

@@ -54,6 +54,27 @@ public class UserEntry {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if  (!(obj instanceof UserEntry)) {
+      return false;
+    }
+
+    return equals((UserEntry) obj, false);
+  }
+
+  public boolean equals(UserEntry obj, boolean ignoreId) {
+    if (!ident.equals(obj.ident, ignoreId)) {
+      return false;
+    }
+
+    if (!hashedPassword.equals(obj.hashedPassword)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
   public String toString() {
     return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nactive: ", active, "\npassword: *****\n");

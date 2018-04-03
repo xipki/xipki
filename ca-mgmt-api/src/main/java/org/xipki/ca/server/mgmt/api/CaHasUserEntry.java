@@ -75,17 +75,23 @@ public class CaHasUserEntry {
       return false;
     }
 
-    CaHasUserEntry objB = (CaHasUserEntry) obj;
+    return equals((CaHasUserEntry) obj, false);
+  }
 
-    if (!userIdent.equals(objB.userIdent)) {
+  public boolean equals(CaHasUserEntry obj, boolean ignoreId) {
+    if (obj == null) {
       return false;
     }
 
-    if (permission != objB.permission) {
+    if (!userIdent.equals(obj.userIdent, ignoreId)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
+    if (permission != obj.permission) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(profiles, obj.profiles)) {
       return false;
     }
 

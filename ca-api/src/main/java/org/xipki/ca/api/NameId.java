@@ -65,6 +65,18 @@ public class NameId {
     return CompareUtil.equalsObject(id, other.id) && name.equals(other.name);
   }
 
+  public boolean equals(NameId obj, boolean ignoreId) {
+    if (obj == null) {
+      return false;
+    }
+
+    if (!name.equals(obj.name)) {
+      return false;
+    }
+
+    return ignoreId ? true : CompareUtil.equalsObject(id, obj.id);
+  }
+
   @Override
   public int hashCode() {
     int ret = name.hashCode();

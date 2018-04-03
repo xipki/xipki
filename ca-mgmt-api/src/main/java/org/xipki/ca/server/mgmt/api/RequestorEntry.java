@@ -112,12 +112,15 @@ public class RequestorEntry {
       return false;
     }
 
-    RequestorEntry objB = (RequestorEntry) obj;
-    if (!ident.equals(objB.ident)) {
+    return equals((RequestorEntry) obj, false);
+  }
+
+  public boolean equals(RequestorEntry obj, boolean ignoreId) {
+    if (!ident.equals(obj.ident, ignoreId)) {
       return false;
     }
 
-    if (!base64Cert.equals(objB.base64Cert)) {
+    if (!base64Cert.equals(obj.base64Cert)) {
       return false;
     }
     return true;

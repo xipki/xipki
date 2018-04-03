@@ -3063,12 +3063,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
+    final boolean ignoreId = true;
     // Requestor
     for (String name : conf.getRequestorNames()) {
       RequestorEntry entry = conf.getRequestor(name);
       RequestorEntry entryB = requestorDbEntries.get(name);
       if (entryB != null) {
-        if (entry.equals(entryB)) {
+        if (entry.equals(entryB, ignoreId)) {
           LOG.info("ignore existed CMP requestor {}", name);
           continue;
         } else {
@@ -3093,7 +3094,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       PublisherEntry entry = conf.getPublisher(name);
       PublisherEntry entryB = publisherDbEntries.get(name);
       if (entryB != null) {
-        if (entry.equals(entryB)) {
+        if (entry.equals(entryB, ignoreId)) {
           LOG.info("ignore existed publisher {}", name);
           continue;
         } else {
@@ -3118,7 +3119,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       CertprofileEntry entry = conf.getCertProfile(name);
       CertprofileEntry entryB = certprofileDbEntries.get(name);
       if (entryB != null) {
-        if (entry.equals(entryB)) {
+        if (entry.equals(entryB, ignoreId)) {
           LOG.info("ignore existed certProfile {}", name);
           continue;
         } else {
@@ -3147,7 +3148,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         boolean equals = false;
         if (obj instanceof UserEntry) {
           UserEntry entry = (UserEntry) obj;
-          equals = entry.equals(entryB);
+          equals = entry.equals(entryB, ignoreId);
         } else {
           AddUserEntry entry = (AddUserEntry) obj;
           equals = PasswordHash.validatePassword(entry.getPassword(), entryB.getHashedPassword());
@@ -3203,7 +3204,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             entry.setCert(signer.getCertificate());
           }
 
-          if (entry.equals(entryB, true)) {
+          if (entry.equals(entryB, true, true)) {
             LOG.info("ignore existed CA {}", caName);
           } else {
             String msg = concat("CA ", caName, " existed, could not re-added it");
@@ -3311,7 +3312,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           }
 
           if (requestorB != null) {
-            if (requestor.equals(requestorB)) {
+            if (requestor.equals(requestorB, ignoreId)) {
               LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
             } else {
               String msg = concat("could not add requestor ", requestorName, " to CA", caName);
@@ -3347,7 +3348,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           }
 
           if (userB != null) {
-            if (user.equals(userB)) {
+            if (user.equals(userB, ignoreId)) {
               LOG.info("ignored adding user {} to CA {}", userName, caName);
             } else {
               String msg = concat("could not add user ", userName, " to CA", caName);
@@ -3373,7 +3374,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       ScepEntry entry = conf.getScep(name);
       ScepEntry entryB = scepDbEntries.get(name);
       if (entryB != null) {
-        if (entry.equals(entryB)) {
+        if (entry.equals(entryB, ignoreId)) {
           LOG.error("ignore existed SCEP {}", name);
           continue;
         } else {

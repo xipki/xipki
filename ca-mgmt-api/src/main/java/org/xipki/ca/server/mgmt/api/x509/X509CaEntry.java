@@ -218,59 +218,57 @@ public class X509CaEntry extends CaEntry {
 
   @Override
   public boolean equals(Object obj) {
-    return equals(obj, false);
-  }
-
-  public boolean equals(Object obj, boolean ignoreDynamicFields) {
     if (! (obj instanceof X509CaEntry)) {
       return false;
     }
 
-    if (!super.equals(obj)) {
+    return equals((X509CaEntry) obj, false, false);
+  }
+
+  public boolean equals(X509CaEntry obj, boolean ignoreDynamicFields, boolean ignoreId) {
+    if (!super.equals(obj, ignoreDynamicFields, ignoreId)) {
       return false;
     }
 
-    X509CaEntry objB = (X509CaEntry) obj;
-
     if (!ignoreDynamicFields) {
-      if (nextCrlNumber != objB.nextCrlNumber) {
+      if (nextCrlNumber != obj.nextCrlNumber) {
         return false;
       }
     }
 
-    if (!CompareUtil.equalsObject(crlUris, objB.crlUris)) {
+    if (!CompareUtil.equalsObject(crlUris, obj.crlUris)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(deltaCrlUris, objB.deltaCrlUris)) {
+    if (!CompareUtil.equalsObject(deltaCrlUris, obj.deltaCrlUris)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(ocspUris, objB.ocspUris)) {
+    if (!CompareUtil.equalsObject(ocspUris, obj.ocspUris)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(caCertUris, objB.caCertUris)) {
+    if (!CompareUtil.equalsObject(caCertUris, obj.caCertUris)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(cert, objB.cert)) {
+    if (!CompareUtil.equalsObject(cert, obj.cert)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(crlSignerName, objB.crlSignerName)) {
+    if (!CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)) {
       return false;
     }
 
-    if (serialNoBitLen != objB.serialNoBitLen) {
+    if (serialNoBitLen != obj.serialNoBitLen) {
       return false;
     }
 
-    if (numCrls != objB.numCrls) {
+    if (numCrls != obj.numCrls) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(revocationInfo, objB.revocationInfo)) {
+    if (!CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)) {
       return false;
     }
 

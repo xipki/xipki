@@ -76,16 +76,19 @@ public class PublisherEntry {
       return false;
     }
 
-    PublisherEntry objB = (PublisherEntry) obj;
-    if (!ident.equals(objB.ident)) {
+    return equals((PublisherEntry) obj, false);
+  }
+
+  public boolean equals(PublisherEntry obj, boolean ignoreId) {
+    if (!ident.equals(obj.ident, ignoreId)) {
       return false;
     }
 
-    if (!type.equals(objB.type)) {
+    if (!type.equals(obj.type)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(conf, objB.conf)) {
+    if (!CompareUtil.equalsObject(conf, obj.conf)) {
       return false;
     }
 

@@ -101,20 +101,27 @@ public class ScepEntry {
       return false;
     }
 
-    ScepEntry objB = (ScepEntry) obj;
-    if (!caIdent.equals(objB.caIdent)) {
+    return equals((ScepEntry) obj, false);
+  }
+
+  public boolean equals(ScepEntry obj, boolean ignoreId) {
+    if (this == obj) {
+      return true;
+    }
+
+    if (!caIdent.equals(obj.caIdent, ignoreId)) {
       return false;
     }
 
-    if (active != objB.active) {
+    if (active != obj.active) {
       return false;
     }
 
-    if (!responderName.equals(objB.responderName)) {
+    if (!responderName.equals(obj.responderName)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(control, objB.control)) {
+    if (!CompareUtil.equalsObject(control, obj.control)) {
       return false;
     }
 

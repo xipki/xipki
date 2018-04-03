@@ -102,20 +102,27 @@ public class CaHasRequestorEntry {
       return false;
     }
 
-    CaHasRequestorEntry objB = (CaHasRequestorEntry) obj;
-    if (ra != objB.ra) {
+    return equals((CaHasRequestorEntry) obj, false);
+  }
+
+  public boolean equals(CaHasRequestorEntry obj, boolean ignoreId) {
+    if (obj == null) {
       return false;
     }
 
-    if (!requestorIdent.equals(objB.requestorIdent)) {
+    if (ra != obj.ra) {
       return false;
     }
 
-    if (permission != objB.permission) {
+    if (!requestorIdent.equals(obj.requestorIdent, ignoreId)) {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
+    if (permission != obj.permission) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(profiles, obj.profiles)) {
       return false;
     }
 
