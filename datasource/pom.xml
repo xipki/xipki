@@ -26,6 +26,9 @@
   <packaging>bundle</packaging>
   <artifactId>datasource</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <Import-Package>com.zaxxer.hikari;version="[2.7,4)",*</Import-Package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
