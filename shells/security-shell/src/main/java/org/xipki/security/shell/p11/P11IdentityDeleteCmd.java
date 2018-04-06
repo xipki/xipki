@@ -43,7 +43,7 @@ public class P11IdentityDeleteCmd extends P11SecurityAction {
     P11Slot slot = getSlot();
     P11ObjectIdentifier objIdentifier = getObjectIdentifier();
     if (objIdentifier == null) {
-      println("identity to be deleted does not exist");
+      println(" unkown identity " + objIdentifier);
       return null;
     }
 
