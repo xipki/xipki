@@ -1162,13 +1162,13 @@ public class X509Ca {
     }
   } // method republishCertificates
 
-  public boolean clearPublishQueue(List<String> publisherNames) throws CaMgmtException {
+  public void clearPublishQueue(List<String> publisherNames) throws CaMgmtException {
     if (publisherNames == null) {
       try {
         certstore.clearPublishQueue(caIdent, null);
-        return true;
       } catch (OperationException ex) {
-        throw new CaMgmtException(ex.getMessage(), ex);
+        throw new CaMgmtException(
+            "could not clear publish queue of CA " + caIdent + ": " + ex.getMessage(), ex);
       }
     }
 
@@ -1177,11 +1177,11 @@ public class X509Ca {
       try {
         certstore.clearPublishQueue(caIdent, publisherIdent);
       } catch (OperationException ex) {
-        throw new CaMgmtException(ex.getMessage(), ex);
+        throw new CaMgmtException(
+            "could not clear publish queue of CA " + caIdent + ": " + ex.getMessage()
+            + " for publisher " + publisherName, ex);
       }
     }
-
-    return true;
   } // method clearPublishQueue
 
   public boolean publishCertsInQueue() {

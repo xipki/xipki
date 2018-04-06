@@ -2343,10 +2343,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new CaMgmtException(concat("could not find CA named ", caName));
     }
 
-    if (ca.clearPublishQueue(publisherNames)) {
-      throw new CaMgmtException("could not clear publisher Queue of CA " + caName
-          + " for publishers " + publisherNames);
-    }
+    ca.clearPublishQueue(publisherNames);
   } // method clearPublishQueue
 
   private void shutdownScheduledThreadPoolExecutor() {
