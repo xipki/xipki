@@ -31,45 +31,35 @@ echo "========================================================"
 KEY_TYPE = ""
 KEY_DIR = ""
 
-if { $SIG_TYPE equals "RSA" } {
+if { $SIG_TYPE equals "RSA" } then {
   KEY_TYPE = "RSA"
   KEY_DIR = "rsa"
   SIGALGO = "${HASH}withRSA"
-}
-
-if { $SIG_TYPE equals "RSAPSS" } {
+} elif { $SIG_TYPE equals "RSAPSS" } then {
   KEY_TYPE = "RSA"
   KEY_DIR = "rsa"
   SIGALGO = "${HASH}withRSAandMGF1"
-}
-
-if { $SIG_TYPE equals "EC" } {
+} elif { $SIG_TYPE equals "EC" } then {
   KEY_TYPE = "EC"
   KEY_DIR = "ec"
   SIGALGO = "${HASH}withECDSA"
-}
-
-if { $SIG_TYPE equals "PLAINEC" } {
+} elif { $SIG_TYPE equals "PLAINEC" } then {
   KEY_TYPE = "EC"
   KEY_DIR = "ec"
   SIGALGO = "${HASH}withPlainECDSA"
-}
-
-if { $SIG_TYPE equals "DSA" } {
+} elif { $SIG_TYPE equals "DSA" } then {
   KEY_TYPE = "DSA"
   KEY_DIR = "dsa"
   SIGALGO = "${HASH}withDSA"
-}
-
-if { $SIG_TYPE equals "SM2" } {
+} elif { $SIG_TYPE equals "SM2" } then {
   KEY_TYPE = "SM2"
   KEY_DIR = "sm2"
   SIGALGO = "${HASH}withSM2"
 }
 
-if { $SIG_TYPE equals "RSAPSS" } {
+if { $SIG_TYPE equals "RSAPSS" } then {
   CMP_SIGALGO = "${STDHASH}withRSAandMGF1"
-} {
+} else {
   CMP_SIGALGO = "${STDHASH}withRSA"
 }
 
@@ -77,85 +67,51 @@ xi:copy-dir xipki/qa/p12/shared output
 
 xi:copy-dir xipki/qa/p12/${KEY_DIR} output
 
-if { $KEY_TYPE equals "RSA" } {
-  if { "$KEYSPEC" equals "" } {
+if { "$KEYSPEC" equals "" } then {
+  if { $KEY_TYPE equals "RSA" } then {
     KEYSPEC = "2048"
-  }
-}
-
-if { $KEY_TYPE equals "EC" } {
-  if { "$KEYSPEC" equals "" } {
+  } elif { $KEY_TYPE equals "EC" } then {
     KEYSPEC = "secp256r1"
-  }
-}
-
-if { $KEY_TYPE equals "DSA" } {
-  if { "$KEYSPEC" equals "" } {
+  } elif { $KEY_TYPE equals "DSA" } then {
     KEYSPEC = "2048"
   }
 }
 
 list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
 
-if { $TOKEN_TYPE equals "PKCS11" } {
+if { $TOKEN_TYPE equals "PKCS11" } then {
   SLOT = "0"
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=ocsp99"
 
   each ($list) {
     xi:delete-key-p11 --force --slot $SLOT --label ${it}
-  }
 
-  if { $KEY_TYPE equals "RSA" } {
-    each ($list) {
+    if { $KEY_TYPE equals "RSA" } then {
       xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label ${it}
-    }
-  }
-
-  if { $KEY_TYPE equals "EC" } {
-    each ($list) {
+    } elif { $KEY_TYPE equals "EC" } then {
       xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label ${it}
-    }
-  }
-
-  if { $KEY_TYPE equals "DSA" } {
-    each ($list) {
+    } elif { $KEY_TYPE equals "DSA" } then {
       xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label ${it}
-    }
-  }
-
-  if { $KEY_TYPE equals "SM2" } {
-    each ($list) {
+    } elif { $KEY_TYPE equals "SM2" } then {
       xi:sm2-p11 --slot $SLOT --label ${it}
     }
   }
 
 }
 
-if { $TOKEN_TYPE equals "PKCS12" } {
+if { $TOKEN_TYPE equals "PKCS12" } then {
 
   OCSP_KEYCONF = "password=1234,keystore=file:output/ocsp99.p12"
 
-  if { $KEY_TYPE equals "RSA" } {
-    each ($list) {
+  each ($list) {
+    if { $KEY_TYPE equals "RSA" } then {
       xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/${it}.p12
-    }
-  }
-
-  if { $KEY_TYPE equals "DSA" } {
-    each ($list) {
+    } elif { $KEY_TYPE equals "DSA" } then {
       xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/${it}.p12
-    }
-  }
-
-  if { $KEY_TYPE equals "EC" } {
-    each ($list) {
+    } elif { $KEY_TYPE equals "EC" } then {
       xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/${it}.p12
-    }
-  }
-
-  if { $KEY_TYPE equals "SM2" } {
-    each ($list) {
+    } elif { $KEY_TYPE equals "SM2" } then {
       xi:sm2-p12 --password 1234 --out output/${it}.p12
     }
   }

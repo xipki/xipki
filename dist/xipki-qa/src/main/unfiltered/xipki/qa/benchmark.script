@@ -22,52 +22,53 @@ printUsage = "false"
 
 argsValid = "false"
 
-if { "$1" equals "" } {
+if { "$1" equals "" } then {
   printUsage = "true"
   argsValid = "true"
-} {
+} else {
   action = $1
-  if { "$action" equals "help" } {
+  if { "$action" equals "help" } then {
     printUsage = "true"
     argsValid = "true"
-  } {
+  } else {
     list = [enroll ocsp revoke]; each ($list) {
-      if { "$action" equals $it } {
+      if { "$action" equals $it } then {
         argsValid = "true"
+        break
       }
     }
   }
 }
 
-if { $argsValid equals "false" } {
+if { $argsValid equals "false" } then {
   echo "invalid arguments $args"
   echo ""
   printUsage = "true"
 }
 
-if { $printUsage equals "true" } {
+if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/qa/benchmark.script <test type> [<durataion> [<threads>]]"
   echo "test type:       enroll, ocsp, revoke"
   echo "duration:        duration in seconds, default is 15"
   echo "threads:         number of threads, default is 5"
-} {
-  if { "$2" equals "" } {
+} else {
+  if { "$2" equals "" } then {
     argsValid = "true"
     duration = "15s"
     threads = 5
-  } {
+  } else {
     argsValid = "true"
     duration = "$2"
-    if { "$3" equals "" } {
+    if { "$3" equals "" } then {
       threads = 5
-    } {
+    } else {
       threads = "$3"
     }
   }
 
-  if { "$action" equals "enroll" } {
+  if { "$action" equals "enroll" } then {
     feature:install -r xipki-caclient-shell
 
     echo "Sleeping 1 second"
@@ -85,9 +86,7 @@ if { $printUsage equals "true" } {
       --profile TLS -n 3 --random-dn O
 
     feature:uninstall xipki-caclient-shell
-  }
-
-  if { "$action" equals "revoke" } {
+  } elif { "$action" equals "revoke" } then {
     feature:install -r xipki-caclient-shell
 
     echo "Sleeping 1 second"
@@ -99,9 +98,9 @@ if { $printUsage equals "true" } {
       --ca-db xipki/ca-config/ca-db.properties
 
     feature:uninstall xipki-caclient-shell
-  }
+  } elif { "$action" equals "ocsp" } then {
+    feature:install xipki-ocspqa-shell
 
-  if { "$action" equals "ocsp" } {
     URL = http://localhost:8080/ocsp/responder1
     URL_CRL = http://localhost:8080/ocsp/responder2
 
@@ -116,5 +115,7 @@ if { $printUsage equals "true" } {
     xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
       --issuer output/subcawithcrl1.der --cert output/ocsp2.der --url $URL_CRL \
       --queue-size $OCSP_QUEUE_SIZE
+
+    feature:install xipki-ocspqa-shell
   }
 }

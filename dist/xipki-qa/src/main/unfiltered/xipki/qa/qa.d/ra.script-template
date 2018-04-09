@@ -380,6 +380,6 @@ feature:uninstall xipki-caclient-shell
 source file:./xipki/qa/scep.script
 
 # JSCEP works only in case of RSA
-if { $KEY_TYPE equals "rsa" } {
+if { $KEY_TYPE equals "rsa" } then {
   source file:./xipki/qa/jscep.script
 }

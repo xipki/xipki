@@ -20,88 +20,89 @@ printUsage = "false"
 argsValid = "false"
 errMsg = ""
 
-if { "$1" equals "" } {
+if { "$1" equals "" } then {
   printUsage = "true"
   argsValid = "true"
-} {
-  if { "$1" equals "help" } {
-    printUsage = "true"
-    argsValid = "true"
-  } {
-    if { "$1" equals "-l" } {
-      HASH = $2
-      TOKEN_TYPE = $3
-      SIG_TYPE = $4
-      KEYSPEC =$5
-    } {
-      HASH = $1
-      TOKEN_TYPE = $2
-      SIG_TYPE = $3
-      KEYSPEC =$4
-    }
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  if { "$1" equals "-l" } then {
+    HASH = $2
+    TOKEN_TYPE = $3
+    SIG_TYPE = $4
+    KEYSPEC =$5
+  } else {
+    HASH = $1
+    TOKEN_TYPE = $2
+    SIG_TYPE = $3
+    KEYSPEC =$4
+  }
 
-    if { "$HASH" equals "SM3" } {
-      STDHASH = SHA256
-    } {
-      STDHASH = "$HASH"
-    }
+  if { "$HASH" equals "SM3" } then {
+    STDHASH = SHA256
+  } else {
+    STDHASH = "$HASH"
+  }
 
-    list = [PKCS11 PKCS12]; each ($list) {
-      if { "$TOKEN_TYPE" equals $it } {
+  list = [PKCS11 PKCS12]; each ($list) {
+    if { "$TOKEN_TYPE" equals $it } then {
+      argsValid = "true"
+      break
+    }
+  }
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+  } else {
+    argsValid = "false"
+
+    list = [RSA RSAPSS EC PLAINEC DSA SM2]; each ($list) {
+      if { "$SIG_TYPE" equals $it } then {
         argsValid = "true"
+        break
       }
     }
+  }
 
-    if { "$argsValid" equals "false" } {
-      errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
-    } {
-      argsValid = "false"
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid SIG_TYPE $SIG_TYPE"
+  } else {
+    argsValid = "false"
 
-      list = [RSA RSAPSS EC PLAINEC DSA SM2]; each ($list) {
-        if { "$SIG_TYPE" equals $it } {
+    if { "$SIG_TYPE" equals "PLAINEC" } then {
+      list = [SHA1 SHA256 SHA384 SHA512]; each ($list) {
+        if { "$HASH" equals $it } then {
           argsValid = "true"
+          break
+        }
+      }
+
+      if { "$argsValid" equals "false" } then {
+        errMsg = "invalid combination $HASH and $SIG_TYPE"
+      }
+    } elif { "$SIG_TYPE" equals "SM2" } then {
+      list = [SM3]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
+        }
+      }
+
+      if { "$argsValid" equals "false" } then {
+        errMsg = "invalid combination $HASH and $SIG_TYPE"
+      }
+    } else {
+      list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
         }
       }
     }
 
-    if { "$argsValid" equals "false" } {
-      errMsg = "invalid SIG_TYPE $SIG_TYPE"
-    } {
-      argsValid = "false"
-
-      if { "$SIG_TYPE" equals "PLAINEC" } {
-        list = [SHA1 SHA256 SHA384 SHA512]; each ($list) {
-          if { "$HASH" equals $it } {
-            argsValid = "true"
-          }
-        }
-
-        if { "$argsValid" equals "false" } {
-          errMsg = "invalid combination $HASH and $SIG_TYPE"
-        }
-      } {
-        if { "$SIG_TYPE" equals "SM2" } {
-          list = [SM3]; each ($list) {
-            if { "$HASH" equals $it } {
-              argsValid = "true"
-            }
-          }
-
-          if { "$argsValid" equals "false" } {
-            errMsg = "invalid combination $HASH and $SIG_TYPE"
-          }
-        } {
-          list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
-            if { "$HASH" equals $it } {
-              argsValid = "true"
-            }
-          }
-        }
-      }
-    }
-
-    if { "$argsValid" equals "false" } {
-      if { "$errMsg" equals ""} {
+    if { "$argsValid" equals "false" } then {
+      if { "$errMsg" equals ""} then {
         errMsg = "invalid HASH $HASH"
       }
     }
@@ -109,13 +110,13 @@ if { "$1" equals "" } {
   }
 }
 
-if { $argsValid equals "false" } {
+if { $argsValid equals "false" } then {
   echo "$errMsg"
   echo ""
   printUsage = "true"
 }
 
-if { $printUsage equals "true" } {
+if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/qa/lifecycle.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
@@ -129,7 +130,7 @@ if { $printUsage equals "true" } {
   echo "                     curve name for signature types EC and PLAINEC"
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
-} {
+} else {
   source file:./xipki/qa/qa.d/prepare-keys.script
 
   ## Prepare OCSP responder configuration
@@ -170,7 +171,7 @@ if { $printUsage equals "true" } {
 
   dsaPlain = ""
 
-  if { "$SIG_TYPE" equals "PLAINEC" } {
+  if { "$SIG_TYPE" equals "PLAINEC" } then {
     dsaPlain = "--dsa-plain"
   }
 
@@ -186,7 +187,7 @@ if { $printUsage equals "true" } {
     xipki/qa/qa.d/ra.script
 
   rsaMgf1 = ""
-  if { "$SIG_TYPE" equals "RSAPSS" } {
+  if { "$SIG_TYPE" equals "RSAPSS" } then {
     rsaMgf1 = "--rsa-mgf1"
   }
 
@@ -204,7 +205,7 @@ if { $printUsage equals "true" } {
 
   gm = ""
 
-  if { "$SIG_TYPE" equals "SM2" } {
+  if { "$SIG_TYPE" equals "SM2" } then {
     gm = "--gm"
   }
 
@@ -219,9 +220,9 @@ if { $printUsage equals "true" } {
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     xipki/qa/qa.d/ra.script
 
-  if { "$1" equals "-l" } {
+  if { "$1" equals "-l" } then {
     source file:./xipki/qa/qa.d/ca-load.script
-  } {
+  } else {
     source file:./xipki/qa/qa.d/ca.script
   }
 

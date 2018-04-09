@@ -46,7 +46,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.1.5</karaf.version>
+    <karaf.version>4.2.0</karaf.version>
     <netty.version>4.1.18.Final</netty.version>
     <netty-tcnative.version>2.0.7.Final</netty-tcnative.version>
     <bc.version>1.59</bc.version>
