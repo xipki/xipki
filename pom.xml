@@ -46,6 +46,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <servlet.version>3.1.0</servlet.version>
+    <karaf.compile.version>4.1.5</karaf.compile.version>
     <karaf.version>4.2.0</karaf.version>
     <netty.version>4.1.18.Final</netty.version>
     <netty-tcnative.version>2.0.7.Final</netty-tcnative.version>
@@ -310,7 +311,7 @@
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>
         <artifactId>org.apache.karaf.shell.core</artifactId>
-        <version>${karaf.version}</version>
+        <version>${karaf.compile.version}</version>
       </dependency>
       <dependency>
         <groupId>org.liquibase</groupId>
