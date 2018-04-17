@@ -40,7 +40,7 @@ public class PublisherEntry {
 
   public PublisherEntry(NameId ident, String type, String conf) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.type = ParamUtil.requireNonBlank("type", type);
+    this.type = ParamUtil.requireNonBlank("type", type).toLowerCase();
     this.conf = conf;
   }
 

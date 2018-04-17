@@ -1723,6 +1723,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new CaMgmtException(msg);
     }
 
+    if (type != null) {
+      type = type.toLowerCase();
+    }
+
     asssertMasterMode();
 
     IdentifiedX509Certprofile profile = queryExecutor.changeCertprofile(ident, type, conf, this);
@@ -1812,6 +1816,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     asssertMasterMode();
     if (type == null && conf == null && base64Cert == null) {
       throw new IllegalArgumentException("nothing to change");
+    }
+
+    if (type != null) {
+      type = type.toLowerCase();
     }
 
     ResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
@@ -1980,6 +1988,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     asssertMasterMode();
     if (type == null && conf == null) {
       throw new IllegalArgumentException("nothing to change");
+    }
+    if (type != null) {
+      type = type.toLowerCase();
     }
 
     IdentifiedX509CertPublisher publisher = queryExecutor.changePublisher(name, type, conf, this);

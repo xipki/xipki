@@ -40,7 +40,7 @@ public class CertprofileEntry {
 
   public CertprofileEntry(NameId ident, String type, String conf) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.type = ParamUtil.requireNonBlank("type", type);
+    this.type = ParamUtil.requireNonBlank("type", type).toLowerCase();
     this.conf = conf;
     if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
       throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");

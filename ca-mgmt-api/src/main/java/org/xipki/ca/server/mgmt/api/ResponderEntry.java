@@ -51,7 +51,7 @@ public class ResponderEntry {
 
   public ResponderEntry(String name, String type, String conf, String base64Cert) {
     this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-    this.type = ParamUtil.requireNonBlank("type", type);
+    this.type = ParamUtil.requireNonBlank("type", type).toLowerCase();
     this.conf = conf;
     this.base64Cert = base64Cert;
 

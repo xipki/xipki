@@ -74,7 +74,7 @@ public class CaEntry {
   public CaEntry(NameId ident, String signerType, String signerConf, int expirationPeriod)
       throws CaMgmtException {
     this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
+    this.signerType = ParamUtil.requireNonBlank("signerType", signerType).toLowerCase();
     this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
     this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
   }

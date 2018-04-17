@@ -89,7 +89,7 @@ public class ChangeCaEntry {
   }
 
   public void setSignerType(String signerType) {
-    this.signerType = signerType;
+    this.signerType = signerType == null ? null : signerType.toLowerCase();
   }
 
   public String getSignerConf() {

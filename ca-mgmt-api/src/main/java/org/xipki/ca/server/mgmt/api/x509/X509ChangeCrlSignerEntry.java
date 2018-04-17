@@ -51,7 +51,7 @@ public class X509ChangeCrlSignerEntry {
   }
 
   public void setSignerType(String signerType) {
-    this.signerType = signerType;
+    this.signerType = (signerType == null) ? null : signerType.toLowerCase();
   }
 
   public String getSignerConf() {
