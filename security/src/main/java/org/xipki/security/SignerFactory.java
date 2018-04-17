@@ -18,6 +18,7 @@
 package org.xipki.security;
 
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.xipki.common.ObjectCreationException;
 
@@ -28,6 +29,12 @@ import org.xipki.common.ObjectCreationException;
  */
 
 public interface SignerFactory {
+
+  /**
+   * Retrieves the types of supported signers.
+   * @return lower-case types of supported signers, never {@code null}.
+   */
+  Set<String> getSupportedSignerTypes();
 
   /**
    * Indicates whether a signer of the given {@code type} can be created or not.

@@ -17,6 +17,8 @@
 
 package org.xipki.ca.api.publisher.x509;
 
+import java.util.Set;
+
 import org.xipki.common.ObjectCreationException;
 
 /**
@@ -26,6 +28,20 @@ import org.xipki.common.ObjectCreationException;
  */
 
 public interface X509CertPublisherFactoryRegister {
+
+  /**
+   * Retrieves the types of supported publishers.
+   * @return lower-case types of supported publishers, never {@code null}.
+   */
+  Set<String> getSupportedTypes();
+
+  /**
+   * TODO.
+   * @param type
+   *          Type of the publisher. Must not be {@code null}.
+   * @return whether publisher of this type can be created.
+   */
+  boolean canCreatePublisher(String type);
 
   /**
    * TODO.

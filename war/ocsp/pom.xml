@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2013 - 2018 Lijun Liao
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki.war</groupId>
+    <artifactId>war-parent</artifactId>
+    <version>3.1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>ocsp</artifactId>
+  <packaging>war</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <jetty.plugin.version>9.4.9.v20180320</jetty.plugin.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jdbc.h2.version>1.4.196</jdbc.h2.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>ocsp-server-servlet</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>ocsp-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>pkcs11-iaik</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>pkcs11-proxy</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>pkcs11-emulator</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${jdbc.h2.version}</version>
+    </dependency>
+    <!-- replace me with other artifacts -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jetty.plugin.version}</version>
+        <configuration>
+          <scanIntervalSeconds>2</scanIntervalSeconds>
+          <systemProperties>
+            <systemProperty>
+              <name>org.eclipse.jetty.annotations.maxWait</name>
+              <value>5</value>
+            </systemProperty>
+          </systemProperties>
+          <webApp>
+            <contextPath>/</contextPath>
+          </webApp>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

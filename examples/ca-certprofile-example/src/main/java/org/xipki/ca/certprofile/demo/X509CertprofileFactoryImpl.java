@@ -17,6 +17,11 @@
 
 package org.xipki.ca.certprofile.demo;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.xipki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.ca.api.profile.x509.X509CertprofileFactory;
 import org.xipki.common.ObjectCreationException;
@@ -29,14 +34,23 @@ import org.xipki.common.ObjectCreationException;
 
 public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
 
+  private static final String TYPE = "demoxml";
+  private static final Set<String> types = Collections.unmodifiableSet(
+      new HashSet<>(Arrays.asList(TYPE)));
+
+  @Override
+  public Set<String> getSupportedTypes() {
+    return types;
+  }
+
   @Override
   public boolean canCreateProfile(String type) {
-    return "DemoXML".equalsIgnoreCase(type);
+    return types.contains(type.toLowerCase());
   }
 
   @Override
   public X509Certprofile newCertprofile(String type) throws ObjectCreationException {
-    if ("DemoXML".equalsIgnoreCase(type)) {
+    if (TYPE.equalsIgnoreCase(type)) {
       return new DemoX509Certprofile();
     } else {
       throw new ObjectCreationException("unknown certprofile type '" + type + "'");

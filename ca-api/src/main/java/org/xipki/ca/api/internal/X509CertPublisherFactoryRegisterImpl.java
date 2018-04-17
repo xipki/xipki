@@ -17,6 +17,9 @@
 
 package org.xipki.ca.api.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
@@ -42,6 +45,16 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
       new ConcurrentLinkedDeque<X509CertPublisherFactory>();
 
   @Override
+  public boolean canCreatePublisher(String type) {
+    for (X509CertPublisherFactory service : services) {
+      if (service.canCreatePublisher(type)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public X509CertPublisher newPublisher(String type) throws ObjectCreationException {
     ParamUtil.requireNonBlank("type", type);
 
@@ -51,8 +64,16 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
       }
     }
 
-    throw new ObjectCreationException(
-        "could not find factory to create Publisher of type " + type);
+    throw new ObjectCreationException("could not find factory to create Publisher of type " + type);
+  }
+
+  @Override
+  public Set<String> getSupportedTypes() {
+    Set<String> types = new HashSet<>();
+    for (X509CertPublisherFactory service : services) {
+      types.addAll(service.getSupportedTypes());
+    }
+    return Collections.unmodifiableSet(types);
   }
 
   public void bindService(X509CertPublisherFactory service) {

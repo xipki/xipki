@@ -269,6 +269,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
 
+  private static final String PUBLISHER_TYPE_OCSP = "ocsp";
+
   private static final String EVENT_LOCK = "LOCK";
 
   private static final String EVENT_CACHAGNE = "CA_CHANGE";
@@ -427,6 +429,24 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   public boolean isMasterMode() {
     return masterMode;
+  }
+
+  @Override
+  public Set<String> getSupportedSignerTypes() {
+    return securityFactory.getSupportedSignerTypes();
+  }
+
+  @Override
+  public Set<String> getSupportedCertProfileTypes() {
+    return x509CertProfileFactoryRegister.getSupportedTypes();
+  }
+
+  @Override
+  public Set<String> getSupportedPublisherTypes() {
+    Set<String> types = new HashSet<>();
+    types.add(PUBLISHER_TYPE_OCSP);
+    types.addAll(x509CertPublisherFactoryRegister.getSupportedTypes());
+    return Collections.unmodifiableSet(types);
   }
 
   private void init() throws CaMgmtException {
@@ -2675,8 +2695,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   IdentifiedX509Certprofile createCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
+
+    String type = dbEntry.getType();
+    if (!x509CertProfileFactoryRegister.canCreateProfile(type)) {
+      throw new CaMgmtException("unsupported cert profile type " + type);
+    }
+
     try {
-      X509Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(dbEntry.getType());
+      X509Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(type);
       IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
       ret.setEnvParameterResolver(envParameterResolver);
       ret.validate();
@@ -2695,10 +2721,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     X509CertPublisher publisher;
     IdentifiedX509CertPublisher ret;
     try {
-      if ("OCSP".equalsIgnoreCase(type)) {
+      if (PUBLISHER_TYPE_OCSP.equalsIgnoreCase(type)) {
         publisher = new OcspCertPublisher();
-      } else {
+      } else if (x509CertPublisherFactoryRegister.canCreatePublisher(type)) {
         publisher = x509CertPublisherFactoryRegister.newPublisher(type);
+      } else {
+        throw new CaMgmtException("unsupported publisher type " + type);
       }
 
       ret = new IdentifiedX509CertPublisher(dbEntry, publisher);

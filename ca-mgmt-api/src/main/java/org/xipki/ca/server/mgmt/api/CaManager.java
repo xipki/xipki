@@ -851,4 +851,22 @@ public interface CaManager {
    */
   byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException;
 
+  /**
+   * Retrieves the types of supported signers.
+   * @return lower-case types of supported signers, never {@code null}.
+   */
+  Set<String> getSupportedSignerTypes();
+
+  /**
+   * Retrieves the types of supported certificate profiles.
+   * @return types of supported certificate profiles, never {@code null}.
+   */
+  Set<String> getSupportedCertProfileTypes();
+
+  /**
+   * Retrieves the types of supported publishers.
+   * @return lower-case types of supported publishers, never {@code null}.
+   */
+  Set<String> getSupportedPublisherTypes();
+
 }

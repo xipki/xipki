@@ -322,9 +322,8 @@ class OcspStoreQueryExecutor {
       PreparedStatement ps = borrowPreparedStatement(sql);
 
       try {
-        int idx = 1;
-        ps.setInt(idx++, issuerId);
-        ps.setString(idx++, serialNumber.toString(16));
+        ps.setInt(1, issuerId);
+        ps.setString(2, serialNumber.toString(16));
         ps.executeUpdate();
       } catch (SQLException ex) {
         throw datasource.translate(sql, ex);
@@ -485,9 +484,8 @@ class OcspStoreQueryExecutor {
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
-      int idx = 1;
-      ps.setString(idx++, serialNumber.toString(16));
-      ps.setInt(idx++, issuerId);
+      ps.setString(1, serialNumber.toString(16));
+      ps.setInt(2, issuerId);
 
       rs = ps.executeQuery();
       return rs.next() ? rs.getLong("ID") : null;

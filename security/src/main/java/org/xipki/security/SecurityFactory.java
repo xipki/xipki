@@ -22,6 +22,7 @@ import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -40,6 +41,12 @@ import org.xipki.password.PasswordResolver;
 public interface SecurityFactory {
 
   PasswordResolver getPasswordResolver();
+
+  /**
+   * Retrieves the types of supported signers.
+   * @return lower-case types of supported signers, never {@code null}.
+   */
+  Set<String> getSupportedSignerTypes();
 
   /**
    * Create secret key and certificate pair.

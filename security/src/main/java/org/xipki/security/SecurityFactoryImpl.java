@@ -35,6 +35,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -89,6 +90,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   private boolean strongRandom4SignEnabled;
 
   public SecurityFactoryImpl() {
+  }
+
+  @Override
+  public Set<String> getSupportedSignerTypes() {
+    return signerFactoryRegister.getSupportedSignerTypes();
   }
 
   public boolean isStrongRandom4KeyEnabled() {

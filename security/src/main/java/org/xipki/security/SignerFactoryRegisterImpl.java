@@ -24,6 +24,10 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import javax.crypto.NoSuchPaddingException;
@@ -64,10 +68,22 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
+  private static final String TYPE_PKCS11 = "pkcs11";
+  private static final String TYPE_PKCS12 = "pkcs12";
+
   private P11CryptServiceFactory p11CryptServiceFactory;
 
   private ConcurrentLinkedDeque<SignerFactory> services =
       new ConcurrentLinkedDeque<SignerFactory>();
+
+  @Override
+  public Set<String> getSupportedSignerTypes() {
+    Set<String> types = new HashSet<>(Arrays.asList(TYPE_PKCS11, TYPE_PKCS12));
+    for (SignerFactory service : services) {
+      types.addAll(service.getSupportedSignerTypes());
+    }
+    return Collections.unmodifiableSet(types);
+  }
 
   public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
     this.p11CryptServiceFactory = p11CryptServiceFactory;

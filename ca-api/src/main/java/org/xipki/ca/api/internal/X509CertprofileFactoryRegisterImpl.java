@@ -17,6 +17,9 @@
 
 package org.xipki.ca.api.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
@@ -40,6 +43,21 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
 
   private ConcurrentLinkedDeque<X509CertprofileFactory> services =
       new ConcurrentLinkedDeque<X509CertprofileFactory>();
+
+  @Override
+  public Set<String> getSupportedTypes() {
+    Set<String> types = new HashSet<>();
+    for (X509CertprofileFactory service : services) {
+      types.addAll(service.getSupportedTypes());
+    }
+    return Collections.unmodifiableSet(types);
+  }
+
+  @Override
+  public boolean canCreateProfile(String type) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
   @Override
   public X509Certprofile newCertprofile(String type) throws ObjectCreationException {

@@ -17,6 +17,8 @@
 
 package org.xipki.ca.api.profile.x509;
 
+import java.util.Set;
+
 import org.xipki.common.ObjectCreationException;
 
 /**
@@ -26,6 +28,20 @@ import org.xipki.common.ObjectCreationException;
  */
 
 public interface X509CertprofileFactoryRegister {
+
+  /**
+   * Retrieves the types of supported certificate profiles.
+   * @return types of supported certificate profiles, never {@code null}.
+   */
+  Set<String> getSupportedTypes();
+
+  /**
+   * TODO.
+   * @param type
+   *          Type of the certificate profile. Must not be {@code null}.
+   * @return whether certificate profile of this type can be created.
+   */
+  boolean canCreateProfile(String type);
 
   /**
    * TODO.
