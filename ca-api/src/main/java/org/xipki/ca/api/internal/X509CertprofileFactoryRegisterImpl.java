@@ -55,7 +55,11 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
 
   @Override
   public boolean canCreateProfile(String type) {
-    // TODO Auto-generated method stub
+    for (X509CertprofileFactory service : services) {
+      if (service.canCreateProfile(type)) {
+        return true;
+      }
+    }
     return false;
   }
 
