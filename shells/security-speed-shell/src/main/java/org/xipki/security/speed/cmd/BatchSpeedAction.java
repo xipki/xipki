@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.LoadExecutor;
 import org.xipki.common.util.LogUtil;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
@@ -36,9 +35,6 @@ import org.xipki.security.util.AlgorithmUtil;
 public abstract class BatchSpeedAction extends SecurityAction {
 
   private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedAction.class);
-
-  protected static final String DEFAULT_P11MODULE_NAME =
-      P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
   @Option(name = "--duration",
       description = "duration for each test case")

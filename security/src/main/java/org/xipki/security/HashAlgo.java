@@ -34,8 +34,6 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.xipki.common.util.ParamUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
-
 /**
  * TODO.
  * @author Lijun Liao
@@ -146,6 +144,7 @@ public enum HashAlgo {
     return type;
   }
 
+  /*
   public static HashAlgo getInstanceForPkcs11HashMech(long hashMech) {
     if (hashMech == PKCS11Constants.CKM_SHA_1) {
       return HashAlgo.SHA1;
@@ -196,6 +195,7 @@ public enum HashAlgo {
       return null;
     }
   }
+  */
 
   public static HashAlgo getInstanceForEncoded(byte[] encoded) {
     return getInstanceForEncoded(encoded, 0, encoded.length);

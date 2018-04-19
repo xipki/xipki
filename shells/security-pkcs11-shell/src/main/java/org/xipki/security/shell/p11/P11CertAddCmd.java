@@ -17,14 +17,16 @@
 
 package org.xipki.security.shell.p11;
 
+import java.security.cert.X509Certificate;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.util.X509Util;
 
 /**
  * TODO.
@@ -32,24 +34,22 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "refresh-p11",
-    description = "refresh PKCS#11 module")
+@Command(scope = "xi", name = "add-cert-p11",
+    description = "add certificate to PKCS#11 device")
 @Service
-public class P11RefreshSlotCmd extends SecurityAction {
+public class P11CertAddCmd extends P11SecurityAction {
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module.")
-  @Completion(P11ModuleNameCompleter.class)
-  private String moduleName = DEFAULT_P11MODULE_NAME;
+  @Option(name = "--cert", required = true,
+      description = "certificate file\n(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
   @Override
   protected Object execute0() throws Exception {
-    P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-    if (p11Service == null) {
-      throw new IllegalCmdParamException("undefined module " + moduleName);
-    }
-    p11Service.refresh();
-    println("refreshed module " + moduleName);
+    X509Certificate cert = X509Util.parseCert(certFile);
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objectId = slot.addCert(cert);
+    println("added certificate under " + objectId);
     return null;
   }
 

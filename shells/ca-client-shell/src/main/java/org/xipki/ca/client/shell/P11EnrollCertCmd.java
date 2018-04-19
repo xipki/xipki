@@ -20,17 +20,14 @@ package org.xipki.ca.client.shell;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.client.shell.completer.P11ModuleNameCompleter;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Hex;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
 
 /**
  * TODO.
@@ -59,8 +56,7 @@ public class P11EnrollCertCmd extends EnrollCertAction {
 
   @Option(name = "--module",
       description = "name of the PKCS#11 module")
-  @Completion(P11ModuleNameCompleter.class)
-  private String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
+  private String moduleName = "default";
 
   @Override
   protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)

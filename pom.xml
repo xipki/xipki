@@ -74,6 +74,7 @@
     <module>database-tool</module>
     <module>password</module>
     <module>security</module>
+    <module>security-pkcs11</module>
     <module>pkcs11-emulator</module>
     <module>pkcs11-iaik</module>
     <module>pkcs11-proxy</module>

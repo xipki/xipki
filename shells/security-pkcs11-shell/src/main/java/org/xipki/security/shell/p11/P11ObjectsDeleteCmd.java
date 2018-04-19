@@ -18,13 +18,10 @@
 package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.Hex;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * TODO.
@@ -35,11 +32,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xi", name = "delete-objects-p11",
     description = "delete objects in PKCS#11 device")
 @Service
-public class P11ObjectsDeleteCmd extends SecurityAction {
-
-  @Option(name = "--slot", required = true,
-      description = "slot index\n(required)")
-  protected Integer slotIndex;
+public class P11ObjectsDeleteCmd extends P11SecurityAction {
 
   @Option(name = "--id",
       description = "id (hex) of the objects in the PKCS#11 device\n"
@@ -51,14 +44,9 @@ public class P11ObjectsDeleteCmd extends SecurityAction {
           + "at least one of id and label must be specified")
   private String label;
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module")
-  @Completion(P11ModuleNameCompleter.class)
-  protected String moduleName = DEFAULT_P11MODULE_NAME;
-
   @Override
   protected Object execute0() throws Exception {
-    P11Slot slot = getSlot(moduleName, slotIndex);
+    P11Slot slot = getSlot();
     byte[] idBytes = null;
     if (id != null) {
       idBytes = Hex.decode(id);

@@ -37,23 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Base64;
-import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.P11ContentSignerBuilder;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
-import org.xipki.security.pkcs11.P11MacContentSignerBuilder;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs12.SoftTokenContentSignerBuilder;
 import org.xipki.security.pkcs12.SoftTokenMacContentSignerBuilder;
 import org.xipki.security.util.AlgorithmUtil;
@@ -68,25 +57,16 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  private static final String TYPE_PKCS11 = "pkcs11";
-  private static final String TYPE_PKCS12 = "pkcs12";
-
-  private P11CryptServiceFactory p11CryptServiceFactory;
-
   private ConcurrentLinkedDeque<SignerFactory> services =
       new ConcurrentLinkedDeque<SignerFactory>();
 
   @Override
   public Set<String> getSupportedSignerTypes() {
-    Set<String> types = new HashSet<>(Arrays.asList(TYPE_PKCS11, TYPE_PKCS12));
+    Set<String> types = new HashSet<>(Arrays.asList("pkcs12", "jks", "jceks"));
     for (SignerFactory service : services) {
       types.addAll(service.getSupportedSignerTypes());
     }
     return Collections.unmodifiableSet(types);
-  }
-
-  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
-    this.p11CryptServiceFactory = p11CryptServiceFactory;
   }
 
   public void bindService(SignerFactory service) {
@@ -125,11 +105,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     if ("PKCS12".equalsIgnoreCase(type)
         || "JKS".equalsIgnoreCase(type)
         || "JCEKS".equalsIgnoreCase(type)) {
-      return newKeystoreSigner(securityFactory, type, conf, certificateChain);
-    }
-
-    if ("PKCS11".equalsIgnoreCase(type)) {
-      return newPkcs11Signer(securityFactory, type, conf, certificateChain);
+      return newKeystoreSigner(securityFactory, type.toUpperCase(), conf, certificateChain);
     }
 
     for (SignerFactory service : services) {
@@ -228,110 +204,6 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | XiSecurityException ex) {
       throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(),
           ex.getMessage()));
-    }
-  }
-
-  private ConcurrentContentSigner newPkcs11Signer(SecurityFactory securityFactory,
-      String type, SignerConf conf, X509Certificate[] certificateChain)
-      throws ObjectCreationException {
-    if (p11CryptServiceFactory == null) {
-      throw new ObjectCreationException("p11CryptServiceFactory is not set");
-    }
-
-    String str = conf.getConfValue("parallelism");
-    int parallelism = securityFactory.getDefaultSignerParallelism();
-    if (str != null) {
-      try {
-        parallelism = Integer.parseInt(str);
-      } catch (NumberFormatException ex) {
-        throw new ObjectCreationException("invalid parallelism " + str);
-      }
-
-      if (parallelism < 1) {
-        throw new ObjectCreationException("invalid parallelism " + str);
-      }
-    }
-
-    String moduleName = conf.getConfValue("module");
-    str = conf.getConfValue("slot");
-    Integer slotIndex = (str == null) ? null : Integer.parseInt(str);
-
-    str = conf.getConfValue("slot-id");
-    Long slotId = (str == null) ? null : Long.parseLong(str);
-
-    if ((slotIndex == null && slotId == null)
-        || (slotIndex != null && slotId != null)) {
-      throw new ObjectCreationException(
-          "exactly one of slot (index) and slot-id must be specified");
-    }
-
-    String keyLabel = conf.getConfValue("key-label");
-    str = conf.getConfValue("key-id");
-    byte[] keyId = null;
-    if (str != null) {
-      keyId = Hex.decode(str);
-    }
-
-    if ((keyId == null && keyLabel == null) || (keyId != null && keyLabel != null)) {
-      throw new ObjectCreationException("exactly one of key-id and key-label must be specified");
-    }
-
-    P11CryptService p11Service;
-    P11Slot slot;
-    try {
-      p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-      P11Module module = p11Service.getModule();
-      P11SlotIdentifier p11SlotId;
-      if (slotId != null) {
-        p11SlotId = module.getSlotIdForId(slotId);
-      } else if (slotIndex != null) {
-        p11SlotId = module.getSlotIdForIndex(slotIndex);
-      } else {
-        throw new RuntimeException("should not reach here");
-      }
-      slot = module.getSlot(p11SlotId);
-    } catch (P11TokenException | XiSecurityException ex) {
-      throw new ObjectCreationException(ex.getMessage(), ex);
-    }
-
-    P11ObjectIdentifier p11ObjId = (keyId != null)
-        ? slot.getObjectIdForId(keyId) : slot.getObjectIdForLabel(keyLabel);
-    if (p11ObjId == null) {
-      String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
-      throw new ObjectCreationException("cound not find identity with " + str2);
-    }
-    P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
-
-    try {
-      AlgorithmIdentifier macAlgId = null;
-      String algoName = conf.getConfValue("algo");
-      if (algoName != null) {
-        try {
-          macAlgId = AlgorithmUtil.getMacAlgId(algoName);
-        } catch (NoSuchAlgorithmException ex) {
-          // do nothing
-        }
-      }
-
-      if (macAlgId != null) {
-        P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(
-            p11Service, entityId);
-        return signerBuilder.createSigner(macAlgId, parallelism);
-      } else {
-        AlgorithmIdentifier signatureAlgId;
-        if (conf.getHashAlgo() == null) {
-          signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
-        } else {
-          PublicKey pubKey = slot.getIdentity(p11ObjId).getPublicKey();
-          signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
-        }
-
-        P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,
-            securityFactory, entityId, certificateChain);
-        return signerBuilder.createSigner(signatureAlgId, parallelism);
-      }
-    } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
-      throw new ObjectCreationException(ex.getMessage(), ex);
     }
   }
 

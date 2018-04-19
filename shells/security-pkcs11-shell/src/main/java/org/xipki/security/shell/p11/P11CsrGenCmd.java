@@ -17,16 +17,20 @@
 
 package org.xipki.security.shell.p11;
 
+import java.security.cert.X509Certificate;
+
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.Hex;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.SignatureAlgoControl;
+import org.xipki.security.SignerConf;
+import org.xipki.security.shell.CsrGenAction;
+import org.xipki.security.shell.p11.completer.P11ModuleNameCompleter;
 
 /**
  * TODO.
@@ -34,45 +38,43 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-public abstract class P11SecurityAction extends SecurityAction {
+@Command(scope = "xi", name = "csr-p11",
+    description = "generate CSR request with PKCS#11 device")
+@Service
+public class P11CsrGenCmd extends CsrGenAction {
 
   @Option(name = "--slot", required = true,
       description = "slot index\n(required)")
-  protected Integer slotIndex;
+  private Integer slotIndex;
 
   @Option(name = "--id",
       description = "id of the private key in the PKCS#11 device\n"
           + "either keyId or keyLabel must be specified")
-  protected String id;
+  private String id;
 
   @Option(name = "--label",
       description = "label of the private key in the PKCS#11 device\n"
           + "either keyId or keyLabel must be specified")
-  protected String label;
+  private String label;
 
   @Option(name = "--module",
       description = "name of the PKCS#11 module")
   @Completion(P11ModuleNameCompleter.class)
-  protected String moduleName = DEFAULT_P11MODULE_NAME;
+  private String moduleName = "default";
 
-  public P11ObjectIdentifier getObjectIdentifier()
-      throws IllegalCmdParamException, XiSecurityException, P11TokenException {
-    P11Slot slot = getSlot();
-    P11ObjectIdentifier objIdentifier;
-    if (id != null && label == null) {
-      objIdentifier = slot.getObjectIdForId(Hex.decode(id));
-    } else if (id == null && label != null) {
-      objIdentifier = slot.getObjectIdForLabel(label);
-    } else {
-      throw new IllegalCmdParamException(
-          "exactly one of keyId or keyLabel should be specified");
+  @Override
+  protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
+      throws Exception {
+    ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
+
+    byte[] idBytes = null;
+    if (id != null) {
+      idBytes = Hex.decode(id);
     }
-    return objIdentifier;
-  }
 
-  protected P11Slot getSlot()
-      throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-    return getSlot(moduleName, slotIndex);
+    SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, label, idBytes, 1,
+        HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
+    return securityFactory.createSigner("PKCS11", conf, (X509Certificate[]) null);
   }
 
 }

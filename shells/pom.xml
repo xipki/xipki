@@ -30,7 +30,9 @@
   <modules>
     <module>shell-base</module>
     <module>security-shell</module>
+    <module>security-pkcs11-shell</module>
     <module>security-speed-shell</module>
+    <module>security-speed-pkcs11-shell</module>
     <module>ca-client-shell</module>
     <module>ca-client-benchmark-shell</module>
     <module>ocsp-client-shell</module>

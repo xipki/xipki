@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.shell.completer;
+package org.xipki.security.shell.p11.completer;
 
 import java.util.Collections;
 import java.util.Set;

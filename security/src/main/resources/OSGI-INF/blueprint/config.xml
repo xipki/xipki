@@ -25,7 +25,6 @@
       <cm:property name="hostnameVerifier.trustAll" value="false"/>
       <cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
       <cm:property name="defaultSignerParallelism" value="32"/>
-      <cm:property name="pkcs11.confFile" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -35,34 +34,8 @@
       init-method="init" destroy-method="shutdown"/>
 
 
-  <bean id="p11ModuleFactoryRegister"
-       class="org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl"
-       destroy-method="shutdown">
-  </bean>
-
-  <service ref="p11ModuleFactoryRegister"
-       interface="org.xipki.security.pkcs11.P11ModuleFactoryRegister"/>
-  <reference-list id="p11ModuleFactories"
-       interface="org.xipki.security.pkcs11.P11ModuleFactory"
-       availability="optional">
-    <reference-listener ref="p11ModuleFactoryRegister" bind-method="bindService"
-         unbind-method="unbindService"/>
-  </reference-list>
-
-  <bean id="p11CryptServiceFactory"
-      class="org.xipki.security.pkcs11.P11CryptServiceFactoryImpl"
-      init-method="init" destroy-method="shutdown">
-    <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
-    <property name="passwordResolver" ref="passwordResolver"/>
-    <property name="p11ModuleFactoryRegister" ref="p11ModuleFactoryRegister"/>
-  </bean>
-
-  <service ref="p11CryptServiceFactory"
-      interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
-
   <bean id="signerFactoryRegister"
        class="org.xipki.security.SignerFactoryRegisterImpl">
-    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
 
   <service ref="signerFactoryRegister"
@@ -88,13 +61,6 @@
     <property name="enabled" value="${hostnameVerifier.enabled}"/>
     <property name="trustAll" value="${hostnameVerifier.trustAll}"/>
     <property name="commonnameHostMap" value="${hostnameVerifier.commonnameHostMap}"/>
-  </bean>
-
-  <!-- provider XIPKI -->
-  <bean id="XiProviderRegister"
-      class="org.xipki.security.pkcs11.provider.XiProviderRegister"
-      init-method="regist">
-    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
 
 </blueprint>

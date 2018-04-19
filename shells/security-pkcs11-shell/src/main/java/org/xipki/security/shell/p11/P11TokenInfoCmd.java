@@ -22,12 +22,16 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.pkcs11.P11CryptService;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.security.shell.p11.completer.P11ModuleNameCompleter;
 
 /**
  * TODO.
@@ -47,24 +51,34 @@ public class P11TokenInfoCmd extends SecurityAction {
   @Option(name = "--module",
       description = "name of the PKCS#11 module.")
   @Completion(P11ModuleNameCompleter.class)
-  private String moduleName = DEFAULT_P11MODULE_NAME;
+  private String moduleName = P11SecurityAction.DEFAULT_P11MODULE_NAME;
 
   @Option(name = "--slot",
       description = "slot index")
   private Integer slotIndex;
 
+  @Reference (optional = true)
+  protected P11CryptServiceFactory p11CryptServiceFactory;
+
   @Override
   protected Object execute0() throws Exception {
-    P11Module module = getP11Module(moduleName);
+    P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
+    if (p11Service == null) {
+      throw new IllegalCmdParamException("undefined module " + moduleName);
+    }
+
+    P11Module module = p11Service.getModule();
     println("module: " + moduleName);
     println(module.getDescription());
+
     List<P11SlotIdentifier> slots = module.getSlotIds();
     if (slotIndex == null) {
       output(slots);
       return null;
     }
 
-    P11Slot slot = getSlot(moduleName, slotIndex);
+    P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+    P11Slot slot = module.getSlot(slotId);
     println("Details of slot");
     slot.showDetails(System.out, verbose);
     System.out.println();

@@ -162,7 +162,7 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
 
-    HashAlgo hashAlgo = HashAlgo.getInstanceForPkcs11HashMech(mechanism);
+    HashAlgo hashAlgo = getHashAlgoForPkcs11HashMech(mechanism);
     if (hashAlgo == null) {
       throw new P11TokenException(
           "unknown mechanism " + Functions.mechanismCodeToString(mechanism));
@@ -325,14 +325,14 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
-    HashAlgo contentHash = HashAlgo.getInstanceForPkcs11HashMech(pssParam.getHashAlgorithm());
+    HashAlgo contentHash = getHashAlgoForPkcs11HashMech(pssParam.getHashAlgorithm());
     if (contentHash == null) {
       throw new P11TokenException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
     } else if (hashAlgo != null && contentHash != hashAlgo) {
       throw new P11TokenException("Invalid parameters: invalid hash algorithm");
     }
 
-    HashAlgo mgfHash = HashAlgo.getInstanceForPkcs11MgfMech(
+    HashAlgo mgfHash = getHashAlgoForPkcs11MgfMech(
         pssParam.getMaskGenerationFunction());
     if (mgfHash == null) {
       throw new P11TokenException(
@@ -484,6 +484,57 @@ public class EmulatorP11Identity extends P11Identity {
 
   Key getSigningKey() {
     return signingKey;
+  }
+
+  private static HashAlgo getHashAlgoForPkcs11HashMech(long hashMech) {
+    if (hashMech == PKCS11Constants.CKM_SHA_1) {
+      return HashAlgo.SHA1;
+    } else if (hashMech == PKCS11Constants.CKM_SHA224) {
+      return HashAlgo.SHA224;
+    } else if (hashMech == PKCS11Constants.CKM_SHA256) {
+      return HashAlgo.SHA256;
+    } else if (hashMech == PKCS11Constants.CKM_SHA384) {
+      return HashAlgo.SHA384;
+    } else if (hashMech == PKCS11Constants.CKM_SHA512) {
+      return HashAlgo.SHA512;
+    } else if (hashMech == PKCS11Constants.CKM_SHA3_224) {
+      return HashAlgo.SHA3_224;
+    } else if (hashMech == PKCS11Constants.CKM_SHA3_256) {
+      return HashAlgo.SHA3_256;
+    } else if (hashMech == PKCS11Constants.CKM_SHA3_384) {
+      return HashAlgo.SHA3_384;
+    } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
+      return HashAlgo.SHA3_512;
+    } else if (hashMech == PKCS11Constants.CKM_VENDOR_SM3) {
+      return HashAlgo.SM3;
+    } else {
+      return null;
+    }
+  }
+
+  private static HashAlgo getHashAlgoForPkcs11MgfMech(long hashMech) {
+    if (hashMech == PKCS11Constants.CKG_MGF1_SHA1) {
+      return HashAlgo.SHA1;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA224) {
+      return HashAlgo.SHA224;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA256) {
+      return HashAlgo.SHA256;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA384) {
+      return HashAlgo.SHA384;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA512) {
+      return HashAlgo.SHA512;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_224) {
+      return HashAlgo.SHA3_224;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_256) {
+      return HashAlgo.SHA3_256;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_384) {
+      return HashAlgo.SHA3_384;
+    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_512) {
+      return HashAlgo.SHA3_512;
+    } else {
+      // SM3 does not apply to RSAPSS signature
+      return null;
+    }
   }
 
 }
