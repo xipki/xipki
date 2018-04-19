@@ -72,7 +72,7 @@ public class X509CertificateInfo {
     this.requestor = ParamUtil.requireNonNull("requestor", requestor);
   }
 
-  public byte[] subjectPublicKey() {
+  public byte[] getSubjectPublicKey() {
     return subjectPublicKey;
   }
 

@@ -74,7 +74,7 @@ public class CertificateStore {
     ParamUtil.requireNonNull("certInfo", certInfo);
     try {
       queryExecutor.addCert(certInfo.getIssuer(), certInfo.getCert(),
-          certInfo.subjectPublicKey(), certInfo.getProfile(),
+          certInfo.getSubjectPublicKey(), certInfo.getProfile(),
           certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
           certInfo.getTransactionId(), certInfo.getRequestedSubject());
     } catch (Exception ex) {
