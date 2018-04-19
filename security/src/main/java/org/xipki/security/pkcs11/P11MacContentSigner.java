@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 

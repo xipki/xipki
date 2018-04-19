@@ -21,10 +21,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.common.util.Hex;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 

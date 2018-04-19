@@ -24,9 +24,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.xipki.security.exception.P11TokenException;
-import org.xipki.security.exception.P11UnknownEntityException;
-import org.xipki.security.exception.P11UnsupportedMechanismException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
+import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 
 /**
  * TODO.

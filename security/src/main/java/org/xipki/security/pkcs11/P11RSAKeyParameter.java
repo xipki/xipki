@@ -23,7 +23,7 @@ import java.security.interfaces.RSAPublicKey;
 
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

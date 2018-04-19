@@ -36,6 +36,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.jcajce.provider.util.DigestFactory;
 import org.xipki.security.pkcs11.P11PlainRSASigner;
+import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11RSAKeyParameter;
 
 /**

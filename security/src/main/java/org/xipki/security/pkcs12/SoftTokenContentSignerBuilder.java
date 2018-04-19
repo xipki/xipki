@@ -185,7 +185,7 @@ public class SoftTokenContentSignerBuilder {
       return new SM2Signer();
     }
 
-  } // class ECDSAContentSignerBuilder
+  } // class SM2ContentSignerBuilder
 
   private final PrivateKey key;
 

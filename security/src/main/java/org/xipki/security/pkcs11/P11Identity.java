@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.exception.P11TokenException;
-import org.xipki.security.exception.P11UnsupportedMechanismException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 

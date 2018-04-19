@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.security.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

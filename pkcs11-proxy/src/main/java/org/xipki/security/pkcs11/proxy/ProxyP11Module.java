@@ -42,12 +42,12 @@ import org.xipki.p11proxy.P11ProxyConstants;
 import org.xipki.p11proxy.msg.Asn1P11SlotIdentifier;
 import org.xipki.p11proxy.msg.Asn1ServerCaps;
 import org.xipki.security.exception.BadAsn1ObjectException;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.AbstractP11Module;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

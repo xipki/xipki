@@ -28,12 +28,12 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.AbstractP11Module;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 import iaik.pkcs.pkcs11.DefaultInitializeArgs;
 import iaik.pkcs.pkcs11.Info;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.exception;
+package org.xipki.security.pkcs11.exception;
 
 /**
  * TODO.

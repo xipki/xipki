@@ -36,8 +36,8 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 

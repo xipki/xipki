@@ -164,7 +164,7 @@ public class AlgorithmUtil {
       map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384, AlgorithmCode.SHA3_384WITHDSA);
       map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512, AlgorithmCode.SHA3_512WITHDSA);
       // RSA
-      map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, AlgorithmCode.SHA1WITHDSA);
+      map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, AlgorithmCode.SHA1WITHRSA);
       map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, AlgorithmCode.SHA224WITHRSA);
       map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, AlgorithmCode.SHA256WITHRSA);
       map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, AlgorithmCode.SHA384WITHRSA);

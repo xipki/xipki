@@ -28,7 +28,6 @@ import org.xipki.p11proxy.msg.Asn1P11EntityIdentifier;
 import org.xipki.p11proxy.msg.Asn1P11Params;
 import org.xipki.p11proxy.msg.Asn1RSAPkcsPssParams;
 import org.xipki.p11proxy.msg.Asn1SignTemplate;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11IVParams;
@@ -36,6 +35,7 @@ import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

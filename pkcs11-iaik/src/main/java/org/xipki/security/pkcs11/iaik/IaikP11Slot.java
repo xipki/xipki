@@ -45,7 +45,6 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.security.X509Cert;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.AbstractP11Slot;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
@@ -60,6 +59,7 @@ import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.pkcs11.Pkcs11Functions;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 

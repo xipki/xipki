@@ -32,6 +32,7 @@ import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.NullDigest;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.pkcs11.P11PrivateKey;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 

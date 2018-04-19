@@ -52,7 +52,6 @@ import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
@@ -61,6 +60,7 @@ import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 

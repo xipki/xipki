@@ -70,8 +70,6 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.exception.P11TokenException;
-import org.xipki.security.exception.P11UnknownEntityException;
 import org.xipki.security.pkcs11.AbstractP11Slot;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Identity;
@@ -80,6 +78,8 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
+import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 

@@ -17,10 +17,10 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11ModuleFactory;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

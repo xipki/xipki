@@ -29,8 +29,8 @@ import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

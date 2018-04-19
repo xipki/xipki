@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11.provider;
+package org.xipki.security.pkcs11;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -24,11 +24,8 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
-import org.xipki.security.pkcs11.P11Params;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.
@@ -71,7 +68,7 @@ public class P11PrivateKey implements PrivateKey {
     }
   }
 
-  boolean supportsMechanism(long mechanism) {
+  public boolean supportsMechanism(long mechanism) {
     try {
       return p11CryptService.getSlot(identityId.getSlotId()).supportsMechanism(mechanism);
     } catch (P11TokenException ex) {
@@ -121,11 +118,11 @@ public class P11PrivateKey implements PrivateKey {
     return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
   }
 
-  P11CryptService getP11CryptService() {
+  public P11CryptService getP11CryptService() {
     return p11CryptService;
   }
 
-  P11EntityIdentifier getIdentityId() {
+  public P11EntityIdentifier getIdentityId() {
     return identityId;
   }
 

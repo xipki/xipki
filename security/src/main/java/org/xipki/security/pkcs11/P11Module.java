@@ -19,8 +19,8 @@ package org.xipki.security.pkcs11;
 
 import java.util.List;
 
-import org.xipki.security.exception.P11TokenException;
-import org.xipki.security.exception.P11UnknownEntityException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 
 /**
  * TODO.

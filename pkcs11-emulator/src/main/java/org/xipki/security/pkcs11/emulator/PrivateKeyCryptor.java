@@ -40,7 +40,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11TokenException;
 
 /**
  * TODO.

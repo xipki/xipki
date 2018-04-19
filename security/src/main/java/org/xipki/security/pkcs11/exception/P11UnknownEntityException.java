@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.exception;
+package org.xipki.security.pkcs11.exception;
 
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
@@ -27,19 +27,23 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class P11DuplicateEntityException extends P11TokenException {
+public class P11UnknownEntityException extends P11TokenException {
 
   private static final long serialVersionUID = 1L;
 
-  public P11DuplicateEntityException(P11EntityIdentifier entityId) {
-    super("duplicate entity '" + entityId + "'");
+  public P11UnknownEntityException(P11EntityIdentifier entityId) {
+    super("unknown entity '" + entityId + "'");
   }
 
-  public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
-    super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
+  public P11UnknownEntityException(P11SlotIdentifier slotId) {
+    super("unknown slot '" + slotId + "'");
   }
 
-  public P11DuplicateEntityException(String message) {
+  public P11UnknownEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+    super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
+  }
+
+  public P11UnknownEntityException(String message) {
     super(message);
   }
 

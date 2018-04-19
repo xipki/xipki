@@ -25,10 +25,10 @@ import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.exception.P11UnsupportedMechanismException;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;

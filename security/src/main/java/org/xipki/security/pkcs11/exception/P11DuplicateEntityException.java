@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.security.exception;
+package org.xipki.security.pkcs11.exception;
 
 import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.Pkcs11Functions;
 
 /**
  * TODO.
@@ -27,21 +27,19 @@ import org.xipki.security.pkcs11.Pkcs11Functions;
  * @since 2.0.0
  */
 
-public class P11UnsupportedMechanismException extends P11TokenException {
+public class P11DuplicateEntityException extends P11TokenException {
 
   private static final long serialVersionUID = 1L;
 
-  public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
-    super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
-      + " is not supported by PKCS11 slot " + slotId);
+  public P11DuplicateEntityException(P11EntityIdentifier entityId) {
+    super("duplicate entity '" + entityId + "'");
   }
 
-  public P11UnsupportedMechanismException(long mechanism, P11EntityIdentifier entityId) {
-    super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
-      + " is not supported by PKCS11 entity " + entityId);
+  public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+    super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
   }
 
-  public P11UnsupportedMechanismException(String message) {
+  public P11DuplicateEntityException(String message) {
     super(message);
   }
 
