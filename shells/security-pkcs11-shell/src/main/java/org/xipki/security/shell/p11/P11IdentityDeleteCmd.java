@@ -34,6 +34,16 @@ import org.xipki.security.pkcs11.P11Slot;
 @Service
 public class P11IdentityDeleteCmd extends P11SecurityAction {
 
+  @Option(name = "--id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String id;
+
+  @Option(name = "--label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String label;
+
   @Option(name = "--force", aliases = "-f",
       description = "remove identifies without prompt")
   private Boolean force = Boolean.FALSE;
@@ -41,7 +51,7 @@ public class P11IdentityDeleteCmd extends P11SecurityAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+    P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
     if (objIdentifier == null) {
       println(" unkown identity");
       return null;

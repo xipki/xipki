@@ -48,6 +48,16 @@ import org.xipki.security.util.AlgorithmUtil;
 @Service
 public class P11ProviderTestCmd extends P11SecurityAction {
 
+  @Option(name = "--id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String id;
+
+  @Option(name = "--label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String label;
+
   @Option(name = "--verbose", aliases = "-v",
       description = "show object information verbosely")
   private Boolean verbose = Boolean.FALSE;

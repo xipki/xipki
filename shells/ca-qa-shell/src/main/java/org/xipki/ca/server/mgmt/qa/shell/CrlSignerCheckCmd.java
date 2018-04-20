@@ -48,7 +48,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
     }
 
     if (ey.getSignerType() != null) {
-      MgmtQaShellUtil.assertEquals("signer type", ey.getSignerType(), cs.getType());
+      MgmtQaShellUtil.assertTypeEquals("signer type", ey.getSignerType(), cs.getType());
     }
 
     if (ey.getSignerConf() != null) {

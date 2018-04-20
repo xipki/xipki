@@ -33,6 +33,18 @@ public class MgmtQaShellUtil {
   private MgmtQaShellUtil() {
   }
 
+  public static void assertTypeEquals(String desc, String ex, String is) throws CmdFailure {
+    String tmpEx = ex;
+    if (CaManager.NULL.equals(tmpEx)) {
+      tmpEx = null;
+    }
+
+    boolean bo = (tmpEx == null) ? (is == null) : tmpEx.equalsIgnoreCase(is);
+    if (!bo) {
+      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
+    }
+  }
+
   public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
     String tmpEx = ex;
     if (CaManager.NULL.equals(tmpEx)) {

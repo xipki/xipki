@@ -44,7 +44,7 @@ public class PublisherCheckCmd extends PublisherUpdateCmd {
     }
 
     if (cp.getType() != null) {
-      MgmtQaShellUtil.assertEquals("type", type, cp.getType());
+      MgmtQaShellUtil.assertTypeEquals("type", type, cp.getType());
     }
 
     if (cp.getConf() != null) {

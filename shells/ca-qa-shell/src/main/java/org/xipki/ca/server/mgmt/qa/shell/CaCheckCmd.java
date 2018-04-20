@@ -147,7 +147,7 @@ public class CaCheckCmd extends CaUpdateCmd {
 
     // Signer Type
     if (ey.getSignerType() != null) {
-      MgmtQaShellUtil.assertEquals("signer type", ey.getSignerType(), ca.getSignerType());
+      MgmtQaShellUtil.assertTypeEquals("signer type", ey.getSignerType(), ca.getSignerType());
     }
 
     if (ey.getSignerConf() != null) {

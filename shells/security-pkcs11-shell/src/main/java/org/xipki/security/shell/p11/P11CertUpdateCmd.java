@@ -38,6 +38,16 @@ import org.xipki.security.util.X509Util;
 @Service
 public class P11CertUpdateCmd extends P11SecurityAction {
 
+  @Option(name = "--id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String id;
+
+  @Option(name = "--label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String label;
+
   @Option(name = "--cert", required = true,
       description = "certificate file\n(required)")
   @Completion(FilePathCompleter.class)
@@ -46,7 +56,7 @@ public class P11CertUpdateCmd extends P11SecurityAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+    P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
     X509Certificate newCert = X509Util.parseCert(certFile);
     slot.updateCertificate(objIdentifier, newCert);
     println("updated certificate");

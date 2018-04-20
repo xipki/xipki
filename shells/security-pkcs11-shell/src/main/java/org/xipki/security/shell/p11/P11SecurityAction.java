@@ -48,16 +48,6 @@ public abstract class P11SecurityAction extends SecurityAction {
       description = "slot index\n(required)")
   protected Integer slotIndex;
 
-  @Option(name = "--id",
-      description = "id of the private key in the PKCS#11 device\n"
-          + "either keyId or keyLabel must be specified")
-  protected String id;
-
-  @Option(name = "--label",
-      description = "label of the private key in the PKCS#11 device\n"
-          + "either keyId or keyLabel must be specified")
-  protected String label;
-
   @Option(name = "--module",
       description = "name of the PKCS#11 module")
   @Completion(P11ModuleNameCompleter.class)
@@ -82,13 +72,13 @@ public abstract class P11SecurityAction extends SecurityAction {
     return p11Service.getModule();
   }
 
-  public P11ObjectIdentifier getObjectIdentifier()
+  public P11ObjectIdentifier getObjectIdentifier(String hexId, String label)
       throws IllegalCmdParamException, XiSecurityException, P11TokenException {
     P11Slot slot = getSlot();
     P11ObjectIdentifier objIdentifier;
-    if (id != null && label == null) {
-      objIdentifier = slot.getObjectIdForId(Hex.decode(id));
-    } else if (id == null && label != null) {
+    if (hexId != null && label == null) {
+      objIdentifier = slot.getObjectIdForId(Hex.decode(hexId));
+    } else if (hexId == null && label != null) {
       objIdentifier = slot.getObjectIdForLabel(label);
     } else {
       throw new IllegalCmdParamException(

@@ -30,6 +30,10 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 
 public abstract class P11KeyGenAction extends P11SecurityAction {
 
+  @Option(name = "--label", required = true,
+      description = "label of the PKCS#11 objects\n(required)")
+  protected String label;
+
   @Option(name = "--extractable", aliases = {"-x"},
       description = "whether the key is extractable")
   private Boolean extractable;

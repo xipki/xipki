@@ -54,7 +54,7 @@ public class ProfileCheckCmd extends ProfileUpdateCmd {
     }
 
     if (cp.getType() != null) {
-      MgmtQaShellUtil.assertEquals("type", type, cp.getType());
+      MgmtQaShellUtil.assertTypeEquals("type", type, cp.getType());
     }
 
     MgmtQaShellUtil.assertEquals("conf", conf, cp.getConf());
