@@ -77,7 +77,7 @@ class X509CrlSignerEntryWrapper {
       throw new XiSecurityException("dbEntry is null");
     }
 
-    if ("CA".equals(dbEntry.getType())) {
+    if ("CA".equalsIgnoreCase(dbEntry.getType())) {
       return;
     }
 
