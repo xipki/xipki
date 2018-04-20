@@ -147,11 +147,6 @@ class CertStoreQueryExecutor {
     String b64Cert = Base64.encodeToString(certificate.getEncodedCert());
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
-    long currentTimeSeconds = System.currentTimeMillis() / 1000;
-    BigInteger serialNumber = cert.getSerialNumber();
-    long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
-    long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
-
     Connection conn = null;
     PreparedStatement[] pss = borrowPreparedStatements(SQLs.SQL_ADD_CERT, SQLs.SQL_ADD_CRAW);
 
@@ -163,13 +158,13 @@ class CertStoreQueryExecutor {
       // cert
       int idx = 2;
       psAddcert.setInt(idx++, CertArt.X509PKC.getCode());
-      psAddcert.setLong(idx++, currentTimeSeconds);
-      psAddcert.setString(idx++, serialNumber.toString(16));
+      psAddcert.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
+      psAddcert.setString(idx++, cert.getSerialNumber().toString(16));
       psAddcert.setString(idx++, subjectText);
       psAddcert.setLong(idx++, fpSubject);
       setLong(psAddcert, idx++, fpReqSubject);
-      psAddcert.setLong(idx++, notBeforeSeconds);
-      psAddcert.setLong(idx++, notAfterSeconds);
+      psAddcert.setLong(idx++, cert.getNotBefore().getTime() / 1000); // notBeforeSeconds
+      psAddcert.setLong(idx++, cert.getNotAfter().getTime() / 1000); // notAfterSeconds
       setBoolean(psAddcert, idx++, false);
       psAddcert.setInt(idx++, certProfile.getId());
       psAddcert.setInt(idx++, ca.getId());
@@ -477,8 +472,6 @@ class CertStoreQueryExecutor {
       }
     }
 
-    long certId = certWithRevInfo.getCert().getCertId().longValue();
-    long revTimeSeconds = revInfo.getRevocationTime().getTime() / 1000;
     Long invTimeSeconds = null;
     if (revInfo.getInvalidityTime() != null) {
       invTimeSeconds = revInfo.getInvalidityTime().getTime() / 1000;
@@ -489,10 +482,10 @@ class CertStoreQueryExecutor {
       int idx = 1;
       ps.setLong(idx++, System.currentTimeMillis() / 1000);
       setBoolean(ps, idx++, true);
-      ps.setLong(idx++, revTimeSeconds);
+      ps.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000); // revTimeSeconds
       setLong(ps, idx++, invTimeSeconds);
       ps.setInt(idx++, revInfo.getReason().getCode());
-      ps.setLong(idx++, certId);
+      ps.setLong(idx++, certWithRevInfo.getCert().getCertId().longValue()); // certId
 
       int count = ps.executeUpdate();
       if (count != 1) {
@@ -542,14 +535,12 @@ class CertStoreQueryExecutor {
           + CrlReason.CERTIFICATE_HOLD.getDescription());
     }
 
-    long certId = certWithRevInfo.getCert().getCertId().longValue();
-
     PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_SUSPENDED_CERT);
     try {
       int idx = 1;
       ps.setLong(idx++, System.currentTimeMillis() / 1000);
       ps.setInt(idx++, reason.getCode());
-      ps.setLong(idx++, certId);
+      ps.setLong(idx++, certWithRevInfo.getCert().getCertId().longValue()); // certId
 
       int count = ps.executeUpdate();
       if (count != 1) {
@@ -601,18 +592,16 @@ class CertStoreQueryExecutor {
     }
 
     final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-    long certId = certWithRevInfo.getCert().getCertId().longValue();
-    long currentTimeSeconds = System.currentTimeMillis() / 1000;
 
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       int idx = 1;
-      ps.setLong(idx++, currentTimeSeconds);
+      ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
       setBoolean(ps, idx++, false);
       ps.setNull(idx++, Types.INTEGER);
       ps.setNull(idx++, Types.INTEGER);
       ps.setNull(idx++, Types.INTEGER);
-      ps.setLong(idx++, certId);
+      ps.setLong(idx++, certWithRevInfo.getCert().getCertId().longValue()); // certId
 
       int count = ps.executeUpdate();
       if (count != 1) {
@@ -1423,12 +1412,9 @@ class CertStoreQueryExecutor {
       rs = ps.executeQuery();
       List<CertListInfo> ret = new LinkedList<>();
       while (rs.next()) {
-        String snStr = rs.getString("SN");
-        BigInteger sn = new BigInteger(snStr, 16);
-        Date notBefore = new Date(rs.getLong("NBEFORE") * 1000);
-        Date notAfter = new Date(rs.getLong("NAFTER") * 1000);
-        String subject = rs.getString("SUBJECT");
-        CertListInfo info = new CertListInfo(sn, subject, notBefore, notAfter);
+        CertListInfo info = new CertListInfo(new BigInteger(rs.getString("SN"), 16),
+            rs.getString("SUBJECT"), new Date(rs.getLong("NBEFORE") * 1000),
+            new Date(rs.getLong("NAFTER") * 1000));
         ret.add(info);
       }
       return ret;
@@ -1508,13 +1494,11 @@ class CertStoreQueryExecutor {
         return null;
       }
 
-      int permission = rs.getInt("PERMISSION");
-      String str = rs.getString("PROFILES");
-      List<String> list = StringUtil.splitByComma(str);
+      List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
       CaHasUserEntry entry = new CaHasUserEntry(user);
-      entry.setPermission(permission);
+      entry.setPermission(rs.getInt("PERMISSION"));
       entry.setProfiles(profiles);
       return entry;
     } catch (SQLException ex) {
@@ -1576,15 +1560,11 @@ class CertStoreQueryExecutor {
 
       List<CertRevInfoWithSerial> ret = new LinkedList<>();
       while (rs.next()) {
-        long id = rs.getLong("ID");
-        String serial = rs.getString("SN");
-        int revReason = rs.getInt("RR");
-        long revTime = rs.getLong("RT");
         long revInvalidityTime = rs.getLong("RIT");
-
         Date invalidityTime = (revInvalidityTime == 0) ? null : new Date(1000 * revInvalidityTime);
-        CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id,
-            new BigInteger(serial, 16), revReason, new Date(1000 * revTime), invalidityTime);
+        CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(rs.getLong("ID"),
+            new BigInteger(rs.getString("SN"), 16), rs.getInt("RR"), // revReason
+            new Date(1000 * rs.getLong("RT")), invalidityTime);
         ret.add(revInfo);
       }
 
@@ -1649,18 +1629,13 @@ class CertStoreQueryExecutor {
         String serial = rs.getString("SN");
         boolean revoked = rs.getBoolean("REVOEKD");
         if (revoked) {
-          int revReason = rs.getInt("RR");
-          long tmpRevTime = rs.getLong("RT");
-          long revInvalidityTime = rs.getLong("RIT");
-
-          Date invalidityTime = (revInvalidityTime == 0) ? null
-              : new Date(1000 * revInvalidityTime);
-          revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16), revReason,
-              new Date(1000 * tmpRevTime), invalidityTime);
+          long revInvTime = rs.getLong("RIT");
+          Date invalidityTime = (revInvTime == 0) ? null : new Date(1000 * revInvTime);
+          revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16), rs.getInt("RR"),
+              new Date(1000 * rs.getLong("RT")), invalidityTime);
         } else {
-          long lastUpdate = rs.getLong("LUPDATE");
           revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16),
-              CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
+              CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * rs.getLong("LUPDATE")), null);
         }
         ret.add(revInfo);
       } catch (SQLException ex) {

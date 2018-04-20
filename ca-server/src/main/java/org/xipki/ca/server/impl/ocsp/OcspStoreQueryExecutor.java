@@ -185,7 +185,6 @@ class OcspStoreQueryExecutor {
     byte[] encodedCert = certificate.getEncodedCert();
     String certHash = certhashAlgo.base64Hash(encodedCert);
 
-    long currentTimeSeconds = System.currentTimeMillis() / 1000;
     X509Certificate cert = certificate.getCert();
     long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
     long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
@@ -197,7 +196,7 @@ class OcspStoreQueryExecutor {
       // CERT
       int idx = 1;
       ps.setLong(idx++, certId);
-      ps.setLong(idx++, currentTimeSeconds);
+      ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
       ps.setString(idx++, serialNumber.toString(16));
       ps.setLong(idx++, notBeforeSeconds);
       ps.setLong(idx++, notAfterSeconds);
@@ -247,13 +246,11 @@ class OcspStoreQueryExecutor {
 
     final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
-    long currentTimeSeconds = System.currentTimeMillis() / 1000;
-
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
       int idx = 1;
-      ps.setLong(idx++, currentTimeSeconds);
+      ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
       setBoolean(ps, idx++, revoked);
       if (revoked) {
         long revTime = revInfo.getRevocationTime().getTime() / 1000;

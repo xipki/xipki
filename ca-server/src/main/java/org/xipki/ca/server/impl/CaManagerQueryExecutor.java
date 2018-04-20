@@ -170,9 +170,7 @@ class CaManagerQueryExecutor {
         return null;
       }
 
-      long eventTime = rs.getLong("EVENT_TIME");
-      String eventOwner = rs.getString("EVENT_OWNER");
-      return new SystemEvent(eventName, eventOwner, eventTime);
+      return new SystemEvent(eventName, rs.getString("EVENT_OWNER"), rs.getLong("EVENT_TIME"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -236,9 +234,7 @@ class CaManagerQueryExecutor {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
-        String value = rs.getString("VALUE2");
-        map.put(name, value);
+        map.put(rs.getString("NAME"), rs.getString("VALUE2"));
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -261,9 +257,7 @@ class CaManagerQueryExecutor {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
-        int caId = rs.getInt("CA_ID");
-        map.put(name, caId);
+        map.put(rs.getString("NAME"), rs.getInt("CA_ID"));
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -287,10 +281,8 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown CA " + name);
       }
 
-      int id = rs.getInt("ID");
-      String type = rs.getString("TYPE");
-      String conf = rs.getString("CONF");
-      return new CertprofileEntry(new NameId(id, name), type, conf);
+      return new CertprofileEntry(new NameId(rs.getInt("ID"), name),
+          rs.getString("TYPE"), rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -339,10 +331,8 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unkown Publisher " + name);
       }
 
-      int id = rs.getInt("ID");
-      String type = rs.getString("TYPE");
-      String conf = rs.getString("CONF");
-      return new PublisherEntry(new NameId(id, name), type, conf);
+      return new PublisherEntry(new NameId(rs.getInt("ID"), name),
+          rs.getString("TYPE"), rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -386,9 +376,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown Requestor " + name);
       }
 
-      int id = rs.getInt("ID");
-      String b64Cert = rs.getString("CERT");
-      return new RequestorEntry(new NameId(id, name), b64Cert);
+      return new RequestorEntry(new NameId(rs.getInt("ID"), name), rs.getString("CERT"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -410,11 +398,8 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown CRL signer " + name);
       }
 
-      String signerType = rs.getString("SIGNER_TYPE");
-      String signerConf = rs.getString("SIGNER_CONF");
-      String signerCert = rs.getString("SIGNER_CERT");
-      String crlControlConf = rs.getString("CRL_CONTROL");
-      return new X509CrlSignerEntry(name, signerType, signerConf, signerCert, crlControlConf);
+      return new X509CrlSignerEntry(name, rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
+          rs.getString("SIGNER_CERT"), rs.getString("CRL_CONTROL"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } catch (InvalidConfException ex) {
@@ -438,8 +423,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown CMP control " + name);
       }
 
-      String conf = rs.getString("CONF");
-      return new CmpControlEntry(name, conf);
+      return new CmpControlEntry(name, rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -461,10 +445,8 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown responder " + name);
       }
 
-      String type = rs.getString("TYPE");
-      String conf = rs.getString("CONF");
-      String b64Cert = rs.getString("CERT");
-      return new ResponderEntry(name, type, conf, b64Cert);
+      return new ResponderEntry(name, rs.getString("TYPE"), rs.getString("CONF"),
+          rs.getString("CERT"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -497,11 +479,10 @@ class CaManagerQueryExecutor {
       CertRevocationInfo revocationInfo = null;
       boolean revoked = rs.getBoolean("REV");
       if (revoked) {
-        int revReason = rs.getInt("RR");
-        long revTime = rs.getInt("RT");
         long revInvalidityTime = rs.getInt("RIT");
         Date revInvTime = (revInvalidityTime == 0) ? null : new Date(revInvalidityTime * 1000);
-        revocationInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000), revInvTime);
+        revocationInfo = new CertRevocationInfo(rs.getInt("RR"), new Date(rs.getInt("RT") * 1000),
+            revInvTime);
       }
 
       List<String> tmpCrlUris = null;
@@ -527,31 +508,14 @@ class CaManagerQueryExecutor {
       }
 
       X509CaUris caUris = new X509CaUris(tmpCaCertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
+      X509CaEntry entry = new X509CaEntry(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
+          rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
+          caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
+      entry.setCert(generateCert(rs.getString("CERT")));
 
-      int id = rs.getInt("ID");
-      int serialNoSize = rs.getInt("SN_SIZE");
-      long nextCrlNo = rs.getLong("NEXT_CRLNO");
-      String signerType = rs.getString("SIGNER_TYPE");
-      String signerConf = rs.getString("SIGNER_CONF");
-      int numCrls = rs.getInt("NUM_CRLS");
-      int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
-
-      X509CaEntry entry = new X509CaEntry(new NameId(id, name), serialNoSize,
-          nextCrlNo, signerType, signerConf, caUris, numCrls, expirationPeriod);
-      String b64cert = rs.getString("CERT");
-      X509Certificate cert = generateCert(b64cert);
-      entry.setCert(cert);
-
-      String status = rs.getString("STATUS");
-      CaStatus caStatus = CaStatus.forName(status);
-      entry.setStatus(caStatus);
-
-      String maxValidityS = rs.getString("MAX_VALIDITY");
-      CertValidity maxValidity = CertValidity.getInstance(maxValidityS);
-      entry.setMaxValidity(maxValidity);
-
-      int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
-      entry.setKeepExpiredCertInDays(keepExpiredCertDays);
+      entry.setStatus(CaStatus.forName(rs.getString("STATUS")));
+      entry.setMaxValidity(CertValidity.getInstance(rs.getString("MAX_VALIDITY")));
+      entry.setKeepExpiredCertInDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
 
       String crlsignerName = rs.getString("CRLSIGNER_NAME");
       if (StringUtil.isNotBlank(crlsignerName)) {
@@ -573,28 +537,14 @@ class CaManagerQueryExecutor {
         entry.setCmpControlName(cmpcontrolName);
       }
 
-      boolean duplicateKeyPermitted = (rs.getInt("DUPLICATE_KEY") != 0);
-      entry.setDuplicateKeyPermitted(duplicateKeyPermitted);
-
-      boolean duplicateSubjectPermitted = (rs.getInt("DUPLICATE_SUBJECT") != 0);
-      entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
-
-      boolean saveReq = (rs.getInt("SAVE_REQ") != 0);
-      entry.setSaveRequest(saveReq);
-
-      int permission = rs.getInt("PERMISSION");
-      entry.setPermission(permission);
+      entry.setDuplicateKeyPermitted((rs.getInt("DUPLICATE_KEY") != 0));
+      entry.setDuplicateSubjectPermitted((rs.getInt("DUPLICATE_SUBJECT") != 0));
+      entry.setSaveRequest((rs.getInt("SAVE_REQ") != 0));
+      entry.setPermission(rs.getInt("PERMISSION"));
       entry.setRevocationInfo(revocationInfo);
-
       String validityModeS = rs.getString("VALIDITY_MODE");
-      ValidityMode validityMode = null;
-      if (validityModeS != null) {
-        validityMode = ValidityMode.forName(validityModeS);
-      }
-      if (validityMode == null) {
-        validityMode = ValidityMode.STRICT;
-      }
-      entry.setValidityMode(validityMode);
+      entry.setValidityMode(validityModeS == null
+          ? ValidityMode.STRICT : ValidityMode.forName(validityModeS));
 
       try {
         return new X509CaInfo(entry, certstore);
@@ -625,14 +575,11 @@ class CaManagerQueryExecutor {
         int id = rs.getInt("REQUESTOR_ID");
         String name = idNameMap.get(id);
 
-        boolean ra = rs.getBoolean("RA");
-        int permission = rs.getInt("PERMISSION");
-        String str = rs.getString("PROFILES");
-        List<String> list = StringUtil.splitByComma(str);
+        List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
         CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
-        entry.setRa(ra);
-        entry.setPermission(permission);
+        entry.setRa(rs.getBoolean("RA"));
+        entry.setPermission(rs.getInt("PERMISSION"));
         entry.setProfiles(profiles);
 
         ret.add(entry);
@@ -657,8 +604,7 @@ class CaManagerQueryExecutor {
 
       Set<Integer> ret = new HashSet<>();
       while (rs.next()) {
-        int id = rs.getInt("PROFILE_ID");
-        ret.add(id);
+        ret.add(rs.getInt("PROFILE_ID"));
       }
 
       return ret;
@@ -680,8 +626,7 @@ class CaManagerQueryExecutor {
 
       Set<Integer> ret = new HashSet<>();
       while (rs.next()) {
-        int id = rs.getInt("PUBLISHER_ID");
-        ret.add(id);
+        ret.add(rs.getInt("PUBLISHER_ID"));
       }
 
       return ret;
@@ -786,11 +731,7 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, entry.getValidityMode().name());
       ConfPairs extraControl = entry.getExtraControl();
       String encodedExtraCtrl = (extraControl == null) ? null : extraControl.getEncoded();
-      if (StringUtil.isBlank(encodedExtraCtrl)) {
-        ps.setString(idx++, null);
-      } else {
-        ps.setString(idx++, encodedExtraCtrl);
-      }
+      ps.setString(idx++, StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl);
       ps.setString(idx++, entry.getSignerConf());
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add CA " + entry.getIdent());
@@ -986,10 +927,8 @@ class CaManagerQueryExecutor {
       ps.setInt(idx++, ca.getId());
       ps.setInt(idx++, requestorIdent.getId());
 
-      boolean ra = requestor.isRa();
-      setBoolean(ps, idx++, ra);
-      int permission = requestor.getPermission();
-      ps.setInt(idx++, permission);
+      setBoolean(ps, idx++, requestor.isRa());
+      ps.setInt(idx++, requestor.getPermission());
       String profilesText = StringUtil.collectionAsStringByComma(requestor.getProfiles());
       ps.setString(idx++, profilesText);
 
@@ -998,7 +937,7 @@ class CaManagerQueryExecutor {
       }
 
       LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
-          requestorIdent, ca, ra, permission, profilesText);
+          requestorIdent, ca, requestor.isRa(), requestor.getPermission(), profilesText);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -1575,7 +1514,7 @@ class CaManagerQueryExecutor {
       ps.setString(1, conf);
       ps.setString(2, name);
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not CMP control " + name);
+        throw new CaMgmtException("could not change CMP control " + name);
       }
 
       LOG.info("changed CMP control '{}': {}", name, conf);
@@ -1750,7 +1689,7 @@ class CaManagerQueryExecutor {
     String tmpSignerConf;
     String tmpBase64Cert;
 
-    if ("CA".equalsIgnoreCase(tmpSignerType)) {
+    if ("ca".equalsIgnoreCase(tmpSignerType)) {
       tmpSignerConf = null;
       tmpBase64Cert = null;
     } else {
@@ -2314,13 +2253,10 @@ class CaManagerQueryExecutor {
       }
 
       int caId = rs.getInt("CA_ID");
-      boolean active = rs.getBoolean("ACTIVE");
-      String profilesText = rs.getString("PROFILES");
-      String control = rs.getString("CONTROL");
-      String responderName = rs.getString("RESPONDER_NAME");
-      Set<String> profiles = StringUtil.splitByCommaAsSet(profilesText);
+      Set<String> profiles = StringUtil.splitByCommaAsSet(rs.getString("PROFILES"));
 
-      return new ScepEntry(name, idNameMap.getCa(caId), active, responderName, profiles, control);
+      return new ScepEntry(name, idNameMap.getCa(caId), rs.getBoolean("ACTIVE"),
+          rs.getString("RESPONDER_NAME"), profiles, rs.getString("CONTROL"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } catch (InvalidConfException ex) {
@@ -2556,12 +2492,10 @@ class CaManagerQueryExecutor {
 
       Map<String, CaHasUserEntry> ret = new HashMap<>();
       while (rs.next()) {
-        int permission = rs.getInt("PERMISSION");
-        String str = rs.getString("PROFILES");
-        List<String> list = StringUtil.splitByComma(str);
+        List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
         CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
-        caHasUser.setPermission(permission);
+        caHasUser.setPermission(rs.getInt("PERMISSION"));
         caHasUser.setProfiles(profiles);
 
         int caId = rs.getInt("CA_ID");
@@ -2595,13 +2529,10 @@ class CaManagerQueryExecutor {
 
       List<CaHasUserEntry> ret = new LinkedList<>();
       while (rs.next()) {
-        String username = rs.getString("NAME");
-        int permission = rs.getInt("PERMISSION");
-        String str = rs.getString("PROFILES");
-        List<String> list = StringUtil.splitByComma(str);
+        List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-        CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, username));
-        caHasUser.setPermission(permission);
+        CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, rs.getString("NAME")));
+        caHasUser.setPermission(rs.getInt("PERMISSION"));
         caHasUser.setProfiles(profiles);
 
         ret.add(caHasUser);
@@ -2639,11 +2570,8 @@ class CaManagerQueryExecutor {
         }
       }
 
-      int id = rs.getInt("ID");
-      ident.setId(id);
-      boolean active = rs.getBoolean("ACTIVE");
-      String hashedPassword = rs.getString("PASSWORD");
-      return new UserEntry(ident, active, hashedPassword);
+      ident.setId(rs.getInt("ID"));
+      return new UserEntry(ident, rs.getBoolean("ACTIVE"), rs.getString("PASSWORD"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
