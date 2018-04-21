@@ -2767,7 +2767,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   public void removeUser(String username) throws CaMgmtException {
     username = ParamUtil.requireNonBlank("username", username).toLowerCase();
     asssertMasterMode();
-    queryExecutor.removeUser(username);
+    boolean bo = queryExecutor.deleteRowWithName(username, "TUSER");
+    if (!bo) {
+      throw new CaMgmtException("unknown user " + username);
+    }
   }
 
   @Override
@@ -2852,7 +2855,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   public void removeScep(String name) throws CaMgmtException {
     name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     asssertMasterMode();
-    queryExecutor.removeScep(name);
+    boolean bo = queryExecutor.deleteRowWithName(name, "TUSER");
+    if (!bo) {
+      throw new CaMgmtException("unknown SCEP " + name);
+    }
     scepDbEntries.remove(name);
     sceps.remove(name);
   } // method removeScep

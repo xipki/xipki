@@ -36,9 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.security.auth.x500.X500Principal;
-
-import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
@@ -184,7 +181,7 @@ class CaManagerQueryExecutor {
     }
   } // method getSystemEvent
 
-  void deleteSystemEvent(String eventName) throws CaMgmtException {
+  private void deleteSystemEvent(String eventName) throws CaMgmtException {
     final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME=?";
     PreparedStatement ps = null;
 
@@ -199,18 +196,17 @@ class CaManagerQueryExecutor {
     }
   } // method deleteSystemEvent
 
-  void addSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
+  private void addSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     final String sql =
         "INSERT INTO SYSTEM_EVENT (NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER) VALUES (?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
-      int idx = 1;
-      ps.setString(idx++, systemEvent.getName());
-      ps.setLong(idx++, systemEvent.getEventTime());
-      ps.setTimestamp(idx++, new Timestamp(systemEvent.getEventTime() * 1000L));
-      ps.setString(idx++, systemEvent.getOwner());
+      ps.setString(1, systemEvent.getName());
+      ps.setLong(2, systemEvent.getEventTime());
+      ps.setTimestamp(3, new Timestamp(systemEvent.getEventTime() * 1000L));
+      ps.setString(4, systemEvent.getOwner());
 
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add system event " + systemEvent.getName());
@@ -300,7 +296,7 @@ class CaManagerQueryExecutor {
     return namesFromTable(table, "NAME");
   }
 
-  List<String> namesFromTable(String table, String nameColumn) throws CaMgmtException {
+  private List<String> namesFromTable(String table, String nameColumn) throws CaMgmtException {
     final String sql = concat("SELECT ", nameColumn, " FROM ", table);
     Statement stmt = null;
     ResultSet rs = null;
@@ -670,19 +666,6 @@ class CaManagerQueryExecutor {
     }
   } // method deleteRowWithName
 
-  boolean deleteRows(String table) throws CaMgmtException {
-    final String sql = "DELETE FROM " + table;
-    Statement stmt = null;
-    try {
-      stmt = createStatement();
-      return stmt.executeUpdate(sql) > 0;
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(stmt, null);
-    }
-  } // method deleteRows
-
   void addCa(CaEntry caEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("caEntry", caEntry);
     if (!(caEntry instanceof X509CaEntry)) {
@@ -837,9 +820,8 @@ class CaManagerQueryExecutor {
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
-      int idx = 1;
-      ps.setString(idx++, name);
-      ps.setString(idx++, dbEntry.getConf());
+      ps.setString(1, name);
+      ps.setString(2, dbEntry.getConf());
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add CMP control " + name);
       }
@@ -866,10 +848,9 @@ class CaManagerQueryExecutor {
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
-      int idx = 1;
-      ps.setInt(idx++, dbEntry.getIdent().getId());
-      ps.setString(idx++, dbEntry.getIdent().getName());
-      ps.setString(idx++, Base64.encodeToString(dbEntry.getCert().getEncoded()));
+      ps.setInt(1, dbEntry.getIdent().getId());
+      ps.setString(2, dbEntry.getIdent().getName());
+      ps.setString(3, Base64.encodeToString(dbEntry.getCert().getEncoded()));
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add requestor " + dbEntry.getIdent());
       }
@@ -1152,9 +1133,8 @@ class CaManagerQueryExecutor {
             securityFactory.createSigner(tmpSignerType, new SignerConf(m[1]), tmpCert);
           }
         } catch (XiSecurityException | ObjectCreationException ex) {
-          throw new CaMgmtException(
-              "could not create signer for CA '" + changeCaEntry.getIdent()
-              + "'" + ex.getMessage(), ex);
+          throw new CaMgmtException("could not create signer for CA '"
+              + changeCaEntry.getIdent() + "'" + ex.getMessage(), ex);
         }
       } catch (SQLException ex) {
         throw new CaMgmtException(datasource, sql, ex);
@@ -1390,9 +1370,8 @@ class CaManagerQueryExecutor {
   RequestorEntryWrapper changeRequestor(NameId nameId, String base64Cert)
       throws CaMgmtException {
     ParamUtil.requireNonNull("nameId", nameId);
-    RequestorEntry newDbEntry = new RequestorEntry(nameId, base64Cert);
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-    requestor.setDbEntry(newDbEntry);
+    requestor.setDbEntry(new RequestorEntry(nameId, base64Cert));
 
     changeIfNotNull("REQUESTOR", col(INT, "ID", nameId.getId()), col(STRING, "CERT", base64Cert));
     return requestor;
@@ -1736,24 +1715,6 @@ class CaManagerQueryExecutor {
     }
   } // method addScep
 
-  void removeScep(String name) throws CaMgmtException {
-    ParamUtil.requireNonNull("name", name);
-    final String sql = "DELETE FROM SCEP WHERE NAME=?";
-
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setString(1, name);
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not remove SCEP " + name);
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method removeScep
-
   ScepEntry getScep(String name, CaIdNameMap idNameMap) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     final String sql = sqls.sqlSelectScep;
@@ -1828,24 +1789,6 @@ class CaManagerQueryExecutor {
 
     LOG.info("added user '{}'", name);
   } // method addUser
-
-  void removeUser(String username) throws CaMgmtException {
-    ParamUtil.requireNonBlank("username", username);
-    final String sql = "DELETE FROM TUSER WHERE NAME=?";
-
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setString(1, username);
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not remove User " + username);
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method removeUser
 
   void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
     String username = userEntry.getIdent().getName();
@@ -2042,19 +1985,12 @@ class CaManagerQueryExecutor {
     }
   } // method getUser
 
-  private static void setBoolean(PreparedStatement ps, int index, boolean bo)
-      throws SQLException {
+  private static void setBoolean(PreparedStatement ps, int index, boolean bo) throws SQLException {
     ps.setInt(index, bo ? 1 : 0);
   }
 
   private static String getRealString(String str) {
     return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
-  }
-
-  static String canonicalizName(X500Principal prin) {
-    ParamUtil.requireNonNull("prin", prin);
-    X500Name x500Name = X500Name.getInstance(prin.getEncoded());
-    return X509Util.canonicalizName(x500Name);
   }
 
   private int getNonNullIdForName(String sql, String name) throws CaMgmtException {
