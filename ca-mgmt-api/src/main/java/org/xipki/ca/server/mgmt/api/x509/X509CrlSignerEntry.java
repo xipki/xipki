@@ -112,7 +112,7 @@ public class X509CrlSignerEntry {
     this.cert = cert;
   }
 
-  public String crlControl() {
+  public String getCrlControl() {
     return crlControl;
   }
 

@@ -3693,7 +3693,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
               concat("files/crlsigner-", name, ".conf")));
           jaxb.setSignerCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
               concat("files/crlsigner-", name, ".der")));
-          jaxb.setCrlControl(entry.crlControl());
+          jaxb.setCrlControl(entry.getCrlControl());
 
           list.add(jaxb);
         }
