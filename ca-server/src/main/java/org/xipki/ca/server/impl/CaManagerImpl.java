@@ -94,7 +94,7 @@ import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
 import org.xipki.ca.server.impl.ocsp.OcspCertPublisher;
 import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
-import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
@@ -375,7 +375,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private DataSourceWrapper datasource;
 
-  private CertificateStore certstore;
+  private CertStore certstore;
 
   private SecurityFactory securityFactory;
 
@@ -556,7 +556,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
     try {
-      this.certstore = new CertificateStore(datasource, idGen);
+      this.certstore = new CertStore(datasource, idGen);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }

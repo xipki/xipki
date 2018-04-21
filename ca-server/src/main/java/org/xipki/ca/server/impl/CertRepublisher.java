@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
-import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.common.EndOfQueue;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.QueueEntry;
@@ -77,7 +77,7 @@ class CertRepublisher {
       try {
         List<SerialWithId> serials;
         do {
-          serials = certstore.getCertSerials(ca, startId, numEntries, onlyRevokedCerts);
+          serials = certstore.getSerialNumbers(ca, startId, numEntries, onlyRevokedCerts);
           long maxId = 1;
           for (SerialWithId sid : serials) {
             if (sid.getId() > maxId) {
@@ -143,7 +143,7 @@ class CertRepublisher {
         X509CertificateInfo certInfo;
 
         try {
-          certInfo = certstore.getCertificateInfoForId(ca, caCert, sid.getId(), caIdNameMap);
+          certInfo = certstore.getCertForId(ca, caCert, sid.getId(), caIdNameMap);
         } catch (OperationException | CertificateException ex) {
           LogUtil.error(LOG, ex);
           failed = true;
@@ -181,7 +181,7 @@ class CertRepublisher {
 
   private final CaIdNameMap caIdNameMap;
 
-  private final CertificateStore certstore;
+  private final CertStore certstore;
 
   private final List<IdentifiedX509CertPublisher> publishers;
 
@@ -195,7 +195,7 @@ class CertRepublisher {
 
   private ProcessLog processLog;
 
-  CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertificateStore certstore,
+  CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertStore certstore,
       List<IdentifiedX509CertPublisher> publishers, boolean onlyRevokedCerts,
       int numThreads) {
     this.ca = ParamUtil.requireNonNull("ca", ca);

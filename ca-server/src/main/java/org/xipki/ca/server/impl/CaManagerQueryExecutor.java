@@ -48,7 +48,7 @@ import org.xipki.ca.server.impl.SqlColumn.ColumnType;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.scep.ScepImpl;
-import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CaEntry;
@@ -460,7 +460,7 @@ class CaManagerQueryExecutor {
     }
   } // method createResponder
 
-  X509CaInfo createCaInfo(String name, boolean masterMode, CertificateStore certstore)
+  X509CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
       throws CaMgmtException {
     final String sql = sqls.sqlSelectCa;
     PreparedStatement stmt = null;

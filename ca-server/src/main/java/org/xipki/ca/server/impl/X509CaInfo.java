@@ -33,7 +33,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
@@ -75,7 +75,7 @@ public class X509CaInfo {
 
   private PublicCaInfo publicCaInfo;
 
-  private CertificateStore certStore;
+  private CertStore certStore;
 
   private RandomSerialNumberGenerator randomSnGenerator;
 
@@ -85,7 +85,7 @@ public class X509CaInfo {
 
   private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
-  public X509CaInfo(X509CaEntry caEntry, CertificateStore certStore) throws OperationException {
+  public X509CaInfo(X509CaEntry caEntry, CertStore certStore) throws OperationException {
     this.caEntry = ParamUtil.requireNonNull("caEntry", caEntry);
     this.certStore = ParamUtil.requireNonNull("certStore", certStore);
 

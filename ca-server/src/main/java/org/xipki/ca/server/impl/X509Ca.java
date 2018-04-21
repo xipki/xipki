@@ -103,9 +103,9 @@ import org.xipki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
-import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
+import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
@@ -413,7 +413,7 @@ public class X509Ca {
 
   private final X509Cert caCert;
 
-  private final CertificateStore certstore;
+  private final CertStore certstore;
 
   private final CaIdNameMap caIdNameMap;
 
@@ -435,7 +435,7 @@ public class X509Ca {
 
   private final ConcurrentSkipListSet<Long> subjectCertsInProcess = new ConcurrentSkipListSet<>();
 
-  public X509Ca(CaManagerImpl caManager, X509CaInfo caInfo, CertificateStore certstore)
+  public X509Ca(CaManagerImpl caManager, X509CaInfo caInfo, CertStore certstore)
       throws OperationException {
     this.caManager = ParamUtil.requireNonNull("caManager", caManager);
     this.masterMode = caManager.isMasterMode();
@@ -498,7 +498,7 @@ public class X509Ca {
 
   public X509Certificate getCertificate(BigInteger serialNumber)
       throws CertificateException, OperationException {
-    X509CertificateInfo certInfo = certstore.getCertificateInfoForSerial(caIdent,
+    X509CertificateInfo certInfo = certstore.getCertificateInfo(caIdent,
         caCert, serialNumber, caIdNameMap);
     return (certInfo == null) ? null : certInfo.getCert().getCert();
   }
@@ -554,7 +554,8 @@ public class X509Ca {
   }
 
   public NameId getUserIdent(int userId) throws OperationException {
-    return certstore.getUserIdent(userId);
+    String name = certstore.getUsername(userId);
+    return (name == null) ? null : new NameId(userId, name);
   }
 
   public ByUserRequestorInfo getByUserRequestor(NameId userIdent) throws OperationException {
@@ -774,9 +775,8 @@ public class X509Ca {
           revInfos = certstore.getCertsForDeltaCrl(caIdent, startId, numEntries,
               control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
         } else {
-          revInfos = certstore.getRevokedCerts(caIdent, notExpireAt, startId,
-              numEntries, control.isOnlyContainsCaCerts(),
-              control.isOnlyContainsUserCerts());
+          revInfos = certstore.getRevokedCerts(caIdent, notExpireAt, startId, numEntries,
+              control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
         }
         allRevInfos.addAll(revInfos);
 
@@ -972,7 +972,7 @@ public class X509Ca {
 
     List<SerialWithId> serials;
     do {
-      serials = certstore.getCertSerials(caIdent, notExpireAt, startId, numEntries, false,
+      serials = certstore.getSerialNumbers(caIdent, notExpireAt, startId, numEntries, false,
           onlyCaCerts, onlyUserCerts);
 
       long maxId = 1;
@@ -989,7 +989,7 @@ public class X509Ca {
         if (control.isXipkiCertsetCertIncluded()) {
           X509CertificateInfo certInfo;
           try {
-            certInfo = certstore.getCertificateInfoForId(caIdent, caCert, sid.getId(), caIdNameMap);
+            certInfo = certstore.getCertForId(caIdent, caCert, sid.getId(), caIdNameMap);
           } catch (CertificateException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                 "CertificateException: " + ex.getMessage());
@@ -1002,7 +1002,7 @@ public class X509Ca {
             profileId = certInfo.getProfile().getId();
           }
         } else if (control.isXipkiCertsetProfilenameIncluded()) {
-          profileId = certstore.getCertProfileForId(caIdent, sid.getId());
+          profileId = certstore.getCertProfileForCertId(caIdent, sid.getId());
         }
 
         if (profileId != null) {
@@ -1054,7 +1054,7 @@ public class X509Ca {
       return 0;
     }
 
-    if (!certstore.addCertificate(certInfo)) {
+    if (!certstore.addCert(certInfo)) {
       return 1;
     }
 
@@ -1216,7 +1216,7 @@ public class X509Ca {
         X509CertificateInfo certInfo;
 
         try {
-          certInfo = certstore.getCertificateInfoForId(caIdent, caCert, certId, caIdNameMap);
+          certInfo = certstore.getCertForId(caIdent, caCert, certId, caIdNameMap);
         } catch (OperationException | CertificateException ex) {
           LogUtil.error(LOG, ex);
           return false;
@@ -1242,7 +1242,12 @@ public class X509Ca {
   } // method publishCertsInQueue
 
   private boolean publishCrl(X509CRL crl) {
-    if (!certstore.addCrl(caIdent, crl)) {
+    try {
+      certstore.addCrl(caIdent, crl);
+    } catch (Exception ex) {
+      LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
+          caIdent.getName(), crl.getThisUpdate(), ex.getMessage());
+      LOG.debug("Exception", ex);
       return false;
     }
 
@@ -1394,8 +1399,8 @@ public class X509Ca {
     X509CertWithRevocationInfo revokedCert = null;
 
     CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
-    revokedCert = certstore.revokeCertificate(caIdent, serialNumber, revInfo,
-        force, shouldPublishToDeltaCrlCache(), caIdNameMap);
+    revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force,
+        shouldPublishToDeltaCrlCache(), caIdNameMap);
     if (revokedCert == null) {
       return null;
     }
@@ -1506,7 +1511,7 @@ public class X509Ca {
 
     LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caIdent, hexSerial);
 
-    X509CertWithDbId unrevokedCert = certstore.unrevokeCertificate(caIdent,
+    X509CertWithDbId unrevokedCert = certstore.unrevokeCert(caIdent,
         serialNumber, force, shouldPublishToDeltaCrlCache(), caIdNameMap);
     if (unrevokedCert == null) {
       return null;
@@ -2344,7 +2349,7 @@ public class X509Ca {
 
     int sum = 0;
     while (true) {
-      List<BigInteger> serials = certstore.getExpiredCertSerials(caIdent, expiredAt, numEntries);
+      List<BigInteger> serials = certstore.getExpiredSerialNumbers(caIdent, expiredAt, numEntries);
       if (CollectionUtil.isEmpty(serials)) {
         return sum;
       }
