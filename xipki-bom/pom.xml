@@ -217,6 +217,11 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
+        <artifactId>security-pkcs11</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki</groupId>
         <artifactId>servlet-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -273,7 +278,17 @@
       </dependency>
       <dependency>
         <groupId>org.xipki.shells</groupId>
+        <artifactId>security-pkcs11-shell</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.shells</groupId>
         <artifactId>security-speed-shell</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.shells</groupId>
+        <artifactId>security-speed-pkcs11-shell</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
