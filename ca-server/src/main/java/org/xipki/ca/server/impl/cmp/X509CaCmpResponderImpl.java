@@ -95,6 +95,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditEventData;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
@@ -331,15 +332,10 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
     if (respBody.getType() == PKIBody.TYPE_ERROR) {
       ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
-      AuditStatus auditStatus = AuditStatus.FAILED;
       org.xipki.cmp.PkiStatusInfo pkiStatus =
           new org.xipki.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
 
-      if (pkiStatus.pkiFailureInfo() == PKIFailureInfo.systemFailure) {
-        auditStatus = AuditStatus.FAILED;
-      }
-      event.setStatus(auditStatus);
-
+      event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();
       if (statusString != null) {
         event.addEventData(CaAuditConstants.NAME_message, statusString);
@@ -409,14 +405,14 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
       if (!req.hasProofOfPossession()) {
         certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP,
-            "no POP", null));
+            "no POP"));
         continue;
       }
 
       if (!verifyPopo(req, tmpRequestor.isRa())) {
         LOG.warn("could not validate POP for request {}", certReqId.getValue());
         certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP,
-            "invalid POP", null));
+            "invalid POP"));
         continue;
       }
 
@@ -464,10 +460,12 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       for (int i = 0; i < n; i++) {
         certResps[i] = certResponses.get(i);
       }
+      event.setStatus(AuditStatus.FAILED);
       return new CertRepMessage(null, certResps);
     }
 
     if (cmpControl.isGroupEnroll() && certTemplateDatas.size() != n) {
+      event.setStatus(AuditStatus.FAILED);
       // at least one certRequest cannot be used to enroll certificate
       int lastFailureIndex = certTemplateDatas.size();
       BigInteger failCertReqId = certReqIds.get(lastFailureIndex).getPositiveValue();
@@ -581,7 +579,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
       if (certprofileName == null) {
         certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-            "badCertTemplate", null);
+            "badCertTemplate");
       } else {
         certprofileName = certprofileName.toLowerCase();
         if (!requestor.isCertProfilePermitted(certprofileName)) {
@@ -602,6 +600,20 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
     if (certGenerated && cmpControl.isSendCaCert()) {
       caPubs = new CMPCertificate[]{ca.getCaInfo().getCertInCmpFormat()};
     }
+
+    if (event.getStatus() == null || event.getStatus() != AuditStatus.FAILED) {
+      int status = certResp.getStatus().getStatus().intValue();
+      if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS
+          && status != PKIStatus.WAITING) {
+        event.setStatus(AuditStatus.FAILED);
+        PKIFreeText statusString = certResp.getStatus().getStatusString();
+        if (statusString != null) {
+          event.addEventData(CaAuditConstants.NAME_message,
+              statusString.getStringAt(0).getString());
+        }
+      }
+    }
+
     CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
 
     return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
@@ -646,6 +658,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
           }
         }
       } catch (OperationException ex) {
+        event.setStatus(AuditStatus.FAILED);
         for (int i = 0; i < n; i++) {
           ret.add(postProcessException(certReqIds.get(i), ex));
         }
@@ -686,6 +699,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
 
           ret.add(postProcessCertInfo(certReqId, certInfo, tid, cmpControl));
         } catch (OperationException ex) {
+          event.setStatus(AuditStatus.FAILED);
           ret.add(postProcessException(certReqId, ex));
         }
       }
@@ -1310,8 +1324,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
       case PKIBody.TYPE_P10_CERT_REQ:
         checkPermission(requestor, PermissionConstants.ENROLL_CERT);
         respBody = processP10cr(request, requestor, tid, reqHeader,
-            CertificationRequest.getInstance(reqBody.getContent()), cmpControl, msgId,
-            event);
+            CertificationRequest.getInstance(reqBody.getContent()), cmpControl, msgId, event);
         break;
       case PKIBody.TYPE_CROSS_CERT_REQ:
         checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
@@ -1642,12 +1655,7 @@ public class X509CaCmpResponderImpl extends CmpResponder implements X509CaCmpRes
   }
 
   private CertResponse buildErrorCertResponse(ASN1Integer certReqId, int pkiFailureInfo,
-      String msg) {
-    return buildErrorCertResponse(certReqId, pkiFailureInfo, msg, msg);
-  }
-
-  private CertResponse buildErrorCertResponse(ASN1Integer certReqId, int pkiFailureInfo,
-      String msg, String pkiStatusText) {
+      String pkiStatusText) {
     return new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText));
   }
 

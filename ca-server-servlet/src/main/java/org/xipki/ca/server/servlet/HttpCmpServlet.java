@@ -86,9 +86,6 @@ public class HttpCmpServlet extends HttpServlet {
     event.setName(CaAuditConstants.NAME_PERF);
     event.addEventData(CaAuditConstants.NAME_reqType, RequestType.CMP.name());
 
-    AuditLevel auditLevel = AuditLevel.INFO;
-    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
-    String auditMessage = null;
     try {
       String reqContentType = req.getHeader("Content-Type");
       if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
@@ -143,44 +140,38 @@ public class HttpCmpServlet extends HttpServlet {
       resp.setContentType(CT_RESPONSE);
       resp.setContentLength(encodedPkiResp.length);
       resp.getOutputStream().write(encodedPkiResp);
-    } catch (HttpRespAuditException ex) {
-      auditStatus = ex.getAuditStatus();
-      auditLevel = ex.getAuditLevel();
-      auditMessage = ex.getAuditMessage();
-      sendError(resp, ex.getHttpStatus());
     } catch (Throwable th) {
-      if (th instanceof EOFException) {
-        LogUtil.warn(LOG, th, "connection reset by peer");
+      AuditLevel auditLevel;
+      AuditStatus auditStatus;
+      String auditMessage;
+
+      if (th instanceof HttpRespAuditException) {
+        HttpRespAuditException hae = (HttpRespAuditException) th;
+        auditStatus = hae.getAuditStatus();
+        auditLevel = hae.getAuditLevel();
+        auditMessage = hae.getAuditMessage();
       } else {
-        LOG.error("Throwable thrown, this should not happen!", th);
+        auditLevel = AuditLevel.ERROR;
+        auditStatus = AuditStatus.FAILED;
+        auditMessage = "internal error";
+        if (th instanceof EOFException) {
+          LogUtil.warn(LOG, th, "connection reset by peer");
+        } else {
+          LOG.error("Throwable thrown, this should not happen!", th);
+        }
       }
-      auditLevel = AuditLevel.ERROR;
-      auditStatus = AuditStatus.FAILED;
-      auditMessage = "internal error";
-      sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+      event.setStatus(auditStatus);
+      event.setLevel(auditLevel);
+      if (auditMessage != null) {
+        event.addEventData(CaAuditConstants.NAME_message, auditMessage);
+      }
     } finally {
       resp.flushBuffer();
-      audit(auditService, event, auditLevel, auditStatus, auditMessage);
+      event.finish();
+      auditService.logEvent(event);
     }
   } // method service
-
-  private static void audit(AuditService auditService, AuditEvent event,
-      AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
-    if (auditLevel != null) {
-      event.setLevel(auditLevel);
-    }
-
-    if (auditStatus != null) {
-      event.setStatus(auditStatus);
-    }
-
-    if (auditMessage != null) {
-      event.addEventData(CaAuditConstants.NAME_message, auditMessage);
-    }
-
-    event.finish();
-    auditService.logEvent(event);
-  } // method audit
 
   private static void sendError(HttpServletResponse resp, int status) {
     resp.setStatus(status);

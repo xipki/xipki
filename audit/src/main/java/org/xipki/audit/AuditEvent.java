@@ -121,13 +121,14 @@ public class AuditEvent {
       }
     }
 
-    AuditEventData ret = null;
     if (idx != -1) {
-      ret = eventDatas.get(idx);
+      AuditEventData existing = eventDatas.get(idx);
+      existing.addValue(eventData.getValue());
+      return existing;
+    } else {
+      eventDatas.add(eventData);
+      return eventData;
     }
-    eventDatas.add(eventData);
-
-    return ret;
   }
 
   public boolean removeEventData(String eventDataName) {

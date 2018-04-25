@@ -21,10 +21,14 @@ import java.util.Date;
 
 import javax.net.ssl.SSLSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditServiceRegister;
-import org.xipki.ca.server.api.ResponderManager;
+import org.xipki.audit.AuditStatus;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
+import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.Rest;
 import org.xipki.ca.server.api.RestResponse;
 import org.xipki.http.servlet.AbstractHttpServlet;
@@ -44,6 +48,8 @@ import io.netty.handler.codec.http.HttpVersion;
  */
 
 public class HttpRestServlet extends AbstractHttpServlet {
+
+  private static final Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
   private ResponderManager responderManager;
 
@@ -82,7 +88,15 @@ public class HttpRestServlet extends AbstractHttpServlet {
       for (String headerName : response.getHeaders().keySet()) {
         resp.headers().add(headerName, response.getHeaders().get(headerName));
       }
+      if (event.getStatus() == null) {
+        event.setStatus(AuditStatus.SUCCESSFUL);
+      }
       return resp;
+    } catch (RuntimeException ex) {
+      event.setStatus(AuditStatus.FAILED);
+      event.setLevel(AuditLevel.ERROR);
+      LOG.error("RuntimeException thrown, this should not happen!", ex);
+      throw ex;
     } finally {
       event.finish();
       auditServiceRegister.getAuditService().logEvent(event);

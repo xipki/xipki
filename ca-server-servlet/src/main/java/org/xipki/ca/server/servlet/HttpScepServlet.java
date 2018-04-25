@@ -285,7 +285,12 @@ public class HttpScepServlet extends HttpServlet {
 
   private static void audit(AuditService auditService, AuditEvent event,
       AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
-    event.setLevel(auditLevel);
+    AuditLevel curLevel = event.getLevel();
+    if (curLevel == null) {
+      event.setLevel(auditLevel);
+    } else if (curLevel.getValue() > auditLevel.getValue()) {
+      event.setLevel(auditLevel);
+    }
 
     if (auditStatus != null) {
       event.setStatus(auditStatus);

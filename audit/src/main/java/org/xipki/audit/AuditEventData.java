@@ -29,7 +29,7 @@ public class AuditEventData {
 
   private final String name;
 
-  private final String value;
+  private String value;
 
   public AuditEventData(String name, Object value) {
     Objects.requireNonNull(name, "name must not be null");
@@ -43,6 +43,10 @@ public class AuditEventData {
     } else {
       this.value = value.toString();
     }
+  }
+
+  public void addValue(Object additionalValue) {
+    this.value += ", " + additionalValue;
   }
 
   public String getName() {

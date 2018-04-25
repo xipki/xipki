@@ -28,8 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
+import org.xipki.audit.AuditStatus;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.api.Rest;
@@ -105,6 +107,14 @@ public class HttpRestServlet extends HttpServlet {
         resp.setContentLength(respBody.length);
         resp.getOutputStream().write(respBody);
       }
+      if (event.getStatus() == null) {
+        event.setStatus(AuditStatus.SUCCESSFUL);
+      }
+    } catch (RuntimeException ex) {
+      event.setStatus(AuditStatus.FAILED);
+      event.setLevel(AuditLevel.ERROR);
+      LOG.error("RuntimeException thrown, this should not happen!", ex);
+      throw ex;
     } finally {
       event.finish();
       auditService.logEvent(event);

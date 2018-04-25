@@ -245,6 +245,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
         auditStatus = AuditStatus.FAILED;
         return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
       }
+
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         final String msg = "connection reset by peer";
@@ -289,7 +290,12 @@ public class HttpScepServlet extends AbstractHttpServlet {
 
   private static void audit(AuditService auditService, AuditEvent event,
       AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
-    event.setLevel(auditLevel);
+    AuditLevel curLevel = event.getLevel();
+    if (curLevel == null) {
+      event.setLevel(auditLevel);
+    } else if (curLevel.getValue() > auditLevel.getValue()) {
+      event.setLevel(auditLevel);
+    }
 
     if (auditStatus != null) {
       event.setStatus(auditStatus);

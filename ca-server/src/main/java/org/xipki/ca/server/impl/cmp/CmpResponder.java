@@ -133,8 +133,7 @@ abstract class CmpResponder {
    * @return the response
    */
   protected abstract PKIMessage processPkiMessage0(PKIMessage request, RequestorInfo requestor,
-      ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId,
-      AuditEvent event);
+      ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId, AuditEvent event);
 
   public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
       AuditEvent event) {
@@ -287,8 +286,7 @@ abstract class CmpResponder {
         event.setStatus(AuditStatus.FAILED);
         event.addEventData(CaAuditConstants.NAME_message, errorStatus);
       }
-      return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
-          errorStatus);
+      return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
     }
 
     PKIMessage resp = processPkiMessage0(pkiMessage, requestor, tid, message, msgId, event);
@@ -309,8 +307,7 @@ abstract class CmpResponder {
   }
 
   private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
-      CmpControl cmpControl)
-      throws CMPException, InvalidKeyException, OperatorCreationException {
+      CmpControl cmpControl) throws CMPException, InvalidKeyException, OperatorCreationException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {

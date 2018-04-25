@@ -88,9 +88,6 @@ public class HttpCmpServlet extends AbstractHttpServlet {
     event.setName(CaAuditConstants.NAME_PERF);
     event.addEventData(CaAuditConstants.NAME_reqType, RequestType.CMP.name());
 
-    AuditLevel auditLevel = AuditLevel.INFO;
-    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
-    String auditMessage = null;
     try {
       if (responderManager == null) {
         String message = "responderManager in servlet not configured";
@@ -146,24 +143,41 @@ public class HttpCmpServlet extends AbstractHttpServlet {
 
       PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, event);
       byte[] encodedPkiResp = pkiResp.getEncoded();
-      return createOKResponse(httpVersion, CT_RESPONSE, encodedPkiResp);
-    } catch (HttpRespAuditException ex) {
-      auditStatus = ex.getAuditStatus();
-      auditLevel = ex.getAuditLevel();
-      auditMessage = ex.getAuditMessage();
-      return createErrorResponse(httpVersion, ex.getHttpStatus());
-    } catch (Throwable th) {
-      if (th instanceof EOFException) {
-        LogUtil.warn(LOG, th, "connection reset by peer");
-      } else {
-        LOG.error("Throwable thrown, this should not happen!", th);
+      if (event.getStatus() == null) {
+        event.setStatus(AuditStatus.SUCCESSFUL);
       }
-      auditLevel = AuditLevel.ERROR;
-      auditStatus = AuditStatus.FAILED;
-      auditMessage = "internal error";
+      return createOKResponse(httpVersion, CT_RESPONSE, encodedPkiResp);
+    } catch (Throwable th) {
+      AuditLevel auditLevel;
+      AuditStatus auditStatus;
+      String auditMessage;
+
+      if (th instanceof HttpRespAuditException) {
+        HttpRespAuditException hae = (HttpRespAuditException) th;
+        auditStatus = hae.getAuditStatus();
+        auditLevel = hae.getAuditLevel();
+        auditMessage = hae.getAuditMessage();
+      } else {
+        auditLevel = AuditLevel.ERROR;
+        auditStatus = AuditStatus.FAILED;
+        auditMessage = "internal error";
+        if (th instanceof EOFException) {
+          LogUtil.warn(LOG, th, "connection reset by peer");
+        } else {
+          LOG.error("Throwable thrown, this should not happen!", th);
+        }
+      }
+
+      event.setStatus(auditStatus);
+      event.setLevel(auditLevel);
+      if (auditMessage != null) {
+        event.addEventData(CaAuditConstants.NAME_message, auditMessage);
+      }
+
       return createErrorResponse(httpVersion, HttpResponseStatus.INTERNAL_SERVER_ERROR);
     } finally {
-      audit(auditService, event, auditLevel, auditStatus, auditMessage);
+      event.finish();
+      auditService.logEvent(event);
     }
   } // method service
 
@@ -174,23 +188,5 @@ public class HttpCmpServlet extends AbstractHttpServlet {
   public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
     this.auditServiceRegister = auditServiceRegister;
   }
-
-  private static void audit(AuditService auditService, AuditEvent event,
-      AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
-    if (auditLevel != null) {
-      event.setLevel(auditLevel);
-    }
-
-    if (auditStatus != null) {
-      event.setStatus(auditStatus);
-    }
-
-    if (auditMessage != null) {
-      event.addEventData(CaAuditConstants.NAME_message, auditMessage);
-    }
-
-    event.finish();
-    auditService.logEvent(event);
-  } // method audit
 
 }
