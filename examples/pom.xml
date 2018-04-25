@@ -28,7 +28,7 @@
   <name>XiPKI :: example :: ${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
-    <module>ca-certprofile-example</module>
+    <module>certprofile-example</module>
     <module>tlskeys-example</module>
     <module>lite-caclient-example</module>
     <module>scep-example</module>

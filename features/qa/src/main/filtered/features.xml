@@ -21,7 +21,7 @@
   <feature name="xipki-custom-certprofiles" version="${project.version}" description="CA Custom Certificate Profiles">
     <feature>xipki-ca-base</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="70">mvn:org.xipki.examples/ca-certprofile-example/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.examples/certprofile-example/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>
@@ -57,7 +57,7 @@
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
     <feature prerequisite="true">xipki-camgmt-shell</feature>
-    <bundle start-level="70">mvn:org.xipki/ca-certprofile-xml/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/certprofile-xml/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ca-qa/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/ca-qa-shell/${project.version}</bundle>
   </feature>

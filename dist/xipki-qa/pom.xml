@@ -196,7 +196,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>ca-certprofile-xml</artifactId>
+                  <artifactId>certprofile-xml</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
