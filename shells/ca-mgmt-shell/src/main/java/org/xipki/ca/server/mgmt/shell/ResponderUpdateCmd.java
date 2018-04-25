@@ -28,12 +28,12 @@ import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 

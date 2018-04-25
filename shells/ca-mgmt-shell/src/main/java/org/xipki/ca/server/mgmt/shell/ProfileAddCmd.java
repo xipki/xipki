@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileTypeCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -45,6 +46,7 @@ public class ProfileAddCmd extends CaAction {
 
   @Option(name = "--type", required = true,
       description = "profile type\n(required)")
+  @Completion(ProfileTypeCompleter.class)
   private String type;
 
   @Option(name = "--conf",

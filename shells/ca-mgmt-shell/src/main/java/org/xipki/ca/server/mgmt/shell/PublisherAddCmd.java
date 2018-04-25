@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.shell.completer.PublisherTypeCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -45,6 +46,7 @@ public class PublisherAddCmd extends CaAction {
 
   @Option(name = "--type", required = true,
       description = "publisher type\n(required)")
+  @Completion(PublisherTypeCompleter.class)
   private String type;
 
   @Option(name = "--conf",

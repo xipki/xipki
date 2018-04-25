@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -29,14 +28,11 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Service
-public class CrlSignerTypeCompleter extends MgmtNameCompleter {
+public class ProfileTypeCompleter extends MgmtNameCompleter {
 
   @Override
   protected Set<String> getEnums() {
-    Set<String> types = caManager.getSupportedSignerTypes();
-    Set<String> ret = new HashSet<>(types);
-    ret.add("CA");
-    return ret;
+    return caManager.getSupportedCertProfileTypes();
   }
 
 }

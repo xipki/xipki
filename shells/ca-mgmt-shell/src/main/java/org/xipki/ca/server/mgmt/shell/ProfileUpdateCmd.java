@@ -23,6 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileTypeCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -46,6 +47,7 @@ public class ProfileUpdateCmd extends CaAction {
 
   @Option(name = "--type",
       description = "profile type")
+  @Completion(ProfileTypeCompleter.class)
   protected String type;
 
   @Option(name = "--conf",

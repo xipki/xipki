@@ -26,10 +26,10 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 

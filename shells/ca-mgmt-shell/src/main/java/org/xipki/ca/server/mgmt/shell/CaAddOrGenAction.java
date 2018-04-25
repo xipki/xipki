@@ -34,12 +34,12 @@ import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.console.karaf.completer.YesNoCompleter;
 import org.xipki.password.PasswordResolver;
 
