@@ -43,7 +43,7 @@ public class P12HMACSignLoadTest extends P12SignLoadTest {
     return identity.keystore();
   }
 
-  public static int getKeysize(String hmacAlgorithm) {
+  private static int getKeysize(String hmacAlgorithm) {
     int keysize;
     if ("HMACSHA1".equalsIgnoreCase(hmacAlgorithm)) {
       keysize = 160;

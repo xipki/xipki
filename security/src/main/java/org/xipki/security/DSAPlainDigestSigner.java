@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs12;
+package org.xipki.security;
 
 import java.io.IOException;
 import java.math.BigInteger;

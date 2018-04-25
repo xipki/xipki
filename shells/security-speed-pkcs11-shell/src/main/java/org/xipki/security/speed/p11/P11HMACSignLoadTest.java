@@ -23,7 +23,6 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.speed.p12.P12HMACSignLoadTest;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -44,11 +43,33 @@ public class P11HMACSignLoadTest extends P11SignLoadTest {
   private static P11ObjectIdentifier generateKey(P11Slot slot, String signatureAlgorithm)
       throws Exception {
     ParamUtil.requireNonNull("slot", slot);
-    int keysize = P12HMACSignLoadTest.getKeysize(signatureAlgorithm);
+    int keysize = getKeysize(signatureAlgorithm);
     byte[] keyBytes = new byte[keysize / 8];
     new SecureRandom().nextBytes(keyBytes);
     return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
         "loadtest-" + System.currentTimeMillis(), getNewKeyControl());
+  }
+
+  private static int getKeysize(String hmacAlgorithm) {
+    int keysize;
+    if ("HMACSHA1".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 160;
+    } else if ("HMACSHA224".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-224".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 224;
+    } else if ("HMACSHA256".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-256".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 256;
+    } else if ("HMACSHA384".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-384".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 384;
+    } else if ("HMACSHA512".equalsIgnoreCase(hmacAlgorithm)
+        || "HMACSHA3-512".equalsIgnoreCase(hmacAlgorithm)) {
+      keysize = 512;
+    } else {
+      throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
+    }
+    return keysize;
   }
 
 }

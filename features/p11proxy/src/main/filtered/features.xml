@@ -46,6 +46,7 @@
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/security/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/security-pkcs11/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/security-pkcs12/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/p11proxy-common/${project.version}</bundle>
@@ -57,5 +58,6 @@
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
   </feature>
 </features>

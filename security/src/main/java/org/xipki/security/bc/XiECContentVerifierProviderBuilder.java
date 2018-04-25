@@ -26,7 +26,7 @@ import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
-import org.xipki.security.pkcs12.DSAPlainDigestSigner;
+import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
@@ -45,6 +45,7 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
     this.digestAlgorithmFinder = digestAlgorithmFinder;
   }
 
+  @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
     boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);

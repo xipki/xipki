@@ -75,6 +75,7 @@
     <module>password</module>
     <module>security</module>
     <module>security-pkcs11</module>
+    <module>security-pkcs12</module>
     <module>pkcs11-emulator</module>
     <module>pkcs11-iaik</module>
     <module>pkcs11-proxy</module>

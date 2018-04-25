@@ -64,6 +64,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.XiContentSigner;

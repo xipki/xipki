@@ -35,7 +35,7 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 public class KeystoreTypeCompleter extends AbstractDynamicEnumCompleter {
 
   private static final Set<String> TYPES = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList("PKCS12", "JKS")));
+      new HashSet<>(Arrays.asList("PKCS12", "JKS", "JCEKS")));
 
   @Override
   protected Set<String> getEnums() {

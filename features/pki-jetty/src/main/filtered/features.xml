@@ -26,6 +26,7 @@
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/security/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/security-pkcs11/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/security-pkcs12/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/p11proxy-common/${project.version}</bundle>
@@ -65,8 +66,10 @@
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.shells/security-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-speed-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-speed-pkcs11-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/security-speed-pkcs12-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}" description="OCSP server">
     <feature>xipki-datasource</feature>
