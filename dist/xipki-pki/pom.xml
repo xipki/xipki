@@ -148,6 +148,13 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
+                  <artifactId>publisher-ocsp</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>sql/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
                   <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>

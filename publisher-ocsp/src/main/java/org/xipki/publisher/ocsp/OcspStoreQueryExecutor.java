@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.ocsp;
+package org.xipki.publisher.ocsp;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

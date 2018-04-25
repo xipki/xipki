@@ -91,7 +91,6 @@ import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResu
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
-import org.xipki.ca.server.impl.ocsp.OcspCertPublisher;
 import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertStore;
@@ -112,10 +111,10 @@ import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
-import org.xipki.ca.server.mgmt.api.RequestorEntry;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
+import org.xipki.ca.server.mgmt.api.ResponderEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
@@ -268,8 +267,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   public static final String ENV_EPOCH = "EPOCH";
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
-
-  private static final String PUBLISHER_TYPE_OCSP = "ocsp";
 
   private static final String EVENT_LOCK = "LOCK";
 
@@ -443,10 +440,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   @Override
   public Set<String> getSupportedPublisherTypes() {
-    Set<String> types = new HashSet<>();
-    types.add(PUBLISHER_TYPE_OCSP);
-    types.addAll(x509CertPublisherFactoryRegister.getSupportedTypes());
-    return Collections.unmodifiableSet(types);
+    return x509CertPublisherFactoryRegister.getSupportedTypes();
   }
 
   private void init() throws CaMgmtException {
@@ -2732,9 +2726,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     X509CertPublisher publisher;
     IdentifiedX509CertPublisher ret;
     try {
-      if (PUBLISHER_TYPE_OCSP.equalsIgnoreCase(type)) {
-        publisher = new OcspCertPublisher();
-      } else if (x509CertPublisherFactoryRegister.canCreatePublisher(type)) {
+      if (x509CertPublisherFactoryRegister.canCreatePublisher(type)) {
         publisher = x509CertPublisherFactoryRegister.newPublisher(type);
       } else {
         throw new CaMgmtException("unsupported publisher type " + type);

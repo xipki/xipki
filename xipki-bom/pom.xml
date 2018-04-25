@@ -57,7 +57,12 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>ca-certprofile-xml</artifactId>
+        <artifactId>certprofile-xml</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki</groupId>
+        <artifactId>publisher-ocsp</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -218,6 +223,11 @@
       <dependency>
         <groupId>org.xipki</groupId>
         <artifactId>security-pkcs11</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki</groupId>
+        <artifactId>security-pkcs12</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

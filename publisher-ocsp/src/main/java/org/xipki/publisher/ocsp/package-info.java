@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.ocsp;
+package org.xipki.publisher.ocsp;

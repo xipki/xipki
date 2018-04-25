@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.ocsp;
+package org.xipki.publisher.ocsp;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509CRL;
@@ -33,7 +33,6 @@ import org.xipki.ca.api.X509CertWithDbId;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.x509.X509CertPublisher;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
-import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -170,13 +169,13 @@ public class OcspCertPublisher extends X509CertPublisher {
     if (cert instanceof X509CertWithDbId) {
       Long certId = ((X509CertWithDbId) cert).getCertId();
       if (certId != null) {
-        event.addEventData(CaAuditConstants.NAME_id, certId);
+        event.addEventData("id", certId);
       }
     }
-    event.addEventData(CaAuditConstants.NAME_issuer, issuer);
-    event.addEventData(CaAuditConstants.NAME_subject, subjectText);
-    event.addEventData(CaAuditConstants.NAME_serial, serialText);
-    event.addEventData(CaAuditConstants.NAME_message, messagePrefix);
+    event.addEventData("issuer", issuer);
+    event.addEventData("subject", subjectText);
+    event.addEventData("serial", serialText);
+    event.addEventData("message", messagePrefix);
     auditServiceRegister.getAuditService().logEvent(event);
   } // method logAndAudit
 

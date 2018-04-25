@@ -51,6 +51,7 @@
     <bundle start-level="70">mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/scep-common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/ca-server-api/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/publisher-ocsp/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}" description="CA server">
     <feature>xipki-ca-base</feature>
