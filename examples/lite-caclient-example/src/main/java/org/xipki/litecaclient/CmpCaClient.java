@@ -432,7 +432,7 @@ public class CmpCaClient {
         new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE));
     builder.addGeneralInfo(
         new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-            new DERUTF8String("CERT-PROFILE?" + certProfile + "%")));
+            new DERUTF8String("certprofile?" + certProfile + "%")));
     builder.setBody(new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr));
     ProtectedPKIMessage request = builder.build(requestorSigner);
 
@@ -498,7 +498,7 @@ public class CmpCaClient {
 
     AttributeTypeAndValue certprofileInfo =
         new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-            new DERUTF8String("CERT-PROFILE?" + certProfile + "%"));
+            new DERUTF8String("certprofile?" + certProfile + "%"));
 
     AttributeTypeAndValue[] atvs = {certprofileInfo};
     CertReqMsg certReqMsg = new CertReqMsg(certReq, popo, atvs);

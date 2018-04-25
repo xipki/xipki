@@ -38,21 +38,22 @@ import org.xipki.litecaclient.SdkUtil;
 
 public class CmpCaClientExample extends CaClientExample {
 
-  private static final String XIPKI_DIR = "~/source/xipki/dist/xipki-pki/target/xipki-pki-2.2.1";
-
   //private static final String CA_URL = "http://localhost:8080/cmp/myca";
 
   private static final String CA_URL = "https://localhost:8443/cmp/myca";
 
-  private static final String CA_CERT_FILE = XIPKI_DIR + "/xipki/setup/keycerts/MYCA1.der";
+  private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-pki/target/"
+      + "xipki-pki-3.1.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
+
+  private static final String KEYCERT_DIR =  "../tlskeys-example/src/main/resources";
+
+  private static final String REQUESTOR_KEYSTORE_FILE =
+      KEYCERT_DIR + "/tls-client.p12";
 
   private static final String REQUESTOR_KEYSTORE_PASSWORD = "1234";
 
-  private static final String REQUESTOR_KEYSTORE_FILE =
-      XIPKI_DIR + "/xipki/security/tlskeys/tls-client-keystore.p12";
-
   private static final String RESPONDER_CERT_FILE =
-      XIPKI_DIR + "/xipki/security/tlskeys/tls-server.der";
+      KEYCERT_DIR + "/tls-server.der";
 
   private static final String HASH_ALGO = "SHA256";
 

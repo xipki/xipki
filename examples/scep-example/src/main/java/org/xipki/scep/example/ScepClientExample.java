@@ -43,12 +43,10 @@ import org.xipki.scep.util.ScepUtil;
 
 public class ScepClientExample extends CaClientExample {
 
-  private static final String XIPKI_DIR =
-      "~/source/xipki/dist/xipki-pki/target/xipki-pki-2.3.0-SNAPSHOT";
-
   private static final String CA_URL = "http://localhost:8080/scep/scep1/tls/pkiclient.exe";
 
-  private static final String CA_CERT_FILE = XIPKI_DIR + "/xipki/setup/keycerts/MYCA1.der";
+  private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-pki/target/"
+      + "xipki-pki-3.1.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
 
   private static final String challengePassword = "user1:password1";
 
