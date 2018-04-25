@@ -95,7 +95,6 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditEventData;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
