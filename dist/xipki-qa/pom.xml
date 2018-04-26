@@ -286,6 +286,7 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
+                <feature>system</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
@@ -322,6 +323,7 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
+                <feature>system</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <feature>http-whiteboard</feature>
