@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.jscep.client.shell;
+package org.xipki.scep.jscepclient.shell;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;

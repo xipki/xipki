@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.jscep.client.shell;
+package org.xipki.scep.jscepclient.shell;
 
 import java.io.File;
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
-import org.jscep.client.ClientException;
 import org.jscep.client.EnrollmentResponse;
-import org.jscep.transaction.TransactionException;
+import org.jscep.transaction.TransactionId;
+import org.jscep.util.CertificationRequestUtils;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -38,7 +41,10 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-public abstract class EnrollCertAction extends ClientAction {
+@Command(scope = "xi", name = "jscep-certpoll",
+    description = "poll certificate")
+@Service
+public class CertPollCmd extends ClientAction {
 
   @Option(name = "--csr", required = true,
       description = "CSR file\n(required)")
@@ -50,34 +56,16 @@ public abstract class EnrollCertAction extends ClientAction {
   @Completion(FilePathCompleter.class)
   private String outputFile;
 
-  /**
-   * Enrolls certificate.
-   *
-   * @param client
-   *          Client. Must not be {@code null}.
-   * @param csr
-   *          CSR. Must not be {@code null}.
-   * @param identityKey
-   *          Identity key. Must not be {@code null}.
-   * @param identityCert
-   *          Identity certificate. Must not be {@code null}.
-   * @return the enrollment response
-   * @throws ClientException
-   *             if any client error occurs.
-   * @throws TransactionException
-   *             if there is a problem with the SCEP transaction.
-   */
-  protected abstract EnrollmentResponse requestCertificate(Client client,
-      PKCS10CertificationRequest csr, PrivateKey identityKey, X509Certificate identityCert)
-      throws ClientException, TransactionException;
-
   @Override
   protected Object execute0() throws Exception {
-    Client client = getScepClient();
-
     PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
 
-    EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(), getIdentityCert());
+    Client client = getScepClient();
+
+    TransactionId transId = TransactionId.createTransactionId(
+        CertificationRequestUtils.getPublicKey(csr), "SHA-1");
+    EnrollmentResponse resp = client.poll(getIdentityCert(), getIdentityKey(),
+        new X500Principal(csr.getSubject().getEncoded()), transId);
     if (resp.isFailure()) {
       throw new CmdFailure("server returned 'failure'");
     }
@@ -92,7 +80,7 @@ public abstract class EnrollCertAction extends ClientAction {
       throw new Exception("received no certificate");
     }
 
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
     return null;
   }
 

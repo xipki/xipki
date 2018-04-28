@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.jscep.client.shell;
+package org.xipki.scep.jscepclient.shell;
