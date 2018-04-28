@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.common.EndOfQueue;
 import org.xipki.common.ProcessLog;

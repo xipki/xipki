@@ -17,7 +17,7 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
 import org.xipki.common.util.ParamUtil;
 
 /**

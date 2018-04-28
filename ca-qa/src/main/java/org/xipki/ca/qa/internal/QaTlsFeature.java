@@ -20,8 +20,8 @@ package org.xipki.ca.qa.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.ca.certprofile.x509.jaxb.IntWithDescType;
-import org.xipki.ca.certprofile.x509.jaxb.TlsFeature;
+import org.xipki.ca.certprofile.xml.jaxb.IntWithDescType;
+import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
 import org.xipki.common.util.ParamUtil;
 
 /**

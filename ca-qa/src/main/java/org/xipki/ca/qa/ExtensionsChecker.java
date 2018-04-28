@@ -90,46 +90,46 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.profile.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.CertLevel;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.GeneralNameTag;
+import org.xipki.ca.api.profile.KeyUsageControl;
 import org.xipki.ca.api.profile.Range;
-import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.x509.KeyUsageControl;
-import org.xipki.ca.api.profile.x509.SubjectDirectoryAttributesControl;
-import org.xipki.ca.api.profile.x509.SubjectDnSpec;
-import org.xipki.ca.api.profile.x509.X509CertLevel;
-import org.xipki.ca.certprofile.BiometricInfoOption;
-import org.xipki.ca.certprofile.XmlX509Certprofile;
-import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
-import org.xipki.ca.certprofile.commonpki.AdmissionSyntaxOption;
-import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
-import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
-import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
-import org.xipki.ca.certprofile.x509.jaxb.ExtensionType;
-import org.xipki.ca.certprofile.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.x509.jaxb.PdsLocationType;
-import org.xipki.ca.certprofile.x509.jaxb.PdsLocationsType;
-import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
-import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
-import org.xipki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
-import org.xipki.ca.certprofile.x509.jaxb.QcStatementType;
-import org.xipki.ca.certprofile.x509.jaxb.QcStatementValueType;
-import org.xipki.ca.certprofile.x509.jaxb.QcStatements;
-import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
-import org.xipki.ca.certprofile.x509.jaxb.RangeType;
-import org.xipki.ca.certprofile.x509.jaxb.RangesType;
-import org.xipki.ca.certprofile.x509.jaxb.Restriction;
-import org.xipki.ca.certprofile.x509.jaxb.SMIMECapabilities;
-import org.xipki.ca.certprofile.x509.jaxb.SMIMECapability;
-import org.xipki.ca.certprofile.x509.jaxb.TlsFeature;
-import org.xipki.ca.certprofile.x509.jaxb.TripleState;
-import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.ca.api.profile.SubjectDirectoryAttributesControl;
+import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.ca.certprofile.xml.BiometricInfoOption;
+import org.xipki.ca.certprofile.xml.XmlX509Certprofile;
+import org.xipki.ca.certprofile.xml.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.xml.commonpki.AdmissionSyntaxOption;
+import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
+import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
+import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
+import org.xipki.ca.certprofile.xml.jaxb.ExtensionsType;
+import org.xipki.ca.certprofile.xml.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.xml.jaxb.PdsLocationType;
+import org.xipki.ca.certprofile.xml.jaxb.PdsLocationsType;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.xml.jaxb.QcEuLimitValueType;
+import org.xipki.ca.certprofile.xml.jaxb.QcStatementType;
+import org.xipki.ca.certprofile.xml.jaxb.QcStatementValueType;
+import org.xipki.ca.certprofile.xml.jaxb.QcStatements;
+import org.xipki.ca.certprofile.xml.jaxb.Range2Type;
+import org.xipki.ca.certprofile.xml.jaxb.RangeType;
+import org.xipki.ca.certprofile.xml.jaxb.RangesType;
+import org.xipki.ca.certprofile.xml.jaxb.Restriction;
+import org.xipki.ca.certprofile.xml.jaxb.SMIMECapabilities;
+import org.xipki.ca.certprofile.xml.jaxb.SMIMECapability;
+import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
+import org.xipki.ca.certprofile.xml.jaxb.TripleState;
+import org.xipki.ca.certprofile.xml.jaxb.ValidityModel;
+import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
 import org.xipki.ca.qa.internal.QaAuthorizationTemplate;
 import org.xipki.ca.qa.internal.QaCertificatePolicies;
 import org.xipki.ca.qa.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
@@ -224,10 +224,10 @@ public class ExtensionsChecker {
     // Certificate Policies
     ASN1ObjectIdentifier type = Extension.certificatePolicies;
     if (extensionControls.containsKey(type)) {
-      org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies extConf =
-          (org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies)
+      org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies extConf =
+          (org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies)
             getExtensionValue(type, extensionsType,
-                org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies.class);
+                org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies.class);
       if (extConf != null) {
         this.certificatePolicies = new QaCertificatePolicies(extConf);
       }
@@ -246,9 +246,9 @@ public class ExtensionsChecker {
     // Name Constrains
     type = Extension.nameConstraints;
     if (extensionControls.containsKey(type)) {
-      org.xipki.ca.certprofile.x509.jaxb.NameConstraints extConf =
-          (org.xipki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(type,
-              extensionsType, org.xipki.ca.certprofile.x509.jaxb.NameConstraints.class);
+      org.xipki.ca.certprofile.xml.jaxb.NameConstraints extConf =
+          (org.xipki.ca.certprofile.xml.jaxb.NameConstraints) getExtensionValue(type,
+              extensionsType, org.xipki.ca.certprofile.xml.jaxb.NameConstraints.class);
       if (extConf != null) {
         this.nameConstraints = new QaNameConstraints(extConf);
       }
@@ -349,7 +349,7 @@ public class ExtensionsChecker {
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
             m.getCapabilityID().getValue());
         ASN1Encodable params = null;
-        org.xipki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters capParams =
+        org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters capParams =
             m.getParameters();
         if (capParams != null) {
           if (capParams.getInteger() != null) {
@@ -799,8 +799,8 @@ public class ExtensionsChecker {
 
   private void checkExtensionBasicConstraints(StringBuilder failureMsg, byte[] extensionValue) {
     BasicConstraints bc = BasicConstraints.getInstance(extensionValue);
-    X509CertLevel certLevel = certProfile.getCertLevel();
-    boolean ca = (X509CertLevel.RootCA == certLevel) || (X509CertLevel.SubCA == certLevel);
+    CertLevel certLevel = certProfile.getCertLevel();
+    boolean ca = (CertLevel.RootCA == certLevel) || (CertLevel.SubCA == certLevel);
     if (ca != bc.isCA()) {
       addViolation(failureMsg, "ca", bc.isCA(), ca);
     }

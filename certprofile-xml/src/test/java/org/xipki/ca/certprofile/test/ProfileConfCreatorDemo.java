@@ -49,85 +49,85 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
-import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
-import org.xipki.ca.api.profile.x509.X509CertLevel;
-import org.xipki.ca.api.profile.x509.X509CertVersion;
-import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
-import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
-import org.xipki.ca.certprofile.x509.jaxb.AdmissionSyntax;
-import org.xipki.ca.certprofile.x509.jaxb.AdmissionsType;
-import org.xipki.ca.certprofile.x509.jaxb.AlgorithmType;
-import org.xipki.ca.certprofile.x509.jaxb.AnyType;
-import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
-import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
-import org.xipki.ca.certprofile.x509.jaxb.Base64BinaryWithDescType;
-import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
-import org.xipki.ca.certprofile.x509.jaxb.BiometricInfo;
-import org.xipki.ca.certprofile.x509.jaxb.BiometricTypeType;
-import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
-import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
-import org.xipki.ca.certprofile.x509.jaxb.ConstantValueType;
-import org.xipki.ca.certprofile.x509.jaxb.DSAParameters;
-import org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType;
-import org.xipki.ca.certprofile.x509.jaxb.ECParameters;
-import org.xipki.ca.certprofile.x509.jaxb.ECParameters.Curves;
-import org.xipki.ca.certprofile.x509.jaxb.ECParameters.PointEncodings;
-import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage.Usage;
-import org.xipki.ca.certprofile.x509.jaxb.ExtensionType;
-import org.xipki.ca.certprofile.x509.jaxb.ExtensionValueType;
-import org.xipki.ca.certprofile.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.x509.jaxb.GeneralNameType;
-import org.xipki.ca.certprofile.x509.jaxb.GeneralNameType.OtherName;
-import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
-import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreesType;
-import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.x509.jaxb.IntWithDescType;
-import org.xipki.ca.certprofile.x509.jaxb.KeyParametersType;
-import org.xipki.ca.certprofile.x509.jaxb.KeyUsage;
-import org.xipki.ca.certprofile.x509.jaxb.KeyUsageEnum;
-import org.xipki.ca.certprofile.x509.jaxb.NameConstraints;
-import org.xipki.ca.certprofile.x509.jaxb.NameValueType;
-import org.xipki.ca.certprofile.x509.jaxb.NamingAuthorityType;
-import org.xipki.ca.certprofile.x509.jaxb.ObjectFactory;
-import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
-import org.xipki.ca.certprofile.x509.jaxb.PdsLocationType;
-import org.xipki.ca.certprofile.x509.jaxb.PdsLocationsType;
-import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
-import org.xipki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
-import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
-import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
-import org.xipki.ca.certprofile.x509.jaxb.ProfessionInfoType;
-import org.xipki.ca.certprofile.x509.jaxb.ProfessionInfoType.RegistrationNumber;
-import org.xipki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
-import org.xipki.ca.certprofile.x509.jaxb.QcStatementType;
-import org.xipki.ca.certprofile.x509.jaxb.QcStatementValueType;
-import org.xipki.ca.certprofile.x509.jaxb.QcStatements;
-import org.xipki.ca.certprofile.x509.jaxb.RSAParameters;
-import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
-import org.xipki.ca.certprofile.x509.jaxb.RangeType;
-import org.xipki.ca.certprofile.x509.jaxb.RangesType;
-import org.xipki.ca.certprofile.x509.jaxb.RdnType;
-import org.xipki.ca.certprofile.x509.jaxb.Restriction;
-import org.xipki.ca.certprofile.x509.jaxb.SMIMECapabilities;
-import org.xipki.ca.certprofile.x509.jaxb.SMIMECapability;
-import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
-import org.xipki.ca.certprofile.x509.jaxb.SubjectDirectoryAttributs;
-import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
-import org.xipki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNameType;
-import org.xipki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNameType.Target;
-import org.xipki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNamesType;
-import org.xipki.ca.certprofile.x509.jaxb.TlsFeature;
-import org.xipki.ca.certprofile.x509.jaxb.TripleState;
-import org.xipki.ca.certprofile.x509.jaxb.UsageType;
-import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.SignatureAlgorithms;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
+import org.xipki.ca.api.profile.CertLevel;
+import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.X509CertVersion;
+import org.xipki.ca.certprofile.xml.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
+import org.xipki.ca.certprofile.xml.jaxb.AdmissionSyntax;
+import org.xipki.ca.certprofile.xml.jaxb.AdmissionsType;
+import org.xipki.ca.certprofile.xml.jaxb.AlgorithmType;
+import org.xipki.ca.certprofile.xml.jaxb.AnyType;
+import org.xipki.ca.certprofile.xml.jaxb.AuthorityInfoAccess;
+import org.xipki.ca.certprofile.xml.jaxb.AuthorityKeyIdentifier;
+import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
+import org.xipki.ca.certprofile.xml.jaxb.Base64BinaryWithDescType;
+import org.xipki.ca.certprofile.xml.jaxb.BasicConstraints;
+import org.xipki.ca.certprofile.xml.jaxb.BiometricInfo;
+import org.xipki.ca.certprofile.xml.jaxb.BiometricTypeType;
+import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies;
+import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType;
+import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.xml.jaxb.ConstantValueType;
+import org.xipki.ca.certprofile.xml.jaxb.DSAParameters;
+import org.xipki.ca.certprofile.xml.jaxb.DirectoryStringType;
+import org.xipki.ca.certprofile.xml.jaxb.ECParameters;
+import org.xipki.ca.certprofile.xml.jaxb.ECParameters.Curves;
+import org.xipki.ca.certprofile.xml.jaxb.ECParameters.PointEncodings;
+import org.xipki.ca.certprofile.xml.jaxb.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.xml.jaxb.ExtendedKeyUsage.Usage;
+import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
+import org.xipki.ca.certprofile.xml.jaxb.ExtensionValueType;
+import org.xipki.ca.certprofile.xml.jaxb.ExtensionsType;
+import org.xipki.ca.certprofile.xml.jaxb.GeneralNameType;
+import org.xipki.ca.certprofile.xml.jaxb.GeneralNameType.OtherName;
+import org.xipki.ca.certprofile.xml.jaxb.GeneralSubtreeBaseType;
+import org.xipki.ca.certprofile.xml.jaxb.GeneralSubtreesType;
+import org.xipki.ca.certprofile.xml.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.xml.jaxb.IntWithDescType;
+import org.xipki.ca.certprofile.xml.jaxb.KeyParametersType;
+import org.xipki.ca.certprofile.xml.jaxb.KeyUsage;
+import org.xipki.ca.certprofile.xml.jaxb.KeyUsageEnum;
+import org.xipki.ca.certprofile.xml.jaxb.NameConstraints;
+import org.xipki.ca.certprofile.xml.jaxb.NameValueType;
+import org.xipki.ca.certprofile.xml.jaxb.NamingAuthorityType;
+import org.xipki.ca.certprofile.xml.jaxb.ObjectFactory;
+import org.xipki.ca.certprofile.xml.jaxb.OidWithDescType;
+import org.xipki.ca.certprofile.xml.jaxb.PdsLocationType;
+import org.xipki.ca.certprofile.xml.jaxb.PdsLocationsType;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyIdMappingType;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.xml.jaxb.PrivateKeyUsagePeriod;
+import org.xipki.ca.certprofile.xml.jaxb.ProfessionInfoType;
+import org.xipki.ca.certprofile.xml.jaxb.ProfessionInfoType.RegistrationNumber;
+import org.xipki.ca.certprofile.xml.jaxb.QcEuLimitValueType;
+import org.xipki.ca.certprofile.xml.jaxb.QcStatementType;
+import org.xipki.ca.certprofile.xml.jaxb.QcStatementValueType;
+import org.xipki.ca.certprofile.xml.jaxb.QcStatements;
+import org.xipki.ca.certprofile.xml.jaxb.RSAParameters;
+import org.xipki.ca.certprofile.xml.jaxb.Range2Type;
+import org.xipki.ca.certprofile.xml.jaxb.RangeType;
+import org.xipki.ca.certprofile.xml.jaxb.RangesType;
+import org.xipki.ca.certprofile.xml.jaxb.RdnType;
+import org.xipki.ca.certprofile.xml.jaxb.Restriction;
+import org.xipki.ca.certprofile.xml.jaxb.SMIMECapabilities;
+import org.xipki.ca.certprofile.xml.jaxb.SMIMECapability;
+import org.xipki.ca.certprofile.xml.jaxb.SubjectAltName;
+import org.xipki.ca.certprofile.xml.jaxb.SubjectDirectoryAttributs;
+import org.xipki.ca.certprofile.xml.jaxb.SubjectInfoAccess;
+import org.xipki.ca.certprofile.xml.jaxb.SubjectToSubjectAltNameType;
+import org.xipki.ca.certprofile.xml.jaxb.SubjectToSubjectAltNameType.Target;
+import org.xipki.ca.certprofile.xml.jaxb.SubjectToSubjectAltNamesType;
+import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
+import org.xipki.ca.certprofile.xml.jaxb.TripleState;
+import org.xipki.ca.certprofile.xml.jaxb.UsageType;
+import org.xipki.ca.certprofile.xml.jaxb.ValidityModel;
+import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
+import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.KeyAlgorithms;
+import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Parameters;
+import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.SignatureAlgorithms;
+import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Subject;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
@@ -272,7 +272,7 @@ public class ProfileConfCreatorDemo {
   } // method marshal
 
   private static X509ProfileType certprofileRootCa() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile rootca", X509CertLevel.RootCA, "10y",
+    X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y",
         false);
 
     // Subject
@@ -312,7 +312,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileRootCa
 
   private static X509ProfileType certprofileCross() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile cross", X509CertLevel.SubCA, "10y",
+    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y",
         false);
 
     // Subject
@@ -355,7 +355,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileCross
 
   private static X509ProfileType certprofileSubCa() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile subca", X509CertLevel.SubCA, "8y",
+    X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y",
         false);
 
     // Subject
@@ -401,7 +401,7 @@ public class ProfileConfCreatorDemo {
 
   private static X509ProfileType certprofileSubCaComplex() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile subca-complex (with most extensions)",
-        X509CertLevel.SubCA, "8y", false);
+        CertLevel.SubCA, "8y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -512,7 +512,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileSubCaComplex
 
   private static X509ProfileType certprofileOcsp() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile ocsp", X509CertLevel.EndEntity, "5y",
+    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
         false);
 
     // Subject
@@ -563,7 +563,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileOcsp
 
   private static X509ProfileType certprofileScep() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile scep", X509CertLevel.EndEntity, "5y",
+    X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y",
         false);
 
     profile.setKeyAlgorithms(createRSAKeyAlgorithms());
@@ -610,7 +610,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileScep
 
   private static X509ProfileType certprofileTls() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls", X509CertLevel.EndEntity, "5y",
+    X509ProfileType profile = getBaseProfile("certprofile tls", CertLevel.EndEntity, "5y",
         true);
 
     profile.setDuplicateKey(true);
@@ -694,7 +694,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileTls
 
   private static X509ProfileType certprofileTlsC() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls-c", X509CertLevel.EndEntity, "5y",
+    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y",
         false);
 
     // Subject
@@ -747,7 +747,7 @@ public class ProfileConfCreatorDemo {
   private static X509ProfileType certprofileTlsWithIncSerial() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile tls-inc-sn "
         + "(serial number will be added automatically)",
-        X509CertLevel.EndEntity, "5y", false);
+        CertLevel.EndEntity, "5y", false);
 
     profile.setDuplicateKey(true);
 
@@ -805,7 +805,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileTlsWithIncSerial
 
   private static X509ProfileType certprofileGsmcK() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile gsmc-k", X509CertLevel.EndEntity,
+    X509ProfileType profile = getBaseProfile("certprofile gsmc-k", CertLevel.EndEntity,
         "5y", false);
 
     // SpecialBehavior
@@ -908,7 +908,7 @@ public class ProfileConfCreatorDemo {
 
   private static X509ProfileType certprofileMultipleOus() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile multiple-ous",
-        X509CertLevel.EndEntity, "5y", false);
+        CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -959,7 +959,7 @@ public class ProfileConfCreatorDemo {
    */
   private static X509ProfileType certprofileMultipleValuedRdn() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn",
-        X509CertLevel.EndEntity, "5y", false);
+        CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -1002,7 +1002,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileMultipleValuedRdn
 
   private static X509ProfileType certprofileQc() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile qc", X509CertLevel.EndEntity,
+    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity,
         "5y", false);
 
     // Subject
@@ -1063,7 +1063,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileEeComplex
 
   private static X509ProfileType certprofileEeComplex() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile ee-complex", X509CertLevel.EndEntity,
+    X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
         "5y", true);
 
     // Subject
@@ -1258,7 +1258,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileEeComplex
 
   private static X509ProfileType certprofileMaxTime() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile max-time", X509CertLevel.EndEntity,
+    X509ProfileType profile = getBaseProfile("certprofile max-time", CertLevel.EndEntity,
         "9999y", false);
 
     // Subject
@@ -1306,7 +1306,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileMaxTime
 
   private static X509ProfileType certprofileExtended() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile extended", X509CertLevel.EndEntity,
+    X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity,
         "5y", false);
 
     profile.setDuplicateKey(true);
@@ -1789,7 +1789,7 @@ public class ProfileConfCreatorDemo {
     return createExtensionValueType(extValue);
   }
 
-  private static X509ProfileType getBaseProfile(String description, X509CertLevel certLevel,
+  private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
       String validity, boolean useMidnightNotBefore) {
     X509ProfileType profile = new X509ProfileType();
 
@@ -1833,7 +1833,7 @@ public class ProfileConfCreatorDemo {
     profile.setSubject(subject);
     subject.setKeepRdnOrder(false);
 
-    ASN1ObjectIdentifier[] curveIds = (X509CertLevel.EndEntity != certLevel) ? null :
+    ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
       new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
         TeleTrusTObjectIdentifiers.brainpoolP256r1, GMObjectIdentifiers.sm2p256v1};
 
@@ -2011,7 +2011,7 @@ public class ProfileConfCreatorDemo {
     caps.getSMIMECapability().add(cap);
     cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"),
         "RC2-CBC"));
-    cap.setParameters(new org.xipki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters());
+    cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters());
     cap.getParameters().setInteger(BigInteger.valueOf(128));
 
     // RC2-CBC keysize 64
@@ -2019,7 +2019,7 @@ public class ProfileConfCreatorDemo {
     caps.getSMIMECapability().add(cap);
     cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"),
         "RC2-CBC"));
-    cap.setParameters(new org.xipki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters());
+    cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters());
 
     Base64BinaryWithDescType binary = new Base64BinaryWithDescType();
     try {

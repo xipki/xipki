@@ -51,12 +51,12 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.ca.api.profile.CertLevel;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.x509.SubjectInfo;
-import org.xipki.ca.api.profile.x509.X509CertLevel;
+import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
@@ -121,9 +121,9 @@ class X509SelfSignedCertBuilder {
           "serialNumber must not be non-positive: " + serialNumber);
     }
 
-    X509CertLevel level = certprofile.getCertLevel();
-    if (X509CertLevel.RootCA != level) {
-      throw new IllegalArgumentException("certprofile is not of level " + X509CertLevel.RootCA);
+    CertLevel level = certprofile.getCertLevel();
+    if (CertLevel.RootCA != level) {
+      throw new IllegalArgumentException("certprofile is not of level " + CertLevel.RootCA);
     }
 
     if (!securityFactory.verifyPopo(csr, null)) {

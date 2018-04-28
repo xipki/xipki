@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
-import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCpsUriPolicyQualifier;
 import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.common.util.ParamUtil;

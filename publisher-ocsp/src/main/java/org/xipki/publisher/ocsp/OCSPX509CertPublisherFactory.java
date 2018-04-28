@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.ca.api.publisher.x509.X509CertPublisher;
-import org.xipki.ca.api.publisher.x509.X509CertPublisherFactory;
+import org.xipki.ca.api.publisher.X509CertPublisher;
+import org.xipki.ca.api.publisher.X509CertPublisherFactory;
 import org.xipki.common.ObjectCreationException;
 
 /**

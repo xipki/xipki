@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
-import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyIdMappingType;
+import org.xipki.ca.certprofile.xml.jaxb.PolicyMappings;
 import org.xipki.common.util.ParamUtil;
 
 /**

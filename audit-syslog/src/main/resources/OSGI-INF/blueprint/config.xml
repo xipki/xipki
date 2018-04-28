@@ -41,7 +41,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <bean id="syslogAuditServiceImpl"
-      class="org.xipki.audit.syslog.impl.SyslogAuditServiceImpl"
+      class="org.xipki.audit.syslog.SyslogAuditService"
       init-method="init" destroy-method="destroy">
     <property name="facility" value="${facility}"/>
     <property name="host" value="${host}"/>

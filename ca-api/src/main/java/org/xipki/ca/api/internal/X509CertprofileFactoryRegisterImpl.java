@@ -24,9 +24,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.ca.api.profile.x509.X509CertprofileFactory;
-import org.xipki.ca.api.profile.x509.X509CertprofileFactoryRegister;
+import org.xipki.ca.api.profile.X509Certprofile;
+import org.xipki.ca.api.profile.X509CertprofileFactory;
+import org.xipki.ca.api.profile.X509CertprofileFactoryRegister;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
 

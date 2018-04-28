@@ -40,8 +40,8 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.xipki.ca.api.profile.x509.SubjectDnSpec;
-import org.xipki.ca.api.profile.x509.X509CertLevel;
+import org.xipki.ca.api.profile.CertLevel;
+import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 
@@ -81,15 +81,15 @@ public class CaUtil {
     return null;
   }
 
-  public static BasicConstraints createBasicConstraints(X509CertLevel level, Integer pathLen) {
+  public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
     BasicConstraints basicConstraints;
-    if (level == X509CertLevel.RootCA || level == X509CertLevel.SubCA) {
+    if (level == CertLevel.RootCA || level == CertLevel.SubCA) {
       basicConstraints = (pathLen != null)  ? new BasicConstraints(pathLen)
           : new BasicConstraints(true);
-    } else if (level == X509CertLevel.EndEntity) {
+    } else if (level == CertLevel.EndEntity) {
       basicConstraints = new BasicConstraints(false);
     } else {
-      throw new RuntimeException("unknown X509CertLevel " + level);
+      throw new RuntimeException("unknown CertLevel " + level);
     }
     return basicConstraints;
   }

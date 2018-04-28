@@ -55,22 +55,22 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.ca.api.profile.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.CertLevel;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
-import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.x509.KeyUsageControl;
-import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
-import org.xipki.ca.api.profile.x509.SubjectDnSpec;
-import org.xipki.ca.api.profile.x509.SubjectInfo;
-import org.xipki.ca.api.profile.x509.X509CertLevel;
-import org.xipki.ca.api.profile.x509.X509CertVersion;
-import org.xipki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.ca.api.profile.x509.X509CertprofileUtil;
+import org.xipki.ca.api.profile.KeyUsageControl;
+import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.X509CertVersion;
+import org.xipki.ca.api.profile.X509Certprofile;
+import org.xipki.ca.api.profile.CertprofileUtil;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.util.CollectionUtil;
@@ -529,7 +529,7 @@ class IdentifiedX509Certprofile {
     return values;
   } // method getExtensions
 
-  public X509CertLevel getCertLevel() {
+  public CertLevel getCertLevel() {
     return certprofile.getCertLevel();
   }
 
@@ -615,8 +615,8 @@ class IdentifiedX509Certprofile {
       msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
     }
 
-    X509CertLevel level = getCertLevel();
-    boolean ca = (level == X509CertLevel.RootCA) || (level == X509CertLevel.SubCA);
+    CertLevel level = getCertLevel();
+    boolean ca = (level == CertLevel.RootCA) || (level == CertLevel.SubCA);
 
     // make sure that CA-only extensions are not permitted in EE certificate
     set.clear();
@@ -683,7 +683,7 @@ class IdentifiedX509Certprofile {
       }
     }
 
-    if (level == X509CertLevel.SubCA) {
+    if (level == CertLevel.SubCA) {
       ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
       ExtensionControl extCtrl = controls.get(type);
       if (extCtrl == null || !extCtrl.isRequired()) {
@@ -841,7 +841,7 @@ class IdentifiedX509Certprofile {
             + accessMethod.getId() + " is not allowed");
       }
 
-      GeneralName accessLocation = X509CertprofileUtil.createGeneralName(
+      GeneralName accessLocation = CertprofileUtil.createGeneralName(
           ad.getAccessLocation(), generalNameModes);
       vec.add(new AccessDescription(accessMethod, accessLocation));
     } // end for

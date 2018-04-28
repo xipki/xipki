@@ -16,5 +16,5 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
   <bean id="factory" class="org.xipki.ca.certprofile.demo.X509CertprofileFactoryImpl"/>
-  <service ref="factory" interface="org.xipki.ca.api.profile.x509.X509CertprofileFactory"/>
+  <service ref="factory" interface="org.xipki.ca.api.profile.X509CertprofileFactory"/>
 </blueprint>

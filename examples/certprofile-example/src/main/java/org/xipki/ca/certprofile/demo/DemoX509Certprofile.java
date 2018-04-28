@@ -34,7 +34,7 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.certprofile.XmlX509Certprofile;
+import org.xipki.ca.certprofile.xml.XmlX509Certprofile;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.XmlUtil;

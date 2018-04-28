@@ -31,10 +31,10 @@
       interface="org.xipki.audit.AuditServiceRegister"/>
 
   <reference id="x509CertProfileFactoryRegister"
-      interface="org.xipki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
+      interface="org.xipki.ca.api.profile.X509CertprofileFactoryRegister"/>
 
   <reference id="x509CertPublisherFactoryRegister"
-      interface="org.xipki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
+      interface="org.xipki.ca.api.publisher.X509CertPublisherFactoryRegister"/>
 
   <bean id="caManager" class="org.xipki.ca.server.impl.CaManagerImpl"
       init-method="startCaSystem" destroy-method="shutdown">

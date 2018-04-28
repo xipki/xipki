@@ -17,7 +17,7 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
+import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
 import org.xipki.common.util.ParamUtil;
 
 /**
