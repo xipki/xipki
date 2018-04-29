@@ -363,7 +363,7 @@ class CaConfigurationDbExporter extends DbPorter {
   private void exportProfile(CAConfigurationType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table PROFILE");
     Profiles profiles = new Profiles();
-    final String sql = "SELECT ID,NAME,ART,TYPE,CONF FROM PROFILE";
+    final String sql = "SELECT ID,NAME,TYPE,CONF FROM PROFILE";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -377,7 +377,6 @@ class CaConfigurationDbExporter extends DbPorter {
         ProfileType profile = new ProfileType();
         profile.setId(rs.getInt("ID"));
         profile.setName(name);
-        profile.setArt(rs.getInt("ART"));
         profile.setType(rs.getString("TYPE"));
         profile.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/certprofile-" + name));
 
@@ -399,7 +398,7 @@ class CaConfigurationDbExporter extends DbPorter {
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,"
         + "SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV,RR,RT,RIT,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,VALIDITY_MODE,"
-        + "CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,CMPCONTROL_NAME,EXTRA_CONTROL FROM CA";
+        + "CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMPCONTROL_NAME,EXTRA_CONTROL FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -413,7 +412,6 @@ class CaConfigurationDbExporter extends DbPorter {
         CaType ca = new CaType();
         ca.setId(rs.getInt("ID"));
         ca.setName(name);
-        ca.setArt(rs.getInt("ART"));
         ca.setSnSize(rs.getInt("SN_SIZE"));
         ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
         ca.setStatus(rs.getString("STATUS"));

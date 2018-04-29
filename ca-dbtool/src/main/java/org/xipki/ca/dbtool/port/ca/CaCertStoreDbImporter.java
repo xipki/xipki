@@ -88,8 +88,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
   private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
   private static final String SQL_ADD_CERT =
-      "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
+      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_CRAW =
       "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
@@ -448,7 +448,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         if (CaDbEntryType.CERT == type) {
           CertType cert = (CertType) entry;
-          int certArt = (cert.getArt() == null) ? 1 : cert.getArt();
 
           String filename = cert.getFile();
           // rawcert
@@ -480,7 +479,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             int idx = 1;
 
             psCert.setLong(idx++, id);
-            psCert.setInt(idx++, certArt);
             psCert.setLong(idx++, cert.getUpdate());
             psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
 

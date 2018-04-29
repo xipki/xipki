@@ -54,7 +54,6 @@ import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
-import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
@@ -470,11 +469,6 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("uknown CA " + name);
       }
 
-      int artCode = rs.getInt("ART");
-      if (artCode != CertArt.X509PKC.getCode()) {
-        throw new CaMgmtException("CA " + name + " is not X509CA, and is not supported");
-      }
-
       String crlUris = rs.getString("CRL_URIS");
       String deltaCrlUris = rs.getString("DELTACRL_URIS");
 
@@ -681,11 +675,11 @@ class CaManagerQueryExecutor {
 
     X509CaEntry entry = (X509CaEntry) caEntry;
 
-    final String sql = "INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
+    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
         + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,"
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -694,7 +688,6 @@ class CaManagerQueryExecutor {
       int idx = 1;
       ps.setInt(idx++, entry.getIdent().getId());
       ps.setString(idx++, entry.getIdent().getName());
-      ps.setInt(idx++, CertArt.X509PKC.getCode());
       ps.setString(idx++, entry.getSubject());
       ps.setInt(idx++, entry.getSerialNoBitLen());
       ps.setLong(idx++, entry.getNextCrlNumber());
@@ -760,7 +753,7 @@ class CaManagerQueryExecutor {
 
   void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
-    final String sql = "INSERT INTO PROFILE (ID,NAME,ART,TYPE,CONF) VALUES (?,?,?,?,?)";
+    final String sql = "INSERT INTO PROFILE (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
     try {
       int id = (int) datasource.getMax(null, "PROFILE", "ID");
@@ -775,7 +768,6 @@ class CaManagerQueryExecutor {
       int idx = 1;
       ps.setInt(idx++, dbEntry.getIdent().getId());
       ps.setString(idx++, dbEntry.getIdent().getName());
-      ps.setInt(idx++, CertArt.X509PKC.getCode());
       ps.setString(idx++, dbEntry.getType());
       String conf = dbEntry.getConf();
       ps.setString(idx++, conf);

@@ -237,7 +237,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     switch (type) {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
-        coreSql = "ID,SN,CA_ID,PID,RID,ART,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
+        coreSql = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
             + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID=CRAW.CID";
         break;
       case CRL:
@@ -343,7 +343,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
             CertType cert = new CertType();
             cert.setId(id);
-            cert.setArt(rs.getInt("ART"));
             cert.setCaId(rs.getInt("CA_ID"));
             cert.setEe(rs.getBoolean("EE"));
             cert.setFile(certFileName);

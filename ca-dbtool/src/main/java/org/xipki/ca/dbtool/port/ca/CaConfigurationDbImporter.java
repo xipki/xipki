@@ -326,7 +326,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
   private void importProfile(Profiles profiles) throws DataAccessException, IOException {
     System.out.println("importing table PROFILE");
-    final String sql = "INSERT INTO PROFILE (ID,NAME,ART,TYPE,CONF) VALUES (?,?,?,?,?)";
+    final String sql = "INSERT INTO PROFILE (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
@@ -335,8 +335,6 @@ class CaConfigurationDbImporter extends DbPorter {
           int idx = 1;
           ps.setInt(idx++, certprofile.getId());
           ps.setString(idx++, certprofile.getName());
-          int art = (certprofile.getArt() == null) ? 1 : certprofile.getArt();
-          ps.setInt(idx++, art);
           ps.setString(idx++, certprofile.getType());
 
           String conf = value(certprofile.getConf());
@@ -359,20 +357,18 @@ class CaConfigurationDbImporter extends DbPorter {
 
   private void importCa(Cas cas) throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
-    String sql = "INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
+    String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
         + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
 
       for (CaType ca : cas.getCa()) {
-        int art = (ca.getArt() == null) ? 1 : ca.getArt();
-
         try {
           byte[] certBytes = binary(ca.getCert());
           X509Certificate cert = X509Util.parseCert(certBytes);
@@ -380,7 +376,6 @@ class CaConfigurationDbImporter extends DbPorter {
           int idx = 1;
           ps.setInt(idx++, ca.getId());
           ps.setString(idx++, ca.getName().toLowerCase());
-          ps.setInt(idx++, art);
           ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(), maxX500nameLen));
           ps.setInt(idx++, ca.getSnSize());
           ps.setLong(idx++, ca.getNextCrlNo());

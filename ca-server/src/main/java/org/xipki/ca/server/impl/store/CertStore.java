@@ -62,7 +62,6 @@ import org.xipki.ca.server.impl.UniqueIdGenerator;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
-import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.common.util.Base64;
@@ -175,7 +174,6 @@ public class CertStore {
 
       // cert
       int idx = 2;
-      psAddcert.setInt(idx++, CertArt.X509PKC.getCode());
       psAddcert.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
       psAddcert.setString(idx++, cert.getSerialNumber().toString(16));
       psAddcert.setString(idx++, subjectText);

@@ -143,9 +143,6 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
-      <column name="ART" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
@@ -178,9 +175,6 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
-      <column name="ART" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
       <column name="SN_SIZE" type="SMALLINT"
           remarks="number of octets of the serial number"/>
       <column name="NEXT_CRLNO" type="BIGINT"/>
@@ -337,9 +331,6 @@
     <createTable tableName="CERT">
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="ART" type="SMALLINT">
-        <constraints nullable="false"/>
       </column>
       <column name="CA_ID" type="SMALLINT"
           remarks="Issuer (CA) id">

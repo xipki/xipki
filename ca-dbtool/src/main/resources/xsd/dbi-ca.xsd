@@ -185,7 +185,6 @@
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="art" type="xs:int" minOccurs="0"/>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType"/>
     </xs:sequence>
@@ -195,7 +194,6 @@
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="art" type="xs:int" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>
       <xs:element name="nextCrlNo" type="xs:long"/>
       <xs:element name="status" type="xs:string"/>

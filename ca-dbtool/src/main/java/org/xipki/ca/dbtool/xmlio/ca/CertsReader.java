@@ -74,9 +74,6 @@ public class CertsReader extends DbiXmlReader {
           case CertType.TAG_ROOT:
             ret.validate();
             return ret;
-          case CertType.TAG_ART:
-            ret.setArt(parseInt(tagContent));
-            break;
           case CertType.TAG_CAID:
             ret.setCaId(parseInt(tagContent));
             break;

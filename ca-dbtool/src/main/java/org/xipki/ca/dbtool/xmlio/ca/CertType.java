@@ -36,8 +36,6 @@ public class CertType extends IdentifidDbObjectType {
 
   public static final String TAG_ROOT = "cert";
 
-  public static final String TAG_ART = "art";
-
   public static final String TAG_CAID = "caId";
 
   /**
@@ -100,8 +98,6 @@ public class CertType extends IdentifidDbObjectType {
 
   private String file;
 
-  private Integer art;
-
   private Integer caId;
 
   private String sn;
@@ -131,14 +127,6 @@ public class CertType extends IdentifidDbObjectType {
   private Long fpRs;
 
   private String rs;
-
-  public Integer getArt() {
-    return art;
-  }
-
-  public void setArt(Integer art) {
-    this.art = art;
-  }
 
   public Integer getCaId() {
     return caId;
@@ -272,7 +260,6 @@ public class CertType extends IdentifidDbObjectType {
   public void validate() throws InvalidDataObjectException {
     super.validate();
 
-    assertNotNull(TAG_ART, art);
     assertNotNull(TAG_CAID, caId);
     assertNotNull(TAG_EE, ee);
     assertNotBlank(TAG_FILE, file);
@@ -296,7 +283,6 @@ public class CertType extends IdentifidDbObjectType {
 
     writer.writeStartElement(TAG_ROOT);
     writeIfNotNull(writer, TAG_ID, getId());
-    writeIfNotNull(writer, TAG_ART, art);
     writeIfNotNull(writer, TAG_CAID, caId);
     writeIfNotNull(writer, TAG_SN, sn);
     writeIfNotNull(writer, TAG_PID, pid);
