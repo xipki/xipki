@@ -12,9 +12,7 @@ Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin
 Just drop me an email.
 
 ## Prerequisite
-* JRE / JDK 8
-  * [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html) / [Zulu](https://www.azul.com/downloads/zulu/): [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-  * OpenJDK (via linux package manager): No policy files are required
+* JRE / JDK 8 (build 162 or higher)
 ## Tested Platforms
 
 - Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
