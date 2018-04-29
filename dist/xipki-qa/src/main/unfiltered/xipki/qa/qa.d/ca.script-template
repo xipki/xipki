@@ -42,7 +42,7 @@ ca:cmpcontrol-add \
 ## Certificate Profiles
 
 list = [ cross subca subca-complex ocsp scep multiple-ous \
-  multi-valued-rdn qc ee-complex tls tls-c tls-inc-sn gsmc-k max-time ]
+  multi-valued-rdn qc ee-complex tls tls-c tls-inc-sn max-time ]
 
 each ($list) {
   ca:profile-add --type XML --name ${it} \
@@ -371,7 +371,6 @@ ca:caprofile-add \
   --profile tls \
   --profile tls-c \
   --profile tls-inc-sn \
-  --profile gsmc-k \
   --profile extended
 
 ## Add publisher

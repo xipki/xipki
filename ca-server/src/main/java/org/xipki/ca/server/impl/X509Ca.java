@@ -29,7 +29,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -39,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledFuture;
@@ -98,7 +96,6 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
@@ -2055,37 +2052,6 @@ public class X509Ca {
       }
     }
 
-    Date gsmckFirstNotBefore = null;
-    if (certprofile.getspecialCertprofileBehavior()
-        == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
-      gsmckFirstNotBefore = grantedNotBefore;
-
-      RDN[] cnRdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
-      if (cnRdns != null && cnRdns.length > 0) {
-        String requestedCn = X509Util.rdnValueToString(cnRdns[0].getFirst().getValue());
-        Long gsmckFirstNotBeforeInSecond =
-            certstore.getNotBeforeOfFirstCertStartsWithCommonName(requestedCn, certprofileIdent);
-        if (gsmckFirstNotBeforeInSecond != null) {
-          gsmckFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * MS_PER_SECOND);
-        }
-
-        // append the commonName with '-' + yyyyMMdd
-        SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMdd");
-        dateF.setTimeZone(new SimpleTimeZone(0, "Z"));
-        String yyyyMMdd = dateF.format(gsmckFirstNotBefore);
-        String suffix = "-" + yyyyMMdd;
-
-        // append the -yyyyMMdd to the commonName
-        RDN[] rdns = requestedSubject.getRDNs();
-        for (int i = 0; i < rdns.length; i++) {
-          if (ObjectIdentifiers.DN_CN.equals(rdns[i].getFirst().getType())) {
-            rdns[i] = new RDN(ObjectIdentifiers.DN_CN, new DERUTF8String(requestedCn + suffix));
-          }
-        }
-        requestedSubject = new X500Name(rdns);
-      } // end if
-    } // end if
-
     // subject
     SubjectInfo subjectInfo;
     try {
@@ -2158,17 +2124,6 @@ public class X509Ca {
 
     // CHECKSTYLE:SKIP
     Date origMaxNotAfter = maxNotAfter;
-
-    if (certprofile.getspecialCertprofileBehavior()
-        == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
-      String str = certprofile.setParameter(SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
-      long maxLifetimeInDays = Long.parseLong(str);
-      Date maxLifetime = new Date(gsmckFirstNotBefore.getTime()
-          + maxLifetimeInDays * DAY_IN_MS - MS_PER_SECOND);
-      if (maxNotAfter.after(maxLifetime)) {
-        maxNotAfter = maxLifetime;
-      }
-    }
 
     Date grantedNotAfter = certTemplate.getNotAfter();
     if (grantedNotAfter != null) {

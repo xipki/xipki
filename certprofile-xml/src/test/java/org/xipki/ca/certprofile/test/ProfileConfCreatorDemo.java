@@ -50,7 +50,6 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
 import org.xipki.ca.api.profile.CertLevel;
-import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.X509CertVersion;
 import org.xipki.ca.certprofile.xml.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
@@ -89,7 +88,6 @@ import org.xipki.ca.certprofile.xml.jaxb.KeyParametersType;
 import org.xipki.ca.certprofile.xml.jaxb.KeyUsage;
 import org.xipki.ca.certprofile.xml.jaxb.KeyUsageEnum;
 import org.xipki.ca.certprofile.xml.jaxb.NameConstraints;
-import org.xipki.ca.certprofile.xml.jaxb.NameValueType;
 import org.xipki.ca.certprofile.xml.jaxb.NamingAuthorityType;
 import org.xipki.ca.certprofile.xml.jaxb.ObjectFactory;
 import org.xipki.ca.certprofile.xml.jaxb.OidWithDescType;
@@ -125,7 +123,6 @@ import org.xipki.ca.certprofile.xml.jaxb.UsageType;
 import org.xipki.ca.certprofile.xml.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.SignatureAlgorithms;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Subject;
 import org.xipki.common.util.ParamUtil;
@@ -152,9 +149,6 @@ public class ProfileConfCreatorDemo {
     }
 
   } // class ExampleDescription
-
-  private static final ASN1ObjectIdentifier ID_GEMATIK =
-      new ASN1ObjectIdentifier("1.2.276.0.76.4");
 
   private static final String REGEX_FQDN =
       "(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)";
@@ -235,9 +229,6 @@ public class ProfileConfCreatorDemo {
 
       profile = certprofileTlsWithIncSerial();
       marshall(ms, profile, "certprofile-tls-inc-sn.xml");
-
-      profile = certprofileGsmcK();
-      marshall(ms, profile, "certprofile-gsmc-k.xml");
 
       profile = certprofileMultipleOus();
       marshall(ms, profile, "certprofile-multiple-ous.xml");
@@ -803,108 +794,6 @@ public class ProfileConfCreatorDemo {
 
     return profile;
   } // method certprofileTlsWithIncSerial
-
-  private static X509ProfileType certprofileGsmcK() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile gsmc-k", CertLevel.EndEntity,
-        "5y", false);
-
-    // SpecialBehavior
-    profile.setSpecialBehavior(SpecialX509CertprofileBehavior.gematik_gSMC_K.name());
-
-    // Maximal life time
-    Parameters profileParams = new Parameters();
-    profile.setParameters(profileParams);
-    NameValueType nv = new NameValueType();
-    nv.setName(SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
-    nv.setValue(Integer.toString(20 * 365));
-    profileParams.getParameter().add(nv);
-
-    // Subject
-    Subject subject = profile.getSubject();
-    subject.setDuplicateSubjectPermitted(true);
-    subject.setIncSerialNumber(false);
-
-    List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-        new String[]{"DE"}, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_ST, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_L, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_STREET, 0, 1));
-    // regex: ICCSN-yyyyMMdd
-    String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}, null, null));
-
-    // Extensions
-    ExtensionsType extensions = profile.getExtensions();
-    List<ExtensionType> list = extensions.getExtension();
-
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-
-    // Extensions - basicConstraints
-    ExtensionValueType extensionValue = null;
-    list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
-
-    // Extensions - AuthorityInfoAccess
-    extensionValue = createAuthorityInfoAccess();
-    list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
-
-    // Extensions - AuthorityKeyIdentifier
-    extensionValue = createAuthorityKeyIdentifier(true);
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
-
-    // Extensions - keyUsage
-    extensionValue = createKeyUsages(
-        new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.KEY_ENCIPHERMENT},
-        null);
-    list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
-
-    // Extensions - extenedKeyUsage
-    extensionValue = createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
-    list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
-
-    // Extensions - Policy
-    CertificatePolicies policies = new CertificatePolicies();
-    ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[] {
-        ID_GEMATIK.branch("79"), ID_GEMATIK.branch("163")
-    };
-    for (ASN1ObjectIdentifier id : policyIds) {
-      CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
-      policies.getCertificatePolicyInformation().add(policyInfo);
-      policyInfo.setPolicyIdentifier(createOidType(id));
-    }
-    extensionValue = createExtensionValueType(policies);
-    list.add(createExtension(Extension.certificatePolicies, true, false, extensionValue));
-
-    // Extension - Admission
-    AdmissionSyntax admissionSyntax = new AdmissionSyntax();
-    AdmissionsType admissions = new AdmissionsType();
-    admissionSyntax.getContentsOfAdmissions().add(admissions);
-
-    ProfessionInfoType pi = new ProfessionInfoType();
-    admissions.getProfessionInfo().add(pi);
-
-    pi.getProfessionOid().add(createOidType(ID_GEMATIK.branch("103")));
-    pi.getProfessionItem().add("Anwendungskonnektor");
-    extensionValue = createExtensionValueType(admissionSyntax);
-
-    // check the syntax
-    XmlX509CertprofileUtil.buildAdmissionSyntax(false, admissionSyntax);
-
-    list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false,
-        extensionValue));
-
-    // SubjectAltNames
-    extensionValue = null;
-    list.add(createExtension(Extension.subjectAlternativeName, false, false, extensionValue));
-
-    return profile;
-  } // method certprofileGsmcK
 
   private static X509ProfileType certprofileMultipleOus() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile multiple-ous",

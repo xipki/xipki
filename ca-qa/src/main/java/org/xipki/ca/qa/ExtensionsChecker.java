@@ -1609,17 +1609,7 @@ public class ExtensionsChecker {
     List<GeneralName> grantedNames = new LinkedList<>();
     // copy the required attributes of Subject
     if (subjectToSubjectAltNameModes != null) {
-      X500Name grantedSubject;
-      try {
-        grantedSubject = certProfile.getSubject(requestedSubject).getGrantedSubject();
-      } catch (CertprofileException | BadCertTemplateException ex) {
-        if (certProfile.getSpecialCertprofileBehavior() == null) {
-          throw ex;
-        }
-
-        LogUtil.warn(LOG, ex, "could not derive granted subject from requested subject");
-        grantedSubject = requestedSubject;
-      }
+      X500Name grantedSubject = certProfile.getSubject(requestedSubject).getGrantedSubject();
 
       for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
         GeneralNameTag tag = subjectToSubjectAltNameModes.get(attrType);

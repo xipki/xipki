@@ -303,38 +303,6 @@ xi:update-cert-p12 --p12 output/tls-c2.p12 --password 1234 \
 ## Revocate certificates
 xi:cmp-revoke --ca subca1 --cert output/tls-c2.der --reason affiliationChanged
 
-## Enroll certificates gsmc-k
-
-xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --p12 output/gsmc-k1.p12 --password 1234 \
-  --subject "CN=80276123451234512345,O=xipki,C=DE" \
-  --out output/gsmc-k1.csr
-
-xi:cmp-csr-enroll --csr output/gsmc-k1.csr --out output/gsmc-k1.der --profile gsmc-k
-
-xi:update-cert-p12 --p12 output/gsmc-k1.p12 --password 1234 \
-  --cert output/gsmc-k1.der \
-  --ca-cert output/subca1.der \
-  --ca-cert output/rootca1.der
-
-# Sleep 2 seconds to ensure different notBefore in certificate
-echo "Sleeping 2 seconds"
-sleep 2
-
-# with the same CN
-
-xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --p12 output/gsmc-k2.p12 --password 1234 \
-  --subject "CN=80276123451234512345,O=xipki,C=DE" \
-  --out output/gsmc-k2.csr
-
-xi:cmp-csr-enroll --csr output/gsmc-k2.csr --out output/gsmc-k2.der --profile gsmc-k
-
-xi:update-cert-p12 --p12 output/gsmc-k2.p12 --password 1234 \
-  --cert output/gsmc-k2.der \
-  --ca-cert output/subca1.der \
-  --ca-cert output/rootca1.der
-
 # Certificate extended1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \

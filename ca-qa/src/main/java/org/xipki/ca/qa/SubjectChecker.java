@@ -39,7 +39,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.RdnControl;
-import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.StringType;
 import org.xipki.ca.api.profile.SubjectControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
@@ -57,13 +56,9 @@ import org.xipki.security.util.X509Util;
 
 public class SubjectChecker {
 
-  private final SpecialX509CertprofileBehavior specialBehavior;
-
   private final SubjectControl subjectControl;
 
-  public SubjectChecker(SpecialX509CertprofileBehavior specialBehavior,
-      SubjectControl subjectControl) throws CertprofileException {
-    this.specialBehavior = specialBehavior;
+  public SubjectChecker(SubjectControl subjectControl) throws CertprofileException {
     this.subjectControl = ParamUtil.requireNonNull("subjectControl", subjectControl);
   }
 
@@ -361,13 +356,7 @@ public class SubjectChecker {
       }
     } else {
       String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
-      if (ObjectIdentifiers.DN_CN.equals(type) && specialBehavior != null
-          && SpecialX509CertprofileBehavior.gematik_gSMC_K.equals(specialBehavior)) {
-        if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
-          failureMsg.append("content '").append(tmpAtvTextValue)
-            .append("' does not start with '").append(requestedCoreAtvTextValue).append("-'; ");
-        }
-      } else if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+      if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
         if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {
           failureMsg.append("content '").append(tmpAtvTextValue)
             .append("' but expected '").append(requestedCoreAtvTextValue).append("'; ");

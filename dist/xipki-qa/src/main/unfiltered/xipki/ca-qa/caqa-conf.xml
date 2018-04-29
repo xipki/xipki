@@ -74,9 +74,6 @@
     <X509Certprofile name="tls-inc-sn">
       <file>xipki/qa/certprofile/certprofile-tls-inc-sn.xml</file>
     </X509Certprofile>
-    <X509Certprofile name="gsmc-k">
-      <file>xipki/qa/certprofile/certprofile-gsmc-k.xml</file>
-    </X509Certprofile>
     <X509Certprofile name="qc">
       <file>xipki/qa/certprofile/certprofile-qc.xml</file>
     </X509Certprofile>

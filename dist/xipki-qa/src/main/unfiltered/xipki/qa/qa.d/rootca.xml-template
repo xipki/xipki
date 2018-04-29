@@ -150,11 +150,6 @@
         <file>${profiles.dir}/certprofile-tls-inc-sn.xml</file>
       </conf>
     </profile>
-    <profile name="gsmc-k">
-      <type>XML</type>
-      <conf>
-        <file>${profiles.dir}/certprofile-gsmc-k.xml</file>
-      </conf>
     </profile>
     <profile name="max-time">
       <type>XML</type>

@@ -90,7 +90,6 @@ import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyUsageControl;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.RdnControl;
-import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.StringType;
 import org.xipki.ca.api.profile.SubjectControl;
 import org.xipki.ca.api.profile.SubjectDirectoryAttributesControl;
@@ -113,7 +112,6 @@ import org.xipki.ca.certprofile.xml.jaxb.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xml.jaxb.IntWithDescType;
 import org.xipki.ca.certprofile.xml.jaxb.KeyUsage;
 import org.xipki.ca.certprofile.xml.jaxb.NameConstraints;
-import org.xipki.ca.certprofile.xml.jaxb.NameValueType;
 import org.xipki.ca.certprofile.xml.jaxb.PdsLocationType;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyMappings;
@@ -138,7 +136,6 @@ import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
 import org.xipki.ca.certprofile.xml.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Subject;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
@@ -204,8 +201,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
   private boolean notBeforeMidnight;
 
-  private Map<String, String> parameters;
-
   private Integer pathLen;
 
   private ExtensionValue policyConstraints;
@@ -227,8 +222,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   private List<String> signatureAlgorithms;
 
   private ExtensionValue smimeCapabilities;
-
-  private SpecialX509CertprofileBehavior specialBehavior;
 
   private SubjectControl subjectControl;
 
@@ -266,7 +259,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     maxSize = null;
     nameConstraints = null;
     notBeforeMidnight = false;
-    parameters = null;
     pathLen = null;
     policyConstraints = null;
     policyMappings = null;
@@ -278,7 +270,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     serialNumberInReqPermitted = true;
     signatureAlgorithms = null;
     smimeCapabilities = null;
-    specialBehavior = null;
     subjectControl = null;
     tlsFeature = null;
     validity = null;
@@ -375,11 +366,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
       throw new CertprofileException("invalid notBefore '" + str + "'");
     }
 
-    String specBehavior = conf.getSpecialBehavior();
-    if (specBehavior != null) {
-      this.specialBehavior = SpecialX509CertprofileBehavior.forName(specBehavior);
-    }
-
     this.duplicateKeyPermitted = conf.isDuplicateKey();
     this.serialNumberInReqPermitted = conf.isSerialNumberInReq();
 
@@ -387,18 +373,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
     if (keyAlgos != null) {
       this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(keyAlgos);
-    }
-
-    // parameters
-    Parameters confParams = conf.getParameters();
-    if (confParams == null) {
-      parameters = null;
-    } else {
-      Map<String, String> tmpMap = new HashMap<>();
-      for (NameValueType nv : confParams.getParameter()) {
-        tmpMap.put(nv.getName(), nv.getValue());
-      }
-      parameters = Collections.unmodifiableMap(tmpMap);
     }
 
     // Subject
@@ -1182,11 +1156,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public String setParameter(String paramName) {
-    return (parameters == null) ? null : parameters.get(paramName);
-  }
-
-  @Override
   public ExtensionValues getExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
       X500Name requestedSubject, X500Name grantedSubject,
@@ -1810,11 +1779,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
-    return specialBehavior;
-  }
-
-  @Override
   public boolean isDuplicateKeyPermitted() {
     return duplicateKeyPermitted;
   }
@@ -1918,10 +1882,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     return notBeforeMidnight;
   }
 
-  public Map<String, String> getParameters() {
-    return parameters;
-  }
-
   public Integer getPathLen() {
     return pathLen;
   }
@@ -1956,10 +1916,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
   public ExtensionValue getSmimeCapabilities() {
     return smimeCapabilities;
-  }
-
-  public SpecialX509CertprofileBehavior getSpecialBehavior() {
-    return specialBehavior;
   }
 
   public ExtensionValue getTlsFeature() {

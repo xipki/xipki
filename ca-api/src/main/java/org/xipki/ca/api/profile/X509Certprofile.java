@@ -57,10 +57,6 @@ public abstract class X509Certprofile {
     return null;
   }
 
-  public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
-    return null;
-  }
-
   /**
    * Returns whether include subject and serial number of the issuer certificate in the
    * AuthorityKeyIdentifier extension.
@@ -113,16 +109,6 @@ public abstract class X509Certprofile {
    */
   public boolean isSerialNumberInReqPermitted() {
     return true;
-  }
-
-  /**
-   * Returns the parameter value for the given name.
-   * @param paramName
-   *          Parameter name. Must not be {@code null}.
-   * @return parameter value.
-   */
-  public String setParameter(String paramName) {
-    return null;
   }
 
   public boolean hasMidnightNotBefore() {

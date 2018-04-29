@@ -85,12 +85,6 @@ caqa:check-cert --issuer subca --profile tls-c \
 caqa:check-cert --issuer subca --profile tls-c \
   --csr output/tls-c2.csr --cert output/tls-c2.der
 
-caqa:check-cert --issuer subca --profile gsmc-k \
-  --csr output/gsmc-k1.csr --cert output/gsmc-k1.der
-
-caqa:check-cert --issuer subca --profile gsmc-k \
-  --csr output/gsmc-k2.csr --cert output/gsmc-k2.der
-
 caqa:check-cert --issuer subca --profile qc \
   --csr output/qc1.csr --cert output/qc1.der
 

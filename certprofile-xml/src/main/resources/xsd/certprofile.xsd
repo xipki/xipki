@@ -66,26 +66,6 @@
       </xs:element>
       <xs:element name="duplicateKey" type="xs:boolean"/>
       <xs:element name="serialNumberInReq" type="xs:boolean"/>
-      <xs:element name="specialBehavior" type="xs:string" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            some certificate profiles must be processed specially. Currently
-            defined special behavior is gematik_gSMC_K.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="parameters" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            current supported parameter is "maxLifetime" for specialBehavior "gematik_gSMC_K"
-          </xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="parameter" type="nameValueType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="keyAlgorithms" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

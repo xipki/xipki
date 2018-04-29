@@ -60,7 +60,6 @@
         <str>tls</str>
         <str>tls-c</str>
         <str>tls-inc-sn</str>
-        <str>gsmc-k</str>
         <str>extended</str>
       </profiles>
       <requestors>

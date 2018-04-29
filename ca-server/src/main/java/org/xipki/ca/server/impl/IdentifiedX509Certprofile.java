@@ -65,7 +65,6 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyUsageControl;
-import org.xipki.ca.api.profile.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
@@ -158,27 +157,6 @@ class IdentifiedX509Certprofile {
     this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
 
     this.certprofile.initialize(dbEntry.getConf());
-    if (certProfile.getSpecialCertprofileBehavior()
-          == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
-      String paramName = SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME;
-      String str = certProfile.setParameter(paramName);
-      if (str == null) {
-        throw new CertprofileException("parameter " + paramName + " is not defined");
-      }
-
-      str = str.trim();
-      int idx;
-      try {
-        idx = Integer.parseInt(str);
-      } catch (NumberFormatException ex) {
-        throw new CertprofileException("invalid " + paramName + ": " + str);
-      }
-
-      if (idx < 1) {
-        throw new CertprofileException("invalid " + paramName + ": " + str);
-      }
-    }
-
   } // constructor
 
   public NameId getIdent() {
@@ -195,10 +173,6 @@ class IdentifiedX509Certprofile {
 
   public List<String> getSignatureAlgorithms() {
     return certprofile.getSignatureAlgorithms();
-  }
-
-  public SpecialX509CertprofileBehavior getspecialCertprofileBehavior() {
-    return certprofile.getSpecialCertprofileBehavior();
   }
 
   public void setEnvParameterResolver(EnvParameterResolver envParameterResolver) {
@@ -571,10 +545,6 @@ class IdentifiedX509Certprofile {
 
   public boolean isSerialNumberInReqPermitted() {
     return certprofile.isSerialNumberInReqPermitted();
-  }
-
-  public String setParameter(String paramName) {
-    return certprofile.setParameter(paramName);
   }
 
   public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {

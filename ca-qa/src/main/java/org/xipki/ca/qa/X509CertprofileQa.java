@@ -109,8 +109,7 @@ public class X509CertprofileQa {
       certProfile.initialize(conf);
 
       this.publicKeyChecker = new PublicKeyChecker(certProfile.getKeyAlgorithms());
-      this.subjectChecker = new SubjectChecker(certProfile.getSpecialBehavior(),
-          certProfile.getSubjectControl());
+      this.subjectChecker = new SubjectChecker(certProfile.getSubjectControl());
       this.extensionsChecker = new ExtensionsChecker(conf, certProfile);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
