@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.ConfPairs;
@@ -59,6 +62,22 @@ public class ChangeCaEntry {
   private Integer expirationPeriod;
 
   private ConfPairs extraControl;
+
+  private List<String> crlUris;
+
+  private List<String> deltaCrlUris;
+
+  private List<String> ocspUris;
+
+  private List<String> caCertUris;
+
+  private X509Certificate cert;
+
+  private String crlSignerName;
+
+  private Integer numCrls;
+
+  private Integer serialNoBitLen;
 
   public ChangeCaEntry(NameId ident) throws CaMgmtException {
     this.ident = ParamUtil.requireNonNull("ident", ident);
@@ -178,6 +197,73 @@ public class ChangeCaEntry {
 
   public void setExtraControl(ConfPairs extraControl) {
     this.extraControl = extraControl;
+  }
+
+  public Integer getSerialNoBitLen() {
+    return serialNoBitLen;
+  }
+
+  public void setSerialNoBitLen(Integer serialNoBitLen) {
+    if (serialNoBitLen != null) {
+      ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
+    }
+    this.serialNoBitLen = serialNoBitLen;
+  }
+
+  public List<String> getCrlUris() {
+    return crlUris;
+  }
+
+  public void setCrlUris(List<String> crlUris) {
+    this.crlUris = crlUris;
+  }
+
+  public List<String> getDeltaCrlUris() {
+    return deltaCrlUris;
+  }
+
+  public void setDeltaCrlUris(List<String> deltaCrlUris) {
+    this.deltaCrlUris = deltaCrlUris;
+  }
+
+  public List<String> getOcspUris() {
+    return ocspUris;
+  }
+
+  public void setOcspUris(List<String> ocspUris) {
+    this.ocspUris = ocspUris;
+  }
+
+  public List<String> getCaCertUris() {
+    return caCertUris;
+  }
+
+  public void setCaCertUris(List<String> caCertUris) {
+    this.caCertUris = caCertUris;
+  }
+
+  public X509Certificate getCert() {
+    return cert;
+  }
+
+  public void setCert(X509Certificate cert) {
+    this.cert = cert;
+  }
+
+  public String getCrlSignerName() {
+    return crlSignerName;
+  }
+
+  public void setCrlSignerName(String crlSignerName) {
+    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
+  }
+
+  public Integer getNumCrls() {
+    return numCrls;
+  }
+
+  public void setNumCrls(Integer numCrls) {
+    this.numCrls = numCrls;
   }
 
 }

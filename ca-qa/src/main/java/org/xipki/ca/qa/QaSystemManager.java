@@ -35,7 +35,7 @@ public interface QaSystemManager {
    *          Name of the issuer
    * @return the issuer
    */
-  X509IssuerInfo getIssuer(String issuerName);
+  IssuerInfo getIssuer(String issuerName);
 
   Set<String> getCertprofileNames();
 
@@ -45,6 +45,6 @@ public interface QaSystemManager {
    *          Name of the cert profile.
    * @return the cert profile.
    */
-  X509CertprofileQa getCertprofile(String certprofileName);
+  CertprofileQa getCertprofile(String certprofileName);
 
 }

@@ -19,9 +19,9 @@ package org.xipki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.x509.CrlControl;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.CrlControl;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 import org.xipki.console.karaf.CmdFailure;
 
@@ -38,11 +38,11 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
   @Override
   protected Object execute0() throws Exception {
-    X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
+    ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
     String name = ey.getName();
     println("checking CRL signer " + name);
 
-    X509CrlSignerEntry cs = caManager.getCrlSigner(name);
+    CrlSignerEntry cs = caManager.getCrlSigner(name);
     if (cs == null) {
       throw new CmdFailure("CRL signer named '" + name + "' is not configured");
     }

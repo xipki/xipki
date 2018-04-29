@@ -103,8 +103,8 @@ import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.SubjectDirectoryAttributesControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.certprofile.xml.BiometricInfoOption;
-import org.xipki.ca.certprofile.xml.XmlX509Certprofile;
-import org.xipki.ca.certprofile.xml.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.xml.XmlCertprofile;
+import org.xipki.ca.certprofile.xml.XmlCertprofileUtil;
 import org.xipki.ca.certprofile.xml.commonpki.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
@@ -206,9 +206,9 @@ public class ExtensionsChecker {
 
   private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
-  private XmlX509Certprofile certProfile;
+  private XmlCertprofile certProfile;
 
-  public ExtensionsChecker(X509ProfileType conf, XmlX509Certprofile certProfile)
+  public ExtensionsChecker(X509ProfileType conf, XmlCertprofile certProfile)
       throws CertprofileException {
     this.certProfile = ParamUtil.requireNonNull("certProfile", certProfile);
 
@@ -281,7 +281,7 @@ public class ExtensionsChecker {
           type, extensionsType, Restriction.class);
       if (extConf != null) {
         restriction = new QaDirectoryString(
-            XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()),
+            XmlCertprofileUtil.convertDirectoryStringType(extConf.getType()),
             extConf.getText());
       }
     }
@@ -293,7 +293,7 @@ public class ExtensionsChecker {
           type, extensionsType, AdditionalInformation.class);
       if (extConf != null) {
         additionalInformation = new QaDirectoryString(
-            XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()),
+            XmlCertprofileUtil.convertDirectoryStringType(extConf.getType()),
             extConf.getText());
       }
     }
@@ -377,7 +377,7 @@ public class ExtensionsChecker {
     this.constantExtensions = buildConstantExtesions(extensionsType);
   } // constructor
 
-  public List<ValidationIssue> checkExtensions(Certificate cert, X509IssuerInfo issuerInfo,
+  public List<ValidationIssue> checkExtensions(Certificate cert, IssuerInfo issuerInfo,
       Extensions requestedExtensions, X500Name requestedSubject) {
     ParamUtil.requireNonNull("cert", cert);
     ParamUtil.requireNonNull("issuerInfo", issuerInfo);
@@ -581,7 +581,7 @@ public class ExtensionsChecker {
   } // getExpectedExtValue
 
   private Set<ASN1ObjectIdentifier> getExensionTypes(Certificate cert,
-      X509IssuerInfo issuerInfo, Extensions requestedExtensions) {
+      IssuerInfo issuerInfo, Extensions requestedExtensions) {
     Set<ASN1ObjectIdentifier> types = new HashSet<>();
     // profile required extension types
     Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
@@ -835,7 +835,7 @@ public class ExtensionsChecker {
   } // method checkExtensionSubjectKeyIdentifier
 
   private void checkExtensionIssuerKeyIdentifier(StringBuilder failureMsg,
-      byte[] extensionValue, X509IssuerInfo issuerInfo) {
+      byte[] extensionValue, IssuerInfo issuerInfo) {
     AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
     byte[] keyIdentifier = asn1.getKeyIdentifier();
     if (keyIdentifier == null) {
@@ -1721,7 +1721,7 @@ public class ExtensionsChecker {
   } // method checkExtensionSubjectInfoAccess
 
   private void checkExtensionIssuerAltNames(StringBuilder failureMsg, byte[] extensionValue,
-      X509IssuerInfo issuerInfo) {
+      IssuerInfo issuerInfo) {
     Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions()
         .getExtension(Extension.subjectAlternativeName);
     if (caSubjectAltExtension == null) {
@@ -1737,7 +1737,7 @@ public class ExtensionsChecker {
   } // method checkExtensionIssuerAltNames
 
   private void checkExtensionCrlDistributionPoints(StringBuilder failureMsg,
-      byte[] extensionValue, X509IssuerInfo issuerInfo) {
+      byte[] extensionValue, IssuerInfo issuerInfo) {
     CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
     DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
     if (isDistributionPoints == null) {
@@ -1789,7 +1789,7 @@ public class ExtensionsChecker {
   } // method checkExtensionCrlDistributionPoints
 
   private void checkExtensionDeltaCrlDistributionPoints(StringBuilder failureMsg,
-      byte[] extensionValue, X509IssuerInfo issuerInfo) {
+      byte[] extensionValue, IssuerInfo issuerInfo) {
     CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
     DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
     if (isDistributionPoints == null) {
@@ -1896,7 +1896,7 @@ public class ExtensionsChecker {
   } // method checkExtensionAdmission
 
   private void checkExtensionAuthorityInfoAccess(StringBuilder failureMsg,
-      byte[] extensionValue, X509IssuerInfo issuerInfo) {
+      byte[] extensionValue, IssuerInfo issuerInfo) {
     AuthorityInfoAccessControl aiaControl = certProfile.getAiaControl();
     Set<String> expCaIssuerUris = (aiaControl == null || aiaControl.isIncludesCaIssuers())
         ? issuerInfo.getCaIssuerUrls() : Collections.emptySet();

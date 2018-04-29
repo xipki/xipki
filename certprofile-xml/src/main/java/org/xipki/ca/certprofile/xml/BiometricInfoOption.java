@@ -49,7 +49,7 @@ public class BiometricInfoOption {
     ParamUtil.requireNonNull("jaxb", jaxb);
 
     this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
-    this.hashAlgorithms = XmlX509CertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
+    this.hashAlgorithms = XmlCertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
 
     for (ASN1ObjectIdentifier m : hashAlgorithms) {
       AlgorithmUtil.getHashOutputSizeInOctets(m);

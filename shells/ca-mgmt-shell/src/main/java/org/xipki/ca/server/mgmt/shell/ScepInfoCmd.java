@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;

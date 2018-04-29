@@ -293,12 +293,22 @@
       </dependency>
       <dependency>
         <groupId>org.xipki.shells</groupId>
+        <artifactId>security-pkcs12-shell</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.shells</groupId>
         <artifactId>security-speed-shell</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xipki.shells</groupId>
         <artifactId>security-speed-pkcs11-shell</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.shells</groupId>
+        <artifactId>security-speed-pkcs12-shell</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

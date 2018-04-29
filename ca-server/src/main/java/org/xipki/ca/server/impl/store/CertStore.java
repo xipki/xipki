@@ -49,9 +49,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.X509CertWithDbId;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.server.impl.CaIdNameMap;
 import org.xipki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
@@ -115,7 +115,7 @@ public class CertStore {
     this.sqls = new SQLs(datasource);
   } // constructor
 
-  public boolean addCert(X509CertificateInfo certInfo) {
+  public boolean addCert(CertificateInfo certInfo) {
     ParamUtil.requireNonNull("certInfo", certInfo);
     try {
       addCert(certInfo.getIssuer(), certInfo.getCert(),
@@ -133,7 +133,7 @@ public class CertStore {
     return true;
   }
 
-  private void addCert(NameId ca, X509CertWithDbId certificate, byte[] encodedSubjectPublicKey,
+  private void addCert(NameId ca, CertWithDbId certificate, byte[] encodedSubjectPublicKey,
       NameId certProfile, NameId requestor, Integer userId, RequestType reqType,
       byte[] transactionId, X500Name reqSubject)
       throws DataAccessException, OperationException {
@@ -461,14 +461,14 @@ public class CertStore {
     }
   } // method addCrl
 
-  public X509CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,
+  public CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,
       CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCrlCache,
       CaIdNameMap idNameMap) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     ParamUtil.requireNonNull("revInfo", revInfo);
 
-    X509CertWithRevocationInfo certWithRevInfo =
+    CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca, serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
@@ -531,14 +531,14 @@ public class CertStore {
     return certWithRevInfo;
   } // method revokeCert
 
-  public X509CertWithRevocationInfo revokeSuspendedCert(NameId ca, BigInteger serialNumber,
+  public CertWithRevocationInfo revokeSuspendedCert(NameId ca, BigInteger serialNumber,
       CrlReason reason, boolean publishToDeltaCrlCache, CaIdNameMap idNameMap)
       throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     ParamUtil.requireNonNull("reason", reason);
 
-    X509CertWithRevocationInfo certWithRevInfo =
+    CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca, serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
@@ -587,12 +587,12 @@ public class CertStore {
     return certWithRevInfo;
   } // method revokeSuspendedCert
 
-  public X509CertWithDbId unrevokeCert(NameId ca, BigInteger serialNumber, boolean force,
+  public CertWithDbId unrevokeCert(NameId ca, BigInteger serialNumber, boolean force,
       boolean publishToDeltaCrlCache, CaIdNameMap idNamMap) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    X509CertWithRevocationInfo certWithRevInfo =
+    CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca, serialNumber, idNamMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
@@ -940,7 +940,7 @@ public class CertStore {
     return numCrlsToDelete;
   } // method cleanupCrls
 
-  public X509CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId,
+  public CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId,
       CaIdNameMap idNameMap) throws OperationException, CertificateException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("caCert", caCert);
@@ -981,9 +981,9 @@ public class CertStore {
 
     byte[] encodedCert = Base64.decodeFast(b64Cert);
     X509Certificate cert = X509Util.parseCert(encodedCert);
-    X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
+    CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
     certWithMeta.setCertId(certId);
-    X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, ca, caCert,
+    CertificateInfo certInfo = new CertificateInfo(certWithMeta, ca, caCert,
         cert.getPublicKey().getEncoded(), idNameMap.getCertprofile(certprofileId),
         idNameMap.getRequestor(requestorId));
     if (!revoked) {
@@ -997,7 +997,7 @@ public class CertStore {
     return certInfo;
   } // method getCertForId
 
-  private X509CertWithDbId getCertForId(long certId) throws OperationException, OperationException {
+  private CertWithDbId getCertForId(long certId) throws OperationException, OperationException {
     final String sql = sqls.sqlRawCertForId;
 
     String b64Cert;
@@ -1026,10 +1026,10 @@ public class CertStore {
     } catch (CertificateException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
-    return new X509CertWithDbId(cert, encodedCert);
+    return new CertWithDbId(cert, encodedCert);
   } // method getCertForId
 
-  public X509CertWithRevocationInfo getCertWithRevocationInfo(NameId ca, BigInteger serial,
+  public CertWithRevocationInfo getCertWithRevocationInfo(NameId ca, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
@@ -1086,18 +1086,18 @@ public class CertStore {
       revInfo = new CertRevocationInfo(revReason, new Date(1000 * revTime), invalidityTime);
     }
 
-    X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, certBytes);
+    CertWithDbId certWithMeta = new CertWithDbId(cert, certBytes);
     certWithMeta.setCertId(certId);
 
     String profileName = idNameMap.getCertprofileName(certprofileId);
-    X509CertWithRevocationInfo ret = new X509CertWithRevocationInfo();
+    CertWithRevocationInfo ret = new CertWithRevocationInfo();
     ret.setCertprofile(profileName);
     ret.setCert(certWithMeta);
     ret.setRevInfo(revInfo);
     return ret;
   } // method getCertWithRevocationInfo
 
-  public X509CertificateInfo getCertificateInfo(NameId ca, X509Cert caCert, BigInteger serial,
+  public CertificateInfo getCertificateInfo(NameId ca, X509Cert caCert, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException, CertificateException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("caCert", caCert);
@@ -1144,11 +1144,11 @@ public class CertStore {
       byte[] encodedCert = Base64.decodeFast(b64Cert);
       X509Certificate cert = X509Util.parseCert(encodedCert);
 
-      X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
+      CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
 
       byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
           .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
-      X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, ca,
+      CertificateInfo certInfo = new CertificateInfo(certWithMeta, ca,
           caCert, subjectPublicKeyInfo, idNameMap.getCertprofile(certprofileId),
           idNameMap.getRequestor(requestorId));
 
@@ -1233,7 +1233,7 @@ public class CertStore {
 
     List<X509Certificate> certs = new ArrayList<X509Certificate>(certIds.size());
     for (Long certId : certIds) {
-      X509CertWithDbId cert = getCertForId(certId);
+      CertWithDbId cert = getCertForId(certId);
       if (cert != null) {
         certs.add(cert.getCert());
       }

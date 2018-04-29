@@ -17,7 +17,7 @@
 
 package org.xipki.ca.server.impl.cmp;
 
-import org.xipki.ca.api.X509CertWithDbId;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.common.util.ParamUtil;
 
@@ -31,17 +31,17 @@ public class RequestorEntryWrapper {
 
   private RequestorEntry dbEntry;
 
-  private X509CertWithDbId cert;
+  private CertWithDbId cert;
 
   public RequestorEntryWrapper() {
   }
 
   public void setDbEntry(RequestorEntry dbEntry) {
     this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-    this.cert = new X509CertWithDbId(dbEntry.getCert());
+    this.cert = new CertWithDbId(dbEntry.getCert());
   }
 
-  public X509CertWithDbId getCert() {
+  public CertWithDbId getCert() {
     return cert;
   }
 

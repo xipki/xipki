@@ -31,10 +31,10 @@ import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.qa.QaSystemManager;
-import org.xipki.ca.qa.X509CertprofileQa;
-import org.xipki.ca.qa.X509IssuerInfo;
-import org.xipki.ca.server.mgmt.qa.shell.completer.X509CertprofileNameCompleter;
-import org.xipki.ca.server.mgmt.qa.shell.completer.X509IssuerNameCompleter;
+import org.xipki.ca.qa.CertprofileQa;
+import org.xipki.ca.qa.IssuerInfo;
+import org.xipki.ca.server.mgmt.qa.shell.completer.CertprofileNameCompleter;
+import org.xipki.ca.server.mgmt.qa.shell.completer.IssuerNameCompleter;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
@@ -61,7 +61,7 @@ public class CheckCertCmd extends XiAction {
 
   @Option(name = "--issuer",
       description = "issuer name\n(required if multiple issuers are configured)")
-  @Completion(X509IssuerNameCompleter.class)
+  @Completion(IssuerNameCompleter.class)
   private String issuerName;
 
   @Option(name = "--csr", required = true,
@@ -71,7 +71,7 @@ public class CheckCertCmd extends XiAction {
 
   @Option(name = "--profile", aliases = "-p", required = true,
       description = "certificate profile\n(required)")
-  @Completion(X509CertprofileNameCompleter.class)
+  @Completion(CertprofileNameCompleter.class)
   private String profileName;
 
   @Option(name = "--verbose", aliases = "-v",
@@ -101,9 +101,9 @@ public class CheckCertCmd extends XiAction {
           + " is not within the configured issuers " + issuerNames);
     }
 
-    X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
+    IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-    X509CertprofileQa qa = qaSystemManager.getCertprofile(profileName);
+    CertprofileQa qa = qaSystemManager.getCertprofile(profileName);
     if (qa == null) {
       throw new IllegalCmdParamException("found no certificate profile named '"
           + profileName + "'");

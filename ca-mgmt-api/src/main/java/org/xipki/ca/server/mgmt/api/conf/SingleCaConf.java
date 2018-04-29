@@ -22,7 +22,6 @@ import java.util.List;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -58,8 +57,8 @@ public class SingleCaConf {
         throw new IllegalArgumentException("caEntry must not be null if genSelfIssued is non-null");
       }
 
-      if (caEntry instanceof X509CaEntry) {
-        if (((X509CaEntry) caEntry).getCert() != null) {
+      if (caEntry instanceof CaEntry) {
+        if (((CaEntry) caEntry).getCert() != null) {
           throw new IllegalArgumentException(
               "caEntry.cert must not be null if genSelfIssued is non-null");
         }

@@ -56,7 +56,7 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.Scep;
@@ -71,8 +71,8 @@ import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
-import org.xipki.ca.server.mgmt.api.x509.ScepControl;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.ca.server.mgmt.api.ScepControl;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
@@ -514,7 +514,7 @@ public class ScepImpl implements Scep {
           CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
               csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
               certProfileName);
-          X509CertificateInfo cert = ca.generateCertificate(certTemplateData, requestor,
+          CertificateInfo cert = ca.generateCertificate(certTemplateData, requestor,
               RequestType.SCEP, tidBytes, msgId);
           /* Don't save SCEP message, since it contains password in plaintext
           if (ca.getCaInfo().isSaveRequest() && cert.getCert().getCertId() != null) {

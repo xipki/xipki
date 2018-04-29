@@ -28,12 +28,6 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
-import org.xipki.ca.server.mgmt.api.x509.CertWithStatusInfo;
-import org.xipki.ca.server.mgmt.api.x509.ChangeScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
@@ -422,7 +416,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException;
+  void addCrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException;
 
   /**
    * Remove the CRL signer {@code crlSignerName}.
@@ -440,7 +434,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeCrlSigner(X509ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
+  void changeCrlSigner(ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
 
   /**
    * Returns the CRL signer named {@code name}.
@@ -448,7 +442,7 @@ public interface CaManager {
    *          CRL signer name. Must not be {@code null}.
    * @return the CRL Signer
    */
-  X509CrlSignerEntry getCrlSigner(String name);
+  CrlSignerEntry getCrlSigner(String name);
 
   /**
    * Adds a publisher.
@@ -672,7 +666,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Certificate generateRootCa(X509CaEntry caEntry, String certprofileName, byte[] encodedCsr,
+  X509Certificate generateRootCa(CaEntry caEntry, String certprofileName, byte[] encodedCsr,
       BigInteger serialNumber) throws CaMgmtException;
 
   /**

@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 
 /**
  * TODO.
@@ -39,11 +38,8 @@ public class RcaNameCompleter extends MgmtNameCompleter {
     Set<String> ret = new HashSet<>();
     for (String name : caManager.getCaNames()) {
       CaEntry caEntry = caManager.getCa(name);
-      if (!(caEntry instanceof X509CaEntry)) {
-        continue;
-      }
 
-      X509Certificate cert = ((X509CaEntry) caEntry).getCert();
+      X509Certificate cert = caEntry.getCert();
       if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
         ret.add(name);
       }

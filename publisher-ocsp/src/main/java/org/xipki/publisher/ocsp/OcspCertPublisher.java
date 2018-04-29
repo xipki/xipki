@@ -29,10 +29,10 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.EnvParameterResolver;
-import org.xipki.ca.api.X509CertWithDbId;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.api.publisher.X509CertPublisher;
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertPublisher;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -49,7 +49,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class OcspCertPublisher extends X509CertPublisher {
+public class OcspCertPublisher extends CertPublisher {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspCertPublisher.class);
 
@@ -116,9 +116,9 @@ public class OcspCertPublisher extends X509CertPublisher {
   }
 
   @Override
-  public boolean certificateAdded(X509CertificateInfo certInfo) {
+  public boolean certificateAdded(CertificateInfo certInfo) {
     X509Cert caCert = certInfo.getIssuerCert();
-    X509CertWithDbId cert = certInfo.getCert();
+    CertWithDbId cert = certInfo.getCert();
 
     try {
       queryExecutor.addCert(caCert, cert, certInfo.getProfile().getName(),
@@ -131,7 +131,7 @@ public class OcspCertPublisher extends X509CertPublisher {
   }
 
   @Override
-  public boolean certificateRevoked(X509Cert caCert, X509CertWithDbId cert,
+  public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert,
       String certprofile, CertRevocationInfo revInfo) {
     try {
       queryExecutor.revokeCert(caCert, cert, certprofile, revInfo);
@@ -143,7 +143,7 @@ public class OcspCertPublisher extends X509CertPublisher {
   }
 
   @Override
-  public boolean certificateUnrevoked(X509Cert caCert, X509CertWithDbId cert) {
+  public boolean certificateUnrevoked(X509Cert caCert, CertWithDbId cert) {
     try {
       queryExecutor.unrevokeCert(caCert, cert);
       return true;
@@ -166,8 +166,8 @@ public class OcspCertPublisher extends X509CertPublisher {
     event.setName("SYSTEM");
     event.setLevel(AuditLevel.ERROR);
     event.setStatus(AuditStatus.FAILED);
-    if (cert instanceof X509CertWithDbId) {
-      Long certId = ((X509CertWithDbId) cert).getCertId();
+    if (cert instanceof CertWithDbId) {
+      Long certId = ((CertWithDbId) cert).getCertId();
       if (certId != null) {
         event.addEventData("id", certId);
       }
@@ -220,7 +220,7 @@ public class OcspCertPublisher extends X509CertPublisher {
   }
 
   @Override
-  public boolean certificateRemoved(X509Cert issuerCert, X509CertWithDbId cert) {
+  public boolean certificateRemoved(X509Cert issuerCert, CertWithDbId cert) {
     try {
       queryExecutor.removeCert(issuerCert, cert);
       return true;

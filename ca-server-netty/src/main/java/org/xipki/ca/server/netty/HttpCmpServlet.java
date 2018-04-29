@@ -34,7 +34,7 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.X509CaCmpResponder;
+import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
@@ -104,7 +104,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
       }
 
       String caName = null;
-      X509CaCmpResponder responder = null;
+      CaCmpResponder responder = null;
       if (servletUri.getPath().length() > 1) {
         // skip the first char which is always '/'
         String caAlias = servletUri.getPath().substring(1);

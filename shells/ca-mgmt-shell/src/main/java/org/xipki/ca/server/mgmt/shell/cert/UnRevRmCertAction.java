@@ -25,7 +25,6 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.IoUtil;
@@ -63,15 +62,11 @@ public abstract class UnRevRmCertAction extends CaAction {
       throw new CmdFailure("CA " + caName + " not available");
     }
 
-    if (!(ca instanceof X509CaEntry)) {
-      throw new CmdFailure("CA " + caName + " is not an X.509-CA");
-    }
-
     BigInteger serialNumber;
     if (serialNumberS != null) {
       serialNumber = toBigInt(serialNumberS);
     } else if (certFile != null) {
-      X509Certificate caCert = ((X509CaEntry) ca).getCert();
+      X509Certificate caCert = ca.getCert();
       X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
       if (!X509Util.issues(caCert, cert)) {
         throw new CmdFailure("certificate '" + certFile + "' is not issued by CA " + caName);

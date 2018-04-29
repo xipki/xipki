@@ -38,11 +38,11 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.qa.jaxb.CertprofileType;
 import org.xipki.ca.qa.jaxb.FileOrValueType;
+import org.xipki.ca.qa.jaxb.IssuerType;
 import org.xipki.ca.qa.jaxb.ObjectFactory;
 import org.xipki.ca.qa.jaxb.QAConfType;
-import org.xipki.ca.qa.jaxb.X509CertprofileType;
-import org.xipki.ca.qa.jaxb.X509IssuerType;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -63,9 +63,9 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
   private String confFile;
 
-  private Map<String, X509CertprofileQa> x509ProfileMap = new HashMap<>();
+  private Map<String, CertprofileQa> x509ProfileMap = new HashMap<>();
 
-  private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+  private Map<String, IssuerInfo> x509IssuerInfoMap = new HashMap<>();
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -112,9 +112,9 @@ public class QaSystemManagerImpl implements QaSystemManager {
       return;
     }
 
-    if (qaConf.getX509Issuers() != null) {
-      List<X509IssuerType> x509IssuerTypes = qaConf.getX509Issuers().getX509Issuer();
-      for (X509IssuerType issuerType : x509IssuerTypes) {
+    if (qaConf.getIssuers() != null) {
+      List<IssuerType> issuerTypes = qaConf.getIssuers().getIssuer();
+      for (IssuerType issuerType : issuerTypes) {
         byte[] certBytes;
         try {
           certBytes = readData(issuerType.getCert());
@@ -135,9 +135,9 @@ public class QaSystemManagerImpl implements QaSystemManager {
           return;
         }
 
-        X509IssuerInfo issuerInfo;
+        IssuerInfo issuerInfo;
         try {
-          issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(),
+          issuerInfo = new IssuerInfo(issuerType.getCaIssuerUrl(),
               issuerType.getOcspUrl(), issuerType.getCrlUrl(),
               issuerType.getDeltaCrlUrl(), certBytes, cutoffNotAfter);
         } catch (CertificateException ex) {
@@ -150,14 +150,13 @@ public class QaSystemManagerImpl implements QaSystemManager {
       }
     }
 
-    if (qaConf.getX509Certprofiles() != null) {
-      List<X509CertprofileType> certprofileTypes =
-          qaConf.getX509Certprofiles().getX509Certprofile();
-      for (X509CertprofileType type : certprofileTypes) {
+    if (qaConf.getCertprofiles() != null) {
+      List<CertprofileType> certprofileTypes = qaConf.getCertprofiles().getCertprofile();
+      for (CertprofileType type : certprofileTypes) {
         String name = type.getName();
         try {
           byte[] content = readData(type);
-          x509ProfileMap.put(name, new X509CertprofileQa(content));
+          x509ProfileMap.put(name, new CertprofileQa(content));
           LOG.info("configured X509 certificate profile {}", name);
         } catch (IOException | CertprofileException ex) {
           LogUtil.error(LOG, ex, "could not parse QA certificate profile " + name);
@@ -179,7 +178,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
   }
 
   @Override
-  public X509IssuerInfo getIssuer(String issuerName) {
+  public IssuerInfo getIssuer(String issuerName) {
     ParamUtil.requireNonNull("issuerName", issuerName);
     return x509IssuerInfoMap.get(issuerName);
   }
@@ -190,7 +189,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
   }
 
   @Override
-  public X509CertprofileQa getCertprofile(String certprofileName) {
+  public CertprofileQa getCertprofile(String certprofileName) {
     ParamUtil.requireNonNull("certprofileName", certprofileName);
     return x509ProfileMap.get(certprofileName);
   }

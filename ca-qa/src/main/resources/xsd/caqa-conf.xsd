@@ -21,16 +21,16 @@
   <xs:element name="QAConf" type="QAConfType"/>
   <xs:complexType name="QAConfType">
     <xs:sequence>
-      <xs:element name="X509Issuers" type="X509IssuersType" minOccurs="0"/>
-      <xs:element name="X509Certprofiles" type="X509CertprofilesType" minOccurs="0"/>
+      <xs:element name="issuers" type="issuersType" minOccurs="0"/>
+      <xs:element name="certprofiles" type="certprofilesType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="X509IssuersType">
+  <xs:complexType name="issuersType">
     <xs:sequence>
-      <xs:element name="X509Issuer" type="X509IssuerType" maxOccurs="unbounded"/>
+      <xs:element name="issuer" type="issuerType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="X509IssuerType">
+  <xs:complexType name="issuerType">
     <xs:sequence>
       <xs:element name="cert" type="fileOrValueType"/>
       <xs:element name="validityMode" type="xs:string" minOccurs="0">
@@ -45,12 +45,12 @@
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
-  <xs:complexType name="X509CertprofilesType">
+  <xs:complexType name="certprofilesType">
     <xs:sequence>
-      <xs:element name="X509Certprofile" type="X509CertprofileType" maxOccurs="unbounded"/>
+      <xs:element name="certprofile" type="certprofileType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="X509CertprofileType">
+  <xs:complexType name="certprofileType">
     <xs:complexContent>
       <xs:extension base="fileOrValueType">
         <xs:attribute name="name" type="xs:string" use="required"/>

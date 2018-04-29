@@ -18,8 +18,11 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.xipki.ca.api.NameId;
@@ -29,9 +32,13 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.KeyUsage;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * TODO.
@@ -71,12 +78,45 @@ public class CaEntry {
 
   private ConfPairs extraControl;
 
-  public CaEntry(NameId ident, String signerType, String signerConf, int expirationPeriod)
-      throws CaMgmtException {
+  private List<String> crlUris;
+
+  private List<String> deltaCrlUris;
+
+  private List<String> ocspUris;
+
+  private List<String> caCertUris;
+
+  private X509Certificate cert;
+
+  private String crlSignerName;
+
+  private int serialNoBitLen;
+
+  private long nextCrlNumber;
+
+  private int numCrls;
+
+  private CertRevocationInfo revocationInfo;
+
+  private String subject;
+
+  private String hexSha1OfCert;
+
+  public CaEntry(NameId ident, int serialNoBitLen, long nextCrlNumber, String signerType,
+      String signerConf, CaUris caUris, int numCrls, int expirationPeriod) throws CaMgmtException {
     this.ident = ParamUtil.requireNonNull("ident", ident);
     this.signerType = ParamUtil.requireNonBlank("signerType", signerType).toLowerCase();
     this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
     this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+
+    this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 1);
+    this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
+    this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
+
+    this.caCertUris = caUris.getCaCertUris();
+    this.ocspUris = caUris.getOcspUris();
+    this.crlUris = caUris.getCrlUris();
+    this.deltaCrlUris = caUris.getDeltaCrlUris();
   }
 
   public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
@@ -234,7 +274,15 @@ public class CaEntry {
       }
     }
 
-    return StringUtil.concatObjectsCap(500, "id: ", ident.getId(), "\nname: ", ident.getName(),
+    String revInfoText = "";
+    if (revocationInfo != null) {
+      StringUtil.concatObjectsCap(30,
+          "\treason: ", revocationInfo.getReason().getDescription(),
+          "\n\trevoked at ", revocationInfo.getRevocationTime(), "\n");
+    }
+
+    return StringUtil.concatObjectsCap(1500,
+        "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nstatus: ", (status == null ? "null" : status.getStatus()),
         "\nmaxValidity: ", maxValidity,
         "\nexpirationPeriod: ", expirationPeriod, " days",
@@ -250,7 +298,14 @@ public class CaEntry {
         "\npermission: ", permission,
         "\nkeepExpiredCerts: ", (keepExpiredCertInDays < 0
                       ? "forever" : keepExpiredCertInDays + " days"),
-        "\nextraControl: ", extraCtrlText, "\n");
+        "\nextraControl: ", extraCtrlText, "\n",
+        "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
+        "\ndeltaCrlUris:", formatUris(deltaCrlUris), "\ncrlUris:", formatUris(crlUris),
+        "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(caCertUris),
+        "\ncert: \n", InternUtil.formatCert(cert, verbose),
+        "\ncrlSignerName: ", crlSignerName,
+        "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), "\n",
+        revInfoText);
   } // method toString
 
   protected static String urisToString(Collection<? extends Object> tokens) {
@@ -277,7 +332,7 @@ public class CaEntry {
       return false;
     }
 
-    return equals((CaEntry) obj);
+    return equals((CaEntry) obj, false, false);
   }
 
   public boolean equals(CaEntry obj, boolean ignoreDynamicFields, boolean ignoreId) {
@@ -337,12 +392,169 @@ public class CaEntry {
       return false;
     }
 
+    if (!ignoreDynamicFields) {
+      if (nextCrlNumber != obj.nextCrlNumber) {
+        return false;
+      }
+    }
+
+    if (!CompareUtil.equalsObject(crlUris, obj.crlUris)) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(deltaCrlUris, obj.deltaCrlUris)) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(ocspUris, obj.ocspUris)) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(caCertUris, obj.caCertUris)) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(cert, obj.cert)) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)) {
+      return false;
+    }
+
+    if (serialNoBitLen != obj.serialNoBitLen) {
+      return false;
+    }
+
+    if (numCrls != obj.numCrls) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)) {
+      return false;
+    }
     return true;
   }
 
   @Override
   public int hashCode() {
     return ident.hashCode();
+  }
+
+  public void setCert(X509Certificate cert) throws CaMgmtException {
+    if (cert == null) {
+      this.cert = null;
+      this.subject = null;
+      this.hexSha1OfCert = null;
+    } else {
+      if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign)) {
+        throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
+      }
+      this.cert = cert;
+      this.subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
+      byte[] encodedCert;
+      try {
+        encodedCert = cert.getEncoded();
+      } catch (CertificateEncodingException ex) {
+        throw new CaMgmtException("could not encoded certificate", ex);
+      }
+      this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
+    }
+  }
+
+  public int getSerialNoBitLen() {
+    return serialNoBitLen;
+  }
+
+  public void setSerialNoBitLen(int serialNoBitLen) {
+    this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
+  }
+
+  public long getNextCrlNumber() {
+    return nextCrlNumber;
+  }
+
+  public void setNextCrlNumber(long crlNumber) {
+    this.nextCrlNumber = crlNumber;
+  }
+
+  public List<String> getCrlUris() {
+    return crlUris;
+  }
+
+  public String getCrlUrisAsString() {
+    return urisToString(crlUris);
+  }
+
+  public List<String> getDeltaCrlUris() {
+    return deltaCrlUris;
+  }
+
+  public String getDeltaCrlUrisAsString() {
+    return urisToString(deltaCrlUris);
+  }
+
+  public List<String> getOcspUris() {
+    return ocspUris;
+  }
+
+  public String getOcspUrisAsString() {
+    return urisToString(ocspUris);
+  }
+
+  public List<String> getCaCertUris() {
+    return caCertUris;
+  }
+
+  public String getCaCertUrisAsString() {
+    return urisToString(caCertUris);
+  }
+
+  public X509Certificate getCert() {
+    return cert;
+  }
+
+  public int getNumCrls() {
+    return numCrls;
+  }
+
+  public String getCrlSignerName() {
+    return crlSignerName;
+  }
+
+  public void setCrlSignerName(String crlSignerName) {
+    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
+  }
+
+  public CertRevocationInfo getRevocationInfo() {
+    return revocationInfo;
+  }
+
+  public void setRevocationInfo(CertRevocationInfo revocationInfo) {
+    this.revocationInfo = revocationInfo;
+  }
+
+  public Date getCrlBaseTime() {
+    return (cert == null) ? null : cert.getNotBefore();
+  }
+
+  public String getSubject() {
+    return subject;
+  }
+
+  public String getHexSha1OfCert() {
+    return hexSha1OfCert;
+  }
+
+  private static String formatUris(List<String> uris) {
+    if (CollectionUtil.isEmpty(uris)) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder();
+    for (String uri : uris) {
+      sb.append("\n    ").append(uri);
+    }
+    return sb.toString();
   }
 
 }

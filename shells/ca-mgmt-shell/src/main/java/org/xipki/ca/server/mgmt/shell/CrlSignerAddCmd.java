@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -85,7 +85,7 @@ public class CrlSignerAddCmd extends CaAction {
       }
     }
 
-    X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert,
+    CrlSignerEntry entry = new CrlSignerEntry(name, signerType, signerConf, base64Cert,
         crlControl);
     String msg = "CRL signer " + name;
     try {

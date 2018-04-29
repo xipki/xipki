@@ -33,8 +33,8 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
+import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter;
@@ -171,8 +171,8 @@ public class CaUpdateCmd extends CaAction {
   @Reference
   private PasswordResolver passwordResolver;
 
-  protected X509ChangeCaEntry getChangeCaEntry() throws Exception {
-    X509ChangeCaEntry entry = new X509ChangeCaEntry(new NameId(null, caName));
+  protected ChangeCaEntry getChangeCaEntry() throws Exception {
+    ChangeCaEntry entry = new ChangeCaEntry(new NameId(null, caName));
 
     if (snBitLen != null) {
       ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);

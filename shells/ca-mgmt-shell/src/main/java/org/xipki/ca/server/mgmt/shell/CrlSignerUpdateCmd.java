@@ -26,8 +26,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
 import org.xipki.common.util.Base64;
@@ -75,7 +75,7 @@ public class CrlSignerUpdateCmd extends CaAction {
   @Reference
   private PasswordResolver passwordResolver;
 
-  protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry() throws Exception {
+  protected ChangeCrlSignerEntry getCrlSignerChangeEntry() throws Exception {
     String signerCertConf = null;
     if (CaManager.NULL.equalsIgnoreCase(signerCert)) {
       signerCertConf = CaManager.NULL;
@@ -88,7 +88,7 @@ public class CrlSignerUpdateCmd extends CaAction {
     if (signerConf != null) {
       String tmpSignerType = signerType;
       if (tmpSignerType == null) {
-        X509CrlSignerEntry entry = caManager.getCrlSigner(name);
+        CrlSignerEntry entry = caManager.getCrlSigner(name);
         if (entry == null) {
           throw new IllegalCmdParamException("please specify the signerType");
         }
@@ -99,7 +99,7 @@ public class CrlSignerUpdateCmd extends CaAction {
           passwordResolver, securityFactory);
     }
 
-    X509ChangeCrlSignerEntry dbEntry = new X509ChangeCrlSignerEntry(name);
+    ChangeCrlSignerEntry dbEntry = new ChangeCrlSignerEntry(name);
     dbEntry.setSignerType(signerType);
     dbEntry.setSignerConf(signerConf);
     dbEntry.setCrlControl(crlControl);

@@ -54,22 +54,20 @@ import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
+import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.ca.server.mgmt.api.CrlControl;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.mgmt.api.x509.CrlControl;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaUris;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -385,7 +383,7 @@ class CaManagerQueryExecutor {
     }
   } // method createRequestor
 
-  X509CrlSignerEntry createCrlSigner(String name) throws CaMgmtException {
+  CrlSignerEntry createCrlSigner(String name) throws CaMgmtException {
     final String sql = sqls.sqlSelectCrlSigner;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -399,7 +397,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown CRL signer " + name);
       }
 
-      return new X509CrlSignerEntry(name, rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
+      return new CrlSignerEntry(name, rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
           rs.getString("SIGNER_CERT"), rs.getString("CRL_CONTROL"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -455,7 +453,7 @@ class CaManagerQueryExecutor {
     }
   } // method createResponder
 
-  X509CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
+  CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
       throws CaMgmtException {
     final String sql = sqls.sqlSelectCa;
     PreparedStatement stmt = null;
@@ -503,8 +501,8 @@ class CaManagerQueryExecutor {
         tmpCaCertUris = StringUtil.splitByComma(caCertUris);
       }
 
-      X509CaUris caUris = new X509CaUris(tmpCaCertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
-      X509CaEntry entry = new X509CaEntry(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
+      CaUris caUris = new CaUris(tmpCaCertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
+      CaEntry entry = new CaEntry(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
           rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
           caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
       entry.setCert(generateCert(rs.getString("CERT")));
@@ -543,7 +541,7 @@ class CaManagerQueryExecutor {
           ? ValidityMode.STRICT : ValidityMode.forName(validityModeS));
 
       try {
-        return new X509CaInfo(entry, certstore);
+        return new CaInfo(entry, certstore);
       } catch (OperationException ex) {
         throw new CaMgmtException(ex);
       }
@@ -662,9 +660,6 @@ class CaManagerQueryExecutor {
 
   void addCa(CaEntry caEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("caEntry", caEntry);
-    if (!(caEntry instanceof X509CaEntry)) {
-      throw new CaMgmtException("unsupported CAEntry " + caEntry.getClass().getName());
-    }
 
     try {
       int id = (int) datasource.getMax(null, "CA", "ID");
@@ -672,8 +667,6 @@ class CaManagerQueryExecutor {
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
-
-    X509CaEntry entry = (X509CaEntry) caEntry;
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
@@ -686,40 +679,40 @@ class CaManagerQueryExecutor {
     try {
       ps = prepareStatement(sql);
       int idx = 1;
-      ps.setInt(idx++, entry.getIdent().getId());
-      ps.setString(idx++, entry.getIdent().getName());
-      ps.setString(idx++, entry.getSubject());
-      ps.setInt(idx++, entry.getSerialNoBitLen());
-      ps.setLong(idx++, entry.getNextCrlNumber());
-      ps.setString(idx++, entry.getStatus().getStatus());
-      ps.setString(idx++, entry.getCrlUrisAsString());
-      ps.setString(idx++, entry.getDeltaCrlUrisAsString());
-      ps.setString(idx++, entry.getOcspUrisAsString());
-      ps.setString(idx++, entry.getCaCertUrisAsString());
-      ps.setString(idx++, entry.getMaxValidity().toString());
-      byte[] encodedCert = entry.getCert().getEncoded();
+      ps.setInt(idx++, caEntry.getIdent().getId());
+      ps.setString(idx++, caEntry.getIdent().getName());
+      ps.setString(idx++, caEntry.getSubject());
+      ps.setInt(idx++, caEntry.getSerialNoBitLen());
+      ps.setLong(idx++, caEntry.getNextCrlNumber());
+      ps.setString(idx++, caEntry.getStatus().getStatus());
+      ps.setString(idx++, caEntry.getCrlUrisAsString());
+      ps.setString(idx++, caEntry.getDeltaCrlUrisAsString());
+      ps.setString(idx++, caEntry.getOcspUrisAsString());
+      ps.setString(idx++, caEntry.getCaCertUrisAsString());
+      ps.setString(idx++, caEntry.getMaxValidity().toString());
+      byte[] encodedCert = caEntry.getCert().getEncoded();
       ps.setString(idx++, Base64.encodeToString(encodedCert));
-      ps.setString(idx++, entry.getSignerType());
-      ps.setString(idx++, entry.getCrlSignerName());
-      ps.setString(idx++, entry.getResponderName());
-      ps.setString(idx++, entry.getCmpControlName());
-      setBoolean(ps, idx++, entry.isDuplicateKeyPermitted());
-      setBoolean(ps, idx++, entry.isDuplicateSubjectPermitted());
-      setBoolean(ps, idx++, entry.isSaveRequest());
-      ps.setInt(idx++, entry.getPermission());
-      ps.setInt(idx++, entry.getNumCrls());
-      ps.setInt(idx++, entry.getExpirationPeriod());
-      ps.setInt(idx++, entry.getKeepExpiredCertInDays());
-      ps.setString(idx++, entry.getValidityMode().name());
-      ConfPairs extraControl = entry.getExtraControl();
+      ps.setString(idx++, caEntry.getSignerType());
+      ps.setString(idx++, caEntry.getCrlSignerName());
+      ps.setString(idx++, caEntry.getResponderName());
+      ps.setString(idx++, caEntry.getCmpControlName());
+      setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
+      setBoolean(ps, idx++, caEntry.isDuplicateSubjectPermitted());
+      setBoolean(ps, idx++, caEntry.isSaveRequest());
+      ps.setInt(idx++, caEntry.getPermission());
+      ps.setInt(idx++, caEntry.getNumCrls());
+      ps.setInt(idx++, caEntry.getExpirationPeriod());
+      ps.setInt(idx++, caEntry.getKeepExpiredCertInDays());
+      ps.setString(idx++, caEntry.getValidityMode().name());
+      ConfPairs extraControl = caEntry.getExtraControl();
       String encodedExtraCtrl = (extraControl == null) ? null : extraControl.getEncoded();
       ps.setString(idx++, StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl);
-      ps.setString(idx++, entry.getSignerConf());
+      ps.setString(idx++, caEntry.getSignerConf());
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add CA " + entry.getIdent());
+        throw new CaMgmtException("could not add CA " + caEntry.getIdent());
       }
       if (LOG.isInfoEnabled()) {
-        LOG.info("add CA '{}': {}", entry.getIdent(), entry.toString(false, true));
+        LOG.info("add CA '{}': {}", caEntry.getIdent(), caEntry.toString(false, true));
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -924,7 +917,7 @@ class CaManagerQueryExecutor {
     }
   } // method addRequestorToCa
 
-  void addCrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException {
+  void addCrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     String crlControl = dbEntry.getCrlControl();
     // validate crlControl
@@ -1059,16 +1052,13 @@ class CaManagerQueryExecutor {
       throws CaMgmtException {
     ParamUtil.requireNonNull("changeCaEntry", changeCaEntry);
     ParamUtil.requireNonNull("securityFactory", securityFactory);
-    if (!(changeCaEntry instanceof X509ChangeCaEntry)) {
-      throw new CaMgmtException("unsupported ChangeCAEntry " + changeCaEntry.getClass().getName());
-    }
 
-    X509ChangeCaEntry entry = (X509ChangeCaEntry) changeCaEntry;
-    X509Certificate cert = entry.getCert();
+    X509Certificate cert = changeCaEntry.getCert();
     if (cert != null) {
       boolean anyCertIssued;
       try {
-        anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID", entry.getIdent().getId());
+        anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID",
+            changeCaEntry.getIdent().getId());
       } catch (DataAccessException ex) {
         throw new CaMgmtException(ex);
       }
@@ -1078,8 +1068,8 @@ class CaManagerQueryExecutor {
       }
     }
 
-    String signerType = entry.getSignerType();
-    String signerConf = entry.getSignerConf();
+    String signerType = changeCaEntry.getSignerType();
+    String signerConf = changeCaEntry.getSignerConf();
 
     if (signerType != null || signerConf != null || cert != null) {
       // validate the signer configuration
@@ -1089,10 +1079,10 @@ class CaManagerQueryExecutor {
 
       try {
         stmt = prepareStatement(sql);
-        stmt.setInt(1, entry.getIdent().getId());
+        stmt.setInt(1, changeCaEntry.getIdent().getId());
         rs = stmt.executeQuery();
         if (!rs.next()) {
-          throw new CaMgmtException("unknown CA '" + entry.getIdent());
+          throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
         }
 
         String tmpSignerType = (signerType == null ? rs.getString("SIGNER_TYPE") : signerType);
@@ -1146,32 +1136,32 @@ class CaManagerQueryExecutor {
       }
     }
 
-    String status = (entry.getStatus() == null) ? null : entry.getStatus().name();
-    String maxValidity = (entry.getMaxValidity() == null) ? null
-        : entry.getMaxValidity().toString();
-    String extraControl = (entry.getExtraControl() == null) ? null
-        : entry.getExtraControl().getEncoded();
-    String validityMode = (entry.getValidityMode() == null) ? null
-        : entry.getValidityMode().name();
+    String status = (changeCaEntry.getStatus() == null) ? null : changeCaEntry.getStatus().name();
+    String maxValidity = (changeCaEntry.getMaxValidity() == null) ? null
+        : changeCaEntry.getMaxValidity().toString();
+    String extraControl = (changeCaEntry.getExtraControl() == null) ? null
+        : changeCaEntry.getExtraControl().getEncoded();
+    String validityMode = (changeCaEntry.getValidityMode() == null) ? null
+        : changeCaEntry.getValidityMode().name();
 
-    changeIfNotNull("CA", col(INT, "ID", entry.getIdent().getId()),
-        col(INT, "SN_SIZE", entry.getSerialNoBitLen()), col(STRING, "STATUS", status),
+    changeIfNotNull("CA", col(INT, "ID", changeCaEntry.getIdent().getId()),
+        col(INT, "SN_SIZE", changeCaEntry.getSerialNoBitLen()), col(STRING, "STATUS", status),
         col(STRING, "SUBJECT", subject), col(STRING, "CERT", base64Cert),
-        col(COLL_STRING, "CRL_URIS", entry.getCrlUris()),
-        col(COLL_STRING, "DELTACRL_URIS", entry.getDeltaCrlUris()),
-        col(COLL_STRING, "OCSP_URIS", entry.getOcspUris()),
-        col(COLL_STRING, "CACERT_URIS", entry.getCaCertUris()),
+        col(COLL_STRING, "CRL_URIS", changeCaEntry.getCrlUris()),
+        col(COLL_STRING, "DELTACRL_URIS", changeCaEntry.getDeltaCrlUris()),
+        col(COLL_STRING, "OCSP_URIS", changeCaEntry.getOcspUris()),
+        col(COLL_STRING, "CACERT_URIS", changeCaEntry.getCaCertUris()),
         col(STRING, "MAX_VALIDITY", maxValidity), col(COLL_STRING, "SIGNER_TYPE", signerType),
-        col(STRING, "CRLSIGNER_NAME", entry.getCrlSignerName()),
-        col(STRING, "RESPONDER_NAME", entry.getResponderName()),
-        col(STRING, "CMPCONTROL_NAME", entry.getCmpControlName()),
-        col(BOOL, "DUPLICATE_KEY", entry.getDuplicateKeyPermitted()),
-        col(BOOL, "DUPLICATE_SUBJECT", entry.getDuplicateSubjectPermitted()),
-        col(BOOL, "SAVE_REQ", entry.getSaveRequest()),
-        col(INT, "PERMISSION", entry.getPermission()),
-        col(INT, "NUM_CRLS", entry.getNumCrls()),
-        col(INT, "EXPIRATION_PERIOD", entry.getExpirationPeriod()),
-        col(INT, "KEEP_EXPIRED_CERT_DAYS", entry.getKeepExpiredCertInDays()),
+        col(STRING, "CRLSIGNER_NAME", changeCaEntry.getCrlSignerName()),
+        col(STRING, "RESPONDER_NAME", changeCaEntry.getResponderName()),
+        col(STRING, "CMPCONTROL_NAME", changeCaEntry.getCmpControlName()),
+        col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
+        col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
+        col(BOOL, "SAVE_REQ", changeCaEntry.getSaveRequest()),
+        col(INT, "PERMISSION", changeCaEntry.getPermission()),
+        col(INT, "NUM_CRLS", changeCaEntry.getNumCrls()),
+        col(INT, "EXPIRATION_PERIOD", changeCaEntry.getExpirationPeriod()),
+        col(INT, "KEEP_EXPIRED_CERT_DAYS", changeCaEntry.getKeepExpiredCertInDays()),
         col(STRING, "VALIDITY_MODE", validityMode),
         col(STRING, "EXTRA_CONTROL", extraControl),
         col(STRING, "SIGNER_CONF", signerConf, false, true));
@@ -1391,13 +1381,13 @@ class CaManagerQueryExecutor {
     return responder;
   } // method changeResponder
 
-  X509CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf,
+  CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf,
       String base64Cert, String crlControl, CaManagerImpl caManager,
       SecurityFactory securityFactory) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("caManager", caManager);
 
-    X509CrlSignerEntry dbEntry = createCrlSigner(name);
+    CrlSignerEntry dbEntry = createCrlSigner(name);
     if (crlControl != null) { // validate crlControl
       try {
         new CrlControl(crlControl);
@@ -1409,7 +1399,7 @@ class CaManagerQueryExecutor {
     String tmpSignerType = (signerType == null) ? dbEntry.getType() : signerType;
     try {
       if ("ca".equalsIgnoreCase(tmpSignerType)) {
-        dbEntry = new X509CrlSignerEntry(name, "ca", null, null,
+        dbEntry = new CrlSignerEntry(name, "ca", null, null,
             (crlControl == null ? dbEntry.getCrlControl() : crlControl));
       } else {
         if (signerConf != null) {
@@ -1417,7 +1407,7 @@ class CaManagerQueryExecutor {
               signerConf, null, securityFactory);
         }
 
-        dbEntry = new X509CrlSignerEntry(name, "ca",
+        dbEntry = new CrlSignerEntry(name, "ca",
             (signerConf == null ? dbEntry.getConf() : signerConf),
             (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert),
             (crlControl == null ? dbEntry.getCrlControl() : crlControl));
@@ -1426,7 +1416,7 @@ class CaManagerQueryExecutor {
       throw new CaMgmtException(ex);
     }
 
-    X509CrlSignerEntryWrapper crlSigner = caManager.createX509CrlSigner(dbEntry);
+    CrlSignerEntryWrapper crlSigner = caManager.createX509CrlSigner(dbEntry);
 
     changeIfNotNull("CRLSIGNER", col(STRING, "NAME", name), col(STRING, "SIGNER_TYPE", signerType),
         col(STRING, "SIGNER_CERT", base64Cert), col(STRING, "CRL_CONTROL", crlControl),

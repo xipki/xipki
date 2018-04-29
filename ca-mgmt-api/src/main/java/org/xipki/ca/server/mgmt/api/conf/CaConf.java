@@ -55,10 +55,13 @@ import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
+import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -80,10 +83,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaUris;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -115,7 +114,7 @@ public class CaConf {
 
   private final Map<String, String> environments = new HashMap<>();
 
-  private final Map<String, X509CrlSignerEntry> crlSigners = new HashMap<>();
+  private final Map<String, CrlSignerEntry> crlSigners = new HashMap<>();
 
   private final Map<String, RequestorEntry> requestors = new HashMap<>();
 
@@ -275,7 +274,7 @@ public class CaConf {
     // CRL signers
     if (jaxb.getCrlsigners() != null) {
       for (CrlsignerType m : jaxb.getCrlsigners().getCrlsigner()) {
-        X509CrlSignerEntry en = new X509CrlSignerEntry(m.getName(),
+        CrlSignerEntry en = new CrlSignerEntry(m.getName(),
             expandConf(m.getSignerType()), getValue(m.getSignerConf(), zipFile),
             getBase64Binary(m.getSignerCert(), zipFile), expandConf(m.getCrlControl()));
         addCrlSigner(en);
@@ -330,7 +329,7 @@ public class CaConf {
       for (CaType m : jaxb.getCas().getCa()) {
         String name = m.getName();
         GenSelfIssued genSelfIssued = null;
-        X509CaEntry caEntry = null;
+        CaEntry caEntry = null;
 
         if (m.getCaInfo() != null) {
           X509CaInfoType ci = m.getCaInfo().getX509Ca();
@@ -358,7 +357,7 @@ public class CaConf {
                 csr, serialNumber, certFilename);
           }
 
-          X509CaUris caUris = new X509CaUris(getStrings(ci.getCacertUris()),
+          CaUris caUris = new CaUris(getStrings(ci.getCacertUris()),
               getStrings(ci.getOcspUris()), getStrings(ci.getCrlUris()),
               getStrings(ci.getDeltacrlUris()));
 
@@ -367,7 +366,7 @@ public class CaConf {
 
           int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
 
-          caEntry = new X509CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
+          caEntry = new CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile), caUris,
               numCrls, exprirationPeriod);
 
@@ -524,7 +523,7 @@ public class CaConf {
     return environments.get(ParamUtil.requireNonNull("name", name));
   }
 
-  public void addCrlSigner(X509CrlSignerEntry crlSigner) {
+  public void addCrlSigner(CrlSignerEntry crlSigner) {
     ParamUtil.requireNonNull("crlSigner", crlSigner);
     this.crlSigners.put(crlSigner.getName(), crlSigner);
   }
@@ -533,7 +532,7 @@ public class CaConf {
     return Collections.unmodifiableSet(crlSigners.keySet());
   }
 
-  public X509CrlSignerEntry getCrlSigner(String name) {
+  public CrlSignerEntry getCrlSigner(String name) {
     return crlSigners.get(ParamUtil.requireNonNull("name", name));
   }
 

@@ -76,25 +76,25 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertValidity.Unit;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.X509Certprofile;
-import org.xipki.ca.api.profile.X509CertprofileFactoryRegister;
+import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.api.publisher.X509CertPublisher;
-import org.xipki.ca.api.publisher.X509CertPublisherFactoryRegister;
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertPublisher;
+import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.Rest;
 import org.xipki.ca.server.api.Scep;
-import org.xipki.ca.server.api.X509CaCmpResponder;
-import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
+import org.xipki.ca.server.api.CaCmpResponder;
+import org.xipki.ca.server.impl.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
-import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
+import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
 import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertStore;
-import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
+import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CaEntry;
@@ -104,17 +104,24 @@ import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaSystemStatus;
+import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
@@ -136,14 +143,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
-import org.xipki.ca.server.mgmt.api.x509.CertWithStatusInfo;
-import org.xipki.ca.server.mgmt.api.x509.ChangeScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
-import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaUris;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -286,7 +285,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private Map<String, DataSourceWrapper> datasources;
 
-  private final Map<String, X509CaInfo> caInfos = new ConcurrentHashMap<>();
+  private final Map<String, CaInfo> caInfos = new ConcurrentHashMap<>();
 
   private Map<String, ResponderEntryWrapper> responders = new ConcurrentHashMap<>();
 
@@ -308,9 +307,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
-  private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
+  private final Map<String, CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
 
-  private final Map<String, X509CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
+  private final Map<String, CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, ScepImpl> sceps = new ConcurrentHashMap<>();
 
@@ -330,7 +329,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-  private final Map<String, X509CaCmpResponderImpl> x509Responders = new ConcurrentHashMap<>();
+  private final Map<String, CaCmpResponderImpl> x509Responders = new ConcurrentHashMap<>();
 
   private final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
 
@@ -366,9 +365,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private AuditServiceRegister auditServiceRegister;
 
-  private X509CertprofileFactoryRegister x509CertProfileFactoryRegister;
+  private CertprofileFactoryRegister x509CertProfileFactoryRegister;
 
-  private X509CertPublisherFactoryRegister x509CertPublisherFactoryRegister;
+  private CertPublisherFactoryRegister x509CertPublisherFactoryRegister;
 
   private DataSourceWrapper datasource;
 
@@ -789,7 +788,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method startCaSystem0
 
   private boolean startCa(String caName) {
-    X509CaInfo caEntry = caInfos.get(caName);
+    CaInfo caEntry = caInfos.get(caName);
 
     ConfPairs extraControl = caEntry.getCaEntry().getExtraControl();
     if (extraControl != null) {
@@ -815,7 +814,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     boolean signerRequired = caEntry.isSignerRequired();
 
-    X509CrlSignerEntryWrapper crlSignerEntry = null;
+    CrlSignerEntryWrapper crlSignerEntry = null;
     String crlSignerName = caEntry.getCrlSignerName();
     // CRL will be generated only in master mode
     if (signerRequired && masterMode && crlSignerName != null) {
@@ -841,7 +840,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     x509cas.put(caName, ca);
-    X509CaCmpResponderImpl caResponder = new X509CaCmpResponderImpl(this, caName);
+    CaCmpResponderImpl caResponder = new CaCmpResponderImpl(this, caName);
     x509Responders.put(caName, caResponder);
 
     return true;
@@ -899,7 +898,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method shutdown
 
   @Override
-  public X509CaCmpResponder getX509CaResponder(String name) {
+  public CaCmpResponder getX509CaResponder(String name) {
     return x509Responders.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
   }
 
@@ -1143,14 +1142,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     List<String> names = queryExecutor.namesFromTable("CRLSIGNER");
     for (String name : names) {
-      X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
+      CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
       if (dbEntry == null) {
         LOG.error("could not initialize CRL signer '{}'", name);
         continue;
       }
 
       crlSignerDbEntries.put(name, dbEntry);
-      X509CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
+      CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
       crlSigners.put(name, crlSigner);
     }
 
@@ -1245,7 +1244,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       oldCa.shutdown();
     }
 
-    X509CaInfo ca = queryExecutor.createCaInfo(name, masterMode, certstore);
+    CaInfo ca = queryExecutor.createCaInfo(name, masterMode, certstore);
     caInfos.put(name, ca);
     idNameMap.addCa(ca.getIdent());
     caHasRequestors.put(name, queryExecutor.createCaHasRequestors(ca.getIdent()));
@@ -1303,26 +1302,23 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       caEntry.setSignerConf(newSignerConf);
     }
 
-    if (caEntry instanceof X509CaEntry) {
-      try {
-        X509CaEntry tmpCaEntry = (X509CaEntry) caEntry;
-        List<String[]> signerConfs = CaEntry.splitCaSignerConfs(tmpCaEntry.getSignerConf());
-        ConcurrentContentSigner signer;
-        for (String[] m : signerConfs) {
-          SignerConf signerConf = new SignerConf(m[1]);
-          signer = securityFactory.createSigner(tmpCaEntry.getSignerType(), signerConf,
-              tmpCaEntry.getCert());
-          if (tmpCaEntry.getCert() == null) {
-            if (signer.getCertificate() == null) {
-              throw new CaMgmtException("CA signer without certificate is not allowed");
-            }
-            tmpCaEntry.setCert(signer.getCertificate());
+    try {
+      List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
+      ConcurrentContentSigner signer;
+      for (String[] m : signerConfs) {
+        SignerConf signerConf = new SignerConf(m[1]);
+        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
+            caEntry.getCert());
+        if (caEntry.getCert() == null) {
+          if (signer.getCertificate() == null) {
+            throw new CaMgmtException("CA signer without certificate is not allowed");
           }
+          caEntry.setCert(signer.getCertificate());
         }
-      } catch (XiSecurityException | ObjectCreationException ex) {
-        throw new CaMgmtException(
-          concat("could not create signer for new CA ", name, ": ", ex.getMessage()), ex);
       }
+    } catch (XiSecurityException | ObjectCreationException ex) {
+      throw new CaMgmtException(
+        concat("could not create signer for new CA ", name, ": ", ex.getMessage()), ex);
     }
 
     queryExecutor.addCa(caEntry);
@@ -1338,8 +1334,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method addCa
 
   @Override
-  public X509CaEntry getCa(String name) {
-    X509CaInfo caInfo = caInfos.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
+  public CaEntry getCa(String name) {
+    CaInfo caInfo = caInfos.get(ParamUtil.requireNonBlank("name", name).toLowerCase());
     return (caInfo == null) ? null : caInfo.getCaEntry();
   }
 
@@ -1360,7 +1356,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     if (!createCa(name)) {
       LOG.error("could not create CA {}", name);
     } else {
-      X509CaInfo caInfo = caInfos.get(name);
+      CaInfo caInfo = caInfos.get(name);
       if (CaStatus.ACTIVE != caInfo.getCaEntry().getStatus()) {
         return;
       }
@@ -1792,7 +1788,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     for (String caName : caInfos.keySet()) {
-      X509CaInfo caInfo = caInfos.get(caName);
+      CaInfo caInfo = caInfos.get(caName);
       if (name.equals(caInfo.getResponderName())) {
         caInfo.setResponderName(null);
       }
@@ -1839,7 +1835,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public void addCrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException {
+  public void addCrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     asssertMasterMode();
     String name = dbEntry.getName();
@@ -1855,8 +1851,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    X509CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
-    X509CrlSignerEntry tmpDbEntry = crlSigner.getDbEntry();
+    CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
+    CrlSignerEntry tmpDbEntry = crlSigner.getDbEntry();
     queryExecutor.addCrlSigner(tmpDbEntry);
     crlSigners.put(name, crlSigner);
     crlSignerDbEntries.put(name, tmpDbEntry);
@@ -1871,7 +1867,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new CaMgmtException("unknown CRL signer " + name);
     }
     for (String caName : caInfos.keySet()) {
-      X509CaInfo caInfo = caInfos.get(caName);
+      CaInfo caInfo = caInfos.get(caName);
       if (name.equals(caInfo.getCrlSignerName())) {
         caInfo.setCrlSignerName(null);
       }
@@ -1883,7 +1879,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method removeCrlSigner
 
   @Override
-  public void changeCrlSigner(X509ChangeCrlSignerEntry dbEntry) throws CaMgmtException {
+  public void changeCrlSigner(ChangeCrlSignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     asssertMasterMode();
 
@@ -1893,7 +1889,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     String signerCert = dbEntry.getBase64Cert();
     String crlControl = dbEntry.getCrlControl();
 
-    X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(name, signerType,
+    CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(name, signerType,
         signerConf, signerCert, crlControl, this, securityFactory);
 
     crlSigners.remove(name);
@@ -1903,12 +1899,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method changeCrlSigner
 
   @Override
-  public X509CrlSignerEntry getCrlSigner(String name) {
+  public CrlSignerEntry getCrlSigner(String name) {
     name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     return crlSignerDbEntries.get(name);
   }
 
-  public X509CrlSignerEntryWrapper getCrlSignerWrapper(String name) {
+  public CrlSignerEntryWrapper getCrlSignerWrapper(String name) {
     name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     return crlSigners.get(name);
   }
@@ -2040,7 +2036,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     for (String caName : caInfos.keySet()) {
-      X509CaInfo caInfo = caInfos.get(caName);
+      CaInfo caInfo = caInfos.get(caName);
       if (name.equals(caInfo.getCmpControlName())) {
         caInfo.setCmpControlName(null);
       }
@@ -2303,12 +2299,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method unrevokeCa
 
   public void setX509CertProfileFactoryRegister(
-      X509CertprofileFactoryRegister x509CertProfileFactoryRegister) {
+      CertprofileFactoryRegister x509CertProfileFactoryRegister) {
     this.x509CertProfileFactoryRegister = x509CertProfileFactoryRegister;
   }
 
   public void setX509CertPublisherFactoryRegister(
-      X509CertPublisherFactoryRegister x509CertPublisherFactoryRegister) {
+      CertPublisherFactoryRegister x509CertPublisherFactoryRegister) {
     this.x509CertPublisherFactoryRegister = x509CertPublisherFactoryRegister;
   }
 
@@ -2481,7 +2477,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
         notBefore, notAfter, extensions, profileName);
 
-    X509CertificateInfo certInfo;
+    CertificateInfo certInfo;
     try {
       certInfo = ca.generateCertificate(certTemplateData, byCaRequestor, RequestType.CA,
           (byte[]) null, CaAuditConstants.MSGID_ca_mgmt);
@@ -2540,7 +2536,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method getIdentifiedPublishersForCa
 
   @Override
-  public X509Certificate generateRootCa(X509CaEntry caEntry, String profileName,
+  public X509Certificate generateRootCa(CaEntry caEntry, String profileName,
       byte[] encodedCsr, BigInteger serialNumber) throws CaMgmtException {
     ParamUtil.requireNonNull("caEntry", caEntry);
     profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
@@ -2584,7 +2580,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     GenerateSelfSignedResult result;
     try {
-      result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
+      result = SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
           caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, caCertUris, ocspUris,
           crlUris, deltaCrlUris, caEntry.getExtraControl());
     } catch (OperationException | InvalidConfException ex) {
@@ -2603,13 +2599,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
+    CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
 
     String name = caEntry.getIdent().getName();
     long nextCrlNumber = caEntry.getNextCrlNumber();
     CaStatus status = caEntry.getStatus();
 
-    X509CaEntry entry = new X509CaEntry(new NameId(null, name), caEntry.getSerialNoBitLen(),
+    CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoBitLen(),
         nextCrlNumber, signerType, signerConf, caUris, numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControlName(caEntry.getCmpControlName());
@@ -2673,9 +2669,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return ret;
   } // method createCmpResponder
 
-  X509CrlSignerEntryWrapper createX509CrlSigner(X509CrlSignerEntry dbEntry) throws CaMgmtException {
+  CrlSignerEntryWrapper createX509CrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
-    X509CrlSignerEntryWrapper signer = new X509CrlSignerEntryWrapper();
+    CrlSignerEntryWrapper signer = new CrlSignerEntryWrapper();
     try {
       signer.setDbEntry(dbEntry);
     } catch (InvalidConfException ex) {
@@ -2707,7 +2703,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     try {
-      X509Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(type);
+      Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(type);
       IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
       ret.setEnvParameterResolver(envParameterResolver);
       ret.validate();
@@ -2723,7 +2719,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     String type = dbEntry.getType();
 
-    X509CertPublisher publisher;
+    CertPublisher publisher;
     IdentifiedX509CertPublisher ret;
     try {
       if (x509CertPublisherFactoryRegister.canCreatePublisher(type)) {
@@ -2955,7 +2951,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     X509Ca ca = getX509Ca(caName);
-    X509CertWithRevocationInfo certInfo;
+    CertWithRevocationInfo certInfo;
     try {
       certInfo = ca.getCertWithRevocationInfo(serialNumber);
     } catch (CertificateException | OperationException ex) {
@@ -3074,8 +3070,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     // CRL signer
     for (String name : conf.getCrlSignerNames()) {
-      X509CrlSignerEntry entry = conf.getCrlSigner(name);
-      X509CrlSignerEntry entryB = crlSignerDbEntries.get(name);
+      CrlSignerEntry entry = conf.getCrlSigner(name);
+      CrlSignerEntry entryB = crlSignerDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed CRL signer {}", name);
@@ -3218,27 +3214,21 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
       CaEntry caEntry = scc.getCaEntry();
       if (caEntry != null) {
-        if (! (caEntry instanceof X509CaEntry)) {
-          throw new CaMgmtException(
-            concat("Unsupported CaEntry ", caName, " (only X509CaEntry is supported"));
-        }
-
-        X509CaEntry entry = (X509CaEntry) caEntry;
         if (caInfos.containsKey(caName)) {
           CaEntry entryB = caInfos.get(caName).getCaEntry();
-          if (entry.getCert() == null && genSelfIssued != null) {
-            SignerConf signerConf = new SignerConf(entry.getSignerConf());
+          if (caEntry.getCert() == null && genSelfIssued != null) {
+            SignerConf signerConf = new SignerConf(caEntry.getSignerConf());
             ConcurrentContentSigner signer;
             try {
-              signer = securityFactory.createSigner(entry.getSignerType(), signerConf,
+              signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
                   (X509Certificate) null);
             } catch (ObjectCreationException ex) {
               throw new CaMgmtException(concat("could not create signer for CA ", caName), ex);
             }
-            entry.setCert(signer.getCertificate());
+            caEntry.setCert(signer.getCertificate());
           }
 
-          if (entry.equals(entryB, true, true)) {
+          if (caEntry.equals(entryB, true, true)) {
             LOG.info("ignore existed CA {}", caName);
           } else {
             String msg = concat("CA ", caName, " existed, could not re-added it");
@@ -3247,7 +3237,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           }
         } else {
           if (genSelfIssued != null) {
-            X509Certificate cert = generateRootCa(entry, genSelfIssued.getProfile(),
+            X509Certificate cert = generateRootCa(caEntry, genSelfIssued.getProfile(),
                 genSelfIssued.getCsr(), genSelfIssued.getSerialNumber());
             LOG.info("generated root CA {}", caName);
             String fn = genSelfIssued.getCertFilename();
@@ -3265,7 +3255,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             }
           } else {
             try {
-              addCa(entry);
+              addCa(caEntry);
               LOG.info("added CA {}", caName);
             } catch (CaMgmtException ex) {
               String msg = concat("could not add CA ", caName);
@@ -3561,7 +3551,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             }
           }
 
-          X509CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
+          CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
           X509CaInfoType ciJaxb = new X509CaInfoType();
           ciJaxb.setCacertUris(createStrings(entry.getCaCertUris()));
           byte[] certBytes;
@@ -3683,7 +3673,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             continue;
           }
 
-          X509CrlSignerEntry entry = crlSignerDbEntries.get(name);
+          CrlSignerEntry entry = crlSignerDbEntries.get(name);
           CrlsignerType jaxb = new CrlsignerType();
           jaxb.setName(name);
           jaxb.setSignerType(entry.getType());

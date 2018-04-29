@@ -15,24 +15,24 @@
   limitations under the License.
 -->
 <QAConf xmlns="http://xipki.org/ca/qa/qa/conf/v2">
-  <X509Issuers>
-    <X509Issuer name="rootca">
+  <issuers>
+    <issuer name="rootca">
       <cert>
         <file>output/rootca1.der</file>
       </cert>
       <validityMode>cutoff</validityMode>
       <caIssuerUrl>http://example.org/rootca1.der</caIssuerUrl>
       <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
-    </X509Issuer>
-    <X509Issuer name="subca">
+    </issuer>
+    <issuer name="subca">
       <cert>
         <file>output/subca1.der</file>
       </cert>
       <validityMode>cutoff</validityMode>
       <caIssuerUrl>http://example.org/subca1.der</caIssuerUrl>
       <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
-    </X509Issuer>
-    <X509Issuer name="subcawithcrl">
+    </issuer>
+    <issuer name="subcawithcrl">
       <cert>
         <file>output/subcawithcrl1.der</file>
       </cert>
@@ -41,50 +41,50 @@
       <ocspUrl>http://localhost:8080/ocsp/responder2</ocspUrl>
       <crlUrl>http://example.org/crl</crlUrl>
       <deltaCrlUrl>http://example.org/deltacrl</deltaCrlUrl>
-    </X509Issuer>
-  </X509Issuers>
-  <X509Certprofiles>
-    <X509Certprofile name="rootca">
+    </issuer>
+  </issuers>
+  <certprofiles>
+    <certprofile name="rootca">
       <file>xipki/qa/certprofile/certprofile-rootca.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="cross">
+    </certprofile>
+    <certprofile name="cross">
       <file>xipki/qa/certprofile/certprofile-cross.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="subca">
+    </certprofile>
+    <certprofile name="subca">
       <file>xipki/qa/certprofile/certprofile-subca.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="subca-complex">
+    </certprofile>
+    <certprofile name="subca-complex">
       <file>xipki/qa/certprofile/certprofile-subca-complex.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="ocsp">
+    </certprofile>
+    <certprofile name="ocsp">
       <file>xipki/qa/certprofile/certprofile-ocsp.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="multiple-ous">
+    </certprofile>
+    <certprofile name="multiple-ous">
       <file>xipki/qa/certprofile/certprofile-multiple-ous.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="multi-valued-rdn">
+    </certprofile>
+    <certprofile name="multi-valued-rdn">
       <file>xipki/qa/certprofile/certprofile-multi-valued-rdn.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="tls">
+    </certprofile>
+    <certprofile name="tls">
       <file>xipki/qa/certprofile/certprofile-tls.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="tls-c">
+    </certprofile>
+    <certprofile name="tls-c">
       <file>xipki/qa/certprofile/certprofile-tls-c.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="tls-inc-sn">
+    </certprofile>
+    <certprofile name="tls-inc-sn">
       <file>xipki/qa/certprofile/certprofile-tls-inc-sn.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="qc">
+    </certprofile>
+    <certprofile name="qc">
       <file>xipki/qa/certprofile/certprofile-qc.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="ee-complex">
+    </certprofile>
+    <certprofile name="ee-complex">
       <file>xipki/qa/certprofile/certprofile-ee-complex.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="max-time">
+    </certprofile>
+    <certprofile name="max-time">
       <file>xipki/qa/certprofile/certprofile-max-time.xml</file>
-    </X509Certprofile>
-    <X509Certprofile name="extended">
+    </certprofile>
+    <certprofile name="extended">
       <file>xipki/ca-qa/certprofile/certprofile-extended-qa.xml</file>
-    </X509Certprofile>
-  </X509Certprofiles>
+    </certprofile>
+  </certprofiles>
 </QAConf>

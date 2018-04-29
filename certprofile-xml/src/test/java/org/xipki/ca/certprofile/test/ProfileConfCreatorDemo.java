@@ -51,7 +51,7 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
 import org.xipki.ca.api.profile.CertLevel;
 import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.certprofile.xml.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.xml.XmlCertprofileUtil;
 import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.xml.jaxb.AdmissionSyntax;
 import org.xipki.ca.certprofile.xml.jaxb.AdmissionsType;
@@ -1052,7 +1052,7 @@ public class ProfileConfCreatorDemo {
     regNum.setRegex("a*b");
 
     // check the syntax
-    XmlX509CertprofileUtil.buildAdmissionSyntax(false, admissionSyntax);
+    XmlCertprofileUtil.buildAdmissionSyntax(false, admissionSyntax);
 
     extensionValue = createExtensionValueType(admissionSyntax);
     list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false,

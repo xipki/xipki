@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
@@ -44,11 +44,11 @@ class PendingCertificatePool {
 
     private final long waitForConfirmTill;
 
-    private final X509CertificateInfo certInfo;
+    private final CertificateInfo certInfo;
 
     private final byte[] certHash;
 
-    MyEntry(BigInteger certReqId, long waitForConfirmTill, X509CertificateInfo certInfo) {
+    MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
       this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
       this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
       this.waitForConfirmTill = waitForConfirmTill;
@@ -77,7 +77,7 @@ class PendingCertificatePool {
   PendingCertificatePool() {
   }
 
-  void addCertificate(byte[] transactionId, BigInteger certReqId, X509CertificateInfo certInfo,
+  void addCertificate(byte[] transactionId, BigInteger certReqId, CertificateInfo certInfo,
       long waitForConfirmTill) {
     ParamUtil.requireNonNull("transactionId", transactionId);
     ParamUtil.requireNonNull("certInfo", certInfo);
@@ -97,7 +97,7 @@ class PendingCertificatePool {
     }
   }
 
-  X509CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId,
+  CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId,
       byte[] certHash) {
     ParamUtil.requireNonNull("transactionId", transactionId);
     ParamUtil.requireNonNull("certReqId", certReqId);
@@ -133,7 +133,7 @@ class PendingCertificatePool {
     return (retEntry == null) ? null : retEntry.certInfo;
   }
 
-  Set<X509CertificateInfo> removeCertificates(byte[] transactionId) {
+  Set<CertificateInfo> removeCertificates(byte[] transactionId) {
     ParamUtil.requireNonNull("transactionId", transactionId);
 
     String hexId = Hex.encode(transactionId);
@@ -146,14 +146,14 @@ class PendingCertificatePool {
       return null;
     }
 
-    Set<X509CertificateInfo> ret = new HashSet<>();
+    Set<CertificateInfo> ret = new HashSet<>();
     for (MyEntry myEntry :entries) {
       ret.add(myEntry.certInfo);
     }
     return ret;
   }
 
-  Set<X509CertificateInfo> removeConfirmTimeoutedCertificates() {
+  Set<CertificateInfo> removeConfirmTimeoutedCertificates() {
     synchronized (map) {
       if (CollectionUtil.isEmpty(map)) {
         return null;
@@ -161,7 +161,7 @@ class PendingCertificatePool {
 
       long now = System.currentTimeMillis();
 
-      Set<X509CertificateInfo> ret = new HashSet<>();
+      Set<CertificateInfo> ret = new HashSet<>();
 
       for (String tid : map.keySet()) {
         Set<MyEntry> entries = map.get(tid);

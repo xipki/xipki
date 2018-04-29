@@ -150,7 +150,6 @@
         <file>${profiles.dir}/certprofile-tls-inc-sn.xml</file>
       </conf>
     </profile>
-    </profile>
     <profile name="max-time">
       <type>XML</type>
       <conf>

@@ -40,7 +40,7 @@ import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.ca.server.api.CaAuditConstants;
@@ -50,7 +50,7 @@ import org.xipki.ca.server.api.RestResponse;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.X509Ca;
-import org.xipki.ca.server.impl.cmp.X509CaCmpResponderImpl;
+import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
@@ -123,7 +123,7 @@ public class RestImpl implements Rest {
         if (caName == null) {
           caName = caAlias.toLowerCase();
         }
-        ca = ((X509CaCmpResponderImpl) responderManager.getX509CaResponder(caName)).getCa();
+        ca = ((CaCmpResponderImpl) responderManager.getX509CaResponder(caName)).getCa();
       }
 
       if (caName == null || ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
@@ -246,7 +246,7 @@ public class RestImpl implements Rest {
         CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
             notBefore, notAfter, extensions, profile);
 
-        X509CertificateInfo certInfo = ca.generateCertificate(certTemplate,
+        CertificateInfo certInfo = ca.generateCertificate(certTemplate,
             requestor, RequestType.REST, null, msgId);
 
         if (ca.getCaInfo().isSaveRequest()) {

@@ -68,7 +68,7 @@ import org.xipki.ca.api.profile.KeyUsageControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.api.profile.X509Certprofile;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileUtil;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
@@ -149,9 +149,9 @@ class IdentifiedX509Certprofile {
   } // end static
 
   private final CertprofileEntry dbEntry;
-  private final X509Certprofile certprofile;
+  private final Certprofile certprofile;
 
-  IdentifiedX509Certprofile(CertprofileEntry dbEntry, X509Certprofile certProfile)
+  IdentifiedX509Certprofile(CertprofileEntry dbEntry, Certprofile certProfile)
       throws CertprofileException {
     this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
     this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);

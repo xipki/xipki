@@ -19,7 +19,7 @@ package org.xipki.ca.server.impl.cmp;
 
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.X509CertWithDbId;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
@@ -35,9 +35,9 @@ public class CmpRequestorInfo implements RequestorInfo {
 
   private final CaHasRequestorEntry caHasRequestor;
 
-  private final X509CertWithDbId cert;
+  private final CertWithDbId cert;
 
-  public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, X509CertWithDbId cert) {
+  public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, CertWithDbId cert) {
     this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
     this.cert = ParamUtil.requireNonNull("cert", cert);
   }
@@ -46,7 +46,7 @@ public class CmpRequestorInfo implements RequestorInfo {
     return caHasRequestor;
   }
 
-  public X509CertWithDbId getCert() {
+  public CertWithDbId getCert() {
     return cert;
   }
 

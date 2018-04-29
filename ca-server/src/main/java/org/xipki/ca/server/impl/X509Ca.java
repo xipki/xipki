@@ -91,19 +91,19 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.X509CertWithDbId;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.store.CertStore;
-import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
+import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
@@ -112,11 +112,11 @@ import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.mgmt.api.x509.CrlControl;
-import org.xipki.ca.server.mgmt.api.x509.CrlControl.HourMinute;
-import org.xipki.ca.server.mgmt.api.x509.CrlControl.UpdateMode;
+import org.xipki.ca.server.mgmt.api.CrlControl.HourMinute;
+import org.xipki.ca.server.mgmt.api.CrlControl.UpdateMode;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
@@ -219,7 +219,7 @@ public class X509Ca {
 
     @Override
     public void run() {
-      X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+      CrlSignerEntryWrapper crlSigner = getCrlSigner();
       if (crlSigner == null || crlSigner.getCrlControl().getUpdateMode() != UpdateMode.interval) {
         return;
       }
@@ -404,7 +404,7 @@ public class X509Ca {
 
   private static final Logger LOG = LoggerFactory.getLogger(X509Ca.class);
 
-  private final X509CaInfo caInfo;
+  private final CaInfo caInfo;
 
   private final NameId caIdent;
 
@@ -432,7 +432,7 @@ public class X509Ca {
 
   private final ConcurrentSkipListSet<Long> subjectCertsInProcess = new ConcurrentSkipListSet<>();
 
-  public X509Ca(CaManagerImpl caManager, X509CaInfo caInfo, CertStore certstore)
+  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore)
       throws OperationException {
     this.caManager = ParamUtil.requireNonNull("caManager", caManager);
     this.masterMode = caManager.isMasterMode();
@@ -451,7 +451,7 @@ public class X509Ca {
       }
     }
 
-    X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+    CrlSignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner != null) {
       // CA signs the CRL
       if (caManager.getCrlSignerWrapper(caInfo.getCrlSignerName()) == null
@@ -484,7 +484,7 @@ public class X509Ca {
         new SuspendedCertsRevoker(), random.nextInt(60), 60, TimeUnit.MINUTES);
   } // constructor
 
-  public X509CaInfo getCaInfo() {
+  public CaInfo getCaInfo() {
     return caInfo;
   }
 
@@ -495,7 +495,7 @@ public class X509Ca {
 
   public X509Certificate getCertificate(BigInteger serialNumber)
       throws CertificateException, OperationException {
-    X509CertificateInfo certInfo = certstore.getCertificateInfo(caIdent,
+    CertificateInfo certInfo = certstore.getCertificateInfo(caIdent,
         caCert, serialNumber, caIdNameMap);
     return (certInfo == null) ? null : certInfo.getCert().getCert();
   }
@@ -522,7 +522,7 @@ public class X509Ca {
     return certstore.knowsCertForSerial(caIdent, cert.getSerialNumber());
   }
 
-  public X509CertWithRevocationInfo getCertWithRevocationInfo(BigInteger serialNumber)
+  public CertWithRevocationInfo getCertWithRevocationInfo(BigInteger serialNumber)
       throws CertificateException, OperationException {
     return certstore.getCertWithRevocationInfo(caIdent, serialNumber, caIdNameMap);
   }
@@ -657,7 +657,7 @@ public class X509Ca {
   } // method cleanupCrls
 
   public X509CRL generateCrlOnDemand(String msgId) throws OperationException {
-    X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+    CrlSignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner == null) {
       throw new OperationException(ErrorCode.NOT_PERMITTED, "CA could not generate CRL");
     }
@@ -706,7 +706,7 @@ public class X509Ca {
 
   private X509CRL generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
       AuditEvent event, String msgId) throws OperationException {
-    X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+    CrlSignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner == null) {
       throw new OperationException(ErrorCode.NOT_PERMITTED, "CRL generation is not allowed");
     }
@@ -984,7 +984,7 @@ public class X509Ca {
         Integer profileId = null;
 
         if (control.isXipkiCertsetCertIncluded()) {
-          X509CertificateInfo certInfo;
+          CertificateInfo certInfo;
           try {
             certInfo = certstore.getCertForId(caIdent, caCert, sid.getId(), caIdNameMap);
           } catch (CertificateException ex) {
@@ -1022,20 +1022,20 @@ public class X509Ca {
     }
   }
 
-  public X509CertificateInfo regenerateCertificate(CertTemplateData certTemplate,
+  public CertificateInfo regenerateCertificate(CertTemplateData certTemplate,
       RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
       throws OperationException {
     return regenerateCertificates(Arrays.asList(certTemplate), requestor, reqType,
         transactionId, msgId).get(0);
   }
 
-  public List<X509CertificateInfo> regenerateCertificates(List<CertTemplateData> certTemplates,
+  public List<CertificateInfo> regenerateCertificates(List<CertTemplateData> certTemplates,
       RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
       throws OperationException {
     return generateCertificates(certTemplates, requestor, true, reqType, transactionId, msgId);
   }
 
-  public boolean publishCertificate(X509CertificateInfo certInfo) {
+  public boolean publishCertificate(CertificateInfo certInfo) {
     return publishCertificate0(certInfo) == 0;
   }
 
@@ -1045,7 +1045,7 @@ public class X509Ca {
    * @return 0 for published successfully, 1 if could not be published to CA certstore and
    *     any publishers, 2 if could be published to CA certstore but not to all publishers.
    */
-  private int publishCertificate0(X509CertificateInfo certInfo) {
+  private int publishCertificate0(CertificateInfo certInfo) {
     ParamUtil.requireNonNull("certInfo", certInfo);
     if (certInfo.isAlreadyIssued()) {
       return 0;
@@ -1210,7 +1210,7 @@ public class X509Ca {
       }
 
       for (Long certId : certIds) {
-        X509CertificateInfo certInfo;
+        CertificateInfo certInfo;
 
         try {
           certInfo = certstore.getCertForId(caIdent, caCert, certId, caIdNameMap);
@@ -1259,7 +1259,7 @@ public class X509Ca {
     return true;
   } // method publishCrl
 
-  public X509CertWithRevocationInfo revokeCertificate(BigInteger serialNumber, CrlReason reason,
+  public CertWithRevocationInfo revokeCertificate(BigInteger serialNumber, CrlReason reason,
       Date invalidityTime, String msgId) throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
@@ -1292,7 +1292,7 @@ public class X509Ca {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_cert, msgId);
     boolean successful = true;
     try {
-      X509CertWithRevocationInfo ret = revokeCertificate0(serialNumber, reason,
+      CertWithRevocationInfo ret = revokeCertificate0(serialNumber, reason,
           invalidityTime, false, event);
       successful = (ret != null);
       return ret;
@@ -1301,7 +1301,7 @@ public class X509Ca {
     }
   } // method revokeCertificate
 
-  public X509CertWithDbId unrevokeCertificate(BigInteger serialNumber, String msgId)
+  public CertWithDbId unrevokeCertificate(BigInteger serialNumber, String msgId)
       throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
@@ -1311,7 +1311,7 @@ public class X509Ca {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_unrevoke_cert, msgId);
     boolean successful = true;
     try {
-      X509CertWithDbId ret = unrevokeCertificate0(serialNumber, false, event);
+      CertWithDbId ret = unrevokeCertificate0(serialNumber, false, event);
       successful = true;
       return ret;
     } finally {
@@ -1319,7 +1319,7 @@ public class X509Ca {
     }
   } // method unrevokeCertificate
 
-  public X509CertWithDbId removeCertificate(BigInteger serialNumber, String msgId)
+  public CertWithDbId removeCertificate(BigInteger serialNumber, String msgId)
       throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
@@ -1329,7 +1329,7 @@ public class X509Ca {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_cert, msgId);
     boolean successful = true;
     try {
-      X509CertWithDbId ret = removeCertificate0(serialNumber, event);
+      CertWithDbId ret = removeCertificate0(serialNumber, event);
       successful = (ret != null);
       return ret;
     } finally {
@@ -1337,17 +1337,17 @@ public class X509Ca {
     }
   } // method removeCertificate
 
-  private X509CertWithDbId removeCertificate0(BigInteger serialNumber, AuditEvent event)
+  private CertWithDbId removeCertificate0(BigInteger serialNumber, AuditEvent event)
       throws OperationException {
     event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
-    X509CertWithRevocationInfo certWithRevInfo =
+    CertWithRevocationInfo certWithRevInfo =
         certstore.getCertWithRevocationInfo(caIdent, serialNumber, caIdNameMap);
     if (certWithRevInfo == null) {
       return null;
     }
 
     boolean successful = true;
-    X509CertWithDbId certToRemove = certWithRevInfo.getCert();
+    CertWithDbId certToRemove = certWithRevInfo.getCert();
     for (IdentifiedX509CertPublisher publisher : publishers()) {
       boolean singleSuccessful;
       try {
@@ -1380,7 +1380,7 @@ public class X509Ca {
     return certToRemove;
   } // method removeCertificate0
 
-  private X509CertWithRevocationInfo revokeCertificate0(BigInteger serialNumber, CrlReason reason,
+  private CertWithRevocationInfo revokeCertificate0(BigInteger serialNumber, CrlReason reason,
       Date invalidityTime, boolean force, AuditEvent event) throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
@@ -1393,7 +1393,7 @@ public class X509Ca {
     LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
         caIdent, hexSerial, reason.getDescription(), invalidityTime);
 
-    X509CertWithRevocationInfo revokedCert = null;
+    CertWithRevocationInfo revokedCert = null;
 
     CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
     revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force,
@@ -1436,13 +1436,13 @@ public class X509Ca {
     return revokedCert;
   } // method revokeCertificate0
 
-  private X509CertWithRevocationInfo revokeSuspendedCert(BigInteger serialNumber,
+  private CertWithRevocationInfo revokeSuspendedCert(BigInteger serialNumber,
       CrlReason reason, String msgId) throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_suspendedCert, msgId);
 
     boolean successful = false;
     try {
-      X509CertWithRevocationInfo ret = revokeSuspendedCert0(serialNumber, reason, event);
+      CertWithRevocationInfo ret = revokeSuspendedCert0(serialNumber, reason, event);
       successful = (ret != null);
       return ret;
     } finally {
@@ -1450,7 +1450,7 @@ public class X509Ca {
     }
   }
 
-  private X509CertWithRevocationInfo revokeSuspendedCert0(BigInteger serialNumber,
+  private CertWithRevocationInfo revokeSuspendedCert0(BigInteger serialNumber,
       CrlReason reason, AuditEvent event) throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
 
@@ -1462,7 +1462,7 @@ public class X509Ca {
           caIdent, hexSerial, reason.getDescription());
     }
 
-    X509CertWithRevocationInfo revokedCert = certstore.revokeSuspendedCert(caIdent,
+    CertWithRevocationInfo revokedCert = certstore.revokeSuspendedCert(caIdent,
         serialNumber, reason, shouldPublishToDeltaCrlCache(), caIdNameMap);
     if (revokedCert == null) {
       return null;
@@ -1501,14 +1501,14 @@ public class X509Ca {
     return revokedCert;
   } // method revokeSuspendedCert0
 
-  private X509CertWithDbId unrevokeCertificate0(BigInteger serialNumber, boolean force,
+  private CertWithDbId unrevokeCertificate0(BigInteger serialNumber, boolean force,
       AuditEvent event) throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
 
     LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caIdent, hexSerial);
 
-    X509CertWithDbId unrevokedCert = certstore.unrevokeCert(caIdent,
+    CertWithDbId unrevokedCert = certstore.unrevokeCert(caIdent,
         serialNumber, force, shouldPublishToDeltaCrlCache(), caIdNameMap);
     if (unrevokedCert == null) {
       return null;
@@ -1546,7 +1546,7 @@ public class X509Ca {
   } // doUnrevokeCertificate
 
   private boolean shouldPublishToDeltaCrlCache() {
-    X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+    CrlSignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner == null) {
       return false;
     }
@@ -1569,7 +1569,7 @@ public class X509Ca {
       AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_cert, msgId);
       boolean successful = true;
       try {
-        X509CertWithRevocationInfo ret = revokeCertificate0(caInfo.getSerialNumber(),
+        CertWithRevocationInfo ret = revokeCertificate0(caInfo.getSerialNumber(),
             revocationInfo.getReason(), revocationInfo.getInvalidityTime(), true, event);
         successful = (ret != null);
       } finally {
@@ -1641,13 +1641,13 @@ public class X509Ca {
     return caManager.getIdentifiedPublishersForCa(caIdent.getName());
   }
 
-  public List<X509CertificateInfo> generateCertificates(List<CertTemplateData> certTemplates,
+  public List<CertificateInfo> generateCertificates(List<CertTemplateData> certTemplates,
       RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
       throws OperationException {
     return generateCertificates(certTemplates, requestor, false, reqType, transactionId, msgId);
   }
 
-  private List<X509CertificateInfo> generateCertificates(List<CertTemplateData> certTemplates,
+  private List<CertificateInfo> generateCertificates(List<CertTemplateData> certTemplates,
       RequestorInfo requestor, boolean keyUpdate, RequestType reqType, byte[] transactionId,
       String msgId) throws OperationExceptionWithIndex {
     ParamUtil.requireNonEmpty("certTemplates", certTemplates);
@@ -1664,7 +1664,7 @@ public class X509Ca {
       }
     }
 
-    List<X509CertificateInfo> certInfos = new ArrayList<>(n);
+    List<CertificateInfo> certInfos = new ArrayList<>(n);
     OperationExceptionWithIndex exception = null;
 
     for (int i = 0; i < n; i++) {
@@ -1679,14 +1679,14 @@ public class X509Ca {
 
       boolean successful = false;
       try {
-        X509CertificateInfo certInfo = generateCertificate(gct, requestor, false, reqType,
+        CertificateInfo certInfo = generateCertificate(gct, requestor, false, reqType,
             transactionId, msgId);
         successful = true;
         certInfos.add(certInfo);
 
         if (LOG.isInfoEnabled()) {
           String prefix = certInfo.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
-          X509CertWithDbId cert = certInfo.getCert();
+          CertWithDbId cert = certInfo.getCert();
           LOG.info("{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
               prefix, caIdent, certprofilIdent, cert.getSubject(),
               LogUtil.formatCsn(cert.getCert().getSerialNumber()));
@@ -1708,7 +1708,7 @@ public class X509Ca {
       LOG.error("could not generate certificate for request[{}], reverted all generated"
           + " certificates", exception.getIndex());
       // delete generated certificates
-      for (X509CertificateInfo m : certInfos) {
+      for (CertificateInfo m : certInfos) {
         BigInteger serial = m.getCert().getCert().getSerialNumber();
         try {
           removeCertificate(serial, msgId);
@@ -1724,7 +1724,7 @@ public class X509Ca {
     return certInfos;
   }
 
-  public X509CertificateInfo generateCertificate(CertTemplateData certTemplate,
+  public CertificateInfo generateCertificate(CertTemplateData certTemplate,
       RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
       throws OperationException {
     ParamUtil.requireNonNull("certTemplate", certTemplate);
@@ -1732,14 +1732,14 @@ public class X509Ca {
         reqType, transactionId, msgId).get(0);
   }
 
-  private X509CertificateInfo generateCertificate(GrantedCertTemplate gct,
+  private CertificateInfo generateCertificate(GrantedCertTemplate gct,
       RequestorInfo requestor, boolean keyUpdate, RequestType reqType, byte[] transactionId,
       String msgId) throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_cert, msgId);
 
     boolean successful = false;
     try {
-      X509CertificateInfo ret = generateCertificate0(gct, requestor,
+      CertificateInfo ret = generateCertificate0(gct, requestor,
           keyUpdate, reqType, transactionId, event);
       successful = (ret != null);
       return ret;
@@ -1748,7 +1748,7 @@ public class X509Ca {
     }
   }
 
-  private X509CertificateInfo generateCertificate0(GrantedCertTemplate gct,
+  private CertificateInfo generateCertificate0(GrantedCertTemplate gct,
       RequestorInfo requestor, boolean keyUpdate, RequestType reqType, byte[] transactionId,
       AuditEvent event) throws OperationException {
     ParamUtil.requireNonNull("gct", gct);
@@ -1789,10 +1789,10 @@ public class X509Ca {
           caInfo.getPublicCaInfo().getX500Subject(), caInfo.nextSerial(), gct.grantedNotBefore,
           gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
 
-      X509CertificateInfo ret;
+      CertificateInfo ret;
 
       try {
-        X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+        CrlSignerEntryWrapper crlSigner = getCrlSigner();
         X509Certificate crlSignerCert = (crlSigner == null) ? null : crlSigner.getCert();
 
         ExtensionValues extensionTuples = certprofile.getExtensions(gct.requestedSubject,
@@ -1845,8 +1845,8 @@ public class X509Ca {
               "could not verify the signature of generated certificate");
         }
 
-        X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
-        ret = new X509CertificateInfo(certWithMeta, caIdent, caCert,
+        CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
+        ret = new CertificateInfo(certWithMeta, caIdent, caCert,
             gct.grantedPublicKeyData, gct.certprofile.getIdent(), requestor.getIdent());
         if (requestor instanceof ByUserRequestorInfo) {
           ret.setUser((((ByUserRequestorInfo) requestor).getUserId()));
@@ -2414,7 +2414,7 @@ public class X509Ca {
     databaseHealth.setHealthy(databaseHealthy);
     result.addChildCheck(databaseHealth);
 
-    X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+    CrlSignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner != null && crlSigner.getSigner() != null) {
       boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
       healthy &= crlSignerHealthy;
@@ -2477,9 +2477,9 @@ public class X509Ca {
     }
   } // method verifySignature
 
-  private X509CrlSignerEntryWrapper getCrlSigner() {
+  private CrlSignerEntryWrapper getCrlSigner() {
     String crlSignerName = caInfo.getCrlSignerName();
-    X509CrlSignerEntryWrapper crlSigner = (crlSignerName == null) ? null
+    CrlSignerEntryWrapper crlSigner = (crlSignerName == null) ? null
         : caManager.getCrlSignerWrapper(crlSignerName);
     return crlSigner;
   }

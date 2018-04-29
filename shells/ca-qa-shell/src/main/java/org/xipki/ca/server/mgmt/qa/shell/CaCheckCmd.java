@@ -20,8 +20,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.shell.CaUpdateCmd;
 import org.xipki.common.ConfPairs;
 import org.xipki.console.karaf.CmdFailure;
@@ -39,20 +38,14 @@ public class CaCheckCmd extends CaUpdateCmd {
 
   @Override
   protected Object execute0() throws Exception {
-    X509ChangeCaEntry ey = getChangeCaEntry();
+    ChangeCaEntry ey = getChangeCaEntry();
     String caName = ey.getIdent().getName();
     println("checking CA" + caName);
 
-    CaEntry entry = caManager.getCa(caName);
-    if (entry == null) {
+    CaEntry ca = caManager.getCa(caName);
+    if (ca == null) {
       throw new CmdFailure("could not find CA '" + caName + "'");
     }
-
-    if (!(entry instanceof X509CaEntry)) {
-      throw new CmdFailure("CA '" + caName + "' is not an X509-CA");
-    }
-
-    X509CaEntry ca = (X509CaEntry) entry;
 
     // CA cert uris
     if (ey.getCaCertUris() != null) {

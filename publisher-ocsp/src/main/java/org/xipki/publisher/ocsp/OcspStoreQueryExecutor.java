@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.X509CertWithDbId;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -150,17 +150,17 @@ class OcspStoreQueryExecutor {
     }
   } // method initIssuerStore
 
-  void addCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile)
+  void addCert(X509Cert issuer, CertWithDbId certificate, String certprofile)
       throws DataAccessException, OperationException {
     addCert(issuer, certificate, certprofile, null);
   }
 
-  void addCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile,
+  void addCert(X509Cert issuer, CertWithDbId certificate, String certprofile,
       CertRevocationInfo revInfo) throws DataAccessException, OperationException {
     addOrUpdateCert(issuer, certificate, certprofile, revInfo);
   }
 
-  private void addOrUpdateCert(X509Cert issuer, X509CertWithDbId certificate, String certprofile,
+  private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate, String certprofile,
       CertRevocationInfo revInfo) throws DataAccessException, OperationException {
     ParamUtil.requireNonNull("issuer", issuer);
 
@@ -275,12 +275,12 @@ class OcspStoreQueryExecutor {
     }
   }
 
-  void revokeCert(X509Cert caCert, X509CertWithDbId cert, String certprofile,
+  void revokeCert(X509Cert caCert, CertWithDbId cert, String certprofile,
       CertRevocationInfo revInfo) throws DataAccessException, OperationException {
     addOrUpdateCert(caCert, cert, certprofile, revInfo);
   }
 
-  void unrevokeCert(X509Cert issuer, X509CertWithDbId cert) throws DataAccessException {
+  void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
     ParamUtil.requireNonNull("issuer", issuer);
     ParamUtil.requireNonNull("cert", cert);
 
@@ -331,7 +331,7 @@ class OcspStoreQueryExecutor {
 
   } // method unrevokeCert
 
-  void removeCert(X509Cert issuer, X509CertWithDbId cert) throws DataAccessException {
+  void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
     ParamUtil.requireNonNull("issuer", issuer);
     ParamUtil.requireNonNull("cert", cert);
 

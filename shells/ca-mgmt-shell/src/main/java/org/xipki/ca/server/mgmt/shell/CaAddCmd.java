@@ -23,8 +23,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
@@ -47,7 +47,7 @@ public class CaAddCmd extends CaAddOrGenAction {
 
   @Override
   protected Object execute0() throws Exception {
-    X509CaEntry caEntry = getCaEntry();
+    CaEntry caEntry = getCaEntry();
     if (certFile != null) {
       X509Certificate caCert = X509Util.parseCert(certFile);
       caEntry.setCert(caCert);

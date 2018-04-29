@@ -25,10 +25,10 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
+import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.mgmt.api.x509.X509CaEntry;
-import org.xipki.ca.server.mgmt.api.x509.X509CaUris;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
@@ -156,7 +156,7 @@ public abstract class CaAddOrGenAction extends CaAction {
   @Reference
   private PasswordResolver passwordResolver;
 
-  protected X509CaEntry getCaEntry() throws Exception {
+  protected CaEntry getCaEntry() throws Exception {
     ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);
 
     if (nextCrlNumber < 1) {
@@ -176,8 +176,8 @@ public abstract class CaAddOrGenAction extends CaAction {
           securityFactory);
     }
 
-    X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-    X509CaEntry entry = new X509CaEntry(new NameId(null, caName), snBitLen, nextCrlNumber,
+    CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
+    CaEntry entry = new CaEntry(new NameId(null, caName), snBitLen, nextCrlNumber,
         signerType, signerConf, caUris, numCrls.intValue(), expirationPeriod.intValue());
 
     entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
