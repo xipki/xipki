@@ -45,31 +45,31 @@ list = [ cross subca subca-complex ocsp scep multiple-ous \
   multi-valued-rdn qc ee-complex tls tls-c tls-inc-sn max-time ]
 
 each ($list) {
-  ca:profile-add --type XML --name ${it} \
+  ca:profile-add --type xml --name ${it} \
     --conf-file xipki/qa/certprofile/certprofile-${it}.xml
 }
 
 ca:profile-add \
   --name tlsa \
-  --type XML \
+  --type xml \
   --conf-file xipki/qa/certprofile/certprofile-tls.xml
 
 ca:profile-add \
   --name extended \
-  --type DemoXML \
+  --type demoxml \
   --conf-file xipki/qa/certprofile/certprofile-extended.xml
 
 ## Publishers
 ca:publisher-add \
   --name ocsp-publisher \
-  --type OCSP \
+  --type ocsp \
   --conf datasource=ocsp,publish.goodcerts=true
 
 # CMP Responder
 # with encrypted password 1234
 ca:responder-add \
   --name responder1 \
-  --signer-type PKCS12 \
+  --signer-type pkcs12 \
   --signer-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
 
 # CMP Requestors
@@ -81,7 +81,7 @@ ca:requestor-add \
 # Generate CRL every day at 02:00 UTC with 90 minutes overlap time
 ca:crlsigner-add \
   --name casign-crlsigner \
-  --signer-type CA \
+  --signer-type ca \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false
 ################################################################################
 #
@@ -110,7 +110,7 @@ echo "#################################################################"
 ## Add the profile rootca
 ca:profile-add \
   --name rootca \
-  --type XML \
+  --type xml \
   --conf-file xipki/qa/certprofile/certprofile-rootca.xml
 
 ## Create the CSR for the command caqa:check-cert in QA

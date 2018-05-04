@@ -52,7 +52,7 @@ echo "#################################################################"
 xi:copy-file -f xipki/setup/cacert-none/ca-conf.xml-template \
   xipki/setup/cacert-none/ca-conf.xml
 
-xi:replace --old "REPLACEME_TOKEN_TYPE" --new "PKCS12" \
+xi:replace --old "REPLACEME_TOKEN_TYPE" --new "pkcs12" \
   xipki/setup/cacert-none/ca-conf.xml
 
 xi:replace --old "REPLACEME_CA_SIGNERCONF" \

@@ -30,7 +30,7 @@
   </cmpcontrols>
   <responders>
     <responder name="responder1">
-      <type>PKCS12</type>
+      <type>pkcs12</type>
       <conf>
         <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server.p12,algo=SHA256withRSA</value>
       </conf>
@@ -65,37 +65,37 @@
   </publishers>
   <profiles>
     <profile name="rootca">
-      <type>XML</type>
+      <type>xml</type>
       <conf>
         <file>${profiles.dir}/certprofile-rootca.xml</file>
       </conf>
     </profile>
     <!--profile name="subca">
-      <type>XML</type>
+      <type>xml</type>
       <conf>
         <file>${profiles.dir}/certprofile-subca.xml</file>
       </conf>
     </profile-->
     <profile name="scep">
-      <type>XML</type>
+      <type>xml</type>
       <conf>
         <file>${profiles.dir}/certprofile-scep.xml</file>
       </conf>
     </profile>
     <profile name="ocsp">
-      <type>XML</type>
+      <type>xml</type>
       <conf>
         <file>${profiles.dir}/certprofile-ocsp.xml</file>
       </conf>
     </profile>
     <profile name="tls">
-      <type>XML</type>
+      <type>xml</type>
       <conf>
         <file>${profiles.dir}/certprofile-tls.xml</file>
       </conf>
     </profile>
     <profile name="tls-c">
-      <type>XML</type>
+      <type>xml</type>
       <conf>
         <file>${profiles.dir}/certprofile-tls-c.xml</file>
       </conf>

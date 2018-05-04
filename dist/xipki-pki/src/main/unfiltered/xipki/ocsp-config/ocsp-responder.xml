@@ -42,7 +42,7 @@
   <!-- signers -->
   <signers>
     <signer name="signer1">
-      <type>PKCS12</type>
+      <type>pkcs12</type>
       <key>password=1234,keystore=file:xipki/setup/keycerts/ocsp1.p12</key>
       <algorithms>
         <!-- In case of RSA key -->
@@ -64,7 +64,7 @@
   <stores>
     <store name="dbstore1">
       <source>
-        <type>XIPKI-DB</type>
+        <type>xipki-db</type>
         <datasource>datasource1</datasource>
         <conf>
 # Comma-separated files of CA certificates to be considered
@@ -111,7 +111,7 @@
         <validationModel>PKIX</validationModel>
         <trustAnchors>
           <keystore>
-            <type>PKCS12</type>
+            <type>pkcs12</type>
             <keystore>
               <file>xipki/security/tlskeys/tls-ca-cert.p12</file>
             </keystore>

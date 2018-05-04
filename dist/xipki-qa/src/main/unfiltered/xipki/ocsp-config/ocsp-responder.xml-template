@@ -82,7 +82,7 @@
   <stores>
     <store name="dbstore1">
       <source>
-        <type>XIPKI-DB</type>
+        <type>xipki-db</type>
         <datasource>datasource1</datasource>
         <conf>
 # Comma-separated files of CA certificates to be considered
@@ -103,7 +103,7 @@
     </store>
     <store name="crlstore1">
       <source>
-        <type>CRL</type>
+        <type>crl</type>
         <datasource>datasource-crl</datasource>
         <conf>
 # CRL file
@@ -171,7 +171,7 @@ certs.dir = output
         <validationModel>PKIX</validationModel>
         <trustAnchors>
           <keystore>
-            <type>PKCS12</type>
+            <type>pkcs12</type>
             <keystore>
               <file>xipki/security/tlskeys/tls-ca-cert.p12</file>
             </keystore>

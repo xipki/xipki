@@ -43,7 +43,7 @@ xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep1.p12 --password 1234 \
 
 echo "# add SCEP"
 
-ca:responder-add --name scep-responder1 --signer-type PKCS12 \
+ca:responder-add --name scep-responder1 --signer-type pkcs12 \
   --signer-conf password=1234,keystore=file:${KEYCERTS_DIR}/scep1.p12,algo=SHA256withRSA
 
 ca:scep-add --name scep1 --ca myca1 --profile all --responder scep-responder1 \

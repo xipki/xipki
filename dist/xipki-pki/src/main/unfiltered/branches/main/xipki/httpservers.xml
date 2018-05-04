@@ -40,14 +40,14 @@
         <store>
           <file>xipki/security/tlskeys/tls-server.p12</file>
         </store>
-        <type>PKCS12</type>
+        <type>pkcs12</type>
         <password>1234</password>
       </keystore>
       <truststore>
         <store>
           <file>xipki/security/tlskeys/tls-ca-cert.p12</file>
         </store>
-        <type>PKCS12</type>
+        <type>pkcs12</type>
         <password>1234</password>
       </truststore>
     </tls>
