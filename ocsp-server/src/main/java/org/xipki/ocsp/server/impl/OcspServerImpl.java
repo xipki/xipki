@@ -95,8 +95,6 @@ import org.xipki.ocsp.server.impl.jaxb.ResponseCacheType;
 import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;
 import org.xipki.ocsp.server.impl.jaxb.SignerType;
 import org.xipki.ocsp.server.impl.jaxb.StoreType;
-import org.xipki.ocsp.server.impl.store.crl.CrlDbCertStatusStore;
-import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.ocsp.server.impl.type.CertID;
 import org.xipki.ocsp.server.impl.type.EncodingException;
 import org.xipki.ocsp.server.impl.type.ExtendedExtension;
@@ -983,19 +981,13 @@ public class OcspServerImpl implements OcspServer {
   private OcspStore newStore(StoreType conf, Map<String, DataSourceWrapper> datasources)
       throws InvalidConfException {
     OcspStore store;
-    String type = conf.getSource().getType();
-    if ("CRL".equalsIgnoreCase(type)) {
-      store = new CrlDbCertStatusStore();
-    } else if ("XIPKI-DB".equals(type)) {
-      store = new DbCertStatusStore();
-    } else {
-      try {
-        store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType());
-      } catch (ObjectCreationException ex) {
-        throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-            + ":" + ex.getMessage(), ex);
-      }
+    try {
+      store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType());
+    } catch (ObjectCreationException ex) {
+      throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
+          + ":" + ex.getMessage(), ex);
     }
+
     store.setName(conf.getName());
     Integer interval = conf.getRetentionInterval();
     int retentionInterva = (interval == null) ? -1 : interval.intValue();

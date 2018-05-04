@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.crl;
+package org.xipki.ocsp.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import org.xipki.ocsp.api.OcspStoreException;
  * @since 2.0.0
  */
 
-class StoreConf {
+class CrlStoreConf {
 
   /*
    * required
@@ -87,7 +87,7 @@ class StoreConf {
    */
   private String certsDir;
 
-  StoreConf(String propsConf) throws OcspStoreException {
+  CrlStoreConf(String propsConf) throws OcspStoreException {
     Properties props = new Properties();
     try {
       props.load(new ByteArrayInputStream(propsConf.getBytes()));

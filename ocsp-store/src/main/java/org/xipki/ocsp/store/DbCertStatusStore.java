@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.db;
+package org.xipki.ocsp.store;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -496,7 +496,7 @@ public class DbCertStatusStore extends OcspStore {
           "Could not retrieve the certhash's algorithm from the database", ex);
     }
 
-    StoreConf storeConf = new StoreConf(conf);
+    DbStoreConf storeConf = new DbStoreConf(conf);
 
     try {
       Set<X509Certificate> includeIssuers = null;

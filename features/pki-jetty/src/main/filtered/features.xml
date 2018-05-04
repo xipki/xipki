@@ -76,6 +76,7 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <bundle start-level="70">mvn:org.xipki/ocsp-api/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/ocsp-store/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ocsp-server/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ocsp-server-servlet/${project.version}</bundle>
   </feature>

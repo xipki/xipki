@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.crl;
+package org.xipki.ocsp.store;
 
 /**
  * TODO.

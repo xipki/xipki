@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.db;
+package org.xipki.ocsp.store;

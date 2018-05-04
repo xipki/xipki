@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.db;
+package org.xipki.ocsp.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.xipki.ocsp.api.OcspStoreException;
  * @since 2.0.0
  */
 
-class StoreConf {
+class DbStoreConf {
 
   private static final String KEY_cacerts_includes = "cacerts.includes";
 
@@ -42,7 +42,7 @@ class StoreConf {
 
   private final Set<String> caCertsExcludes = new HashSet<>();
 
-  StoreConf(String propsConf) throws OcspStoreException {
+  DbStoreConf(String propsConf) throws OcspStoreException {
     Properties props = new Properties();
     try {
       props.load(new ByteArrayInputStream(propsConf.getBytes()));

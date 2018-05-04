@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.crl;
+package org.xipki.ocsp.store;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -74,7 +74,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CrlInfo;
-import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;

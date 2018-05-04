@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.impl.store.crl;
+package org.xipki.ocsp.store;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +38,6 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
@@ -93,7 +92,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     ParamUtil.requireNonBlank("conf", conf);
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
-    StoreConf storeConf = new StoreConf(conf);
+    CrlStoreConf storeConf = new CrlStoreConf(conf);
     this.crlFilename = IoUtil.expandFilepath(storeConf.getCrFile());
     this.crlUrl = storeConf.getCrlUrl();
     this.certsDirName = (storeConf.getCertsDir() == null) ? null
