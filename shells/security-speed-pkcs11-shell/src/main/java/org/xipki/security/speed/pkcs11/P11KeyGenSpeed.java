@@ -19,7 +19,7 @@ package org.xipki.security.speed.pkcs11;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
@@ -30,7 +30,7 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-public abstract class P11KeyGenSpeed extends LoadExecutor {
+public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 
@@ -60,7 +60,7 @@ public abstract class P11KeyGenSpeed extends LoadExecutor {
   protected abstract void genKeypair() throws Exception;
 
   protected String getDummyLabel() {
-    return "loadtest-" + idx.getAndIncrement();
+    return "speed-" + idx.getAndIncrement();
   }
 
   protected P11NewKeyControl getControl() {

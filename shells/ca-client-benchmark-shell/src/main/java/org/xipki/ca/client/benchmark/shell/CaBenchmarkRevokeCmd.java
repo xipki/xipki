@@ -125,7 +125,7 @@ public class CaBenchmarkRevokeCmd extends CaBenchmarkAction {
 
       loadTest.setDuration(duration);
       loadTest.setThreads(numThreads);
-      loadTest.test();
+      loadTest.execute();
     } finally {
       if (caDataSource != null) {
         caDataSource.close();

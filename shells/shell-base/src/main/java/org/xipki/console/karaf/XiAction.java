@@ -31,6 +31,7 @@ import org.apache.karaf.shell.api.console.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
@@ -161,7 +162,7 @@ public abstract class XiAction implements Action {
     SecureRandom random = new SecureRandom();
     byte[] bytes = new byte[numOfBytes];
     random.nextBytes(bytes);
-    return new BigInteger(1, bytes).toString(16);
+    return Hex.encode(bytes);
   }
 
   protected static boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName) {
@@ -195,11 +196,7 @@ public abstract class XiAction implements Action {
   }
 
   protected char[] readPasswordIfNotSet(String prompt, String password) throws IOException {
-    if (password != null) {
-      return password.toCharArray();
-    }
-
-    return readPassword(prompt);
+    return (password != null) ? password.toCharArray() : readPassword(prompt);
   }
 
   protected char[] readPassword() throws IOException {

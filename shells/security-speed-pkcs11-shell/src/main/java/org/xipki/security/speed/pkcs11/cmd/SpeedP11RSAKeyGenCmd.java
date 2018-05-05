@@ -20,7 +20,7 @@ package org.xipki.security.speed.pkcs11.cmd;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.pkcs11.P11RSAKeyGenSpeed;
 
 /**
@@ -44,7 +44,7 @@ public class SpeedP11RSAKeyGenCmd extends SpeedP11Action {
   private String publicExponent = "0x10001";
 
   @Override
-  protected LoadExecutor getTester() throws Exception {
+  protected BenchmarkExecutor getTester() throws Exception {
     return new P11RSAKeyGenSpeed(getSlot(), keysize, toBigInt(publicExponent));
   }
 

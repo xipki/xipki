@@ -65,8 +65,7 @@ public class FileRmCmd extends XiAction {
         return null;
       }
 
-      if (force
-          || confirm("Do you want to remove directory " + targetPath, 3)) {
+      if (force || confirm("Do you want to remove directory " + targetPath, 3)) {
         FileUtils.deleteDirectory(target);
         println("removed directory " + targetPath);
       }

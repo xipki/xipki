@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -40,7 +40,7 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public abstract class P11SignSpeed extends LoadExecutor {
+public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 

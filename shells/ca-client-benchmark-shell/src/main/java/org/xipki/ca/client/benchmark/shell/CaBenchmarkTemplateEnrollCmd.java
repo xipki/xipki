@@ -75,7 +75,7 @@ public class CaBenchmarkTemplateEnrollCmd extends CaBenchmarkAction {
         maxRequests, description);
     loadTest.setDuration(duration);
     loadTest.setThreads(numThreads);
-    loadTest.test();
+    loadTest.execute();
 
     return null;
   } // method execute0

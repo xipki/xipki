@@ -24,9 +24,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
@@ -58,13 +57,11 @@ public class BSpeedP11DSASignCmd extends BSpeedP11Action {
   }
 
   @Override
-  protected LoadExecutor nextTester() throws Exception {
+  protected BenchmarkExecutor nextTester() throws Exception {
     DSAControl control = queue.poll();
     if (control == null) {
       return null;
     }
-
-    P11Slot slot = getSlot();
 
     if (control.plen() == 1024) {
       if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
@@ -73,8 +70,7 @@ public class BSpeedP11DSASignCmd extends BSpeedP11Action {
       }
     }
 
-    return new P11DSASignSpeed(securityFactory, slot, sigAlgo, control.plen(),
-        control.qlen());
+    return new P11DSASignSpeed(securityFactory, getSlot(), sigAlgo, control.plen(), control.qlen());
   }
 
 }

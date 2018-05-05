@@ -22,7 +22,7 @@ import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.RSAControl;
 import org.xipki.security.speed.pkcs12.P12RSAKeyGenSpeed;
@@ -49,7 +49,7 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedAction {
   }
 
   @Override
-  protected LoadExecutor nextTester() throws Exception {
+  protected BenchmarkExecutor nextTester() throws Exception {
     RSAControl control = queue.poll();
     if (control == null) {
       return null;

@@ -24,8 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
-import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.cmd.RSAControl;
 import org.xipki.security.speed.cmd.completer.RSASigAlgCompleter;
 import org.xipki.security.speed.pkcs11.P11RSASignSpeed;
@@ -57,14 +56,13 @@ public class BSpeedP11RSASignCmd extends BSpeedP11Action {
   }
 
   @Override
-  protected LoadExecutor nextTester() throws Exception {
+  protected BenchmarkExecutor nextTester() throws Exception {
     RSAControl control = queue.poll();
     if (control == null) {
       return null;
     }
 
-    P11Slot slot = getSlot();
-    return new P11RSASignSpeed(securityFactory, slot, sigAlgo, control.modulusLen(),
+    return new P11RSASignSpeed(securityFactory, getSlot(), sigAlgo, control.modulusLen(),
                 toBigInt("0x10001"));
   }
 

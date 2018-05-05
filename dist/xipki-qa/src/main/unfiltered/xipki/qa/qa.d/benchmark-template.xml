@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<enrollTemplate xmlns="http://xipki.org/ca/client/loadtest/v2">
+<enrollTemplate xmlns="http://xipki.org/ca/client/benchmark/v1">
   <!-- the certificate profile must allow duplication of public key -->
   <!--
   <enrollCert>

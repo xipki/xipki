@@ -39,7 +39,7 @@ import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -48,7 +48,7 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CaBenchmarkEnroll extends LoadExecutor {
+public class CaBenchmarkEnroll extends BenchmarkExecutor {
 
   private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
 
@@ -56,7 +56,7 @@ public class CaBenchmarkEnroll extends LoadExecutor {
 
   private final CaClient caClient;
 
-  private final BenchmarkEntry loadtestEntry;
+  private final BenchmarkEntry benchmarkEntry;
 
   private final AtomicLong index;
 
@@ -66,12 +66,12 @@ public class CaBenchmarkEnroll extends LoadExecutor {
 
   private AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public CaBenchmarkEnroll(CaClient caClient, BenchmarkEntry loadtestEntry, int maxRequests,
+  public CaBenchmarkEnroll(CaClient caClient, BenchmarkEntry benchmarkEntry, int maxRequests,
       int num, String description) {
     super(description);
     this.maxRequests = maxRequests;
     this.num = ParamUtil.requireMin("num", num, 1);
-    this.loadtestEntry = ParamUtil.requireNonNull("loadtestEntry", loadtestEntry);
+    this.benchmarkEntry = ParamUtil.requireNonNull("benchmarkEntry", benchmarkEntry);
     this.caClient = ParamUtil.requireNonNull("caClient", caClient);
     this.index = new AtomicLong(getSecureIndex());
   }
@@ -98,7 +98,7 @@ public class CaBenchmarkEnroll extends LoadExecutor {
         for (Integer certId : certRequests.keySet()) {
           String id = "id-" + certId;
           EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(id,
-              loadtestEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
+              benchmarkEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
           request.addRequestEntry(requestEntry);
         }
 
@@ -150,9 +150,9 @@ public class CaBenchmarkEnroll extends LoadExecutor {
       CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
 
       long thisIndex = index.getAndIncrement();
-      certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
+      certTempBuilder.setSubject(benchmarkEntry.getX500Name(thisIndex));
 
-      SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo();
+      SubjectPublicKeyInfo spki = benchmarkEntry.getSubjectPublicKeyInfo();
       certTempBuilder.setPublicKey(spki);
       CertTemplate certTemplate = certTempBuilder.build();
       CertRequest certRequest = new CertRequest(certId, certTemplate, null);

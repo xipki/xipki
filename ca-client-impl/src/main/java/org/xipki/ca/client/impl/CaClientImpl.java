@@ -865,8 +865,8 @@ public final class CaClientImpl implements CaClient {
       return false;
     }
 
-    boolean inLoadTest = Boolean.getBoolean("org.xipki.loadtest");
-    if (inLoadTest) {
+    boolean inBenchmark = Boolean.getBoolean("org.xipki.benchmark");
+    if (inBenchmark) {
       return true;
     }
 

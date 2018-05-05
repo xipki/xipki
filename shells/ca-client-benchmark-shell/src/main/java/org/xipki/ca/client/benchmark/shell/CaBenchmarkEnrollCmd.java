@@ -116,14 +116,14 @@ public class CaBenchmarkEnrollCmd extends CaBenchmarkAction {
       throw new IllegalCmdParamException("invalid keyType " + keyType);
     }
 
-    BenchmarkEntry loadtestEntry = new BenchmarkEntry(certprofile, keyEntry, subjectTemplate,
+    BenchmarkEntry benchmarkEntry = new BenchmarkEntry(certprofile, keyEntry, subjectTemplate,
         randomDn);
-    CaBenchmarkEnroll loadTest = new CaBenchmarkEnroll(caClient, loadtestEntry, maxRequests, num,
+    CaBenchmarkEnroll benchmark = new CaBenchmarkEnroll(caClient, benchmarkEntry, maxRequests, num,
         description);
 
-    loadTest.setDuration(duration);
-    loadTest.setThreads(numThreads);
-    loadTest.test();
+    benchmark.setDuration(duration);
+    benchmark.setThreads(numThreads);
+    benchmark.execute();
 
     return null;
   } // method execute0

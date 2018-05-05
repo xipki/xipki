@@ -24,8 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
-import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.cmd.ECControl;
 import org.xipki.security.speed.cmd.completer.ECDSASigAlgCompleter;
 import org.xipki.security.speed.pkcs11.P11ECSignSpeed;
@@ -56,14 +55,13 @@ public class BSpeedP11ECSignCmd extends BSpeedP11Action {
   }
 
   @Override
-  protected LoadExecutor nextTester() throws Exception {
+  protected BenchmarkExecutor nextTester() throws Exception {
     ECControl control = queue.poll();
     if (control == null) {
       return null;
     }
 
-    P11Slot slot = getSlot();
-    return new P11ECSignSpeed(securityFactory, slot, sigAlgo, control.curveName());
+    return new P11ECSignSpeed(securityFactory, getSlot(), sigAlgo, control.curveName());
   }
 
 }

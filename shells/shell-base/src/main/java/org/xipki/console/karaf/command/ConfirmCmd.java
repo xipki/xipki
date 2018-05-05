@@ -40,8 +40,7 @@ public class ConfirmCmd extends XiAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean toContinue = confirm(
-        prompt + "\nDo you want to continue", 3);
+    boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
     if (!toContinue) {
       throw new CmdFailure("User cancelled");
     }

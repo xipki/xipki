@@ -164,7 +164,7 @@ public class BenchmarkOcspStatusCmd extends OcspStatusAction {
           serialNumberIterator, maxRequests, analyzeResponse, queueSize, description.toString());
       loadTest.setDuration(duration);
       loadTest.setThreads(numThreads);
-      loadTest.test();
+      loadTest.execute();
     } finally {
       if (serialNumberIterator instanceof FileBigIntegerIterator) {
         ((FileBigIntegerIterator) serialNumberIterator).close();

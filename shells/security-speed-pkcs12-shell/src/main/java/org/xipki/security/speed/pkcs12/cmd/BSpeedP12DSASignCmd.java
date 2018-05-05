@@ -22,7 +22,7 @@ import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.pkcs12.P12DSASignSpeed;
 
@@ -48,7 +48,7 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignAction {
   }
 
   @Override
-  protected LoadExecutor nextTester() throws Exception {
+  protected BenchmarkExecutor nextTester() throws Exception {
     DSAControl control = queue.poll();
     if (control == null) {
       return null;

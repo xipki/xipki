@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
@@ -52,7 +52,7 @@ public class SpeedP11DSASignCmd extends SpeedP11Action {
   private String sigAlgo;
 
   @Override
-  protected LoadExecutor getTester() throws Exception {
+  protected BenchmarkExecutor getTester() throws Exception {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }

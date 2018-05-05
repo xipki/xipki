@@ -36,7 +36,7 @@
         generateElementProperty="true"
     </jxb:globalBindings-->
 
-    <jxb:bindings schemaLocation="../resources/xsd/loadtest.xsd" node="/xsd:schema">
+    <jxb:bindings schemaLocation="../resources/xsd/benchmark.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
             <jxb:package name="org.xipki.ca.client.benchmark.shell.jaxb"/>
         </jxb:schemaBindings>

@@ -19,7 +19,7 @@ package org.xipki.security.speed.pkcs12;
 
 import java.security.SecureRandom;
 
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.SecurityFactory;
 
@@ -29,7 +29,7 @@ import org.xipki.security.SecurityFactory;
  * @since 2.0.0
  */
 
-public abstract class P12KeyGenSpeed extends LoadExecutor {
+public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 

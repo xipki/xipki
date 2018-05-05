@@ -110,7 +110,6 @@ public class FileListCmd extends XiAction {
     }
 
     println("");
-
     return null;
   }
 

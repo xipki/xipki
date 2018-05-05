@@ -36,35 +36,4 @@ public class DirPathCompleter extends FileCompleter {
     return path.toFile().isDirectory() && super.accept(path);
   }
 
-  // This method is for karaf 4.0.*
-  /*
-  @Override
-  protected int matchFiles(String buffer, String translated, File[] files,
-      List<String> candidates) {
-    if (files == null) {
-      return -1;
-    }
-
-    int matches = 0;
-
-    // first pass: just count the matches
-    for (File file : files) {
-      if (file.isDirectory() && file.getAbsolutePath().startsWith(translated)) {
-        matches++;
-      }
-    }
-    for (File file : files) {
-      if (file.isDirectory() && file.getAbsolutePath().startsWith(translated)) {
-        CharSequence name =
-            file.getName() + (matches == 1 && file.isDirectory() ? separator() : " ");
-        candidates.add(render(file, name).toString());
-      }
-    }
-
-    int index = buffer.lastIndexOf(separator());
-
-    return index + separator().length();
-  }
-  */
-
 }

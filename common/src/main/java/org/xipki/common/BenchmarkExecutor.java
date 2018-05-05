@@ -35,9 +35,9 @@ import org.xipki.common.util.StringUtil;
  * @since 2.0.0
  */
 
-public abstract class LoadExecutor {
+public abstract class BenchmarkExecutor {
 
-  private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
+  public static final String PROPKEY_BENCHMARK = "org.xipki.benchmark";
 
   private static final int DEFAULT_DURATION = 30; // 30 seconds
 
@@ -57,7 +57,7 @@ public abstract class LoadExecutor {
 
   private String unit = "";
 
-  public LoadExecutor(String description) {
+  public BenchmarkExecutor(String description) {
     this.description = ParamUtil.requireNonNull("description", description);
     this.processLog = new ProcessLog(0);
   }
@@ -67,8 +67,8 @@ public abstract class LoadExecutor {
   protected void shutdown() {
   }
 
-  public void test() {
-    System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
+  public void execute() {
+    System.getProperties().setProperty(PROPKEY_BENCHMARK, "true");
     List<Runnable> runnables = new ArrayList<>(threads);
     for (int i = 0; i < threads; i++) {
       Runnable runnable;
@@ -119,7 +119,7 @@ public abstract class LoadExecutor {
     printSummary();
 
     shutdown();
-    System.getProperties().remove(PROPKEY_LOADTEST);
+    System.getProperties().remove(PROPKEY_BENCHMARK);
   } // method test
 
   public boolean isInterrupted() {

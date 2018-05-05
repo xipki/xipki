@@ -54,8 +54,7 @@ public abstract class P12KeyGenAction extends KeyGenAction {
   }
 
   protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {
-    KeystoreGenerationParameters params = new KeystoreGenerationParameters(
-        getPassword());
+    KeystoreGenerationParameters params = new KeystoreGenerationParameters(getPassword());
 
     SecureRandom random = securityFactory.getRandom4Key();
     if (random != null) {

@@ -20,7 +20,7 @@ package org.xipki.security.speed.pkcs12.cmd;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.cmd.SingleSpeedAction;
 import org.xipki.security.speed.pkcs12.P12DSAKeyGenSpeed;
 
@@ -45,7 +45,7 @@ public class SpeedP12DSAKeyGenCmd extends SingleSpeedAction {
   private Integer qlen;
 
   @Override
-  protected LoadExecutor getTester() throws Exception {
+  protected BenchmarkExecutor getTester() throws Exception {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }

@@ -56,7 +56,7 @@ import org.xipki.ca.client.benchmark.shell.jaxb.EnrollCertType;
 import org.xipki.ca.client.benchmark.shell.jaxb.EnrollTemplateType;
 import org.xipki.ca.client.benchmark.shell.jaxb.ObjectFactory;
 import org.xipki.common.InvalidConfException;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xml.sax.SAXException;
@@ -67,7 +67,7 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-public class CaBenchmarkTemplateEnroll extends LoadExecutor {
+public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private static final class CertRequestWithProfile {
 
@@ -151,7 +151,7 @@ public class CaBenchmarkTemplateEnroll extends LoadExecutor {
 
   private final CaClient caClient;
 
-  private final List<BenchmarkEntry> loadtestEntries;
+  private final List<BenchmarkEntry> benchmarkEntries;
 
   private final int maxRequests;
 
@@ -175,7 +175,7 @@ public class CaBenchmarkTemplateEnroll extends LoadExecutor {
     this.index = new AtomicLong(getSecureIndex());
 
     List<EnrollCertType> list = template.getEnrollCert();
-    loadtestEntries = new ArrayList<>(list.size());
+    benchmarkEntries = new ArrayList<>(list.size());
 
     for (EnrollCertType entry : list) {
       KeyEntry keyEntry;
@@ -195,9 +195,8 @@ public class CaBenchmarkTemplateEnroll extends LoadExecutor {
         throw new InvalidConfException("invalid randomDN " + randomDnStr);
       }
 
-      BenchmarkEntry loadtestEntry = new BenchmarkEntry(entry.getCertprofile(), keyEntry,
-              entry.getSubject(), randomDn);
-      loadtestEntries.add(loadtestEntry);
+      benchmarkEntries.add(
+          new BenchmarkEntry(entry.getCertprofile(), keyEntry, entry.getSubject(), randomDn));
     }
   } // constructor
 
@@ -207,7 +206,7 @@ public class CaBenchmarkTemplateEnroll extends LoadExecutor {
   }
 
   public int getNumberOfCertsInOneRequest() {
-    return loadtestEntries.size();
+    return benchmarkEntries.size();
   }
 
   private Map<Integer, CertRequestWithProfile> nextCertRequests() {
@@ -219,22 +218,22 @@ public class CaBenchmarkTemplateEnroll extends LoadExecutor {
     }
 
     Map<Integer, CertRequestWithProfile> certRequests = new HashMap<>();
-    final int n = loadtestEntries.size();
+    final int n = benchmarkEntries.size();
     for (int i = 0; i < n; i++) {
-      BenchmarkEntry loadtestEntry = loadtestEntries.get(i);
+      BenchmarkEntry benchmarkEntry = benchmarkEntries.get(i);
       final int certId = i + 1;
       CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
 
       long thisIndex = index.getAndIncrement();
-      certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
+      certTempBuilder.setSubject(benchmarkEntry.getX500Name(thisIndex));
 
-      SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo();
+      SubjectPublicKeyInfo spki = benchmarkEntry.getSubjectPublicKeyInfo();
       certTempBuilder.setPublicKey(spki);
 
       CertTemplate certTemplate = certTempBuilder.build();
       CertRequest certRequest = new CertRequest(certId, certTemplate, null);
       CertRequestWithProfile requestWithCertprofile = new CertRequestWithProfile(
-              loadtestEntry.getCertprofile(), certRequest);
+              benchmarkEntry.getCertprofile(), certRequest);
       certRequests.put(certId, requestWithCertprofile);
     }
     return certRequests;
@@ -252,7 +251,7 @@ public class CaBenchmarkTemplateEnroll extends LoadExecutor {
 
           final SchemaFactory schemaFact = SchemaFactory.newInstance(
               javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-          URL url = ObjectFactory.class.getResource("/xsd/loadtest.xsd");
+          URL url = ObjectFactory.class.getResource("/xsd/benchmark.xsd");
           jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
         }
 

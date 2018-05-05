@@ -22,8 +22,7 @@ import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
-import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.cmd.RSAControl;
 import org.xipki.security.speed.pkcs11.P11RSAKeyGenSpeed;
 
@@ -49,14 +48,13 @@ public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Action {
   }
 
   @Override
-  protected LoadExecutor nextTester() throws Exception {
+  protected BenchmarkExecutor nextTester() throws Exception {
     RSAControl control = queue.poll();
     if (control == null) {
       return null;
     }
 
-    P11Slot slot = getSlot();
-    return new P11RSAKeyGenSpeed(slot, control.modulusLen(), toBigInt("0x10001"));
+    return new P11RSAKeyGenSpeed(getSlot(), control.modulusLen(), toBigInt("0x10001"));
   }
 
 }

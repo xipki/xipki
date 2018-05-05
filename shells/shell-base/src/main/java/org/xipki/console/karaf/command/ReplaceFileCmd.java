@@ -70,7 +70,6 @@ public class ReplaceFileCmd extends XiAction {
     }
 
     ParamUtil.requireNonBlank("old", oldText);
-
     replaceFile(sourceFile, oldText, newText);
 
     return null;
@@ -78,7 +77,6 @@ public class ReplaceFileCmd extends XiAction {
 
   private void replaceFile(File file, String oldText, String newText) throws Exception {
     BufferedReader reader = new BufferedReader(new FileReader(file));
-
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
 
     boolean changed = false;

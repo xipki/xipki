@@ -25,7 +25,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
@@ -39,7 +39,7 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-public abstract class P12SignSpeed extends LoadExecutor {
+public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 

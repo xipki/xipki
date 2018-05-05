@@ -14,9 +14,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<xs:schema xmlns="http://xipki.org/ca/client/loadtest/v2"
+<xs:schema xmlns="http://xipki.org/ca/client/benchmark/v1"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://xipki.org/ca/client/loadtest/v2"
+  targetNamespace="http://xipki.org/ca/client/benchmark/v1"
   elementFormDefault="qualified">
   <!-- CertStore -->
   <xs:element name="enrollTemplate" type="enrollTemplateType"/>

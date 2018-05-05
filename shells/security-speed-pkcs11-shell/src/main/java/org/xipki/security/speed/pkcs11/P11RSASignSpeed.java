@@ -44,7 +44,7 @@ public class P11RSASignSpeed extends P11SignSpeed {
       BigInteger publicExponent) throws Exception {
     ParamUtil.requireNonNull("slot", slot);
     return slot.generateRSAKeypair(keysize, publicExponent,
-        "loadtest-" + System.currentTimeMillis(), getNewKeyControl());
+        "speed-" + System.currentTimeMillis(), getNewKeyControl());
   }
 
 }

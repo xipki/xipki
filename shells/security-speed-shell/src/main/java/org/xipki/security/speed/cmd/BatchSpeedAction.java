@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.LogUtil;
 import org.xipki.security.util.AlgorithmUtil;
 
@@ -44,13 +44,13 @@ public abstract class BatchSpeedAction extends SecurityAction {
       description = "number of threads")
   private Integer numThreads = 5;
 
-  protected abstract LoadExecutor nextTester() throws Exception;
+  protected abstract BenchmarkExecutor nextTester() throws Exception;
 
   @Override
   protected Object execute0() throws InterruptedException {
     while (true) {
       println("============================================");
-      LoadExecutor tester;
+      BenchmarkExecutor tester;
       try {
         tester = nextTester();
       } catch (Exception ex) {
@@ -59,13 +59,14 @@ public abstract class BatchSpeedAction extends SecurityAction {
         println(msg + ": " + ex.getMessage());
         continue;
       }
+
       if (tester == null) {
         break;
       }
 
       tester.setDuration(duration);
       tester.setThreads(Math.min(20, numThreads));
-      tester.test();
+      tester.execute();
       if (tester.isInterrupted()) {
         throw new InterruptedException("cancelled by the user");
       }

@@ -26,7 +26,6 @@ import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.speed.cmd.SingleSpeedAction;
 
@@ -57,7 +56,6 @@ public abstract class SpeedP11Action extends SingleSpeedAction {
       throw new IllegalCmdParamException("undefined module " + moduleName);
     }
     P11Module module = p11Service.getModule();
-    P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
-    return module.getSlot(slotId);
+    return module.getSlot(module.getSlotIdForIndex(slotIndex));
   }
 }

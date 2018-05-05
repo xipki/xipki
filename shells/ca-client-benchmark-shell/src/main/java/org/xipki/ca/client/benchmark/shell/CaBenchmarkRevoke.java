@@ -34,7 +34,7 @@ import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntry;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
@@ -46,7 +46,7 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
-public class CaBenchmarkRevoke extends LoadExecutor {
+public class CaBenchmarkRevoke extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaBenchmarkRevoke.class);
 

@@ -19,7 +19,7 @@ package org.xipki.security.speed.pkcs12.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 import org.xipki.security.speed.pkcs12.P12SM2SignSpeed;
 
 /**
@@ -35,7 +35,7 @@ import org.xipki.security.speed.pkcs12.P12SM2SignSpeed;
 public class SpeedP12SM2SignCmd extends SpeedP12SignAction {
 
   @Override
-  protected LoadExecutor getTester() throws Exception {
+  protected BenchmarkExecutor getTester() throws Exception {
     return new P12SM2SignSpeed(securityFactory);
   }
 

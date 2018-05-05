@@ -18,7 +18,7 @@
 package org.xipki.security.speed.cmd;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.common.LoadExecutor;
+import org.xipki.common.BenchmarkExecutor;
 
 /**
  * TODO.
@@ -36,15 +36,15 @@ public abstract class SingleSpeedAction extends SecurityAction {
       description = "number of threads")
   private Integer numThreads = 5;
 
-  protected abstract LoadExecutor getTester() throws Exception;
+  protected abstract BenchmarkExecutor getTester() throws Exception;
 
   @Override
   protected Object execute0() throws Exception {
-    LoadExecutor tester = getTester();
+    BenchmarkExecutor tester = getTester();
     tester.setDuration(duration);
     tester.setThreads(Math.min(20, numThreads));
 
-    tester.test();
+    tester.execute();
     return null;
   }
 
