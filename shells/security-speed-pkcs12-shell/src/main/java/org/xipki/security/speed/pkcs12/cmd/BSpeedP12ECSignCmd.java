@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.ECControl;
-import org.xipki.security.speed.pkcs12.P12ECSignLoadTest;
+import org.xipki.security.speed.pkcs12.P12ECSignSpeed;
 
 /**
  * TODO.
@@ -53,7 +53,7 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignAction {
       return null;
     }
 
-    return new P12ECSignLoadTest(securityFactory, sigAlgo, control.curveName());
+    return new P12ECSignSpeed(securityFactory, sigAlgo, control.curveName());
   }
 
 }

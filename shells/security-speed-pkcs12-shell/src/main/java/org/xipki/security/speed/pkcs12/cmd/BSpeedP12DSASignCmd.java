@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.DSAControl;
-import org.xipki.security.speed.pkcs12.P12DSASignLoadTest;
+import org.xipki.security.speed.pkcs12.P12DSASignSpeed;
 
 /**
  * TODO.
@@ -57,7 +57,7 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignAction {
       sigAlgo = "SHA1withDSA";
     }
 
-    return new P12DSASignLoadTest(securityFactory, sigAlgo, control.plen(),
+    return new P12DSASignSpeed(securityFactory, sigAlgo, control.plen(),
         control.qlen());
   }
 

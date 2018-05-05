@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.pkcs11.P11DSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11DSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -48,7 +48,7 @@ public class SpeedP11DSAKeyGenCmd extends SpeedP11Action {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }
-    return new P11DSAKeyGenLoadTest(getSlot(), plen, qlen);
+    return new P11DSAKeyGenSpeed(getSlot(), plen, qlen);
   }
 
 }

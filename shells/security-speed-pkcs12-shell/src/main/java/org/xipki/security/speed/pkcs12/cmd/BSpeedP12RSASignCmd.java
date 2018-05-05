@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.RSAControl;
-import org.xipki.security.speed.pkcs12.P12RSASignLoadTest;
+import org.xipki.security.speed.pkcs12.P12RSASignSpeed;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class BSpeedP12RSASignCmd extends BSpeedP12SignAction {
       return null;
     }
 
-    return new P12RSASignLoadTest(securityFactory, sigAlgo, control.modulusLen(),
+    return new P12RSASignSpeed(securityFactory, sigAlgo, control.modulusLen(),
             toBigInt("0x10001"));
   }
 }

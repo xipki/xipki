@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.RSAControl;
-import org.xipki.security.speed.pkcs11.P11RSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11RSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -56,7 +56,7 @@ public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Action {
     }
 
     P11Slot slot = getSlot();
-    return new P11RSAKeyGenLoadTest(slot, control.modulusLen(), toBigInt("0x10001"));
+    return new P11RSAKeyGenSpeed(slot, control.modulusLen(), toBigInt("0x10001"));
   }
 
 }

@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.RSAControl;
-import org.xipki.security.speed.pkcs12.P12RSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs12.P12RSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -55,7 +55,7 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedAction {
       return null;
     }
 
-    return new P12RSAKeyGenLoadTest(control.modulusLen(), toBigInt("0x10001"),
+    return new P12RSAKeyGenSpeed(control.modulusLen(), toBigInt("0x10001"),
         securityFactory);
   }
 

@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.speed.cmd.SingleSpeedAction;
-import org.xipki.security.speed.pkcs12.P12ECKeyGenLoadTest;
+import org.xipki.security.speed.pkcs12.P12ECKeyGenSpeed;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public class SpeedP12ECKeyGenCmd extends SingleSpeedAction {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P12ECKeyGenLoadTest(curveName, securityFactory);
+    return new P12ECKeyGenSpeed(curveName, securityFactory);
   }
 
 }

@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.completer.RSASigAlgCompleter;
-import org.xipki.security.speed.pkcs12.P12RSASignLoadTest;
+import org.xipki.security.speed.pkcs12.P12RSASignSpeed;
 
 /**
  * TODO.
@@ -52,7 +52,7 @@ public class SpeedP12RSASignCmd extends SpeedP12SignAction {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P12RSASignLoadTest(securityFactory, sigAlgo, keysize, toBigInt(publicExponent));
+    return new P12RSASignSpeed(securityFactory, sigAlgo, keysize, toBigInt(publicExponent));
   }
 
 }

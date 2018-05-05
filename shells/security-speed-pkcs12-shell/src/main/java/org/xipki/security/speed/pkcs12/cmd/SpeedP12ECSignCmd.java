@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.speed.cmd.completer.ECDSASigAlgCompleter;
-import org.xipki.security.speed.pkcs12.P12ECSignLoadTest;
+import org.xipki.security.speed.pkcs12.P12ECSignSpeed;
 
 /**
  * TODO.
@@ -50,7 +50,7 @@ public class SpeedP12ECSignCmd extends SpeedP12SignAction {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P12ECSignLoadTest(securityFactory, sigAlgo, curveName);
+    return new P12ECSignSpeed(securityFactory, sigAlgo, curveName);
   }
 
 }

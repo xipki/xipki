@@ -22,7 +22,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.SingleSpeedAction;
-import org.xipki.security.speed.pkcs12.P12DSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs12.P12DSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -49,7 +49,7 @@ public class SpeedP12DSAKeyGenCmd extends SingleSpeedAction {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }
-    return new P12DSAKeyGenLoadTest(plen, qlen, securityFactory);
+    return new P12DSAKeyGenSpeed(plen, qlen, securityFactory);
   }
 
 }

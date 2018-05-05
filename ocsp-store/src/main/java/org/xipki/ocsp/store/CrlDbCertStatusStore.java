@@ -185,8 +185,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
           if (StringUtil.isNotBlank(str)) {
             invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
           }
-          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED,
-              revocationTime, invalidityTime);
+          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED, revocationTime, invalidityTime);
         }
       }
 

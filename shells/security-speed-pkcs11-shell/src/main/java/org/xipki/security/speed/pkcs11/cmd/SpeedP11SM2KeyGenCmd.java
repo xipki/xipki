@@ -20,7 +20,7 @@ package org.xipki.security.speed.pkcs11.cmd;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.pkcs11.P11SM2KeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11SM2KeyGenSpeed;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ public class SpeedP11SM2KeyGenCmd extends SpeedP11Action {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P11SM2KeyGenLoadTest(getSlot());
+    return new P11SM2KeyGenSpeed(getSlot());
   }
 
 }

@@ -29,7 +29,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
-import org.xipki.security.speed.pkcs11.P11DSASignLoadTest;
+import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
 
 /**
  * TODO.
@@ -73,7 +73,7 @@ public class BSpeedP11DSASignCmd extends BSpeedP11Action {
       }
     }
 
-    return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, control.plen(),
+    return new P11DSASignSpeed(securityFactory, slot, sigAlgo, control.plen(),
         control.qlen());
   }
 

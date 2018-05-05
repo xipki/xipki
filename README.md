@@ -355,7 +355,7 @@ Components
     - draft-gutmann-scep-00
     - draft-nourse-scep-23
 
-- Key Tool (for both PKCS#12 and PKCS#11 tokens)
+- Toolkit (for both PKCS#12 and PKCS#11 tokens)
   - Generating keypairs of RSA, EC and DSA in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
@@ -371,7 +371,7 @@ Components
   - Support of health check
   - Audit with syslog and slf4j
 
-- For CA, OCSP Responder and Key Tool
+- For CA, OCSP Responder and Toolkit
   - API to resolve password
   - Support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password

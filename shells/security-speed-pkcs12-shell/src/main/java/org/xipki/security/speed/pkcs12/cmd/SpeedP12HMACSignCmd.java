@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.completer.HMACSigAlgCompleter;
-import org.xipki.security.speed.pkcs12.P12HMACSignLoadTest;
+import org.xipki.security.speed.pkcs12.P12HMACSignSpeed;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class SpeedP12HMACSignCmd extends SpeedP12SignAction {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P12HMACSignLoadTest(securityFactory, sigAlgo);
+    return new P12HMACSignSpeed(securityFactory, sigAlgo);
   }
 
 }

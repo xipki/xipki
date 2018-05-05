@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
-import org.xipki.security.speed.pkcs11.P11DSASignLoadTest;
+import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
 
 /**
  * TODO.
@@ -64,7 +64,7 @@ public class SpeedP11DSASignCmd extends SpeedP11Action {
       }
     }
 
-    return new P11DSASignLoadTest(securityFactory, getSlot(), sigAlgo, plen, qlen);
+    return new P11DSASignSpeed(securityFactory, getSlot(), sigAlgo, plen, qlen);
   }
 
 }

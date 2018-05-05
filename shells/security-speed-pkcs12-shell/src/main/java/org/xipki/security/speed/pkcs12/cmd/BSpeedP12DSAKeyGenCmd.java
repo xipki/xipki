@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.DSAControl;
-import org.xipki.security.speed.pkcs12.P12DSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs12.P12DSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -55,7 +55,7 @@ public class BSpeedP12DSAKeyGenCmd extends BatchSpeedAction {
       return null;
     }
 
-    return new P12DSAKeyGenLoadTest(control.plen(), control.qlen(), securityFactory);
+    return new P12DSAKeyGenSpeed(control.plen(), control.qlen(), securityFactory);
   }
 
 }

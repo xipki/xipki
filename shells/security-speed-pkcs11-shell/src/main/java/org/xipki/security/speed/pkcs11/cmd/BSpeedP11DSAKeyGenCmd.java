@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.DSAControl;
-import org.xipki.security.speed.pkcs11.P11DSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11DSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -56,7 +56,7 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11Action {
     }
 
     P11Slot slot = getSlot();
-    return new P11DSAKeyGenLoadTest(slot, control.plen(), control.qlen());
+    return new P11DSAKeyGenSpeed(slot, control.plen(), control.qlen());
   }
 
 }

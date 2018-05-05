@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.completer.GMACSigAlgCompleter;
-import org.xipki.security.speed.pkcs12.P12AESGmacSignLoadTest;
+import org.xipki.security.speed.pkcs12.P12AESGmacSignSpeed;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class SpeedP12AESGmacSignCmd extends SpeedP12SignAction {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P12AESGmacSignLoadTest(securityFactory, sigAlgo);
+    return new P12AESGmacSignSpeed(securityFactory, sigAlgo);
   }
 
 }

@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
-import org.xipki.security.speed.pkcs12.P12DSASignLoadTest;
+import org.xipki.security.speed.pkcs12.P12DSASignSpeed;
 
 /**
  * TODO.
@@ -55,7 +55,7 @@ public class SpeedP12DSASignCmd extends SpeedP12SignAction {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }
-    return new P12DSASignLoadTest(securityFactory, sigAlgo, plen, qlen);
+    return new P12DSASignSpeed(securityFactory, sigAlgo, plen, qlen);
   }
 
 }

@@ -28,7 +28,7 @@ import org.xipki.common.LoadExecutor;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.ECControl;
 import org.xipki.security.speed.cmd.completer.ECDSASigAlgCompleter;
-import org.xipki.security.speed.pkcs11.P11ECSignLoadTest;
+import org.xipki.security.speed.pkcs11.P11ECSignSpeed;
 
 /**
  * TODO.
@@ -63,7 +63,7 @@ public class BSpeedP11ECSignCmd extends BSpeedP11Action {
     }
 
     P11Slot slot = getSlot();
-    return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, control.curveName());
+    return new P11ECSignSpeed(securityFactory, slot, sigAlgo, control.curveName());
   }
 
 }

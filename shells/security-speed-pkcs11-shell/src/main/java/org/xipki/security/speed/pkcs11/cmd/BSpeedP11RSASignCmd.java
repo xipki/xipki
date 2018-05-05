@@ -28,7 +28,7 @@ import org.xipki.common.LoadExecutor;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.RSAControl;
 import org.xipki.security.speed.cmd.completer.RSASigAlgCompleter;
-import org.xipki.security.speed.pkcs11.P11RSASignLoadTest;
+import org.xipki.security.speed.pkcs11.P11RSASignSpeed;
 
 /**
  * TODO.
@@ -64,7 +64,7 @@ public class BSpeedP11RSASignCmd extends BSpeedP11Action {
     }
 
     P11Slot slot = getSlot();
-    return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, control.modulusLen(),
+    return new P11RSASignSpeed(securityFactory, slot, sigAlgo, control.modulusLen(),
                 toBigInt("0x10001"));
   }
 

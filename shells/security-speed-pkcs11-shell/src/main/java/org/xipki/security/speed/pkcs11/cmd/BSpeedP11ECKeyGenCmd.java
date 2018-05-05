@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.speed.cmd.ECControl;
-import org.xipki.security.speed.pkcs11.P11ECKeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11ECKeyGenSpeed;
 
 /**
  * TODO.
@@ -55,7 +55,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11Action {
     }
 
     P11Slot slot = getSlot();
-    return new P11ECKeyGenLoadTest(slot, control.curveName());
+    return new P11ECKeyGenSpeed(slot, control.curveName());
   }
 
 }

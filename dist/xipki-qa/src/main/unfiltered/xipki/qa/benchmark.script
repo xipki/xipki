@@ -77,7 +77,7 @@ if { $printUsage equals "true" } then {
     # Loadtest Template
     echo "Template enroll benchmark"
     xiqa:cmp-benchmark-template-enroll --duration $duration --thread $threads \
-      --template xipki/qa/qa.d/loadtest-template.xml
+      --template xipki/qa/qa.d/benchmark-template.xml
 
     # Loadtest RSA key
     echo "Enroll benchmark"

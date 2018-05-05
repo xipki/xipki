@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.speed.cmd.BatchSpeedAction;
 import org.xipki.security.speed.cmd.ECControl;
-import org.xipki.security.speed.pkcs12.P12ECKeyGenLoadTest;
+import org.xipki.security.speed.pkcs12.P12ECKeyGenSpeed;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class BSpeedP12ECKeyGenCmd extends BatchSpeedAction {
       return null;
     }
 
-    return new P12ECKeyGenLoadTest(control.curveName(), securityFactory);
+    return new P12ECKeyGenSpeed(control.curveName(), securityFactory);
   }
 
 }

@@ -18,7 +18,6 @@
 package org.xipki.dbtool;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.dbtool.internal.MyLoggerFactory;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;

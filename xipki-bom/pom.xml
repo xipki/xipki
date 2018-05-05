@@ -162,6 +162,11 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
+        <artifactId>ocsp-store</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki</groupId>
         <artifactId>ocsp-server-netty</artifactId>
         <version>${project.version}</version>
       </dependency>

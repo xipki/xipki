@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
 import org.xipki.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.security.speed.pkcs11.P11ECKeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11ECKeyGenSpeed;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class SpeedP11ECKeyGenCmd extends SpeedP11Action {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P11ECKeyGenLoadTest(getSlot(), curveName);
+    return new P11ECKeyGenSpeed(getSlot(), curveName);
   }
 
 }

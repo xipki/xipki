@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.pkcs11.P11RSAKeyGenLoadTest;
+import org.xipki.security.speed.pkcs11.P11RSAKeyGenSpeed;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public class SpeedP11RSAKeyGenCmd extends SpeedP11Action {
 
   @Override
   protected LoadExecutor getTester() throws Exception {
-    return new P11RSAKeyGenLoadTest(getSlot(), keysize, toBigInt(publicExponent));
+    return new P11RSAKeyGenSpeed(getSlot(), keysize, toBigInt(publicExponent));
   }
 
 }
