@@ -1765,8 +1765,8 @@ public class X509Ca {
 
     IdentifiedX509Certprofile certprofile = gct.certprofile;
 
-    boolean publicKeyCertInProcessExisted = publicKeyCertsInProcess.add(gct.fpPublicKey);
-    if (!publicKeyCertInProcessExisted) {
+    boolean addedPublicKey = publicKeyCertsInProcess.add(gct.fpPublicKey);
+    if (!addedPublicKey) { // in process already exists a request with given public key.
       if (!certprofile.isDuplicateKeyPermitted()) {
         throw new OperationException(ErrorCode.ALREADY_ISSUED,
             "certificate with the given public key already in process");
@@ -1775,7 +1775,7 @@ public class X509Ca {
 
     if (!subjectCertsInProcess.add(gct.fpSubject)) {
       if (!certprofile.isDuplicateSubjectPermitted()) {
-        if (!publicKeyCertInProcessExisted) {
+        if (addedPublicKey) {
           publicKeyCertsInProcess.remove(gct.fpPublicKey);
         }
 

@@ -17,7 +17,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
 
-  <cm:property-placeholder persistent-id="org.xipki.security" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.security">
     <cm:default-properties>
       <cm:property name="key.strongrandom.enabled" value="false"/>
       <cm:property name="sign.strongrandom.enabled" value="false"/>
