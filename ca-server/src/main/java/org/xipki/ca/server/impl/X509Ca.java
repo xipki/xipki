@@ -1760,20 +1760,22 @@ public class X509Ca {
 
     IdentifiedX509Certprofile certprofile = gct.certprofile;
 
-    boolean addedPublicKey = publicKeyCertsInProcess.add(gct.fpPublicKey);
-    if (!addedPublicKey) { // in process already exists a request with given public key.
-      if (!certprofile.isDuplicateKeyPermitted()) {
+    boolean duplicatedKeyNotAllowed = !caInfo.isDuplicateKeyPermitted();
+    boolean duplicatedSubjectNotAllowed = !caInfo.isDuplicateSubjectPermitted();
+    if (duplicatedKeyNotAllowed) {
+      if (!publicKeyCertsInProcess.add(gct.fpPublicKey)) {
+        // in process already exists a request with given public key.
         throw new OperationException(ErrorCode.ALREADY_ISSUED,
             "certificate with the given public key already in process");
       }
     }
 
-    if (!subjectCertsInProcess.add(gct.fpSubject)) {
-      if (!certprofile.isDuplicateSubjectPermitted()) {
-        if (addedPublicKey) {
+    if (duplicatedSubjectNotAllowed) {
+      if (!subjectCertsInProcess.add(gct.fpSubject)) {
+        // in process already exists a request with given subject.
+        if (duplicatedKeyNotAllowed) { // remove the added entry from publicKeyCertsInProcess
           publicKeyCertsInProcess.remove(gct.fpPublicKey);
         }
-
         throw new OperationException(ErrorCode.ALREADY_ISSUED,
             "certificate with the given subject " + gct.grantedSubjectText + " already in process");
       }
@@ -1868,18 +1870,17 @@ public class X509Ca {
 
       return ret;
     } finally {
-      publicKeyCertsInProcess.remove(gct.fpPublicKey);
-      subjectCertsInProcess.remove(gct.fpSubject);
+      if (duplicatedKeyNotAllowed) {
+        publicKeyCertsInProcess.remove(gct.fpPublicKey);
+      }
+      if (duplicatedSubjectNotAllowed) {
+        subjectCertsInProcess.remove(gct.fpSubject);
+      }
     }
   } // method generateCertificate0
 
   private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
-    boolean duplicateSubjectPermitted = caInfo.isDuplicateSubjectPermitted();
-    if (duplicateSubjectPermitted && !gct.certprofile.isDuplicateSubjectPermitted()) {
-      duplicateSubjectPermitted = false;
-    }
-
-    if (duplicateSubjectPermitted) {
+    if (caInfo.isDuplicateSubjectPermitted()) {
       return;
     }
 
@@ -2074,9 +2075,6 @@ public class X509Ca {
     }
 
     boolean duplicateKeyPermitted = caInfo.isDuplicateKeyPermitted();
-    if (duplicateKeyPermitted && !certprofile.isDuplicateKeyPermitted()) {
-      duplicateKeyPermitted = false;
-    }
 
     byte[] subjectPublicKeyData = grantedPublicKeyInfo.getPublicKeyData().getBytes();
     long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);

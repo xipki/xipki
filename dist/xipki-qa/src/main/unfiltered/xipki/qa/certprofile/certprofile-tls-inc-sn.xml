@@ -64,7 +64,6 @@
   <certLevel>EndEntity</certLevel>
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
-  <duplicateKey>true</duplicateKey>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>
@@ -113,7 +112,7 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject duplicateSubjectPermitted="true">
+  <subject>
     <incSerialNumber>true</incSerialNumber>
     <keepRdnOrder>false</keepRdnOrder>
     <rdn minOccurs="1" maxOccurs="1">

@@ -177,10 +177,6 @@ public class XmlCertprofile extends BaseCertprofile {
 
   private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
-  private boolean duplicateKeyPermitted;
-
-  private boolean duplicateSubjectPermitted;
-
   private Set<ExtKeyUsageControl> extendedKeyusages;
 
   private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
@@ -247,8 +243,6 @@ public class XmlCertprofile extends BaseCertprofile {
     certLevel = null;
     certificatePolicies = null;
     constantExtensions = null;
-    duplicateKeyPermitted = true;
-    duplicateSubjectPermitted = true;
     extendedKeyusages = null;
     extensionControls = null;
     includeIssuerAndSerialInAki = false;
@@ -366,7 +360,6 @@ public class XmlCertprofile extends BaseCertprofile {
       throw new CertprofileException("invalid notBefore '" + str + "'");
     }
 
-    this.duplicateKeyPermitted = conf.isDuplicateKey();
     this.serialNumberInReqPermitted = conf.isSerialNumberInReq();
 
     // KeyAlgorithms
@@ -377,7 +370,6 @@ public class XmlCertprofile extends BaseCertprofile {
 
     // Subject
     Subject subject = conf.getSubject();
-    duplicateSubjectPermitted = subject.isDuplicateSubjectPermitted();
 
     List<RdnControl> subjectDnControls = new LinkedList<>();
 
@@ -1776,16 +1768,6 @@ public class XmlCertprofile extends BaseCertprofile {
   @Override
   public SubjectControl getSubjectControl() {
     return subjectControl;
-  }
-
-  @Override
-  public boolean isDuplicateKeyPermitted() {
-    return duplicateKeyPermitted;
-  }
-
-  @Override
-  public boolean isDuplicateSubjectPermitted() {
-    return duplicateSubjectPermitted;
   }
 
   @Override

@@ -534,14 +534,6 @@ class IdentifiedX509Certprofile {
     return certprofile.incSerialNumber(currentSerialNumber);
   }
 
-  public boolean isDuplicateKeyPermitted() {
-    return certprofile.isDuplicateKeyPermitted();
-  }
-
-  public boolean isDuplicateSubjectPermitted() {
-    return certprofile.isDuplicateSubjectPermitted();
-  }
-
   public boolean isSerialNumberInReqPermitted() {
     return certprofile.isSerialNumberInReqPermitted();
   }

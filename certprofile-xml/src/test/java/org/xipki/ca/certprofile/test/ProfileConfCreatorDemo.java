@@ -589,11 +589,8 @@ public class ProfileConfCreatorDemo {
   private static X509ProfileType certprofileTls() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile tls", CertLevel.EndEntity, "5y", true);
 
-    profile.setDuplicateKey(true);
-
     // Subject
     Subject subject = profile.getSubject();
-    subject.setDuplicateSubjectPermitted(true);
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
@@ -719,11 +716,8 @@ public class ProfileConfCreatorDemo {
     X509ProfileType profile = getBaseProfile("certprofile tls-inc-sn "
         + "(serial number will be added automatically)", CertLevel.EndEntity, "5y", false);
 
-    profile.setDuplicateKey(true);
-
     // Subject
     Subject subject = profile.getSubject();
-    subject.setDuplicateSubjectPermitted(true);
     subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdn();
@@ -1120,7 +1114,6 @@ public class ProfileConfCreatorDemo {
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setDuplicateSubjectPermitted(false);
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
@@ -1164,11 +1157,8 @@ public class ProfileConfCreatorDemo {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity,
         "5y", false);
 
-    profile.setDuplicateKey(true);
-
     // Subject
     Subject subject = profile.getSubject();
-    subject.setDuplicateSubjectPermitted(true);
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
@@ -1652,7 +1642,6 @@ public class ProfileConfCreatorDemo {
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
-    profile.setDuplicateKey(false);
     profile.setSerialNumberInReq(false);
 
     // SignatureAlgorithms
@@ -1681,7 +1670,6 @@ public class ProfileConfCreatorDemo {
 
     // Subject
     Subject subject = new Subject();
-    subject.setDuplicateSubjectPermitted(false);
     profile.setSubject(subject);
     subject.setKeepRdnOrder(false);
 

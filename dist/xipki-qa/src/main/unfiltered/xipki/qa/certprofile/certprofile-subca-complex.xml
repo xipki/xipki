@@ -64,7 +64,6 @@
   <certLevel>SubCA</certLevel>
   <validity>8y</validity>
   <notBeforeTime>current</notBeforeTime>
-  <duplicateKey>false</duplicateKey>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>
@@ -108,7 +107,7 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject duplicateSubjectPermitted="false">
+  <subject>
     <incSerialNumber>false</incSerialNumber>
     <keepRdnOrder>false</keepRdnOrder>
     <rdn minOccurs="1" maxOccurs="1">

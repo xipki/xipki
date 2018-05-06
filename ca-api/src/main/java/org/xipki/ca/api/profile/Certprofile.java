@@ -94,14 +94,6 @@ public abstract class Certprofile {
     }
   }
 
-  public boolean isDuplicateKeyPermitted() {
-    return true;
-  }
-
-  public boolean isDuplicateSubjectPermitted() {
-    return true;
-  }
-
   /**
    * Whether the subject attribute serialNumber in request is permitted.
    *

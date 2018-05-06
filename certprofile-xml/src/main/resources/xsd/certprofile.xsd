@@ -64,7 +64,6 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="duplicateKey" type="xs:boolean"/>
       <xs:element name="serialNumberInReq" type="xs:boolean"/>
       <xs:element name="keyAlgorithms" minOccurs="0">
         <xs:complexType>
@@ -86,7 +85,6 @@
             </xs:element>
             <xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
           </xs:sequence>
-          <xs:attribute name="duplicateSubjectPermitted" type="xs:boolean" use="required"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="extensions" type="extensionsType"/>
