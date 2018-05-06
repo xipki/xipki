@@ -67,7 +67,7 @@ class CrlSignerEntryWrapper {
   }
 
   public void initSigner(SecurityFactory securityFactory)
-      throws XiSecurityException, OperationException, InvalidConfException {
+      throws XiSecurityException, OperationException {
     ParamUtil.requireNonNull("securityFactory", securityFactory);
     if (signer != null) {
       return;

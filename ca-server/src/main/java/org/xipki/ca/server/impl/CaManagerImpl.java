@@ -674,8 +674,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     if (!caSystemStarted) {
-      String msg = "could not start CA system";
-      LOG.error(msg);
+      LOG.error("could not start CA system");
     }
 
     auditLogPciEvent(caSystemStarted, "START");
@@ -823,7 +822,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         crlSignerEntry.getDbEntry().setConfFaulty(true);
         crlSignerEntry.initSigner(securityFactory);
         crlSignerEntry.getDbEntry().setConfFaulty(false);
-      } catch (XiSecurityException | OperationException | InvalidConfException ex) {
+      } catch (XiSecurityException | OperationException ex) {
         LogUtil.error(LOG, ex,
             concat("X09CrlSignerEntryWrapper.initSigner (name=", crlSignerName, ")"));
         return false;
@@ -1815,8 +1814,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     ResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
         base64Cert, this, securityFactory);
 
-    // Update SCEP
-
     responders.remove(name);
     responderDbEntries.remove(name);
     responderDbEntries.put(name, newResponder.getDbEntry());
@@ -2111,7 +2108,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     queryExecutor.changeEnvParam(name, value);
-
     envParameterResolver.addParameter(name, value);
   } // method changeEnvParam
 
@@ -2234,8 +2230,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
-    boolean successful = ca.republishCertificates(publisherNames, numThreads);
-    if (!successful) {
+    if (!ca.republishCertificates(publisherNames, numThreads)) {
       throw new CaMgmtException(concat("republishing certificates of CA ", caName, " failed"));
     }
   } // method republishCertificates
@@ -2298,27 +2293,25 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     auditLogPciEvent(true, concat("UNREVOKE CA ", caName));
   } // method unrevokeCa
 
-  public void setX509CertProfileFactoryRegister(
-      CertprofileFactoryRegister x509CertProfileFactoryRegister) {
-    this.x509CertProfileFactoryRegister = x509CertProfileFactoryRegister;
+  public void setX509CertProfileFactoryRegister(CertprofileFactoryRegister register) {
+    this.x509CertProfileFactoryRegister = register;
   }
 
-  public void setX509CertPublisherFactoryRegister(
-      CertPublisherFactoryRegister x509CertPublisherFactoryRegister) {
-    this.x509CertPublisherFactoryRegister = x509CertPublisherFactoryRegister;
+  public void setX509CertPublisherFactoryRegister(CertPublisherFactoryRegister register) {
+    this.x509CertPublisherFactoryRegister = register;
   }
 
-  public void setAuditServiceRegister(AuditServiceRegister serviceRegister) {
-    this.auditServiceRegister = ParamUtil.requireNonNull("serviceRegister", serviceRegister);
+  public void setAuditServiceRegister(AuditServiceRegister register) {
+    this.auditServiceRegister = ParamUtil.requireNonNull("serviceRegister", register);
 
     for (String name : publishers.keySet()) {
       IdentifiedX509CertPublisher publisherEntry = publishers.get(name);
-      publisherEntry.setAuditServiceRegister(auditServiceRegister);
+      publisherEntry.setAuditServiceRegister(register);
     }
 
     for (String name : x509cas.keySet()) {
       X509Ca ca = x509cas.get(name);
-      ca.setAuditServiceRegister(serviceRegister);
+      ca.setAuditServiceRegister(register);
     }
   }
 
@@ -2338,8 +2331,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method auditLogPciEvent
 
   @Override
-  public void clearPublishQueue(String caName, List<String> publisherNames)
-      throws CaMgmtException {
+  public void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
     asssertMasterMode();
 
     publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
@@ -2401,8 +2393,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method revokeCertificate
 
   @Override
-  public void unrevokeCertificate(String caName, BigInteger serialNumber)
-      throws CaMgmtException {
+  public void unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     X509Ca ca = getX509Ca(caName);
@@ -2679,7 +2670,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
     try {
       signer.initSigner(securityFactory);
-    } catch (XiSecurityException | OperationException | InvalidConfException ex) {
+    } catch (XiSecurityException | OperationException ex) {
       String message = "could not create CRL signer " + dbEntry.getName();
       LogUtil.error(LOG, ex, message);
 
@@ -2745,8 +2736,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public void changeUser(ChangeUserEntry userEntry)
-      throws CaMgmtException {
+  public void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
     asssertMasterMode();
     queryExecutor.changeUser(userEntry);
   }

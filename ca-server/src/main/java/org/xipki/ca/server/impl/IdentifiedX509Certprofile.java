@@ -418,8 +418,7 @@ class IdentifiedX509Certprofile {
     extControl = controls.remove(extType);
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
       // the extension ocsp-nocheck will only be set if requested explicitly
-      DERNull value = DERNull.INSTANCE;
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, DERNull.INSTANCE, extControl, neededExtTypes, wantedExtTypes);
     }
 
     // SubjectInfoAccess
@@ -429,7 +428,7 @@ class IdentifiedX509Certprofile {
       ASN1Sequence value = null;
       if (requestedExtensions != null && extControl.isRequest()) {
         value = createSubjectInfoAccess(requestedExtensions,
-                    certprofile.getSubjectInfoAccessModes());
+            certprofile.getSubjectInfoAccessModes());
       }
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
@@ -785,8 +784,7 @@ class IdentifiedX509Certprofile {
   } // method addRequestedExtKeyusage
 
   private static ASN1Sequence createSubjectInfoAccess(Extensions requestedExtensions,
-      Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
-      throws BadCertTemplateException {
+      Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes) throws BadCertTemplateException {
     if (modes == null) {
       return null;
     }

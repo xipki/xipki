@@ -403,8 +403,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       certReqIds.put(i, certReqId);
 
       if (!req.hasProofOfPossession()) {
-        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP,
-            "no POP"));
+        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "no POP"));
         continue;
       }
 
@@ -419,9 +418,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       String certprofileName = (keyvalues == null) ? null
           : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
       if (certprofileName == null) {
-        String msg = "no certificate profile";
-        certResponses.put(i, buildErrorCertResponse(certReqId,
-            PKIFailureInfo.badCertTemplate, msg));
+        certResponses.put(i, buildErrorCertResponse(
+                              certReqId, PKIFailureInfo.badCertTemplate, "no certificate profile"));
         continue;
       }
       certprofileName = certprofileName.toLowerCase();
@@ -605,10 +603,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS
           && status != PKIStatus.WAITING) {
         event.setStatus(AuditStatus.FAILED);
-        PKIFreeText statusString = certResp.getStatus().getStatusString();
-        if (statusString != null) {
-          event.addEventData(CaAuditConstants.NAME_message,
-              statusString.getStringAt(0).getString());
+        PKIFreeText statusStr = certResp.getStatus().getStatusString();
+        if (statusStr != null) {
+          event.addEventData(CaAuditConstants.NAME_message, statusStr.getStringAt(0).getString());
         }
       }
     }
@@ -932,8 +929,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       } catch (OperationException ex) {
         ErrorCode code = ex.getErrorCode();
         LOG.warn("{}, OperationException: code={}, message={}",
-            PermissionConstants.getTextForCode(permission),
-            code.name(), ex.getErrorMessage());
+            PermissionConstants.getTextForCode(permission), code.name(), ex.getErrorMessage());
         String errorMessage;
         switch (code) {
           case DATABASE_FAILURE:
@@ -1066,8 +1062,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       try {
         ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(), msgId);
       } catch (OperationException ex) {
-        LogUtil.warn(LOG, ex,
-            "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
+        LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
             + " serialNumber=" + LogUtil.formatCsn(serialNumber));
       }
 
@@ -1153,12 +1148,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
   @Override
   protected CmpControl getCmpControl() {
-    CmpControl control = getCa().getCmpControl();
-    if (control != null) {
-      return control;
-    }
-    throw new IllegalStateException(
-        "should not happen, no CMP control is defined for CA " + caName);
+    return getCa().getCmpControl();
   }
 
   private void checkPermission(CmpRequestorInfo requestor, int requiredPermission)
@@ -1166,9 +1156,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     X509Ca ca = getCa();
     int permission = ca.getCaInfo().getPermission();
     if (!PermissionConstants.contains(permission, requiredPermission)) {
-      throw new InsuffientPermissionException(
-          "Permission " + PermissionConstants.getTextForCode(requiredPermission)
-          + "is not permitted");
+      throw new InsuffientPermissionException("Permission "
+          + PermissionConstants.getTextForCode(requiredPermission) + "is not permitted");
     }
 
     requestor.assertPermitted(requiredPermission);
@@ -1460,9 +1449,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
         }
 
         if (crl == null) {
-          String statusMessage = "no CRL is available";
           return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
-              statusMessage);
+              "no CRL is available");
         }
 
         itvResp = new InfoTypeAndValue(infoType, crl);
@@ -1478,10 +1466,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
             reqValue = seq.getObjectAt(1);
           }
         } catch (IllegalArgumentException ex) {
-          String statusMessage = "invalid value of the InfoTypeAndValue for "
-              + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
           return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-              statusMessage);
+              "invalid value of the InfoTypeAndValue for "
+              + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
         }
 
         ASN1Encodable respValue;
@@ -1532,9 +1519,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
             respValue = new DERUTF8String(systemInfo);
             break;
           default:
-            String statusMessage = "unsupported XiPKI action code '" + action + "'";
             return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-                statusMessage);
+                "unsupported XiPKI action code " + action);
         } // end switch (action)
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -1568,9 +1554,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
       return buildErrorMsgPkiBody(PKIStatus.rejection, failureInfo, errorMessage);
     } catch (CRLException ex) {
-      String statusMessage = "CRLException: " + ex.getMessage();
       return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
-          statusMessage);
+          "CRLException: " + ex.getMessage());
     }
   } // method cmpGeneralMsg
 
@@ -1586,8 +1571,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     return (crlNumber == null) ? ca.getBcCurrentCrl() : ca.getBcCrl(crlNumber);
   }
 
-  public X509CRL generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType,
-      String msgId) throws OperationException {
+  public X509CRL generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType, String msgId)
+      throws OperationException {
     ParamUtil.requireNonNull("requestor", requestor);
     try {
       checkPermission(requestor, PermissionConstants.GEN_CRL);
@@ -1595,8 +1580,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
     }
 
-    X509Ca ca = getCa();
-    return ca.generateCrlOnDemand(msgId);
+    return getCa().generateCrlOnDemand(msgId);
   }
 
   public void revokeCert(CmpRequestorInfo requestor, BigInteger serialNumber, CrlReason reason,
@@ -1638,8 +1622,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
     }
 
-    X509Ca ca = getCa();
-    CertWithDbId returnedObj = ca.removeCertificate(serialNumber, msgId);
+    CertWithDbId returnedObj = getCa().removeCertificate(serialNumber, msgId);
     if (returnedObj == null) {
       throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
     }

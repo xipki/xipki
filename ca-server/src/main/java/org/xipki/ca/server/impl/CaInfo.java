@@ -99,16 +99,14 @@ public class CaInfo {
       byte[] encodedCert = cert.getEncoded();
       bcCert = Certificate.getInstance(encodedCert);
     } catch (CertificateEncodingException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "could not encode the CA certificate");
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not encode the CA certificate");
     }
     this.certInCmpFormat = new CMPCertificate(bcCert);
 
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaCertUris(), caEntry.getOcspUris(),
         caEntry.getCrlUris(), caEntry.getDeltaCrlUris(), caEntry.getExtraControl());
 
-    this.noNewCertificateAfter =
-        this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
+    this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
   } // constructor

@@ -263,8 +263,7 @@ public class ProfileConfCreatorDemo {
   } // method marshal
 
   private static X509ProfileType certprofileRootCa() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y",
-        false);
+    X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -274,8 +273,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -303,8 +301,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileRootCa
 
   private static X509ProfileType certprofileCross() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y",
-        false);
+    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -314,8 +311,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -346,8 +342,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileCross
 
   private static X509ProfileType certprofileSubCa() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y",
-        false);
+    X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -357,8 +352,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -399,12 +393,10 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-        new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-        new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
     // Extensions
@@ -503,8 +495,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileSubCaComplex
 
   private static X509ProfileType certprofileOcsp() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
-        false);
+    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -515,8 +506,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -526,8 +516,7 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
     list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
     list.add(createExtension(Extension.freshestCRL, false, false, null));
-    list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false,
-        null));
+    list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false, null));
 
     // Extensions - basicConstraints
     ExtensionValueType extensionValue = null;
@@ -554,8 +543,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileOcsp
 
   private static X509ProfileType certprofileScep() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y",
-        false);
+    X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y", false);
 
     profile.setKeyAlgorithms(createRSAKeyAlgorithms());
 
@@ -567,8 +555,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -593,16 +580,14 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - keyUsage
     extensionValue = createKeyUsages(
-        new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.KEY_ENCIPHERMENT},
-        null);
+        new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.KEY_ENCIPHERMENT}, null);
     list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
     return profile;
   } // method certprofileScep
 
   private static X509ProfileType certprofileTls() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls", CertLevel.EndEntity, "5y",
-        true);
+    X509ProfileType profile = getBaseProfile("certprofile tls", CertLevel.EndEntity, "5y", true);
 
     profile.setDuplicateKey(true);
 
@@ -615,10 +600,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
 
     // Extensions
     // Extensions - general
@@ -678,15 +661,13 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - SMIMECapabilities
     extensionValue = createSmimeCapabilities();
-    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false,
-        extensionValue));
+    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false, extensionValue));
 
     return profile;
   } // method certprofileTls
 
   private static X509ProfileType certprofileTlsC() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y",
-        false);
+    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -696,8 +677,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -737,8 +717,7 @@ public class ProfileConfCreatorDemo {
 
   private static X509ProfileType certprofileTlsWithIncSerial() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile tls-inc-sn "
-        + "(serial number will be added automatically)",
-        CertLevel.EndEntity, "5y", false);
+        + "(serial number will be added automatically)", CertLevel.EndEntity, "5y", false);
 
     profile.setDuplicateKey(true);
 
@@ -748,14 +727,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-        new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-        new String[]{REGEX_SN}, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1,
-        new String[]{REGEX_FQDN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
 
     // Extensions
     // Extensions - general
@@ -811,8 +787,7 @@ public class ProfileConfCreatorDemo {
     final String regexOu2 = "[\\d]{5,5}";
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regexOu1, regexOu2},
         null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -858,8 +833,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -891,8 +865,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileMultipleValuedRdn
 
   private static X509ProfileType certprofileQc() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity,
-        "5y", false);
+    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -903,8 +876,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -964,8 +936,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
@@ -1014,8 +985,7 @@ public class ProfileConfCreatorDemo {
     attrTypes.add(createOidType(ObjectIdentifiers.DN_DATE_OF_BIRTH));
     attrTypes.add(createOidType(ObjectIdentifiers.DN_PLACE_OF_BIRTH));
     extensionValue = createExtensionValueType(subjectDirAttrType);
-    list.add(createExtension(Extension.subjectDirectoryAttributes, true, false,
-        extensionValue));
+    list.add(createExtension(Extension.subjectDirectoryAttributes, true, false, extensionValue));
 
     // Extension - Admission
     AdmissionSyntax admissionSyntax = new AdmissionSyntax();
@@ -1127,10 +1097,8 @@ public class ProfileConfCreatorDemo {
       access.setAccessLocation(accessLocation);
 
       otherName = new OtherName();
-      otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.1"),
-          "dummy oid 1"));
-      otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.2"),
-          "dummy oid 2"));
+      otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.1"), "dummy oid 1"));
+      otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.2"), "dummy oid 2"));
       accessLocation.setOtherName(otherName);
       accessLocation.setRfc822Name("");
       accessLocation.setDnsName("");
@@ -1159,10 +1127,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
 
     // Extensions
     ExtensionsType extensions = profile.getExtensions();
@@ -1209,10 +1175,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
-        null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null,
-        null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
 
     // Extensions
     // Extensions - general
@@ -1272,8 +1236,7 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - SMIMECapabilities
     extensionValue = createSmimeCapabilities();
-    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false,
-        extensionValue));
+    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false, extensionValue));
 
     // Extensions - 1.2.3.4.1 (demo-ca-extraInfo)
     list.add(createExtension(
@@ -1898,16 +1861,14 @@ public class ProfileConfCreatorDemo {
     // RC2-CBC keysize 128
     cap = new SMIMECapability();
     caps.getSMIMECapability().add(cap);
-    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"),
-        "RC2-CBC"));
+    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
     cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters());
     cap.getParameters().setInteger(BigInteger.valueOf(128));
 
     // RC2-CBC keysize 64
     cap = new SMIMECapability();
     caps.getSMIMECapability().add(cap);
-    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"),
-        "RC2-CBC"));
+    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
     cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters());
 
     Base64BinaryWithDescType binary = new Base64BinaryWithDescType();

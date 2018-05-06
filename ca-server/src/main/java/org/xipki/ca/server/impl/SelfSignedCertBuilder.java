@@ -207,16 +207,15 @@ class SelfSignedCertBuilder {
       List<String> deltaCrlUris, ConfPairs extraControl)
       throws OperationException {
 
-    SubjectPublicKeyInfo tmpPublicKeyInfo;
     try {
-      tmpPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
+      publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
     } catch (InvalidKeySpecException ex) {
       LOG.warn("SecurityUtil.toRfc3279Style", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }
 
     try {
-      certprofile.checkPublicKey(tmpPublicKeyInfo);
+      certprofile.checkPublicKey(publicKeyInfo);
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.checkPublicKey", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -252,7 +251,7 @@ class SelfSignedCertBuilder {
     X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject,
-        serialNumber, notBefore, notAfter, grantedSubject, tmpPublicKeyInfo);
+        serialNumber, notBefore, notAfter, grantedSubject, publicKeyInfo);
 
     PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, serialNumber, null, null,
         caCertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
@@ -268,7 +267,7 @@ class SelfSignedCertBuilder {
 
     try {
       addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, extensions,
-          tmpPublicKeyInfo, publicCaInfo, notBefore, notAfter);
+          publicKeyInfo, publicCaInfo, notBefore, notAfter);
 
       ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
       X509CertificateHolder certHolder;

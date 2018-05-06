@@ -508,8 +508,8 @@ public class X509Ca {
    * @throws OperationException
    *         if error occurs.
    */
-  public List<X509Certificate> getCertificate(X500Name subjectName,
-      byte[] transactionId) throws OperationException {
+  public List<X509Certificate> getCertificate(X500Name subjectName, byte[] transactionId)
+      throws OperationException {
     return certstore.getCertificate(subjectName, transactionId);
   }
 
@@ -527,8 +527,7 @@ public class X509Ca {
     return certstore.getCertWithRevocationInfo(caIdent, serialNumber, caIdNameMap);
   }
 
-  public byte[] getCertRequest(BigInteger serialNumber)
-      throws OperationException {
+  public byte[] getCertRequest(BigInteger serialNumber) throws OperationException {
     return certstore.getCertRequest(caIdent, serialNumber);
   }
 
@@ -741,8 +740,7 @@ public class X509Ca {
         crlIssuer = caInfo.getPublicCaInfo().getX500Subject();
       } else {
         directCrl = false;
-        crlIssuer = X500Name.getInstance(
-            tmpCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
+        crlIssuer = tmpCrlSigner.getBcCertificate().getSubject();
       }
 
       X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
@@ -816,8 +814,7 @@ public class X509Ca {
             }
             break;
           default:
-            throw new RuntimeException(
-                "unknown TripleState: " + crlControl.getInvalidityDateMode());
+            throw new RuntimeException("unknown TripleState " + crlControl.getInvalidityDateMode());
         }
 
         BigInteger serial = revInfo.getSerial();
@@ -1266,17 +1263,16 @@ public class X509Ca {
           "insufficient permission to revoke CA certificate");
     }
 
-    CrlReason tmpReason = reason;
-    if (tmpReason == null) {
-      tmpReason = CrlReason.UNSPECIFIED;
+    if (reason == null) {
+      reason = CrlReason.UNSPECIFIED;
     }
 
-    switch (tmpReason) {
+    switch (reason) {
       case CA_COMPROMISE:
       case AA_COMPROMISE:
       case REMOVE_FROM_CRL:
         throw new OperationException(ErrorCode.NOT_PERMITTED,
-            "Insufficient permission revoke certificate with reason " + tmpReason.getDescription());
+            "Insufficient permission revoke certificate with reason " + reason.getDescription());
       case UNSPECIFIED:
       case KEY_COMPROMISE:
       case AFFILIATION_CHANGED:
@@ -1286,7 +1282,7 @@ public class X509Ca {
       case PRIVILEGE_WITHDRAWN:
         break;
       default:
-        throw new RuntimeException("unknown CRL reason " + tmpReason);
+        throw new RuntimeException("unknown CRL reason " + reason);
     } // switch (reason)
 
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_cert, msgId);
@@ -1355,7 +1351,7 @@ public class X509Ca {
       } catch (RuntimeException ex) {
         singleSuccessful = false;
         LogUtil.warn(LOG, ex,
-            "could not remove certificate to the publisher " + publisher.getIdent());
+            "could not remove certificate from the publisher " + publisher.getIdent());
       }
 
       if (singleSuccessful) {
@@ -1521,9 +1517,8 @@ public class X509Ca {
           successful = publisher.certificateUnrevoked(caCert, unrevokedCert);
         } catch (RuntimeException ex) {
           successful = false;
-          LogUtil.error(LOG, ex,
-              "could not publish unrevocation of certificate to the publisher "
-              + publisher.getIdent());
+          LogUtil.error(LOG, ex, "could not publish unrevocation of certificate to the publisher "
+                                    + publisher.getIdent());
         }
 
         if (successful) {
@@ -1590,7 +1585,7 @@ public class X509Ca {
     }
 
     if (failed) {
-      final String message = "could not event caRevoked of CA " + caIdent
+      final String message = "could not publish event caRevoked of CA " + caIdent
           + " to at least one publisher";
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
     }

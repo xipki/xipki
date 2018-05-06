@@ -246,8 +246,8 @@ public class RestImpl implements Rest {
         CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
             notBefore, notAfter, extensions, profile);
 
-        CertificateInfo certInfo = ca.generateCertificate(certTemplate,
-            requestor, RequestType.REST, null, msgId);
+        CertificateInfo certInfo = ca.generateCertificate(certTemplate, requestor, RequestType.REST,
+            null, msgId);
 
         if (ca.getCaInfo().isSaveRequest()) {
           long dbId = ca.addRequest(encodedCsr);
@@ -327,8 +327,7 @@ public class RestImpl implements Rest {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
-        String strCrlNumber = httpRetriever.getParameter(
-            RestAPIConstants.PARAM_crl_number);
+        String strCrlNumber = httpRetriever.getParameter(RestAPIConstants.PARAM_crl_number);
         BigInteger crlNumber = null;
         if (StringUtil.isNotBlank(strCrlNumber)) {
           try {

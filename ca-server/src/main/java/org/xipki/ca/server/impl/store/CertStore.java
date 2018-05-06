@@ -118,9 +118,8 @@ public class CertStore {
   public boolean addCert(CertificateInfo certInfo) {
     ParamUtil.requireNonNull("certInfo", certInfo);
     try {
-      addCert(certInfo.getIssuer(), certInfo.getCert(),
-          certInfo.getSubjectPublicKey(), certInfo.getProfile(),
-          certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
+      addCert(certInfo.getIssuer(), certInfo.getCert(), certInfo.getSubjectPublicKey(),
+          certInfo.getProfile(), certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
           certInfo.getTransactionId(), certInfo.getRequestedSubject());
     } catch (Exception ex) {
       LOG.error("could not save certificate {}: {}. Message: {}",
@@ -135,8 +134,7 @@ public class CertStore {
 
   private void addCert(NameId ca, CertWithDbId certificate, byte[] encodedSubjectPublicKey,
       NameId certProfile, NameId requestor, Integer userId, RequestType reqType,
-      byte[] transactionId, X500Name reqSubject)
-      throws DataAccessException, OperationException {
+      byte[] transactionId, X500Name reqSubject) throws DataAccessException, OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("certificate", certificate);
     ParamUtil.requireNonNull("certProfile", certProfile);
@@ -666,8 +664,7 @@ public class CertStore {
     }
   }
 
-  public void removeCertificate(NameId ca, BigInteger serialNumber)
-      throws OperationException {
+  public void removeCertificate(NameId ca, BigInteger serialNumber) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 

@@ -97,8 +97,7 @@ class PendingCertificatePool {
     }
   }
 
-  CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId,
-      byte[] certHash) {
+  CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId, byte[] certHash) {
     ParamUtil.requireNonNull("transactionId", transactionId);
     ParamUtil.requireNonNull("certReqId", certReqId);
     ParamUtil.requireNonNull("certHash", certHash);

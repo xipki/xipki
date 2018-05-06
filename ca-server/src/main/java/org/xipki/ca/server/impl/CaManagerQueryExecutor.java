@@ -1085,15 +1085,15 @@ class CaManagerQueryExecutor {
           throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
         }
 
-        String tmpSignerType = (signerType == null ? rs.getString("SIGNER_TYPE") : signerType);
+        if (signerType == null) {
+          signerType = rs.getString("SIGNER_TYPE");
+        }
 
-        String tmpSignerConf;
         if (signerConf == null) {
-          tmpSignerConf = rs.getString("SIGNER_CONF");
+          signerConf = rs.getString("SIGNER_CONF");
         } else {
           signerConf = CaManagerImpl.canonicalizeSignerConf(
-              tmpSignerType, signerConf, null, securityFactory);
-          tmpSignerConf = signerConf;
+              signerType, signerConf, null, securityFactory);
         }
 
         // need the certificate to validity the signer
@@ -1110,9 +1110,9 @@ class CaManagerQueryExecutor {
         }
 
         try {
-          List<String[]> signerConfs = CaEntry.splitCaSignerConfs(tmpSignerConf);
+          List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
           for (String[] m : signerConfs) {
-            securityFactory.createSigner(tmpSignerType, new SignerConf(m[1]), tmpCert);
+            securityFactory.createSigner(signerType, new SignerConf(m[1]), tmpCert);
           }
         } catch (XiSecurityException | ObjectCreationException ex) {
           throw new CaMgmtException("could not create signer for CA '"
@@ -1349,8 +1349,7 @@ class CaManagerQueryExecutor {
     }
   }
 
-  RequestorEntryWrapper changeRequestor(NameId nameId, String base64Cert)
-      throws CaMgmtException {
+  RequestorEntryWrapper changeRequestor(NameId nameId, String base64Cert) throws CaMgmtException {
     ParamUtil.requireNonNull("nameId", nameId);
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
     requestor.setDbEntry(new RequestorEntry(nameId, base64Cert));
@@ -1359,9 +1358,8 @@ class CaManagerQueryExecutor {
     return requestor;
   } // method changeRequestor
 
-  ResponderEntryWrapper changeResponder(String name, String type, String conf,
-      String base64Cert, CaManagerImpl caManager, SecurityFactory securityFactory)
-      throws CaMgmtException {
+  ResponderEntryWrapper changeResponder(String name, String type, String conf, String base64Cert,
+      CaManagerImpl caManager, SecurityFactory securityFactory) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("caManager", caManager);
 
@@ -1457,8 +1455,8 @@ class CaManagerQueryExecutor {
     changeIfNotNull("ENVIRONMENT", col(STRING, "NAME", name), col(STRING, "VALUE2", value));
   } // method changeEnvParam
 
-  IdentifiedX509CertPublisher changePublisher(String name, String type,
-      String conf, CaManagerImpl caManager) throws CaMgmtException {
+  IdentifiedX509CertPublisher changePublisher(String name, String type, String conf,
+      CaManagerImpl caManager) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("caManager", caManager);
 
@@ -1522,8 +1520,7 @@ class CaManagerQueryExecutor {
       ps.setInt(1, caId);
       ps.setInt(2, profileId);
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException(
-            "could not remove profile " + profileName + " from CA " + caName);
+        throw new CaMgmtException("could not remove profile " + profileName + " from CA " + caName);
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -1806,8 +1803,7 @@ class CaManagerQueryExecutor {
       ps.setInt(1, caId);
       ps.setInt(2, id);
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException(
-            "could not remove user " + username + " from CA " + caName);
+        throw new CaMgmtException("could not remove user " + username + " from CA " + caName);
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);

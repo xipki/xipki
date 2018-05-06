@@ -196,8 +196,7 @@ class CertRepublisher {
   private ProcessLog processLog;
 
   CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertStore certstore,
-      List<IdentifiedX509CertPublisher> publishers, boolean onlyRevokedCerts,
-      int numThreads) {
+      List<IdentifiedX509CertPublisher> publishers, boolean onlyRevokedCerts, int numThreads) {
     this.ca = ParamUtil.requireNonNull("ca", ca);
     this.caCert = ParamUtil.requireNonNull("caCert", caCert);
     this.caIdNameMap = ParamUtil.requireNonNull("caIdNameMap", caIdNameMap);
