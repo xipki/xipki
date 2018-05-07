@@ -44,7 +44,7 @@ public class ScepEntry {
 
   private final String control;
 
-  private final String responderName;
+  private String responderName;
 
   public ScepEntry(String name, NameId caIdent, boolean active, String responderName,
       Set<String> certProfiles, String control) throws InvalidConfException {
@@ -71,6 +71,10 @@ public class ScepEntry {
 
   public String getControl() {
     return control;
+  }
+
+  public void setResponderName(String responderName) {
+    this.responderName = responderName;
   }
 
   public String getResponderName() {

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * TODO.
@@ -49,8 +50,8 @@ class CertBasedIdentityStore {
 
     for (CertBasedIdentityEntry existingEntry : entries) {
       if (existingEntry.getId() == entry.getId()) {
-        throw new IllegalArgumentException(String.format(
-            "%s with the same id %d already available", table, entry.getId()));
+        throw new IllegalArgumentException(StringUtil.concatObjects(table,
+            " with the same id ", entry.getId(), " already available"));
       }
     }
 

@@ -217,16 +217,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="EXPIRATION_PERIOD" type="SMALLINT" defaultValueNumeric="365" />
-      <column name="REV" type="SMALLINT" defaultValueNumeric="0"
-          remarks="whether the certificate is revoked">
-        <constraints nullable="false"/>
-      </column>
-      <column name="RR" type="SMALLINT"
-          remarks="revocation reason"/>
-      <column name="RT"  type="BIGINT"
-          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="RIT" type="BIGINT"
-          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="REV_INFO" type="varchar(200)" remarks="CA revocation information"/>
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>

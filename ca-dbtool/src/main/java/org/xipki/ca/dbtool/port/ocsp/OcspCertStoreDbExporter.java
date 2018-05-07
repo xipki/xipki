@@ -159,7 +159,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     System.out.println("exporting table ISSUER");
     Issuers issuers = new Issuers();
     certstore.setIssuers(issuers);
-    final String sql = "SELECT ID,CERT,REV,RR,RT,RIT FROM ISSUER";
+    final String sql = "SELECT ID,CERT,REV_INFO FROM ISSUER";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -181,19 +181,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         String certFileName = issuerCertsDir + "/cert-issuer-" + id;
         IoUtil.save(new File(baseDir, certFileName), cert.getBytes("UTF-8"));
         issuer.setCertFile(certFileName);
-
-        boolean revoked = rs.getBoolean("REV");
-        issuer.setRevoked(revoked);
-        if (revoked) {
-          int revReason = rs.getInt("RR");
-          long revTime = rs.getLong("RT");
-          long revInvalidityTime = rs.getLong("RIT");
-          issuer.setRevReason(revReason);
-          issuer.setRevTime(revTime);
-          if (revInvalidityTime != 0) {
-            issuer.setRevInvTime(revInvalidityTime);
-          }
-        }
+        issuer.setRevInfo(rs.getString("REV_INFO"));
 
         issuers.getIssuer().add(issuer);
       }

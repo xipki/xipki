@@ -215,10 +215,7 @@
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="expirationPeriod" type="xs:int"/>
       <xs:element name="keepExpiredCertDays" type="xs:int"/>
-      <xs:element name="revoked" type="xs:boolean"/>
-      <xs:element name="revReason" type="xs:int" minOccurs="0"/>
-      <xs:element name="revTime" type="xs:long" minOccurs="0"/>
-      <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="revInfo" type="xs:string" minOccurs="0"/>
       <xs:element name="validityMode" type="xs:string" minOccurs="0"/>
       <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
     </xs:sequence>

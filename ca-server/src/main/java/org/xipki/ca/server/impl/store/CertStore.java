@@ -100,7 +100,7 @@ public class CertStore {
 
   private final UniqueIdGenerator idGenerator;
 
-  private final SQLs sqls;
+  private final StoreSqls sqls;
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
       throws DataAccessException {
@@ -108,11 +108,9 @@ public class CertStore {
     this.idGenerator = ParamUtil.requireNonNull("idGenerator", idGenerator);
 
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-    String str = dbSchemaInfo.variableValue("VERSION");
-    this.dbSchemaVersion = Integer.parseInt(str);
-    str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
-    this.maxX500nameLen = Integer.parseInt(str);
-    this.sqls = new SQLs(datasource);
+    this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
+    this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
+    this.sqls = new StoreSqls(datasource);
   } // constructor
 
   public boolean addCert(CertificateInfo certInfo) {
@@ -141,11 +139,10 @@ public class CertStore {
     ParamUtil.requireNonNull("requestor", requestor);
 
     long certId = idGenerator.nextId();
-    X509Certificate cert = certificate.getCert();
 
     long fpPk = FpIdCalculator.hash(encodedSubjectPublicKey);
     String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
-    long fpSubject = X509Util.fpCanonicalizedName(cert.getSubjectX500Principal());
+    long fpSubject = X509Util.fpCanonicalizedName(certificate.getSubjectAsX500Name());
 
     String reqSubjectText = null;
     Long fpReqSubject = null;
@@ -163,7 +160,8 @@ public class CertStore {
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
     Connection conn = null;
-    PreparedStatement[] pss = borrowPreparedStatements(SQLs.SQL_ADD_CERT, SQLs.SQL_ADD_CRAW);
+    PreparedStatement[] pss =
+        borrowPreparedStatements(StoreSqls.SQL_ADD_CERT, StoreSqls.SQL_ADD_CRAW);
 
     try {
       PreparedStatement psAddcert = pss[0];
@@ -171,6 +169,7 @@ public class CertStore {
       conn = psAddcert.getConnection();
 
       // cert
+      X509Certificate cert = certificate.getCert();
       int idx = 2;
       psAddcert.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
       psAddcert.setString(idx++, cert.getSerialNumber().toString(16));
@@ -208,13 +207,13 @@ public class CertStore {
 
       String sql = null;
       try {
-        sql = SQLs.SQL_ADD_CERT;
+        sql = StoreSqls.SQL_ADD_CERT;
         psAddcert.executeUpdate();
 
-        sql = SQLs.SQL_ADD_CRAW;
+        sql = StoreSqls.SQL_ADD_CRAW;
         psAddRawcert.executeUpdate();
 
-        sql = "(commit add cert to CA certstore)";
+        sql = "(commit adding cert to CA certstore)";
         conn.commit();
       } catch (Throwable th) {
         conn.rollback();
@@ -251,7 +250,7 @@ public class CertStore {
       throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = SQLs.SQL_INSERT_PUBLISHQUEUE;
+    final String sql = StoreSqls.SQL_INSERT_PUBLISHQUEUE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, publisher.getId());
@@ -266,7 +265,7 @@ public class CertStore {
   }
 
   public void removeFromPublishQueue(NameId publisher, long certId) throws OperationException {
-    final String sql = SQLs.SQL_REMOVE_PUBLISHQUEUE;
+    final String sql = StoreSqls.SQL_REMOVE_PUBLISHQUEUE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, publisher.getId());
@@ -282,7 +281,7 @@ public class CertStore {
   public long getMaxIdOfDeltaCrlCache(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = SQLs.SQL_MAXID_DELTACRL_CACHE;
+    final String sql = StoreSqls.SQL_MAXID_DELTACRL_CACHE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, ca.getId());
@@ -299,7 +298,7 @@ public class CertStore {
   }
 
   public void clearDeltaCrlCache(NameId ca, long maxId) throws OperationException {
-    final String sql = SQLs.SQL_CLEAR_DELTACRL_CACHE;
+    final String sql = StoreSqls.SQL_CLEAR_DELTACRL_CACHE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, maxId + 1);
@@ -350,7 +349,7 @@ public class CertStore {
   public long getMaxCrlNumber(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = SQLs.SQL_MAX_CRLNO;
+    final String sql = StoreSqls.SQL_MAX_CRLNO;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
@@ -371,7 +370,7 @@ public class CertStore {
   public Long getThisUpdateOfCurrentCrl(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = SQLs.SQL_MAX_THISUPDAATE_CRL;
+    final String sql = StoreSqls.SQL_MAX_THISUPDAATE_CRL;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
@@ -424,7 +423,7 @@ public class CertStore {
       baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
     }
 
-    final String sql = SQLs.SQL_ADD_CRL;
+    final String sql = StoreSqls.SQL_ADD_CRL;
     long currentMaxCrlId;
     try {
       currentMaxCrlId = datasource.getMax(null, "CRL", "ID");
@@ -497,7 +496,7 @@ public class CertStore {
       invTimeSeconds = revInfo.getInvalidityTime().getTime() / 1000;
     }
 
-    PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_CERT);
+    PreparedStatement ps = borrowPreparedStatement(StoreSqls.SQL_REVOKE_CERT);
     try {
       int idx = 1;
       ps.setLong(idx++, System.currentTimeMillis() / 1000);
@@ -516,7 +515,7 @@ public class CertStore {
       }
     } catch (SQLException ex) {
       throw new OperationException(DB_FAILURE,
-          datasource.translate(SQLs.SQL_REVOKE_CERT, ex).getMessage());
+          datasource.translate(StoreSqls.SQL_REVOKE_CERT, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -556,7 +555,7 @@ public class CertStore {
           + CrlReason.CERTIFICATE_HOLD.getDescription());
     }
 
-    PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_SUSPENDED_CERT);
+    PreparedStatement ps = borrowPreparedStatement(StoreSqls.SQL_REVOKE_SUSPENDED_CERT);
     try {
       int idx = 1;
       ps.setLong(idx++, System.currentTimeMillis() / 1000);
@@ -572,7 +571,7 @@ public class CertStore {
       }
     } catch (SQLException ex) {
       throw new OperationException(DB_FAILURE,
-          datasource.translate(SQLs.SQL_REVOKE_CERT, ex).getMessage());
+          datasource.translate(StoreSqls.SQL_REVOKE_CERT, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -593,8 +592,10 @@ public class CertStore {
     CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca, serialNumber, idNamMap);
     if (certWithRevInfo == null) {
-      LOG.warn("certificate with CA={} and serialNumber={} does not exist",
-          ca.getName(), LogUtil.formatCsn(serialNumber));
+      if (LOG.isWarnEnabled()) {
+        LOG.warn("certificate with CA={} and serialNumber={} does not exist",
+            ca.getName(), LogUtil.formatCsn(serialNumber));
+      }
       return null;
     }
 
@@ -648,7 +649,7 @@ public class CertStore {
       throws OperationException {
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    final String sql = SQLs.SQL_ADD_DELTACRL_CACHE;
+    final String sql = StoreSqls.SQL_ADD_DELTACRL_CACHE;
     PreparedStatement ps = null;
     try {
       long id = idGenerator.nextId();
@@ -668,7 +669,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    final String sql = SQLs.SQL_REMOVE_CERT;
+    final String sql = StoreSqls.SQL_REMOVE_CERT;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
@@ -1842,7 +1843,7 @@ public class CertStore {
   } // method getNotBeforeOfFirstCertStartsWithCommonName
 
   public void deleteUnreferencedRequests() throws OperationException {
-    final String sql = SQLs.SQL_DELETE_UNREFERENCED_REQUEST;
+    final String sql = StoreSqls.SQL_DELETE_UNREFERENCED_REQUEST;
     PreparedStatement ps = borrowPreparedStatement(sql);
     ResultSet rs = null;
     try {
@@ -1860,7 +1861,7 @@ public class CertStore {
     long id = idGenerator.nextId();
     long currentTimeSeconds = System.currentTimeMillis() / 1000;
     String b64Request = Base64.encodeToString(request);
-    final String sql = SQLs.SQL_ADD_REQUEST;
+    final String sql = StoreSqls.SQL_ADD_REQUEST;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, id);
@@ -1877,7 +1878,7 @@ public class CertStore {
   }
 
   public void addRequestCert(long requestId, long certId) throws OperationException {
-    final String sql = SQLs.SQL_ADD_REQCERT;
+    final String sql = StoreSqls.SQL_ADD_REQCERT;
     long id = idGenerator.nextId();
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {

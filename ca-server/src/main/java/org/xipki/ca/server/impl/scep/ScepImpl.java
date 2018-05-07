@@ -124,13 +124,13 @@ public class ScepImpl implements Scep {
 
   private final CaManagerImpl caManager;
 
-  private final PrivateKey responderKey;
-
-  private final X509Certificate responderCert;
-
   private final CaCaps caCaps;
 
-  private final EnvelopedDataDecryptor envelopedDataDecryptor;
+  private PrivateKey responderKey;
+
+  private X509Certificate responderCert;
+
+  private EnvelopedDataDecryptor envelopedDataDecryptor;
 
   private X509Cert caCert;
 
@@ -171,29 +171,39 @@ public class ScepImpl implements Scep {
       throw new CaMgmtException("Unknown responder " + responderName);
     }
 
-    ConcurrentContentSigner signer = responder.getSigner();
-
-    Key signingKey = signer.getSigningKey();
-    if (!(signingKey instanceof PrivateKey)) {
-      throw new CaMgmtException("Unsupported signer type: the signing key is not a PrivateKey");
-    }
-    this.responderKey = (PrivateKey) signingKey;
-    this.responderCert = signer.getCertificate();
-
-    if (!(responderCert.getPublicKey() instanceof RSAPublicKey)) {
-      throw new IllegalArgumentException("The responder key is not RSA key for SCEP " + name);
-    }
-
     // CACaps
     CaCaps caps = new CaCaps();
     caps.addCapabilities(CaCapability.AES, CaCapability.DES3, CaCapability.POSTPKIOperation,
         CaCapability.Renewal, CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512);
     this.caCaps = caps;
 
-    EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
-        responderKey);
-    this.envelopedDataDecryptor = new EnvelopedDataDecryptor(di);
+    setResponder(responder);
+  }
 
+  public void setResponder(ResponderEntryWrapper responder) throws CaMgmtException {
+    if (responder == null) {
+      this.responderKey = null;
+      this.responderCert = null;
+      this.envelopedDataDecryptor = null;
+      return;
+    }
+
+    ConcurrentContentSigner signer = responder.getSigner();
+
+    Key signingKey = signer.getSigningKey();
+    if (!(signingKey instanceof PrivateKey)) {
+      throw new CaMgmtException("Unsupported signer type: the signing key is not a PrivateKey");
+    }
+
+    if (!(signer.getCertificate().getPublicKey() instanceof RSAPublicKey)) {
+      throw new IllegalArgumentException("The responder key is not RSA key for SCEP " + name);
+    }
+
+    this.responderKey = (PrivateKey) signingKey;
+    this.responderCert = signer.getCertificate();
+    this.envelopedDataDecryptor =
+        new EnvelopedDataDecryptor(
+            new EnvelopedDataDecryptorInstance(responderCert, responderKey));
   }
 
   /**

@@ -26,7 +26,7 @@ import org.xipki.datasource.DataSourceWrapper;
  */
 
 // CHECKSTYLE:SKIP
-class SQLs {
+class MgmtSqls {
 
   final String sqlSelectProfileId;
   final String sqlSelectProfile;
@@ -45,7 +45,7 @@ class SQLs {
   final String sqlSelectUserId;
   final String sqlSelectUser;
 
-  SQLs(DataSourceWrapper datasource) {
+  MgmtSqls(DataSourceWrapper datasource) {
     this.sqlSelectProfileId = datasource.buildSelectFirstSql(1,
         "ID FROM PROFILE WHERE NAME=?");
 
@@ -80,7 +80,7 @@ class SQLs {
         "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
         + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
         + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
-        + ",EXPIRATION_PERIOD,REV,RR,RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
+        + ",EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
         + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
 
     this.sqlNextSelectCrlNo = datasource.buildSelectFirstSql(1,

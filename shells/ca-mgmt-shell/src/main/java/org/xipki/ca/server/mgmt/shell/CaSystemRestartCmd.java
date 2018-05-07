@@ -53,7 +53,7 @@ public class CaSystemRestartCmd extends CaAction {
     sb.append("  inactive CAs:\n");
     printCaNames(sb, caManager.getInactiveCaNames(), prefix);
 
-    println(sb.toString());
+    print(sb.toString());
     return null;
   } // method execute0
 

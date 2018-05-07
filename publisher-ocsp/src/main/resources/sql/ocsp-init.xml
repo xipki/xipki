@@ -66,14 +66,7 @@
           remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="0" name="REV" type="SMALLINT"
-          remarks="whether the certificate is revoked"/>
-      <column name="RR" type="SMALLINT"
-          remarks="revocation reason"/>
-      <column name="RT"  type="BIGINT"
-          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="RIT" type="BIGINT"
-          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="REV_INFO" type="varchar(200)" remarks="CA revocation information"/>
       <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>

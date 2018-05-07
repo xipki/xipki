@@ -19,6 +19,7 @@ package org.xipki.security;
 
 import java.util.Date;
 
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
@@ -95,6 +96,29 @@ public class CertRevocationInfo {
   public String toString() {
     return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime,
         "\ninvalidityTime: ", invalidityTime);
+  }
+
+  public static CertRevocationInfo fromEncoded(String encoded) {
+    ConfPairs pairs = new ConfPairs(encoded);
+    CrlReason reason = CrlReason.forNameOrText(pairs.value("reason"));
+    Date revocationTime = new Date(1000L * Long.parseLong(pairs.value("revocationTime")));
+    String str = pairs.value("invalidityTime");
+    Date invalidityTime = null;
+    if (str != null) {
+      invalidityTime = new Date(1000L * Long.parseLong(pairs.value("invalidityTime")));
+    }
+
+    return new CertRevocationInfo(reason, revocationTime, invalidityTime);
+  }
+
+  public String getEncoded() {
+    ConfPairs pairs = new ConfPairs();
+    pairs.putPair("reason", reason.getDescription());
+    pairs.putPair("revocationTime", Long.toString(revocationTime.getTime() / 1000));
+    if (invalidityTime != null) {
+      pairs.putPair("invalidityTime", Long.toString(invalidityTime.getTime() / 1000));
+    }
+    return pairs.getEncoded();
   }
 
 }

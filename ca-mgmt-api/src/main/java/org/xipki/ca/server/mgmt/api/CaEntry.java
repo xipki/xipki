@@ -276,9 +276,9 @@ public class CaEntry {
 
     String revInfoText = "";
     if (revocationInfo != null) {
-      StringUtil.concatObjectsCap(30,
-          "\treason: ", revocationInfo.getReason().getDescription(),
-          "\n\trevoked at ", revocationInfo.getRevocationTime(), "\n");
+      revInfoText = StringUtil.concatObjectsCap(30,
+          "\n\treason: ", revocationInfo.getReason().getDescription(),
+          "\n\trevoked at ", revocationInfo.getRevocationTime());
     }
 
     return StringUtil.concatObjectsCap(1500,
@@ -304,7 +304,7 @@ public class CaEntry {
         "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(caCertUris),
         "\ncert: \n", InternUtil.formatCert(cert, verbose),
         "\ncrlSignerName: ", crlSignerName,
-        "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), "\n",
+        "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"),
         revInfoText);
   } // method toString
 
@@ -552,7 +552,7 @@ public class CaEntry {
     }
     StringBuilder sb = new StringBuilder();
     for (String uri : uris) {
-      sb.append("\n    ").append(uri);
+      sb.append("\n\t").append(uri);
     }
     return sb.toString();
   }

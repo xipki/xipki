@@ -290,10 +290,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
       ps.setLong(idx++, cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
       ps.setLong(idx++, cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
-      setBoolean(ps, idx++, ca.isRevoked());
-      setInt(ps, idx++, ca.getRevReason());
-      setLong(ps, idx++, ca.getRevTime());
-      setLong(ps, idx++, ca.getRevInvTime());
+      ps.setString(idx++, ca.getRevInfo());
       ps.setString(idx++, Base64.encodeToString(encodedCert));
 
       ps.execute();

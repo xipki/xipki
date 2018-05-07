@@ -397,7 +397,7 @@ class CaConfigurationDbExporter extends DbPorter {
     Cas cas = new Cas();
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,"
         + "SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
-        + "REV,RR,RT,RIT,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,VALIDITY_MODE,"
+        + "REV_INFO,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,VALIDITY_MODE,"
         + "CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMPCONTROL_NAME,EXTRA_CONTROL FROM CA";
 
     Statement stmt = null;
@@ -437,14 +437,7 @@ class CaConfigurationDbExporter extends DbPorter {
         ca.setValidityMode(rs.getString("VALIDITY_MODE"));
         ca.setExtraControl(rs.getString("EXTRA_CONTROL"));
         ca.setNumCrls(rs.getInt("NUM_CRLS"));
-
-        boolean revoked = rs.getBoolean("REV");
-        ca.setRevoked(revoked);
-        if (revoked) {
-          ca.setRevReason(rs.getInt("RR"));
-          ca.setRevTime(rs.getLong("RT"));
-          ca.setRevInvTime(rs.getLong("RIT"));
-        }
+        ca.setRevInfo(rs.getString("REV_INFO"));
 
         cas.getCa().add(ca);
       }

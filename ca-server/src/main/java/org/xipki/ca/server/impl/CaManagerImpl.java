@@ -1793,6 +1793,17 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
+    for (String scepName : scepDbEntries.keySet()) {
+      ScepEntry scep = scepDbEntries.get(scepName);
+      if (name.equals(scep.getResponderName())) {
+        scep.setResponderName(null);
+        ScepImpl scepImpl = sceps.get(scepName);
+        if (scepImpl != null) {
+          scepImpl.setResponder(null);
+        }
+      }
+    }
+
     responderDbEntries.remove(name);
     responders.remove(name);
     LOG.info("removed Responder '{}'", name);
@@ -1818,6 +1829,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     responderDbEntries.remove(name);
     responderDbEntries.put(name, newResponder.getDbEntry());
     responders.put(name, newResponder);
+
+    for (ScepImpl scep : sceps.values()) {
+      if (name.equals(scep.getDbEntry().getResponderName())) {
+        scep.setResponder(newResponder);
+      }
+    }
   } // method changeResponder
 
   @Override

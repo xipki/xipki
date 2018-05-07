@@ -99,11 +99,11 @@ class CaManagerQueryExecutor {
 
   private final DataSourceWrapper datasource;
 
-  private final SQLs sqls;
+  private final MgmtSqls sqls;
 
   CaManagerQueryExecutor(DataSourceWrapper datasource) {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-    this.sqls = new SQLs(datasource);
+    this.sqls = new MgmtSqls(datasource);
   }
 
   private X509Certificate generateCert(String b64Cert) throws CaMgmtException {
@@ -470,15 +470,6 @@ class CaManagerQueryExecutor {
       String crlUris = rs.getString("CRL_URIS");
       String deltaCrlUris = rs.getString("DELTACRL_URIS");
 
-      CertRevocationInfo revocationInfo = null;
-      boolean revoked = rs.getBoolean("REV");
-      if (revoked) {
-        long revInvalidityTime = rs.getInt("RIT");
-        Date revInvTime = (revInvalidityTime == 0) ? null : new Date(revInvalidityTime * 1000);
-        revocationInfo = new CertRevocationInfo(rs.getInt("RR"), new Date(rs.getInt("RT") * 1000),
-            revInvTime);
-      }
-
       List<String> tmpCrlUris = null;
       if (StringUtil.isNotBlank(crlUris)) {
         tmpCrlUris = StringUtil.splitByComma(crlUris);
@@ -535,7 +526,12 @@ class CaManagerQueryExecutor {
       entry.setDuplicateSubjectPermitted((rs.getInt("DUPLICATE_SUBJECT") != 0));
       entry.setSaveRequest((rs.getInt("SAVE_REQ") != 0));
       entry.setPermission(rs.getInt("PERMISSION"));
+
+      String revInfo = rs.getString("REV_INFO");
+      CertRevocationInfo revocationInfo = (revInfo == null)
+          ? null : CertRevocationInfo.fromEncoded(revInfo);
       entry.setRevocationInfo(revocationInfo);
+
       String validityModeS = rs.getString("VALIDITY_MODE");
       entry.setValidityMode(validityModeS == null
           ? ValidityMode.STRICT : ValidityMode.forName(validityModeS));
@@ -1578,20 +1574,12 @@ class CaManagerQueryExecutor {
   void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     ParamUtil.requireNonBlank("caName", caName);
     ParamUtil.requireNonNull("revocationInfo", revocationInfo);
-    String sql = "UPDATE CA SET REV=?,RR=?,RT=?,RIT=? WHERE NAME=?";
+    String sql = "UPDATE CA SET REV_INFO=? WHERE NAME=?";
     PreparedStatement ps = null;
     try {
-      if (revocationInfo.getInvalidityTime() == null) {
-        revocationInfo.setInvalidityTime(revocationInfo.getRevocationTime());
-      }
-
       ps = prepareStatement(sql);
-      int idx = 1;
-      setBoolean(ps, idx++, true);
-      ps.setInt(idx++, revocationInfo.getReason().getCode());
-      ps.setLong(idx++, revocationInfo.getRevocationTime().getTime() / 1000);
-      ps.setLong(idx++, revocationInfo.getInvalidityTime().getTime() / 1000);
-      ps.setString(idx++, caName);
+      ps.setString(1, revocationInfo.getEncoded());
+      ps.setString(2, caName);
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not revoke CA " + caName);
       }
@@ -1646,16 +1634,12 @@ class CaManagerQueryExecutor {
     ParamUtil.requireNonBlank("caName", caName);
     LOG.info("Unrevoking of CA '{}'", caName);
 
-    final String sql = "UPDATE CA SET REV=?,RR=?,RT=?,RIT=? WHERE NAME=?";
+    final String sql = "UPDATE CA SET REV_INFO=? WHERE NAME=?";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
-      int idx = 1;
-      setBoolean(ps, idx++, false);
-      ps.setNull(idx++, Types.INTEGER);
-      ps.setNull(idx++, Types.INTEGER);
-      ps.setNull(idx++, Types.INTEGER);
-      ps.setString(idx++, caName);
+      ps.setNull(1, Types.VARCHAR);
+      ps.setString(2, caName);
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not unrevoke CA " + caName);
       }

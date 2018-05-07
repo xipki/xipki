@@ -30,8 +30,7 @@ import org.xipki.datasource.DataSourceWrapper;
  * @since 2.2.0
  */
 
-// CHECKSTYLE:SKIP
-class SQLs {
+class StoreSqls {
 
   static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
@@ -145,7 +144,7 @@ class SQLs {
 
   private final LruCache<Integer, String> cacheSqlSerialsRevoked = new LruCache<>(5);
 
-  SQLs(DataSourceWrapper datasource) {
+  StoreSqls(DataSourceWrapper datasource) {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
     this.sqlCaHasCrl = datasource.buildSelectFirstSql(1,

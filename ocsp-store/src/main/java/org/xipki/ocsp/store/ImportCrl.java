@@ -332,49 +332,28 @@ public class ImportCrl {
     sql = null;
     try {
       // issuer exists
+      int offset = 1;
       if (addNew) {
         int maxId = (int) datasource.getMax(conn, "ISSUER", "ID");
         issuerId = maxId + 1;
 
-        sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV,RT,RIT,CRL_INFO)"
-            + " VALUES(?,?,?,?,?,?,?,?,?,?)";
-      } else {
-        sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,CRL_INFO=? WHERE ID=?";
-      }
-
-      ps = datasource.prepareStatement(conn, sql);
-
-      int offset = 1;
-
-      if (addNew) {
+        sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO,CRL_INFO)"
+            + " VALUES(?,?,?,?,?,?,?,?)";
+        ps = datasource.prepareStatement(conn, sql);
         String subject = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
+
         ps.setInt(offset++, issuerId);
         ps.setString(offset++, subject);
         ps.setLong(offset++, caCert.getNotBefore().getTime() / 1000);
         ps.setLong(offset++, caCert.getNotAfter().getTime() / 1000);
         ps.setString(offset++, fpCaCert);
         ps.setString(offset++, Base64.encodeToString(encodedCaCert));
-      }
-
-      ps.setInt(offset++, (caRevInfo == null) ? 0 : 1);
-      Date revTime = null;
-      Date revInvTime = null;
-      if (caRevInfo != null) {
-        revTime = caRevInfo.getRevocationTime();
-        revInvTime = caRevInfo.getInvalidityTime();
-      }
-
-      if (revTime != null) {
-        ps.setLong(offset++, revTime.getTime() / 1000);
       } else {
-        ps.setNull(offset++, Types.BIGINT);
+        sql = "UPDATE ISSUER SET REV_INFO=?,CRL_INFO=? WHERE ID=?";
+        ps = datasource.prepareStatement(conn, sql);
       }
 
-      if (revInvTime != null) {
-        ps.setLong(offset++, revInvTime.getTime() / 1000);
-      } else {
-        ps.setNull(offset++, Types.BIGINT);
-      }
+      ps.setString(offset++, (caRevInfo == null) ? null : caRevInfo.getEncoded());
 
       // CRL info
       try {

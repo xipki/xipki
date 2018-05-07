@@ -37,8 +37,8 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
   protected static final String MSG_CERTS_FINISHED = "certs.finished";
 
   protected static final String SQL_ADD_ISSUER =
-      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV,RR,RT,RIT,CERT) "
-      + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV_INFO,CERT) "
+      + "VALUES (?,?,?,?,?,?,?)";
 
   protected static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN,HASH,SUBJECT)"

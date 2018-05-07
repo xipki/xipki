@@ -361,8 +361,8 @@ class CaConfigurationDbImporter extends DbPorter {
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
         + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
-        + "REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
+        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -399,10 +399,7 @@ class CaConfigurationDbImporter extends DbPorter {
           ps.setInt(idx++, tmpNumCrls);
           ps.setInt(idx++, ca.getExpirationPeriod());
           ps.setInt(idx++, ca.getKeepExpiredCertDays());
-          setBoolean(ps, idx++, ca.isRevoked());
-          setInt(ps, idx++, ca.getRevReason());
-          setLong(ps, idx++, ca.getRevTime());
-          setLong(ps, idx++, ca.getRevInvTime());
+          ps.setString(idx++, ca.getRevInfo());
           ps.setString(idx++, ca.getValidityMode());
           ps.setString(idx++, ca.getExtraControl());
           ps.setString(idx++, value(ca.getSignerConf()));

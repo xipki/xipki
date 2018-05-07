@@ -26,7 +26,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,9 +33,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.CertWithDbId;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -358,23 +357,13 @@ class OcspStoreQueryExecutor {
     ParamUtil.requireNonNull("caCert", caCert);
     ParamUtil.requireNonNull("revInfo", revInfo);
 
-    Date revocationTime = revInfo.getRevocationTime();
-    Date invalidityTime = revInfo.getInvalidityTime();
-    if (invalidityTime == null) {
-      invalidityTime = revocationTime;
-    }
-
     int issuerId = getIssuerId(caCert);
-    final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+    final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
-      int idx = 1;
-      setBoolean(ps, idx++, true);
-      ps.setLong(idx++, revocationTime.getTime() / 1000);
-      ps.setLong(idx++, invalidityTime.getTime() / 1000);
-      ps.setInt(idx++, revInfo.getReason().getCode());
-      ps.setInt(idx++, issuerId);
+      ps.setString(1, revInfo.getEncoded());
+      ps.setInt(2, issuerId);
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
@@ -385,16 +374,12 @@ class OcspStoreQueryExecutor {
 
   void unrevokeCa(X509Cert caCert) throws DataAccessException {
     int issuerId = getIssuerId(caCert);
-    final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+    final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
-      int idx = 1;
-      setBoolean(ps, idx++, false);
-      ps.setNull(idx++, Types.INTEGER);
-      ps.setNull(idx++, Types.INTEGER);
-      ps.setNull(idx++, Types.INTEGER);
-      ps.setInt(idx++, issuerId);
+      ps.setNull(1, Types.VARCHAR);
+      ps.setInt(2, issuerId);
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

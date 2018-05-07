@@ -142,7 +142,7 @@ public class DbCertStatusStore extends OcspStore {
     storeUpdateInProcess.set(true);
     try {
       if (initialized) {
-        final String sql = "SELECT ID,REV,RT,S1C FROM ISSUER";
+        final String sql = "SELECT ID,REV_INFO,S1C FROM ISSUER";
         PreparedStatement ps = preparedStatement(sql);
         ResultSet rs = null;
 
@@ -157,8 +157,12 @@ public class DbCertStatusStore extends OcspStore {
             }
 
             int id = rs.getInt("ID");
-            boolean revoked = rs.getBoolean("REV");
-            Long revTimeMs = revoked ? rs.getLong("RT") * 1000 : null;
+            Long revTimeMs = null;
+            String str = rs.getString("REV_INFO");
+            if (str != null) {
+              CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
+              revTimeMs = revInfo.getRevocationTime().getTime();
+            }
             SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
             newIssuers.put(id, issuerEntry);
           }
@@ -190,7 +194,7 @@ public class DbCertStatusStore extends OcspStore {
         }
       } // end if(initialized)
 
-      final String sql = "SELECT ID,NBEFORE,REV,RT,S1C,CERT,CRL_INFO FROM ISSUER";
+      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT,CRL_INFO FROM ISSUER";
       PreparedStatement ps = preparedStatement(sql);
 
       ResultSet rs = null;
@@ -222,10 +226,10 @@ public class DbCertStatusStore extends OcspStore {
             }
           }
 
-          boolean revoked = rs.getBoolean("REV");
-          if (revoked) {
-            long lo = rs.getLong("RT");
-            caInfoEntry.setRevocationInfo(new Date(lo * 1000));
+          String str = rs.getString("REV_INFO");
+          if (str != null) {
+            CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
+            caInfoEntry.setRevocationInfo(revInfo.getRevocationTime());
           }
 
           caInfos.add(caInfoEntry);
