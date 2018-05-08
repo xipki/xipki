@@ -75,22 +75,22 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertValidity.Unit;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
-import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisher;
+import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.Rest;
 import org.xipki.ca.server.api.Scep;
-import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.impl.SelfSignedCertBuilder.GenerateSelfSignedResult;
+import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
-import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
 import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertStore;
@@ -126,10 +126,11 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
 import org.xipki.ca.server.mgmt.api.conf.SingleCaConf;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CmpcontrolType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
@@ -142,7 +143,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -3558,7 +3558,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           }
 
           CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
-          X509CaInfoType ciJaxb = new X509CaInfoType();
+          CaInfoType ciJaxb = new CaInfoType();
           ciJaxb.setCacertUris(createStrings(entry.getCaCertUris()));
           byte[] certBytes;
           try {
@@ -3607,8 +3607,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setStatus(entry.getStatus().getStatus());
           ciJaxb.setValidityMode(entry.getValidityMode().name());
 
-          jaxb.setCaInfo(new CaType.CaInfo());
-          jaxb.getCaInfo().setX509Ca(ciJaxb);
+          jaxb.setCaInfo(ciJaxb);
 
           list.add(jaxb);
         }

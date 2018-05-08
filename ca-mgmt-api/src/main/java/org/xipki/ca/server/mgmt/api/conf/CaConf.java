@@ -82,7 +82,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -332,7 +332,7 @@ public class CaConf {
         CaEntry caEntry = null;
 
         if (m.getCaInfo() != null) {
-          X509CaInfoType ci = m.getCaInfo().getX509Ca();
+          CaInfoType ci = m.getCaInfo();
           if (ci.getGenSelfIssued() != null) {
             String certFilename = null;
             if (ci.getCert() != null) {

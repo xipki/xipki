@@ -184,13 +184,7 @@
   </xs:complexType>
   <xs:complexType name="caType">
     <xs:all>
-      <xs:element name="caInfo" minOccurs="0">
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="x509Ca" type="x509CaInfoType" minOccurs="0"/>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="caInfo" type="caInfoType" minOccurs="0"/>
       <xs:element name="aliases" type="stringsType" minOccurs="0"/>
       <xs:element name="profiles" type="stringsType" minOccurs="0"/>
       <xs:element name="requestors" minOccurs="0">
@@ -218,7 +212,7 @@
       <xs:element name="serialNumber" type="xs:string" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
-  <xs:complexType name="x509CaInfoType">
+  <xs:complexType name="caInfoType">
     <xs:all>
       <!-- general CA configuration -->
       <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>

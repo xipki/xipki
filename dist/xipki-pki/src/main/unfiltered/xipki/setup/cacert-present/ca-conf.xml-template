@@ -98,32 +98,30 @@
   <cas>
     <ca name="myca1">
       <caInfo>
-        <x509Ca>
-          <cmpcontrolName>cmpcontrol1</cmpcontrolName>
-          <crlsignerName>casign-crlsigner</crlsignerName>
-          <duplicateKey>true</duplicateKey>
-          <duplicateSubject>true</duplicateSubject>
-          <expirationPeriod>365</expirationPeriod>
-          <keepExpiredCertDays>-1</keepExpiredCertDays>
-          <permission>255</permission>
-          <maxValidity>10y</maxValidity>
-          <responderName>responder1</responderName>
-          <saveReq>false</saveReq>
-          <signerType>${token.type}</signerType>
-          <signerConf>
-            <value>${ca.signerConf}</value>
-          </signerConf>
-          <status>active</status>
-          <validityMode>cutoff</validityMode>
-          <crlUris>
-            <str>http://ca.example.org/crl</str>
-          </crlUris>
-          <ocspUris>
-            <str>http://localhost:8080/ocsp/responder1</str>
-          </ocspUris>
-          <nextCrlNo>2</nextCrlNo>
-          <snSize>63</snSize>
-        </x509Ca>
+        <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+        <crlsignerName>casign-crlsigner</crlsignerName>
+        <duplicateKey>true</duplicateKey>
+        <duplicateSubject>true</duplicateSubject>
+        <expirationPeriod>365</expirationPeriod>
+        <keepExpiredCertDays>-1</keepExpiredCertDays>
+        <permission>255</permission>
+        <maxValidity>10y</maxValidity>
+        <responderName>responder1</responderName>
+        <saveReq>false</saveReq>
+        <signerType>${token.type}</signerType>
+        <signerConf>
+          <value>${ca.signerConf}</value>
+        </signerConf>
+        <status>active</status>
+        <validityMode>cutoff</validityMode>
+        <crlUris>
+          <str>http://ca.example.org/crl</str>
+        </crlUris>
+        <ocspUris>
+          <str>http://localhost:8080/ocsp/responder1</str>
+        </ocspUris>
+        <nextCrlNo>2</nextCrlNo>
+        <snSize>63</snSize>
       </caInfo>
       <aliases>
         <str>myca</str>

@@ -22,34 +22,32 @@
   <cas>
     <ca name="subca1">
       <caInfo>
-        <x509Ca>
-          <cmpcontrolName>cmpcontrol1</cmpcontrolName>
-          <duplicateKey>true</duplicateKey>
-          <duplicateSubject>true</duplicateSubject>
-          <expirationPeriod>365</expirationPeriod>
-          <keepExpiredCertDays>-1</keepExpiredCertDays>
-          <permission>255</permission>
-          <maxValidity>5y</maxValidity>
-          <responderName>responder1</responderName>
-          <saveReq>true</saveReq>
-          <signerType>${token.type}</signerType>
-          <signerConf>
-            <value>${ca.signerConf}</value>
-          </signerConf>
-          <status>active</status>
-          <validityMode>strict</validityMode>
-          <cacertUris>
-            <str>http://example.org/subca1.der</str>
-          </cacertUris>
-          <nextCrlNo>2</nextCrlNo>
-          <ocspUris>
-            <str>http://localhost:8080/ocsp/responder1</str>
-          </ocspUris>
-          <snSize>63</snSize>
-          <extraControl>
-            <value>revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d</value>
-          </extraControl>
-        </x509Ca>
+        <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+        <duplicateKey>true</duplicateKey>
+        <duplicateSubject>true</duplicateSubject>
+        <expirationPeriod>365</expirationPeriod>
+        <keepExpiredCertDays>-1</keepExpiredCertDays>
+        <permission>255</permission>
+        <maxValidity>5y</maxValidity>
+        <responderName>responder1</responderName>
+        <saveReq>true</saveReq>
+        <signerType>${token.type}</signerType>
+        <signerConf>
+          <value>${ca.signerConf}</value>
+        </signerConf>
+        <status>active</status>
+        <validityMode>strict</validityMode>
+        <cacertUris>
+          <str>http://example.org/subca1.der</str>
+        </cacertUris>
+        <nextCrlNo>2</nextCrlNo>
+        <ocspUris>
+          <str>http://localhost:8080/ocsp/responder1</str>
+        </ocspUris>
+        <snSize>63</snSize>
+        <extraControl>
+          <value>revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d</value>
+        </extraControl>
       </caInfo>
       <aliases>
         <str>subca</str>
