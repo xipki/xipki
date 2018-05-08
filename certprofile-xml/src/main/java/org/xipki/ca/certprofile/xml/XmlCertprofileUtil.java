@@ -84,10 +84,10 @@ import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
-import org.xipki.ca.certprofile.xml.jaxb.DHParameters;
-import org.xipki.ca.certprofile.xml.jaxb.DSAParameters;
-import org.xipki.ca.certprofile.xml.jaxb.ECParameters;
-import org.xipki.ca.certprofile.xml.jaxb.ECParameters.Curves;
+import org.xipki.ca.certprofile.xml.jaxb.DhParameters;
+import org.xipki.ca.certprofile.xml.jaxb.DsaParameters;
+import org.xipki.ca.certprofile.xml.jaxb.EcParameters;
+import org.xipki.ca.certprofile.xml.jaxb.EcParameters.Curves;
 import org.xipki.ca.certprofile.xml.jaxb.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.xml.jaxb.ExtendedKeyUsage.Usage;
 import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
@@ -103,8 +103,8 @@ import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyIdMappingType;
 import org.xipki.ca.certprofile.xml.jaxb.ProfessionInfoType;
 import org.xipki.ca.certprofile.xml.jaxb.ProfessionInfoType.RegistrationNumber;
-import org.xipki.ca.certprofile.xml.jaxb.RSAPSSParameters;
-import org.xipki.ca.certprofile.xml.jaxb.RSAParameters;
+import org.xipki.ca.certprofile.xml.jaxb.RsapssParameters;
+import org.xipki.ca.certprofile.xml.jaxb.RsaParameters;
 import org.xipki.ca.certprofile.xml.jaxb.RangeType;
 import org.xipki.ca.certprofile.xml.jaxb.RangesType;
 import org.xipki.ca.certprofile.xml.jaxb.UsageType;
@@ -622,8 +622,8 @@ public class XmlCertprofileUtil {
     }
 
     Object paramsObj = type.getParameters().getAny();
-    if (paramsObj instanceof ECParameters) {
-      ECParameters params = (ECParameters) paramsObj;
+    if (paramsObj instanceof EcParameters) {
+      EcParameters params = (EcParameters) paramsObj;
       KeyParametersOption.ECParamatersOption option =
           new KeyParametersOption.ECParamatersOption();
 
@@ -640,8 +640,8 @@ public class XmlCertprofileUtil {
       }
 
       return option;
-    } else if (paramsObj instanceof RSAParameters) {
-      RSAParameters params = (RSAParameters) paramsObj;
+    } else if (paramsObj instanceof RsaParameters) {
+      RsaParameters params = (RsaParameters) paramsObj;
       KeyParametersOption.RSAParametersOption option =
           new KeyParametersOption.RSAParametersOption();
 
@@ -649,8 +649,8 @@ public class XmlCertprofileUtil {
       option.setModulusLengths(modulusLengths);
 
       return option;
-    } else if (paramsObj instanceof RSAPSSParameters) {
-      RSAPSSParameters params = (RSAPSSParameters) paramsObj;
+    } else if (paramsObj instanceof RsapssParameters) {
+      RsapssParameters params = (RsapssParameters) paramsObj;
       KeyParametersOption.RSAPSSParametersOption option =
           new KeyParametersOption.RSAPSSParametersOption();
 
@@ -658,8 +658,8 @@ public class XmlCertprofileUtil {
       option.setModulusLengths(modulusLengths);
 
       return option;
-    } else if (paramsObj instanceof DSAParameters) {
-      DSAParameters params = (DSAParameters) paramsObj;
+    } else if (paramsObj instanceof DsaParameters) {
+      DsaParameters params = (DsaParameters) paramsObj;
       KeyParametersOption.DSAParametersOption option =
           new KeyParametersOption.DSAParametersOption();
 
@@ -670,8 +670,8 @@ public class XmlCertprofileUtil {
       option.setQlengths(qlengths);
 
       return option;
-    } else if (paramsObj instanceof DHParameters) {
-      DHParameters params = (DHParameters) paramsObj;
+    } else if (paramsObj instanceof DhParameters) {
+      DhParameters params = (DhParameters) paramsObj;
       KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
 
       Set<Range> plengths = buildParametersMap(params.getPLength());

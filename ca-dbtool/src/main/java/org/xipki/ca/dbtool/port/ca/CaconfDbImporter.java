@@ -30,28 +30,28 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasRequestors;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasUsers;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Caaliases;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Cas;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Cmpcontrols;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Crlsigners;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Environments;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Profiles;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Publishers;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Requestors;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Responders;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Sceps;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasRequestorType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasUserType;
 import org.xipki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.ca.dbtool.jaxb.ca.CaaliasType;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasProfiles;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasPublishers;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasRequestors;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cmpcontrols;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Environments;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.CmpcontrolType;
 import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
 import org.xipki.ca.dbtool.jaxb.ca.EnvironmentType;
@@ -77,11 +77,11 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class CaConfigurationDbImporter extends DbPorter {
+class CaconfDbImporter extends DbPorter {
 
   private final Unmarshaller unmarshaller;
 
-  CaConfigurationDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe,
+  CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe,
       boolean evaluateOnly) throws DataAccessException, JAXBException {
     super(datasource, srcDir, stopMe, evaluateOnly);
 
@@ -91,10 +91,10 @@ class CaConfigurationDbImporter extends DbPorter {
   }
 
   public void importToDb() throws Exception {
-    CAConfigurationType caconf;
+    CaconfType caconf;
     try {
       @SuppressWarnings("unchecked")
-      JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
+      JAXBElement<CaconfType> root = (JAXBElement<CaconfType>)
           unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CONFIGURATION));
       caconf = root.getValue();
     } catch (JAXBException ex) {

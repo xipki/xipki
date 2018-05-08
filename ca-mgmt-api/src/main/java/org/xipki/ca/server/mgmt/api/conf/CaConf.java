@@ -65,7 +65,7 @@ import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CAConfType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
@@ -142,7 +142,7 @@ public class CaConf {
     init(confFile, securityFactory);
   }
 
-  public static void marshal(CAConfType jaxb, OutputStream out)
+  public static void marshal(CaconfType jaxb, OutputStream out)
       throws JAXBException, SAXException {
     ParamUtil.requireNonNull("jaxb", jaxb);
     ParamUtil.requireNonNull("out", out);
@@ -156,7 +156,7 @@ public class CaConf {
       Marshaller jaxbMarshaller = context.createMarshaller();
       jaxbMarshaller.setSchema(schemaFact.newSchema(url));
 
-      jaxbMarshaller.marshal(new ObjectFactory().createCAConf(jaxb), out);
+      jaxbMarshaller.marshal(new ObjectFactory().createCaconf(jaxb), out);
     } catch (JAXBException ex) {
       throw XmlUtil.convert(ex);
     }
@@ -206,7 +206,7 @@ public class CaConf {
       Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
       jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 
-      CAConfType root = (CAConfType) ((JAXBElement<?>)
+      CaconfType root = (CaconfType) ((JAXBElement<?>)
           jaxbUnmarshaller.unmarshal(caConfStream)).getValue();
       init(root, baseDir, zipFile, securityFactory);
     } catch (JAXBException ex) {
@@ -230,7 +230,7 @@ public class CaConf {
     }
   }
 
-  private void init(CAConfType jaxb, String baseDir, ZipFile zipFile,
+  private void init(CaconfType jaxb, String baseDir, ZipFile zipFile,
       SecurityFactory securityFactory) throws IOException, InvalidConfException, CaMgmtException {
     // Properties
     if (baseDir != null) {

@@ -87,7 +87,7 @@ import org.xipki.ocsp.server.impl.jaxb.DatasourceType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.FileOrPlainValueType;
 import org.xipki.ocsp.server.impl.jaxb.FileOrValueType;
-import org.xipki.ocsp.server.impl.jaxb.OCSPServer;
+import org.xipki.ocsp.server.impl.jaxb.Ocspserver;
 import org.xipki.ocsp.server.impl.jaxb.ObjectFactory;
 import org.xipki.ocsp.server.impl.jaxb.RequestOptionType;
 import org.xipki.ocsp.server.impl.jaxb.ResponderType;
@@ -295,7 +295,7 @@ public class OcspServerImpl implements OcspServer {
       throw new IllegalStateException("securityFactory is not set");
     }
 
-    OCSPServer conf = parseConf(confFile);
+    Ocspserver conf = parseConf(confFile);
 
     //-- check the duplication names
     Set<String> set = new HashSet<>();
@@ -995,7 +995,7 @@ public class OcspServerImpl implements OcspServer {
     store.setUnknownSerialAsGood(getBoolean(conf.isUnknownSerialAsGood(), false));
 
     store.setIncludeArchiveCutoff(getBoolean(conf.isIncludeArchiveCutoff(), true));
-    store.setIncludeCrlId(getBoolean(conf.isIncludeCrlID(), true));
+    store.setIncludeCrlId(getBoolean(conf.isIncludeCrlId(), true));
 
     store.setIgnoreExpiredCert(getBoolean(conf.isIgnoreExpiredCert(), true));
     store.setIgnoreNotYetValidCert(getBoolean(conf.isIgnoreNotYetValidCert(), true));
@@ -1186,7 +1186,7 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private static OCSPServer parseConf(String confFilename) throws InvalidConfException {
+  private static Ocspserver parseConf(String confFilename) throws InvalidConfException {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -1194,7 +1194,7 @@ public class OcspServerImpl implements OcspServer {
           javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
       Schema schema = schemaFact.newSchema(OcspServerImpl.class.getResource("/xsd/ocsp-conf.xsd"));
       unmarshaller.setSchema(schema);
-      return (OCSPServer) unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFilename)));
+      return (Ocspserver) unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFilename)));
     } catch (SAXException ex) {
       throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(), ex);
     } catch (JAXBException ex) {

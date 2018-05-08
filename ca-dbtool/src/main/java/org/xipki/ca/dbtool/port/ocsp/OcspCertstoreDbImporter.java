@@ -35,8 +35,8 @@ import javax.xml.bind.Unmarshaller;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType;
-import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertstoreType;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertstoreType.Issuers;
 import org.xipki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
@@ -58,9 +58,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
+class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspCertstoreDbImporter.class);
 
   private final Unmarshaller unmarshaller;
 
@@ -68,7 +68,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertStoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
+  OcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
       boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
     super(datasource, srcDir, stopMe, evaluateOnly);
 
@@ -92,11 +92,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
   }
 
   public void importToDb() throws Exception {
-    CertStoreType certstore;
+    CertstoreType certstore;
     try {
       File file = new File(baseDir + File.separator + FILENAME_OCSP_CERTSTORE);
       @SuppressWarnings("unchecked")
-      JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+      JAXBElement<CertstoreType> root = (JAXBElement<CertstoreType>)
           unmarshaller.unmarshal(file);
       certstore = root.getValue();
     } catch (JAXBException ex) {
@@ -104,7 +104,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     }
 
     if (certstore.getVersion() > VERSION) {
-      throw new Exception("could not import CertStore greater than " + VERSION + ": "
+      throw new Exception("could not import Certstore greater than " + VERSION + ": "
           + certstore.getVersion());
     }
 
@@ -191,7 +191,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     }
   } // method importIssuer0
 
-  private void importCert(CertStoreType certstore, File processLogFile) throws Exception {
+  private void importCert(CertstoreType certstore, File processLogFile) throws Exception {
     int numProcessedBefore = 0;
     long minId = 1;
     if (processLogFile.exists()) {

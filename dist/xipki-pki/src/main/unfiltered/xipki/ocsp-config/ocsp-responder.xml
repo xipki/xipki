@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<OCSPServer master="true" xmlns="http://xipki.org/ocsp/conf/v2">
+<ocspserver master="true" xmlns="http://xipki.org/ocsp/conf/v2">
   <!--responseCache>
     <datasource name="datasource-cache">
       <conf>
@@ -81,7 +81,7 @@
       <retentionInterval>-1</retentionInterval>
       <unknownSerialAsGood>false</unknownSerialAsGood>
       <includeArchiveCutoff>true</includeArchiveCutoff>
-      <includeCrlID>false</includeCrlID>
+      <includeCrlId>false</includeCrlId>
     </store>
   </stores>
   <!-- requestOptions -->
@@ -131,4 +131,4 @@
       <includeCertHash>false</includeCertHash>
     </responseOption>
   </responseOptions>
-</OCSPServer>
+</ocspserver>

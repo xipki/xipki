@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<X509Profile xmlns="http://xipki.org/ca/xmlprofile/v2" maxSize="5000">
+<x509profile xmlns="http://xipki.org/ca/xmlprofile/v2" maxSize="5000">
   <appInfo>
     <myDescription xmlns="http://example.org">
       <category>cat A</category>
@@ -69,20 +69,20 @@
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
       <parameters>
-        <RSAParameters>
+        <rsaParameters>
           <modulusLength>
             <range min="1024" max="1024"/>
             <range min="2048" max="2048"/>
             <range min="3072" max="3072"/>
             <range min="4096" max="4096"/>
           </modulusLength>
-        </RSAParameters>
+        </rsaParameters>
       </parameters>
     </algorithm>
     <algorithm>
       <algorithm description="DSA">1.2.840.10040.4.1</algorithm>
       <parameters>
-        <DSAParameters>
+        <dsaParameters>
           <pLength>
             <range min="1024" max="1024"/>
             <range min="2048" max="2048"/>
@@ -93,17 +93,17 @@
             <range min="224" max="224"/>
             <range min="256" max="256"/>
           </qLength>
-        </DSAParameters>
+        </dsaParameters>
       </parameters>
     </algorithm>
     <algorithm>
       <algorithm description="EC">1.2.840.10045.2.1</algorithm>
       <parameters>
-        <ECParameters>
+        <ecParameters>
           <pointEncodings>
             <pointEncoding>4</pointEncoding>
           </pointEncodings>
-        </ECParameters>
+        </ecParameters>
       </parameters>
     </algorithm>
   </keyAlgorithms>
@@ -289,4 +289,4 @@
       </value>
     </extension>
   </extensions>
-</X509Profile>
+</x509profile>

@@ -19,8 +19,8 @@
   targetNamespace="http://xipki.org/security/pkcs11/conf/v2"
   elementFormDefault="qualified">
   <!-- CertStore -->
-  <xs:element name="PKCS11Conf" type="PKCS11ConfType"/>
-  <xs:complexType name="PKCS11ConfType">
+  <xs:element name="pkcs11conf" type="pkcs11confType"/>
+  <xs:complexType name="pkcs11confType">
     <xs:all>
       <xs:element name="modules" type="modulesType"/>
       <xs:element name="mechanismSets" type="mechnanismSetsType"/>

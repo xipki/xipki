@@ -19,8 +19,8 @@
   targetNamespace="http://xipki.org/ca/conf/v2"
   elementFormDefault="qualified">
   <!--  CAConfiguration -->
-  <xs:element name="CAConf" type="CAConfType"/>
-  <xs:complexType name="CAConfType">
+  <xs:element name="caconf" type="caconfType"/>
+  <xs:complexType name="caconfType">
     <xs:all>
       <xs:element name="properties" minOccurs="0">
         <xs:complexType>
@@ -109,7 +109,6 @@
         </xs:complexType>
       </xs:element>
     </xs:all>
-    <xs:attribute name="version" type="xs:int" use="required"/>
   </xs:complexType>
   <xs:complexType name="cmpcontrolType">
     <xs:all>

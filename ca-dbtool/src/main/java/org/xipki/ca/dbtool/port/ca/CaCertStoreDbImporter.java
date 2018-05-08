@@ -83,9 +83,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
+class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbImporter.class);
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"

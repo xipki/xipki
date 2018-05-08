@@ -91,7 +91,7 @@ public class CaDbImportWorker extends DbPortWorker {
     try {
       if (!resume) {
         // CAConfiguration
-        CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(datasource,
+        CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource,
             srcFolder, stopMe, evaluateOnly);
         caConfImporter.importToDb();
         caConfImporter.shutdown();

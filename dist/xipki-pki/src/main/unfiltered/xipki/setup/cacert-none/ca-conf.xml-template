@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<CAConf xmlns="http://xipki.org/ca/conf/v2" version="1">
+<caconf xmlns="http://xipki.org/ca/conf/v2">
   <properties>
     <property name="profiles.dir">xipki/setup/certprofile</property>
     <property name="security.dir">xipki/security</property>
@@ -175,4 +175,4 @@
       </publishers>
     </ca>
   </cas>
-</CAConf>
+</caconf>

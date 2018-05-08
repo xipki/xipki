@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<CAConf xmlns="http://xipki.org/ca/conf/v2" version="1">
+<caconf xmlns="http://xipki.org/ca/conf/v2">
   <properties>
     <property name="token.type">REPLACEME-TOKEN_TYPE</property>
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
@@ -77,4 +77,4 @@
       </publishers>
     </ca>
   </cas>
-</CAConf>
+</caconf>

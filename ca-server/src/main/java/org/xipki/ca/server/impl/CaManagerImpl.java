@@ -126,7 +126,7 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
 import org.xipki.ca.server.mgmt.api.conf.SingleCaConf;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CAConfType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
@@ -3462,8 +3462,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       parentFile.mkdirs();
     }
 
-    CAConfType root = new CAConfType();
-    root.setVersion(1);
+    CaconfType root = new CaconfType();
 
     ZipOutputStream zipStream = getZipOutputStream(zipFile);
     try {
@@ -3476,7 +3475,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       Set<String> includeUserNames = new HashSet<>();
 
       // users
-      root.setUsers(new CAConfType.Users());
+      root.setUsers(new CaconfType.Users());
       List<UserType> users = root.getUsers().getUser();
 
       // cas
@@ -3615,7 +3614,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setCas(new CAConfType.Cas());
+          root.setCas(new CaconfType.Cas());
           root.getCas().getCa().addAll(list);
         }
       }
@@ -3643,7 +3642,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setCmpcontrols(new CAConfType.Cmpcontrols());
+          root.setCmpcontrols(new CaconfType.Cmpcontrols());
           root.getCmpcontrols().getCmpcontrol().addAll(list);
         }
       }
@@ -3666,7 +3665,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setEnvironments(new CAConfType.Environments());
+          root.setEnvironments(new CaconfType.Environments());
           root.getEnvironments().getEnvironment().addAll(list);
         }
       }
@@ -3694,7 +3693,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setCrlsigners(new CAConfType.Crlsigners());
+          root.setCrlsigners(new CaconfType.Crlsigners());
           root.getCrlsigners().getCrlsigner().addAll(list);
         }
       }
@@ -3717,7 +3716,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setRequestors(new CAConfType.Requestors());
+          root.setRequestors(new CaconfType.Requestors());
           root.getRequestors().getRequestor().addAll(list);
         }
       }
@@ -3739,7 +3738,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setPublishers(new CAConfType.Publishers());
+          root.setPublishers(new CaconfType.Publishers());
           root.getPublishers().getPublisher().addAll(list);
         }
       }
@@ -3761,7 +3760,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setProfiles(new CAConfType.Profiles());
+          root.setProfiles(new CaconfType.Profiles());
           root.getProfiles().getProfile().addAll(list);
         }
       }
@@ -3790,7 +3789,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setSceps(new CAConfType.Sceps());
+          root.setSceps(new CaconfType.Sceps());
           root.getSceps().getScep().addAll(list);
         }
       }
@@ -3817,7 +3816,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setResponders(new CAConfType.Responders());
+          root.setResponders(new CaconfType.Responders());
           root.getResponders().getResponder().addAll(list);
         }
       }

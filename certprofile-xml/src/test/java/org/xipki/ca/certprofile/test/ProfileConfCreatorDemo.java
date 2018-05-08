@@ -68,11 +68,11 @@ import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.xml.jaxb.ConstantValueType;
-import org.xipki.ca.certprofile.xml.jaxb.DSAParameters;
+import org.xipki.ca.certprofile.xml.jaxb.DsaParameters;
 import org.xipki.ca.certprofile.xml.jaxb.DirectoryStringType;
-import org.xipki.ca.certprofile.xml.jaxb.ECParameters;
-import org.xipki.ca.certprofile.xml.jaxb.ECParameters.Curves;
-import org.xipki.ca.certprofile.xml.jaxb.ECParameters.PointEncodings;
+import org.xipki.ca.certprofile.xml.jaxb.EcParameters;
+import org.xipki.ca.certprofile.xml.jaxb.EcParameters.Curves;
+import org.xipki.ca.certprofile.xml.jaxb.EcParameters.PointEncodings;
 import org.xipki.ca.certprofile.xml.jaxb.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.xml.jaxb.ExtendedKeyUsage.Usage;
 import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
@@ -103,14 +103,14 @@ import org.xipki.ca.certprofile.xml.jaxb.QcEuLimitValueType;
 import org.xipki.ca.certprofile.xml.jaxb.QcStatementType;
 import org.xipki.ca.certprofile.xml.jaxb.QcStatementValueType;
 import org.xipki.ca.certprofile.xml.jaxb.QcStatements;
-import org.xipki.ca.certprofile.xml.jaxb.RSAParameters;
+import org.xipki.ca.certprofile.xml.jaxb.RsaParameters;
 import org.xipki.ca.certprofile.xml.jaxb.Range2Type;
 import org.xipki.ca.certprofile.xml.jaxb.RangeType;
 import org.xipki.ca.certprofile.xml.jaxb.RangesType;
 import org.xipki.ca.certprofile.xml.jaxb.RdnType;
 import org.xipki.ca.certprofile.xml.jaxb.Restriction;
-import org.xipki.ca.certprofile.xml.jaxb.SMIMECapabilities;
-import org.xipki.ca.certprofile.xml.jaxb.SMIMECapability;
+import org.xipki.ca.certprofile.xml.jaxb.SmimeCapabilities;
+import org.xipki.ca.certprofile.xml.jaxb.SmimeCapability;
 import org.xipki.ca.certprofile.xml.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.xml.jaxb.SubjectDirectoryAttributs;
 import org.xipki.ca.certprofile.xml.jaxb.SubjectInfoAccess;
@@ -1696,7 +1696,7 @@ public class ProfileConfCreatorDemo {
 
     algorithm.getAlgorithm().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
 
-    RSAParameters rsaParams = new RSAParameters();
+    RsaParameters rsaParams = new RsaParameters();
     algorithm.setParameters(createKeyParametersType(rsaParams));
 
     RangesType ranges = new RangesType();
@@ -1712,7 +1712,7 @@ public class ProfileConfCreatorDemo {
     list.add(algorithm);
 
     algorithm.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-    DSAParameters dsaParams = new DSAParameters();
+    DsaParameters dsaParams = new DsaParameters();
     algorithm.setParameters(createKeyParametersType(dsaParams));
 
     ranges = new RangesType();
@@ -1735,7 +1735,7 @@ public class ProfileConfCreatorDemo {
     list.add(algorithm);
 
     algorithm.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
-    ECParameters ecParams = new ECParameters();
+    EcParameters ecParams = new EcParameters();
     algorithm.setParameters(createKeyParametersType(ecParams));
 
     if (curveIds != null && curveIds.length > 0) {
@@ -1764,7 +1764,7 @@ public class ProfileConfCreatorDemo {
 
     algorithm.getAlgorithm().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
 
-    RSAParameters params = new RSAParameters();
+    RsaParameters params = new RsaParameters();
     algorithm.setParameters(createKeyParametersType(params));
 
     RangesType ranges = new RangesType();
@@ -1838,26 +1838,26 @@ public class ProfileConfCreatorDemo {
   }
 
   private static ExtensionValueType createSmimeCapabilities() {
-    SMIMECapabilities caps = new SMIMECapabilities();
+    SmimeCapabilities caps = new SmimeCapabilities();
 
     // DES-EDE3-CBC
-    SMIMECapability cap = new SMIMECapability();
-    caps.getSMIMECapability().add(cap);
+    SmimeCapability cap = new SmimeCapability();
+    caps.getSmimeCapability().add(cap);
     cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.7"),
         "DES-EDE3-CBC"));
 
     // RC2-CBC keysize 128
-    cap = new SMIMECapability();
-    caps.getSMIMECapability().add(cap);
+    cap = new SmimeCapability();
+    caps.getSmimeCapability().add(cap);
     cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
-    cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters());
+    cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters());
     cap.getParameters().setInteger(BigInteger.valueOf(128));
 
     // RC2-CBC keysize 64
-    cap = new SMIMECapability();
-    caps.getSMIMECapability().add(cap);
+    cap = new SmimeCapability();
+    caps.getSmimeCapability().add(cap);
     cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
-    cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters());
+    cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters());
 
     Base64BinaryWithDescType binary = new Base64BinaryWithDescType();
     try {

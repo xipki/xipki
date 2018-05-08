@@ -18,8 +18,8 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://xipki.org/ca/client/conf/v2"
   elementFormDefault="qualified">
-  <xs:element name="CAClient" type="CAClientType"/>
-  <xs:complexType name="CAClientType">
+  <xs:element name="caclient" type="caclientType"/>
+  <xs:complexType name="caclientType">
     <xs:all>
       <xs:element name="requestors">
         <xs:complexType>
@@ -35,10 +35,10 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="CAs">
+      <xs:element name="cas">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="CAInfoUpdateInterval" type="xs:int" minOccurs="0">
+            <xs:element name="cainfoUpdateInterval" type="xs:int" minOccurs="0">
               <xs:annotation>
                 <xs:documentation>
                    - Update interval in minutes.
@@ -49,7 +49,7 @@
                 </xs:documentation>
               </xs:annotation>
             </xs:element>
-            <xs:element name="CA" type="CAType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="ca" type="caType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -77,7 +77,7 @@
       </xs:element>
     </xs:all>
   </xs:complexType>
-  <xs:complexType name="cmpControlType">
+  <xs:complexType name="cmpcontrolType">
     <xs:choice>
       <xs:element name="autoconf" type="xs:anyType"/>
       <xs:sequence>
@@ -86,15 +86,15 @@
     </xs:choice>
   </xs:complexType>
 
-  <xs:complexType name="CAType">
+  <xs:complexType name="caType">
     <xs:all>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="url" type="xs:anyURI"/>
       <xs:element name="healthUrl" type="xs:anyURI" minOccurs="0"/>
       <xs:element name="requestor" type="xs:string"/>
       <xs:element name="responder" type="xs:string"/>
-      <xs:element name="cmpControl" type="cmpControlType"/>
-      <xs:element name="caCert" type="CACertType"/>
+      <xs:element name="cmpcontrol" type="cmpcontrolType"/>
+      <xs:element name="caCert" type="caCertType"/>
       <xs:element name="certprofiles" type="certprofilesType"/>
     </xs:all>
     <xs:attribute name="enabled" type="xs:boolean" default="true"/>
@@ -107,7 +107,7 @@
       </xs:sequence>
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="CACertType">
+  <xs:complexType name="caCertType">
     <xs:choice>
       <xs:element name="autoconf" type="xs:anyType"/>
       <xs:element name="cert" type="fileOrValueType"/>

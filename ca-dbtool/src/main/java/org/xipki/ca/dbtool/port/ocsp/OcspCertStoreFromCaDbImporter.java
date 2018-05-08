@@ -43,9 +43,9 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.CaType;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType;
 import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
@@ -73,7 +73,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
+class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreFromCaDbImporter.class);
 
@@ -129,18 +129,17 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
           + certstore.getVersion());
     }
 
-    CAConfigurationType caConf;
+    CaconfType caconf;
     try {
       File file = new File(baseDir + File.separator + FILENAME_CA_CONFIGURATION);
       @SuppressWarnings("unchecked")
-      JAXBElement<CAConfigurationType> rootCaConf = (JAXBElement<CAConfigurationType>)
-          unmarshaller.unmarshal(file);
-      caConf = rootCaConf.getValue();
+      JAXBElement<CaconfType> rootCaConf = (JAXBElement<CaconfType>)unmarshaller.unmarshal(file);
+      caconf = rootCaConf.getValue();
     } catch (JAXBException ex) {
       throw XmlUtil.convert(ex);
     }
 
-    if (caConf.getVersion() > VERSION) {
+    if (caconf.getVersion() > VERSION) {
       throw new InvalidInputException("could not import CA Configuration greater than "
           + VERSION + ": " + certstore.getVersion());
     }
@@ -152,7 +151,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
       }
 
       PublisherType publisherType = null;
-      for (PublisherType type : caConf.getPublishers().getPublisher()) {
+      for (PublisherType type : caconf.getPublishers().getPublisher()) {
         if (publisherName.equals(type.getName())) {
           publisherType = type;
           break;
@@ -176,14 +175,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
       }
 
       Set<Integer> relatedCaIds = new HashSet<>();
-      for (CaHasPublisherType ctype : caConf.getCaHasPublishers().getCaHasPublisher()) {
+      for (CaHasPublisherType ctype : caconf.getCaHasPublishers().getCaHasPublisher()) {
         if (ctype.getPublisherId() == publisherType.getId()) {
           relatedCaIds.add(ctype.getCaId());
         }
       }
 
       List<CaType> relatedCas = new LinkedList<>();
-      for (CaType m : caConf.getCas().getCa()) {
+      for (CaType m : caconf.getCas().getCa()) {
         if (relatedCaIds.contains(m.getId())) {
           relatedCas.add(m);
         }
@@ -195,7 +194,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
       }
 
       Map<Integer, String> profileMap = new HashMap<Integer, String>();
-      for (ProfileType ni : caConf.getProfiles().getProfile()) {
+      for (ProfileType ni : caconf.getProfiles().getProfile()) {
         profileMap.put(ni.getId(), ni.getName());
       }
 

@@ -102,7 +102,7 @@ public class OcspDbExportWorker extends DbPortWorker {
     long start = System.currentTimeMillis();
     try {
       // CertStore
-      OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(datasource,
+      OcspCertstoreDbExporter certStoreExporter = new OcspCertstoreDbExporter(datasource,
           destFolder, numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
       certStoreExporter.export();
       certStoreExporter.shutdown();

@@ -85,11 +85,11 @@ import org.xipki.ca.client.api.dto.RevokeCertResultEntry;
 import org.xipki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertEntry;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
-import org.xipki.ca.client.impl.jaxb.CAClientType;
-import org.xipki.ca.client.impl.jaxb.CAType;
+import org.xipki.ca.client.impl.jaxb.CaclientType;
+import org.xipki.ca.client.impl.jaxb.CaType;
 import org.xipki.ca.client.impl.jaxb.CertprofileType;
 import org.xipki.ca.client.impl.jaxb.CertprofilesType;
-import org.xipki.ca.client.impl.jaxb.CmpControlType;
+import org.xipki.ca.client.impl.jaxb.CmpcontrolType;
 import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
@@ -253,7 +253,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("could not find configuration file " + confFile);
     }
 
-    CAClientType config;
+    CaclientType config;
     try {
       config = parse(new FileInputStream(configFile));
     } catch (FileNotFoundException ex) {
@@ -261,7 +261,7 @@ public final class CaClientImpl implements CaClient {
     }
     int numActiveCAs = 0;
 
-    for (CAType caType : config.getCAs().getCA()) {
+    for (CaType caType : config.getCas().getCa()) {
       if (!caType.isEnabled()) {
         LOG.info("CA " + caType.getName() + " is disabled");
         continue;
@@ -300,7 +300,7 @@ public final class CaClientImpl implements CaClient {
 
     // CA
     Set<CaConf> cas = new HashSet<>();
-    for (CAType caType : config.getCAs().getCA()) {
+    for (CaType caType : config.getCas().getCa()) {
       if (!caType.isEnabled()) {
         continue;
       }
@@ -325,7 +325,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         // CMPControl
-        CmpControlType cmpCtrlType = caType.getCmpControl();
+        CmpcontrolType cmpCtrlType = caType.getCmpcontrol();
         if (cmpCtrlType.getAutoconf() != null) {
           ca.setCmpControlAutoconf(true);
         } else {
@@ -432,7 +432,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     if (!autoConfCaNames.isEmpty()) {
-      Integer caInfoUpdateInterval = config.getCAs().getCAInfoUpdateInterval();
+      Integer caInfoUpdateInterval = config.getCas().getCainfoUpdateInterval();
       if (caInfoUpdateInterval == null) {
         caInfoUpdateInterval = 10;
       } else if (caInfoUpdateInterval <= 0) {
@@ -1211,7 +1211,7 @@ public final class CaClientImpl implements CaClient {
     return new EnrollCertResult(caCert, certOrErrors);
   } // method parseEnrollCertResult
 
-  private static CAClientType parse(InputStream configStream) throws CaClientException {
+  private static CaclientType parse(InputStream configStream) throws CaClientException {
     Object root;
     synchronized (jaxbUnmarshallerLock) {
       try {
@@ -1221,7 +1221,7 @@ public final class CaClientImpl implements CaClient {
 
           final SchemaFactory schemaFact = SchemaFactory.newInstance(
                   javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-          URL url = CAClientType.class.getResource("/xsd/caclient-conf.xsd");
+          URL url = CaclientType.class.getResource("/xsd/caclient-conf.xsd");
           jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
         }
 
@@ -1244,7 +1244,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("invalid root element type");
     }
 
-    CAClientType conf = (CAClientType) ((JAXBElement<?>) root).getValue();
+    CaclientType conf = (CaclientType) ((JAXBElement<?>) root).getValue();
     // canonicalize the names
     for (RequestorType m : conf.getRequestors().getRequestor()) {
       m.setName(m.getName().toLowerCase());
@@ -1254,7 +1254,7 @@ public final class CaClientImpl implements CaClient {
       m.setName(m.getName().toLowerCase());
     }
 
-    for (CAType ca : conf.getCAs().getCA()) {
+    for (CaType ca : conf.getCas().getCa()) {
       ca.setName(ca.getName().toLowerCase());
       ca.setRequestor(ca.getRequestor().toLowerCase());
       ca.setResponder(ca.getResponder().toLowerCase());

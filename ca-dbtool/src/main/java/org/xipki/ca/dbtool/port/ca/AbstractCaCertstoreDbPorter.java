@@ -29,9 +29,9 @@ import org.xipki.datasource.DataSourceWrapper;
  * @since 2.0.0
  */
 
-class AbstractCaCertStoreDbPorter extends DbPorter {
+class AbstractCaCertstoreDbPorter extends DbPorter {
 
-  AbstractCaCertStoreDbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
+  AbstractCaCertstoreDbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
       boolean evaluateOnly) throws DataAccessException {
     super(datasource, baseDir, stopMe, evaluateOnly);
   }

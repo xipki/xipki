@@ -42,7 +42,7 @@ import org.xipki.security.pkcs11.jaxb.MechnanismSetsType;
 import org.xipki.security.pkcs11.jaxb.ModuleType;
 import org.xipki.security.pkcs11.jaxb.ModulesType;
 import org.xipki.security.pkcs11.jaxb.ObjectFactory;
-import org.xipki.security.pkcs11.jaxb.PKCS11ConfType;
+import org.xipki.security.pkcs11.jaxb.Pkcs11ConfType;
 import org.xml.sax.SAXException;
 
 /**
@@ -70,9 +70,9 @@ public class P11Conf {
       Schema schema = schemaFact.newSchema(getClass().getResource("/xsd/pkcs11-conf.xsd"));
       unmarshaller.setSchema(schema);
       @SuppressWarnings("unchecked")
-      JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)
+      JAXBElement<Pkcs11ConfType> rootElement = (JAXBElement<Pkcs11ConfType>)
           unmarshaller.unmarshal(confStream);
-      PKCS11ConfType pkcs11Conf = rootElement.getValue();
+      Pkcs11ConfType pkcs11Conf = rootElement.getValue();
       ModulesType modulesType = pkcs11Conf.getModules();
 
       MechnanismSetsType mechanismSets = pkcs11Conf.getMechanismSets();

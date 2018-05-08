@@ -38,8 +38,8 @@ import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType;
-import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertstoreType;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertstoreType.Issuers;
 import org.xipki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.ca.dbtool.port.DbPorter;
@@ -59,11 +59,11 @@ import org.xipki.datasource.DataSourceWrapper;
  * @since 2.0.0
  */
 
-class OcspCertStoreDbExporter extends DbPorter {
+class OcspCertstoreDbExporter extends DbPorter {
 
   public static final String PROCESS_LOG_FILENAME = "export.process";
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspCertstoreDbExporter.class);
 
   private final Marshaller marshaller;
 
@@ -75,7 +75,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
   private final boolean resume;
 
-  OcspCertStoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+  OcspCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
       int numCertsPerSelect, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
       throws Exception {
     super(datasource, baseDir, stopMe, evaluateOnly);
@@ -103,11 +103,11 @@ class OcspCertStoreDbExporter extends DbPorter {
   } // constructor
 
   public void export() throws Exception {
-    CertStoreType certstore;
+    CertstoreType certstore;
     if (resume) {
       try {
         @SuppressWarnings("unchecked")
-        JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+        JAXBElement<CertstoreType> root = (JAXBElement<CertstoreType>)
             unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CERTSTORE));
         certstore = root.getValue();
       } catch (JAXBException ex) {
@@ -115,11 +115,11 @@ class OcspCertStoreDbExporter extends DbPorter {
       }
 
       if (certstore.getVersion() > VERSION) {
-        throw new Exception("could not continue with CertStore greater than " + VERSION
+        throw new Exception("could not continue with Certstore greater than " + VERSION
             + ": " + certstore.getVersion());
       }
     } else {
-      certstore = new CertStoreType();
+      certstore = new CertstoreType();
       certstore.setVersion(VERSION);
     }
     System.out.println("exporting OCSP certstore from database");
@@ -132,7 +132,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
     Exception exception = exportCert(certstore, processLogFile);
 
-    JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
+    JAXBElement<CertstoreType> root = new ObjectFactory().createCertstore(certstore);
     try {
       marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CERTSTORE));
     } catch (JAXBException ex) {
@@ -146,7 +146,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     }
   } // method export
 
-  private void exportHashAlgo(CertStoreType certstore) throws DataAccessException {
+  private void exportHashAlgo(CertstoreType certstore) throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
       throw new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA");
@@ -155,7 +155,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     certstore.setCerthashAlgo(certHashAlgoStr);
   }
 
-  private void exportIssuer(CertStoreType certstore) throws DataAccessException, IOException {
+  private void exportIssuer(CertstoreType certstore) throws DataAccessException, IOException {
     System.out.println("exporting table ISSUER");
     Issuers issuers = new Issuers();
     certstore.setIssuers(issuers);
@@ -194,7 +194,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     System.out.println(" exported table ISSUER");
   } // method exportIssuer
 
-  private Exception exportCert(CertStoreType certstore, File processLogFile) {
+  private Exception exportCert(CertstoreType certstore, File processLogFile) {
     final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
     entriesDir.mkdirs();
 
@@ -217,7 +217,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     }
   } // method exportCert
 
-  private void exportCert0(CertStoreType certstore, File processLogFile,
+  private void exportCert0(CertstoreType certstore, File processLogFile,
       FileOutputStream certsFileOs) throws Exception {
     File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
     Long minId = null;

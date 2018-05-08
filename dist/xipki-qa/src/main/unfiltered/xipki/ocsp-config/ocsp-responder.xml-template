@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<OCSPServer master="true" xmlns="http://xipki.org/ocsp/conf/v2">
+<ocspserver master="true" xmlns="http://xipki.org/ocsp/conf/v2">
   <!-- responseCache -->
   <!-- responseCache/validity indicates how long (in seconds) the response will
        be cached in database -->
@@ -99,7 +99,7 @@
       <retentionInterval>-1</retentionInterval>
       <unknownSerialAsGood>false</unknownSerialAsGood>
       <includeArchiveCutoff>true</includeArchiveCutoff>
-      <includeCrlID>false</includeCrlID>
+      <includeCrlId>false</includeCrlId>
     </store>
     <store name="crlstore1">
       <source>
@@ -141,7 +141,7 @@ certs.dir = output
       <retentionInterval>0</retentionInterval>
       <unknownSerialAsGood>true</unknownSerialAsGood>
       <includeArchiveCutoff>false</includeArchiveCutoff>
-      <includeCrlID>true</includeCrlID>
+      <includeCrlId>true</includeCrlId>
     </store>
   </stores>
   <!-- requestOptions -->
@@ -200,4 +200,4 @@ certs.dir = output
       <includeCertHash>false</includeCertHash>
     </responseOption>
   </responseOptions>
-</OCSPServer>
+</ocspserver>

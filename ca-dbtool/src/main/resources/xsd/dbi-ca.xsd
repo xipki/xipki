@@ -19,8 +19,8 @@
   targetNamespace="http://xipki.org/ca/dbtool/ca/v2"
   elementFormDefault="qualified">
   <!--  CAConfiguration -->
-  <xs:element name="CAConfiguration" type="CAConfigurationType"/>
-  <xs:complexType name="CAConfigurationType">
+  <xs:element name="caconf" type="caconfType"/>
+  <xs:complexType name="caconfType">
     <xs:sequence>
       <xs:element name="cmpcontrols">
         <xs:complexType>

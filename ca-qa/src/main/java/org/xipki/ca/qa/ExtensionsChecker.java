@@ -124,8 +124,8 @@ import org.xipki.ca.certprofile.xml.jaxb.Range2Type;
 import org.xipki.ca.certprofile.xml.jaxb.RangeType;
 import org.xipki.ca.certprofile.xml.jaxb.RangesType;
 import org.xipki.ca.certprofile.xml.jaxb.Restriction;
-import org.xipki.ca.certprofile.xml.jaxb.SMIMECapabilities;
-import org.xipki.ca.certprofile.xml.jaxb.SMIMECapability;
+import org.xipki.ca.certprofile.xml.jaxb.SmimeCapabilities;
+import org.xipki.ca.certprofile.xml.jaxb.SmimeCapability;
 import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
 import org.xipki.ca.certprofile.xml.jaxb.TripleState;
 import org.xipki.ca.certprofile.xml.jaxb.ValidityModel;
@@ -340,16 +340,16 @@ public class ExtensionsChecker {
     // SMIMECapabilities
     type = ObjectIdentifiers.id_smimeCapabilities;
     if (extensionControls.containsKey(type)) {
-      SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
-          type, extensionsType, SMIMECapabilities.class);
-      List<SMIMECapability> list = extConf.getSMIMECapability();
+      SmimeCapabilities extConf = (SmimeCapabilities) getExtensionValue(
+          type, extensionsType, SmimeCapabilities.class);
+      List<SmimeCapability> list = extConf.getSmimeCapability();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (SMIMECapability m : list) {
+      for (SmimeCapability m : list) {
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
             m.getCapabilityID().getValue());
         ASN1Encodable params = null;
-        org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters capParams =
+        org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters capParams =
             m.getParameters();
         if (capParams != null) {
           if (capParams.getInteger() != null) {

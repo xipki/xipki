@@ -18,8 +18,8 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://xipki.org/ca/qa/qa/conf/v2"
   elementFormDefault="qualified">
-  <xs:element name="QAConf" type="QAConfType"/>
-  <xs:complexType name="QAConfType">
+  <xs:element name="qaconf" type="qaconfType"/>
+  <xs:complexType name="qaconfType">
     <xs:sequence>
       <xs:element name="issuers" type="issuersType" minOccurs="0"/>
       <xs:element name="certprofiles" type="certprofilesType" minOccurs="0"/>

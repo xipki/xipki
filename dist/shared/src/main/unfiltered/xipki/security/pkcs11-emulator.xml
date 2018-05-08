@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<PKCS11Conf xmlns="http://xipki.org/security/pkcs11/conf/v2">
+<pkcs11conf xmlns="http://xipki.org/security/pkcs11/conf/v2">
   <modules>
     <!-- exactly one module must be named 'default' -->
     <module name="default">
@@ -134,4 +134,4 @@
       <mechanism>CKM_VENDOR_SM2_KEY_PAIR_GEN</mechanism>
     </mechanismSet>
   </mechanismSets>
-</PKCS11Conf>
+</pkcs11conf>

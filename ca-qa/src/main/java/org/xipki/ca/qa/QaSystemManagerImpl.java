@@ -42,7 +42,7 @@ import org.xipki.ca.qa.jaxb.CertprofileType;
 import org.xipki.ca.qa.jaxb.FileOrValueType;
 import org.xipki.ca.qa.jaxb.IssuerType;
 import org.xipki.ca.qa.jaxb.ObjectFactory;
-import org.xipki.ca.qa.jaxb.QAConfType;
+import org.xipki.ca.qa.jaxb.QaconfType;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -102,7 +102,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
       return;
     }
 
-    QAConfType qaConf;
+    QaconfType qaConf;
     try {
       FileInputStream issuerConfStream = new FileInputStream(confFile);
       qaConf = parseQaConf(issuerConfStream);
@@ -194,7 +194,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     return x509ProfileMap.get(certprofileName);
   }
 
-  private QAConfType parseQaConf(InputStream confStream)
+  private QaconfType parseQaConf(InputStream confStream)
       throws IOException, JAXBException, SAXException {
     JAXBElement<?> rootElement;
     try {
@@ -204,8 +204,8 @@ public class QaSystemManagerImpl implements QaSystemManager {
     }
 
     Object rootType = rootElement.getValue();
-    if (rootType instanceof QAConfType) {
-      return (QAConfType) rootElement.getValue();
+    if (rootType instanceof QaconfType) {
+      return (QaconfType) rootElement.getValue();
     } else {
       throw new SAXException("invalid root element type");
     }

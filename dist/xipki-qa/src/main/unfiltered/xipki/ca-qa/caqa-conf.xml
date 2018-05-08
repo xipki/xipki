@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<QAConf xmlns="http://xipki.org/ca/qa/qa/conf/v2">
+<qaconf xmlns="http://xipki.org/ca/qa/qa/conf/v2">
   <issuers>
     <issuer name="rootca">
       <cert>
@@ -87,4 +87,4 @@
       <file>xipki/ca-qa/certprofile/certprofile-extended-qa.xml</file>
     </certprofile>
   </certprofiles>
-</QAConf>
+</qaconf>

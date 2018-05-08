@@ -79,9 +79,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
+class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbExporter.class);
 
   private final Marshaller marshaller;
 
@@ -93,7 +93,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
   private final boolean resume;
 
-  CaCertStoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+  CaCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
       int numCertsPerSelect, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
           throws DataAccessException, JAXBException {
     super(datasource, baseDir, stopMe, evaluateOnly);

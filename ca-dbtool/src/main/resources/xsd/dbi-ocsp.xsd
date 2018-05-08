@@ -19,8 +19,8 @@
   targetNamespace="http://xipki.org/ca/dbtool/ocsp/v2"
   elementFormDefault="qualified">
   <!-- CertStore -->
-  <xs:element name="CertStore" type="CertStoreType"/>
-  <xs:complexType name="CertStoreType">
+  <xs:element name="certstore" type="certstoreType"/>
+  <xs:complexType name="certstoreType">
     <xs:sequence>
       <xs:element name="certhashAlgo" type="xs:string"/>
       <xs:element name="issuers">

@@ -19,8 +19,8 @@
     targetNamespace="http://xipki.org/ca/xmlprofile/v2"
     elementFormDefault="qualified">
   <!-- root element -->
-  <xs:element name="X509Profile" type="X509ProfileType"/>
-  <xs:complexType name="X509ProfileType">
+  <xs:element name="x509profile" type="x509profileType"/>
+  <xs:complexType name="x509profileType">
     <xs:sequence>
       <xs:element name="appInfo" type="anyType" minOccurs="0"/>
       <xs:element name="version" type="xs:string">
@@ -207,45 +207,45 @@
       <xs:extension base="anyType"/>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="BaseRSAParametersType">
+  <xs:complexType name="baseRsaParametersType">
       <xs:sequence>
         <xs:element name="modulusLength" type="rangesType" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
-  <xs:element name="RSAParameters">
+  <xs:element name="rsaParameters">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="BaseRSAParametersType">
+        <xs:extension base="baseRsaParametersType">
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="BaseDSAParametersType">
+  <xs:complexType name="baseDsaParametersType">
    <xs:sequence>
       <xs:element name="pLength" type="rangesType" minOccurs="0"/>
       <xs:element name="qLength" type="rangesType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="DSAParameters">
+  <xs:element name="dsaParameters">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="BaseDSAParametersType">
+        <xs:extension base="baseDsaParametersType">
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="DHParameters">
+  <xs:element name="dhParameters">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="BaseDSAParametersType">
+        <xs:extension base="baseDsaParametersType">
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="RSAPSSParameters">
+  <xs:element name="rsapssParameters">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="BaseRSAParametersType">
+        <xs:extension base="baseRsaParametersType">
           <xs:sequence>
             <xs:element name="hashAlgorithm" type="oidWithDescType" minOccurs="0"
                 maxOccurs="unbounded"/>
@@ -260,7 +260,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ECParameters">
+  <xs:element name="ecParameters">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="curves" minOccurs="0">
@@ -522,7 +522,7 @@
       <xs:element name="constant" type="constantValueType"/>
       <xs:element name="qcRetentionPeriod" type="xs:int"/>
       <xs:element name="qcEuLimitValue" type="qcEuLimitValueType"/>
-      <xs:element name="pdsLocations" type="PdsLocationsType"/>
+      <xs:element name="pdsLocations" type="pdsLocationsType"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="qcEuLimitValueType">
@@ -532,12 +532,12 @@
       <xs:element name="exponent" type="range2Type"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="PdsLocationsType">
+  <xs:complexType name="pdsLocationsType">
     <xs:sequence>
-      <xs:element name="pdsLocation" type="PdsLocationType" maxOccurs="99"/>
+      <xs:element name="pdsLocation" type="pdsLocationType" maxOccurs="99"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="PdsLocationType">
+  <xs:complexType name="pdsLocationType">
     <xs:sequence>
       <xs:element name="url" type="xs:string"/>
       <xs:element name="language" type="xs:string"/>
@@ -551,14 +551,14 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SMIMECapabilities">
+  <xs:element name="smimeCapabilities">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="SMIMECapability" maxOccurs="unbounded" />
+        <xs:element ref="smimeCapability" maxOccurs="unbounded" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SMIMECapability">
+  <xs:element name="smimeCapability">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="capabilityID" type="oidWithDescType"/>

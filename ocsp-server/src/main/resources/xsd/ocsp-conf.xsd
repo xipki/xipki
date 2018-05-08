@@ -19,7 +19,7 @@
   targetNamespace="http://xipki.org/ocsp/conf/v2"
   elementFormDefault="qualified">
   <!-- Root Element -->
-  <xs:element name="OCSPServer">
+  <xs:element name="ocspserver">
     <xs:complexType>
       <xs:all>
         <xs:element name="responseCache" type="responseCacheType" minOccurs="0"/>
@@ -321,7 +321,7 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="includeCrlID" type="xs:boolean" minOccurs="0">
+      <xs:element name="includeCrlId" type="xs:boolean" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
             Whether to include extension crlID in OCSP response if

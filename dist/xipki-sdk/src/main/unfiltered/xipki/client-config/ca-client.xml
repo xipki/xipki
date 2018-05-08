@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<CAClient xmlns="http://xipki.org/ca/client/conf/v2">
+<caclient xmlns="http://xipki.org/ca/client/conf/v2">
   <requestors>
     <requestor>
       <name>requestor1</name>
@@ -41,25 +41,25 @@
       </signatureAlgos>
     </responder>
   </responders>
-  <CAs>
+  <cas>
     <!-- Interval in minutes to update the CA information if autoconf is activated,
       default to be 10, value between 1 and 4 will be converted to 5, value less than 1
       disables the interval update -->
-    <CAInfoUpdateInterval>10</CAInfoUpdateInterval>
-    <CA enabled="true">
+    <cainfoUpdateInterval>10</cainfoUpdateInterval>
+    <ca enabled="true">
       <name>MYCA</name>
       <url>https://localhost:8443/cmp/myca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
-      <cmpControl>
+      <cmpcontrol>
         <autoconf/>
-      </cmpControl>
+      </cmpcontrol>
       <caCert>
         <autoconf/>
       </caCert>
       <certprofiles>
         <autoconf/>
       </certprofiles>
-    </CA>
-  </CAs>
-</CAClient>
+    </ca>
+  </cas>
+</caclient>

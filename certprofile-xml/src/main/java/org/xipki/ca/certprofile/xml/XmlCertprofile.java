@@ -123,8 +123,8 @@ import org.xipki.ca.certprofile.xml.jaxb.QcStatements;
 import org.xipki.ca.certprofile.xml.jaxb.Range2Type;
 import org.xipki.ca.certprofile.xml.jaxb.RdnType;
 import org.xipki.ca.certprofile.xml.jaxb.Restriction;
-import org.xipki.ca.certprofile.xml.jaxb.SMIMECapabilities;
-import org.xipki.ca.certprofile.xml.jaxb.SMIMECapability;
+import org.xipki.ca.certprofile.xml.jaxb.SmimeCapabilities;
+import org.xipki.ca.certprofile.xml.jaxb.SmimeCapability;
 import org.xipki.ca.certprofile.xml.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.xml.jaxb.SubjectDirectoryAttributs;
 import org.xipki.ca.certprofile.xml.jaxb.SubjectInfoAccess;
@@ -1004,19 +1004,19 @@ public class XmlCertprofile extends BaseCertprofile {
     }
     extnIds.remove(type);
 
-    SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(type, extensionsType,
-        SMIMECapabilities.class);
+    SmimeCapabilities extConf = (SmimeCapabilities) getExtensionValue(type, extensionsType,
+        SmimeCapabilities.class);
     if (extConf == null) {
       return;
     }
 
-    List<SMIMECapability> list = extConf.getSMIMECapability();
+    List<SmimeCapability> list = extConf.getSmimeCapability();
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
-    for (SMIMECapability m : list) {
+    for (SmimeCapability m : list) {
       ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getCapabilityID().getValue());
       ASN1Encodable params = null;
-      org.xipki.ca.certprofile.xml.jaxb.SMIMECapability.Parameters capParams = m.getParameters();
+      org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters capParams = m.getParameters();
       if (capParams != null) {
         if (capParams.getInteger() != null) {
           params = new ASN1Integer(capParams.getInteger());
@@ -1933,7 +1933,8 @@ public class XmlCertprofile extends BaseCertprofile {
       } else {
         String displayName = ObjectIdentifiers.oidToDisplayName(type);
         throw new CertprofileException("the extension configuration for " + displayName
-            + " is not of the expected type " + expectedClass.getName());
+            + " is not of the expected type " + expectedClass.getName() + ", but "
+            + obj.getClass().getName());
       }
     }
 

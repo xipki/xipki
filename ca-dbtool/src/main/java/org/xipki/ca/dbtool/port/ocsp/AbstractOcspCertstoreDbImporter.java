@@ -32,7 +32,7 @@ import org.xipki.security.HashAlgo;
  * @since 2.0.0
  */
 
-abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
+abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
 
   protected static final String MSG_CERTS_FINISHED = "certs.finished";
 
@@ -46,7 +46,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
 
   protected static final String SQL_DEL_CERT = "DELETE FROM CERT WHERE ID>?";
 
-  AbstractOcspCertStoreDbImporter(DataSourceWrapper datasource, String srcDir,
+  AbstractOcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir,
       AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
     super(datasource, srcDir, stopMe, evaluateOnly);
   }
