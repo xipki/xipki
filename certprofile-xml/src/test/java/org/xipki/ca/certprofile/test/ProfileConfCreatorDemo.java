@@ -463,9 +463,9 @@ public class ProfileConfCreatorDemo {
     subjectAltNameMode.setDnsName("");
     subjectAltNameMode.setDirectoryName("");
     subjectAltNameMode.setEdiPartyName("");
-    subjectAltNameMode.setUniformResourceIdentifier("");
+    subjectAltNameMode.setUri("");
     subjectAltNameMode.setIpAddress("");
-    subjectAltNameMode.setRegisteredID("");
+    subjectAltNameMode.setRegisteredId("");
 
     extensionValue = createExtensionValueType(subjectAltNameMode);
     list.add(createExtension(Extension.subjectAlternativeName, true, false, extensionValue));
@@ -480,7 +480,7 @@ public class ProfileConfCreatorDemo {
     GeneralNameType accessLocation = new GeneralNameType();
     access.setAccessLocation(accessLocation);
     accessLocation.setDirectoryName("");
-    accessLocation.setUniformResourceIdentifier("");
+    accessLocation.setUri("");
 
     extensionValue = createExtensionValueType(subjectInfoAccessMode);
     list.add(createExtension(Extension.subjectInfoAccess, true, false, extensionValue));
@@ -1067,9 +1067,9 @@ public class ProfileConfCreatorDemo {
     subjectAltNameMode.setDnsName("");
     subjectAltNameMode.setDirectoryName("");
     subjectAltNameMode.setEdiPartyName("");
-    subjectAltNameMode.setUniformResourceIdentifier("");
+    subjectAltNameMode.setUri("");
     subjectAltNameMode.setIpAddress("");
-    subjectAltNameMode.setRegisteredID("");
+    subjectAltNameMode.setRegisteredId("");
 
     extensionValue = createExtensionValueType(subjectAltNameMode);
     list.add(createExtension(Extension.subjectAlternativeName, true, false, extensionValue));
@@ -1098,9 +1098,9 @@ public class ProfileConfCreatorDemo {
       accessLocation.setDnsName("");
       accessLocation.setDirectoryName("");
       accessLocation.setEdiPartyName("");
-      accessLocation.setUniformResourceIdentifier("");
+      accessLocation.setUri("");
       accessLocation.setIpAddress("");
-      accessLocation.setRegisteredID("");
+      accessLocation.setRegisteredId("");
     }
 
     extensionValue = createExtensionValueType(subjectInfoAccessMode);
@@ -1843,20 +1843,20 @@ public class ProfileConfCreatorDemo {
     // DES-EDE3-CBC
     SmimeCapability cap = new SmimeCapability();
     caps.getSmimeCapability().add(cap);
-    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.7"),
+    cap.setCapabilityId(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.7"),
         "DES-EDE3-CBC"));
 
     // RC2-CBC keysize 128
     cap = new SmimeCapability();
     caps.getSmimeCapability().add(cap);
-    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
+    cap.setCapabilityId(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
     cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters());
     cap.getParameters().setInteger(BigInteger.valueOf(128));
 
     // RC2-CBC keysize 64
     cap = new SmimeCapability();
     caps.getSmimeCapability().add(cap);
-    cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
+    cap.setCapabilityId(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
     cap.setParameters(new org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters());
 
     Base64BinaryWithDescType binary = new Base64BinaryWithDescType();

@@ -561,7 +561,7 @@
   <xs:element name="smimeCapability">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="capabilityID" type="oidWithDescType"/>
+        <xs:element name="capabilityId" type="oidWithDescType"/>
         <xs:element name="parameters" minOccurs="0">
           <xs:complexType>
             <xs:choice>
@@ -628,9 +628,9 @@
       <xs:element name="dnsName" type="xs:string" minOccurs="0"/>
       <xs:element name="directoryName" type="xs:string" minOccurs="0"/>
       <xs:element name="ediPartyName" type="xs:string" minOccurs="0"/>
-      <xs:element name="uniformResourceIdentifier" type="xs:string" minOccurs="0"/>
+      <xs:element name="uri" type="xs:string" minOccurs="0"/>
       <xs:element name="ipAddress" type="xs:string" minOccurs="0"/>
-      <xs:element name="registeredID" type="xs:string" minOccurs="0"/>
+      <xs:element name="registeredId" type="xs:string" minOccurs="0"/>
       <xs:element name="otherName" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

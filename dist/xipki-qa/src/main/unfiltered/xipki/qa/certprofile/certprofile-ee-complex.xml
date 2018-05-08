@@ -368,9 +368,9 @@
           <dnsName></dnsName>
           <directoryName></directoryName>
           <ediPartyName></ediPartyName>
-          <uniformResourceIdentifier></uniformResourceIdentifier>
+          <uri></uri>
           <ipAddress></ipAddress>
-          <registeredID></registeredID>
+          <registeredId></registeredId>
           <otherName>
             <type description="dummy oid 1">1.2.3.1</type>
             <type description="dummy oid 2">1.2.3.2</type>
@@ -390,9 +390,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -406,9 +406,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -422,9 +422,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -438,9 +438,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -454,9 +454,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -470,9 +470,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -486,9 +486,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -502,9 +502,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -518,9 +518,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -534,9 +534,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>
@@ -550,9 +550,9 @@
               <dnsName></dnsName>
               <directoryName></directoryName>
               <ediPartyName></ediPartyName>
-              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <uri></uri>
               <ipAddress></ipAddress>
-              <registeredID></registeredID>
+              <registeredId></registeredId>
               <otherName>
 <type description="dummy oid 1">1.2.3.1</type>
 <type description="dummy oid 2">1.2.3.2</type>

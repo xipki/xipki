@@ -108,6 +108,7 @@
   <xs:complexType name="slotType">
     <xs:choice>
       <xs:element name="index" type="xs:int"/>
+      <!-- slot identifier (decimal or with the prefix 0x for heximal) -->
       <xs:element name="id" type="xs:string"/>
     </xs:choice>
   </xs:complexType>

@@ -35,7 +35,7 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="subject" type="xs:string"/>
-      <xs:element name="randomDN" type="xs:string">
+      <xs:element name="randomDn" type="xs:string">
         <xs:annotation>
           <xs:documentation>
             Valid values are GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN

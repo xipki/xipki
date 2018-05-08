@@ -1014,7 +1014,7 @@ public class XmlCertprofile extends BaseCertprofile {
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (SmimeCapability m : list) {
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getCapabilityID().getValue());
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getCapabilityId().getValue());
       ASN1Encodable params = null;
       org.xipki.ca.certprofile.xml.jaxb.SmimeCapability.Parameters capParams = m.getParameters();
       if (capParams != null) {

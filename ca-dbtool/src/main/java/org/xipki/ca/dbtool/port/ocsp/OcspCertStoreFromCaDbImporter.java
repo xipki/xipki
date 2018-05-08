@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
@@ -114,10 +114,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   }
 
   public void importToDb() throws Exception {
-    CertStoreType certstore;
+    CertstoreType certstore;
     try {
       @SuppressWarnings("unchecked")
-      JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+      JAXBElement<CertstoreType> root = (JAXBElement<CertstoreType>)
           unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CERTSTORE));
       certstore = root.getValue();
     } catch (JAXBException ex) {
@@ -302,7 +302,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   } // method importIssuer0
 
-  private void importCert(CertStoreType certstore, Map<Integer, String> profileMap,
+  private void importCert(CertstoreType certstore, Map<Integer, String> profileMap,
       boolean revokedOnly, List<Integer> caIds, File processLogFile) throws Exception {
     HashAlgo certhashAlgo = getCertHashAlgo(datasource);
 

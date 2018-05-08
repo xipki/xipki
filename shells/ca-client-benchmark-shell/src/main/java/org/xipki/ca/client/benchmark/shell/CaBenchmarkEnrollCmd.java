@@ -101,7 +101,7 @@ public class CaBenchmarkEnrollCmd extends CaBenchmarkAction {
     if (randomDnStr != null) {
       randomDn = RandomDn.getInstance(randomDnStr);
       if (randomDn == null) {
-        throw new IllegalCmdParamException("invalid randomDN " + randomDnStr);
+        throw new IllegalCmdParamException("invalid randomDn " + randomDnStr);
       }
     }
 

@@ -282,9 +282,9 @@
       <xs:element name="profiles" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <!-- CertStore -->
-  <xs:element name="CertStore" type="CertStoreType"/>
-  <xs:complexType name="CertStoreType">
+  <!-- Certstore -->
+  <xs:element name="Certstore" type="CertstoreType"/>
+  <xs:complexType name="CertstoreType">
     <xs:sequence>
       <xs:element name="countCrls" type="xs:int"/>
       <xs:element name="countCerts" type="xs:int"/>
@@ -297,10 +297,10 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="deltaCRLCache">
+      <xs:element name="deltaCrlCache">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="entry" type="deltaCRLCacheEntryType" minOccurs="0"
+            <xs:element name="entry" type="deltaCrlCacheEntryType" minOccurs="0"
                 maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
@@ -315,7 +315,7 @@
       <xs:element name="caId" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="deltaCRLCacheEntryType">
+  <xs:complexType name="deltaCrlCacheEntryType">
     <xs:sequence>
       <xs:element name="serial" type="xs:string"/>
       <xs:element name="caId" type="xs:int"/>

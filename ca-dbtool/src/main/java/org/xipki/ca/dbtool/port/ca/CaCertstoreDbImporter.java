@@ -46,10 +46,10 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
-import org.xipki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType.DeltaCrlCache;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType.PublishQueue;
+import org.xipki.ca.dbtool.jaxb.ca.DeltaCrlCacheEntryType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
@@ -83,9 +83,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
+class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbImporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbImporter.class);
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
@@ -110,7 +110,7 @@ class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
 
   private final int numCertsPerCommit;
 
-  CaCertStoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
+  CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
       boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
     super(datasource, srcDir, stopMe, evaluateOnly);
 
@@ -135,10 +135,10 @@ class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
   }
 
   public void importToDb() throws Exception {
-    CertStoreType certstore;
+    CertstoreType certstore;
     try {
       @SuppressWarnings("unchecked")
-      JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+      JAXBElement<CertstoreType> root = (JAXBElement<CertstoreType>)
           unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CERTSTORE));
       certstore = root.getValue();
     } catch (JAXBException ex) {
@@ -146,7 +146,7 @@ class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
     }
 
     if (certstore.getVersion() > VERSION) {
-      throw new Exception("could not import CertStore greater than " + VERSION + ": "
+      throw new Exception("could not import Certstore greater than " + VERSION + ": "
           + certstore.getVersion());
     }
 
@@ -224,7 +224,7 @@ class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
       }
 
       importPublishQueue(certstore.getPublishQueue());
-      importDeltaCrlCache(certstore.getDeltaCRLCache());
+      importDeltaCrlCache(certstore.getDeltaCrlCache());
 
       recoverIndexes();
       processLogFile.delete();
@@ -260,14 +260,14 @@ class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
     System.out.println(" imported table PUBLISHQUEUE");
   } // method importPublishQueue
 
-  private void importDeltaCrlCache(DeltaCRLCache deltaCrlCache) throws DataAccessException {
+  private void importDeltaCrlCache(DeltaCrlCache deltaCrlCache) throws DataAccessException {
     final String sql = "INSERT INTO DELTACRL_CACHE (ID,SN,CA_ID) VALUES (?,?,?)";
     System.out.println("importing table DELTACRL_CACHE");
     PreparedStatement ps = prepareStatement(sql);
 
     try {
       long id = 1;
-      for (DeltaCRLCacheEntryType entry : deltaCrlCache.getEntry()) {
+      for (DeltaCrlCacheEntryType entry : deltaCrlCache.getEntry()) {
         try {
           ps.setLong(1, id++);
           ps.setString(2, entry.getSerial());
@@ -286,7 +286,7 @@ class CaCertStoreDbImporter extends AbstractCaCertstoreDbPorter {
     System.out.println(" imported table DELTACRL_CACHE");
   } // method importDeltaCRLCache
 
-  private Exception importEntries(CaDbEntryType type, CertStoreType certstore,
+  private Exception importEntries(CaDbEntryType type, CertstoreType certstore,
       File processLogFile, Integer numProcessedInLastProcess, Long idProcessedInLastProcess) {
     String tablesText = (CaDbEntryType.CERT == type)
         ? "tables CERT and CRAW" : "table " + type.getTableName();

@@ -189,10 +189,10 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
         throw new RuntimeException("should not reach here, unknown child of KeyEntry");
       }
 
-      String randomDnStr = entry.getRandomDN();
+      String randomDnStr = entry.getRandomDn();
       BenchmarkEntry.RandomDn randomDn = BenchmarkEntry.RandomDn.getInstance(randomDnStr);
       if (randomDn == null) {
-        throw new InvalidConfException("invalid randomDN " + randomDnStr);
+        throw new InvalidConfException("invalid randomDn " + randomDnStr);
       }
 
       benchmarkEntries.add(

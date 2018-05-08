@@ -225,16 +225,16 @@
       <value>
         <smimeCapabilities>
           <smimeCapability>
-            <capabilityID description="DES-EDE3-CBC">1.2.840.113549.3.7</capabilityID>
+            <capabilityId description="DES-EDE3-CBC">1.2.840.113549.3.7</capabilityId>
           </smimeCapability>
           <smimeCapability>
-            <capabilityID description="RC2-CBC">1.2.840.113549.3.2</capabilityID>
+            <capabilityId description="RC2-CBC">1.2.840.113549.3.2</capabilityId>
             <parameters>
               <integer>128</integer>
             </parameters>
           </smimeCapability>
           <smimeCapability>
-            <capabilityID description="RC2-CBC">1.2.840.113549.3.2</capabilityID>
+            <capabilityId description="RC2-CBC">1.2.840.113549.3.2</capabilityId>
             <parameters>
               <base64Binary description="INTEGER 64">AgFA</base64Binary>
             </parameters>

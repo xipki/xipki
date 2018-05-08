@@ -44,10 +44,10 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
-import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
-import org.xipki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType.DeltaCrlCache;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreType.PublishQueue;
+import org.xipki.ca.dbtool.jaxb.ca.DeltaCrlCacheEntryType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.ca.dbtool.port.DbPorter;
@@ -115,11 +115,11 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
 
   @SuppressWarnings("unchecked")
   public void export() throws Exception {
-    CertStoreType certstore;
+    CertstoreType certstore;
     if (resume) {
-      JAXBElement<CertStoreType> root;
+      JAXBElement<CertstoreType> root;
       try {
-        root = (JAXBElement<CertStoreType>)
+        root = (JAXBElement<CertstoreType>)
           unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CERTSTORE));
       } catch (JAXBException ex) {
         throw XmlUtil.convert(ex);
@@ -131,7 +131,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
             + VERSION + ": " + certstore.getVersion());
       }
     } else {
-      certstore = new CertStoreType();
+      certstore = new CertstoreType();
       certstore.setVersion(VERSION);
     }
 
@@ -176,7 +176,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
         }
       }
 
-      JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
+      JAXBElement<CertstoreType> root = new ObjectFactory().createCertstore(certstore);
       try {
         marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CERTSTORE));
       } catch (JAXBException ex) {
@@ -194,7 +194,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     }
   } // method export
 
-  private Exception exportEntries(CaDbEntryType type, CertStoreType certstore,
+  private Exception exportEntries(CaDbEntryType type, CertstoreType certstore,
       File processLogFile, Long idProcessedInLastProcess) {
     String tablesText = (CaDbEntryType.CERT == type)
         ? "tables CERT and CRAW" : "table " + type.getTableName();
@@ -222,7 +222,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     }
   }
 
-  private void exportEntries(CaDbEntryType type, CertStoreType certstore, File processLogFile,
+  private void exportEntries(CaDbEntryType type, CertstoreType certstore, File processLogFile,
       FileOutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
     final int numEntriesPerSelect = Math.max(1,
         Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
@@ -524,7 +524,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     System.out.println(exportedText() + sum + " entries from " + tablesText);
   } // method exportEntries
 
-  private void exportPublishQueue(CertStoreType certstore) throws DataAccessException {
+  private void exportPublishQueue(CertstoreType certstore) throws DataAccessException {
     System.out.println("exporting table PUBLISHQUEUE");
 
     String sql = "SELECT CID,PID,CA_ID FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC";
@@ -567,18 +567,18 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     System.out.println(" exported table PUBLISHQUEUE");
   } // method exportPublishQueue
 
-  private void exportDeltaCrlCache(CertStoreType certstore) throws DataAccessException {
+  private void exportDeltaCrlCache(CertstoreType certstore) throws DataAccessException {
     System.out.println("exporting table DELTACRL_CACHE");
 
     final String sql = "SELECT SN,CA_ID FROM DELTACRL_CACHE";
 
-    DeltaCRLCache deltaCache = new DeltaCRLCache();
-    certstore.setDeltaCRLCache(deltaCache);
+    DeltaCrlCache deltaCache = new DeltaCrlCache();
+    certstore.setDeltaCrlCache(deltaCache);
 
     PreparedStatement ps = prepareStatement(sql);
     ResultSet rs = null;
 
-    List<DeltaCRLCacheEntryType> list = deltaCache.getEntry();
+    List<DeltaCrlCacheEntryType> list = deltaCache.getEntry();
 
     try {
       rs = ps.executeQuery();
@@ -587,7 +587,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
         String serial = rs.getString("SN");
         int caId = rs.getInt("CA_ID");
 
-        DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
+        DeltaCrlCacheEntryType entry = new DeltaCrlCacheEntryType();
         entry.setCaId(caId);
         entry.setSerial(serial);
         list.add(entry);
@@ -630,7 +630,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     }
   }
 
-  private static void setCount(CaDbEntryType type, CertStoreType certstore, int num) {
+  private static void setCount(CaDbEntryType type, CertstoreType certstore, int num) {
     switch (type) {
       case CERT:
         certstore.setCountCerts(num);

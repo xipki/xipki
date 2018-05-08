@@ -353,7 +353,7 @@ public class XmlCertprofileUtil {
       ret.add(new GeneralNameMode(GeneralNameTag.ediPartyName));
     }
 
-    if (name.getUniformResourceIdentifier() != null) {
+    if (name.getUri() != null) {
       ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
     }
 
@@ -361,7 +361,7 @@ public class XmlCertprofileUtil {
       ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
     }
 
-    if (name.getRegisteredID() != null) {
+    if (name.getRegisteredId() != null) {
       ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
     }
 
