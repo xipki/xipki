@@ -1,0 +1,6 @@
+sudo: false
+language: java
+script: mvn clean install -Pdist
+
+notifications:
+  email: false
