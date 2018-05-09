@@ -260,7 +260,7 @@ A list of all available XiPKI features can be retrieved via the command
 `feature:list  | grep xipki` in OSGi console.
 
 For details of karaf features please refer to
-[Karaf Manuel Provisioning](https://karaf.apache.org/manual/latest/provisioning)
+[Karaf Manual: Provisioning](https://karaf.apache.org/manual/latest/provisioning)
 
 Karaf Commands
 -----
