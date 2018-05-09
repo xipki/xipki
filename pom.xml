@@ -54,7 +54,7 @@
     <slf4j.version>1.7.7</slf4j.version>
     <jscep.version>2.4.0</jscep.version>
     <junit.version>4.8.2</junit.version>
-    <pkcs11-wrapper.version>1.4.1-SNAPSHOT</pkcs11-wrapper.version>
+    <pkcs11-wrapper.version>1.4.1</pkcs11-wrapper.version>
     <liquibase.version>3.5.4</liquibase.version>
     <snakeyaml.version>1.17</snakeyaml.version>
     <hikaricp.version>3.0.0</hikaricp.version>
