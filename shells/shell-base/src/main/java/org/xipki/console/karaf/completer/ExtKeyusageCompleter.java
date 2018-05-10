@@ -17,12 +17,9 @@
 
 package org.xipki.console.karaf.completer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.ObjectIdentifiers;
 
 /**
@@ -32,26 +29,20 @@ import org.xipki.security.ObjectIdentifiers;
  */
 
 @Service
-public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
+public class ExtKeyusageCompleter extends AbstractEnumCompleter {
 
-  private static final Set<String> USAGES;
-
-  static {
-    Set<String> oids = new HashSet<>();
-    oids.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-    oids.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-    oids.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-    oids.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-    oids.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-    oids.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-    oids.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-    oids.add(ObjectIdentifiers.id_kp_timeStamping.getId());
-    USAGES = Collections.unmodifiableSet(oids);
-  }
-
-  @Override
-  protected Set<String> getEnums() {
-    return USAGES;
+  public ExtKeyusageCompleter() {
+    String tokens = StringUtil.concat(
+        ObjectIdentifiers.id_kp_clientAuth.getId(), ",",
+        ObjectIdentifiers.id_kp_codeSigning.getId(), ",",
+        ObjectIdentifiers.id_kp_emailProtection.getId(), ",",
+        ObjectIdentifiers.id_kp_ipsecEndSystem.getId(), ",",
+        ObjectIdentifiers.id_kp_ipsecTunnel.getId(), ",",
+        ObjectIdentifiers.id_kp_OCSPSigning.getId(), ",",
+        ObjectIdentifiers.id_kp_serverAuth.getId(), ",",
+        ObjectIdentifiers.id_kp_timeStamping.getId());
+    
+    setTokens(tokens);
   }
 
 }

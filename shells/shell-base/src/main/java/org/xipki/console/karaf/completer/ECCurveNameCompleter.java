@@ -17,11 +17,8 @@
 
 package org.xipki.console.karaf.completer;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
@@ -32,11 +29,15 @@ import org.xipki.security.util.AlgorithmUtil;
 
 @Service
 // CHECKSTYLE:SKIP
-public class ECCurveNameCompleter extends AbstractDynamicEnumCompleter {
+public class ECCurveNameCompleter extends AbstractEnumCompleter {
 
-  @Override
-  protected Set<String> getEnums() {
-    return new HashSet<>(AlgorithmUtil.getECCurveNames());
+  public ECCurveNameCompleter() {
+    StringBuilder enums = new StringBuilder();
+    for (String name : AlgorithmUtil.getECCurveNames()) {
+      enums.append(name).append(",");
+    }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
   }
 
 }

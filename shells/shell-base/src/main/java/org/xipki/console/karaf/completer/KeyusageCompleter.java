@@ -17,12 +17,8 @@
 
 package org.xipki.console.karaf.completer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.KeyUsage;
 
 /**
@@ -32,21 +28,15 @@ import org.xipki.security.KeyUsage;
  */
 
 @Service
-public class KeyusageCompleter extends AbstractDynamicEnumCompleter {
+public class KeyusageCompleter extends AbstractEnumCompleter {
 
-  private static final Set<String> USAGES;
-
-  static {
-    Set<String> usages = new HashSet<>();
+  public KeyusageCompleter() {
+    StringBuilder enums = new StringBuilder();
     for (KeyUsage usage : KeyUsage.values()) {
-      usages.add(usage.getName());
+      enums.append(usage.getName()).append(",");
     }
-    USAGES = Collections.unmodifiableSet(usages);
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
   }
-
-  @Override
-  protected Set<String> getEnums() {
-    return USAGES;
-  }
-
+  
 }

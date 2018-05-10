@@ -17,13 +17,8 @@
 
 package org.xipki.security.shell.completer;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
  * TODO.
@@ -32,14 +27,10 @@ import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
  */
 
 @Service
-public class KeystoreTypeCompleter extends AbstractDynamicEnumCompleter {
+public class KeystoreTypeCompleter extends AbstractEnumCompleter {
 
-  private static final Set<String> TYPES = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList("PKCS12", "JKS", "JCEKS")));
-
-  @Override
-  protected Set<String> getEnums() {
-    return TYPES;
+  public KeystoreTypeCompleter() {
+    setTokens("PKCS12,JKS,JCEKS");
   }
 
 }

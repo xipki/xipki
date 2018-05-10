@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.intern;
+package org.xipki.console.karaf;
 
 import java.io.Closeable;
 import java.io.File;
@@ -85,13 +85,15 @@ public class FileUtils {
    * @throws IOException if an IO error occurs while checking the file
    * @since 2.0.0
    */
-  public static boolean isSymlink(File file) throws IOException {
+  private static boolean isSymlink(File file) throws IOException {
     if (file == null) {
       throw new NullPointerException("File must not be null");
     }
-    if (Configuration.isWindows()) {
+    
+    if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
       return false;
     }
+
     File fileInCanonicalDir = (file.getParent() == null) ? file
         : new File(file.getParentFile().getCanonicalFile(), file.getName());
 
@@ -107,7 +109,7 @@ public class FileUtils {
    * @throws IOException in case cleaning is unsuccessful
    * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
    */
-  public static void cleanDirectory(File directory) throws IOException {
+  private static void cleanDirectory(File directory) throws IOException {
     if (!directory.exists()) {
       throw new IllegalArgumentException(directory + " does not exist");
     }
@@ -153,7 +155,7 @@ public class FileUtils {
    * @throws FileNotFoundException if the file was not found
    * @throws IOException in case deletion is unsuccessful
    */
-  public static void forceDelete(File file) throws IOException {
+  private static void forceDelete(File file) throws IOException {
     if (file.isDirectory()) {
       deleteDirectory(file);
       return;
@@ -248,7 +250,7 @@ public class FileUtils {
    * @throws IOException if an error occurs
    * @since 1.1
    */
-  public static void copyDirectory(File srcDir, File destDir, FileFilter filter,
+  private static void copyDirectory(File srcDir, File destDir, FileFilter filter,
       boolean preserveFileDate, List<String> exclusionList) throws IOException {
     // recurse
     final File[] srcFiles = (filter == null)
@@ -288,7 +290,7 @@ public class FileUtils {
     }
   }
 
-  public static void closeQuietly(Closeable... closeables) {
+  private static void closeQuietly(Closeable... closeables) {
     if (closeables == null) {
       return;
     }
