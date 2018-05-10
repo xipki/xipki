@@ -30,11 +30,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.shell.completer.LogLevelCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
 import org.xipki.password.PasswordResolver;
@@ -67,17 +67,17 @@ public class InitDbCmd extends XiAction {
 
   @Option(name = "--log-file",
       description = "log file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String logFile;
 
   @Option(name = "--db-conf", required = true,
       description = "DB configuration file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String dbConfFile;
 
   @Option(name = "--db-schema", required = true,
       description = "DB schema file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String dbSchemaFile;
 
   @Override

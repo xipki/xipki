@@ -17,9 +17,9 @@
 
 package org.xipki.ca.server.impl.cmp;
 
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;

@@ -24,13 +24,13 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -48,7 +48,7 @@ public abstract class UnRevRmCertAction extends CaAction {
 
   @Option(name = "--cert", aliases = "-c",
       description = "certificate file\n(either cert or serial must be specified)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String certFile;
 
   @Option(name = "--serial", aliases = "-s",

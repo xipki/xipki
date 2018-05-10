@@ -23,8 +23,8 @@ import java.security.SecureRandom;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.shell.KeyGenAction;
@@ -40,7 +40,7 @@ public abstract class P12KeyGenAction extends KeyGenAction {
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the key\n"
           + "(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String keyOutFile;
 
   @Option(name = "--password",

@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -52,7 +53,6 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.ocsp.client.api.OcspRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
@@ -77,7 +77,7 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
 
   @Option(name = "--resp-issuer",
       description = "certificate file of the responder's issuer")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String respIssuerFile;
 
   @Option(name = "--url",
@@ -86,12 +86,12 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
 
   @Option(name = "--req-out",
       description = "where to save the request")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String reqout;
 
   @Option(name = "--resp-out",
       description = "where to save the response")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String respout;
 
   @Option(name = "--hex",
@@ -105,12 +105,12 @@ public abstract class BaseOcspStatusAction extends OcspStatusAction {
 
   @Option(name = "--cert", aliases = "-c", multiValued = true,
       description = "certificate\n(multi-valued)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private List<String> certFiles;
 
   @Option(name = "--ac",
       description = "the certificates are attribute certificates")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private Boolean isAttrCert = Boolean.FALSE;
 
   @Reference

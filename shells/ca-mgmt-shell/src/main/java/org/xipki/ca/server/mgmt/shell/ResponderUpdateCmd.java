@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ResponderEntry;
@@ -33,7 +34,6 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 
@@ -63,7 +63,7 @@ public class ResponderUpdateCmd extends CaAction {
 
   @Option(name = "--cert",
       description = "requestor certificate file or 'null'")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String certFile;
 
   @Option(name = "--signer-conf",

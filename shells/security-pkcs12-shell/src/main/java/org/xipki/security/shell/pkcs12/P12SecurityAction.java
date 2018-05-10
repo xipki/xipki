@@ -27,7 +27,7 @@ import java.security.cert.CertificateException;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.util.KeyUtil;
 
@@ -41,7 +41,7 @@ public abstract class P12SecurityAction extends SecurityAction {
 
   @Option(name = "--p12", required = true,
       description = "PKCS#12 keystore file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String p12File;
 
   @Option(name = "--password",

@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.CaEntry;
@@ -48,7 +49,6 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.YesNoCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
@@ -132,7 +132,7 @@ public class CaUpdateCmd extends CaAction {
 
   @Option(name = "--cert",
       description = "CA certificate file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String certFile;
 
   @Option(name = "--signer-type",

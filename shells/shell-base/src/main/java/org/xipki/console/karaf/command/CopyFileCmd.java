@@ -24,9 +24,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.console.karaf.FileUtils;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -41,12 +41,12 @@ public class CopyFileCmd extends XiAction {
 
   @Argument(index = 0, name = "source file", required = true,
       description = "file to be copied\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String source;
 
   @Argument(index = 1, name = "destination", required = true,
       description = "destination directory or file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String dest;
 
   @Option(name = "--force", aliases = "-f",

@@ -21,10 +21,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.ocsp.OcspDbExportWorker;
 import org.xipki.console.karaf.completer.DirPathCompleter;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -41,7 +41,7 @@ public class ExportOcspCmd extends DbPortAction {
 
   @Option(name = "--db-conf",
       description = "database configuration file.")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String dbconfFile = DFLT_DBCONF_FILE;
 
   @Option(name = "--out-dir", required = true,

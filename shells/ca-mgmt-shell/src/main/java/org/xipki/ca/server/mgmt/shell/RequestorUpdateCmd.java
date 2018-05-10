@@ -23,11 +23,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -47,7 +47,7 @@ public class RequestorUpdateCmd extends CaAction {
 
   @Option(name = "--cert", required = true,
       description = "requestor certificate file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String certFile;
 
   @Override

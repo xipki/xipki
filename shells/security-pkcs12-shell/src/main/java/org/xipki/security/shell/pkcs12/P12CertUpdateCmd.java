@@ -29,9 +29,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.XiSecurityException;
@@ -49,12 +49,12 @@ public class P12CertUpdateCmd extends P12SecurityAction {
 
   @Option(name = "--cert", required = true,
       description = "certificate file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String certFile;
 
   @Option(name = "--ca-cert", multiValued = true,
       description = "CA Certificate file\n(multi-valued)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private Set<String> caCertFiles;
 
   @Override

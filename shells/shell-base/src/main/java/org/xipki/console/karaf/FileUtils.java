@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.List;
 
+import javax.security.auth.login.Configuration;
+
 /**
  * TODO.
  * @author Lijun Liao

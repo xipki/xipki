@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ChangeCrlSignerEntry;
@@ -34,7 +35,6 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 
@@ -65,7 +65,7 @@ public class CrlSignerUpdateCmd extends CaAction {
 
   @Option(name = "--cert",
       description = "CRL signer's certificate file or 'null'")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String signerCert;
 
   @Option(name = "--control",

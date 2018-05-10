@@ -23,10 +23,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.OBFPasswordService;
 
 /**
@@ -46,11 +46,11 @@ public class DeobfuscateCmd extends SecurityAction {
   private String passwordHint;
 
   @Option(name = "--password-file", description = "file containing the obfuscated password")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String passwordFile;
 
   @Option(name = "--out", description = "where to save the password")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outFile;
 
   @Override

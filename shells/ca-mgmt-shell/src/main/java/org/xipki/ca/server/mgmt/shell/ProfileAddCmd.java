@@ -21,13 +21,13 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileTypeCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -55,7 +55,7 @@ public class ProfileAddCmd extends CaAction {
 
   @Option(name = "--conf-file",
       description = "certificate profile configuration file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String confFile;
 
   @Override

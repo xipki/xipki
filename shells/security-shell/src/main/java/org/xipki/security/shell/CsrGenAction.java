@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -61,7 +62,6 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.ExtKeyusageCompleter;
 import org.xipki.console.karaf.completer.ExtensionNameCompleter;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.KeyusageCompleter;
 import org.xipki.security.ConcurrentBagEntrySigner;
@@ -119,7 +119,7 @@ public abstract class CsrGenAction extends SecurityAction {
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "output file name\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outputFilename;
 
   @Option(name = "--challenge-password", aliases = "-c",
@@ -155,7 +155,7 @@ public abstract class CsrGenAction extends SecurityAction {
 
   @Option(name = "--biometric-uri",
       description = "Biometric sourcedata URI")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String biometricUri;
 
   @Option(name = "--need-extension", multiValued = true,

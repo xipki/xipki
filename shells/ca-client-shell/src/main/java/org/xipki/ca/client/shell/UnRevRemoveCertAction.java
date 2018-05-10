@@ -29,9 +29,9 @@ import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -49,7 +49,7 @@ public abstract class UnRevRemoveCertAction extends ClientAction {
 
   @Option(name = "--cert", aliases = "-c",
       description = "certificate file (either cert or serial must be specified)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String certFile;
 
   @Option(name = "--serial", aliases = "-s",

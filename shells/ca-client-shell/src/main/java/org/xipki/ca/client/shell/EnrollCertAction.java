@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -67,7 +68,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.ExtKeyusageCompleter;
 import org.xipki.console.karaf.completer.ExtensionNameCompleter;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.KeyusageCompleter;
 import org.xipki.security.ConcurrentBagEntrySigner;
@@ -114,7 +114,7 @@ public abstract class EnrollCertAction extends ClientAction {
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outputFile;
 
   @Option(name = "--rsa-mgf1",
@@ -172,7 +172,7 @@ public abstract class EnrollCertAction extends ClientAction {
 
   @Option(name = "--biometric-file",
       description = "Biometric hash algorithm")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String biometricFile;
 
   @Option(name = "--biometric-uri",

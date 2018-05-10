@@ -28,6 +28,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.BigIntegerRange;
 import org.xipki.common.util.CollectionUtil;
@@ -36,7 +37,6 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.RangeBigIntegerIterator;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.OcspStatusAction;
 import org.xipki.ocsp.qa.benchmark.OcspBenchmark;
@@ -63,12 +63,12 @@ public class BenchmarkOcspStatusCmd extends OcspStatusAction {
 
   @Option(name = "--serial-file",
       description = "file that contains serial numbers")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String serialNumberFile;
 
   @Option(name = "--cert", multiValued = true,
       description = "certificate\n(multi-valued)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private List<String> certFiles;
 
   @Option(name = "--duration",

@@ -32,12 +32,12 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -72,12 +72,12 @@ public class CurlCmd extends XiAction {
 
   @Option(name = "--data-file",
       description = "file contains the data to be sent in a POST request")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String postDataFile;
 
   @Option(name = "--out",
       description = "where to save the response")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outFile;
 
   @Option(name = "--header", aliases = "-h", multiValued = true,

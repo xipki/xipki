@@ -31,8 +31,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 import org.xipki.security.util.X509Util;
 
@@ -49,7 +49,7 @@ public class ImportCertCmd extends SecurityAction {
 
   @Option(name = "--keystore", required = true,
       description = "Keystore file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String ksFile;
 
   @Option(name = "--type", required = true,
@@ -63,7 +63,7 @@ public class ImportCertCmd extends SecurityAction {
 
   @Option(name = "--cert", aliases = "-c", required = true, multiValued = true,
       description = "Certificate files\n(required, multi-valued)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private List<String> certFiles;
 
   @Override

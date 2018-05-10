@@ -29,10 +29,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 
 /**
@@ -48,7 +48,7 @@ public class ConvertKeystoreCmd extends SecurityAction {
 
   @Option(name = "--in", required = true,
       description = "Source keystore file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String inFile;
 
   @Option(name = "--intype", required = true,
@@ -62,7 +62,7 @@ public class ConvertKeystoreCmd extends SecurityAction {
 
   @Option(name = "--out", required = true,
       description = "Destination keystore file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outFile;
 
   @Option(name = "--outtype", required = true,

@@ -25,10 +25,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -48,7 +48,7 @@ public class GetCaCertCmd extends ClientAction {
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the CA certificate\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String outFile;
 
   @Override

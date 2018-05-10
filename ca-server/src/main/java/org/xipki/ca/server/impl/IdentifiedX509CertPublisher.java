@@ -21,11 +21,11 @@ import java.security.cert.X509CRL;
 import java.util.Map;
 
 import org.xipki.audit.AuditServiceRegister;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisher;
+import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.common.util.ParamUtil;

@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
@@ -35,7 +36,6 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -53,12 +53,12 @@ public class ExtractCertFromCrlCmd extends SecurityAction {
 
   @Option(name = "--crl", required = true,
       description = "CRL file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String crlFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "ZIP file to save the extracted certificates\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outFile;
 
   @Override

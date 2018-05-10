@@ -22,12 +22,12 @@ import java.io.IOException;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.client.api.CaClient;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -42,12 +42,12 @@ public abstract class ClientAction extends XiAction {
 
   @Option(name = "--req-out",
       description = "where to save the request")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String reqout;
 
   @Option(name = "--resp-out",
       description = "where to save the response")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String respout;
 
   protected RequestResponseDebug getRequestResponseDebug() {

@@ -30,9 +30,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
@@ -53,7 +53,7 @@ public class P12CsrGenCmd extends CsrGenAction {
 
   @Option(name = "--p12", required = true,
       description = "PKCS#12 keystore file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String p12File;
 
   @Option(name = "--password",

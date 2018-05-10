@@ -24,24 +24,24 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.xipki.ca.qa.CertprofileQa;
+import org.xipki.ca.qa.IssuerInfo;
 import org.xipki.ca.qa.QaSystemManager;
 import org.xipki.ca.qa.shell.completer.CertprofileNameCompleter;
 import org.xipki.ca.qa.shell.completer.IssuerNameCompleter;
-import org.xipki.ca.qa.CertprofileQa;
-import org.xipki.ca.qa.IssuerInfo;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -56,7 +56,7 @@ public class CheckCertCmd extends XiAction {
 
   @Option(name = "--cert", aliases = "-c", required = true,
       description = "certificate file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String certFile;
 
   @Option(name = "--issuer",
@@ -66,7 +66,7 @@ public class CheckCertCmd extends XiAction {
 
   @Option(name = "--csr", required = true,
       description = "CSR file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--profile", aliases = "-p", required = true,

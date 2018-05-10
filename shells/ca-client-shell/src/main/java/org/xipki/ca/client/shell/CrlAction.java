@@ -23,12 +23,12 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public abstract class CrlAction extends ClientAction {
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the CRL\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String outFile;
 
   protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;

@@ -30,9 +30,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
@@ -58,7 +58,7 @@ public class P11SecretKeyImportCmd extends P11KeyGenAction {
 
   @Option(name = "--keystore", required = true,
       description = "JCEKS keystore from which the key is imported\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String keyOutFile;
 
   @Option(name = "--password",

@@ -27,12 +27,12 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.FileBigIntegerIterator;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.SecurityFactory;
@@ -50,7 +50,7 @@ public class CaBenchmarkRevokeCmd extends CaBenchmarkAction {
 
   @Option(name = "--issuer", required = true,
       description = "issuer certificate file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String issuerCertFile;
 
   @Option(name = "--duration",
@@ -64,7 +64,7 @@ public class CaBenchmarkRevokeCmd extends CaBenchmarkAction {
   @Option(name = "--ca-db",
       description = "CA database configuration file\n"
           + "(exactly one of ca-db and serial-file must be specified)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String caDbConfFile;
 
   @Option(name = "--hex",
@@ -73,7 +73,7 @@ public class CaBenchmarkRevokeCmd extends CaBenchmarkAction {
 
   @Option(name = "--serial-file",
       description = "file that contains serial numbers")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String serialNumberFile;
 
   @Option(name = "--max-num",

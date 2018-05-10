@@ -22,11 +22,11 @@ import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -43,7 +43,7 @@ public abstract class CrlAction extends CaAction {
 
   @Option(name = "--out", aliases = "-o",
       description = "where to save the CRL (optional)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   protected String outFile;
 
   protected abstract X509CRL retrieveCrl() throws Exception;

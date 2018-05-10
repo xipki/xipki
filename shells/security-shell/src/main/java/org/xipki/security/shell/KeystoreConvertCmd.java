@@ -29,8 +29,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -49,7 +49,7 @@ public class KeystoreConvertCmd extends SecurityAction {
 
   @Option(name = "--in", required = true,
       description = "file of source keystore\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String inFile;
 
   @Option(name = "--in-provider",
@@ -80,7 +80,7 @@ public class KeystoreConvertCmd extends SecurityAction {
 
   @Option(name = "--out", required = true,
       description = "file of target keystore\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outFile;
 
   @Option(name = "--out-pass",

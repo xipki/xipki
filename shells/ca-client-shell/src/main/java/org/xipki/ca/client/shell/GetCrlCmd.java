@@ -26,6 +26,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
@@ -34,7 +35,6 @@ import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -53,7 +53,7 @@ public class GetCrlCmd extends CrlAction {
 
   @Option(name = "--basecrl-out",
       description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String baseCrlOut;
 
   @Override

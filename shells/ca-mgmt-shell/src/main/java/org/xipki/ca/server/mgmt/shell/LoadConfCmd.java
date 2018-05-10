@@ -21,10 +21,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -39,7 +39,7 @@ public class LoadConfCmd extends CaAction {
 
   @Option(name = "--conf-file",
       description = "CA system configuration file (XML or zip file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String confFile;
 
   @Override

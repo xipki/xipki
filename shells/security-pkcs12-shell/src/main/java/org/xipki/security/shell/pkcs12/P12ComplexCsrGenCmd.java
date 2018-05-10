@@ -33,6 +33,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -59,7 +60,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
@@ -82,7 +82,7 @@ public class P12ComplexCsrGenCmd extends CsrGenAction {
 
   @Option(name = "--p12", required = true,
       description = "PKCS#12 keystore file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String p12File;
 
   @Option(name = "--password",

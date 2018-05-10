@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.ClientException;
@@ -30,7 +31,6 @@ import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -42,12 +42,12 @@ public abstract class EnrollCertAction extends ClientAction {
 
   @Option(name = "--csr", required = true,
       description = "CSR file\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String outputFile;
 
   /**

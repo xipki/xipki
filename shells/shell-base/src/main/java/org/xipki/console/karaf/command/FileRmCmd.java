@@ -24,9 +24,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.console.karaf.FileUtils;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -41,7 +41,7 @@ public class FileRmCmd extends XiAction {
 
   @Argument(index = 0, name = "file", required = true,
       description = "file or directory to be deleted\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String targetPath;
 
   @Option(name = "--recursive", aliases = "-r",

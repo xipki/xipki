@@ -35,6 +35,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
@@ -48,7 +49,6 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.DirPathCompleter;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.SigAlgCompleter;
 import org.xipki.ocsp.client.api.OcspRequestor;
@@ -87,7 +87,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
 
   @Option(name = "--resp-issuer",
       description = "certificate file of the responder's issuer")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String respIssuerFile;
 
   @Option(name = "--url", required = true,
@@ -98,7 +98,7 @@ public class BatchOcspQaStatusCmd extends OcspStatusAction {
       description = "file containing the serial number and revocation information"
           + "\n(required)\nEach line starts with # for comment or is of following format"
           + "\nserial-number[,status[,revocation-time]]")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String snFile;
 
   @Option(name = "--hex",

@@ -20,9 +20,9 @@ package org.xipki.ca.api.publisher;
 import java.security.cert.CertificateEncodingException;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.CertWithDbId;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;

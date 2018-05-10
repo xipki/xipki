@@ -25,11 +25,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.diffdb.DigestDiffWorker;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.DirPathCompleter;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * TODO.
@@ -44,12 +44,12 @@ public class DiffDigestDbCmd extends DbPortAction {
 
   @Option(name = "--ref-db", required = true,
       description = "database configuration file of the reference system\n(required)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String refDbConf;
 
   @Option(name = "--target", required = true,
       description = "configuration file of the target database to be evaluated")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String dbconfFile;
 
   @Option(name = "--report-dir", required = true,
@@ -70,7 +70,7 @@ public class DiffDigestDbCmd extends DbPortAction {
 
   @Option(name = "--ca-cert", multiValued = true,
       description = "Certificate of CAs to be considered\n(multi-valued)")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private List<String> caCertFiles;
 
   protected DbPortWorker getDbPortWorker() throws Exception {

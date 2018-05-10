@@ -30,12 +30,12 @@ import java.util.Properties;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.shell.completer.LogLevelCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
 import org.xipki.password.PasswordResolver;
@@ -67,12 +67,12 @@ public abstract class LiquibaseAction extends XiAction {
 
   @Option(name = "--log-file",
       description = "log file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String logFile;
 
   @Option(name = "--ca-conf",
       description = "CA configuration file")
-  @Completion(FilePathCompleter.class)
+  @Completion(FileCompleter.class)
   private String caconfFile = DFLT_CACONF_FILE;
 
   protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
