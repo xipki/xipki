@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.security.speed.pkcs11.cmd;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.common.BenchmarkExecutor;
+import org.xipki.security.speed.pkcs11.P11SM2SignSpeed;
 
 /**
  * TODO.
@@ -28,17 +28,15 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "xi", name = "speed-sm2-sign-p11",
+    description = "performance test of PKCS#11 SM2 signature creation")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+// CHECKSTYLE:SKIP
+public class SpeedP11SM2SignAction extends SpeedP11Action {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
-
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
-    }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+  @Override
+  protected BenchmarkExecutor getTester() throws Exception {
+    return new P11SM2SignSpeed(securityFactory, getSlot());
   }
 
 }

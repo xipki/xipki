@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.dbtool.shell;
 
+import java.util.Map;
+
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
  * TODO.
@@ -28,17 +29,20 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "ca", name = "initdb-ca",
+    description = "reset and initialize the CA database")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class InitDbCaAction extends LiquibaseAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
+  private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
 
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
-    }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+  @Override
+  protected Object execute0() throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+
+    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+    resetAndInit(dbConf, SCHEMA_FILE);
+    return null;
   }
 
 }

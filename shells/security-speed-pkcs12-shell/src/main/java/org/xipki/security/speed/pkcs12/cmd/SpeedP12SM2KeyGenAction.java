@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.security.speed.pkcs12.cmd;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.common.BenchmarkExecutor;
+import org.xipki.security.speed.cmd.SingleSpeedAction;
+import org.xipki.security.speed.pkcs12.P12ECKeyGenSpeed;
 
 /**
  * TODO.
@@ -28,17 +29,15 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "xi", name = "speed-sm2-gen-p12",
+    description = "performance test of PKCS#12 SM2 key generation")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+// CHECKSTYLE:SKIP
+public class SpeedP12SM2KeyGenAction extends SingleSpeedAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
-
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
-    }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+  @Override
+  protected BenchmarkExecutor getTester() throws Exception {
+    return new P12ECKeyGenSpeed("sm2p256v1", securityFactory);
   }
 
 }

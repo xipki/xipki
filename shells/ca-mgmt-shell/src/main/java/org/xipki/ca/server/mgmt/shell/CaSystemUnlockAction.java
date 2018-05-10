@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -28,17 +28,20 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "ca", name = "unlock",
+    description = "unlock CA system")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class CaSystemUnlockAction extends CaAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
-
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
+  @Override
+  protected Object execute0() throws Exception {
+    try {
+      caManager.unlockCa();
+      println("unlocked CA system, calling ca:restart to restart CA system");
+      return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not unlock CA system, error: " + ex.getMessage(), ex);
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
   }
 
 }

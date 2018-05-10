@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.client.shell;
 
+import java.security.cert.X509CRL;
+
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.ca.client.api.CaClientException;
+import org.xipki.ca.client.api.PkiErrorException;
+import org.xipki.common.RequestResponseDebug;
 
 /**
  * TODO.
@@ -28,17 +31,19 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "xi", name = "cmp-gencrl",
+    description = "generate CRL")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class GenCrlAction extends CrlAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
-
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
+  @Override
+  protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      return caClient.generateCrl(caName, debug);
+    } finally {
+      saveRequestResponse(debug);
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
   }
 
 }

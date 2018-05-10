@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.security.shell.pkcs11;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11Slot;
 
 /**
  * TODO.
@@ -28,17 +28,23 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "xi", name = "sm2-p11",
+    description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+// CHECKSTYLE:SKIP
+public class P11SM2KeyGenAction extends P11KeyGenAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objId = slot.generateSM2Keypair(label, getControl());
+    finalize("SM2", objId);
+    return null;
+  }
 
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
-    }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+  @Override
+  protected boolean getDefaultExtractable() {
+    return false;
   }
 
 }

@@ -18,6 +18,7 @@
 package org.xipki.scep.jscepclient.shell;
 
 import java.io.File;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -25,11 +26,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
-import org.jscep.client.EnrollmentResponse;
-import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.security.util.X509Util;
 
 /**
  * TODO.
@@ -37,15 +36,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-enroll",
-    description = "enroll certificate via automatic selected messageType")
+@Command(scope = "xi", name = "jscep-getcrl",
+    description = "download CRL")
 @Service
-public class EnrollCertAction extends ClientAction {
+public class GetCrlAction extends ClientAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--cert", aliases = "-c", required = true,
+      description = "certificate\n(required)")
   @Completion(FileCompleter.class)
-  private String csrFile;
+  private String certFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate\n(required)")
@@ -54,26 +53,15 @@ public class EnrollCertAction extends ClientAction {
 
   @Override
   protected Object execute0() throws Exception {
+    X509Certificate cert = X509Util.parseCert(new File(certFile));
     Client client = getScepClient();
-
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
-
-    EnrollmentResponse resp = client.enrol(getIdentityCert(), getIdentityKey(), csr);
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
+    X509CRL crl = client.getRevocationList(getIdentityCert(), getIdentityKey(),
+        cert.getIssuerX500Principal(), cert.getSerialNumber());
+    if (crl == null) {
+      throw new CmdFailure("received no CRL from server");
     }
 
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
-    }
-
-    X509Certificate cert = extractEeCerts(resp.getCertStore());
-
-    if (cert == null) {
-      throw new Exception("received no certificate");
-    }
-
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
     return null;
   }
 

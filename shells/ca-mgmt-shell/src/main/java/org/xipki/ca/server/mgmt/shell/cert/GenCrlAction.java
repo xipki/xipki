@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.security.cert.X509CRL;
+
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
 
 /**
  * TODO.
@@ -28,17 +28,14 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "ca", name = "gencrl",
+    description = "generate CRL")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class GenCrlAction extends CrlAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
-
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
-    }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+  @Override
+  protected X509CRL retrieveCrl() throws Exception {
+    return caManager.generateCrlOnDemand(caName);
   }
 
 }

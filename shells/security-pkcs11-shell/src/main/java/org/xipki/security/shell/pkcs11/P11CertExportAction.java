@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.jscepclient.shell;
+package org.xipki.security.shell.pkcs11;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
@@ -25,11 +25,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.jscep.client.Client;
-import org.jscep.client.EnrollmentResponse;
-import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11Slot;
 
 /**
  * TODO.
@@ -37,43 +35,35 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-enroll",
-    description = "enroll certificate via automatic selected messageType")
+@Command(scope = "xi", name = "export-cert-p11",
+    description = "export certificate from PKCS#11 device")
 @Service
-public class EnrollCertAction extends ClientAction {
+public class P11CertExportAction extends P11SecurityAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
-  @Completion(FileCompleter.class)
-  private String csrFile;
+  @Option(name = "--id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String id;
+
+  @Option(name = "--label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String label;
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate\n(required)")
   @Completion(FileCompleter.class)
-  private String outputFile;
+  private String outFile;
 
   @Override
   protected Object execute0() throws Exception {
-    Client client = getScepClient();
-
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
-
-    EnrollmentResponse resp = client.enrol(getIdentityCert(), getIdentityKey(), csr);
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
-    }
-
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
-    }
-
-    X509Certificate cert = extractEeCerts(resp.getCertStore());
-
+    P11Slot slot = getSlot();
+    P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
+    X509Certificate cert = slot.exportCert(objIdentifier);
     if (cert == null) {
-      throw new Exception("received no certificate");
+      throw new CmdFailure("could not export certificate " + objIdentifier);
     }
-
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
     return null;
   }
 

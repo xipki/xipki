@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.qa.shell;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.ca.server.mgmt.shell.CrlSignerRemoveAction;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -28,17 +28,22 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "caqa", name = "neg-crlsigner-rm",
+    description = "remove CRL signer (negative, QA)")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class NegCrlSignerRemoveAction extends CrlSignerRemoveAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    println("neg-crlsigner-rm");
 
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+
+    throw new CmdFailure("exception expected, but received none");
   }
 
 }

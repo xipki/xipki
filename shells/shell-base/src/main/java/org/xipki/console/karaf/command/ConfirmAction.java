@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.console.karaf.command;
 
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.XiAction;
 
 /**
  * TODO.
@@ -28,17 +29,23 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "xi", name = "confirm",
+    description = "confirm an action")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class ConfirmAction extends XiAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
+  @Argument(index = 0, name = "message", required = true,
+      description = "prompt message\n(required)")
+  private String prompt;
 
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
+  @Override
+  protected Object execute0() throws Exception {
+    boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
+    if (!toContinue) {
+      throw new CmdFailure("User cancelled");
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+
+    return null;
   }
 
 }

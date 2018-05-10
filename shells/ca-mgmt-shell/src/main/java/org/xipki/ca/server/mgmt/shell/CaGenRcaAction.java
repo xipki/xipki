@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.jscepclient.shell;
+package org.xipki.ca.server.mgmt.shell;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -25,11 +26,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.jscep.client.Client;
-import org.jscep.client.EnrollmentResponse;
+import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -37,43 +35,45 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-enroll",
-    description = "enroll certificate via automatic selected messageType")
+@Command(scope = "ca", name = "gen-rootca",
+    description = "generate selfsigned CA")
 @Service
-public class EnrollCertAction extends ClientAction {
+public class CaGenRcaAction extends CaAddOrGenAction {
 
   @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+      description = "CSR of the Root CA\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 
-  @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate\n(required)")
+  @Option(name = "--profile", required = true,
+      description = "profile of the Root CA\n(required)")
+  private String rootcaProfile;
+
+  @Option(name = "--serial",
+      description = "profile of the Root CA")
+  private String serialS;
+
+  @Option(name = "--out", aliases = "-o",
+      description = "where to save the generated CA certificate")
   @Completion(FileCompleter.class)
-  private String outputFile;
+  private String rootcaCertOutFile;
 
   @Override
   protected Object execute0() throws Exception {
-    Client client = getScepClient();
-
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
-
-    EnrollmentResponse resp = client.enrol(getIdentityCert(), getIdentityKey(), csr);
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
+    CaEntry caEntry = getCaEntry();
+    byte[] csr = IoUtil.read(csrFile);
+    BigInteger serialNumber = null;
+    if (serialS != null) {
+      serialNumber = toBigInt(serialS);
     }
 
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
+    X509Certificate rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr,
+        serialNumber);
+    if (rootcaCertOutFile != null) {
+      saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
+          rootcaCert.getEncoded());
     }
-
-    X509Certificate cert = extractEeCerts(resp.getCertStore());
-
-    if (cert == null) {
-      throw new Exception("received no certificate");
-    }
-
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    println("generated root CA " + caEntry.getIdent().getName());
     return null;
   }
 

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.qa.shell;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.CrlReason;
+import org.xipki.ca.server.mgmt.shell.EnvUpdateAction;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -28,17 +28,23 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
+@Command(scope = "caqa", name = "env-check",
+    description = "check information of CA environment parameters (QA)")
 @Service
-public class CaCrlReasonCompleter extends AbstractEnumCompleter {
+public class EnvCheckAction extends EnvUpdateAction {
 
-  public CaCrlReasonCompleter() {
-    StringBuilder enums = new StringBuilder();
+  @Override
+  protected Object execute0() throws Exception {
+    println("checking environment " + name);
 
-    for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
-      enums.append(reason.getDescription()).append(",");
+    String is = caManager.getEnvParam(name);
+    if (!value.equals(is)) {
+      throw new CmdFailure("Environment parameter '" + name + "': is '" + is
+          + "', but expected '" + value + "'");
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+
+    println(" checked environment " + name);
+    return null;
   }
 
 }

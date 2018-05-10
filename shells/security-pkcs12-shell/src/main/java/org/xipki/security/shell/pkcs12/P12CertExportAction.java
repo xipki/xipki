@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.jscepclient.shell;
+package org.xipki.security.shell.pkcs12;
 
 import java.io.File;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.jscep.client.Client;
-import org.jscep.client.EnrollmentResponse;
-import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -37,43 +35,37 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-enroll",
-    description = "enroll certificate via automatic selected messageType")
+@Command(scope = "xi", name = "export-cert-p12",
+    description = "export certificate from PKCS#12 keystore")
 @Service
-public class EnrollCertAction extends ClientAction {
-
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
-  @Completion(FileCompleter.class)
-  private String csrFile;
+public class P12CertExportAction extends P12SecurityAction {
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate\n(required)")
   @Completion(FileCompleter.class)
-  private String outputFile;
+  private String outFile;
 
   @Override
   protected Object execute0() throws Exception {
-    Client client = getScepClient();
+    KeyStore ks = getKeyStore();
 
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
-
-    EnrollmentResponse resp = client.enrol(getIdentityCert(), getIdentityKey(), csr);
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
+    String keyname = null;
+    Enumeration<String> aliases = ks.aliases();
+    while (aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      if (ks.isKeyEntry(alias)) {
+        keyname = alias;
+        break;
+      }
     }
 
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
+    if (keyname == null) {
+      throw new CmdFailure("could not find private key");
     }
 
-    X509Certificate cert = extractEeCerts(resp.getCertStore());
+    X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
+    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 
-    if (cert == null) {
-      throw new Exception("received no certificate");
-    }
-
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
     return null;
   }
 
