@@ -97,7 +97,6 @@
       <xs:element name="caCert" type="caCertType"/>
       <xs:element name="certprofiles" type="certprofilesType"/>
     </xs:all>
-    <xs:attribute name="enabled" type="xs:boolean" default="true"/>
   </xs:complexType>
   <xs:complexType name="certprofilesType">
     <xs:choice>

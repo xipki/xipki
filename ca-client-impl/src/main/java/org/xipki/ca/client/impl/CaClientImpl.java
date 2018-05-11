@@ -259,18 +259,9 @@ public final class CaClientImpl implements CaClient {
     } catch (FileNotFoundException ex) {
       throw new CaClientException("could not read file " + confFile);
     }
-    int numActiveCAs = 0;
 
-    for (CaType caType : config.getCas().getCa()) {
-      if (!caType.isEnabled()) {
-        LOG.info("CA " + caType.getName() + " is disabled");
-        continue;
-      }
-      numActiveCAs++;
-    }
-
-    if (numActiveCAs == 0) {
-      LOG.warn("no active CA is configured");
+    if (config.getCas().getCa().isEmpty()) {
+      LOG.warn("no CA is configured");
     }
 
     // responders
@@ -301,10 +292,6 @@ public final class CaClientImpl implements CaClient {
     // CA
     Set<CaConf> cas = new HashSet<>();
     for (CaType caType : config.getCas().getCa()) {
-      if (!caType.isEnabled()) {
-        continue;
-      }
-
       String caName = caType.getName();
       try {
         // responder

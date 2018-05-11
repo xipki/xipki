@@ -46,7 +46,7 @@
       default to be 10, value between 1 and 4 will be converted to 5, value less than 1
       disables the interval update -->
     <cainfoUpdateInterval>10</cainfoUpdateInterval>
-    <ca enabled="true">
+    <ca>
       <name>MYCA</name>
       <url>https://localhost:8443/cmp/myca</url>
       <requestor>requestor1</requestor>
