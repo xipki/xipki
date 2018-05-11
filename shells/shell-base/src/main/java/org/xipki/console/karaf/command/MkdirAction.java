@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.DirCompleter;
 
 /**
  * TODO.
@@ -39,7 +39,7 @@ public class MkdirAction extends XiAction {
 
   @Argument(index = 0, name = "directory_name", required = true,
       description = "directory\n(required)")
-  @Completion(DirPathCompleter.class)
+  @Completion(DirCompleter.class)
   private String dirName;
 
   @Override

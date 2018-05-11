@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.FileUtils;
 import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.DirCompleter;
 
 /**
  * TODO.
@@ -40,12 +40,12 @@ public class CopyDirAction extends XiAction {
 
   @Argument(index = 0, name = "source directory", required = true,
       description = "content of this directory will be copied\n(required)")
-  @Completion(DirPathCompleter.class)
+  @Completion(DirCompleter.class)
   private String source;
 
   @Argument(index = 1, name = "destination", required = true,
       description = "destination directory\n(required)")
-  @Completion(DirPathCompleter.class)
+  @Completion(DirCompleter.class)
   private String dest;
 
   @Override

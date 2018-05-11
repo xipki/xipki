@@ -48,7 +48,7 @@ import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.DirCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.SigAlgCompleter;
 import org.xipki.ocsp.client.api.OcspRequestor;
@@ -103,7 +103,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
   @Option(name = "--out-dir", required = true,
       description = "folder to save the request and response")
-  @Completion(DirPathCompleter.class)
+  @Completion(DirCompleter.class)
   private String outDirStr;
 
   @Option(name = "--save-req",

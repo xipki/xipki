@@ -29,7 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
  */
 
 @Service
-public class DirPathCompleter extends FileCompleter {
+public class DirCompleter extends FileCompleter {
 
   @Override
   protected boolean accept(Path path) {

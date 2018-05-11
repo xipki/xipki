@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.ca.CaDbImportWorker;
-import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.DirCompleter;
 
 /**
  * TODO.
@@ -46,7 +46,7 @@ public class ImportCaAction extends DbPortAction {
 
   @Option(name = "--in-dir", required = true,
       description = "input directory\n(required)")
-  @Completion(DirPathCompleter.class)
+  @Completion(DirCompleter.class)
   private String indir;
 
   @Option(name = "-k",

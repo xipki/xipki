@@ -29,7 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.diffdb.DigestDiffWorker;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.DirCompleter;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class DiffDigestDbAction extends DbPortAction {
 
   @Option(name = "--report-dir", required = true,
       description = "report directory\n(required)")
-  @Completion(DirPathCompleter.class)
+  @Completion(DirCompleter.class)
   private String reportDir;
 
   @Option(name = "--revoked-only")
