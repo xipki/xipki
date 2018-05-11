@@ -91,7 +91,7 @@ public class FileUtils {
     if (file == null) {
       throw new NullPointerException("File must not be null");
     }
-    
+
     if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
       return false;
     }

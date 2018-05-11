@@ -41,7 +41,7 @@ public class ExtKeyusageCompleter extends AbstractEnumCompleter {
         ObjectIdentifiers.id_kp_OCSPSigning.getId(), ",",
         ObjectIdentifiers.id_kp_serverAuth.getId(), ",",
         ObjectIdentifiers.id_kp_timeStamping.getId());
-    
+
     setTokens(tokens);
   }
 

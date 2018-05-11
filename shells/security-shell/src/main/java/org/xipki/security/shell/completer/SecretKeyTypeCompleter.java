@@ -32,5 +32,5 @@ public class SecretKeyTypeCompleter extends AbstractEnumCompleter {
   public SecretKeyTypeCompleter() {
     setTokens("DES3,AES,GENERIC");
   }
-  
+
 }

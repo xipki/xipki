@@ -38,5 +38,5 @@ public class KeyusageCompleter extends AbstractEnumCompleter {
     enums.deleteCharAt(enums.length() - 1);
     setTokens(enums.toString());
   }
-  
+
 }
