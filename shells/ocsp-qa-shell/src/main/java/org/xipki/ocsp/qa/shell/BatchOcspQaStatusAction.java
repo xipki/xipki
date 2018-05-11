@@ -310,6 +310,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
       sum++;
       print("\rProcessed " + sum + " requests in "
           + StringUtil.formatTime((System.currentTimeMillis() - startDate) / 1000, false));
+      println("");
 
       println(resultText, resultOut);
 
