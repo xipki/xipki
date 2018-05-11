@@ -115,23 +115,23 @@
         <status>active</status>
         <validityMode>cutoff</validityMode>
         <crlUris>
-          <str>http://ca.example.org/crl</str>
+          <uri>http://ca.example.org/crl</uri>
         </crlUris>
         <ocspUris>
-          <str>http://localhost:8080/ocsp/responder1</str>
+          <uri>http://localhost:8080/ocsp/responder1</uri>
         </ocspUris>
         <nextCrlNo>2</nextCrlNo>
         <snSize>63</snSize>
       </caInfo>
       <aliases>
-        <str>myca</str>
+        <alias>myca</alias>
       </aliases>
       <profiles>
-        <!--str>subca</str-->
-        <str>ocsp</str>
-        <str>scep</str>
-        <str>tls</str>
-        <str>tls-c</str>
+        <!--profile>subca</profile-->
+        <profile>ocsp</profile>
+        <profile>scep</profile>
+        <profile>tls</profile>
+        <profile>tls-c</profile>
       </profiles>
       <requestors>
         <requestor>
@@ -139,7 +139,7 @@
           <ra>true</ra>
           <permission>255</permission>
           <profiles>
-            <str>all</str>
+            <profile>all</profile>
           </profiles>
         </requestor>
       </requestors>
@@ -148,12 +148,12 @@
           <userName>user1</userName>
           <permission>255</permission>
           <profiles>
-            <str>all</str>
+            <profile>all</profile>
           </profiles>
         </user>
       </users>
       <publishers>
-        <str>ocsp-publisher</str>
+        <publisher>ocsp-publisher</publisher>
       </publishers>
     </ca>
   </cas>
@@ -162,7 +162,7 @@
       <caName>myca1</caName>
       <responderName>scep-responder1</responderName>
       <profiles>
-        <str>all</str>
+        <profile>all</profile>
       </profiles>
       <control>cacert.included=false,signercert.included=true,support.getcrl=true</control>
     </scep>

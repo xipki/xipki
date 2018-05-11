@@ -25,10 +25,10 @@
         <cmpcontrolName>cmpcontrol1</cmpcontrolName>
         <crlsignerName>casign-crlsigner</crlsignerName>
         <crlUris>
-          <str>http://subcawithcrl.example.org/crl</str>
+          <uri>http://subcawithcrl.example.org/crl</uri>
         </crlUris>
         <deltacrlUris>
-          <str>http://subcawithcrl.example.org/deltacrl</str>
+          <uri>http://subcawithcrl.example.org/deltacrl</uri>
         </deltacrlUris>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
@@ -45,24 +45,24 @@
         <status>active</status>
         <validityMode>lax</validityMode>
         <cacertUris>
-          <str>http://example.org/subcawithcrl1.der</str>
+          <uri>http://example.org/subcawithcrl1.der</uri>
         </cacertUris>
         <nextCrlNo>2</nextCrlNo>
         <ocspUris>
-          <str>http://localhost:8080/ocsp/responder2</str>
+          <uri>http://localhost:8080/ocsp/responder2</uri>
         </ocspUris>
         <snSize>63</snSize>
       </caInfo>
       <aliases>
-        <str>subcawithcrl</str>
+        <alias>subcawithcrl</alias>
       </aliases>
       <profiles>
-        <str>ocsp</str>
-        <str>scep</str>
-        <str>multiple-ous</str>
-        <str>multi-valued-rdn</str>
-        <str>max-time</str>
-        <str>tlsa</str>
+        <profile>ocsp</profile>
+        <profile>scep</profile>
+        <profile>multiple-ous</profile>
+        <profile>multi-valued-rdn</profile>
+        <profile>max-time</profile>
+        <profile>tlsa</profile>
       </profiles>
       <requestors>
         <requestor>
@@ -70,7 +70,7 @@
           <ra>true</ra>
           <permission>255</permission>
           <profiles>
-            <str>all</str>
+            <profile>all</profile>
           </profiles>
         </requestor>
       </requestors>
@@ -79,7 +79,7 @@
           <userName>user1</userName>
           <permission>255</permission>
           <profiles>
-            <str>all</str>
+            <profile>all</profile>
           </profiles>
         </user>
       </users>

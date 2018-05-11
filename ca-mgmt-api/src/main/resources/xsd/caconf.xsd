@@ -186,7 +186,7 @@
     <xs:sequence>
       <xs:element name="caName" type="xs:string"/>
       <xs:element name="responderName" type="xs:string"/>
-      <xs:element name="profiles" type="stringsType"/>
+      <xs:element name="profiles" type="profilesType"/>
       <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
@@ -194,8 +194,8 @@
   <xs:complexType name="caType">
     <xs:all>
       <xs:element name="caInfo" type="caInfoType" minOccurs="0"/>
-      <xs:element name="aliases" type="stringsType" minOccurs="0"/>
-      <xs:element name="profiles" type="stringsType" minOccurs="0"/>
+      <xs:element name="aliases" type="aliasesType" minOccurs="0"/>
+      <xs:element name="profiles" type="profilesType" minOccurs="0"/>
       <xs:element name="requestors" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -210,7 +210,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="publishers" type="stringsType" minOccurs="0"/>
+      <xs:element name="publishers" type="publishersType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -255,14 +255,14 @@
         </xs:annotation>
       </xs:element>
       <!-- X.509 specific CA configuration -->
-      <xs:element name="cacertUris" type="stringsType" minOccurs="0"/>
       <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
-      <xs:element name="crlUris" type="stringsType" minOccurs="0"/>
-      <xs:element name="deltacrlUris" type="stringsType" minOccurs="0"/>
       <xs:element name="nextCrlNo" type="xs:long"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
-      <xs:element name="ocspUris" type="stringsType" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>
+      <xs:element name="cacertUris" type="urisType" minOccurs="0"/>
+      <xs:element name="crlUris" type="urisType" minOccurs="0"/>
+      <xs:element name="deltacrlUris" type="urisType" minOccurs="0"/>
+      <xs:element name="ocspUris" type="urisType" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
   <xs:complexType name="caHasRequestorType">
@@ -270,19 +270,34 @@
       <xs:element name="requestorName" type="xs:string"/>
       <xs:element name="ra" type="xs:boolean"/>
       <xs:element name="permission" type="xs:int"/>
-      <xs:element name="profiles" type="stringsType" minOccurs="0"/>
+      <xs:element name="profiles" type="profilesType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="caHasUserType">
     <xs:sequence>
       <xs:element name="userName" type="xs:string"/>
       <xs:element name="permission" type="xs:int"/>
-      <xs:element name="profiles" type="stringsType" minOccurs="0"/>
+      <xs:element name="profiles" type="profilesType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="stringsType">
+  <xs:complexType name="profilesType">
     <xs:sequence>
-      <xs:element name="str" type="xs:string" maxOccurs="unbounded"/>
+      <xs:element name="profile" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="publishersType">
+    <xs:sequence>
+      <xs:element name="publisher" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="aliasesType">
+    <xs:sequence>
+      <xs:element name="alias" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="urisType">
+    <xs:sequence>
+      <xs:element name="uri" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">

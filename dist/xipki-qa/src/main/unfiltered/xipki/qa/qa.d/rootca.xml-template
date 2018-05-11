@@ -192,22 +192,22 @@
         <status>active</status>
         <validityMode>cutoff</validityMode>
         <cacertUris>
-          <str>http://example.org/rootca1.der</str>
+          <uri>http://example.org/rootca1.der</uri>
         </cacertUris>
         <nextCrlNo>2</nextCrlNo>
         <ocspUris>
-          <str>http://localhost:8080/ocsp/responder1</str>
+          <uri>http://localhost:8080/ocsp/responder1</uri>
         </ocspUris>
         <snSize>63</snSize>
       </caInfo>
       <aliases>
-        <str>rootca</str>
+        <alias>rootca</alias>
       </aliases>
       <profiles>
-        <str>cross</str>
-        <str>subca</str>
-        <str>subca-complex</str>
-        <str>ocsp</str>
+        <profile>cross</profile>
+        <profile>subca</profile>
+        <profile>subca-complex</profile>
+        <profile>ocsp</profile>
       </profiles>
       <requestors>
         <requestor>
@@ -215,12 +215,12 @@
           <ra>true</ra>
           <permission>255</permission>
           <profiles>
-            <str>all</str>
+            <profile>all</profile>
           </profiles>
         </requestor>
       </requestors>
       <publishers>
-        <str>ocsp-publisher</str>
+        <publisher>ocsp-publisher</publisher>
       </publishers>
     </ca>
   </cas>

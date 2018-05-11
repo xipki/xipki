@@ -81,7 +81,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
@@ -159,6 +159,8 @@ public class CaConf {
           javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
       URL url = CaConf.class.getResource("/xsd/caconf.xsd");
       Marshaller jaxbMarshaller = context.createMarshaller();
+      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+      jaxbMarshaller.setProperty("com.sun.xml.internal.bind.indentString", "  ");
       jaxbMarshaller.setSchema(schemaFact.newSchema(url));
 
       jaxbMarshaller.marshal(new ObjectFactory().createCaconf(jaxb), out);
@@ -366,9 +368,8 @@ public class CaConf {
                 csr, serialNumber, certFilename);
           }
 
-          CaUris caUris = new CaUris(getStrings(ci.getCacertUris()),
-              getStrings(ci.getOcspUris()), getStrings(ci.getCrlUris()),
-              getStrings(ci.getDeltacrlUris()));
+          CaUris caUris = new CaUris(getUris(ci.getCacertUris()),
+              getUris(ci.getOcspUris()), getUris(ci.getCrlUris()), getUris(ci.getDeltacrlUris()));
 
           int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365
               : ci.getExpirationPeriod().intValue();
@@ -444,9 +445,8 @@ public class CaConf {
                 new CaHasRequestorEntry(new NameId(null, req.getRequestorName()));
             en.setRa(req.isRa());
 
-            List<String> strs = getStrings(req.getProfiles());
-            if (strs != null) {
-              en.setProfiles(new HashSet<>(strs));
+            if (req.getProfiles() != null && !req.getProfiles().getProfile().isEmpty()) {
+              en.setProfiles(new HashSet<>(req.getProfiles().getProfile()));
             }
 
             en.setPermission(req.getPermission());
@@ -460,17 +460,26 @@ public class CaConf {
           for (CaHasUserType req : m.getUsers().getUser()) {
             CaHasUserEntry en = new CaHasUserEntry(new NameId(null, req.getUserName()));
             en.setPermission(req.getPermission());
-            List<String> strs = getStrings(req.getProfiles());
-            if (strs != null) {
-              en.setProfiles(new HashSet<>(strs));
+            if (req.getProfiles() != null && !req.getProfiles().getProfile().isEmpty()) {
+              en.setProfiles(new HashSet<>(req.getProfiles().getProfile()));
             }
             caHasUsers.add(en);
           }
         }
 
-        List<String> aliases = getStrings(m.getAliases());
-        List<String> profileNames = getStrings(m.getProfiles());
-        List<String> publisherNames = getStrings(m.getPublishers());
+        List<String> aliases = null;
+        if (m.getAliases() != null && !m.getAliases().getAlias().isEmpty()) {
+          aliases = m.getAliases().getAlias();
+        }
+        List<String> profileNames = null;
+        if (m.getProfiles() != null && !m.getProfiles().getProfile().isEmpty()) {
+          profileNames = m.getProfiles().getProfile();
+        }
+
+        List<String> publisherNames = null;
+        if (m.getPublishers() != null && !m.getPublishers().getPublisher().isEmpty()) {
+          publisherNames = m.getPublishers().getPublisher();
+        }
 
         SingleCaConf singleCa = new SingleCaConf(name, genSelfIssued, caEntry, aliases,
             profileNames, caHasRequestors, caHasUsers, publisherNames);
@@ -483,7 +492,7 @@ public class CaConf {
       for (ScepType m : jaxb.getSceps().getScep()) {
         String name = m.getName();
         NameId caIdent = new NameId(null, m.getCaName());
-        List<String> certProfiles = getStrings(m.getProfiles());
+        List<String> certProfiles = m.getProfiles().getProfile();
         ScepEntry dbEntry = new ScepEntry(name, caIdent, true, m.getResponderName(),
             new HashSet<>(certProfiles), m.getControl());
         sceps.put(name, dbEntry);
@@ -683,13 +692,13 @@ public class CaConf {
     return IoUtil.read(is);
   }
 
-  private List<String> getStrings(StringsType jaxb) {
+  private List<String> getUris(UrisType jaxb) {
     if (jaxb == null) {
       return null;
     }
 
-    List<String> ret = new ArrayList<>(jaxb.getStr().size());
-    for (String m : jaxb.getStr()) {
+    List<String> ret = new ArrayList<>(jaxb.getUri().size());
+    for (String m : jaxb.getUri()) {
       ret.add(expandConf(m));
     }
     return ret;

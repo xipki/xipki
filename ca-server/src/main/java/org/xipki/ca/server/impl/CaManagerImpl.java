@@ -126,6 +126,7 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
 import org.xipki.ca.server.mgmt.api.conf.SingleCaConf;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.AliasesType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
@@ -137,11 +138,13 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.NameValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfilesType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.PublishersType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
@@ -3492,19 +3495,27 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
           Set<String> strs = getAliasesForCa(name);
           if (CollectionUtil.isNonEmpty(strs)) {
-            jaxb.setAliases(createStrings(strs));
+            AliasesType type = new AliasesType();
+            for (String str : strs) {
+              type.getAlias().add(str);
+            }
+            jaxb.setAliases(type);
           }
 
           strs = caHasProfiles.get(name);
           if (CollectionUtil.isNonEmpty(strs)) {
             includeProfileNames.addAll(strs);
-            jaxb.setProfiles(createStrings(strs));
+            jaxb.setProfiles(createProfiles(strs));
           }
 
           strs = caHasPublishers.get(name);
           if (CollectionUtil.isNonEmpty(strs)) {
             includePublisherNames.addAll(strs);
-            jaxb.setPublishers(createStrings(strs));
+            PublishersType type = new PublishersType();
+            for (String str : strs) {
+              type.getPublisher().add(str);
+            }
+            jaxb.setPublishers(type);
           }
 
           // CaHasRequestors
@@ -3519,7 +3530,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
               CaHasRequestorType jaxb2 = new CaHasRequestorType();
               jaxb2.setRequestorName(requestorName);
               jaxb2.setRa(m.isRa());
-              jaxb2.setProfiles(createStrings(m.getProfiles()));
+              jaxb2.setProfiles(createProfiles(m.getProfiles()));
               jaxb2.setPermission(m.getPermission());
 
               jaxb.getRequestors().getRequestor().add(jaxb2);
@@ -3536,7 +3547,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
               CaHasUserType jaxb2 = new CaHasUserType();
               jaxb2.setUserName(username);
               jaxb2.setPermission(m.getPermission());
-              jaxb2.setProfiles(createStrings(m.getProfiles()));
+              jaxb2.setProfiles(createProfiles(m.getProfiles()));
               list2.add(jaxb2);
 
               if (includeUserNames.contains(username)) {
@@ -3559,7 +3570,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
           CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
           CaInfoType ciJaxb = new CaInfoType();
-          ciJaxb.setCacertUris(createStrings(entry.getCaCertUris()));
+          ciJaxb.setCacertUris(createUris(entry.getCaCertUris()));
           byte[] certBytes;
           try {
             certBytes = entry.getCert().getEncoded();
@@ -3579,8 +3590,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             ciJaxb.setCrlsignerName(entry.getCrlSignerName());
           }
 
-          ciJaxb.setCrlUris(createStrings(entry.getCrlUris()));
-          ciJaxb.setDeltacrlUris(createStrings(entry.getDeltaCrlUris()));
+          ciJaxb.setCrlUris(createUris(entry.getCrlUris()));
+          ciJaxb.setDeltacrlUris(createUris(entry.getDeltaCrlUris()));
           ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
           ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
           ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
@@ -3593,7 +3604,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
           ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
           ciJaxb.setNumCrls(entry.getNumCrls());
-          ciJaxb.setOcspUris(createStrings(entry.getOcspUris()));
+          ciJaxb.setOcspUris(createUris(entry.getOcspUris()));
           ciJaxb.setPermission(entry.getPermission());
           if (entry.getResponderName() != null) {
             includeResponderNames.add(entry.getResponderName());
@@ -3781,7 +3792,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           jaxb.setName(name);
           jaxb.setCaName(caName);
           jaxb.setResponderName(responderName);
-          jaxb.setProfiles(createStrings(entry.getCertProfiles()));
+          jaxb.setProfiles(createProfiles(entry.getCertProfiles()));
           jaxb.setControl(entry.getControl());
 
           list.add(jaxb);
@@ -3906,14 +3917,26 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return zipOutStream;
   }
 
-  private static StringsType createStrings(Collection<String> strs) {
-    if (CollectionUtil.isEmpty(strs)) {
+  private static UrisType createUris(Collection<String> uris) {
+    if (CollectionUtil.isEmpty(uris)) {
       return null;
     }
 
-    StringsType ret = new StringsType();
-    for (String str : strs) {
-      ret.getStr().add(str);
+    UrisType ret = new UrisType();
+    for (String uri : uris) {
+      ret.getUri().add(uri);
+    }
+    return ret;
+  }
+
+  private static ProfilesType createProfiles(Collection<String> profiles) {
+    if (CollectionUtil.isEmpty(profiles)) {
+      return null;
+    }
+
+    ProfilesType ret = new ProfilesType();
+    for (String profile : profiles) {
+      ret.getProfile().add(profile);
     }
     return ret;
   }
