@@ -274,9 +274,8 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
         println(resultText, resultOut);
 
         long now = System.currentTimeMillis();
-        boolean notLessThan1Sec = now - lastPrintDate >= 1000;
-        if (notLessThan1Sec) {
-          println("\rProcessed " + sum + " requests in "
+        if (now - lastPrintDate > 980) { // use 980 ms to ensure the output every second.
+          print("\rProcessed " + sum + " requests in "
               + StringUtil.formatTime((now - startDate) / 1000, false));
           lastPrintDate = now;
         }
@@ -307,6 +306,10 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
         numFail++;
         resultText += "error - " + th.getMessage();
       }
+
+      sum++;
+      print("\rProcessed " + sum + " requests in "
+          + StringUtil.formatTime((System.currentTimeMillis() - startDate) / 1000, false));
 
       println(resultText, resultOut);
 
