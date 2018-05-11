@@ -89,6 +89,7 @@ import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -105,6 +106,8 @@ import org.xml.sax.SAXException;
 
 public class CaConf {
   private static final Logger LOG = LoggerFactory.getLogger(CaConf.class);
+
+  private static final String APP_DIR = "APP_DIR";
 
   private final Map<String, String> properties = new HashMap<>();
 
@@ -127,6 +130,8 @@ public class CaConf {
   private final Map<String, SingleCaConf> cas = new HashMap<>();
 
   private final Map<String, ScepEntry> sceps = new HashMap<>();
+
+  private String baseDir;
 
   public CaConf(String confFilename, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
@@ -196,8 +201,6 @@ public class CaConf {
         }
       }
 
-      String baseDir = (zipFile == null) ? null : confFile.getParentFile().getPath();
-
       JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
 
       SchemaFactory schemaFact = SchemaFactory.newInstance(
@@ -208,7 +211,17 @@ public class CaConf {
 
       CaconfType root = (CaconfType) ((JAXBElement<?>)
           jaxbUnmarshaller.unmarshal(caConfStream)).getValue();
-      init(root, baseDir, zipFile, securityFactory);
+
+      if (zipFile == null) {
+        baseDir = root.getBasedir();
+        if (StringUtil.isBlank(baseDir)) {
+          File confFileParent = confFile.getParentFile();
+          baseDir = (confFileParent == null) ? "." : confFileParent.getPath();
+        } else if (APP_DIR.equalsIgnoreCase(baseDir)) {
+          baseDir = ".";
+        }
+      }
+      init(root, zipFile, securityFactory);
     } catch (JAXBException ex) {
       throw XmlUtil.convert(ex);
     } finally {
@@ -230,13 +243,8 @@ public class CaConf {
     }
   }
 
-  private void init(CaconfType jaxb, String baseDir, ZipFile zipFile,
-      SecurityFactory securityFactory) throws IOException, InvalidConfException, CaMgmtException {
-    // Properties
-    if (baseDir != null) {
-      properties.put("baseDir", baseDir);
-    }
-
+  private void init(CaconfType jaxb, ZipFile zipFile, SecurityFactory securityFactory)
+      throws IOException, InvalidConfException, CaMgmtException {
     if (jaxb.getProperties() != null) {
       for (NameValueType m : jaxb.getProperties().getProperty()) {
         String name = m.getName();
@@ -338,6 +346,7 @@ public class CaConf {
             if (ci.getCert() != null) {
               if (ci.getCert().getFile() != null) {
                 certFilename = expandConf(ci.getCert().getFile());
+                certFilename = resolveFilePath(certFilename);
               } else {
                 throw new InvalidConfException("cert.file of CA " + name + " must not be null");
               }
@@ -637,7 +646,7 @@ public class CaConf {
         throw new IOException("could not find ZIP entry " + fileName);
       }
     } else {
-      is = new FileInputStream(fileName);
+      is = new FileInputStream(resolveFilePath(fileName));
     }
     byte[] binary = IoUtil.read(is);
 
@@ -668,7 +677,7 @@ public class CaConf {
         throw new IOException("could not find ZIP entry " + fileName);
       }
     } else {
-      is = new FileInputStream(fileName);
+      is = new FileInputStream(resolveFilePath(fileName));
     }
 
     return IoUtil.read(is);
@@ -699,6 +708,11 @@ public class CaConf {
     }
 
     return confStr;
+  }
+
+  private String resolveFilePath(String filePath) {
+    File file = new File(filePath);
+    return file.isAbsolute() ? filePath : new File(baseDir, filePath).getPath();
   }
 
 }

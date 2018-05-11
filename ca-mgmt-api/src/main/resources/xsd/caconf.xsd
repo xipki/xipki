@@ -109,6 +109,15 @@
         </xs:complexType>
       </xs:element>
     </xs:all>
+    <xs:attribute name="basedir" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Specify the base directory for relative path specified in this
+        configuration file. Use 'APP_DIR' for application working directory.
+        Default is the directory where this configuration file locates. Will be
+        ignored if this configuration file is contained in a ZIP file.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
   <xs:complexType name="cmpcontrolType">
     <xs:all>
