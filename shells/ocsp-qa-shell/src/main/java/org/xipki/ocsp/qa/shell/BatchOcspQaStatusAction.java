@@ -81,10 +81,6 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
   private static final String FILE_SEP = File.separator;
 
-  @Option(name = "--noout",
-      description = "do not print the detailed message")
-  private Boolean noout = Boolean.FALSE;
-
   @Option(name = "--resp-issuer",
       description = "certificate file of the responder's issuer")
   @Completion(FileCompleter.class)
@@ -243,6 +239,9 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
       int lineNo = 0;
       String line;
 
+      int sum = 0;
+      long startDate = System.currentTimeMillis();
+      long lastPrintDate = 0;
       while ((line = snReader.readLine()) != null) {
         lineNo++;
         line = line.trim();
@@ -253,6 +252,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
           continue;
         }
 
+        sum++;
         String resultText = lineNo + ": " + line + ": ";
         try {
           ValidationResult result = processOcspQuery(ocspQa, line, messageDir,
@@ -271,10 +271,15 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
           resultText += "error - " + th.getMessage();
         }
 
-        if (!noout) {
-          println(resultText);
-        }
         println(resultText, resultOut);
+
+        long now = System.currentTimeMillis();
+        boolean notLessThan1Sec = now - lastPrintDate >= 1000;
+        if (notLessThan1Sec) {
+          println("\rProcessed " + sum + " requests in "
+              + StringUtil.formatTime((now - startDate) / 1000, false));
+          lastPrintDate = now;
+        }
       }
 
       // unknown serial number
@@ -303,9 +308,6 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
         resultText += "error - " + th.getMessage();
       }
 
-      if (!noout) {
-        println(resultText);
-      }
       println(resultText, resultOut);
 
       String message = StringUtil.concatObjectsCap(200,
