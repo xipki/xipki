@@ -270,7 +270,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -308,7 +308,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -349,7 +349,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -393,7 +393,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -502,7 +502,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
@@ -594,7 +594,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -671,7 +671,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -721,7 +721,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -774,7 +774,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
 
     final String regexOu1 = "[A-Z]{1,1}[\\d]{5,5}";
@@ -824,7 +824,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -866,7 +866,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
@@ -927,7 +927,7 @@ public class ProfileConfCreatorDemo {
     subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdn();
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -1117,7 +1117,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
@@ -1162,7 +1162,7 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdn();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
