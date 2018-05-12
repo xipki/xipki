@@ -250,7 +250,7 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f xipki/ocsp-config/example/foo.crl.UPDATEME \
     output/subcawithcrl1.crl.UPDATEME
 
-  feature:install -r xipki-ocspserver
+  feature:install xipki-ocspserver
 
   source file:./xipki/qa/ocsp.script
 

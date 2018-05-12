@@ -19,7 +19,7 @@
 echo "#################################################################"
 echo "#                              QA                               #"
 echo "#################################################################"
-feature:install -r xipki-caqa-shell
+feature:install xipki-caqa-shell
 
 echo "Sleeping 1 second"
 sleep 1

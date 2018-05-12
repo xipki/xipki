@@ -69,7 +69,7 @@ if { $printUsage equals "true" } then {
   }
 
   if { "$action" equals "enroll" } then {
-    feature:install -r xipki-caclient-shell
+    feature:install xipki-caclient-shell
 
     echo "Sleeping 1 second"
     sleep 1
@@ -87,7 +87,7 @@ if { $printUsage equals "true" } then {
 
     feature:uninstall xipki-caclient-shell
   } elif { "$action" equals "revoke" } then {
-    feature:install -r xipki-caclient-shell
+    feature:install xipki-caclient-shell
 
     echo "Sleeping 1 second"
     sleep 1

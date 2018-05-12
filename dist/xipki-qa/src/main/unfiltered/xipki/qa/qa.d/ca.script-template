@@ -18,11 +18,11 @@ ca:initdb \
   --db-conf  xipki/ocsp-config/ocsp-crl-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
 
-feature:install -r xipki-custom-certprofiles
+feature:install xipki-custom-certprofiles
 
-feature:install -r xipki-caserver
+feature:install xipki-caserver
 
-feature:install -r xipki-camgmt-shell
+feature:install xipki-camgmt-shell
 
 echo "Sleeping 1 second"
 sleep 1

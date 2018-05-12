@@ -74,7 +74,7 @@ ca:import-ocspfromca --in-dir output/dbexport/ca
 
 ## Restart the CA
 
-feature:install -r xipki-camgmt-shell
+feature:install xipki-camgmt-shell
 
 echo "Sleeping 1 second"
 sleep 1

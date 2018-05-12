@@ -33,7 +33,7 @@ ca:enroll-cert --ca rootca1 --profile cross \
 echo "#################################################################"
 echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
-feature:install -r xipki-caclient-shell
+feature:install xipki-caclient-shell
 
 echo "Sleeping 1 second"
 sleep 1

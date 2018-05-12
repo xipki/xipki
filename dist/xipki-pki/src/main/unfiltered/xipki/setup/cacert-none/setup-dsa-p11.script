@@ -39,7 +39,7 @@ echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
 
-feature:install -r xipki-database-tool
+feature:install xipki-database-tool
 
 ca:initdb-pki --force
 

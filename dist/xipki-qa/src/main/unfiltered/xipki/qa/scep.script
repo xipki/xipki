@@ -21,7 +21,7 @@ SCEP_URL = http://localhost:8080/scep/scep1/ocsp/pkiclient.exe
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"
 echo "#################################################################"
-feature:install -r xipki-scepclient-shell
+feature:install xipki-scepclient-shell
 
 # Prepare
 

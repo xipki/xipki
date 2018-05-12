@@ -131,7 +131,7 @@ if { $printUsage equals "true" } then {
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } else {
-  feature:install -r xipki-caqa-shell
+  feature:install xipki-caqa-shell
 
   source file:./xipki/qa/qa.d/prepare-keys.script
 
