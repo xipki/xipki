@@ -34,3 +34,11 @@
 
   `git tag --delete <tagname>`
 
+# Syncing fork with upstream
+
+1. git remote add upstream https://github.com/otheruser/repo.git
+2. git fetch upstream
+3. git checkout master
+4. git merge upstream/master
+5. git push
+
