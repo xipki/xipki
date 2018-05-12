@@ -85,8 +85,8 @@ public class HttpCmpServlet extends AbstractHttpServlet {
     AuditService auditService = auditServiceRegister.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
-    event.setName(CaAuditConstants.NAME_PERF);
-    event.addEventData(CaAuditConstants.NAME_reqType, RequestType.CMP.name());
+    event.setName(CaAuditConstants.NAME_perf);
+    event.addEventData(CaAuditConstants.NAME_req_type, RequestType.CMP.name());
 
     try {
       if (responderManager == null) {

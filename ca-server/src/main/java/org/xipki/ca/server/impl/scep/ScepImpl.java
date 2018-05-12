@@ -281,12 +281,12 @@ public class ScepImpl implements Scep {
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor, null);
 
     PkiMessage rep = servicePkiOperation0(requestContent, req, certProfileName, msgId, event);
-    audit(event, CaAuditConstants.NAME_SCEP_pkiStatus, rep.getPkiStatus().toString());
+    audit(event, CaAuditConstants.NAME_SCEP_pki_status, rep.getPkiStatus().toString());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setStatus(AuditStatus.FAILED);
     }
     if (rep.getFailInfo() != null) {
-      audit(event, CaAuditConstants.NAME_SCEP_failInfo, rep.getFailInfo().toString());
+      audit(event, CaAuditConstants.NAME_SCEP_fail_info, rep.getFailInfo().toString());
     }
     return encodeResponse(rep, req);
   } // method servicePkiOperation
@@ -301,7 +301,7 @@ public class ScepImpl implements Scep {
     // verify and decrypt the request
     audit(event, CaAuditConstants.NAME_tid, tid);
     if (req.getFailureMessage() != null) {
-      audit(event, CaAuditConstants.NAME_SCEP_failureMessage, req.getFailureMessage());
+      audit(event, CaAuditConstants.NAME_SCEP_failure_message, req.getFailureMessage());
     }
     Boolean bo = req.isSignatureValid();
     if (bo != null && !bo.booleanValue()) {
@@ -426,7 +426,7 @@ public class ScepImpl implements Scep {
       SignedData signedData;
 
       MessageType mt = req.getMessageType();
-      audit(event, CaAuditConstants.NAME_SCEP_messageType, mt.toString());
+      audit(event, CaAuditConstants.NAME_SCEP_message_type, mt.toString());
 
       switch (mt) {
         case PKCSReq:

@@ -123,9 +123,9 @@ public class HttpScepServlet extends AbstractHttpServlet {
     AuditService auditService = auditServiceRegister.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("SCEP");
-    event.setName(CaAuditConstants.NAME_PERF);
+    event.setName(CaAuditConstants.NAME_perf);
     event.addEventData(CaAuditConstants.NAME_SCEP_name, scepName + "/" + certProfileName);
-    event.addEventData(CaAuditConstants.NAME_reqType, RequestType.SCEP.name());
+    event.addEventData(CaAuditConstants.NAME_req_type, RequestType.SCEP.name());
 
     String msgId = RandomUtil.nextHexLong();
     event.addEventData(CaAuditConstants.NAME_mid, msgId);

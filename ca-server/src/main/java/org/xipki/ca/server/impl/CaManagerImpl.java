@@ -2456,7 +2456,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
-    event.setName(CaAuditConstants.NAME_PERF);
+    event.setName(CaAuditConstants.NAME_perf);
     event.addEventType("CAMGMT_CRL_GEN_ONDEMAND");
 
     X509Ca ca = getX509Ca(caName);

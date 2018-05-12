@@ -35,15 +35,15 @@ public class CaAuditConstants {
 
   public static final String NAME_certprofile = "certprofile";
 
-  public static final String NAME_crlNumber = "crlNumber";
+  public static final String NAME_crl_number = "crl_number";
 
-  public static final String NAME_crlType = "crlType";
+  public static final String NAME_crl_type = "crl_type";
 
-  public static final String NAME_expiredAt = "expiredAt";
+  public static final String NAME_expired_at = "expired_at";
 
   public static final String NAME_id = "id";
 
-  public static final String NAME_invalidityTime = "invalidityTime";
+  public static final String NAME_invalidity_time = "invalidity_time";
 
   public static final String NAME_issuer = "issuer";
 
@@ -51,47 +51,47 @@ public class CaAuditConstants {
 
   public static final String NAME_mid = "mid";
 
-  public static final String NAME_nextUpdate = "nextUpdate";
+  public static final String NAME_next_update = "next_update";
 
-  public static final String NAME_notAfter = "notAfter";
+  public static final String NAME_not_after = "not_after";
 
-  public static final String NAME_notBefore = "notBefore";
+  public static final String NAME_not_before = "not_before";
 
   public static final String NAME_num = "num";
 
-  public static final String NAME_PERF = "PERF";
+  public static final String NAME_perf = "perf";
 
   public static final String NAME_reason = "reason";
 
-  public static final String NAME_reqType = "reqType";
+  public static final String NAME_req_type = "req_type";
 
-  public static final String NAME_reqSubject = "reqSubject";
+  public static final String NAME_req_subject = "req_subject";
 
   public static final String NAME_requestor = "requestor";
 
   public static final String NAME_SCEP_decryption = "decryption";
 
-  public static final String NAME_SCEP_failInfo = "failInfo";
+  public static final String NAME_SCEP_fail_info = "fail_info";
 
-  public static final String NAME_SCEP_failureMessage = "failureMessage";
+  public static final String NAME_SCEP_failure_message = "failure_message";
 
-  public static final String NAME_SCEP_messageType = "messageType";
+  public static final String NAME_SCEP_message_type = "message_type";
 
   public static final String NAME_SCEP_name = "name";
 
-  public static final String NAME_SCEP_pkiStatus = "pkiStatus";
+  public static final String NAME_SCEP_pki_status = "pki_status";
 
   public static final String NAME_SCEP_operation = "operation";
 
+  public static final String NAME_SCEP_signature = "signature";
+
   public static final String NAME_serial = "serial";
 
-  public static final String NAME_thisUpdate = "thisUpdate";
+  public static final String NAME_this_update = "this_update";
 
   public static final String NAME_tid = "tid";
 
   public static final String NAME_user = "user";
-
-  public static final String NAME_SCEP_signature = "signature";
 
   public static final String NAME_subject = "subject";
 
@@ -100,7 +100,7 @@ public class CaAuditConstants {
 
   public static final String TYPE_CMP_ccr = "ccr";
 
-  public static final String TYPE_CMP_certConf = "certConf";
+  public static final String TYPE_CMP_certConf = "cert_conf";
 
   public static final String TYPE_CMP_cr = "cr";
 
@@ -110,17 +110,17 @@ public class CaAuditConstants {
 
   public static final String TYPE_CMP_genm_cainfo = "genm_cainfo";
 
-  public static final String TYPE_CMP_genm_crlForNumber = "genm_crl4number";
+  public static final String TYPE_CMP_genm_crl4number = "genm_crl4number";
 
-  public static final String TYPE_CMP_genm_currentCrl = "genm_currentCrl";
+  public static final String TYPE_CMP_genm_current_crl = "genm_current_crl";
 
-  public static final String TYPE_CMP_genm_genCrl = "genm_genCrl";
+  public static final String TYPE_CMP_genm_gen_crl = "genm_gen_crl";
 
   public static final String TYPE_CMP_kur = "kur";
 
-  public static final String TYPE_CMP_p10Cr = "p10Cr";
+  public static final String TYPE_CMP_p10cr = "p10cr";
 
-  public static final String TYPE_CMP_pkiConf = "pkiConf";
+  public static final String TYPE_CMP_pkiconf = "pkiconf";
 
   public static final String TYPE_CMP_rr_remove = "rr_remove";
 
@@ -146,12 +146,12 @@ public class CaAuditConstants {
 
   public static final String TYPE_remove_cert = "remove_cert";
 
-  public static final String TYPE_remove_expiredCerts = "remove_expiredCerts";
+  public static final String TYPE_remove_expired_certs = "remove_expired_certs";
 
   public static final String TYPE_revoke_ca = "revoke_ca";
 
   public static final String TYPE_revoke_cert = "revoke_cert";
 
-  public static final String TYPE_revoke_suspendedCert = "revoke_suspendedCert";
+  public static final String TYPE_revoke_suspendedCert = "revoke_suspended_cert";
 
 }

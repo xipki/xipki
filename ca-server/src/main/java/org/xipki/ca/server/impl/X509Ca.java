@@ -712,12 +712,12 @@ public class X509Ca {
 
     LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}", caIdent, deltaCrl,
         nextUpdate);
-    event.addEventData(CaAuditConstants.NAME_crlType, deltaCrl ? "DELTA_CRL" : "FULL_CRL");
+    event.addEventData(CaAuditConstants.NAME_crl_type, deltaCrl ? "DELTA_CRL" : "FULL_CRL");
 
     if (nextUpdate == null) {
-      event.addEventData(CaAuditConstants.NAME_nextUpdate, "null");
+      event.addEventData(CaAuditConstants.NAME_next_update, "null");
     } else {
-      event.addEventData(CaAuditConstants.NAME_nextUpdate,
+      event.addEventData(CaAuditConstants.NAME_next_update,
           DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
       if (nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * MS_PER_SECOND) {
         // less than 10 minutes
@@ -851,7 +851,7 @@ public class X509Ca {
       allRevInfos.clear(); // free the memory
 
       BigInteger crlNumber = caInfo.nextCrlNumber();
-      event.addEventData(CaAuditConstants.NAME_crlNumber, crlNumber);
+      event.addEventData(CaAuditConstants.NAME_crl_number, crlNumber);
 
       boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
       boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
@@ -1382,7 +1382,7 @@ public class X509Ca {
     event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
     event.addEventData(CaAuditConstants.NAME_reason, reason.getDescription());
     if (invalidityTime != null) {
-      event.addEventData(CaAuditConstants.NAME_invalidityTime,
+      event.addEventData(CaAuditConstants.NAME_invalidity_time,
           DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityTime));
     }
 
@@ -1748,12 +1748,12 @@ public class X509Ca {
       AuditEvent event) throws OperationException {
     ParamUtil.requireNonNull("gct", gct);
 
-    event.addEventData(CaAuditConstants.NAME_reqSubject,
+    event.addEventData(CaAuditConstants.NAME_req_subject,
         X509Util.getRfc4519Name(gct.requestedSubject));
     event.addEventData(CaAuditConstants.NAME_certprofile, gct.certprofile.getIdent().getName());
-    event.addEventData(CaAuditConstants.NAME_notBefore,
+    event.addEventData(CaAuditConstants.NAME_not_before,
         DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotBefore));
-    event.addEventData(CaAuditConstants.NAME_notAfter,
+    event.addEventData(CaAuditConstants.NAME_not_after,
         DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotAfter));
 
     adaptGrantedSubejct(gct);
@@ -2270,7 +2270,7 @@ public class X509Ca {
 
   private int removeExpirtedCerts(Date expiredAtTime, String msgId) throws OperationException {
     LOG.debug("revoking suspended certificates");
-    AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expiredCerts, msgId);
+    AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expired_certs, msgId);
     boolean successful = false;
     try {
       int num = removeExpirtedCerts0(expiredAtTime, event, msgId);
@@ -2290,7 +2290,7 @@ public class X509Ca {
           "CA could not remove expired certificates in slave mode");
     }
 
-    event.addEventData(CaAuditConstants.NAME_expiredAt, expiredAtTime);
+    event.addEventData(CaAuditConstants.NAME_expired_at, expiredAtTime);
     final int numEntries = 100;
 
     final long expiredAt = expiredAtTime.getTime() / 1000;
@@ -2441,7 +2441,7 @@ public class X509Ca {
   }
 
   private AuditEvent newPerfAuditEvent(String eventType, String msgId) {
-    return newAuditEvent(CaAuditConstants.NAME_PERF, eventType, msgId);
+    return newAuditEvent(CaAuditConstants.NAME_perf, eventType, msgId);
   }
 
   private AuditEvent newAuditEvent(String name, String eventType, String msgId) {

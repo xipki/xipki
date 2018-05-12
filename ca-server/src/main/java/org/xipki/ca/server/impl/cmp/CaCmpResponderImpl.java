@@ -281,7 +281,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
           } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_kur;
           } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
-            eventType = CaAuditConstants.TYPE_CMP_p10Cr;
+            eventType = CaAuditConstants.TYPE_CMP_p10cr;
           } else if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_ccr;
           }
@@ -302,7 +302,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
               reqBody, tmpRequestor, msgId, event);
           break;
         case PKIBody.TYPE_CONFIRM:
-          event.addEventType(CaAuditConstants.TYPE_CMP_pkiConf);
+          event.addEventType(CaAuditConstants.TYPE_CMP_pkiconf);
           respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
           break;
         case PKIBody.TYPE_GEN_MSG:
@@ -1436,7 +1436,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     try {
       X509Ca ca = getCa();
       if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
-        event.addEventType(CaAuditConstants.TYPE_CMP_genm_currentCrl);
+        event.addEventType(CaAuditConstants.TYPE_CMP_genm_current_crl);
         checkPermission(requestor, PermissionConstants.GET_CRL);
         CertificateList crl = ca.getBcCurrentCrl();
 
@@ -1476,7 +1476,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
         int action = asn1Code.getPositiveValue().intValue();
         switch (action) {
           case XiSecurityConstants.CMP_ACTION_GEN_CRL:
-            event.addEventType(CaAuditConstants.TYPE_CMP_genm_genCrl);
+            event.addEventType(CaAuditConstants.TYPE_CMP_genm_gen_crl);
             checkPermission(requestor, PermissionConstants.GEN_CRL);
             X509CRL tmpCrl = ca.generateCrlOnDemand(msgId);
             if (tmpCrl == null) {
@@ -1488,7 +1488,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
             }
             break;
           case XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN:
-            event.addEventType(CaAuditConstants.TYPE_CMP_genm_crlForNumber);
+            event.addEventType(CaAuditConstants.TYPE_CMP_genm_crl4number);
             checkPermission(requestor, PermissionConstants.GET_CRL);
 
             ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);

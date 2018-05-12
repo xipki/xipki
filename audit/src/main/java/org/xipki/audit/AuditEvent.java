@@ -102,7 +102,7 @@ public class AuditEvent {
   }
 
   public AuditEventData addEventType(String type) {
-    return addEventData("eventType", type);
+    return addEventData("event_type", type);
   }
 
   public AuditEventData addEventData(String name, Object value) {

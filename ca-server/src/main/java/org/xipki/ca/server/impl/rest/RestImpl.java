@@ -82,8 +82,8 @@ public class RestImpl implements Rest {
   public RestResponse service(String path, AuditEvent event, byte[] request,
       HttpRequestMetadataRetriever httpRetriever) {
     event.setApplicationName(CaAuditConstants.APPNAME);
-    event.setName(CaAuditConstants.NAME_PERF);
-    event.addEventData(CaAuditConstants.NAME_reqType, RequestType.REST.name());
+    event.setName(CaAuditConstants.NAME_perf);
+    event.addEventData(CaAuditConstants.NAME_req_type, RequestType.REST.name());
 
     String msgId = RandomUtil.nextHexLong();
     event.addEventData(CaAuditConstants.NAME_mid, msgId);
