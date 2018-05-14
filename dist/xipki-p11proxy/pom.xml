@@ -29,6 +29,8 @@
   <properties>
     <app.name>PKCS#11 proxy</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
+    <patchkaraf.repos>mvn:org.xipki.features/p11proxy/${project.version}/xml/features</patchkaraf.repos>
+    <patchkaraf.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-pkcs11-proxy</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -182,6 +184,40 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <configuration>
+              <tasks>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
+                  <arg value="--repos"/>
+                  <arg value="${patchkaraf.repos}"/>
+                  <arg value="--features"/>
+                  <arg value="${patchkaraf.features}"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.url.mvn.cfg"/>
+                </java>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.xipki</groupId>
+            <artifactId>patch-karaf</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

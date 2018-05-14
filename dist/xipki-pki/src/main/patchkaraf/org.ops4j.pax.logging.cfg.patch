@@ -1,0 +1,25 @@
+
+##### BEGIN XiPKI #####
+log4j2.logger.xipki.name = org.xipki
+log4j2.logger.xipki.level = INFO
+
+# Xipki audit logger
+log4j2.logger.xiaudit.name = xipki.audit.slf4j
+# Change the level INFO to ERROR to deactivate the audit
+log4j2.logger.xiaudit.level = INFO
+log4j2.logger.xiaudit.additivity = false
+log4j2.logger.xiaudit.appenderRef.XiauditRollingFile.ref = XiauditRollingFile
+
+# Audit appender
+log4j2.appender.xiaudit.type = RollingRandomAccessFile
+log4j2.appender.xiaudit.name = XiauditRollingFile
+log4j2.appender.xiaudit.fileName = ${karaf.data}/log/xiaudit.log
+log4j2.appender.xiaudit.filePattern = ${karaf.data}/log/xiaudit.log.%i
+log4j2.appender.xiaudit.append = true
+log4j2.appender.xiaudit.layout.type = PatternLayout
+log4j2.appender.xiaudit.layout.pattern = %d{ISO8601} | %m%n
+log4j2.appender.xiaudit.policies.type = Policies
+log4j2.appender.xiaudit.policies.size.type = SizeBasedTriggeringPolicy
+log4j2.appender.xiaudit.policies.size.size = 8MB
+
+##### END XiPKI #####

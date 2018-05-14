@@ -30,6 +30,10 @@
     <app.name>PKI</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
     <jdbc.h2.version>1.4.197</jdbc.h2.version>
+    <patchkaraf.main.repos>mvn:org.xipki.features/pki/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.main.repos>
+    <patchkaraf.jetty.repos>mvn:org.xipki.features/pki-jetty/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.jetty.repos>
+    <patchkaraf.main.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.main.features>
+    <patchkaraf.jetty.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.jetty.features>
   </properties>
   <dependencies>
     <dependency>
@@ -324,6 +328,60 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <configuration>
+              <tasks>
+                <mkdir dir="${project.build.directory}/classes/branches/main/etc"/>
+                <mkdir dir="${project.build.directory}/classes/branches/jetty/etc"/>
+                <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
+                      todir="${project.build.directory}/classes/branches/main/etc"/>
+                <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
+                      todir="${project.build.directory}/classes/branches/jetty/etc"/>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/classes/branches/main/etc/org.apache.karaf.features.cfg"/>
+                  <arg value="--repos"/>
+                  <arg value="${patchkaraf.main.repos}"/>
+                  <arg value="--features"/>
+                  <arg value="${patchkaraf.main.features}"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/classes/branches/jetty/etc/org.apache.karaf.features.cfg"/>
+                  <arg value="--repos"/>
+                  <arg value="${patchkaraf.jetty.repos}"/>
+                  <arg value="--features"/>
+                  <arg value="${patchkaraf.jetty.features}"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.url.mvn.cfg"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
+                  <arg value="--value-file"/>
+                  <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
+                </java>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.xipki</groupId>
+            <artifactId>patch-karaf</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
