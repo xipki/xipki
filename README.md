@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/xipki/xipki.png)](http://travis-ci.org/xipki/xipki)
+
 # XiPKI
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure) is
 a highly scalable and high-performance open source PKI (CA and OCSP responder).
