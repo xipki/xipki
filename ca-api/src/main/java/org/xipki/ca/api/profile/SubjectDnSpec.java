@@ -135,7 +135,8 @@ public class SubjectDnSpec {
       StringBuilder sb = new StringBuilder(500);
       sb.append("forward RDNs: ");
       for (ASN1ObjectIdentifier oid : forwardDNs) {
-        sb.append(oid.getId()).append(", ");
+        String desc = ObjectIdentifiers.getName(oid);
+        sb.append(desc == null ? oid.getId() : desc).append(", ");
       }
       if (!forwardDNs.isEmpty()) {
         sb.delete(sb.length() - 2, sb.length());
