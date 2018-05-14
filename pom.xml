@@ -64,6 +64,7 @@
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
   <modules>
+    <module>patch-karaf</module>
     <!-- SCEP -->
     <module>scep-common</module>
     <module>scep-client</module>
