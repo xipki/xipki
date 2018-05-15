@@ -192,7 +192,7 @@
           <execution>
             <phase>prepare-package</phase>
             <configuration>
-              <tasks>
+              <target>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
@@ -211,7 +211,7 @@
                   <arg value="--value-file"/>
                   <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>

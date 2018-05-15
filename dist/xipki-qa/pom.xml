@@ -363,7 +363,7 @@
           <execution>
             <phase>prepare-package</phase>
             <configuration>
-              <tasks>
+              <target>
                 <mkdir dir="${project.build.directory}/classes/branches/main/etc"/>
                 <mkdir dir="${project.build.directory}/classes/branches/jetty/etc"/>
                 <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
@@ -396,7 +396,7 @@
                   <arg value="--value-file"/>
                   <arg file="../xipki-pki/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
