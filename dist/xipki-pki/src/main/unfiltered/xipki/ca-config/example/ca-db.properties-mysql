@@ -34,7 +34,7 @@
 #dataSource.port = 3306
 #dataSource.databaseName = ca
 
-jdbcUrl = jdbc:mysql://127.0.0.1:3306/ca;useSSL=false
+jdbcUrl = jdbc:mysql://127.0.0.1:3306/ca?useSSL=false
 driverClassName = com.mysql.jdbc.Driver
 
 dataSource.user = root
