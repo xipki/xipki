@@ -1,6 +1,20 @@
 sudo: false
 language: java
-script: mvn clean install -Pdist
+
+before_cache:
+  # No sense in caching current build artifacts
+  - rm -rf $HOME/.m2/repository/org/xipki
+
+cache:
+  directories:
+    - $HOME/.m2/repository
+
+cache:
+  directories:
+    - $HOME/.m2/repository
+
+script:
+  - mvn clean install -Pdist
 
 notifications:
   email: false
