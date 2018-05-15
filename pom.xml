@@ -51,6 +51,7 @@
     <servlet.version>3.1.0</servlet.version>
     <karaf.compile.version>4.1.5</karaf.compile.version>
     <karaf.version>4.2.0</karaf.version>
+    <karaf.plugin.version>4.2.0</karaf.plugin.version>
     <netty.version>4.1.18.Final</netty.version>
     <netty-tcnative.version>2.0.7.Final</netty-tcnative.version>
     <bc.version>1.59</bc.version>
@@ -201,6 +202,11 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>1.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-maven-plugin</artifactId>
+          <version>${karaf.plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
