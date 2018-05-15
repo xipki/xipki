@@ -46,13 +46,14 @@ public class PatchFeature {
   }
 
   private static int func(String[] args) throws IOException {
-    if (args == null || args.length == 0 || args.length % 2 != 0) {
+    if (args == null || args.length == 0 || args[0].equals("--help") || args.length % 2 != 0) {
       return printUsage("");
     }
 
     String fileName = null;
     String repos = null;
     String features = null;
+    boolean backup = true;
 
     for (int i = 0; i < args.length; i += 2) {
       String option = args[i];
@@ -63,6 +64,8 @@ public class PatchFeature {
         repos = value;
       } else if ("--features".equalsIgnoreCase(option)) {
         features = value;
+      } else if ("--backup".equalsIgnoreCase(option)) {
+        backup = Boolean.parseBoolean(value);
       }
     }
 
@@ -102,25 +105,37 @@ public class PatchFeature {
           String line2 = PatchUtil.readContinuedLine(reader, line);
           StringBuilder sb = new StringBuilder();
           sb.append("featuresBoot = \\\n");
-          sb.append("    ( \\\n");
+
+          boolean addPhase = features.startsWith("(");
+          if (addPhase) {
+            sb.append("    ( \\\n");
+          }
+
           String value2 = line2.substring("featuresBoot =".length()).trim();
           StringTokenizer featuresTokenizer = new StringTokenizer(value2, ", \n\r");
           while (featuresTokenizer.hasMoreTokens()) {
             sb.append("    ").append(featuresTokenizer.nextToken()).append(", \\\n");
           }
 
-          if (features.startsWith("(")) {
+          if (addPhase) {
             int index = features.indexOf(')');
-            String phase0Features = features.substring(1, index);
-            features = features.substring(index + 1);
-            featuresTokenizer = new StringTokenizer(phase0Features, ", \n\r");
-            while (featuresTokenizer.hasMoreElements()) {
-              sb.append("    ").append(featuresTokenizer.nextToken()).append(", \\\n");
+            String phase0Features = features.substring(1, index).trim();
+            if (!phase0Features.isEmpty()) {
+              // no additional phase 0 feature
+              features = features.substring(index + 1);
+              featuresTokenizer = new StringTokenizer(phase0Features, ", \n\r");
+              while (featuresTokenizer.hasMoreElements()) {
+                sb.append("    ").append(featuresTokenizer.nextToken()).append(", \\\n");
+              }
             }
           }
+
           int len = sb.length();
           sb.delete(len - 4, len);
-          sb.append("), \\\n");
+          if (addPhase) {
+            sb.append(")");
+          }
+          sb.append(", \\\n");
 
           featuresTokenizer = new StringTokenizer(features, ", \n\r");
           while (featuresTokenizer.hasMoreTokens()) {
@@ -140,9 +155,11 @@ public class PatchFeature {
       writer.close();
     }
 
-    File origFile = new File(fileName + ".orig");
-    if (!file.renameTo(origFile)) {
-      return printUsage("could not rename " + file.getPath() + " to " + origFile.getPath());
+    if (backup) {
+      File origFile = new File(fileName + ".orig");
+      if (!file.renameTo(origFile)) {
+        return printUsage("could not rename " + file.getPath() + " to " + origFile.getPath());
+      }
     }
 
     if (!tmpNewFile.renameTo(file)) {
@@ -158,7 +175,23 @@ public class PatchFeature {
     if (!PatchUtil.isBlank(message)) {
       sb.append(message).append("\n");
     }
-    System.err.println(sb.toString());
+
+    sb.append("\nSYNTAX");
+    sb.append("\n\tjava " + PatchFeature.class.getName() + " [options]");
+    sb.append("\nOPTIONS");
+    sb.append("\n\t--file");
+    sb.append("\n\t\tFile to be patched");
+    sb.append("\n\t--backup");
+    sb.append("\n\t\tWhether to create a backup of the patched file (with appendxi .orig)");
+    sb.append("\n\t\t(defaults to true)");
+    sb.append("\n\t--repos");
+    sb.append("\n\t\tComma-separated repositories");
+    sb.append("\n\t--features");
+    sb.append("\n\t\tFeatures in form of [(f1,...,fk),]fk+1,fn where fx is the feature name");
+    sb.append("\n\t--help");
+    sb.append("\n\t\tDisplay this help message");
+
+    System.out.println(sb.toString());
     return -1;
   }
 

@@ -45,17 +45,20 @@ public class PatchPaxUrlMvn {
   }
 
   private static int func(String[] args) throws IOException {
-    if (args == null || args.length == 0 || args.length % 2 != 0) {
+    if (args == null || args.length == 0 || args[0].equals("--help") || args.length % 2 != 0) {
       return printUsage("");
     }
 
     String fileName = null;
+    boolean backup = true;
 
     for (int i = 0; i < args.length; i += 2) {
       String option = args[i];
       String value = args[i + 1];
       if ("--file".equalsIgnoreCase(option)) {
         fileName = value;
+      } else if ("--backup".equalsIgnoreCase(option)) {
+        backup = Boolean.parseBoolean(value);
       }
     }
 
@@ -86,9 +89,11 @@ public class PatchPaxUrlMvn {
       writer.close();
     }
 
-    File origFile = new File(fileName + ".orig");
-    if (!file.renameTo(origFile)) {
-      return printUsage("could not rename " + file.getPath() + " to " + origFile.getPath());
+    if (backup) {
+      File origFile = new File(fileName + ".orig");
+      if (!file.renameTo(origFile)) {
+        return printUsage("could not rename " + file.getPath() + " to " + origFile.getPath());
+      }
     }
 
     if (!tmpNewFile.renameTo(file)) {
@@ -104,7 +109,19 @@ public class PatchPaxUrlMvn {
     if (!PatchUtil.isBlank(message)) {
       sb.append(message).append("\n");
     }
-    System.err.println(sb.toString());
+
+    sb.append("\nSYNTAX");
+    sb.append("\n\tjava " + PatchPaxUrlMvn.class.getName() + " [options]");
+    sb.append("\nOPTIONS");
+    sb.append("\n\t--file");
+    sb.append("\n\t\tFile to be patched");
+    sb.append("\n\t--backup");
+    sb.append("\n\t\tWhether to create a backup of the patched file (with appendxi .orig)");
+    sb.append("\n\t\t(defaults to true)");
+    sb.append("\n\t--help");
+    sb.append("\n\t\tDisplay this help message");
+
+    System.out.println(sb.toString());
     return -1;
   }
 
