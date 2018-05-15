@@ -107,7 +107,7 @@ class SelfSignedCertBuilder {
   }
 
   public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
-      String signerType, String signerConf, IdentifiedX509Certprofile certprofile,
+      String signerType, String signerConf, IdentifiedCertprofile certprofile,
       CertificationRequest csr, BigInteger serialNumber, List<String> caCertUris,
       List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
       ConfPairs extraControl) throws OperationException, InvalidConfException {
@@ -201,7 +201,7 @@ class SelfSignedCertBuilder {
   } // method generateSelfSigned
 
   private static X509Certificate generateCertificate(ConcurrentContentSigner signer,
-      IdentifiedX509Certprofile certprofile, CertificationRequest csr,
+      IdentifiedCertprofile certprofile, CertificationRequest csr,
       BigInteger serialNumber, SubjectPublicKeyInfo publicKeyInfo,
       List<String> caCertUris, List<String> ocspUris, List<String> crlUris,
       List<String> deltaCrlUris, ConfPairs extraControl)
@@ -287,7 +287,7 @@ class SelfSignedCertBuilder {
   } // method generateCertificate
 
   private static void addExtensions(X509v3CertificateBuilder certBuilder,
-      IdentifiedX509Certprofile profile, X500Name requestedSubject, X500Name grantedSubject,
+      IdentifiedCertprofile profile, X500Name requestedSubject, X500Name grantedSubject,
       Extensions extensions, SubjectPublicKeyInfo requestedPublicKeyInfo,
       PublicCaInfo publicCaInfo, Date notBefore, Date notAfter)
       throws CertprofileException, IOException, BadCertTemplateException {

@@ -40,13 +40,13 @@ import org.xipki.security.X509Cert;
  * @since 2.0.0
  */
 
-class IdentifiedX509CertPublisher {
+class IdentifiedCertPublisher {
 
   private final PublisherEntry entry;
 
   private final CertPublisher certPublisher;
 
-  IdentifiedX509CertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
+  IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
     this.entry = ParamUtil.requireNonNull("entry", entry);
     this.certPublisher = ParamUtil.requireNonNull("certPublisher", certPublisher);
   }

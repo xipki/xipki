@@ -57,13 +57,11 @@ public class ByCaRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public void assertCertProfilePermitted(String certprofile)
-      throws InsuffientPermissionException {
+  public void assertCertProfilePermitted(String certprofile) throws InsuffientPermissionException {
   }
 
   @Override
-  public void assertPermitted(int requiredPermission)
-      throws InsuffientPermissionException {
+  public void assertPermitted(int requiredPermission) throws InsuffientPermissionException {
   }
 
 }

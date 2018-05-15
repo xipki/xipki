@@ -151,7 +151,7 @@ class CertRepublisher {
         }
 
         boolean allSucc = true;
-        for (IdentifiedX509CertPublisher publisher : publishers) {
+        for (IdentifiedCertPublisher publisher : publishers) {
           if (!certInfo.isRevoked() && !publisher.publishsGoodCert()) {
             continue;
           }
@@ -183,7 +183,7 @@ class CertRepublisher {
 
   private final CertStore certstore;
 
-  private final List<IdentifiedX509CertPublisher> publishers;
+  private final List<IdentifiedCertPublisher> publishers;
 
   private final boolean onlyRevokedCerts;
 
@@ -196,7 +196,7 @@ class CertRepublisher {
   private ProcessLog processLog;
 
   CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertStore certstore,
-      List<IdentifiedX509CertPublisher> publishers, boolean onlyRevokedCerts, int numThreads) {
+      List<IdentifiedCertPublisher> publishers, boolean onlyRevokedCerts, int numThreads) {
     this.ca = ParamUtil.requireNonNull("ca", ca);
     this.caCert = ParamUtil.requireNonNull("caCert", caCert);
     this.caIdNameMap = ParamUtil.requireNonNull("caIdNameMap", caIdNameMap);

@@ -148,7 +148,7 @@ public class X509Ca {
   private static class GrantedCertTemplate {
     private final ConcurrentContentSigner signer;
     private final Extensions extensions;
-    private final IdentifiedX509Certprofile certprofile;
+    private final IdentifiedCertprofile certprofile;
     private final Date grantedNotBefore;
     private final Date grantedNotAfter;
     private final X500Name requestedSubject;
@@ -161,7 +161,7 @@ public class X509Ca {
     private String grantedSubjectText;
     private long fpSubject;
 
-    public GrantedCertTemplate(Extensions extensions, IdentifiedX509Certprofile certprofile,
+    public GrantedCertTemplate(Extensions extensions, IdentifiedCertprofile certprofile,
         Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject,
         SubjectPublicKeyInfo grantedPublicKey, long fpPublicKey,
         byte[] grantedPublicKeyData, ConcurrentContentSigner signer, String warning) {
@@ -466,7 +466,7 @@ public class X509Ca {
       return;
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       publisher.caAdded(caCert);
     }
 
@@ -1052,7 +1052,7 @@ public class X509Ca {
       return 1;
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       if (!publisher.isAsyn()) {
         boolean successful;
         try {
@@ -1081,15 +1081,15 @@ public class X509Ca {
   } // method publishCertificate0
 
   public boolean republishCertificates(List<String> publisherNames, int numThreads) {
-    List<IdentifiedX509CertPublisher> publishers;
+    List<IdentifiedCertPublisher> publishers;
     if (publisherNames == null) {
       publishers = publishers();
     } else {
       publishers = new ArrayList<>(publisherNames.size());
 
       for (String publisherName : publisherNames) {
-        IdentifiedX509CertPublisher publisher = null;
-        for (IdentifiedX509CertPublisher p : publishers()) {
+        IdentifiedCertPublisher publisher = null;
+        for (IdentifiedCertPublisher p : publishers()) {
           if (p.getIdent().getName().equals(publisherName)) {
             publisher = p;
             break;
@@ -1113,7 +1113,7 @@ public class X509Ca {
     caInfo.setStatus(CaStatus.INACTIVE);
 
     boolean onlyRevokedCerts = true;
-    for (IdentifiedX509CertPublisher publisher : publishers) {
+    for (IdentifiedCertPublisher publisher : publishers) {
       if (publisher.publishsGoodCert()) {
         onlyRevokedCerts = false;
       }
@@ -1129,7 +1129,7 @@ public class X509Ca {
     } // end for
 
     try {
-      for (IdentifiedX509CertPublisher publisher : publishers) {
+      for (IdentifiedCertPublisher publisher : publishers) {
         boolean successful = publisher.caAdded(caCert);
         if (!successful) {
           LOG.error("republish CA certificate {} to publisher {} failed", caIdent,
@@ -1139,7 +1139,7 @@ public class X509Ca {
       }
 
       if (caInfo.getRevocationInfo() != null) {
-        for (IdentifiedX509CertPublisher publisher : publishers) {
+        for (IdentifiedCertPublisher publisher : publishers) {
           boolean successful = publisher.caRevoked(caCert, caInfo.getRevocationInfo());
           if (!successful) {
             LOG.error("republishing CA revocation to publisher {} failed", publisher.getIdent());
@@ -1180,7 +1180,7 @@ public class X509Ca {
 
   public boolean publishCertsInQueue() {
     boolean allSuccessful = true;
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       if (!publishCertsInQueue(publisher)) {
         allSuccessful = false;
       }
@@ -1189,7 +1189,7 @@ public class X509Ca {
     return allSuccessful;
   }
 
-  private boolean publishCertsInQueue(IdentifiedX509CertPublisher publisher) {
+  private boolean publishCertsInQueue(IdentifiedCertPublisher publisher) {
     ParamUtil.requireNonNull("publisher", publisher);
     final int numEntries = 500;
 
@@ -1245,7 +1245,7 @@ public class X509Ca {
       return false;
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       try {
         publisher.crlAdded(caCert, crl);
       } catch (RuntimeException ex) {
@@ -1344,7 +1344,7 @@ public class X509Ca {
 
     boolean successful = true;
     CertWithDbId certToRemove = certWithRevInfo.getCert();
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       boolean singleSuccessful;
       try {
         singleSuccessful = publisher.certificateRemoved(caCert, certToRemove);
@@ -1398,7 +1398,7 @@ public class X509Ca {
       return null;
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       if (!publisher.isAsyn()) {
         boolean successful;
         try {
@@ -1464,7 +1464,7 @@ public class X509Ca {
       return null;
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       if (!publisher.isAsyn()) {
         boolean successful;
         try {
@@ -1510,7 +1510,7 @@ public class X509Ca {
       return null;
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       if (!publisher.isAsyn()) {
         boolean successful;
         try {
@@ -1573,7 +1573,7 @@ public class X509Ca {
     }
 
     boolean failed = false;
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caRevoked(caCert, revocationInfo);
       if (successful) {
@@ -1605,7 +1605,7 @@ public class X509Ca {
     }
 
     boolean failed = false;
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caUnrevoked(caCert);
       if (successful) {
@@ -1632,7 +1632,7 @@ public class X509Ca {
     certstore.addRequestCert(requestId, certId);
   }
 
-  private List<IdentifiedX509CertPublisher> publishers() {
+  private List<IdentifiedCertPublisher> publishers() {
     return caManager.getIdentifiedPublishersForCa(caIdent.getName());
   }
 
@@ -1758,7 +1758,7 @@ public class X509Ca {
 
     adaptGrantedSubejct(gct);
 
-    IdentifiedX509Certprofile certprofile = gct.certprofile;
+    IdentifiedCertprofile certprofile = gct.certprofile;
 
     boolean duplicatedKeyNotAllowed = !caInfo.isDuplicateKeyPermitted();
     boolean duplicatedSubjectNotAllowed = !caInfo.isDuplicateSubjectPermitted();
@@ -1946,7 +1946,7 @@ public class X509Ca {
       throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
     }
 
-    IdentifiedX509Certprofile certprofile = getX509Certprofile(certTemplate.getCertprofileName());
+    IdentifiedCertprofile certprofile = getX509Certprofile(certTemplate.getCertprofileName());
 
     if (certprofile == null) {
       throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE,
@@ -2165,7 +2165,7 @@ public class X509Ca {
 
   } // method createGrantedCertTemplate
 
-  public IdentifiedX509Certprofile getX509Certprofile(String certprofileName) {
+  public IdentifiedCertprofile getX509Certprofile(String certprofileName) {
     if (certprofileName == null) {
       return null;
     }
@@ -2417,7 +2417,7 @@ public class X509Ca {
       result.addChildCheck(crlSignerHealth);
     }
 
-    for (IdentifiedX509CertPublisher publisher : publishers()) {
+    for (IdentifiedCertPublisher publisher : publishers()) {
       boolean ph = publisher.isHealthy();
       healthy &= ph;
 
@@ -2551,7 +2551,7 @@ public class X509Ca {
     return changed ? new X500Name(tmpRdns.toArray(new RDN[0])) : name;
   } // method removeEmptyRdns
 
-  private static Object[] incSerialNumber(IdentifiedX509Certprofile profile, X500Name origName,
+  private static Object[] incSerialNumber(IdentifiedCertprofile profile, X500Name origName,
       String latestSn) throws BadFormatException {
     RDN[] rdns = origName.getRDNs();
 

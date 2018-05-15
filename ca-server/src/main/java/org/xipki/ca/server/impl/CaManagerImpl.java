@@ -294,11 +294,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private Map<String, ResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
 
-  private final Map<String, IdentifiedX509Certprofile> certprofiles = new ConcurrentHashMap<>();
+  private final Map<String, IdentifiedCertprofile> certprofiles = new ConcurrentHashMap<>();
 
   private final Map<String, CertprofileEntry> certprofileDbEntries = new ConcurrentHashMap<>();
 
-  private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
+  private final Map<String, IdentifiedCertPublisher> publishers = new ConcurrentHashMap<>();
 
   private final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
 
@@ -593,8 +593,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             lockedAt.toString(),  ". In general this indicates that another"
             + " CA software in active mode is accessing the database or the last shutdown of CA"
             + " software in active mode is abnormal.");
-        LOG.error(msg);
-        throw new CaMgmtException(msg);
+        throw logAndCreateException(msg);
       }
 
       if (forceRelock) {
@@ -611,9 +610,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   @Override
   public void unlockCa() throws CaMgmtException {
     if (!masterMode) {
-      String msg = "could not unlock CA in slave mode";
-      LOG.error(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException("could not unlock CA in slave mode");
     }
 
     boolean succ = false;
@@ -649,9 +646,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     auditLogPciEvent(caSystemStarted, "CA_CHANGE");
 
     if (!caSystemStarted) {
-      String msg = "could not restart CA system";
-      LOG.error(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException("could not restart CA system");
     }
   } // method restartCaSystem
 
@@ -827,7 +822,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         crlSignerEntry.getDbEntry().setConfFaulty(false);
       } catch (XiSecurityException | OperationException ex) {
         LogUtil.error(LOG, ex,
-            concat("X09CrlSignerEntryWrapper.initSigner (name=", crlSignerName, ")"));
+            concat("CrlSignerEntryWrapper.initSigner(name=", crlSignerName, ")"));
         return false;
       }
     }
@@ -1091,7 +1086,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       dbEntry.setFaulty(true);
       certprofileDbEntries.put(name, dbEntry);
 
-      IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
+      IdentifiedCertprofile profile = createCertprofile(dbEntry);
       if (profile != null) {
         dbEntry.setFaulty(false);
         certprofiles.put(name, profile);
@@ -1125,7 +1120,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       dbEntry.setFaulty(true);
       publisherDbEntries.put(name, dbEntry);
 
-      IdentifiedX509CertPublisher publisher = createPublisher(dbEntry);
+      IdentifiedCertPublisher publisher = createPublisher(dbEntry);
       if (publisher != null) {
         dbEntry.setFaulty(false);
         publishers.put(name, publisher);
@@ -1395,16 +1390,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     NameId ident = idNameMap.getCertprofile(profileName);
     if (ident == null) {
-      String msg = concat("unknown CertProfile ", profileName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown CertProfile ", profileName));
     }
 
     NameId caIdent = idNameMap.getCa(caName);
     if (caIdent == null) {
-      String msg = concat("unknown CA ", caName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown CA ", caName));
     }
 
     Set<String> set = caHasProfiles.get(caName);
@@ -1413,9 +1404,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       caHasProfiles.put(caName, set);
     } else {
       if (set.contains(profileName)) {
-        String msg = concat("CertProfile ", profileName, " already associated with CA ", caName);
-        LOG.warn(msg);
-        throw new CaMgmtException(msg);
+        throw logAndCreateException(
+            concat("CertProfile ", profileName, " already associated with CA ", caName));
       }
     }
 
@@ -1449,16 +1439,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     NameId ident = idNameMap.getPublisher(publisherName);
     if (ident == null) {
-      String msg = concat("unknown publisher ", publisherName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown publisher ", publisherName));
     }
 
     NameId caIdent = idNameMap.getCa(caName);
     if (caIdent == null) {
-      String msg = concat("unknown CA ", caName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown CA ", caName));
     }
 
     Set<String> publisherNames = caHasPublishers.get(caName);
@@ -1468,12 +1454,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     } else {
       if (publisherNames.contains(publisherName)) {
         String msg = concat("publisher ", publisherName, " already associated with CA ", caName);
-        LOG.warn(msg);
-        throw new CaMgmtException(msg);
+        throw logAndCreateException(msg);
       }
     }
 
-    IdentifiedX509CertPublisher publisher = publishers.get(publisherName);
+    IdentifiedCertPublisher publisher = publishers.get(publisherName);
     if (publisher == null) {
       throw new CaMgmtException(concat("publisher '", publisherName, "' is faulty"));
     }
@@ -1523,33 +1508,32 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method addRequestor
 
   @Override
-  public void removeRequestor(String requestorName) throws CaMgmtException {
-    requestorName = ParamUtil.requireNonBlank("requestorName", requestorName).toLowerCase();
+  public void removeRequestor(String name) throws CaMgmtException {
+    name = ParamUtil.requireNonBlank("requestorName", name).toLowerCase();
     asssertMasterMode();
 
     for (String caName : caHasRequestors.keySet()) {
       boolean removeMe = false;
       for (CaHasRequestorEntry caHasRequestor : caHasRequestors.get(caName)) {
-        if (caHasRequestor.getRequestorIdent().getName().equals(requestorName)) {
+        if (caHasRequestor.getRequestorIdent().getName().equals(name)) {
           removeMe = true;
           break;
         }
       }
 
       if (removeMe) {
-        removeRequestorFromCa(requestorName, caName);
+        removeRequestorFromCa(name, caName);
       }
     }
 
-    boolean bo = queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
-    if (!bo) {
-      throw new CaMgmtException("unknown requestor " + requestorName);
+    if (!queryExecutor.deleteRowWithName(name, "REQUESTOR")) {
+      throw new CaMgmtException("unknown requestor " + name);
     }
 
-    idNameMap.removeRequestor(requestorDbEntries.get(requestorName).getIdent().getId());
-    requestorDbEntries.remove(requestorName);
-    requestors.remove(requestorName);
-    LOG.info("removed requestor '{}'", requestorName);
+    idNameMap.removeRequestor(requestorDbEntries.get(name).getIdent().getId());
+    requestorDbEntries.remove(name);
+    requestors.remove(name);
+    LOG.info("removed requestor '{}'", name);
   } // method removeRequestor
 
   @Override
@@ -1560,9 +1544,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     NameId ident = idNameMap.getRequestor(name);
     if (ident == null) {
-      String msg = concat("unknown requestor ", name);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown requestor ", name));
     }
 
     RequestorEntryWrapper requestor = queryExecutor.changeRequestor(ident, base64Cert);
@@ -1608,9 +1590,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     NameId requestorIdent = requestor.getRequestorIdent();
     NameId ident = idNameMap.getRequestor(requestorIdent.getName());
     if (ident == null) {
-      String msg = concat("unknown requestor ", requestorIdent.getName());
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown requestor ", requestorIdent.getName()));
     }
 
     NameId caIdent = idNameMap.getCa(caName);
@@ -1632,8 +1612,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         String requestorName = requestorIdent.getName();
         if (entry.getRequestorIdent().getName().equals(requestorName)) {
           String msg = concat("Requestor ", requestorName, " already associated with CA ", caName);
-          LOG.warn(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(msg);
         }
       }
     }
@@ -1659,9 +1638,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     X509Ca ca = getX509Ca(caName);
     if (ca == null) {
-      String msg = concat("unknown CA ", caName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown CA ", caName));
     }
 
     queryExecutor.addUserToCa(user, ca.getCaIdent());
@@ -1674,31 +1651,30 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public CertprofileEntry getCertprofile(String profileName) {
-    profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
-    return certprofileDbEntries.get(profileName);
+  public CertprofileEntry getCertprofile(String name) {
+    return certprofileDbEntries.get(name.toLowerCase());
   }
 
   @Override
-  public void removeCertprofile(String profileName) throws CaMgmtException {
-    profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
+  public void removeCertprofile(String name) throws CaMgmtException {
+    name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     asssertMasterMode();
 
     for (String caName : caHasProfiles.keySet()) {
-      if (caHasProfiles.get(caName).contains(profileName)) {
-        removeCertprofileFromCa(profileName, caName);
+      if (caHasProfiles.get(caName).contains(name)) {
+        removeCertprofileFromCa(name, caName);
       }
     }
 
-    boolean bo = queryExecutor.deleteRowWithName(profileName, "PROFILE");
+    boolean bo = queryExecutor.deleteRowWithName(name, "PROFILE");
     if (!bo) {
-      throw new CaMgmtException("unknown profile " + profileName);
+      throw new CaMgmtException("unknown profile " + name);
     }
 
-    LOG.info("removed profile '{}'", profileName);
-    idNameMap.removeCertprofile(certprofileDbEntries.get(profileName).getIdent().getId());
-    certprofileDbEntries.remove(profileName);
-    IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
+    LOG.info("removed profile '{}'", name);
+    idNameMap.removeCertprofile(certprofileDbEntries.get(name).getIdent().getId());
+    certprofileDbEntries.remove(name);
+    IdentifiedCertprofile profile = certprofiles.remove(name);
     shutdownCertprofile(profile);
   } // method removeCertprofile
 
@@ -1710,9 +1686,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
     NameId ident = idNameMap.getCertprofile(name);
     if (ident == null) {
-      String msg = concat("unknown Certprofile ", name);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown Certprofile ", name));
     }
 
     if (type != null) {
@@ -1721,10 +1695,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     asssertMasterMode();
 
-    IdentifiedX509Certprofile profile = queryExecutor.changeCertprofile(ident, type, conf, this);
+    IdentifiedCertprofile profile = queryExecutor.changeCertprofile(ident, type, conf, this);
 
     certprofileDbEntries.remove(name);
-    IdentifiedX509Certprofile oldProfile = certprofiles.remove(name);
+    IdentifiedCertprofile oldProfile = certprofiles.remove(name);
     certprofileDbEntries.put(name, profile.getDbEntry());
     certprofiles.put(name, profile);
 
@@ -1743,16 +1717,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     dbEntry.setFaulty(true);
-    IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
+    IdentifiedCertprofile profile = createCertprofile(dbEntry);
     if (profile == null) {
       throw new CaMgmtException("could not create CertProfile object");
     }
 
     dbEntry.setFaulty(false);
     certprofiles.put(name, profile);
-
     queryExecutor.addCertprofile(dbEntry);
-
     idNameMap.addCertprofile(dbEntry.getIdent());
     certprofileDbEntries.put(name, dbEntry);
   } // method addCertprofile
@@ -1917,13 +1889,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   @Override
   public CrlSignerEntry getCrlSigner(String name) {
-    name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-    return crlSignerDbEntries.get(name);
+    return crlSignerDbEntries.get(name.toLowerCase());
   }
 
   public CrlSignerEntryWrapper getCrlSignerWrapper(String name) {
-    name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-    return crlSigners.get(name);
+    return crlSigners.get(name.toLowerCase());
   }
 
   @Override
@@ -1936,7 +1906,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     dbEntry.setFaulty(true);
-    IdentifiedX509CertPublisher publisher = createPublisher(dbEntry);
+    IdentifiedCertPublisher publisher = createPublisher(dbEntry);
     dbEntry.setFaulty(false);
 
     queryExecutor.addPublisher(dbEntry);
@@ -1985,7 +1955,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     LOG.info("removed publisher '{}'", name);
     publisherDbEntries.remove(name);
-    IdentifiedX509CertPublisher publisher = publishers.remove(name);
+    IdentifiedCertPublisher publisher = publishers.remove(name);
     shutdownPublisher(publisher);
   } // method removePublisher
 
@@ -2000,9 +1970,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       type = type.toLowerCase();
     }
 
-    IdentifiedX509CertPublisher publisher = queryExecutor.changePublisher(name, type, conf, this);
+    IdentifiedCertPublisher publisher = queryExecutor.changePublisher(name, type, conf, this);
 
-    IdentifiedX509CertPublisher oldPublisher = publishers.remove(name);
+    IdentifiedCertPublisher oldPublisher = publishers.remove(name);
     shutdownPublisher(oldPublisher);
 
     publisherDbEntries.put(name, publisher.getDbEntry());
@@ -2218,21 +2188,21 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public void removeCa(String caName) throws CaMgmtException {
-    caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
+  public void removeCa(String name) throws CaMgmtException {
+    name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     asssertMasterMode();
 
-    queryExecutor.removeCa(caName);
+    queryExecutor.removeCa(name);
 
-    LOG.info("removed CA '{}'", caName);
-    caInfos.remove(caName);
-    idNameMap.removeCa(caName);
-    idNameMap.removeCa(caName);
-    caHasProfiles.remove(caName);
-    caHasPublishers.remove(caName);
-    caHasRequestors.remove(caName);
-    X509Ca ca = x509cas.remove(caName);
-    x509Responders.remove(caName);
+    LOG.info("removed CA '{}'", name);
+    caInfos.remove(name);
+    idNameMap.removeCa(name);
+    idNameMap.removeCa(name);
+    caHasProfiles.remove(name);
+    caHasPublishers.remove(name);
+    caHasRequestors.remove(name);
+    X509Ca ca = x509cas.remove(name);
+    x509Responders.remove(name);
     if (ca != null) {
       ca.shutdown();
     }
@@ -2325,7 +2295,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     this.auditServiceRegister = ParamUtil.requireNonNull("serviceRegister", register);
 
     for (String name : publishers.keySet()) {
-      IdentifiedX509CertPublisher publisherEntry = publishers.get(name);
+      IdentifiedCertPublisher publisherEntry = publishers.get(name);
       publisherEntry.setAuditServiceRegister(register);
     }
 
@@ -2363,14 +2333,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
       try {
         certstore.clearPublishQueue((NameId) null, (NameId) null);
-        return;
       } catch (OperationException ex) {
         throw new CaMgmtException(ex.getMessage(), ex);
       }
-    } else {
-      caName = caName.toLowerCase();
+      return;
     }
 
+    caName = caName.toLowerCase();
     X509Ca ca = x509cas.get(caName);
     if (ca == null) {
       throw new CaMgmtException(concat("could not find CA named ", caName));
@@ -2433,9 +2402,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     asssertMasterMode();
     X509Ca ca = getX509Ca(caName);
     if (ca == null) {
-      String msg = concat("unknown CA ", caName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown CA ", caName));
     }
 
     try {
@@ -2526,21 +2493,21 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return ca;
   }
 
-  public IdentifiedX509Certprofile getIdentifiedCertprofile(String profileName) {
+  public IdentifiedCertprofile getIdentifiedCertprofile(String profileName) {
     profileName = ParamUtil.requireNonBlank("profileName", profileName).toLowerCase();
     return certprofiles.get(profileName);
   }
 
-  public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName) {
+  public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName) {
     caName = ParamUtil.requireNonBlank("caName", caName).toLowerCase();
-    List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
+    List<IdentifiedCertPublisher> ret = new LinkedList<>();
     Set<String> publisherNames = caHasPublishers.get(caName);
     if (publisherNames == null) {
       return ret;
     }
 
     for (String publisherName : publisherNames) {
-      IdentifiedX509CertPublisher publisher = publishers.get(publisherName);
+      IdentifiedCertPublisher publisher = publishers.get(publisherName);
       ret.add(publisher);
     }
     return ret;
@@ -2581,7 +2548,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       return null;
     }
 
-    IdentifiedX509Certprofile certprofile = getIdentifiedCertprofile(profileName);
+    IdentifiedCertprofile certprofile = getIdentifiedCertprofile(profileName);
     if (certprofile == null) {
       throw new CaMgmtException(concat("unknown certprofile ", profileName));
     }
@@ -2642,7 +2609,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
   }
 
-  void shutdownCertprofile(IdentifiedX509Certprofile profile) {
+  void shutdownCertprofile(IdentifiedCertprofile profile) {
     if (profile == null) {
       return;
     }
@@ -2654,7 +2621,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
   } // method shutdownCertprofile
 
-  void shutdownPublisher(IdentifiedX509CertPublisher publisher) {
+  void shutdownPublisher(IdentifiedCertPublisher publisher) {
     if (publisher == null) {
       return;
     }
@@ -2705,7 +2672,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return signer;
   } // method createX509CrlSigner
 
-  IdentifiedX509Certprofile createCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
+  IdentifiedCertprofile createCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
 
     String type = dbEntry.getType();
@@ -2715,7 +2682,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     try {
       Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(type);
-      IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
+      IdentifiedCertprofile ret = new IdentifiedCertprofile(dbEntry, profile);
       ret.setEnvParameterResolver(envParameterResolver);
       ret.validate();
       return ret;
@@ -2726,12 +2693,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
   } // method createCertprofile
 
-  IdentifiedX509CertPublisher createPublisher(PublisherEntry dbEntry) throws CaMgmtException {
+  IdentifiedCertPublisher createPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     String type = dbEntry.getType();
 
     CertPublisher publisher;
-    IdentifiedX509CertPublisher ret;
+    IdentifiedCertPublisher ret;
     try {
       if (x509CertPublisherFactoryRegister.canCreatePublisher(type)) {
         publisher = x509CertPublisherFactoryRegister.newPublisher(type);
@@ -2739,7 +2706,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         throw new CaMgmtException("unsupported publisher type " + type);
       }
 
-      ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
+      ret = new IdentifiedCertPublisher(dbEntry, publisher);
       ret.initialize(securityFactory.getPasswordResolver(), datasources);
       return ret;
     } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
@@ -2765,16 +2732,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   public void removeUser(String username) throws CaMgmtException {
     username = ParamUtil.requireNonBlank("username", username).toLowerCase();
     asssertMasterMode();
-    boolean bo = queryExecutor.deleteRowWithName(username, "TUSER");
-    if (!bo) {
+    if (!queryExecutor.deleteRowWithName(username, "TUSER")) {
       throw new CaMgmtException("unknown user " + username);
     }
   }
 
   @Override
   public UserEntry getUser(String username) throws CaMgmtException {
-    username = ParamUtil.requireNonBlank("username", username).toLowerCase();
-    return queryExecutor.getUser(username);
+    return queryExecutor.getUser(username.toLowerCase());
   }
 
   CaIdNameMap idNameMap() {
@@ -2836,9 +2801,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     String caName = dbEntry.getCaIdent().getName();
     NameId caIdent = idNameMap.getCa(caName);
     if (caIdent == null) {
-      String msg = concat("unknown CA ", caName);
-      LOG.warn(msg);
-      throw new CaMgmtException(msg);
+      throw logAndCreateException(concat("unknown CA ", caName));
     }
 
     dbEntry.getCaIdent().setId(caIdent.getId());
@@ -2853,8 +2816,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   public void removeScep(String name) throws CaMgmtException {
     name = ParamUtil.requireNonBlank("name", name).toLowerCase();
     asssertMasterMode();
-    boolean bo = queryExecutor.deleteRowWithName(name, "TUSER");
-    if (!bo) {
+    if (!queryExecutor.deleteRowWithName(name, "TUSER")) {
       throw new CaMgmtException("unknown SCEP " + name);
     }
     scepDbEntries.remove(name);
@@ -3012,9 +2974,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed CMP control {}", name);
           continue;
         } else {
-          String msg = concat("CMP control ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(
+              concat("CMP control ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3037,9 +2998,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed CMP responder {}", name);
           continue;
         } else {
-          String msg = concat("CMP responder ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(
+              concat("CMP responder ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3063,8 +3023,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           continue;
         } else {
           String msg = concat("environment parameter ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(msg);
         }
       }
 
@@ -3087,9 +3046,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed CRL signer {}", name);
           continue;
         } else {
-          String msg = concat("CRL signer ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(
+              concat("CRL signer ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3113,9 +3071,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed CMP requestor {}", name);
           continue;
         } else {
-          String msg = concat("CMP requestor ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(
+              concat("CMP requestor ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3138,9 +3095,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed publisher {}", name);
           continue;
         } else {
-          String msg = concat("publisher ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(
+              concat("publisher ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3163,9 +3119,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed certProfile {}", name);
           continue;
         } else {
-          String msg = concat("certProfile ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(
+              concat("certProfile ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3198,9 +3153,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.info("ignore existed user {}", name);
           continue;
         } else {
-          String msg = concat("user ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(concat("user ", name, " existed, could not re-added it"));
         }
       }
 
@@ -3241,9 +3194,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           if (caEntry.equals(entryB, true, true)) {
             LOG.info("ignore existed CA {}", caName);
           } else {
-            String msg = concat("CA ", caName, " existed, could not re-added it");
-            LOG.error(msg);
-            throw new CaMgmtException(msg);
+            throw logAndCreateException(concat("CA ", caName, " existed, could not re-added it"));
           }
         } else {
           if (genSelfIssued != null) {
@@ -3349,9 +3300,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             if (requestor.equals(requestorB, ignoreId)) {
               LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
             } else {
-              String msg = concat("could not add requestor ", requestorName, " to CA", caName);
-              LOG.error(msg);
-              throw new CaMgmtException(msg);
+              throw logAndCreateException(
+                  concat("could not add requestor ", requestorName, " to CA", caName));
             }
           } else {
             try {
@@ -3385,9 +3335,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             if (user.equals(userB, ignoreId)) {
               LOG.info("ignored adding user {} to CA {}", userName, caName);
             } else {
-              String msg = concat("could not add user ", userName, " to CA", caName);
-              LOG.error(msg);
-              throw new CaMgmtException(msg);
+              throw logAndCreateException(
+                  concat("could not add user ", userName, " to CA", caName));
             }
           } else {
             try {
@@ -3412,9 +3361,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           LOG.error("ignore existed SCEP {}", name);
           continue;
         } else {
-          String msg = concat("SCEP ", name, " existed, could not re-added it");
-          LOG.error(msg);
-          throw new CaMgmtException(msg);
+          throw logAndCreateException(concat("SCEP ", name, " existed, could not re-added it"));
         }
       } else {
         try {
@@ -3906,8 +3853,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return ret;
   }
 
-  private static ZipOutputStream getZipOutputStream(File zipFile)
-      throws FileNotFoundException {
+  private static ZipOutputStream getZipOutputStream(File zipFile) throws FileNotFoundException {
     ParamUtil.requireNonNull("zipFile", zipFile);
 
     BufferedOutputStream out = new BufferedOutputStream(
@@ -3950,4 +3896,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return StringUtil.concat(s1, strs);
   }
 
+  private static CaMgmtException logAndCreateException(String msg) {
+    LOG.error(msg);
+    return new CaMgmtException(msg);
+  }
 }

@@ -1198,13 +1198,13 @@ class CaManagerQueryExecutor {
     }
   } // method commitNextCrlNoIfLess
 
-  IdentifiedX509Certprofile changeCertprofile(NameId nameId, String type, String conf,
+  IdentifiedCertprofile changeCertprofile(NameId nameId, String type, String conf,
       CaManagerImpl caManager) throws CaMgmtException {
     CertprofileEntry currentDbEntry = createCertprofile(nameId.getName());
     CertprofileEntry newDbEntry = new CertprofileEntry(currentDbEntry.getIdent(),
         str(type, currentDbEntry.getType()), str(conf, currentDbEntry.getConf()));
 
-    IdentifiedX509Certprofile profile = caManager.createCertprofile(newDbEntry);
+    IdentifiedCertprofile profile = caManager.createCertprofile(newDbEntry);
     if (profile == null) {
       throw new CaMgmtException("could not create CertProfile object");
     }
@@ -1451,7 +1451,7 @@ class CaManagerQueryExecutor {
     changeIfNotNull("ENVIRONMENT", col(STRING, "NAME", name), col(STRING, "VALUE2", value));
   } // method changeEnvParam
 
-  IdentifiedX509CertPublisher changePublisher(String name, String type, String conf,
+  IdentifiedCertPublisher changePublisher(String name, String type, String conf,
       CaManagerImpl caManager) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("caManager", caManager);
@@ -1460,7 +1460,7 @@ class CaManagerQueryExecutor {
     PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.getIdent(),
         (type == null ? currentDbEntry.getType() : type),
         (conf == null ? currentDbEntry.getConf() : conf));
-    IdentifiedX509CertPublisher publisher = caManager.createPublisher(dbEntry);
+    IdentifiedCertPublisher publisher = caManager.createPublisher(dbEntry);
 
     changeIfNotNull("PUBLISHER", col(STRING, "NAME", name), col(STRING, "TYPE", type),
         col(STRING, "CONF", conf));

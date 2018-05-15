@@ -86,7 +86,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class IdentifiedX509Certprofile {
+class IdentifiedCertprofile {
 
   private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSION_TYPES;
 
@@ -151,7 +151,7 @@ class IdentifiedX509Certprofile {
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
-  IdentifiedX509Certprofile(CertprofileEntry dbEntry, Certprofile certProfile)
+  IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certProfile)
       throws CertprofileException {
     this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
     this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);

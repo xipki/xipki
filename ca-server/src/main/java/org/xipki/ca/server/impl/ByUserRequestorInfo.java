@@ -78,8 +78,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public void assertCertProfilePermitted(String certprofile)
-      throws InsuffientPermissionException {
+  public void assertCertProfilePermitted(String certprofile) throws InsuffientPermissionException {
     if (!isCertProfilePermitted(certprofile)) {
       throw new  InsuffientPermissionException("CertProfile " + certprofile + " is not permitted");
     }
@@ -88,7 +87,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
   @Override
   public void assertPermitted(int permission) throws InsuffientPermissionException {
     if (!isPermitted(permission)) {
-      throw new  InsuffientPermissionException("Permission "
+      throw new InsuffientPermissionException("Permission "
           + PermissionConstants.getTextForCode(permission) + " is not permitted");
     }
   }
