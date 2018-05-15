@@ -383,6 +383,15 @@
       </column>
       <column name="TID" type="VARCHAR(43)"
           remarks="base64 encoded transactionId, maximal 256 bit"/>
+      <column name="SHA1" type="CHAR(28)"
+          remarks="base64 encoded SHA1 fingerprint of the certificate">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REQ_SUBJECT" type="${x500name.type}"/>
+      <column name="CERT" type="VARCHAR(4000)"
+          remarks="Base64 encoded certificate">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
     <createTable tableName="REQUEST">
       <column name="ID" type="BIGINT">
@@ -419,20 +428,6 @@
       <column name="CA_ID"/>
       <column name="FP_RS"/>
     </createIndex>
-    <!-- table CRAW -->
-    <createTable tableName="CRAW">
-      <column name="CID" type="BIGINT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="SHA1" type="CHAR(28)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="REQ_SUBJECT" type="${x500name.type}"/>
-      <column name="CERT" type="VARCHAR(4000)"
-          remarks="Base64 encoded certificate">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
     <!-- table PUBLISHQUEUE -->
     <createTable tableName="PUBLISHQUEUE">
       <column name="CID" type="BIGINT">
@@ -563,11 +558,6 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="PID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="PROFILE"/>
-    <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CID" baseTableName="CRAW"
-      referencedColumnNames="ID" referencedTableName="CERT"/>
     <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"

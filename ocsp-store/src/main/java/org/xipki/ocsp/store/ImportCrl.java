@@ -678,7 +678,6 @@ public class ImportCrl {
       throw datasource.translate(sql, ex);
     }
 
-    // it is not required to add entry to table CRAW
     LOG.info("Imported  certificate {}", certLogId);
   }
 

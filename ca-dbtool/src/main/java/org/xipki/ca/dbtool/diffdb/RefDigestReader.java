@@ -212,11 +212,10 @@ class RefDigestReader {
 
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
           Integer.toString(caId), " AND ID>=?");
-    } else { // if (dbControl == DbControl.XIPKI_CA_v2) {
+    } else { // if (dbControl == DbControl.XIPKI_CA_v3) {
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
           (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
-          " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=", Integer.toString(caId),
-          " AND CERT.ID>=? AND CERT.ID=CRAW.CID");
+          " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
     }
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 

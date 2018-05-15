@@ -196,8 +196,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
 
   private Exception exportEntries(CaDbEntryType type, CertstoreType certstore,
       File processLogFile, Long idProcessedInLastProcess) {
-    String tablesText = (CaDbEntryType.CERT == type)
-        ? "tables CERT and CRAW" : "table " + type.getTableName();
+    String tablesText = "table " + type.getTableName();
 
     File dir = new File(baseDir, type.getDirName());
     dir.mkdirs();
@@ -238,7 +237,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
         coreSql = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-            + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID=CRAW.CID";
+            + "REQ_SUBJECT,CERT FROM CERT WHERE ID>=?";
         break;
       case CRL:
         numProcessedBefore = certstore.getCountCrls();
@@ -259,8 +258,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     Long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1
         : min(tableName, "ID");
 
-    String tablesText = (CaDbEntryType.CERT == type)
-        ? "tables " + tableName + " and CRAW" : "table " + type.getTableName();
+    String tablesText = "table " + type.getTableName();
     System.out.println(exportingText() + tablesText + " from ID " + minId);
 
     final long maxId = max(tableName, "ID");

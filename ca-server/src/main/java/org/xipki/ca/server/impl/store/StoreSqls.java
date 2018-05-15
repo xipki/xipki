@@ -34,10 +34,8 @@ class StoreSqls {
 
   static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-      + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-  static final String SQL_ADD_CRAW =
-      "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
+      + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CERT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
@@ -87,8 +85,6 @@ class StoreSqls {
   final String sqlContainsCertificates;
 
   final String sqlCertForId;
-
-  final String sqlRawCertForId;
 
   final String sqlCertWithRevInfo;
 
@@ -151,18 +147,12 @@ class StoreSqls {
         "ID FROM CRL WHERE CA_ID=?");
     this.sqlContainsCertificates = datasource.buildSelectFirstSql(1,
         "ID FROM CERT WHERE CA_ID=? AND EE=?");
-
     this.sqlCertForId = datasource.buildSelectFirstSql(1,
-        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID=?"
-        + " AND CRAW.CID=CERT.ID");
-    this.sqlRawCertForId = datasource.buildSelectFirstSql(1,
-        "CERT FROM CRAW WHERE CID=?");
+        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE ID=?");
     this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(1,
-        "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=?"
-        + " AND CERT.SN=? AND CRAW.CID=CERT.ID");
+        "ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertInfo = datasource.buildSelectFirstSql(1,
-        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
-        + " AND CRAW.CID=CERT.ID");
+        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertprofileForCertId = datasource.buildSelectFirstSql(1,
         "PID FROM CERT WHERE ID=? AND CA_ID=?");
     this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(1,

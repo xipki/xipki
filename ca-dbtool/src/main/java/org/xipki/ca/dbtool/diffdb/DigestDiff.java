@@ -277,7 +277,7 @@ class DigestDiff {
   public static DbControl detectDbControl(DataSourceWrapper datasource) throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
-      if (datasource.tableExists(conn, "CA") && datasource.tableExists(conn, "CRAW")) {
+      if (datasource.tableExists(conn, "CA")) {
         return DbControl.XIPKI_CA_v3;
       } else if (datasource.tableExists(conn, "ISSUER")) {
         return DbControl.XIPKI_OCSP_v3;

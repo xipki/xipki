@@ -214,18 +214,17 @@ class TargetDigestRetriever {
       }
 
       singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
-        " FROM CERT INNER JOIN CRAW ON CERT.CA_ID=", Integer.toString(caId),
-        " AND CERT.SN=? AND CERT.ID=CRAW.CID");
+        " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND SN=?");
 
       arrayBuffer.append("SN,REV,RR,RT,RIT,")
         .append(hashOrCertColumn)
-        .append(" FROM CERT INNER JOIN CRAW ON CERT.CA_ID=").append(caId)
-        .append(" AND CERT.SN IN (?");
+        .append(" FROM CERT WHERE CA_ID=").append(caId)
+        .append(" AND SN IN (?");
 
       for (int i = 1; i < numPerSelect; i++) {
         arrayBuffer.append(",?");
       }
-      arrayBuffer.append(") AND CERT.ID=CRAW.CID");
+      arrayBuffer.append(")");
     } else {
       throw new IllegalArgumentException("unknown dbControl " + dbControl);
     }

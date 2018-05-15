@@ -65,7 +65,6 @@ import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.common.util.Base64;
-import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -159,90 +158,43 @@ public class CertStore {
     String b64Cert = Base64.encodeToString(certificate.getEncodedCert());
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
-    Connection conn = null;
-    PreparedStatement[] pss =
-        borrowPreparedStatements(StoreSqls.SQL_ADD_CERT, StoreSqls.SQL_ADD_CRAW);
+    final String sql = StoreSqls.SQL_ADD_CERT;
+    PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
-      PreparedStatement psAddcert = pss[0];
-      // all statements have the same connection
-      conn = psAddcert.getConnection();
-
       // cert
       X509Certificate cert = certificate.getCert();
-      int idx = 2;
-      psAddcert.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
-      psAddcert.setString(idx++, cert.getSerialNumber().toString(16));
-      psAddcert.setString(idx++, subjectText);
-      psAddcert.setLong(idx++, fpSubject);
-      setLong(psAddcert, idx++, fpReqSubject);
-      psAddcert.setLong(idx++, cert.getNotBefore().getTime() / 1000); // notBeforeSeconds
-      psAddcert.setLong(idx++, cert.getNotAfter().getTime() / 1000); // notAfterSeconds
-      setBoolean(psAddcert, idx++, false);
-      psAddcert.setInt(idx++, certProfile.getId());
-      psAddcert.setInt(idx++, ca.getId());
-      setInt(psAddcert, idx++, requestor.getId());
-      setInt(psAddcert, idx++, userId);
-      psAddcert.setLong(idx++, fpPk);
+      int idx = 1;
+      ps.setLong(idx++, certId);
+      ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
+      ps.setString(idx++, cert.getSerialNumber().toString(16));
+      ps.setString(idx++, subjectText);
+      ps.setLong(idx++, fpSubject);
+      setLong(ps, idx++, fpReqSubject);
+      ps.setLong(idx++, cert.getNotBefore().getTime() / 1000); // notBeforeSeconds
+      ps.setLong(idx++, cert.getNotAfter().getTime() / 1000); // notAfterSeconds
+      setBoolean(ps, idx++, false);
+      ps.setInt(idx++, certProfile.getId());
+      ps.setInt(idx++, ca.getId());
+      setInt(ps, idx++, requestor.getId());
+      setInt(ps, idx++, userId);
+      ps.setLong(idx++, fpPk);
       boolean isEeCert = cert.getBasicConstraints() == -1;
-      psAddcert.setInt(idx++, isEeCert ? 1 : 0);
-      psAddcert.setInt(idx++, reqType.getCode());
-      psAddcert.setString(idx++, tid);
+      ps.setInt(idx++, isEeCert ? 1 : 0);
+      ps.setInt(idx++, reqType.getCode());
+      ps.setString(idx++, tid);
 
-      // rawcert
-      PreparedStatement psAddRawcert = pss[1];
+      ps.setString(idx++, b64FpCert);
+      ps.setString(idx++, reqSubjectText);
+      ps.setString(idx++, b64Cert);
 
-      idx = 2;
-      psAddRawcert.setString(idx++, b64FpCert);
-      psAddRawcert.setString(idx++, reqSubjectText);
-      psAddRawcert.setString(idx++, b64Cert);
+      ps.executeUpdate();
 
       certificate.setCertId(certId);
-
-      psAddcert.setLong(1, certId);
-      psAddRawcert.setLong(1, certId);
-
-      final boolean origAutoCommit = conn.getAutoCommit();
-      conn.setAutoCommit(false);
-
-      String sql = null;
-      try {
-        sql = StoreSqls.SQL_ADD_CERT;
-        psAddcert.executeUpdate();
-
-        sql = StoreSqls.SQL_ADD_CRAW;
-        psAddRawcert.executeUpdate();
-
-        sql = "(commit adding cert to CA certstore)";
-        conn.commit();
-      } catch (Throwable th) {
-        conn.rollback();
-        // more secure
-        datasource.deleteFromTable(null, "CRAW", "CID", certId);
-        datasource.deleteFromTable(null, "CERT", "ID", certId);
-
-        if (th instanceof SQLException) {
-          LOG.error("datasource {} could not add certificate with id {}: {}",
-              datasource.getName(), certId, th.getMessage());
-          throw datasource.translate(sql, (SQLException) th);
-        } else {
-          throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
-        }
-      } finally {
-        conn.setAutoCommit(origAutoCommit);
-      }
     } catch (SQLException ex) {
       throw datasource.translate(null, ex);
     } finally {
-      try {
-        for (PreparedStatement ps : pss) {
-          releaseStatement(ps);
-        }
-      } finally {
-        if (conn != null) {
-          datasource.returnConnection(conn);
-        }
-      }
+      releaseDbResources(ps, null);
     }
   } // method addCert
 
@@ -465,8 +417,7 @@ public class CertStore {
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     ParamUtil.requireNonNull("revInfo", revInfo);
 
-    CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(ca, serialNumber, idNameMap);
+    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(ca, serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
           ca.getName(), LogUtil.formatCsn(serialNumber));
@@ -995,38 +946,6 @@ public class CertStore {
     return certInfo;
   } // method getCertForId
 
-  private CertWithDbId getCertForId(long certId) throws OperationException, OperationException {
-    final String sql = sqls.sqlRawCertForId;
-
-    String b64Cert;
-    ResultSet rs = null;
-    PreparedStatement ps = borrowPreparedStatement(sql);
-    try {
-      ps.setLong(1, certId);
-      rs = ps.executeQuery();
-      if (!rs.next()) {
-        return null;
-      }
-      b64Cert = rs.getString("CERT");
-    } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
-    } finally {
-      releaseDbResources(ps, rs);
-    }
-
-    if (b64Cert == null) {
-      return null;
-    }
-    byte[] encodedCert = Base64.decodeFast(b64Cert);
-    X509Certificate cert;
-    try {
-      cert = X509Util.parseCert(encodedCert);
-    } catch (CertificateException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-    }
-    return new CertWithDbId(cert, encodedCert);
-  } // method getCertForId
-
   public CertWithRevocationInfo getCertWithRevocationInfo(NameId ca, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
@@ -1197,11 +1116,11 @@ public class CertStore {
   public List<X509Certificate> getCertificate(X500Name subjectName, byte[] transactionId)
       throws OperationException {
     final String sql = (transactionId != null)
-        ? "SELECT ID FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)"
-        : "SELECT ID FROM CERT WHERE FP_S=? OR FP_RS=?";
+        ? "SELECT CERT FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)"
+        : "SELECT CERT FROM CERT WHERE FP_S=? OR FP_RS=?";
 
     long fpSubject = X509Util.fpCanonicalizedName(subjectName);
-    List<Long> certIds = new LinkedList<Long>();
+    List<X509Certificate> certs = new LinkedList<>();
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1216,25 +1135,21 @@ public class CertStore {
       rs = ps.executeQuery();
 
       while (rs.next()) {
-        long id = rs.getLong("ID");
-        certIds.add(id);
+        String b64Cert = rs.getString("CERT");
+        byte[] encodedCert = Base64.decodeFast(b64Cert);
+
+        X509Certificate cert;
+        try {
+          cert = X509Util.parseCert(encodedCert);
+        } catch (CertificateException ex) {
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+        }
+        certs.add(cert);
       }
     } catch (SQLException ex) {
       throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
-    }
-
-    if (CollectionUtil.isEmpty(certIds)) {
-      return Collections.emptyList();
-    }
-
-    List<X509Certificate> certs = new ArrayList<X509Certificate>(certIds.size());
-    for (Long certId : certIds) {
-      CertWithDbId cert = getCertForId(certId);
-      if (cert != null) {
-        certs.add(cert.getCert());
-      }
     }
 
     return certs;
@@ -1686,53 +1601,6 @@ public class CertStore {
     return HashAlgo.SHA1.base64Hash(data);
   }
 
-  private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
-      throws OperationException {
-    Connection conn;
-    try {
-      conn = datasource.getConnection();
-    } catch (DataAccessException ex) {
-      throw new OperationException(DB_FAILURE, ex.getMessage());
-    }
-
-    if (conn == null) {
-      throw new OperationException(DB_FAILURE, "could not get connection");
-    }
-
-    final int n = sqlQueries.length;
-    PreparedStatement[] pss = new PreparedStatement[n];
-    for (int i = 0; i < n; i++) {
-      try {
-        pss[i] = datasource.prepareStatement(conn, sqlQueries[i]);
-      } catch (DataAccessException ex) {
-        throw new OperationException(DB_FAILURE, ex.getMessage());
-      }
-      if (pss[i] != null) {
-        continue;
-      }
-
-      // destroy all already initialized statements
-      for (int j = 0; j < i; j++) {
-        try {
-          pss[j].close();
-        } catch (Throwable th) {
-          LOG.warn("could not close preparedStatement", th);
-        }
-      }
-
-      try {
-        conn.close();
-      } catch (Throwable th) {
-        LOG.warn("could not close connection", th);
-      }
-
-      throw new OperationException(DB_FAILURE,
-          "could not create prepared statement for " + sqlQueries[i]);
-    }
-
-    return pss;
-  } // method borrowPreparedStatements
-
   private PreparedStatement borrowPreparedStatement(String sqlQuery)
       throws OperationException {
     PreparedStatement ps = null;
@@ -1890,17 +1758,6 @@ public class CertStore {
       throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
-    }
-  }
-
-  private static void releaseStatement(Statement statment) {
-    if (statment == null) {
-      return;
-    }
-    try {
-      statment.close();
-    } catch (SQLException ex) {
-      LOG.warn("could not close Statement", ex);
     }
   }
 
