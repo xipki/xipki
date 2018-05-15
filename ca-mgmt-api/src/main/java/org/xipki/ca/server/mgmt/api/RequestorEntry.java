@@ -46,10 +46,10 @@ public class RequestorEntry {
 
   public RequestorEntry(NameId ident, String base64Cert) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
-    if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(ident.getName())
-        || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(ident.getName())) {
-      throw new IllegalArgumentException("Requestor name could not be "
-          + RequestorInfo.NAME_BY_USER);
+    String name = ident.getName();
+    if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
+        || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
+      throw new IllegalArgumentException("Requestor name could not be " + name);
     }
 
     this.base64Cert = ParamUtil.requireNonBlank("base64Cert", base64Cert);

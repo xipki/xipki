@@ -248,7 +248,8 @@ public class CmpControl {
         "\nmessageTimeBias: ", messageTimeBias, " s",
         "\nconfirmWaitTime: ", confirmWaitTime, " s",
         "\nprotection algos: ", protAlgos,
-        "\npopo algos: ",  popoAlgos, "conf: ", dbEntry.getConf());
+        "\npopo algos: ",  popoAlgos,
+        "\nconf: ", dbEntry.getConf());
   }
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
