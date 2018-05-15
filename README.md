@@ -1,7 +1,4 @@
-[![][Build Status img]][Build Status]
-[![][Dependency Status img]][Dependency Status]
-[![][license img]][license]
-[![][Maven Central img]][Maven Central]
+[![Build Status](https://secure.travis-ci.org/xipki/xipki.svg)](http://travis-ci.org/xipki/xipki)
 
 # XiPKI
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure) is
