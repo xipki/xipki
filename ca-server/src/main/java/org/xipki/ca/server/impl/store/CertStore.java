@@ -17,6 +17,13 @@
 
 package org.xipki.ca.server.impl.store;
 
+import static org.xipki.ca.api.OperationException.ErrorCode.BAD_REQUEST;
+import static org.xipki.ca.api.OperationException.ErrorCode.CERT_REVOKED;
+import static org.xipki.ca.api.OperationException.ErrorCode.CERT_UNREVOKED;
+import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
+import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
@@ -49,7 +56,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.impl.CaIdNameMap;
@@ -64,6 +70,7 @@ import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.common.LruCache;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -88,7 +95,102 @@ public class CertStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
 
-  private static final ErrorCode DB_FAILURE = ErrorCode.DATABASE_FAILURE;
+  private static final String SQL_ADD_CERT =
+      "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
+      + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CERT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+  private static final String SQL_REVOKE_CERT =
+      "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+
+  private static final String SQL_REVOKE_SUSPENDED_CERT =
+      "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
+
+  private static final String SQL_INSERT_PUBLISHQUEUE =
+      "INSERT INTO PUBLISHQUEUE (PID,CA_ID,CID) VALUES (?,?,?)";
+
+  private static final String SQL_REMOVE_PUBLISHQUEUE =
+      "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
+
+  private static final String SQL_MAXID_DELTACRL_CACHE =
+      "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
+
+  private static final String SQL_CLEAR_DELTACRL_CACHE =
+      "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
+
+  private static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
+
+  private static final String SQL_MAX_THISUPDAATE_CRL =
+      "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=?";
+
+  private static final String SQL_ADD_CRL =
+      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
+      + " VALUES (?,?,?,?,?,?,?,?)";
+
+  private static final String SQL_ADD_DELTACRL_CACHE =
+      "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
+
+  private static final String SQL_REMOVE_CERT = "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
+
+  private static final String SQL_DELETE_UNREFERENCED_REQUEST =
+      "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
+
+  private static final String SQL_ADD_REQUEST =
+      "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
+
+  private static final String SQL_ADD_REQCERT = "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
+
+  private final String sqlCaHasCrl;
+
+  private final String sqlCertForId;
+
+  private final String sqlCertWithRevInfo;
+
+  private final String sqlCertInfo;
+
+  private final String sqlCertprofileForCertId;
+
+  private final String sqlActiveUserInfoForName;
+
+  private final String sqlActiveUserNameForId;
+
+  private final String sqlCaHasUser;
+
+  private final String sqlKnowsCertForSerial;
+
+  private final String sqlRevForId;
+
+  private final String sqlCertStatusForSubjectFp;
+
+  private final String sqlCertforSubjectIssued;
+
+  private final String sqlCertForKeyIssued;
+
+  private final String sqlLatestSerialForSubjectLike;
+
+  private final String sqlCrl;
+
+  private final String sqlCrlWithNo;
+
+  private final String sqlReqIdForSerial;
+
+  private final String sqlReqForId;
+
+  private final LruCache<Integer, String> cacheSqlCidFromPublishQueue = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlExpiredSerials = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlSuspendedSerials = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlDeltaCrlCacheIds = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlRevokedCerts = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlRevokedCertsWithEe = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlSerials = new LruCache<>(5);
+
+  private final LruCache<Integer, String> cacheSqlSerialsRevoked = new LruCache<>(5);
 
   private final DataSourceWrapper datasource;
 
@@ -99,8 +201,6 @@ public class CertStore {
 
   private final UniqueIdGenerator idGenerator;
 
-  private final StoreSqls sqls;
-
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
       throws DataAccessException {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
@@ -109,8 +209,38 @@ public class CertStore {
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
-    this.sqls = new StoreSqls(datasource);
+
+    this.sqlCaHasCrl = buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?");
+    this.sqlCertForId = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE ID=?");
+    this.sqlCertWithRevInfo = buildSelectFirstSql(
+        "ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertInfo = buildSelectFirstSql(
+        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertprofileForCertId = buildSelectFirstSql("PID FROM CERT WHERE ID=? AND CA_ID=?");
+    this.sqlActiveUserInfoForName = buildSelectFirstSql(
+        "ID,PASSWORD FROM TUSER WHERE NAME=? AND ACTIVE=1");
+    this.sqlActiveUserNameForId = buildSelectFirstSql("NAME FROM TUSER WHERE ID=? AND ACTIVE=1");
+    this.sqlCaHasUser = buildSelectFirstSql(
+        "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
+    this.sqlKnowsCertForSerial = buildSelectFirstSql("UID FROM CERT WHERE SN=? AND CA_ID=?");
+    this.sqlRevForId = buildSelectFirstSql("SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?");
+    this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
+    this.sqlCertforSubjectIssued = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND FP_S=?");
+    this.sqlCertForKeyIssued = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND FP_K=?");
+    this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
+        + "CERT ON CERT.CA_ID=? AND CERT.SN=? AND REQCERT.CID=CERT.ID");
+    this.sqlReqForId = buildSelectFirstSql("DATA FROM REQUEST WHERE ID=?");
+    this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(1, "NBEFORE DESC",
+        "SUBJECT FROM CERT WHERE SUBJECT LIKE ?");
+    this.sqlCrl = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",
+        "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
+    this.sqlCrlWithNo = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",
+        "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
   } // constructor
+
+  private String buildSelectFirstSql(String coreSql) {
+    return datasource.buildSelectFirstSql(1, coreSql);
+  }
 
   public boolean addCert(CertificateInfo certInfo) {
     ParamUtil.requireNonNull("certInfo", certInfo);
@@ -158,7 +288,7 @@ public class CertStore {
     String b64Cert = Base64.encodeToString(certificate.getEncodedCert());
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
-    final String sql = StoreSqls.SQL_ADD_CERT;
+    final String sql = SQL_ADD_CERT;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
@@ -202,7 +332,7 @@ public class CertStore {
       throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = StoreSqls.SQL_INSERT_PUBLISHQUEUE;
+    final String sql = SQL_INSERT_PUBLISHQUEUE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, publisher.getId());
@@ -210,21 +340,21 @@ public class CertStore {
       ps.setLong(3, certId);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
   }
 
   public void removeFromPublishQueue(NameId publisher, long certId) throws OperationException {
-    final String sql = StoreSqls.SQL_REMOVE_PUBLISHQUEUE;
+    final String sql = SQL_REMOVE_PUBLISHQUEUE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, publisher.getId());
       ps.setLong(2, certId);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -233,7 +363,7 @@ public class CertStore {
   public long getMaxIdOfDeltaCrlCache(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = StoreSqls.SQL_MAXID_DELTACRL_CACHE;
+    final String sql = SQL_MAXID_DELTACRL_CACHE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, ca.getId());
@@ -243,21 +373,21 @@ public class CertStore {
       }
       return rs.getLong(1);
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
   }
 
   public void clearDeltaCrlCache(NameId ca, long maxId) throws OperationException {
-    final String sql = StoreSqls.SQL_CLEAR_DELTACRL_CACHE;
+    final String sql = SQL_CLEAR_DELTACRL_CACHE;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, maxId + 1);
       ps.setInt(2, ca.getId());
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -292,7 +422,7 @@ public class CertStore {
       }
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -301,7 +431,7 @@ public class CertStore {
   public long getMaxCrlNumber(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = StoreSqls.SQL_MAX_CRLNO;
+    final String sql = SQL_MAX_CRLNO;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
@@ -313,7 +443,7 @@ public class CertStore {
       long maxCrlNumber = rs.getLong(1);
       return (maxCrlNumber < 0) ? 0 : maxCrlNumber;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -322,7 +452,7 @@ public class CertStore {
   public Long getThisUpdateOfCurrentCrl(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = StoreSqls.SQL_MAX_THISUPDAATE_CRL;
+    final String sql = SQL_MAX_THISUPDAATE_CRL;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
@@ -333,7 +463,7 @@ public class CertStore {
       }
       return rs.getLong(1);
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -342,7 +472,7 @@ public class CertStore {
   public boolean hasCrl(NameId ca) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = sqls.sqlCaHasCrl;
+    final String sql = sqlCaHasCrl;
     PreparedStatement ps = null;
     ResultSet rs = null;
     try {
@@ -351,7 +481,7 @@ public class CertStore {
       rs = ps.executeQuery();
       return rs.next();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -375,12 +505,12 @@ public class CertStore {
       baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
     }
 
-    final String sql = StoreSqls.SQL_ADD_CRL;
+    final String sql = SQL_ADD_CRL;
     long currentMaxCrlId;
     try {
       currentMaxCrlId = datasource.getMax(null, "CRL", "ID");
     } catch (DataAccessException ex) {
-      throw new OperationException(DB_FAILURE, ex.getMessage());
+      throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     }
     long crlId = currentMaxCrlId + 1;
 
@@ -404,7 +534,7 @@ public class CertStore {
 
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -429,7 +559,7 @@ public class CertStore {
       CrlReason currentReason = currentRevInfo.getReason();
       if (currentReason == CrlReason.CERTIFICATE_HOLD) {
         if (revInfo.getReason() == CrlReason.CERTIFICATE_HOLD) {
-          throw new OperationException(ErrorCode.CERT_REVOKED,
+          throw new OperationException(CERT_REVOKED,
               "certificate already revoked with the requested reason "
               + currentReason.getDescription());
         } else {
@@ -437,7 +567,7 @@ public class CertStore {
           revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
         }
       } else if (!force) {
-        throw new OperationException(ErrorCode.CERT_REVOKED,
+        throw new OperationException(CERT_REVOKED,
           "certificate already revoked with reason " + currentReason.getDescription());
       }
     }
@@ -447,7 +577,7 @@ public class CertStore {
       invTimeSeconds = revInfo.getInvalidityTime().getTime() / 1000;
     }
 
-    PreparedStatement ps = borrowPreparedStatement(StoreSqls.SQL_REVOKE_CERT);
+    PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
     try {
       int idx = 1;
       ps.setLong(idx++, System.currentTimeMillis() / 1000);
@@ -462,11 +592,11 @@ public class CertStore {
         String message = (count > 1)
             ? count + " rows modified, but exactly one is expected"
             : "no row is modified, but exactly one is expected";
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
+        throw new OperationException(SYSTEM_FAILURE, message);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE,
-          datasource.translate(StoreSqls.SQL_REVOKE_CERT, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE,
+          datasource.translate(SQL_REVOKE_CERT, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -496,17 +626,16 @@ public class CertStore {
 
     CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
     if (currentRevInfo == null) {
-      throw new OperationException(ErrorCode.CERT_UNREVOKED, "certificate is not revoked");
+      throw new OperationException(CERT_UNREVOKED, "certificate is not revoked");
     }
 
     CrlReason currentReason = currentRevInfo.getReason();
     if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-      throw new OperationException(ErrorCode.CERT_REVOKED,
-          "certificate is revoked but not with reason "
+      throw new OperationException(CERT_REVOKED, "certificate is revoked but not with reason "
           + CrlReason.CERTIFICATE_HOLD.getDescription());
     }
 
-    PreparedStatement ps = borrowPreparedStatement(StoreSqls.SQL_REVOKE_SUSPENDED_CERT);
+    PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_SUSPENDED_CERT);
     try {
       int idx = 1;
       ps.setLong(idx++, System.currentTimeMillis() / 1000);
@@ -518,11 +647,11 @@ public class CertStore {
         String message = (count > 1)
             ? count + " rows modified, but exactly one is expected"
             : "no row is modified, but exactly one is expected";
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
+        throw new OperationException(SYSTEM_FAILURE, message);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE,
-          datasource.translate(StoreSqls.SQL_REVOKE_CERT, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE,
+          datasource.translate(SQL_REVOKE_CERT, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -552,13 +681,13 @@ public class CertStore {
 
     CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
     if (currentRevInfo == null) {
-      throw new OperationException(ErrorCode.CERT_UNREVOKED, "certificate is not revoked");
+      throw new OperationException(CERT_UNREVOKED, "certificate is not revoked");
     }
 
     CrlReason currentReason = currentRevInfo.getReason();
     if (!force) {
       if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-        throw new OperationException(ErrorCode.NOT_PERMITTED,
+        throw new OperationException(NOT_PERMITTED,
             "could not unrevoke certificate revoked with reason "
             + currentReason.getDescription());
       }
@@ -581,10 +710,10 @@ public class CertStore {
         String message = (count > 1)
             ? count + " rows modified, but exactly one is expected"
             : "no row is modified, but exactly one is expected";
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
+        throw new OperationException(SYSTEM_FAILURE, message);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -600,7 +729,7 @@ public class CertStore {
       throws OperationException {
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    final String sql = StoreSqls.SQL_ADD_DELTACRL_CACHE;
+    final String sql = SQL_ADD_DELTACRL_CACHE;
     PreparedStatement ps = null;
     try {
       long id = idGenerator.nextId();
@@ -610,7 +739,7 @@ public class CertStore {
       ps.setString(3, serialNumber.toString(16));
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -620,7 +749,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    final String sql = StoreSqls.SQL_REMOVE_CERT;
+    final String sql = SQL_REMOVE_CERT;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
@@ -632,10 +761,10 @@ public class CertStore {
         String message = (count > 1)
             ? count + " rows modified, but exactly one is expected"
             : "no row is modified, but exactly one is expected";
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
+        throw new OperationException(SYSTEM_FAILURE, message);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -643,7 +772,7 @@ public class CertStore {
 
   public List<Long> getPublishQueueEntries(NameId ca, NameId publisher, int numEntries)
       throws OperationException {
-    final String sql = sqls.getSqlCidFromPublishQueue(numEntries);
+    final String sql = getSqlCidFromPublishQueue(numEntries);
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -660,7 +789,7 @@ public class CertStore {
       }
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -679,7 +808,7 @@ public class CertStore {
       rs.next();
       return rs.getLong(1);
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -690,7 +819,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireMin("numEntries", numEntries, 1);
 
-    final String sql = sqls.getSqlSerials(numEntries, onlyRevoked);
+    final String sql = getSqlSerials(numEntries, onlyRevoked);
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -707,7 +836,7 @@ public class CertStore {
       }
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -723,7 +852,7 @@ public class CertStore {
       throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
     }
     boolean withEe = onlyCaCerts || onlyUserCerts;
-    final String sql = sqls.getSqlSerials(numEntries, notExpiredAt, onlyRevoked, withEe);
+    final String sql = getSqlSerials(numEntries, notExpiredAt, onlyRevoked, withEe);
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -747,7 +876,7 @@ public class CertStore {
       }
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -758,7 +887,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireMin("numEntries", numEntries, 1);
 
-    final String sql = sqls.getSqlExpiredSerials(numEntries);
+    final String sql = getSqlExpiredSerials(numEntries);
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -774,7 +903,7 @@ public class CertStore {
       }
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -785,7 +914,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireMin("numEntries", numEntries, 1);
 
-    final String sql = sqls.getSqlSuspendedSerials(numEntries);
+    final String sql = getSqlSuspendedSerials(numEntries);
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -801,7 +930,7 @@ public class CertStore {
       }
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -810,7 +939,7 @@ public class CertStore {
   public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    String sql = (crlNumber == null) ? sqls.sqlCrl : sqls.sqlCrlWithNo;
+    String sql = (crlNumber == null) ? sqlCrl : sqlCrlWithNo;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -832,7 +961,7 @@ public class CertStore {
         }
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -858,7 +987,7 @@ public class CertStore {
         crlNumbers.add(crlNumber);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -881,7 +1010,7 @@ public class CertStore {
       ps.setInt(idx++, crlNumber + 1);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -895,7 +1024,7 @@ public class CertStore {
     ParamUtil.requireNonNull("caCert", caCert);
     ParamUtil.requireNonNull("idNameMap", idNameMap);
 
-    final String sql = sqls.sqlCertForId;
+    final String sql = sqlCertForId;
 
     String b64Cert;
     int certprofileId;
@@ -923,7 +1052,7 @@ public class CertStore {
         revInvTime = rs.getLong("RIT");
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -952,7 +1081,7 @@ public class CertStore {
     ParamUtil.requireNonNull("serial", serial);
     ParamUtil.requireNonNull("idNameMap", idNameMap);
 
-    final String sql = sqls.sqlCertWithRevInfo;
+    final String sql = sqlCertWithRevInfo;
 
     long certId;
     String b64Cert;
@@ -984,7 +1113,7 @@ public class CertStore {
         revInvTime = rs.getLong("RIT");
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -994,7 +1123,7 @@ public class CertStore {
     try {
       cert = X509Util.parseCert(certBytes);
     } catch (CertificateException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+      throw new OperationException(SYSTEM_FAILURE, ex);
     }
 
     CertRevocationInfo revInfo = null;
@@ -1021,7 +1150,7 @@ public class CertStore {
     ParamUtil.requireNonNull("idNameMap", idNameMap);
     ParamUtil.requireNonNull("serial", serial);
 
-    final String sql = sqls.sqlCertInfo;
+    final String sql = sqlCertInfo;
 
     String b64Cert;
     boolean revoked;
@@ -1052,7 +1181,7 @@ public class CertStore {
         revInvTime = rs.getLong("RIT");
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1065,9 +1194,8 @@ public class CertStore {
 
       byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
           .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
-      CertificateInfo certInfo = new CertificateInfo(certWithMeta, ca,
-          caCert, subjectPublicKeyInfo, idNameMap.getCertprofile(certprofileId),
-          idNameMap.getRequestor(requestorId));
+      CertificateInfo certInfo = new CertificateInfo(certWithMeta, ca, caCert, subjectPublicKeyInfo,
+          idNameMap.getCertprofile(certprofileId), idNameMap.getRequestor(requestorId));
 
       if (!revoked) {
         return certInfo;
@@ -1080,14 +1208,14 @@ public class CertStore {
       return certInfo;
     } catch (IOException ex) {
       LOG.warn("getCertificateInfo()", ex);
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+      throw new OperationException(SYSTEM_FAILURE, ex);
     }
   } // method getCertificateInfo
 
   public Integer getCertProfileForCertId(NameId ca, long cid) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = sqls.sqlCertprofileForCertId;
+    final String sql = sqlCertprofileForCertId;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1101,7 +1229,7 @@ public class CertStore {
 
       return rs.getInt("PID");
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1142,12 +1270,12 @@ public class CertStore {
         try {
           cert = X509Util.parseCert(encodedCert);
         } catch (CertificateException ex) {
-          throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+          throw new OperationException(SYSTEM_FAILURE, ex);
         }
         certs.add(cert);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1159,7 +1287,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    String sql = sqls.sqlReqIdForSerial;
+    String sql = sqlReqIdForSerial;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1173,7 +1301,7 @@ public class CertStore {
         reqId = rs.getLong("REQ_ID");
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1183,7 +1311,7 @@ public class CertStore {
     }
 
     String b64Req = null;
-    sql = sqls.sqlReqForId;
+    sql = sqlReqForId;
     ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, reqId);
@@ -1192,7 +1320,7 @@ public class CertStore {
         b64Req = rs.getString("DATA");
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1207,7 +1335,6 @@ public class CertStore {
 
     StringBuilder sb = new StringBuilder(200);
     sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=?");
-    //.append(caId)
 
     Integer idxNotBefore = null;
     Integer idxNotAfter = null;
@@ -1235,7 +1362,7 @@ public class CertStore {
         X500Name rdnName = new X500Name(new RDN[]{rdns[i]});
         String rdnStr = X509Util.getRfc4519Name(rdnName);
         if (rdnStr.indexOf('%') != -1) {
-          throw new OperationException(ErrorCode.BAD_REQUEST,
+          throw new OperationException(BAD_REQUEST,
               "the character '%' is not allowed in subjectPattern");
         }
         if (rdnStr.indexOf('*') != -1) {
@@ -1304,14 +1431,14 @@ public class CertStore {
       }
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
   } // method listCerts
 
   public NameId authenticateUser(String user, byte[] password) throws OperationException {
-    final String sql = sqls.sqlActiveUserInfoForName;
+    final String sql = sqlActiveUserInfoForName;
 
     int id;
     String expPasswordText;
@@ -1330,7 +1457,7 @@ public class CertStore {
       id = rs.getInt("ID");
       expPasswordText = rs.getString("PASSWORD");
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1344,7 +1471,7 @@ public class CertStore {
   } // method authenticateUser
 
   public String getUsername(int id) throws OperationException {
-    final String sql = sqls.sqlActiveUserNameForId;
+    final String sql = sqlActiveUserNameForId;
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1359,14 +1486,14 @@ public class CertStore {
 
       return rs.getString("NAME");
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
   } // method authenticateUser
 
   public CaHasUserEntry getCaHasUser(NameId ca, NameId user) throws OperationException {
-    final String sql = sqls.sqlCaHasUser;
+    final String sql = sqlCaHasUser;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1387,7 +1514,7 @@ public class CertStore {
       entry.setProfiles(profiles);
       return entry;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1395,7 +1522,7 @@ public class CertStore {
 
   public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
     ParamUtil.requireNonNull("serial", serial);
-    final String sql = sqls.sqlKnowsCertForSerial;
+    final String sql = sqlKnowsCertForSerial;
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1412,7 +1539,7 @@ public class CertStore {
       int userId = rs.getInt("UID");
       return new KnowCertResult(true, userId);
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1428,7 +1555,7 @@ public class CertStore {
     }
     boolean withEe = onlyCaCerts || onlyUserCerts;
 
-    String sql = sqls.getSqlRevokedCerts(numEntries, withEe);
+    String sql = getSqlRevokedCerts(numEntries, withEe);
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1455,7 +1582,7 @@ public class CertStore {
 
       return ret;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1466,7 +1593,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireMin("numEntries", numEntries, 1);
 
-    String sql = sqls.getSqlDeltaCrlCacheIds(numEntries);
+    String sql = getSqlDeltaCrlCacheIds(numEntries);
     List<Long> ids = new LinkedList<>();
     ResultSet rs = null;
 
@@ -1480,12 +1607,12 @@ public class CertStore {
         ids.add(id);
       }
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
 
-    sql = sqls.sqlRevForId;
+    sql = sqlRevForId;
     ps = borrowPreparedStatement(sql);
 
     List<CertRevInfoWithSerial> ret = new ArrayList<>();
@@ -1524,7 +1651,7 @@ public class CertStore {
         }
         ret.add(revInfo);
       } catch (SQLException ex) {
-        throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+        throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
       } finally {
         releaseDbResources(null, rs);
       }
@@ -1542,7 +1669,7 @@ public class CertStore {
       throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
-    final String sql = sqls.sqlCertStatusForSubjectFp;
+    final String sql = sqlCertStatusForSubjectFp;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1555,7 +1682,7 @@ public class CertStore {
       }
       return rs.getBoolean("REV") ? CertStatus.REVOKED : CertStatus.GOOD;
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1563,7 +1690,7 @@ public class CertStore {
 
   public boolean isCertForSubjectIssued(NameId ca, long subjectFp) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
-    String sql = sqls.sqlCertforSubjectIssued;
+    String sql = sqlCertforSubjectIssued;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1573,7 +1700,7 @@ public class CertStore {
       rs = ps.executeQuery();
       return rs.next();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1581,7 +1708,7 @@ public class CertStore {
 
   public boolean isCertForKeyIssued(NameId ca, long keyFp) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
-    String sql = sqls.sqlCertForKeyIssued;
+    String sql = sqlCertForKeyIssued;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1591,7 +1718,7 @@ public class CertStore {
       rs = ps.executeQuery();
       return rs.next();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1611,14 +1738,15 @@ public class CertStore {
       }
     } catch (DataAccessException ex) {
       LOG.debug("DataAccessException", ex);
-      throw new OperationException(DB_FAILURE, ex.getMessage());
+      throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     }
 
     if (ps != null) {
       return ps;
     }
 
-    throw new OperationException(DB_FAILURE, "could not create prepared statement for " + sqlQuery);
+    throw new OperationException(DATABASE_FAILURE,
+        "could not create prepared statement for " + sqlQuery);
   } // method borrowPreparedStatement
 
   private void releaseDbResources(Statement ps, ResultSet rs) {
@@ -1656,7 +1784,7 @@ public class CertStore {
 
     String namePattern = X509Util.getRfc4519Name(new X500Name(rdns2));
 
-    final String sql = sqls.sqlLatestSerialForSubjectLike;
+    final String sql = sqlLatestSerialForSubjectLike;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1671,7 +1799,7 @@ public class CertStore {
 
       subjectStr = rs.getString("SUBJECT");
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, ex.getMessage());
+      throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     } finally {
       releaseDbResources(ps, rs);
     }
@@ -1686,13 +1814,13 @@ public class CertStore {
   } // method getLatestSerialNumber
 
   public void deleteUnreferencedRequests() throws OperationException {
-    final String sql = StoreSqls.SQL_DELETE_UNREFERENCED_REQUEST;
+    final String sql = SQL_DELETE_UNREFERENCED_REQUEST;
     PreparedStatement ps = borrowPreparedStatement(sql);
     ResultSet rs = null;
     try {
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       datasource.releaseResources(ps, rs);
     }
@@ -1704,7 +1832,7 @@ public class CertStore {
     long id = idGenerator.nextId();
     long currentTimeSeconds = System.currentTimeMillis() / 1000;
     String b64Request = Base64.encodeToString(request);
-    final String sql = StoreSqls.SQL_ADD_REQUEST;
+    final String sql = SQL_ADD_REQUEST;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, id);
@@ -1712,7 +1840,7 @@ public class CertStore {
       ps.setString(3, b64Request);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
@@ -1721,7 +1849,7 @@ public class CertStore {
   }
 
   public void addRequestCert(long requestId, long certId) throws OperationException {
-    final String sql = StoreSqls.SQL_ADD_REQCERT;
+    final String sql = SQL_ADD_REQCERT;
     long id = idGenerator.nextId();
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
@@ -1730,10 +1858,86 @@ public class CertStore {
       ps.setLong(3, certId);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
       releaseDbResources(ps, null);
     }
+  }
+
+  private String getSqlCidFromPublishQueue(int numEntries) {
+    String sql = cacheSqlCidFromPublishQueue.get(numEntries);
+    if (sql == null) {
+      sql = datasource.buildSelectFirstSql(numEntries, "CID ASC",
+          "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?");
+      cacheSqlCidFromPublishQueue.put(numEntries, sql);
+    }
+    return sql;
+  }
+
+  private String getSqlExpiredSerials(int numEntries) {
+    String sql = cacheSqlExpiredSerials.get(numEntries);
+    if (sql == null) {
+      sql = datasource.buildSelectFirstSql(numEntries, "SN FROM CERT WHERE CA_ID=? AND NAFTER<?");
+      cacheSqlExpiredSerials.put(numEntries, sql);
+    }
+    return sql;
+  }
+
+  private String getSqlSuspendedSerials(int numEntries) {
+    String sql = cacheSqlSuspendedSerials.get(numEntries);
+    if (sql == null) {
+      sql = datasource.buildSelectFirstSql(numEntries,
+          "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?");
+      cacheSqlSuspendedSerials.put(numEntries, sql);
+    }
+    return sql;
+  }
+
+  private String getSqlDeltaCrlCacheIds(int numEntries) {
+    String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
+    if (sql == null) {
+      sql = datasource.buildSelectFirstSql(numEntries, "ID ASC",
+          "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?");
+      cacheSqlDeltaCrlCacheIds.put(numEntries, sql);
+    }
+    return sql;
+  }
+
+  private String getSqlRevokedCerts(int numEntries, boolean withEe) {
+    LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe : cacheSqlRevokedCerts;
+    String sql = cache.get(numEntries);
+    if (sql == null) {
+      String coreSql =
+          "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
+      if (withEe) {
+        coreSql += " AND EE=?";
+      }
+      sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
+      cache.put(numEntries, sql);
+    }
+    return sql;
+  }
+
+  private String getSqlSerials(int numEntries, boolean onlyRevoked) {
+    LruCache<Integer, String> cache = onlyRevoked ? cacheSqlSerialsRevoked : cacheSqlSerials;
+    String sql = cache.get(numEntries);
+    if (sql == null) {
+      String coreSql = "ID,SN FROM CERT WHERE ID>? AND CA_ID=?";
+      if (onlyRevoked) {
+        coreSql += "AND REV=1";
+      }
+      sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
+      cache.put(numEntries, sql);
+    }
+    return sql;
+  }
+
+  private String getSqlSerials(int numEntries, Date notExpiredAt, boolean onlyRevoked,
+      boolean withEe) {
+    String sql = StringUtil.concat("ID,SN FROM CERT WHERE ID>? AND CS=?",
+        (notExpiredAt != null ? " AND NAFTER>?" : ""),
+        (onlyRevoked ? " AND REV=1" : ""), (withEe ? " AND EE=?" : ""));
+    return datasource.buildSelectFirstSql(numEntries, "ID ASC", sql);
   }
 
   private static void setBoolean(PreparedStatement ps, int index, boolean value)
