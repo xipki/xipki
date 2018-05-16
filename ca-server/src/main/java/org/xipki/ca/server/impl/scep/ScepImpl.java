@@ -499,7 +499,7 @@ public class ScepImpl implements Scep {
             if (userIdent == null) {
               // up to draft-nourse-scep-23 the client sends all messages to enroll
               // certificate via MessageType PKCSReq
-              KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
+              KnowCertResult knowCertRes = ca.knowsCert(reqSignatureCert);
               if (!knowCertRes.isKnown()) {
                 LOG.warn("tid={}: signature certificate is not trusted by the CA", tid);
                 throw FailInfoException.BAD_REQUEST;
@@ -524,7 +524,7 @@ public class ScepImpl implements Scep {
           CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
               csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
               certProfileName);
-          CertificateInfo cert = ca.generateCertificate(certTemplateData, requestor,
+          CertificateInfo cert = ca.generateCert(certTemplateData, requestor,
               RequestType.SCEP, tidBytes, msgId);
           /* Don't save SCEP message, since it contains password in plaintext
           if (ca.getCaInfo().isSaveRequest() && cert.getCert().getCertId() != null) {
@@ -588,7 +588,7 @@ public class ScepImpl implements Scep {
       throws FailInfoException, OperationException {
     X509Certificate cert;
     try {
-      cert = ca.getCertificate(serialNumber);
+      cert = ca.getCert(serialNumber);
     } catch (CertificateException ex) {
       final String message = "could not get certificate for CA '" + caIdent
           + "' and serialNumber=" + LogUtil.formatCsn(serialNumber) + ")";
@@ -604,9 +604,9 @@ public class ScepImpl implements Scep {
   private SignedData pollCert(X509Ca ca, X500Name subject, TransactionId tid)
       throws FailInfoException, OperationException {
     byte[] tidBytes = getTransactionIdBytes(tid.getId());
-    List<X509Certificate> certs = ca.getCertificate(subject, tidBytes);
+    List<X509Certificate> certs = ca.getCert(subject, tidBytes);
     if (CollectionUtil.isEmpty(certs)) {
-      certs = ca.getCertificate(subject, null);
+      certs = ca.getCert(subject, null);
     }
 
     if (CollectionUtil.isEmpty(certs)) {

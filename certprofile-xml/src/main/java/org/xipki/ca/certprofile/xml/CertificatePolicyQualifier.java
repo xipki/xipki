@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.certprofile.xml;
 
 import org.xipki.common.util.ParamUtil;
 

@@ -39,7 +39,7 @@ public class ChangeCrlSignerEntry {
   private String crlControl;
 
   public ChangeCrlSignerEntry(String name) throws InvalidConfException {
-    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.name = ParamUtil.requireNonBlankLower("name", name);
   }
 
   public String getName() {

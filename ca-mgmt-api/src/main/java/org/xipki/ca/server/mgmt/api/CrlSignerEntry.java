@@ -56,7 +56,7 @@ public class CrlSignerEntry {
 
   public CrlSignerEntry(String name, String signerType, String signerConf,
       String base64Cert, String crlControl) throws InvalidConfException {
-    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.name = ParamUtil.requireNonBlankLower("name", name);
     this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
     this.signerConf = signerConf;
     this.crlControl = ParamUtil.requireNonNull("crlControl", crlControl);

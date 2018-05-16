@@ -15,37 +15,31 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.certprofile.xml;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.util.CollectionUtil;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.util.ParamUtil;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.0.1
  */
 
-public class CertificatePolicyInformation {
+public class SubjectDirectoryAttributesControl {
 
-  private final String certPolicyId;
+  private final List<ASN1ObjectIdentifier> types;
 
-  private final List<CertificatePolicyQualifier> qualifiers;
-
-  public CertificatePolicyInformation(String certPolicyId,
-      List<CertificatePolicyQualifier> qualifiers) {
-    this.certPolicyId = ParamUtil.requireNonBlank("certPolicyId", certPolicyId);
-    this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
+  public SubjectDirectoryAttributesControl(List<ASN1ObjectIdentifier> types) {
+    ParamUtil.requireNonEmpty("types", types);
+    this.types = new ArrayList<>(types);
   }
 
-  public String getCertPolicyId() {
-    return certPolicyId;
-  }
-
-  public List<CertificatePolicyQualifier> getQualifiers() {
-    return qualifiers;
+  public List<ASN1ObjectIdentifier> getTypes() {
+    return types;
   }
 
 }

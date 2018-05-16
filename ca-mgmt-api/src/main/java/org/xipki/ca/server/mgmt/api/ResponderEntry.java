@@ -50,8 +50,8 @@ public class ResponderEntry {
   private X509Certificate certificate;
 
   public ResponderEntry(String name, String type, String conf, String base64Cert) {
-    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-    this.type = ParamUtil.requireNonBlank("type", type).toLowerCase();
+    this.name = ParamUtil.requireNonBlankLower("name", name);
+    this.type = ParamUtil.requireNonBlankLower("type", type);
     this.conf = conf;
     this.base64Cert = base64Cert;
 

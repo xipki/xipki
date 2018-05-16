@@ -616,7 +616,7 @@ public class CertStore {
     }
   }
 
-  public void removeCertificate(NameId ca, BigInteger serialNumber) throws OperationException {
+  public void removeCert(NameId ca, BigInteger serialNumber) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -639,7 +639,7 @@ public class CertStore {
     } finally {
       releaseDbResources(ps, null);
     }
-  } // method removeCertificate
+  } // method removeCert
 
   public List<Long> getPublishQueueEntries(NameId ca, NameId publisher, int numEntries)
       throws OperationException {
@@ -1014,7 +1014,7 @@ public class CertStore {
     return ret;
   } // method getCertWithRevocationInfo
 
-  public CertificateInfo getCertificateInfo(NameId ca, X509Cert caCert, BigInteger serial,
+  public CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException, CertificateException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("caCert", caCert);
@@ -1113,7 +1113,7 @@ public class CertStore {
    * @param transactionId will only be considered if there are more than one certificate
    *     matches the subject.
    */
-  public List<X509Certificate> getCertificate(X500Name subjectName, byte[] transactionId)
+  public List<X509Certificate> getCert(X500Name subjectName, byte[] transactionId)
       throws OperationException {
     final String sql = (transactionId != null)
         ? "SELECT CERT FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)"
@@ -1153,7 +1153,7 @@ public class CertStore {
     }
 
     return certs;
-  } // method getCertificate
+  } // method getCert
 
   public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
@@ -1200,7 +1200,7 @@ public class CertStore {
     return (b64Req == null) ? null : Base64.decodeFast(b64Req);
   }
 
-  public List<CertListInfo> listCertificates(NameId ca, X500Name subjectPattern, Date validFrom,
+  public List<CertListInfo> listCerts(NameId ca, X500Name subjectPattern, Date validFrom,
       Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireMin("numEntries", numEntries, 1);
@@ -1308,7 +1308,7 @@ public class CertStore {
     } finally {
       releaseDbResources(ps, rs);
     }
-  }
+  } // method listCerts
 
   public NameId authenticateUser(String user, byte[] password) throws OperationException {
     final String sql = sqls.sqlActiveUserInfoForName;
@@ -1684,31 +1684,6 @@ public class CertStore {
 
     return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
   } // method getLatestSerialNumber
-
-  public Long getNotBeforeOfFirstCertStartsWithCommonName(String commonName, NameId profile)
-      throws OperationException {
-    final String sql = sqls.sqlLatestSerialForCertprofileAndSubjectLike;
-
-    ResultSet rs = null;
-    PreparedStatement ps = borrowPreparedStatement(sql);
-
-    try {
-      ps.setInt(1, profile.getId());
-      ps.setString(2, "%cn=" + commonName + "%");
-
-      rs = ps.executeQuery();
-      if (!rs.next()) {
-        return null;
-      }
-
-      long notBefore = rs.getLong("NBEFORE");
-      return (notBefore == 0) ? null : notBefore;
-    } catch (SQLException ex) {
-      throw new OperationException(DB_FAILURE, datasource.translate(sql, ex).getMessage());
-    } finally {
-      releaseDbResources(ps, rs);
-    }
-  } // method getNotBeforeOfFirstCertStartsWithCommonName
 
   public void deleteUnreferencedRequests() throws OperationException {
     final String sql = StoreSqls.SQL_DELETE_UNREFERENCED_REQUEST;

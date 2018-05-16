@@ -41,14 +41,22 @@ public class CertRevocationInfo {
     this(reason, new Date(), null);
   }
 
-  public CertRevocationInfo(int reasonCode) {
-    this(reasonCode, new Date(), null);
+  public CertRevocationInfo(CrlReason reason, Date revocationTime) {
+    this(reason, revocationTime, null);
   }
 
   public CertRevocationInfo(CrlReason reason, Date revocationTime, Date invalidityTime) {
     this.reason = ParamUtil.requireNonNull("reason", reason);
     this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
     this.invalidityTime = invalidityTime;
+  }
+
+  public CertRevocationInfo(int reasonCode) {
+    this(reasonCode, new Date(), null);
+  }
+
+  public CertRevocationInfo(int reasonCode, Date revocationTime) {
+    this(reasonCode, revocationTime, null);
   }
 
   public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime) {

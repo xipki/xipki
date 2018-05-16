@@ -17,7 +17,7 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.api.profile.DirectoryStringType;
+import org.xipki.ca.certprofile.xml.DirectoryStringType;
 import org.xipki.common.util.ParamUtil;
 
 /**

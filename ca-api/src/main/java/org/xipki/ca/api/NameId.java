@@ -35,7 +35,7 @@ public class NameId {
 
   public NameId(Integer id, String name) {
     this.id = id;
-    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.name = ParamUtil.requireNonBlankLower("name", name);
   }
 
   public void setId(Integer id) {

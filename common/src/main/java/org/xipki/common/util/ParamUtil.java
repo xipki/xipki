@@ -95,6 +95,14 @@ public class ParamUtil {
     return obj;
   }
 
+  public static String requireNonBlankLower(String objName, String obj) {
+    Objects.requireNonNull(obj, objName + " must not be null");
+    if (obj.isEmpty()) {
+      throw new IllegalArgumentException(objName + " must not be blank");
+    }
+    return obj.toLowerCase();
+  }
+
   public static <T> Collection<T> requireNonEmpty(String objName, Collection<T> obj) {
     Objects.requireNonNull(obj, objName + " must not be null");
     if (obj.isEmpty()) {

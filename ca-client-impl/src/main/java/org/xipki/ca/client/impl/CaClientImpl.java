@@ -693,14 +693,14 @@ public final class CaClientImpl implements CaClient {
   @Override
   public X509CRL downloadCrl(String caName, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
-    caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
+    caName = ParamUtil.requireNonBlankLower("caName", caName);
     return downloadCrl(caName, (BigInteger) null, debug);
   }
 
   @Override
   public X509CRL downloadCrl(String caName, BigInteger crlNumber, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
-    caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
+    caName = ParamUtil.requireNonBlankLower("caName", caName);
     init0(false);
 
     CaConf ca = casMap.get(caName);
@@ -723,7 +723,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public X509CRL generateCrl(String caName, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
-    caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
+    caName = ParamUtil.requireNonBlankLower("caName", caName);
 
     CaConf ca = casMap.get(caName);
     if (ca == null) {
@@ -802,7 +802,7 @@ public final class CaClientImpl implements CaClient {
       String profileName, String caName) throws CaClientException {
     ParamUtil.requireNonNull("certRequest", certRequest);
     ParamUtil.requireNonNull("pop", pop);
-    profileName = ParamUtil.requireNonNull("profileName", profileName).toLowerCase();
+    profileName = ParamUtil.requireNonBlankLower("profileName", profileName);
 
     init0(false);
     if (caName == null) {
@@ -1025,7 +1025,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public Set<CertprofileInfo> getCertprofiles(String caName) throws CaClientException {
-    caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
+    caName = ParamUtil.requireNonBlankLower("caName", caName);
 
     init0(false);
     CaConf ca = casMap.get(caName);
@@ -1047,7 +1047,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public HealthCheckResult getHealthCheckResult(String caName) throws CaClientException {
-    caName = ParamUtil.requireNonNull("caName", caName).toLowerCase();
+    caName = ParamUtil.requireNonBlankLower("caName", caName);
 
     String name = "X509CA";
     HealthCheckResult healthCheckResult = new HealthCheckResult(name);

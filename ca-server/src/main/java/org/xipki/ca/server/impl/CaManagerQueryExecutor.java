@@ -99,11 +99,53 @@ class CaManagerQueryExecutor {
 
   private final DataSourceWrapper datasource;
 
-  private final MgmtSqls sqls;
+  private final String sqlSelectProfileId;
+  private final String sqlSelectProfile;
+  private final String sqlSelectPublisherId;
+  private final String sqlSelectPublisher;
+  private final String sqlSelectRequestorId;
+  private final String sqlSelectRequestor;
+  private final String sqlSelectCrlSigner;
+  private final String sqlSelectCmpControl;
+  private final String sqlSelectResponder;
+  private final String sqlSelectCaId;
+  private final String sqlSelectCa;
+  private final String sqlNextSelectCrlNo;
+  private final String sqlSelectScep;
+  private final String sqlSelectSystemEvent;
+  private final String sqlSelectUserId;
+  private final String sqlSelectUser;
 
   CaManagerQueryExecutor(DataSourceWrapper datasource) {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-    this.sqls = new MgmtSqls(datasource);
+    this.sqlSelectProfileId = buildSelectFirstSql("ID FROM PROFILE WHERE NAME=?");
+    this.sqlSelectProfile = buildSelectFirstSql("ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
+    this.sqlSelectPublisherId = buildSelectFirstSql("ID FROM PUBLISHER WHERE NAME=?");
+    this.sqlSelectPublisher = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
+    this.sqlSelectRequestorId = buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?");
+    this.sqlSelectRequestor = buildSelectFirstSql("ID,CERT FROM REQUESTOR WHERE NAME=?");
+    this.sqlSelectCrlSigner = buildSelectFirstSql(
+        "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?");
+    this.sqlSelectCmpControl = buildSelectFirstSql("CONF FROM CMPCONTROL WHERE NAME=?");
+    this.sqlSelectResponder = buildSelectFirstSql("TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?");
+    this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
+    this.sqlSelectCa = buildSelectFirstSql(
+        "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
+        + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
+        + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
+        + ",EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
+        + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
+    this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
+    this.sqlSelectScep = buildSelectFirstSql(
+        "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_NAME FROM SCEP WHERE NAME=?");
+    this.sqlSelectSystemEvent = buildSelectFirstSql(
+        "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
+    this.sqlSelectUserId = buildSelectFirstSql("ID FROM TUSER WHERE NAME=?");
+    this.sqlSelectUser = buildSelectFirstSql("ID,ACTIVE,PASSWORD FROM TUSER WHERE NAME=?");
+  }
+
+  private String buildSelectFirstSql(String coreSql) {
+    return datasource.buildSelectFirstSql(1, coreSql);
   }
 
   private X509Certificate generateCert(String b64Cert) throws CaMgmtException {
@@ -157,7 +199,7 @@ class CaManagerQueryExecutor {
    *            If error occurs.
    */
   SystemEvent getSystemEvent(String eventName) throws CaMgmtException {
-    final String sql = sqls.sqlSelectSystemEvent;
+    final String sql = sqlSelectSystemEvent;
     PreparedStatement ps = null;
     ResultSet rs = null;
 
@@ -270,7 +312,7 @@ class CaManagerQueryExecutor {
   CertprofileEntry createCertprofile(String name) throws CaMgmtException {
     PreparedStatement stmt = null;
     ResultSet rs = null;
-    final String sql = sqls.sqlSelectProfile;
+    final String sql = sqlSelectProfile;
     try {
       stmt = prepareStatement(sql);
       stmt.setString(1, name);
@@ -318,7 +360,7 @@ class CaManagerQueryExecutor {
   } // method getNamesFromTable
 
   PublisherEntry createPublisher(String name) throws CaMgmtException {
-    final String sql = sqls.sqlSelectPublisher;
+    final String sql = sqlSelectPublisher;
     PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
@@ -340,7 +382,7 @@ class CaManagerQueryExecutor {
   } // method createPublisher
 
   Integer getRequestorId(String requestorName) throws CaMgmtException {
-    final String sql = sqls.sqlSelectRequestorId;
+    final String sql = sqlSelectRequestorId;
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
@@ -362,7 +404,7 @@ class CaManagerQueryExecutor {
   }
 
   RequestorEntry createRequestor(String name) throws CaMgmtException {
-    final String sql = sqls.sqlSelectRequestor;
+    final String sql = sqlSelectRequestor;
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
@@ -384,7 +426,7 @@ class CaManagerQueryExecutor {
   } // method createRequestor
 
   CrlSignerEntry createCrlSigner(String name) throws CaMgmtException {
-    final String sql = sqls.sqlSelectCrlSigner;
+    final String sql = sqlSelectCrlSigner;
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
@@ -409,7 +451,7 @@ class CaManagerQueryExecutor {
   } // method createCrlSigner
 
   CmpControlEntry createCmpControl(String name) throws CaMgmtException {
-    final String sql = sqls.sqlSelectCmpControl;
+    final String sql = sqlSelectCmpControl;
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
@@ -431,7 +473,7 @@ class CaManagerQueryExecutor {
   } // method createCmpControl
 
   ResponderEntry createResponder(String name) throws CaMgmtException {
-    final String sql = sqls.sqlSelectResponder;
+    final String sql = sqlSelectResponder;
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
@@ -455,7 +497,7 @@ class CaManagerQueryExecutor {
 
   CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
       throws CaMgmtException {
-    final String sql = sqls.sqlSelectCa;
+    final String sql = sqlSelectCa;
     PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
@@ -849,7 +891,7 @@ class CaManagerQueryExecutor {
   } // method addRequestor
 
   void addRequestorIfNeeded(String requestorName) throws CaMgmtException {
-    String sql = sqls.sqlSelectRequestorId;
+    String sql = sqlSelectRequestorId;
     ResultSet rs = null;
     PreparedStatement stmt = null;
     try {
@@ -1166,7 +1208,7 @@ class CaManagerQueryExecutor {
   void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
     PreparedStatement ps = null;
     try {
-      final String sql = sqls.sqlNextSelectCrlNo;
+      final String sql = sqlNextSelectCrlNo;
       ResultSet rs = null;
       long nextCrlNoInDb;
 
@@ -1507,8 +1549,8 @@ class CaManagerQueryExecutor {
     ParamUtil.requireNonBlank("profileName", profileName);
     ParamUtil.requireNonBlank("caName", caName);
 
-    int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
-    int profileId = getNonNullIdForName(sqls.sqlSelectProfileId, profileName);
+    int caId = getNonNullIdForName(sqlSelectCaId, caName);
+    int profileId = getNonNullIdForName(sqlSelectProfileId, profileName);
     final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?";
     PreparedStatement ps = null;
     try {
@@ -1529,8 +1571,8 @@ class CaManagerQueryExecutor {
     ParamUtil.requireNonBlank("requestorName", requestorName);
     ParamUtil.requireNonBlank("caName", caName);
 
-    int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
-    int requestorId = getNonNullIdForName(sqls.sqlSelectRequestorId, requestorName);
+    int caId = getNonNullIdForName(sqlSelectCaId, caName);
+    int requestorId = getNonNullIdForName(sqlSelectRequestorId, requestorName);
     final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?";
     PreparedStatement ps = null;
     try {
@@ -1551,8 +1593,8 @@ class CaManagerQueryExecutor {
   void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
     ParamUtil.requireNonBlank("publisherName", publisherName);
     ParamUtil.requireNonBlank("caName", caName);
-    int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
-    int publisherId = getNonNullIdForName(sqls.sqlSelectPublisherId, publisherName);
+    int caId = getNonNullIdForName(sqlSelectCaId, caName);
+    int publisherId = getNonNullIdForName(sqlSelectPublisherId, publisherName);
 
     final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?";
     PreparedStatement ps = null;
@@ -1680,7 +1722,7 @@ class CaManagerQueryExecutor {
 
   ScepEntry getScep(String name, CaIdNameMap idNameMap) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
-    final String sql = sqls.sqlSelectScep;
+    final String sql = sqlSelectScep;
     ResultSet rs = null;
     PreparedStatement ps = null;
     try {
@@ -1717,7 +1759,7 @@ class CaManagerQueryExecutor {
   }
 
   private void addUser(String name, boolean active, String hashedPassword) throws CaMgmtException {
-    Integer existingId = getIdForName(sqls.sqlSelectUserId, name);
+    Integer existingId = getIdForName(sqlSelectUserId, name);
     if (existingId != null) {
       throw new CaMgmtException(concat("user named '", name, " ' already exists"));
     }
@@ -1756,7 +1798,7 @@ class CaManagerQueryExecutor {
   void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
     String username = userEntry.getIdent().getName();
 
-    Integer existingId = getIdForName(sqls.sqlSelectUserId, username);
+    Integer existingId = getIdForName(sqlSelectUserId, username);
     if (existingId == null) {
       throw new CaMgmtException(concat("user '", username, " ' does not exist"));
     }
@@ -1773,12 +1815,12 @@ class CaManagerQueryExecutor {
   } // method changeUser
 
   void removeUserFromCa(String username, String caName) throws CaMgmtException {
-    Integer id = getIdForName(sqls.sqlSelectUserId, username);
+    Integer id = getIdForName(sqlSelectUserId, username);
     if (id == null) {
       throw new CaMgmtException("unknown user " + username);
     }
 
-    int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
+    int caId = getNonNullIdForName(sqlSelectCaId, caName);
 
     final String sql = "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?";
     PreparedStatement ps = null;
@@ -1801,7 +1843,7 @@ class CaManagerQueryExecutor {
     ParamUtil.requireNonNull("ca", ca);
 
     final NameId userIdent = user.getUserIdent();
-    Integer existingId = getIdForName(sqls.sqlSelectUserId, userIdent.getName());
+    Integer existingId = getIdForName(sqlSelectUserId, userIdent.getName());
     if (existingId == null) {
       throw new CaMgmtException(concat("user '", userIdent.getName(), " ' does not exist"));
     }
@@ -1845,7 +1887,7 @@ class CaManagerQueryExecutor {
 
   Map<String, CaHasUserEntry> getCaHasUsersForUser(String user, CaIdNameMap idNameMap)
       throws CaMgmtException {
-    Integer existingId = getIdForName(sqls.sqlSelectUserId, user);
+    Integer existingId = getIdForName(sqlSelectUserId, user);
     if (existingId == null) {
       throw new CaMgmtException(concat("user '", user, " ' does not exist"));
     }
@@ -1921,7 +1963,7 @@ class CaManagerQueryExecutor {
     ParamUtil.requireNonNull("username", username);
     NameId ident = new NameId(null, username);
 
-    final String sql = sqls.sqlSelectUser;
+    final String sql = sqlSelectUser;
     ResultSet rs = null;
     PreparedStatement ps = null;
     try {

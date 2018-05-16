@@ -157,7 +157,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
         BigInteger serialNumber = null;
         try {
           serialNumber = remainingCert.getCert().getCert().getSerialNumber();
-          ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION,
+          ca.revokeCert(serialNumber, CrlReason.CESSATION_OF_OPERATION,
               invalidityDate, CaAuditConstants.MSGID_ca_routine);
         } catch (Throwable th) {
           LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
@@ -628,10 +628,10 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       try {
         List<CertificateInfo> certInfos;
         if (keyUpdate) {
-          certInfos = ca.regenerateCertificates(certTemplates,
+          certInfos = ca.regenerateCerts(certTemplates,
               requestor, RequestType.CMP, tid.getOctets(), msgId);
         } else {
-          certInfos = ca.generateCertificates(certTemplates, requestor,
+          certInfos = ca.generateCerts(certTemplates, requestor,
               RequestType.CMP, tid.getOctets(), msgId);
         }
 
@@ -670,11 +670,11 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
         CertificateInfo certInfo;
         try {
           if (keyUpdate) {
-            certInfo = ca.regenerateCertificate(certTemplate,
-                requestor, RequestType.CMP, tid.getOctets(), msgId);
+            certInfo = ca.regenerateCert(certTemplate, requestor, RequestType.CMP,
+                tid.getOctets(), msgId);
           } else {
-            certInfo = ca.generateCertificate(certTemplate, requestor,
-                RequestType.CMP, tid.getOctets(), msgId);
+            certInfo = ca.generateCert(certTemplate, requestor, RequestType.CMP,
+                tid.getOctets(), msgId);
           }
 
           if (ca.getCaInfo().isSaveRequest()) {
@@ -872,13 +872,13 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
         X509Ca ca = getCa();
         if (PermissionConstants.UNREVOKE_CERT == permission) {
           // unrevoke
-          returnedObj = ca.unrevokeCertificate(snBigInt, msgId);
+          returnedObj = ca.unrevokeCert(snBigInt, msgId);
           if (returnedObj != null) {
             certDbId = ((CertWithDbId) returnedObj).getCertId();
           }
         } else if (PermissionConstants.REMOVE_CERT == permission) {
           // remove
-          returnedObj = ca.removeCertificate(snBigInt, msgId);
+          returnedObj = ca.removeCert(snBigInt, msgId);
         } else {
           // revoke
           Date invalidityDate = null;
@@ -909,7 +909,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
             reason = CrlReason.UNSPECIFIED;
           }
 
-          returnedObj = ca.revokeCertificate(snBigInt, reason, invalidityDate, msgId);
+          returnedObj = ca.revokeCert(snBigInt, reason, invalidityDate, msgId);
           if (returnedObj != null) {
             certDbId = ((CertWithRevocationInfo) returnedObj).getCert().getCertId();
           }
@@ -1060,7 +1060,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
       X509Ca ca = getCa();
       try {
-        ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(), msgId);
+        ca.revokeCert(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(), msgId);
       } catch (OperationException ex) {
         LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
             + " serialNumber=" + LogUtil.formatCsn(serialNumber));
@@ -1098,7 +1098,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     X509Ca ca = getCa();
     for (CertificateInfo remainingCert : remainingCerts) {
       try {
-        ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
+        ca.revokeCert(remainingCert.getCert().getCert().getSerialNumber(),
             CrlReason.CESSATION_OF_OPERATION, invalidityDate, msgId);
       } catch (OperationException ex) {
         successful = false;
@@ -1204,7 +1204,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
       Set<String> supportedProfileNames = new HashSet<>();
       Set<String> caProfileNames =
-          ca.caManager().getCertprofilesForCa(ca.getCaInfo().getIdent().getName());
+          ca.getCaManager().getCertprofilesForCa(ca.getCaInfo().getIdent().getName());
       for (String caProfileName : caProfileNames) {
         if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
           supportedProfileNames.add(caProfileName);
@@ -1214,7 +1214,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       if (CollectionUtil.isNonEmpty(supportedProfileNames)) {
         sb.append("<certprofiles>");
         for (String name : supportedProfileNames) {
-          CertprofileEntry entry = ca.caManager().getCertprofile(name);
+          CertprofileEntry entry = ca.getCaManager().getCertprofile(name);
           if (entry.isFaulty()) {
             continue;
           }
@@ -1603,9 +1603,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     Object returnedObj;
     if (PermissionConstants.UNREVOKE_CERT == permission) {
       // unrevoke
-      returnedObj = ca.unrevokeCertificate(serialNumber, msgId);
+      returnedObj = ca.unrevokeCert(serialNumber, msgId);
     } else {
-      returnedObj = ca.revokeCertificate(serialNumber, reason, invalidityDate, msgId);
+      returnedObj = ca.revokeCert(serialNumber, reason, invalidityDate, msgId);
     } // end if (permission)
 
     if (returnedObj == null) {
@@ -1622,7 +1622,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
     }
 
-    CertWithDbId returnedObj = getCa().removeCertificate(serialNumber, msgId);
+    CertWithDbId returnedObj = getCa().removeCert(serialNumber, msgId);
     if (returnedObj == null) {
       throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
     }

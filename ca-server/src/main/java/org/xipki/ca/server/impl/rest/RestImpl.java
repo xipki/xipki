@@ -246,7 +246,7 @@ public class RestImpl implements Rest {
         CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
             notBefore, notAfter, extensions, profile);
 
-        CertificateInfo certInfo = ca.generateCertificate(certTemplate, requestor, RequestType.REST,
+        CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
             null, msgId);
 
         if (ca.getCaInfo().isSaveRequest()) {
@@ -306,7 +306,7 @@ public class RestImpl implements Rest {
               : CrlReason.forNameOrText(strReason);
 
           if (reason == CrlReason.REMOVE_FROM_CRL) {
-            ca.unrevokeCertificate(serialNumber, msgId);
+            ca.unrevokeCert(serialNumber, msgId);
           } else {
             Date invalidityTime = null;
             String strInvalidityTime = httpRetriever.getParameter(
@@ -315,10 +315,10 @@ public class RestImpl implements Rest {
               invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
             }
 
-            ca.revokeCertificate(serialNumber, reason, invalidityTime, msgId);
+            ca.revokeCert(serialNumber, reason, invalidityTime, msgId);
           }
         } else if (RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
-          ca.removeCertificate(serialNumber, msgId);
+          ca.removeCert(serialNumber, msgId);
         }
       } else if (RestAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
         try {

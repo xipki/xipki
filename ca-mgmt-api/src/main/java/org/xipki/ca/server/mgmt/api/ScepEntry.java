@@ -48,7 +48,7 @@ public class ScepEntry {
 
   public ScepEntry(String name, NameId caIdent, boolean active, String responderName,
       Set<String> certProfiles, String control) throws InvalidConfException {
-    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.name = ParamUtil.requireNonBlankLower("name", name);
     this.caIdent = ParamUtil.requireNonNull("caIdent", caIdent);
     this.active = active;
     this.responderName = ParamUtil.requireNonBlank("responderName", responderName);

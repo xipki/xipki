@@ -82,8 +82,6 @@ class StoreSqls {
 
   final String sqlCaHasCrl;
 
-  final String sqlContainsCertificates;
-
   final String sqlCertForId;
 
   final String sqlCertWithRevInfo;
@@ -91,8 +89,6 @@ class StoreSqls {
   final String sqlCertInfo;
 
   final String sqlCertprofileForCertId;
-
-  final String sqlCertprofileForSerial;
 
   final String sqlActiveUserInfoForName;
 
@@ -111,8 +107,6 @@ class StoreSqls {
   final String sqlCertForKeyIssued;
 
   final String sqlLatestSerialForSubjectLike;
-
-  final String sqlLatestSerialForCertprofileAndSubjectLike;
 
   final String sqlCrl;
 
@@ -145,8 +139,6 @@ class StoreSqls {
 
     this.sqlCaHasCrl = datasource.buildSelectFirstSql(1,
         "ID FROM CRL WHERE CA_ID=?");
-    this.sqlContainsCertificates = datasource.buildSelectFirstSql(1,
-        "ID FROM CERT WHERE CA_ID=? AND EE=?");
     this.sqlCertForId = datasource.buildSelectFirstSql(1,
         "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE ID=?");
     this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(1,
@@ -155,8 +147,6 @@ class StoreSqls {
         "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertprofileForCertId = datasource.buildSelectFirstSql(1,
         "PID FROM CERT WHERE ID=? AND CA_ID=?");
-    this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(1,
-        "PID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlActiveUserInfoForName = datasource.buildSelectFirstSql(1,
         "ID,PASSWORD FROM TUSER WHERE NAME=? AND ACTIVE=1");
     this.sqlActiveUserNameForId = datasource.buildSelectFirstSql(1,
@@ -175,9 +165,6 @@ class StoreSqls {
         "ID FROM CERT WHERE CA_ID=? AND FP_K=?");
     this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(1, "NBEFORE DESC",
         "SUBJECT FROM CERT WHERE SUBJECT LIKE ?");
-    this.sqlLatestSerialForCertprofileAndSubjectLike = datasource.buildSelectFirstSql(1,
-        "NBEFORE ASC",
-        "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?");
     this.sqlCrl = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
     this.sqlCrlWithNo = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",

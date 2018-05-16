@@ -68,7 +68,7 @@ class CaConf {
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
   CaConf(String name, String url, String healthUrl, String requestorName, CmpResponder responder) {
-    this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+    this.name = ParamUtil.requireNonBlankLower("name", name);
     this.url = ParamUtil.requireNonBlank("url", url);
     this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
     this.responder = ParamUtil.requireNonNull("responder", responder);
@@ -118,13 +118,11 @@ class CaConf {
   }
 
   public boolean supportsProfile(String profileName) {
-    ParamUtil.requireNonNull("profileName", profileName);
-    return profiles.containsKey(profileName.toLowerCase());
+    return profiles.containsKey(ParamUtil.requireNonBlankLower("profileName", profileName));
   }
 
   public CertprofileInfo getProfile(String profileName) {
-    ParamUtil.requireNonNull("profileName", profileName);
-    return profiles.get(profileName.toLowerCase());
+    return profiles.get(ParamUtil.requireNonBlankLower("profileName", profileName));
   }
 
   public boolean isCaInfoConfigured() {

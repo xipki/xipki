@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.certprofile.xml;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERBMPString;
