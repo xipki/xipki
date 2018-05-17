@@ -17,9 +17,8 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.util.Collections;
 import java.util.List;
-
-import org.xipki.common.util.CollectionUtil;
 
 /**
  * TODO.
@@ -35,26 +34,30 @@ public class CaUris {
 
   public CaUris(List<String> caCertUris, List<String> ocspUris, List<String> crlUris,
       List<String> deltaCrlUris) {
-    this.caCertUris = caCertUris;
-    this.ocspUris = ocspUris;
-    this.crlUris = crlUris;
-    this.deltaCrlUris = deltaCrlUris;
+    this.caCertUris = (caCertUris == null)
+        ? Collections.emptyList() : Collections.unmodifiableList(caCertUris);
+    this.ocspUris = (ocspUris == null)
+        ? Collections.emptyList() : Collections.unmodifiableList(ocspUris);
+    this.crlUris = (crlUris == null)
+        ? Collections.emptyList() : Collections.unmodifiableList(crlUris);
+    this.deltaCrlUris = (deltaCrlUris == null)
+        ? Collections.emptyList() : Collections.unmodifiableList(deltaCrlUris);
   }
 
   public List<String> getCaCertUris() {
-    return CollectionUtil.unmodifiableList(caCertUris);
+    return caCertUris;
   }
 
   public List<String> getOcspUris() {
-    return CollectionUtil.unmodifiableList(ocspUris);
+    return ocspUris;
   }
 
   public List<String> getCrlUris() {
-    return CollectionUtil.unmodifiableList(crlUris);
+    return crlUris;
   }
 
   public List<String> getDeltaCrlUris() {
-    return CollectionUtil.unmodifiableList(deltaCrlUris);
+    return deltaCrlUris;
   }
 
 }
