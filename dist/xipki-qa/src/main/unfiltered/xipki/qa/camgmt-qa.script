@@ -135,10 +135,10 @@ if { $printUsage equals "true" } then {
 
   source file:./xipki/qa/qa.d/prepare-keys.script
 
-  xi:copy-file -f xipki/qa/qa.d/ca-load.script-template \
+  xi:copy-file -f xipki/qa/qa.d/template.ca-load.script \
     xipki/qa/qa.d/ca-load.script
 
-  xi:copy-file -f xipki/qa/qa.d/ca.script-template \
+  xi:copy-file -f xipki/qa/qa.d/template.ca.script \
     xipki/qa/qa.d/ca.script
 
   xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \

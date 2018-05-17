@@ -66,7 +66,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/rootca.xml-template xipki/qa/qa.d/rootca.xml
+xi:copy-file -f xipki/qa/qa.d/template.rootca.xml xipki/qa/qa.d/rootca.xml
 
 xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
   xipki/qa/qa.d/rootca.xml
@@ -192,7 +192,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/subca.xml-template xipki/qa/qa.d/subca.xml
+xi:copy-file -f xipki/qa/qa.d/template.subca.xml xipki/qa/qa.d/subca.xml
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" xipki/qa/qa.d/subca.xml
 
@@ -219,7 +219,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/subcawithcrl.xml-template \
+xi:copy-file -f xipki/qa/qa.d/template.subcawithcrl.xml \
   xipki/qa/qa.d/subcawithcrl.xml
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \

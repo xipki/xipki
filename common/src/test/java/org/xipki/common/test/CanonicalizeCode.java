@@ -46,8 +46,7 @@ public class CanonicalizeCode {
   private static final List<byte[]> headerLines = new ArrayList<>(20);
 
   private static final Set<String> textFileExtensions =
-      new HashSet<>(Arrays.asList("txt", "xml", "xsd", "cfg", "properties",
-          "script", "xml-template", "script-template", "jxb", "info",
+      new HashSet<>(Arrays.asList("txt", "xml", "xsd", "cfg", "properties", "script", "jxb", "info",
           "properties-db2", "properties-h2", "properties-hsqldb", "properties-mariadb",
           "properties-mysql", "properties-pgsql", "properties-oracle"));
 

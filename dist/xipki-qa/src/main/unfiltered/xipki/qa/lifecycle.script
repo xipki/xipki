@@ -135,7 +135,7 @@ if { $printUsage equals "true" } then {
 
   ## Prepare OCSP responder configuration
   xi:copy-file -f \
-    xipki/ocsp-config/ocsp-responder.xml-template \
+    xipki/ocsp-config/template.ocsp-responder.xml \
     xipki/ocsp-config/ocsp-responder.xml
 
   xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
@@ -148,22 +148,22 @@ if { $printUsage equals "true" } then {
     xipki/ocsp-config/ocsp-responder.xml
 
   ## CA client configuration
-  xi:copy-file -f xipki/client-config/ca-client.xml-template \
+  xi:copy-file -f xipki/client-config/template.ca-client.xml \
     xipki/client-config/ca-client.xml
 
   xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
     xipki/client-config/ca-client.xml
 
   ## Prepare scripts
-  xi:copy-file -f xipki/qa/rest.script-template xipki/qa/rest.script
+  xi:copy-file -f xipki/qa/template.rest.script xipki/qa/rest.script
 
-  xi:copy-file -f xipki/qa/qa.d/ca-load.script-template \
+  xi:copy-file -f xipki/qa/qa.d/template.ca-load.script \
     xipki/qa/qa.d/ca-load.script
 
-  xi:copy-file -f xipki/qa/qa.d/ca.script-template \
+  xi:copy-file -f xipki/qa/qa.d/template.ca.script \
     xipki/qa/qa.d/ca.script
 
-  xi:copy-file -f xipki/qa/qa.d/ra.script-template \
+  xi:copy-file -f xipki/qa/qa.d/template.ra.script \
     xipki/qa/qa.d/ra.script
 
   xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \

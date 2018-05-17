@@ -40,7 +40,7 @@ echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"
 echo "#################################################################"
 
-xi:copy-file -f xipki/setup/cacert-present/ca-conf.xml-template \
+xi:copy-file -f xipki/setup/cacert-present/template.ca-conf.xml \
   xipki/setup/cacert-present/ca-conf.xml
 
 xi:replace --old "REPLACEME_TOKEN_TYPE" --new "PKCS11" \

@@ -54,7 +54,7 @@ echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"
 echo "#################################################################"
 
-xi:copy-file -f xipki/setup/cacert-none/ca-conf.xml-template \
+xi:copy-file -f xipki/setup/cacert-none/template.ca-conf.xml \
   xipki/setup/cacert-none/ca-conf.xml
 
 xi:replace --old "REPLACEME_TOKEN_TYPE" --new "pkcs11" \
