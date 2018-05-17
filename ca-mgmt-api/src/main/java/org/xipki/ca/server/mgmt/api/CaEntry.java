@@ -66,6 +66,8 @@ public class CaEntry {
 
   private boolean duplicateSubjectPermitted;
 
+  private boolean supportRest;
+
   private boolean saveRequest;
 
   private ValidityMode validityMode = ValidityMode.STRICT;
@@ -218,6 +220,14 @@ public class CaEntry {
     this.duplicateSubjectPermitted = duplicateSubjectPermitted;
   }
 
+  public boolean isSupportRest() {
+    return supportRest;
+  }
+
+  public void setSupportRest(boolean supportRest) {
+    this.supportRest = supportRest;
+  }
+
   public boolean isSaveRequest() {
     return saveRequest;
   }
@@ -293,6 +303,7 @@ public class CaEntry {
         "\nresponderName: ", responderName,
         "\nduplicateKey: ", duplicateKeyPermitted,
         "\nduplicateSubject: ", duplicateSubjectPermitted,
+        "\nsupportRest: ", supportRest,
         "\nsaveRequest: ", saveRequest,
         "\nvalidityMode: ", validityMode,
         "\npermission: ", permission,
@@ -345,6 +356,10 @@ public class CaEntry {
     }
 
     if (!CompareUtil.equalsObject(status, obj.status)) {
+      return false;
+    }
+
+    if (supportRest != obj.supportRest) {
       return false;
     }
 

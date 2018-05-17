@@ -359,10 +359,10 @@ class CaconfDbImporter extends DbPorter {
     System.out.println("importing table CA");
     String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
-        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,"
+        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -392,6 +392,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCmpcontrolName());
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
+          ps.setInt(idx++, ca.getSupportScep());
           ps.setInt(idx++, ca.getSaveReq());
           ps.setInt(idx++, ca.getPermission());
           Integer numCrls = ca.getNumCrls();

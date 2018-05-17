@@ -205,6 +205,10 @@
           remarks="whether duplicate subject key is allowed, default is true (1)">
         <constraints nullable="false"/>
       </column>
+      <column name="SUPPORT_REST" type="SMALLINT" defaultValueNumeric="0"
+          remarks="Whether REST API is supported, default is false (0)">
+        <constraints nullable="false"/>
+      </column>
       <column name="SAVE_REQ" type="SMALLINT" defaultValueNumeric="0"
           remarks="Whether requests should be saved, default is false (0)">
         <constraints nullable="false"/>

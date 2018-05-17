@@ -400,6 +400,7 @@ public class CaConf {
 
           caEntry.setResponderName(ci.getResponderName());
 
+          caEntry.setSupportRest(ci.isSupportRest());
           caEntry.setSaveRequest(ci.isSaveReq());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 

@@ -2579,7 +2579,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     String name = caEntry.getIdent().getName();
     long nextCrlNumber = caEntry.getNextCrlNumber();
-    CaStatus status = caEntry.getStatus();
 
     CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoBitLen(),
         nextCrlNumber, signerType, signerConf, caUris, numCrls, expirationPeriod);
@@ -2593,8 +2592,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     entry.setMaxValidity(caEntry.getMaxValidity());
     entry.setPermission(caEntry.getPermission());
     entry.setResponderName(caEntry.getResponderName());
+    entry.setSupportRest(caEntry.isSupportRest());
     entry.setSaveRequest(caEntry.isSaveRequest());
-    entry.setStatus(status);
+    entry.setStatus(caEntry.getStatus());
     entry.setValidityMode(caEntry.getValidityMode());
 
     addCa(entry);

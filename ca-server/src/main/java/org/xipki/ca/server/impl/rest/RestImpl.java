@@ -126,12 +126,15 @@ public class RestImpl implements Rest {
         ca = ((CaCmpResponderImpl) responderManager.getX509CaResponder(caName)).getCa();
       }
 
-      if (caName == null || ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
+      if (caName == null || ca == null || !ca.getCaInfo().isSupportRest()
+          || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
         String message;
         if (caName == null) {
           message = "no CA is specified";
         } else if (ca == null) {
           message = "unknown CA '" + caName + "'";
+        } else if (!ca.getCaInfo().isSupportRest()) {
+          message = "REST is not supported by the CA '" + caName + "'";
         } else {
           message = "CA '" + caName + "' is out of service";
         }

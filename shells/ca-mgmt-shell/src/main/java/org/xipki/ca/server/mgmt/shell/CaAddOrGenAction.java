@@ -60,6 +60,11 @@ public abstract class CaAddOrGenAction extends CaAction {
   @Completion(CaStatusCompleter.class)
   private String caStatus = "active";
 
+  @Option(name = "--rest-status",
+      description = "REST API status")
+  @Completion(CaStatusCompleter.class)
+  private String restStatus = "inactive";
+
   @Option(name = "--ca-cert-uri", multiValued = true,
       description = "CA certificate URI\n(multi-valued)")
   private List<String> caCertUris;
@@ -139,6 +144,11 @@ public abstract class CaAddOrGenAction extends CaAction {
   @Completion(YesNoCompleter.class)
   private String duplicateSubjectS = "yes";
 
+  @Option(name = "--support-rest",
+      description = "whether the REST API is supported")
+  @Completion(YesNoCompleter.class)
+  private String supportRestS = "no";
+
   @Option(name = "--save-req",
       description = "whether the request is saved")
   @Completion(YesNoCompleter.class)
@@ -188,14 +198,13 @@ public abstract class CaAddOrGenAction extends CaAction {
     boolean duplicateSubjectPermitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
     entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
-    boolean saveReq = isEnabled(saveReqS, false, "save-req");
-    entry.setSaveRequest(saveReq);
+    entry.setSaveRequest(isEnabled(supportRestS, false, "support-scep"));
+    entry.setSaveRequest(isEnabled(saveReqS, false, "save-req"));
 
     ValidityMode validityMode = ValidityMode.forName(validityModeS);
     entry.setValidityMode(validityMode);
 
-    CaStatus status = CaStatus.forName(caStatus);
-    entry.setStatus(status);
+    entry.setStatus(CaStatus.forName(caStatus));
     if (crlSignerName != null) {
       entry.setCrlSignerName(crlSignerName);
     }

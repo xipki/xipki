@@ -210,6 +210,7 @@
       <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
+      <xs:element name="supportScep" type="xs:int"/>
       <xs:element name="saveReq" type="xs:int"/>
       <xs:element name="permission" type="xs:int"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>

@@ -51,6 +51,8 @@ public class ChangeCaEntry {
 
   private Boolean duplicateSubjectPermitted;
 
+  private Boolean supportRest;
+
   private Boolean saveRequest;
 
   private ValidityMode validityMode;
@@ -157,6 +159,14 @@ public class ChangeCaEntry {
 
   public void setValidityMode(ValidityMode validityMode) {
     this.validityMode = validityMode;
+  }
+
+  public Boolean getSupportRest() {
+    return supportRest;
+  }
+
+  public void setSupportRest(Boolean supportRest) {
+    this.supportRest = supportRest;
   }
 
   public Boolean getSaveRequest() {

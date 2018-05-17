@@ -30,6 +30,7 @@
         <permission>255</permission>
         <maxValidity>5y</maxValidity>
         <responderName>responder1</responderName>
+        <supportRest>true</supportRest>
         <saveReq>true</saveReq>
         <signerType>${token.type}</signerType>
         <signerConf>

@@ -245,6 +245,7 @@
       <xs:element name="permission" type="xs:int"/>
       <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="supportRest" type="xs:boolean"/>
       <xs:element name="saveReq" type="xs:boolean"/>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>

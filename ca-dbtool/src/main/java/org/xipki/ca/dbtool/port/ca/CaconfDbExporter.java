@@ -397,8 +397,9 @@ class CaconfDbExporter extends DbPorter {
     Cas cas = new Cas();
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,"
         + "SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
-        + "REV_INFO,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,VALIDITY_MODE,"
-        + "CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMPCONTROL_NAME,EXTRA_CONTROL FROM CA";
+        + "REV_INFO,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,DELTACRL_URIS,"
+        + "VALIDITY_MODE,CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMPCONTROL_NAME,EXTRA_CONTROL "
+        + "FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -430,6 +431,7 @@ class CaconfDbExporter extends DbPorter {
         ca.setCmpcontrolName(rs.getString("CMPCONTROL_NAME"));
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
+        ca.setSaveReq(rs.getInt("SUPPORT_REST"));
         ca.setSaveReq(rs.getInt("SAVE_REQ"));
         ca.setPermission(rs.getInt("PERMISSION"));
         ca.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));

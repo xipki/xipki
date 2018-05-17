@@ -154,6 +154,11 @@ public class CaUpdateAction extends CaAction {
   @Completion(YesNoCompleter.class)
   private String duplicateSubjectS;
 
+  @Option(name = "--support-rest",
+      description = "whether REST API is supported")
+  @Completion(YesNoCompleter.class)
+  private String supportRestS = "no";
+
   @Option(name = "--save-req",
       description = "whether the request is saved")
   @Completion(YesNoCompleter.class)
@@ -213,18 +218,19 @@ public class CaUpdateAction extends CaAction {
     }
 
     if (duplicateKeyS != null) {
-      boolean permitted = isEnabled(duplicateKeyS, true, "duplicate-key");
-      entry.setDuplicateKeyPermitted(permitted);
+      entry.setDuplicateKeyPermitted(isEnabled(duplicateKeyS, true, "duplicate-key"));
     }
 
     if (duplicateSubjectS != null) {
-      boolean permitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
-      entry.setDuplicateSubjectPermitted(permitted);
+      entry.setDuplicateSubjectPermitted(isEnabled(duplicateSubjectS, true, "duplicate-subject"));
+    }
+
+    if (supportRestS != null) {
+      entry.setSupportRest(isEnabled(supportRestS, false, "support-rest"));
     }
 
     if (saveReqS != null) {
-      boolean saveReq = isEnabled(saveReqS, true, "save-req");
-      entry.setSaveRequest(saveReq);
+      entry.setSaveRequest(isEnabled(saveReqS, true, "save-req"));
     }
 
     if (CollectionUtil.isNonEmpty(permissions)) {

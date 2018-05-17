@@ -132,7 +132,7 @@ class CaManagerQueryExecutor {
     this.sqlSelectCa = buildSelectFirstSql(
         "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
         + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
-        + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
+        + ",DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
         + ",EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
         + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
@@ -566,6 +566,7 @@ class CaManagerQueryExecutor {
 
       entry.setDuplicateKeyPermitted((rs.getInt("DUPLICATE_KEY") != 0));
       entry.setDuplicateSubjectPermitted((rs.getInt("DUPLICATE_SUBJECT") != 0));
+      entry.setSupportRest((rs.getInt("SUPPORT_REST") != 0));
       entry.setSaveRequest((rs.getInt("SAVE_REQ") != 0));
       entry.setPermission(rs.getInt("PERMISSION"));
 
@@ -708,9 +709,10 @@ class CaManagerQueryExecutor {
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
-        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,"
-        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
+        + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,"
+        + "EXTRA_CONTROL,SIGNER_CONF) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -736,6 +738,7 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, caEntry.getCmpControlName());
       setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
       setBoolean(ps, idx++, caEntry.isDuplicateSubjectPermitted());
+      setBoolean(ps, idx++, caEntry.isSupportRest());
       setBoolean(ps, idx++, caEntry.isSaveRequest());
       ps.setInt(idx++, caEntry.getPermission());
       ps.setInt(idx++, caEntry.getNumCrls());
@@ -1195,6 +1198,7 @@ class CaManagerQueryExecutor {
         col(STRING, "CMPCONTROL_NAME", changeCaEntry.getCmpControlName()),
         col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
         col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
+        col(BOOL, "SUPPORT_REST", changeCaEntry.getSupportRest()),
         col(BOOL, "SAVE_REQ", changeCaEntry.getSaveRequest()),
         col(INT, "PERMISSION", changeCaEntry.getPermission()),
         col(INT, "NUM_CRLS", changeCaEntry.getNumCrls()),

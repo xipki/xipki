@@ -256,6 +256,14 @@ public class CaInfo {
     caEntry.setDuplicateSubjectPermitted(permitted);
   }
 
+  public boolean isSupportRest() {
+    return caEntry.isSupportRest();
+  }
+
+  public void setSupportRest(boolean supportRest) {
+    caEntry.setSupportRest(supportRest);
+  }
+
   public boolean isSaveRequest() {
     return caEntry.isSaveRequest();
   }
