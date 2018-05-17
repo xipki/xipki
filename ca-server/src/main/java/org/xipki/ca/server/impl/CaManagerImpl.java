@@ -899,7 +899,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return x509Responders.get(ParamUtil.requireNonBlankLower("name", name));
   }
 
-  public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
+  public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {
     return scheduledThreadPoolExecutor;
   }
 

@@ -192,7 +192,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     this.caName = caName;
 
     PendingPoolCleaner pendingPoolCleaner = new PendingPoolCleaner();
-    caManager.scheduledThreadPoolExecutor().scheduleAtFixedRate(pendingPoolCleaner, 10, 10,
+    caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(pendingPoolCleaner, 10, 10,
         TimeUnit.MINUTES);
   }
 

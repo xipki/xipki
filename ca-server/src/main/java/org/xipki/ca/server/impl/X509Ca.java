@@ -482,16 +482,17 @@ public class X509Ca {
     }
 
     Random random = new Random();
+    ScheduledThreadPoolExecutor executor = caManager.getScheduledThreadPoolExecutor();
     // CRL generation services
-    this.crlGenerationService = caManager.scheduledThreadPoolExecutor().scheduleAtFixedRate(
+    this.crlGenerationService = executor.scheduleAtFixedRate(
         new CrlGenerationService(), 60 + random.nextInt(60), 60, TimeUnit.SECONDS);
 
     final int minutesOfDay = 24 * 60;
-    this.expiredCertsRemover = caManager.scheduledThreadPoolExecutor().scheduleAtFixedRate(
+    this.expiredCertsRemover = executor.scheduleAtFixedRate(
         new ExpiredCertsRemover(), minutesOfDay + random.nextInt(60), minutesOfDay,
         TimeUnit.MINUTES);
 
-    this.suspendedCertsRevoker = caManager.scheduledThreadPoolExecutor().scheduleAtFixedRate(
+    this.suspendedCertsRevoker = executor.scheduleAtFixedRate(
         new SuspendedCertsRevoker(), random.nextInt(60), 60, TimeUnit.MINUTES);
   } // constructor
 
@@ -2504,7 +2505,7 @@ public class X509Ca {
       suspendedCertsRevoker = null;
     }
 
-    ScheduledThreadPoolExecutor executor = caManager.scheduledThreadPoolExecutor();
+    ScheduledThreadPoolExecutor executor = caManager.getScheduledThreadPoolExecutor();
     if (executor != null) {
       executor.purge();
     }
