@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -31,6 +30,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
@@ -69,8 +69,7 @@ public class P12CsrGenAction extends CsrGenAction {
   }
 
   public KeyStore getKeyStore()
-      throws IOException, KeyStoreException, NoSuchProviderException,
-        NoSuchAlgorithmException, CertificateException {
+      throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
     KeyStore ks;
     try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
       ks = KeyUtil.getKeyStore("PKCS12");
@@ -89,9 +88,17 @@ public class P12CsrGenAction extends CsrGenAction {
     } catch (IOException ex) {
       throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
     }
-    SignerConf conf = SignerConf.getKeystoreSignerConf(p12File, new String(pwd), 1,
+    SignerConf conf = getKeystoreSignerConf(p12File, new String(pwd),
         HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS12", conf, (X509Certificate[]) null);
+  }
+
+  static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
+      HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
+    ConfPairs conf = new ConfPairs("password", password);
+    conf.putPair("parallelism", Integer.toString(1));
+    conf.putPair("keystore", "file:" + keystoreFile);
+    return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
   }
 
 }

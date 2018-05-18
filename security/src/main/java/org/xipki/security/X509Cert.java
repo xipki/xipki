@@ -62,8 +62,8 @@ public class X509Cert {
     try {
       this.subjectKeyIdentifer = X509Util.extractSki(cert);
     } catch (CertificateEncodingException ex) {
-      throw new RuntimeException(String.format(
-          "CertificateEncodingException: %s", ex.getMessage()));
+      throw new RuntimeException(
+          String.format("CertificateEncodingException: %s", ex.getMessage()));
     }
 
     if (encodedCert != null) {

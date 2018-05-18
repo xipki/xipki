@@ -199,6 +199,6 @@ public interface SecurityFactory {
 
   SecureRandom getRandom4Key();
 
-  int getDefaultSignerParallelism();
+  int getDfltSignerParallelism();
 
 }

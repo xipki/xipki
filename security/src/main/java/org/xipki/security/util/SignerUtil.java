@@ -58,11 +58,11 @@ public class SignerUtil {
   private static final Map<HashAlgo, byte[]> digestPkcsPrefix = new HashMap<>();
 
   static {
-    addDigestPkcsPrefix(HashAlgo.SHA1, "3021300906052b0e03021a05000414");
-    addDigestPkcsPrefix(HashAlgo.SHA224, "302d300d06096086480165030402040500041c");
-    addDigestPkcsPrefix(HashAlgo.SHA256, "3031300d060960864801650304020105000420");
-    addDigestPkcsPrefix(HashAlgo.SHA384, "3041300d060960864801650304020205000430");
-    addDigestPkcsPrefix(HashAlgo.SHA512, "3051300d060960864801650304020305000440");
+    addDigestPkcsPrefix(HashAlgo.SHA1,     "3021300906052b0e03021a05000414");
+    addDigestPkcsPrefix(HashAlgo.SHA224,   "302d300d06096086480165030402040500041c");
+    addDigestPkcsPrefix(HashAlgo.SHA256,   "3031300d060960864801650304020105000420");
+    addDigestPkcsPrefix(HashAlgo.SHA384,   "3041300d060960864801650304020205000430");
+    addDigestPkcsPrefix(HashAlgo.SHA512,   "3051300d060960864801650304020305000440");
     addDigestPkcsPrefix(HashAlgo.SHA3_224, "302d300d06096086480165030402070500041c");
     addDigestPkcsPrefix(HashAlgo.SHA3_256, "3031300d060960864801650304020805000420");
     addDigestPkcsPrefix(HashAlgo.SHA3_384, "3041300d060960864801650304020905000430");
@@ -202,9 +202,8 @@ public class SignerUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue,
-      HashAlgo mgfDigest, int saltLen, int modulusBitLength, SecureRandom random)
-      throws XiSecurityException {
+  public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
+      int saltLen, int modulusBitLength, SecureRandom random) throws XiSecurityException {
     final int hLen = contentDigest.getLength();
     final byte[] salt = new byte[saltLen];
     final byte[] mDash = new byte[8 + saltLen + hLen];
@@ -256,9 +255,8 @@ public class SignerUtil {
   /**
    * mask generator function, as described in PKCS1v2.
    */
-  private static byte[] maskGeneratorFunction1(HashAlgo mgfDigest,
-      byte[] Z, // CHECKSTYLE:SKIP
-      int length) {
+  // CHECKSTYLE:SKIP
+  private static byte[] maskGeneratorFunction1(HashAlgo mgfDigest, byte[] Z, int length) {
     int mgfhLen = mgfDigest.getLength();
     byte[] mask = new byte[length];
     int counter = 0;

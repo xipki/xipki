@@ -88,8 +88,7 @@ public interface ConcurrentContentSigner {
    * @throws XiSecurityException
    *         if error during the initialization occurs.
    */
-  void initialize(String conf, PasswordResolver passwordResolver)
-      throws XiSecurityException;
+  void initialize(String conf, PasswordResolver passwordResolver) throws XiSecurityException;
 
   /**
    * Sign the data.
@@ -118,8 +117,7 @@ public interface ConcurrentContentSigner {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    */
-  ConcurrentBagEntrySigner borrowSigner(int soTimeout)
-      throws NoIdleSignerException;
+  ConcurrentBagEntrySigner borrowSigner(int soTimeout) throws NoIdleSignerException;
 
   void requiteSigner(ConcurrentBagEntrySigner signer);
 

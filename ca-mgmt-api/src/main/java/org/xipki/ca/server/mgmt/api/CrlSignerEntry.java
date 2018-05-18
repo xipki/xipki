@@ -25,7 +25,6 @@ import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -129,7 +128,7 @@ public class CrlSignerEntry {
     return StringUtil.concatObjectsCap(1000, "name: ", name, "\nfaulty: ", isFaulty(),
         "\nsignerType: ", signerType,
         "\nsignerConf: ", (signerConf == null ? "null"
-            : SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo)),
+            : InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
         "\ncrlControl: ", crlControl,
         "\ncert:\n", InternUtil.formatCert(cert, verbose));
   } // method toString

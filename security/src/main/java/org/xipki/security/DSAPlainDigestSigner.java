@@ -59,13 +59,9 @@ public class DSAPlainDigestSigner implements Signer {
   public void init(boolean forSigning, CipherParameters parameters) {
     this.forSigning = forSigning;
 
-    AsymmetricKeyParameter param;
-
-    if (parameters instanceof ParametersWithRandom) {
-      param = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
-    } else {
-      param = (AsymmetricKeyParameter) parameters;
-    }
+    AsymmetricKeyParameter param = (parameters instanceof ParametersWithRandom)
+        ? (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters()
+        : (AsymmetricKeyParameter) parameters;
 
     ParamUtil.requireNonNull("param", param);
     if (param instanceof ECPublicKeyParameters) {
@@ -89,7 +85,6 @@ public class DSAPlainDigestSigner implements Signer {
     }
 
     reset();
-
     dsaSigner.init(forSigning, parameters);
   }
 

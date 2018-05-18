@@ -201,7 +201,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public int getDefaultSignerParallelism() {
+  public int getDfltSignerParallelism() {
     return defaultSignerParallelism;
   }
 

@@ -98,8 +98,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     this(mac, signers, null);
   }
 
-  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers,
-      Key signingKey) throws NoSuchAlgorithmException {
+  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers, Key signingKey)
+      throws NoSuchAlgorithmException {
     ParamUtil.requireNonEmpty("signers", signers);
 
     this.mac = mac;
@@ -125,14 +125,13 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     return mac;
   }
 
-  public void setSha1DigestOfMacKey(byte[] sha1Digest) {
-    if (sha1Digest == null) {
+  public void setSha1DigestOfMacKey(byte[] digest) {
+    if (digest == null) {
       this.sha1OfMacKey = null;
-    } else if (sha1Digest.length == 20) {
-      this.sha1OfMacKey = Arrays.copyOf(sha1Digest, 20);
+    } else if (digest.length == 20) {
+      this.sha1OfMacKey = Arrays.copyOf(digest, 20);
     } else {
-      throw new IllegalArgumentException("invalid sha1Digest.length ("
-          + sha1Digest.length + " != 20)");
+      throw new IllegalArgumentException("invalid sha1Digest.length (" + digest.length + " != 20)");
     }
   }
 

@@ -23,7 +23,6 @@ import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -263,9 +262,8 @@ public class SoftTokenContentSignerBuilder {
 
       this.publicKey = cert.getPublicKey();
       this.certificateChain = X509Util.buildCertPath(cert, caCerts);
-    } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
-        | CertificateException | IOException | UnrecoverableKeyException
-        | ClassCastException ex) {
+    } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
+        | UnrecoverableKeyException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   }

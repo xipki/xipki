@@ -129,6 +129,7 @@ class HashCalculator {
   public static byte[] hash(HashAlgo hashAlgo, byte[] data, int offset, int len) {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     ParamUtil.requireNonNull("data", data);
+
     if (data.length - offset < len) {
       throw new IndexOutOfBoundsException("data.length - offset < len");
     }

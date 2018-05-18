@@ -26,6 +26,8 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.BenchmarkExecutor;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
@@ -80,8 +82,8 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
     ParamUtil.requireNonNull("keystore", keystore);
 
-    SignerConf signerConf = SignerConf.getKeystoreSignerConf(
-        new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
+    SignerConf signerConf = getKeystoreSignerConf(new ByteArrayInputStream(keystore), PASSWORD,
+        signatureAlgorithm, 20);
     this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Certificate) null);
   }
 
@@ -117,4 +119,17 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     return (in == null) ? null : IoUtil.read(in);
   }
 
+  private static SignerConf getKeystoreSignerConf(InputStream keystoreStream,
+      String password, String signatureAlgorithm, int parallelism) throws IOException {
+    ParamUtil.requireNonNull("keystoreStream", keystoreStream);
+    ParamUtil.requireNonBlank("password", password);
+    ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
+    ParamUtil.requireMin("parallelism", parallelism, 1);
+
+    ConfPairs conf = new ConfPairs("password", password);
+    conf.putPair("algo", signatureAlgorithm);
+    conf.putPair("parallelism", Integer.toString(parallelism));
+    conf.putPair("keystore", "base64:" + Base64.encodeToString(IoUtil.read(keystoreStream)));
+    return new SignerConf(conf.getEncoded());
+  }
 }

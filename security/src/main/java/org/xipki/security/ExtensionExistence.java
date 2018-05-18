@@ -97,13 +97,11 @@ public class ExtensionExistence extends ASN1Object {
     }
 
     if (needExtensions == null) {
-      List<ASN1ObjectIdentifier> list = Collections.emptyList();
-      needExtensions = Collections.unmodifiableList(list);
+      needExtensions = Collections.unmodifiableList(Collections.emptyList());
     }
 
     if (wantExtensions == null) {
-      List<ASN1ObjectIdentifier> list = Collections.emptyList();
-      wantExtensions = Collections.unmodifiableList(list);
+      wantExtensions = Collections.unmodifiableList(Collections.emptyList());
     }
   } // constructor
 

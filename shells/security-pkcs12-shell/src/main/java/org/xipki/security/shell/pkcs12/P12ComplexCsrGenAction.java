@@ -122,7 +122,7 @@ public class P12ComplexCsrGenAction extends CsrGenAction {
     } catch (IOException ex) {
       throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
     }
-    SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, new String(pwd), 1,
+    SignerConf signerConf = P12CsrGenAction.getKeystoreSignerConf(p12File, new String(pwd),
         HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
   }

@@ -23,7 +23,9 @@ import java.security.cert.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.BenchmarkExecutor;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
@@ -85,8 +87,8 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     this.objectId = objectId;
 
     P11SlotIdentifier slotId = slot.getSlotId();
-    SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.getModuleName(),
-        null, slotId.getId(), null, objectId.getId(), signatureAlgorithm, 20);
+    SignerConf signerConf = getPkcs11SignerConf(slot.getModuleName(),
+        slotId.getId(), objectId.getId(), signatureAlgorithm, 20);
     try {
       this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
     } catch (ObjectCreationException ex) {
@@ -113,6 +115,26 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   @Override
   protected Runnable getTestor() throws Exception {
     return new Testor();
+  }
+
+  private static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Long slotId, byte[] keyId,
+      String signatureAlgorithm, int parallelism) {
+    ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
+    conf.putPair("parallelism", Integer.toString(parallelism));
+
+    if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+      conf.putPair("module", pkcs11ModuleName);
+    }
+
+    if (slotId != null) {
+      conf.putPair("slot-id", slotId.toString());
+    }
+
+    if (keyId != null) {
+      conf.putPair("key-id", Hex.encode(keyId));
+    }
+
+    return new SignerConf(conf.getEncoded());
   }
 
 }

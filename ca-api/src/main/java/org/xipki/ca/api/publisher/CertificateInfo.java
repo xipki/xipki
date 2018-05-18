@@ -17,8 +17,6 @@
 
 package org.xipki.ca.api.publisher;
 
-import java.security.cert.CertificateEncodingException;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
@@ -62,8 +60,7 @@ public class CertificateInfo {
   private boolean alreadyIssued;
 
   public CertificateInfo(CertWithDbId cert, NameId issuer, X509Cert issuerCert,
-      byte[] subjectPublicKey, NameId profile, NameId requestor)
-      throws CertificateEncodingException {
+      byte[] subjectPublicKey, NameId profile, NameId requestor) {
     this.profile = ParamUtil.requireNonNull("profile", profile);
     this.cert = ParamUtil.requireNonNull("cert", cert);
     this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);

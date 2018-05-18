@@ -85,7 +85,7 @@ public class PKCS12SignerFactory implements SignerFactory {
     }
 
     String str = conf.getConfValue("parallelism");
-    int parallelism = securityFactory.getDefaultSignerParallelism();
+    int parallelism = securityFactory.getDfltSignerParallelism();
     if (str != null) {
       try {
         parallelism = Integer.parseInt(str);

@@ -1357,7 +1357,11 @@ class CaManagerQueryExecutor {
 
       valText = val;
       if (val != null && column.isSignerConf()) {
-        valText = SignerConf.toString(val, false, true);
+        valText = SignerConf.eraseSensitiveData(valText);
+
+        if (valText.length() > 100) {
+          valText = StringUtil.concat(valText.substring(0, 97), "...");
+        }
       }
     } else if (type == ColumnType.INT) {
       if (value == null) {

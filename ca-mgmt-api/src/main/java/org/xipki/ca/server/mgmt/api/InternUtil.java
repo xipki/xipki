@@ -22,6 +22,9 @@ import java.security.cert.X509Certificate;
 
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -58,7 +61,20 @@ class InternUtil {
     }
 
     return sb.toString();
+  }
 
+  public static String signerConfToString(String signerConf, boolean verbose,
+      boolean ignoreSensitiveInfo) {
+    ParamUtil.requireNonBlank("signerConf", signerConf);
+    if (ignoreSensitiveInfo) {
+      signerConf = SignerConf.eraseSensitiveData(signerConf);
+    }
+
+    if (verbose || signerConf.length() < 101) {
+      return signerConf;
+    } else {
+      return StringUtil.concat(signerConf.substring(0, 97), "...");
+    }
   }
 
 }

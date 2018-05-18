@@ -42,16 +42,16 @@ import org.xipki.common.util.ParamUtil;
 
 public enum HashAlgo {
 
-  SHA1(20, AlgorithmCode.SHA1, "1.3.14.3.2.26", "SHA1"),
-  SHA224(28, AlgorithmCode.SHA224, "2.16.840.1.101.3.4.2.4", "SHA224"),
-  SHA256(32, AlgorithmCode.SHA256, "2.16.840.1.101.3.4.2.1", "SHA256"),
-  SHA384(48, AlgorithmCode.SHA384, "2.16.840.1.101.3.4.2.2", "SHA384"),
-  SHA512(64, AlgorithmCode.SHA512, "2.16.840.1.101.3.4.2.3", "SHA512"),
-  SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7", "SHA3-224"),
-  SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8", "SHA3-256"),
-  SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9", "SHA3-384"),
+  SHA1(20,     AlgorithmCode.SHA1,     "1.3.14.3.2.26", "SHA1"),
+  SHA224(28,   AlgorithmCode.SHA224,   "2.16.840.1.101.3.4.2.4",  "SHA224"),
+  SHA256(32,   AlgorithmCode.SHA256,   "2.16.840.1.101.3.4.2.1",  "SHA256"),
+  SHA384(48,   AlgorithmCode.SHA384,   "2.16.840.1.101.3.4.2.2",  "SHA384"),
+  SHA512(64,   AlgorithmCode.SHA512,   "2.16.840.1.101.3.4.2.3",  "SHA512"),
+  SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7",  "SHA3-224"),
+  SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8",  "SHA3-256"),
+  SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9",  "SHA3-384"),
   SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
-  SM3(32, AlgorithmCode.SM3, "1.2.156.10197.1.401", "SM3");
+  SM3(32,      AlgorithmCode.SM3,      "1.2.156.10197.1.401",     "SM3");
 
   private static final Map<String, HashAlgo> map = new HashMap<>();
 
@@ -143,59 +143,6 @@ public enum HashAlgo {
     }
     return type;
   }
-
-  /*
-  public static HashAlgo getInstanceForPkcs11HashMech(long hashMech) {
-    if (hashMech == PKCS11Constants.CKM_SHA_1) {
-      return HashAlgo.SHA1;
-    } else if (hashMech == PKCS11Constants.CKM_SHA224) {
-      return HashAlgo.SHA224;
-    } else if (hashMech == PKCS11Constants.CKM_SHA256) {
-      return HashAlgo.SHA256;
-    } else if (hashMech == PKCS11Constants.CKM_SHA384) {
-      return HashAlgo.SHA384;
-    } else if (hashMech == PKCS11Constants.CKM_SHA512) {
-      return HashAlgo.SHA512;
-    } else if (hashMech == PKCS11Constants.CKM_SHA3_224) {
-      return HashAlgo.SHA3_224;
-    } else if (hashMech == PKCS11Constants.CKM_SHA3_256) {
-      return HashAlgo.SHA3_256;
-    } else if (hashMech == PKCS11Constants.CKM_SHA3_384) {
-      return HashAlgo.SHA3_384;
-    } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
-      return HashAlgo.SHA3_512;
-    } else if (hashMech == PKCS11Constants.CKM_VENDOR_SM3) {
-      return HashAlgo.SM3;
-    } else {
-      return null;
-    }
-  }
-
-  public static HashAlgo getInstanceForPkcs11MgfMech(long hashMech) {
-    if (hashMech == PKCS11Constants.CKG_MGF1_SHA1) {
-      return HashAlgo.SHA1;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA224) {
-      return HashAlgo.SHA224;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA256) {
-      return HashAlgo.SHA256;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA384) {
-      return HashAlgo.SHA384;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA512) {
-      return HashAlgo.SHA512;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_224) {
-      return HashAlgo.SHA3_224;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_256) {
-      return HashAlgo.SHA3_256;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_384) {
-      return HashAlgo.SHA3_384;
-    } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_512) {
-      return HashAlgo.SHA3_512;
-    } else {
-      // SM3 does not apply to RSAPSS signature
-      return null;
-    }
-  }
-  */
 
   public static HashAlgo getInstanceForEncoded(byte[] encoded) {
     return getInstanceForEncoded(encoded, 0, encoded.length);

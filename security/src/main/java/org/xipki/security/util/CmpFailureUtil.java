@@ -69,8 +69,7 @@ public class CmpFailureUtil {
   private CmpFailureUtil() {
   }
 
-  public static String formatPkiStatusInfo(
-      org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
+  public static String formatPkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
     ParamUtil.requireNonNull("pkiStatusInfo", pkiStatusInfo);
     int status = pkiStatusInfo.getStatus().intValue();
     int failureInfo = pkiStatusInfo.getFailInfo().intValue();

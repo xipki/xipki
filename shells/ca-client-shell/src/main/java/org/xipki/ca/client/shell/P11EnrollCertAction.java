@@ -22,8 +22,10 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Hex;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
@@ -66,9 +68,41 @@ public class P11EnrollCertAction extends EnrollCertAction {
       keyIdBytes = Hex.decode(keyId);
     }
 
-    SignerConf signerConf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, keyLabel,
-        keyIdBytes, 1, HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
+    SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
+        keyIdBytes, HashAlgo.getInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+  }
+
+  public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+      String keyLabel, byte[] keyId, HashAlgo hashAlgo,
+      SignatureAlgoControl signatureAlgoControl) {
+    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+    ParamUtil.requireNonNull("slotIndex", slotIndex);
+
+    if (keyId == null && keyLabel == null) {
+      throw new IllegalArgumentException("at least one of keyId and keyLabel must not be null");
+    }
+
+    ConfPairs conf = new ConfPairs();
+    conf.putPair("parallelism", Integer.toString(1));
+
+    if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+      conf.putPair("module", pkcs11ModuleName);
+    }
+
+    if (slotIndex != null) {
+      conf.putPair("slot", slotIndex.toString());
+    }
+
+    if (keyId != null) {
+      conf.putPair("key-id", Hex.encode(keyId));
+    }
+
+    if (keyLabel != null) {
+      conf.putPair("key-label", keyLabel);
+    }
+
+    return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
   }
 
 }

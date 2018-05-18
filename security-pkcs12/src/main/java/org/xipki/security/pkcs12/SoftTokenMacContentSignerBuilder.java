@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
@@ -88,7 +87,7 @@ public class SoftTokenMacContentSignerBuilder {
       }
 
       this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
-    } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
+    } catch (KeyStoreException | NoSuchAlgorithmException
         | CertificateException | IOException | UnrecoverableKeyException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }

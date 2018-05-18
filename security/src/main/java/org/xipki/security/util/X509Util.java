@@ -143,7 +143,7 @@ public class X509Util {
   public static X509Certificate parseCert(String fileName)
       throws IOException, CertificateException {
     ParamUtil.requireNonNull("fileName", fileName);
-    return parseCert(new File(IoUtil.expandFilepath(fileName)));
+    return parseCert(new File(fileName));
   }
 
   public static X509Certificate parseCert(File file) throws IOException, CertificateException {
@@ -197,8 +197,7 @@ public class X509Util {
     return parseBase64EncodedCert(b64);
   }
 
-  public static String toPemCert(X509Certificate cert)
-      throws CertificateException {
+  public static String toPemCert(X509Certificate cert) throws CertificateException {
     ParamUtil.requireNonNull("cert", cert);
     byte[] encoded = cert.getEncoded();
     return StringUtil.concat("-----BEGIN CERTIFICATE-----\n",
@@ -238,8 +237,7 @@ public class X509Util {
     return parseCrl(new ByteArrayInputStream(encodedCrl));
   }
 
-  public static X509CRL parseCrl(InputStream crlStream)
-      throws CertificateException, CRLException {
+  public static X509CRL parseCrl(InputStream crlStream) throws CertificateException, CRLException {
     ParamUtil.requireNonNull("crlStream", crlStream);
     X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
     if (crl == null) {
@@ -505,8 +503,7 @@ public class X509Util {
     try {
       if (certs != null && !isSelfSigned(cert)) {
         while (true) {
-          X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1),
-              certs);
+          X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
           if (caCert == null) {
             break;
           }

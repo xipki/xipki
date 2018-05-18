@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
@@ -58,12 +59,14 @@ public class P12EnrollCertAction extends EnrollCertAction {
       try {
         password = new String(readPassword());
       } catch (IOException ex) {
-        throw new ObjectCreationException("could not read password: " + ex.getMessage(),
-            ex);
+        throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
       }
     }
 
-    SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, password,
+    ConfPairs conf = new ConfPairs("password", password);
+    conf.putPair("parallelism", Integer.toString(1));
+    conf.putPair("keystore", "file:" + p12File);
+    SignerConf signerConf = new SignerConf(conf.getEncoded(),
         HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
     return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
   }

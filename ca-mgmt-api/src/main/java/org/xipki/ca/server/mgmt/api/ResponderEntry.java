@@ -24,7 +24,6 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -123,7 +122,7 @@ public class ResponderEntry {
     if (conf == null) {
       sb.append("null");
     } else {
-      sb.append(SignerConf.toString(conf, verbose, ignoreSensitiveInfo));
+      sb.append(InternUtil.signerConfToString(conf, verbose, ignoreSensitiveInfo));
     }
     sb.append('\n');
     sb.append("certificate: ").append("\n");

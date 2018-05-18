@@ -286,14 +286,10 @@ public class AlgorithmUtil {
       map.put(PKCSObjectIdentifiers.sha256WithRSAEncryption, HashAlgo.SHA256);
       map.put(PKCSObjectIdentifiers.sha384WithRSAEncryption, HashAlgo.SHA384);
       map.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, HashAlgo.SHA512);
-      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
-          HashAlgo.SHA3_224);
-      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
-          HashAlgo.SHA3_256);
-      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
-          HashAlgo.SHA3_384);
-      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
-          HashAlgo.SHA3_512);
+      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224, HashAlgo.SHA3_224);
+      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256, HashAlgo.SHA3_256);
+      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384, HashAlgo.SHA3_384);
+      map.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512, HashAlgo.SHA3_512);
       map.put(GMObjectIdentifiers.sm2sign_with_sm3, HashAlgo.SM3);
       sigAlgOidToDigestMap = Collections.unmodifiableMap(map);
     }
@@ -538,8 +534,7 @@ public class AlgorithmUtil {
     return new AlgorithmIdentifier(oid, DERNull.INSTANCE);
   } // method getMacAlgId
 
-  public static AlgorithmIdentifier getSigAlgId(String sigAlgName)
-      throws NoSuchAlgorithmException {
+  public static AlgorithmIdentifier getSigAlgId(String sigAlgName) throws NoSuchAlgorithmException {
     ParamUtil.requireNonNull("sigAlgName", sigAlgName);
     String algoS = sigAlgName.toUpperCase();
     algoS = canonicalizeAlgoText(algoS);

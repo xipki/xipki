@@ -38,8 +38,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<SignerFactory> services =
-      new ConcurrentLinkedDeque<SignerFactory>();
+  private ConcurrentLinkedDeque<SignerFactory> services = new ConcurrentLinkedDeque<>();
 
   @Override
   public Set<String> getSupportedSignerTypes() {
@@ -89,8 +88,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
       }
     }
 
-    throw new ObjectCreationException(
-        "could not find Factory to create Signer of type '" + type + "'");
+    throw new ObjectCreationException("could not find Factory to create Signer of type " + type);
   }
 
 }

@@ -35,7 +35,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.SignerConf;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -298,7 +297,7 @@ public class CaEntry {
         "\nexpirationPeriod: ", expirationPeriod, " days",
         "\nsignerType: ", signerType,
         "\nsignerConf: ", (signerConf == null ? "null" :
-          SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo)),
+          InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
         "\ncmpcontrolName: ", cmpControlName,
         "\nresponderName: ", responderName,
         "\nduplicateKey: ", duplicateKeyPermitted,
