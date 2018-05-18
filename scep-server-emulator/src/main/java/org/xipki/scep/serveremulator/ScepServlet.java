@@ -56,7 +56,7 @@ import org.xipki.scep.util.ScepUtil;
 
 public class ScepServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 7442535012222114067L;
+  private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
 

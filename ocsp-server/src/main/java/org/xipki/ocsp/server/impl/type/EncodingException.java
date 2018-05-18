@@ -25,7 +25,7 @@ package org.xipki.ocsp.server.impl.type;
 
 public class EncodingException extends Exception {
 
-  private static final long serialVersionUID = 1566332812160625918L;
+  private static final long serialVersionUID = 1L;
 
   public EncodingException() {
   }

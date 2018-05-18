@@ -25,7 +25,7 @@ package org.xipki.dbtool;
 
 public class InvalidInputException extends Exception {
 
-  private static final long serialVersionUID = -3488734044660239124L;
+  private static final long serialVersionUID = 1L;
 
   public InvalidInputException() {
   }
