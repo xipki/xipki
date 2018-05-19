@@ -194,9 +194,19 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
 
 xi:copy-file -f xipki/qa/qa.d/template.subca.xml xipki/qa/qa.d/subca.xml
 
-xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" xipki/qa/qa.d/subca.xml
+xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+  xipki/qa/qa.d/subca.xml
+
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  xipki/qa/qa.d/subca.xml
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/qa.d/subca.xml
+
+xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  xipki/qa/qa.d/subca.xml
+
+xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   xipki/qa/qa.d/subca.xml
 
 ca:load-conf --conf-file xipki/qa/qa.d/subca.xml
@@ -222,10 +232,19 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
 xi:copy-file -f xipki/qa/qa.d/template.subcawithcrl.xml \
   xipki/qa/qa.d/subcawithcrl.xml
 
+xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+  xipki/qa/qa.d/subcawithcrl.xml
+
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   xipki/qa/qa.d/subcawithcrl.xml
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/qa.d/subcawithcrl.xml
+
+xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  xipki/qa/qa.d/subcawithcrl.xml
+
+xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   xipki/qa/qa.d/subcawithcrl.xml
 
 ca:load-conf --conf-file xipki/qa/qa.d/subcawithcrl.xml

@@ -139,8 +139,6 @@ public interface CaManager {
 
   Set<String> getCrlSignerNames();
 
-  Set<String> getCmpControlNames();
-
   Set<String> getCaNames();
 
   Set<String> getSuccessfulCaNames();
@@ -491,43 +489,6 @@ public interface CaManager {
    */
   void changePublisher(String name, String type, String conf) throws CaMgmtException;
 
-  /**
-   * Returns the CMP control.
-   * @param name
-   *          CMP control name.
-   * @return the CMP control.
-   */
-  CmpControlEntry getCmpControl(String name);
-
-  /**
-   * Adds a SCEP contrl.
-   * @param dbEntry
-   *          CMP control entry. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void addCmpControl(CmpControlEntry dbEntry) throws CaMgmtException;
-
-  /**
-   * Remove the CMP control {@code name}.
-   * @param name
-   *          CMP control name. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void removeCmpControl(String name) throws CaMgmtException;
-
-  /**
-   * Changes the CMP control {@code name}.
-   * @param name
-   *          name of the CMP control to be changed. Must not be {@code null}.
-   * @param conf
-   *          Configuration to be changed. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void changeCmpControl(String name, String conf) throws CaMgmtException;
-
   Set<String> getEnvParamNames();
 
   /**
@@ -561,7 +522,7 @@ public interface CaManager {
   /**
    * Changes the environment parameter {@code name}.
    * @param name
-   *          name of the CMP control to be changed. Must not be {@code null}.
+   *          name of the environment to be changed. Must not be {@code null}.
    * @param value
    *          Environment value to be changed. Must not be {@code null}.
    * @throws CaMgmtException

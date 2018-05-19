@@ -22,14 +22,6 @@
     <property name="token.type">REPLACEME-TOKEN_TYPE</property>
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
   </properties>
-  <cmpcontrols>
-    <cmpcontrol name="cmpcontrol1">
-      <!-- The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates -->
-      <conf>
-        <value>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</value>
-       </conf>
-    </cmpcontrol>
-  </cmpcontrols>
   <responders>
     <responder name="responder1">
       <type>pkcs12</type>
@@ -173,7 +165,7 @@
           <profile>rootca</profile>
           <serialNumber>1</serialNumber>
         </genSelfIssued>
-        <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+        <cmpcontrol>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpcontrol>
         <cert>
           <file>${output.dir}/rootca1.der</file>
         </cert>

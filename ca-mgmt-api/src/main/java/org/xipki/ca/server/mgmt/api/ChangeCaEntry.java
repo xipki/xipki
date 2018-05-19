@@ -43,7 +43,7 @@ public class ChangeCaEntry {
 
   private String signerConf;
 
-  private String cmpControlName;
+  private String cmpControl;
 
   private String responderName;
 
@@ -121,12 +121,12 @@ public class ChangeCaEntry {
     this.signerConf = signerConf;
   }
 
-  public String getCmpControlName() {
-    return cmpControlName;
+  public String getCmpControl() {
+    return cmpControl;
   }
 
-  public void setCmpControlName(String cmpControlName) {
-    this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
+  public void setCmpControl(String cmpControl) {
+    this.cmpControl = cmpControl;
   }
 
   public String getResponderName() {

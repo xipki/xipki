@@ -36,6 +36,7 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -199,12 +200,12 @@ public class CaInfo {
     caEntry.setCrlSignerName(crlSignerName);
   }
 
-  public String getCmpControlName() {
-    return caEntry.getCmpControlName();
+  public CmpControl getCmpControl() {
+    return caEntry.getCmpControl();
   }
 
-  public void setCmpControlName(String name) {
-    caEntry.setCmpControlName(name);
+  public void setCmpControl(CmpControl cmpControl) {
+    caEntry.setCmpControl(cmpControl);
   }
 
   public String getResponderName() {

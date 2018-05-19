@@ -33,12 +33,6 @@ echo "#################################################################"
 echo "#                       Prepare environment                    #"
 echo "#################################################################"
 
-## CMP control: messagetime.bias is set to 300 seconds.
-# The popo.algo ${STDHASH}withRSA is for the enrollment of scep responder certificates
-ca:cmpcontrol-add \
-  --name cmpcontrol1 \
-  --conf send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA
-
 ## Certificate Profiles
 
 list = [ cross subca subca-complex ocsp scep multiple-ous \
@@ -154,7 +148,7 @@ ca:gen-rootca \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/rootca1.der \
-  --cmp-control cmpcontrol1 \
+  --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
@@ -353,7 +347,7 @@ ca:ca-add \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/subca1.der \
-  --cmp-control cmpcontrol1 \
+  --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
@@ -416,7 +410,7 @@ ca:ca-add \
   --crl-uri http://subcawithcrl.example.org/crl \
   --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
   --crl-signer casign-crlsigner \
-  --cmp-control cmpcontrol1 \
+  --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \

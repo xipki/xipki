@@ -61,15 +61,6 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <!-- table CMPCONTROL -->
-    <createTable tableName="CMPCONTROL">
-      <column name="NAME" type="VARCHAR(45)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="CONF" type="VARCHAR(1000)">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
     <!-- table RESPONDER -->
     <createTable tableName="RESPONDER">
       <column name="NAME" type="VARCHAR(45)">
@@ -193,9 +184,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
-      <column name="CMPCONTROL_NAME" type="VARCHAR(45)">
-        <constraints nullable="false"/>
-      </column>
+      <column name="CMP_CONTROL" type="VARCHAR(1000)"/>
       <column name="RESPONDER_NAME" type="VARCHAR(45)"/>
       <column defaultValueNumeric="1" name="DUPLICATE_KEY" type="SMALLINT"
           remarks="whether duplicate public key is allowed, default is true (1)">
@@ -379,7 +368,7 @@
       </column>
       <column name="UID" type="INT" remarks="user id"/>
       <column name="RTYPE" type="SMALLINT"
-         remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP">
+         remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP, 4 for REST">
         <constraints nullable="false"/>
       </column>
       <column name="SUBJECT" type="${x500name.type}">
@@ -459,11 +448,6 @@
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="3">
-    <addForeignKeyConstraint  constraintName="FK_CA_CMPCONTROL1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CMPCONTROL_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="CMPCONTROL"/>
     <addForeignKeyConstraint constraintName="FK_CA_CRLSIGNER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

@@ -42,7 +42,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasRequestors;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cmpcontrols;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Environments;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
@@ -51,7 +50,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
-import org.xipki.ca.dbtool.jaxb.ca.CmpcontrolType;
 import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
 import org.xipki.ca.dbtool.jaxb.ca.EnvironmentType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
@@ -92,7 +90,6 @@ class CaconfDbExporter extends DbPorter {
 
     System.out.println("exporting CA configuration from database");
 
-    exportCmpcontrol(caconf);
     exportResponder(caconf);
     exportEnvironment(caconf);
     exportCrlsigner(caconf);
@@ -117,34 +114,6 @@ class CaconfDbExporter extends DbPorter {
 
     System.out.println(" exported CA configuration from database");
   }
-
-  private void exportCmpcontrol(CaconfType caconf) throws DataAccessException {
-    Cmpcontrols cmpcontrols = new Cmpcontrols();
-    caconf.setCmpcontrols(cmpcontrols);
-    System.out.println("exporting table CMPCONTROL");
-
-    final String sql = "SELECT NAME,CONF FROM CMPCONTROL";
-
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
-
-      while (rs.next()) {
-        CmpcontrolType cmpcontrol = new CmpcontrolType();
-        cmpcontrols.getCmpcontrol().add(cmpcontrol);
-        cmpcontrol.setName(rs.getString("NAME"));
-        cmpcontrol.setConf(rs.getString("CONF"));
-      }
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(stmt, rs);
-    }
-
-    System.out.println(" exported table CMPCONTROL");
-  } // method exportCmpcontrol
 
   private void exportEnvironment(CaconfType caconf) throws DataAccessException {
     System.out.println("exporting table ENVIRONMENT");
@@ -398,7 +367,7 @@ class CaconfDbExporter extends DbPorter {
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,"
         + "SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV_INFO,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,DELTACRL_URIS,"
-        + "VALIDITY_MODE,CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMPCONTROL_NAME,EXTRA_CONTROL "
+        + "VALIDITY_MODE,CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMP_CONTROL,EXTRA_CONTROL "
         + "FROM CA";
 
     Statement stmt = null;
@@ -428,7 +397,7 @@ class CaconfDbExporter extends DbPorter {
             rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
         ca.setCrlsignerName(rs.getString("CRLSIGNER_NAME"));
         ca.setResponderName(rs.getString("RESPONDER_NAME"));
-        ca.setCmpcontrolName(rs.getString("CMPCONTROL_NAME"));
+        ca.setCmpcontrol(rs.getString("CMP_CONTROL"));
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
         ca.setSaveReq(rs.getInt("SUPPORT_REST"));

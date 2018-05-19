@@ -114,7 +114,6 @@ import org.xipki.ca.server.mgmt.api.ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
@@ -132,7 +131,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CmpcontrolType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
@@ -302,10 +300,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
 
-  private final Map<String, CmpControl> cmpControls = new ConcurrentHashMap<>();
-
-  private final Map<String, CmpControlEntry> cmpControlDbEntries = new ConcurrentHashMap<>();
-
   private final Map<String, RequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
 
   private final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
@@ -355,8 +349,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   private boolean publishersInitialized;
 
   private boolean crlSignersInitialized;
-
-  private boolean cmpControlInitialized;
 
   private boolean casInitialized;
 
@@ -560,7 +552,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     initCaAliases();
     initCertprofiles();
     initPublishers();
-    initCmpControls();
     initRequestors();
     initResponders();
     initCrlSigners();
@@ -631,7 +622,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     certprofilesInitialized = false;
     publishersInitialized = false;
     crlSignersInitialized = false;
-    cmpControlInitialized = false;
     casInitialized = false;
     environmentParametersInitialized = false;
     scepsInitialized = false;
@@ -929,11 +919,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public Set<String> getCmpControlNames() {
-    return cmpControlDbEntries.keySet();
-  }
-
-  @Override
   public Set<String> getCaNames() {
     return caInfos.keySet();
   }
@@ -1152,37 +1137,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     crlSignersInitialized = true;
   } // method initCrlSigners
-
-  private void initCmpControls() throws CaMgmtException {
-    if (cmpControlInitialized) {
-      return;
-    }
-
-    cmpControls.clear();
-    cmpControlDbEntries.clear();
-
-    List<String> names = queryExecutor.namesFromTable("CMPCONTROL");
-    for (String name : names) {
-      CmpControlEntry cmpControlDb = queryExecutor.createCmpControl(name);
-      if (cmpControlDb == null) {
-        continue;
-      }
-
-      cmpControlDb.setFaulty(true);
-      cmpControlDbEntries.put(name, cmpControlDb);
-
-      CmpControl cmpControl;
-      try {
-        cmpControl = new CmpControl(cmpControlDb);
-        cmpControlDb.setFaulty(false);
-        cmpControls.put(name, cmpControl);
-      } catch (InvalidConfException ex) {
-        LogUtil.error(LOG, ex, concat("could not initialize CMP control ", name, ", ignore it"));
-      }
-    }
-
-    cmpControlInitialized = true;
-  } // method initCmpControls
 
   private void initSceps() throws CaMgmtException {
     if (scepsInitialized) {
@@ -1977,72 +1931,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     publishers.put(name, publisher);
   } // method changePublisher
 
-  @Override
-  public CmpControlEntry getCmpControl(String name) {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    return cmpControlDbEntries.get(name);
-  }
-
-  public CmpControl getCmpControlObject(String name) {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    return cmpControls.get(name);
-  }
-
-  @Override
-  public void addCmpControl(CmpControlEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    asssertMasterMode();
-    final String name = dbEntry.getName();
-    if (cmpControlDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("CMP control named ", name, " exists"));
-    }
-
-    CmpControl cmpControl;
-    try {
-      cmpControl = new CmpControl(dbEntry);
-    } catch (InvalidConfException ex) {
-      LogUtil.error(LOG, ex, "could not add CMP control to certStore");
-      throw new CaMgmtException(ex);
-    }
-
-    CmpControlEntry tmpDbEntry = cmpControl.getDbEntry();
-    queryExecutor.addCmpControl(tmpDbEntry);
-    cmpControls.put(name, cmpControl);
-    cmpControlDbEntries.put(name, tmpDbEntry);
-  } // method addCmpControl
-
-  @Override
-  public void removeCmpControl(String name) throws CaMgmtException {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    asssertMasterMode();
-    boolean bo = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
-    if (!bo) {
-      throw new CaMgmtException("unknown CMP control " + name);
-    }
-
-    for (String caName : caInfos.keySet()) {
-      CaInfo caInfo = caInfos.get(caName);
-      if (name.equals(caInfo.getCmpControlName())) {
-        caInfo.setCmpControlName(null);
-      }
-    }
-
-    cmpControlDbEntries.remove(name);
-    cmpControls.remove(name);
-    LOG.info("removed CMPControl '{}'", name);
-  } // method removeCmpControl
-
-  @Override
-  public void changeCmpControl(String name, String conf) throws CaMgmtException {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    ParamUtil.requireNonBlank("conf", conf);
-    asssertMasterMode();
-    CmpControl newCmpControl = queryExecutor.changeCmpControl(name, conf);
-
-    cmpControlDbEntries.put(name, newCmpControl.getDbEntry());
-    cmpControls.put(name, newCmpControl);
-  } // method changeCmpControl
-
   public EnvParameterResolver getEnvParameterResolver() {
     return envParameterResolver;
   }
@@ -2432,7 +2320,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new CaMgmtException(concat("invalid CSR request. ERROR: ", ex.getMessage()));
     }
 
-    CmpControl cmpControl = getCmpControlObject(ca.getCaInfo().getCmpControlName());
+    CmpControl cmpControl = ca.getCaInfo().getCmpControl();
     if (!securityFactory.verifyPopo(csr, cmpControl.getPopoAlgoValidator())) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
@@ -2583,7 +2471,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoBitLen(),
         nextCrlNumber, signerType, signerConf, caUris, numCrls, expirationPeriod);
     entry.setCert(caCert);
-    entry.setCmpControlName(caEntry.getCmpControlName());
+    entry.setCmpControl(caEntry.getCmpControl());
     entry.setCrlSignerName(caEntry.getCrlSignerName());
     entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
     entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
@@ -2961,30 +2849,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     if (!caSystemSetuped) {
       throw new CaMgmtException("CA system is not initialized yet.");
-    }
-
-    // CMP control
-    for (String name : conf.getCmpControlNames()) {
-      CmpControlEntry entry = conf.getCmpControl(name);
-      CmpControlEntry entryB = cmpControlDbEntries.get(name);
-      if (entryB != null) {
-        if (entry.equals(entryB)) {
-          LOG.info("ignore existed CMP control {}", name);
-          continue;
-        } else {
-          throw logAndCreateException(
-              concat("CMP control ", name, " existed, could not re-added it"));
-        }
-      }
-
-      try {
-        addCmpControl(entry);
-        LOG.info("added CMP control {}", name);
-      } catch (CaMgmtException ex) {
-        String msg = concat("could not add CMP control ", name);
-        LogUtil.error(LOG, ex, msg);
-        throw new CaMgmtException(msg);
-      }
     }
 
     // Responder
@@ -3414,7 +3278,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     ZipOutputStream zipStream = getZipOutputStream(zipFile);
     try {
-      Set<String> includeCmpControlNames = new HashSet<>();
       Set<String> includeResponderNames = new HashSet<>();
       Set<String> includeRequestorNames = new HashSet<>();
       Set<String> includeProfileNames = new HashSet<>();
@@ -3525,11 +3388,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setCert(createFileOrBinary(zipStream, certBytes,
               concat("files/ca-", name, "-cert.der")));
 
-          if (entry.getCmpControlName() != null) {
-            includeCmpControlNames.add(entry.getCmpControlName());
-            ciJaxb.setCmpcontrolName(entry.getCmpControlName());
-          }
-
           if (entry.getCrlSignerName() != null) {
             includeCrlSignerNames.add(entry.getCrlSignerName());
             ciJaxb.setCrlsignerName(entry.getCrlSignerName());
@@ -3577,29 +3435,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       // clear the users if the list is empty
       if (users.isEmpty()) {
         root.setUsers(null);
-      }
-
-      // cmp controls
-      if (CollectionUtil.isNonEmpty(cmpControlDbEntries)) {
-        List<CmpcontrolType> list = new LinkedList<>();
-
-        for (String name : cmpControlDbEntries.keySet()) {
-          if (!includeCmpControlNames.contains(name)) {
-            continue;
-          }
-
-          CmpcontrolType jaxb = new CmpcontrolType();
-          CmpControlEntry entry = cmpControlDbEntries.get(name);
-          jaxb.setName(name);
-          jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/cmpcontrol-", name, ".conf")));
-          list.add(jaxb);
-        }
-
-        if (!list.isEmpty()) {
-          root.setCmpcontrols(new CaconfType.Cmpcontrols());
-          root.getCmpcontrols().getCmpcontrol().addAll(list);
-        }
       }
 
       // environments

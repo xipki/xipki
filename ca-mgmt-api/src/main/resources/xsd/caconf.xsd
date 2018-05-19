@@ -38,13 +38,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="cmpcontrols" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="cmpcontrol" type="cmpcontrolType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="responders" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -118,12 +111,6 @@
         </xs:documentation>
       </xs:annotation>
     </xs:attribute>
-  </xs:complexType>
-  <xs:complexType name="cmpcontrolType">
-    <xs:all>
-      <xs:element name="conf" type="fileOrValueType"/>
-    </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="responderType">
     <xs:all>
@@ -224,7 +211,7 @@
   <xs:complexType name="caInfoType">
     <xs:all>
       <!-- general CA configuration -->
-      <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpcontrol" type="xs:string"/>
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0">
         <xs:annotation>
           <xs:documentation>If genSelfIssued is preset, only choice file is allowed and

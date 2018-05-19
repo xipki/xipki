@@ -177,6 +177,8 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     xipki/qa/qa.d/ca.script
 
+  CMP_CONTROL = "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=${$CMP_SIGALGO},popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2"
+
   if { "$1" equals "-l" } then {
     source file:./xipki/qa/qa.d/ca-load.script
   } else {
@@ -207,33 +209,6 @@ if { $printUsage equals "true" } then {
 
   # Environment name does not exist
   caqa:neg-env-rm qa-env-not-exits
-
-  echo "#################################################################"
-  echo "#                           CMP control                         #"
-  echo "#################################################################"
-
-  CMP_CONTROL = 'send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA'
-
-  ca:cmpcontrol-add --name qa-cmpcontrol1 --conf "${CMP_CONTROL}"
-
-  caqa:cmpcontrol-check --name qa-cmpcontrol1 --conf "${CMP_CONTROL}"
-
-  ca:cmpcontrol-up --name qa-cmpcontrol1 \
-    --conf send.ca=true,messagetime.bias=300
-
-  caqa:neg-cmpcontrol-up --name qa-cmpcontrol1 \
-    --conf send.ca=true,messagetime.bias=300,protection.sigalgo=INVALIDALGO
-
-  caqa:cmpcontrol-check --name qa-cmpcontrol1 \
-    --conf send.ca=true,messagetime.bias=300
-
-  # name already exists
-  caqa:neg-cmpcontrol-add --name qa-cmpcontrol1 \
-    --conf send.ca=true,messagetime.bias=300
-
-  ca:cmpcontrol-rm qa-cmpcontrol1
-
-  caqa:neg-cmpcontrol-rm qa-cmpcontrol-not-exists
 
   echo "#################################################################"
   echo "#                           Requestor                           #"
@@ -404,13 +379,13 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
 
   caqa:ca-check --name subca1 \
---permission all \
+    --permission all \
     --max-validity 5y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/subca1.der \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes
@@ -423,7 +398,7 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes \
@@ -450,7 +425,7 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/rootca1-2.der \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder1 \
     --duplicate-subject no \
     --duplicate-key no \
@@ -482,7 +457,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes \
@@ -503,7 +478,7 @@ if { $printUsage equals "true" } then {
     --cert output/subca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
@@ -522,7 +497,6 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --cmp-control cmpcontrol2 \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
@@ -542,7 +516,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --crl-signer crlsigner2 \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
@@ -561,7 +535,7 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --cmp-control cmpcontrol1 \
+    --cmp-control $CMP_CONTROL \
     --responder responder2 \
     --duplicate-subject  yes \
     --duplicate-key yes \
@@ -699,20 +673,6 @@ if { $printUsage equals "true" } then {
   ca:clear-publishqueue --ca rootca1 --publisher ocsp-publisher
 
   ca:clear-publishqueue --ca all --publisher all
-
-  ##### cmpcontrol #####
-
-  ca:cmpcontrol-add --name cmpcontrol2 \
-    --conf send.ca=true,messagetime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
-
-  ca:cmpcontrol-info
-
-  ca:cmpcontrol-info cmpcontrol2
-
-  ca:cmpcontrol-up --name cmpcontrol2 \
-    --conf send.ca=true,messagetime.bias=300,protection.sigalgo=SHA256withRSA
-
-  ca:cmpcontrol-rm cmpcontrol2
 
   ##### crlsigner #####
 

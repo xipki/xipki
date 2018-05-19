@@ -37,8 +37,8 @@ import org.xipki.console.karaf.completer.DirCompleter;
 @Service
 public class MkdirAction extends XiAction {
 
-  @Argument(index = 0, name = "directory_name", required = true,
-      description = "directory\n(required)")
+  @Argument(index = 0, name = "directory", required = true,
+      description = "directory to be created\n(required)")
   @Completion(DirCompleter.class)
   private String dirName;
 

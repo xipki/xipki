@@ -22,7 +22,7 @@
   <cas>
     <ca name="subca1">
       <caInfo>
-        <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+        <cmpcontrol>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpcontrol>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>

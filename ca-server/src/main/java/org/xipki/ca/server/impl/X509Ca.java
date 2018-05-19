@@ -501,8 +501,7 @@ public class X509Ca {
   }
 
   public CmpControl getCmpControl() {
-    String name = caInfo.getCmpControlName();
-    return (name == null) ? null : caManager.getCmpControlObject(name);
+    return caInfo.getCmpControl();
   }
 
   public X509Certificate getCert(BigInteger serialNumber)

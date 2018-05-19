@@ -464,22 +464,6 @@ Feature xipki-camgmt-shell (started by default)
 
      clear publish queue
 
-   * `ca:cmpcontrol-add`
-
-     add CMP control
-
-   * `ca:cmpcontrol-info`
-
-     show information of CMP control
-
-   * `ca:cmpcontrol-rm`
-
-     remove CMP control
-
-   * `ca:cmpcontrol-up`
-
-     update CMP control
-
    * `ca:crlsigner-add`
 
      add CRL signer

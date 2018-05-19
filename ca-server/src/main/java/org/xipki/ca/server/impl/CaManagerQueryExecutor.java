@@ -106,7 +106,6 @@ class CaManagerQueryExecutor {
   private final String sqlSelectRequestorId;
   private final String sqlSelectRequestor;
   private final String sqlSelectCrlSigner;
-  private final String sqlSelectCmpControl;
   private final String sqlSelectResponder;
   private final String sqlSelectCaId;
   private final String sqlSelectCa;
@@ -126,12 +125,11 @@ class CaManagerQueryExecutor {
     this.sqlSelectRequestor = buildSelectFirstSql("ID,CERT FROM REQUESTOR WHERE NAME=?");
     this.sqlSelectCrlSigner = buildSelectFirstSql(
         "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?");
-    this.sqlSelectCmpControl = buildSelectFirstSql("CONF FROM CMPCONTROL WHERE NAME=?");
     this.sqlSelectResponder = buildSelectFirstSql("TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?");
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectCa = buildSelectFirstSql(
         "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
-        + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
+        + ",CRLSIGNER_NAME,RESPONDER_NAME,CMP_CONTROL,DUPLICATE_KEY"
         + ",DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
         + ",EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
         + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
@@ -450,28 +448,6 @@ class CaManagerQueryExecutor {
     }
   } // method createCrlSigner
 
-  CmpControlEntry createCmpControl(String name) throws CaMgmtException {
-    final String sql = sqlSelectCmpControl;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-      stmt = prepareStatement(sql);
-      stmt.setString(1, name);
-      rs = stmt.executeQuery();
-
-      if (!rs.next()) {
-        throw new CaMgmtException("unknown CMP control " + name);
-      }
-
-      return new CmpControlEntry(name, rs.getString("CONF"));
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(stmt, rs);
-    }
-  } // method createCmpControl
-
   ResponderEntry createResponder(String name) throws CaMgmtException {
     final String sql = sqlSelectResponder;
     PreparedStatement stmt = null;
@@ -559,9 +535,13 @@ class CaManagerQueryExecutor {
         entry.setExtraControl(new ConfPairs(extraControl).unmodifiable());
       }
 
-      String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
-      if (StringUtil.isNotBlank(cmpcontrolName)) {
-        entry.setCmpControlName(cmpcontrolName);
+      String cmpcontrol = rs.getString("CMP_CONTROL");
+      if (StringUtil.isNotBlank(cmpcontrol)) {
+        try {
+          entry.setCmpControl(new CmpControl(cmpcontrol));
+        } catch (InvalidConfException ex) {
+          throw new CaMgmtException("invalid CMP_CONTROL: " + cmpcontrol);
+        }
       }
 
       entry.setDuplicateKeyPermitted((rs.getInt("DUPLICATE_KEY") != 0));
@@ -709,7 +689,7 @@ class CaManagerQueryExecutor {
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
-        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
+        + "RESPONDER_NAME,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,"
         + "EXTRA_CONTROL,SIGNER_CONF) "
         + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -735,7 +715,8 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, caEntry.getSignerType());
       ps.setString(idx++, caEntry.getCrlSignerName());
       ps.setString(idx++, caEntry.getResponderName());
-      ps.setString(idx++, caEntry.getCmpControlName());
+      CmpControl cmpControl = caEntry.getCmpControl();
+      ps.setString(idx++, (cmpControl == null ? null : cmpControl.getConf()));
       setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
       setBoolean(ps, idx++, caEntry.isDuplicateSubjectPermitted());
       setBoolean(ps, idx++, caEntry.isSupportRest());
@@ -1195,7 +1176,7 @@ class CaManagerQueryExecutor {
         col(STRING, "MAX_VALIDITY", maxValidity), col(COLL_STRING, "SIGNER_TYPE", signerType),
         col(STRING, "CRLSIGNER_NAME", changeCaEntry.getCrlSignerName()),
         col(STRING, "RESPONDER_NAME", changeCaEntry.getResponderName()),
-        col(STRING, "CMPCONTROL_NAME", changeCaEntry.getCmpControlName()),
+        col(STRING, "CMP_CONTROL", changeCaEntry.getCmpControl()),
         col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
         col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
         col(BOOL, "SUPPORT_REST", changeCaEntry.getSupportRest()),
@@ -1267,18 +1248,6 @@ class CaManagerQueryExecutor {
       }
     }
   } // method changeCertprofile
-
-  CmpControl changeCmpControl(String name, String conf) throws CaMgmtException {
-    CmpControl cmpControl;
-    try {
-      cmpControl = new CmpControl(new CmpControlEntry(name, conf));
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(ex);
-    }
-
-    changeIfNotNull("CMPCONTROL", col(STRING, "NAME", name), col(STRING, "CONF", conf));
-    return cmpControl;
-  } // method changeCmpControl
 
   private static SqlColumn col(ColumnType type, String name, Object value) {
     return new SqlColumn(type, name, value);

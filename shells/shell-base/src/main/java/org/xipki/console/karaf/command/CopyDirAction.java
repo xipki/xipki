@@ -38,7 +38,7 @@ import org.xipki.console.karaf.completer.DirCompleter;
 @Service
 public class CopyDirAction extends XiAction {
 
-  @Argument(index = 0, name = "source directory", required = true,
+  @Argument(index = 0, name = "source", required = true,
       description = "content of this directory will be copied\n(required)")
   @Completion(DirCompleter.class)
   private String source;

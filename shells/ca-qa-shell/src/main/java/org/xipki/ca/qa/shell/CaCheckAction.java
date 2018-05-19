@@ -21,6 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.shell.CaUpdateAction;
 import org.xipki.common.ConfPairs;
 import org.xipki.console.karaf.CmdFailure;
@@ -40,7 +41,7 @@ public class CaCheckAction extends CaUpdateAction {
   protected Object execute0() throws Exception {
     ChangeCaEntry ey = getChangeCaEntry();
     String caName = ey.getIdent().getName();
-    println("checking CA" + caName);
+    println("checking CA " + caName);
 
     CaEntry ca = caManager.getCa(caName);
     if (ca == null) {
@@ -65,9 +66,8 @@ public class CaCheckAction extends CaUpdateAction {
     }
 
     // CMP control name
-    if (ey.getCmpControlName() != null) {
-      MgmtQaShellUtil.assertEquals("CMP control name",
-          ey.getCmpControlName(), ca.getCmpControlName());
+    if (ey.getCmpControl() != null) {
+      assertObjEquals("CMP control", new CmpControl(ey.getCmpControl()), ca.getCmpControl());
     }
 
     // CRL signer name

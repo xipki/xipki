@@ -28,9 +28,9 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaUris;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
@@ -113,9 +113,8 @@ public abstract class CaAddOrGenAction extends CaAction {
   private String responderName;
 
   @Option(name = "--cmp-control",
-      description = "CMP control name")
-  @Completion(CmpControlNameCompleter.class)
-  private String cmpControlName;
+      description = "CMP control")
+  private String cmpControl;
 
   @Option(name = "--num-crls",
       description = "number of CRLs to be kept in database")
@@ -198,7 +197,7 @@ public abstract class CaAddOrGenAction extends CaAction {
     boolean duplicateSubjectPermitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
     entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
-    entry.setSaveRequest(isEnabled(supportRestS, false, "support-scep"));
+    entry.setSupportRest(isEnabled(supportRestS, false, "support-scep"));
     entry.setSaveRequest(isEnabled(saveReqS, false, "save-req"));
 
     ValidityMode validityMode = ValidityMode.forName(validityModeS);
@@ -217,9 +216,8 @@ public abstract class CaAddOrGenAction extends CaAction {
     entry.setMaxValidity(tmpMaxValidity);
 
     entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
-
-    if (cmpControlName != null) {
-      entry.setCmpControlName(cmpControlName);
+    if (cmpControl != null) {
+      entry.setCmpControl(new CmpControl(cmpControl));
     }
 
     int intPermission = ShellUtil.getPermission(permissions);

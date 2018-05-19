@@ -21,13 +21,6 @@
     <property name="token.type">REPLACEME_TOKEN_TYPE</property>
     <property name="ca.signerConf">REPLACEME_CA_SIGNERCONF</property>
   </properties>
-  <cmpcontrols>
-    <cmpcontrol name="cmpcontrol1">
-      <conf>
-        <value>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</value>
-       </conf>
-    </cmpcontrol>
-  </cmpcontrols>
   <responders>
     <responder name="responder1">
       <type>pkcs12</type>
@@ -98,7 +91,7 @@
   <cas>
     <ca name="myca1">
       <caInfo>
-        <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+        <cmpcontrol>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</cmpcontrol>
         <crlsignerName>casign-crlsigner</crlsignerName>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>

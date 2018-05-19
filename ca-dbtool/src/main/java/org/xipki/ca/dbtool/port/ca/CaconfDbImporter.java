@@ -43,7 +43,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasRequestors;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cmpcontrols;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Environments;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
@@ -52,7 +51,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
-import org.xipki.ca.dbtool.jaxb.ca.CmpcontrolType;
 import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
 import org.xipki.ca.dbtool.jaxb.ca.EnvironmentType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
@@ -64,7 +62,6 @@ import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.Base64;
-import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -108,7 +105,6 @@ class CaconfDbImporter extends DbPorter {
 
     System.out.println("importing CA configuration to database");
     try {
-      importCmpcontrol(caconf.getCmpcontrols());
       importResponder(caconf.getResponders());
       importEnvironment(caconf.getEnvironments());
       importRequestor(caconf.getRequestors());
@@ -130,33 +126,6 @@ class CaconfDbImporter extends DbPorter {
     }
     System.out.println(" imported CA configuration to database");
   } // method importToDb
-
-  private void importCmpcontrol(Cmpcontrols controls) throws DataAccessException {
-    System.out.println("importing table CMPCONTROL");
-    final String sql = "INSERT INTO CMPCONTROL (NAME,CONF) VALUES (?,?)";
-
-    if (controls != null && CollectionUtil.isNonEmpty(controls.getCmpcontrol())) {
-      PreparedStatement ps = null;
-      try {
-        ps = prepareStatement(sql);
-
-        for (CmpcontrolType control : controls.getCmpcontrol()) {
-          try {
-            ps.setString(1, control.getName());
-            ps.setString(2, control.getConf());
-
-            ps.executeUpdate();
-          } catch (SQLException ex) {
-            System.err.println("could not import CMPCONTROL " + control.getName());
-            throw translate(sql, ex);
-          }
-        }
-      } finally {
-        releaseResources(ps, null);
-      }
-    }
-    System.out.println(" imported table CMPCONTROL");
-  } // method importCmpcontrol
 
   private void importResponder(Responders responders) throws DataAccessException, IOException {
     System.out.println("importing table RESPONDER");
@@ -359,7 +328,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println("importing table CA");
     String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
         + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
-        + "RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
+        + "RESPONDER_NAME,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
         + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -389,7 +358,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getSignerType());
           ps.setString(idx++, ca.getCrlsignerName());
           ps.setString(idx++, ca.getResponderName());
-          ps.setString(idx++, ca.getCmpcontrolName());
+          ps.setString(idx++, ca.getCmpcontrol());
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
           ps.setInt(idx++, ca.getSupportScep());

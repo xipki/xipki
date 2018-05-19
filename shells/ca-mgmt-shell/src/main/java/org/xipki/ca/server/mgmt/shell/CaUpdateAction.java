@@ -38,7 +38,6 @@ import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter;
@@ -122,9 +121,8 @@ public class CaUpdateAction extends CaAction {
   private String responderName;
 
   @Option(name = "--cmp-control",
-      description = "CMP control name or 'null'")
-  @Completion(CmpControlNamePlusNullCompleter.class)
-  private String cmpControlName;
+      description = "CMP control or 'null'")
+  private String cmpControl;
 
   @Option(name = "--num-crls",
       description = "number of CRLs to be kept in database")
@@ -256,8 +254,8 @@ public class CaUpdateAction extends CaAction {
       entry.setCrlSignerName(crlSignerName);
     }
 
-    if (cmpControlName != null) {
-      entry.setCmpControlName(cmpControlName);
+    if (cmpControl != null) {
+      entry.setCmpControl(cmpControl);
     }
 
     if (responderName != null) {

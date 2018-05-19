@@ -22,13 +22,6 @@
   <xs:element name="caconf" type="caconfType"/>
   <xs:complexType name="caconfType">
     <xs:sequence>
-      <xs:element name="cmpcontrols">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="cmpcontrol" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="responders">
         <xs:complexType>
           <xs:sequence>
@@ -130,13 +123,6 @@
     </xs:sequence>
     <xs:attribute name="version" type="xs:int" use="required"/>
   </xs:complexType>
-  <xs:element name="cmpcontrol" type="cmpcontrolType"/>
-  <xs:complexType name="cmpcontrolType">
-    <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="conf" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
   <xs:element name="responder" type="responderType"/>
   <xs:complexType name="responderType">
     <xs:sequence>
@@ -207,7 +193,7 @@
       <xs:element name="signerConf" type="fileOrValueType"/>
       <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
-      <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpcontrol" type="xs:string" minOccurs="0"/>
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
       <xs:element name="supportScep" type="xs:int"/>

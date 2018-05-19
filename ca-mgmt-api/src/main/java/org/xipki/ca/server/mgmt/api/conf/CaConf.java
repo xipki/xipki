@@ -57,7 +57,7 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
@@ -70,7 +70,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CmpcontrolType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
@@ -110,8 +109,6 @@ public class CaConf {
   private static final String APP_DIR = "APP_DIR";
 
   private final Map<String, String> properties = new HashMap<>();
-
-  private final Map<String, CmpControlEntry> cmpControls = new HashMap<>();
 
   private final Map<String, ResponderEntry> responders = new HashMap<>();
 
@@ -257,14 +254,6 @@ public class CaConf {
       }
     }
 
-    // CMP controls
-    if (jaxb.getCmpcontrols() != null) {
-      for (CmpcontrolType m : jaxb.getCmpcontrols().getCmpcontrol()) {
-        CmpControlEntry en = new CmpControlEntry(m.getName(), getValue(m.getConf(), zipFile));
-        addCmpControl(en);
-      }
-    }
-
     // Responders
     if (jaxb.getResponders() != null) {
       for (ResponderType m : jaxb.getResponders().getResponder()) {
@@ -380,7 +369,7 @@ public class CaConf {
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile), caUris,
               numCrls, exprirationPeriod);
 
-          caEntry.setCmpControlName(ci.getCmpcontrolName());
+          caEntry.setCmpControl(new CmpControl(ci.getCmpcontrol()));
           caEntry.setCrlSignerName(ci.getCrlsignerName());
           caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
           caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
@@ -500,19 +489,6 @@ public class CaConf {
       }
     }
 
-  }
-
-  public void addCmpControl(CmpControlEntry cmpControl) {
-    ParamUtil.requireNonNull("cmpControl", cmpControl);
-    this.cmpControls.put(cmpControl.getName(), cmpControl);
-  }
-
-  public Set<String> getCmpControlNames() {
-    return Collections.unmodifiableSet(cmpControls.keySet());
-  }
-
-  public CmpControlEntry getCmpControl(String name) {
-    return cmpControls.get(ParamUtil.requireNonNull("name", name));
   }
 
   public void addResponder(ResponderEntry responder) {

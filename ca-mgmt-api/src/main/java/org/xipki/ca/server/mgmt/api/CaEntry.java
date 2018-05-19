@@ -57,7 +57,7 @@ public class CaEntry {
 
   private String signerConf;
 
-  private String cmpControlName;
+  private CmpControl cmpControl;
 
   private String responderName;
 
@@ -187,12 +187,12 @@ public class CaEntry {
     return signerType;
   }
 
-  public void setCmpControlName(String cmpControlName) {
-    this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toLowerCase();
+  public void setCmpControl(CmpControl cmpControl) {
+    this.cmpControl = cmpControl;
   }
 
-  public String getCmpControlName() {
-    return cmpControlName;
+  public CmpControl getCmpControl() {
+    return cmpControl;
   }
 
   public String getResponderName() {
@@ -298,7 +298,7 @@ public class CaEntry {
         "\nsignerType: ", signerType,
         "\nsignerConf: ", (signerConf == null ? "null" :
           InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\ncmpcontrolName: ", cmpControlName,
+        "\ncmpcontrol: ", cmpControl,
         "\nresponderName: ", responderName,
         "\nduplicateKey: ", duplicateKeyPermitted,
         "\nduplicateSubject: ", duplicateSubjectPermitted,
@@ -366,7 +366,7 @@ public class CaEntry {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(cmpControlName, obj.cmpControlName)) {
+    if (!CompareUtil.equalsObject(cmpControl, obj.cmpControl)) {
       return false;
     }
 

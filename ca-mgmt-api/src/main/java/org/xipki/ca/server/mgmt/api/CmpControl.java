@@ -62,7 +62,7 @@ public class CmpControl {
 
   private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
 
-  private final CmpControlEntry dbEntry;
+  private final String conf;
 
   private final boolean confirmCert;
 
@@ -86,10 +86,10 @@ public class CmpControl {
 
   private final CollectionAlgorithmValidator popoAlgoValidator;
 
-  public CmpControl(CmpControlEntry dbEntry) throws InvalidConfException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  public CmpControl(String conf) throws InvalidConfException {
+    ParamUtil.requireNonNull("conf", conf);
 
-    ConfPairs pairs = new ConfPairs(dbEntry.getConf());
+    ConfPairs pairs = new ConfPairs(conf);
     this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
     this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
     this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
@@ -125,14 +125,13 @@ public class CmpControl {
     algos = this.popoAlgoValidator.getAlgoNames();
     pairs.putPair(KEY_POPO_SIGALGO, algosAsString(algos));
 
-    this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
+    this.conf = pairs.getEncoded();
   } // constructor
 
-  public CmpControl(String name, Boolean confirmCert, Boolean sendCaCert,
+  public CmpControl(Boolean confirmCert, Boolean sendCaCert,
       Boolean messageTimeRequired, Boolean sendResponderCert, Boolean rrAkiRequired,
       Integer messageTimeBias, Integer confirmWaitTime, Boolean groupEnroll,
       Set<String> sigAlgos, Set<String> popoAlgos) throws InvalidConfException {
-    ParamUtil.requireNonBlank("name", name);
     if (confirmWaitTime != null) {
       ParamUtil.requireMin("confirmWaitTime", confirmWaitTime, 0);
     }
@@ -184,7 +183,7 @@ public class CmpControl {
       pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popoAlgoValidator.getAlgoNames()));
     }
 
-    this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
+    this.conf = pairs.getEncoded();
   } // constructor
 
   public boolean isMessageTimeRequired() {
@@ -231,25 +230,22 @@ public class CmpControl {
     return popoAlgoValidator;
   }
 
-  public CmpControlEntry getDbEntry() {
-    return dbEntry;
+  public String getConf() {
+    return conf;
   }
 
   @Override
   public String toString() {
-    String protAlgos = algosAsString(sigAlgoValidator.getAlgoNames());
-    String popoAlgos = algosAsString(popoAlgoValidator.getAlgoNames());
-    return StringUtil.concatObjectsCap(500, "name: ", dbEntry.getName(),
-        "\nconfirmCert: ", getYesNo(confirmCert),
-        "\nsendCaCert: ", getYesNo(sendCaCert),
-        "\nsendResponderCert: ", getYesNo(sendResponderCert),
-        "\nmessageTimeRequired: ", getYesNo(messageTimeRequired),
-        "\ngroupEnroll: ", getYesNo(groupEnroll),
-        "\nmessageTimeBias: ", messageTimeBias, " s",
-        "\nconfirmWaitTime: ", confirmWaitTime, " s",
-        "\nprotection algos: ", protAlgos,
-        "\npopo algos: ",  popoAlgos,
-        "\nconf: ", dbEntry.getConf());
+    return conf;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CmpControl)) {
+      return false;
+    }
+
+    return conf.equals(((CmpControl) obj).conf);
   }
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
@@ -264,10 +260,6 @@ public class CmpControl {
     int ret = StringUtil.isBlank(str) ? defaultValue : Integer.parseInt(str);
     pairs.putPair(key, Integer.toString(ret));
     return ret;
-  }
-
-  private static String getYesNo(boolean bo) {
-    return bo ? "yes" : "no";
   }
 
   private static String algosAsString(Set<String> algos) {
