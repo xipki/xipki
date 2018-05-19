@@ -189,28 +189,6 @@ if { $printUsage equals "true" } then {
   sleep 1
 
   echo "#################################################################"
-  echo "#                          Environment                          #"
-  echo "#################################################################"
-
-  ca:env-add --name qa-env1 --value value1
-
-  caqa:env-check --name qa-env1 --value value1
-
-  ca:env-up --name qa-env1 --value value2
-
-  caqa:env-check --name qa-env1 --value value2
-
-  # Environment name exists
-  caqa:neg-env-add --name qa-env1 --value value3
-
-  caqa:env-check --name qa-env1 --value value2
-
-  ca:env-rm qa-env1
-
-  # Environment name does not exist
-  caqa:neg-env-rm qa-env-not-exits
-
-  echo "#################################################################"
   echo "#                           Requestor                           #"
   echo "#################################################################"
   caqa:requestor-check --name requestor1 \
@@ -687,18 +665,6 @@ if { $printUsage equals "true" } then {
     --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:30
 
   ca:crlsigner-rm casign-crlsigner2
-
-  ##### env #####
-
-  env-add --name env2 --value value2
-
-  ca:env-info
-
-  ca:env-info env2
-
-  ca:env-up --name env2 --value value2-2
-
-  ca:env-rm env2
 
   ##### profile #####
 

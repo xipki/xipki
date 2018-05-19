@@ -46,7 +46,6 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
@@ -71,8 +70,6 @@ public abstract class BaseCertprofile extends Certprofile {
   private static final Logger LOG = LoggerFactory.getLogger(BaseCertprofile.class);
 
   private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
-
-  protected EnvParameterResolver envParameterResolver;
 
   protected BaseCertprofile() {
   }
@@ -229,11 +226,6 @@ public abstract class BaseCertprofile extends Certprofile {
     X500Name grantedSubject = new X500Name(rdns.toArray(new RDN[0]));
     return new SubjectInfo(grantedSubject, null);
   } // method getSubject
-
-  @Override
-  public void setEnvParameterResolver(EnvParameterResolver envParameterResolver) {
-    this.envParameterResolver = envParameterResolver;
-  }
 
   @Override
   public boolean incSerialNumberIfSubjectExists() {

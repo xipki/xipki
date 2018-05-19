@@ -43,7 +43,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Environments;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
@@ -51,7 +50,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
-import org.xipki.ca.dbtool.jaxb.ca.EnvironmentType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
@@ -91,7 +89,6 @@ class CaconfDbExporter extends DbPorter {
     System.out.println("exporting CA configuration from database");
 
     exportResponder(caconf);
-    exportEnvironment(caconf);
     exportCrlsigner(caconf);
     exportRequestor(caconf);
     exportUser(caconf);
@@ -114,33 +111,6 @@ class CaconfDbExporter extends DbPorter {
 
     System.out.println(" exported CA configuration from database");
   }
-
-  private void exportEnvironment(CaconfType caconf) throws DataAccessException {
-    System.out.println("exporting table ENVIRONMENT");
-    Environments environments = new Environments();
-    final String sql = "SELECT NAME,VALUE2 FROM ENVIRONMENT";
-
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
-
-      while (rs.next()) {
-        EnvironmentType environment = new EnvironmentType();
-        environment.setName(rs.getString("NAME"));
-        environment.setValue(rs.getString("VALUE2"));
-        environments.getEnvironment().add(environment);
-      }
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(stmt, rs);
-    }
-
-    caconf.setEnvironments(environments);
-    System.out.println(" exported table ENVIRONMENT");
-  } // method exportEnvironment
 
   private void exportCrlsigner(CaconfType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table CRLSIGNER");

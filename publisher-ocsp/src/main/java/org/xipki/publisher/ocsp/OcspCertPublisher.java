@@ -29,7 +29,6 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -52,9 +51,6 @@ import org.xipki.security.util.X509Util;
 public class OcspCertPublisher extends CertPublisher {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspCertPublisher.class);
-
-  @SuppressWarnings("unused")
-  private EnvParameterResolver envParameterResolver;
 
   private OcspStoreQueryExecutor queryExecutor;
 
@@ -98,11 +94,6 @@ public class OcspCertPublisher extends CertPublisher {
       throw new CertPublisherException(ex.getMessage(), ex);
     }
   } // method initialize
-
-  @Override
-  public void setEnvParameterResolver(EnvParameterResolver parameterResolver) {
-    this.envParameterResolver = parameterResolver;
-  }
 
   @Override
   public boolean caAdded(X509Cert issuer) {

@@ -112,8 +112,6 @@ public class CaConf {
 
   private final Map<String, ResponderEntry> responders = new HashMap<>();
 
-  private final Map<String, String> environments = new HashMap<>();
-
   private final Map<String, CrlSignerEntry> crlSigners = new HashMap<>();
 
   private final Map<String, RequestorEntry> requestors = new HashMap<>();
@@ -260,13 +258,6 @@ public class CaConf {
         ResponderEntry en = new ResponderEntry(m.getName(), expandConf(m.getType()),
             getValue(m.getConf(), zipFile), getBase64Binary(m.getCert(), zipFile));
         addResponder(en);
-      }
-    }
-
-    // Environments
-    if (jaxb.getEnvironments() != null) {
-      for (NameValueType m : jaxb.getEnvironments().getEnvironment()) {
-        addEnvironment(m.getName(), expandConf(m.getValue()));
       }
     }
 
@@ -502,20 +493,6 @@ public class CaConf {
 
   public ResponderEntry getResponder(String name) {
     return responders.get(ParamUtil.requireNonNull("name", name));
-  }
-
-  public void addEnvironment(String name, String value) {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonBlank("value", value);
-    this.environments.put(name, value);
-  }
-
-  public Set<String> getEnvironmentNames() {
-    return Collections.unmodifiableSet(environments.keySet());
-  }
-
-  public String getEnvironment(String name) {
-    return environments.get(ParamUtil.requireNonNull("name", name));
   }
 
   public void addCrlSigner(CrlSignerEntry crlSigner) {

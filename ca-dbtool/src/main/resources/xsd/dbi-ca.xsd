@@ -29,13 +29,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="environments">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="environment" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="crlsigners">
         <xs:complexType>
           <xs:sequence>
@@ -130,13 +123,6 @@
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="environment" type="environmentType"/>
-  <xs:complexType name="environmentType">
-    <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="value" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="crlsigner" type="crlsignerType"/>

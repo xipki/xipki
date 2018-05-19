@@ -489,47 +489,6 @@ public interface CaManager {
    */
   void changePublisher(String name, String type, String conf) throws CaMgmtException;
 
-  Set<String> getEnvParamNames();
-
-  /**
-   * Gets the value the environment parameter {@code name}.
-   * @param name
-   *          Environment name. Must not be {@code null}.
-   * @return the value the environment parameter.
-   */
-  String getEnvParam(String name);
-
-  /**
-   * Adds a environment parameter.
-   * @param name
-   *          Environment name. Must not be {@code null}.
-   * @param value
-   *          Environment value. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void addEnvParam(String name, String value) throws CaMgmtException;
-
-  /**
-   * Removes the environment parameter {@code envParamName}.
-   * @param envParamName
-   *          Environment name. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void removeEnvParam(String envParamName) throws CaMgmtException;
-
-  /**
-   * Changes the environment parameter {@code name}.
-   * @param name
-   *          name of the environment to be changed. Must not be {@code null}.
-   * @param value
-   *          Environment value to be changed. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void changeEnvParam(String name, String value) throws CaMgmtException;
-
   /**
    * Revokes the CA {@code caName}.
    * @param caName

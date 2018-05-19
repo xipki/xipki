@@ -28,7 +28,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -72,7 +71,6 @@ import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.Base64;
-import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
@@ -261,28 +259,6 @@ class CaManagerQueryExecutor {
     deleteSystemEvent(systemEvent.getName());
     addSystemEvent(systemEvent);
   }
-
-  Map<String, String> createEnvParameters() throws CaMgmtException {
-    Map<String, String> map = new HashMap<>();
-    final String sql = "SELECT NAME,VALUE2 FROM ENVIRONMENT";
-    Statement stmt = null;
-    ResultSet rs = null;
-
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
-
-      while (rs.next()) {
-        map.put(rs.getString("NAME"), rs.getString("VALUE2"));
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(stmt, rs);
-    }
-
-    return map;
-  } // method createEnvParameters
 
   Map<String, Integer> createCaAliases() throws CaMgmtException {
     Map<String, Integer> map = new HashMap<>();
@@ -656,14 +632,6 @@ class CaManagerQueryExecutor {
 
   private boolean deleteRowWithName(String name, String table, boolean force)
       throws CaMgmtException {
-    if (!force) {
-      if ("ENVIRONMENT".equalsIgnoreCase(table)) {
-        if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
-          throw new CaMgmtException("environment " + name + " is reserved");
-        }
-      }
-    }
-
     final String sql = concat("DELETE FROM ", table, " WHERE NAME=?");
     PreparedStatement ps = null;
     try {
@@ -979,44 +947,6 @@ class CaManagerQueryExecutor {
       datasource.releaseResources(ps, null);
     }
   } // method addCrlSigner
-
-  String setEpoch(Date time) throws CaMgmtException {
-    deleteRowWithName(CaManagerImpl.ENV_EPOCH, "ENVIRONMENT", true);
-    String envEpoch = DateUtil.toUtcTimeyyyyMMdd(time);
-    addEnvParam(CaManagerImpl.ENV_EPOCH, envEpoch, true);
-    return envEpoch;
-  }
-
-  void addEnvParam(String name, String value) throws CaMgmtException {
-    addEnvParam(name, value, false);
-  }
-
-  private void addEnvParam(String name, String value, boolean force) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonNull("value", value);
-    if (!force) {
-      if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
-        throw new CaMgmtException("environment " + name + " is reserved");
-      }
-    }
-    final String sql = "INSERT INTO ENVIRONMENT (NAME,VALUE2) VALUES (?,?)";
-
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setString(1, name);
-      ps.setString(2, value);
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add environment param " + name);
-      }
-
-      LOG.info("added environment param '{}': {}", name, value);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method addEnvParam
 
   void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
@@ -1458,17 +1388,6 @@ class CaManagerQueryExecutor {
         col(COLL_STRING, "PROFILES", certProfiles), col(STRING, "CONTROL", control));
     return scep;
   } // method changeScep
-
-  void changeEnvParam(String name, String value) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonNull("value", value);
-
-    if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
-      throw new CaMgmtException(concat("environment ", name, " is reserved"));
-    }
-
-    changeIfNotNull("ENVIRONMENT", col(STRING, "NAME", name), col(STRING, "VALUE2", value));
-  } // method changeEnvParam
 
   IdentifiedCertPublisher changePublisher(String name, String type, String conf,
       CaManagerImpl caManager) throws CaMgmtException {

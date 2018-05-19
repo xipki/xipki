@@ -88,13 +88,6 @@
       <!-- CONTROL is reserved for future, will currently not be used -->
       <column name="CONTROL" type="VARCHAR(400)"/>
     </createTable>
-    <!-- table ENVIRONMENT -->
-    <createTable tableName="ENVIRONMENT">
-      <column name="NAME" type="VARCHAR(45)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="VALUE2" type="VARCHAR(200)"/>
-    </createTable>
     <!-- table CRLSIGNER -->
     <createTable tableName="CRLSIGNER">
       <column name="NAME" type="VARCHAR(45)">

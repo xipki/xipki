@@ -480,22 +480,6 @@ Feature xipki-camgmt-shell (started by default)
 
      update CRL signer
 
-   * `ca:env-add`
-
-     add CA environment parameter
-
-   * `ca:env-info`
-
-     show information of CA environment parameter
-
-   * `ca:env-rm`
-
-     remove CA environment parameter
-
-   * `ca:env-up`
-
-     update CA environment parameter
-
    * `ca:profile-add`
 
      add certificate profile

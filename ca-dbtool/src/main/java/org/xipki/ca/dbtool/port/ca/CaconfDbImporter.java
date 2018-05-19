@@ -44,7 +44,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Environments;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
@@ -52,7 +51,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
-import org.xipki.ca.dbtool.jaxb.ca.EnvironmentType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
@@ -106,7 +104,6 @@ class CaconfDbImporter extends DbPorter {
     System.out.println("importing CA configuration to database");
     try {
       importResponder(caconf.getResponders());
-      importEnvironment(caconf.getEnvironments());
       importRequestor(caconf.getRequestors());
       importUser(caconf.getUsers());
       importPublisher(caconf.getPublishers());
@@ -161,28 +158,6 @@ class CaconfDbImporter extends DbPorter {
 
     System.out.println(" imported table RESPONDER");
   } // method importResponder
-
-  private void importEnvironment(Environments environments) throws DataAccessException {
-    System.out.println("importing table ENVIRONMENT");
-    final String sql = "INSERT INTO ENVIRONMENT (NAME,VALUE2) VALUES (?,?)";
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      for (EnvironmentType environment : environments.getEnvironment()) {
-        try {
-          ps.setString(1, environment.getName());
-          ps.setString(2, environment.getValue());
-          ps.executeUpdate();
-        } catch (SQLException ex) {
-          System.err.println("could not import ENVIRONMENT with NAME=" + environment.getName());
-          throw translate(sql, ex);
-        }
-      }
-    } finally {
-      releaseResources(ps, null);
-    }
-    System.out.println(" imported table ENVIRONMENT");
-  } // method importEnvironment
 
   private void importCrlsigner(Crlsigners crlsigners) throws DataAccessException, IOException {
     System.out.println("importing table CRLSIGNER");

@@ -67,8 +67,6 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
-import org.xipki.ca.api.DfltEnvParameterResolver;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
@@ -134,7 +132,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.NameValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfilesType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
@@ -320,8 +317,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
-  private final DfltEnvParameterResolver envParameterResolver = new DfltEnvParameterResolver();
-
   private ScheduledThreadPoolExecutor persistentScheduledThreadPoolExecutor;
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
@@ -351,8 +346,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   private boolean crlSignersInitialized;
 
   private boolean casInitialized;
-
-  private boolean environmentParametersInitialized;
 
   private boolean scepsInitialized;
 
@@ -518,29 +511,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
 
-    initEnvironmentParamters();
-    String envEpoch = envParameterResolver.getParameter(ENV_EPOCH);
-
     if (masterMode) {
       lockCa(true);
 
-      if (envEpoch == null) {
-        final long day = 24L * 60 * 60 * 1000;
-        envEpoch = queryExecutor.setEpoch(new Date(System.currentTimeMillis() - day));
-        LOG.info("set environment {} to {}", ENV_EPOCH, envEpoch);
-      }
-
       queryExecutor.addRequestorIfNeeded(RequestorInfo.NAME_BY_CA);
       queryExecutor.addRequestorIfNeeded(RequestorInfo.NAME_BY_USER);
-    } else {
-      if (envEpoch == null) {
-        throw new CaMgmtException("The CA system must be started first with ca.mode = master");
-      }
     }
 
-    LOG.info("use EPOCH: {}", envEpoch);
-    long epoch = DateUtil.parseUtcTimeyyyyMMdd(envEpoch).getTime();
-
+    long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
     try {
@@ -623,7 +601,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     publishersInitialized = false;
     crlSignersInitialized = false;
     casInitialized = false;
-    environmentParametersInitialized = false;
     scepsInitialized = false;
 
     shutdownScheduledThreadPoolExecutor();
@@ -1018,20 +995,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
     responderInitialized = true;
   } // method initResponders
-
-  private void initEnvironmentParamters() throws CaMgmtException {
-    if (environmentParametersInitialized) {
-      return;
-    }
-
-    Map<String, String> map = queryExecutor.createEnvParameters();
-    envParameterResolver.clear();
-    for (String name : map.keySet()) {
-      envParameterResolver.addParameter(name, map.get(name));
-    }
-
-    environmentParametersInitialized = true;
-  } // method initEnvironmentParamters
 
   private void initCaAliases() throws CaMgmtException {
     if (caAliasesInitialized) {
@@ -1931,62 +1894,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     publishers.put(name, publisher);
   } // method changePublisher
 
-  public EnvParameterResolver getEnvParameterResolver() {
-    return envParameterResolver;
-  }
-
-  @Override
-  public Set<String> getEnvParamNames() {
-    return envParameterResolver.allParameterNames();
-  }
-
-  @Override
-  public String getEnvParam(String name) {
-    ParamUtil.requireNonBlank("name", name);
-    return envParameterResolver.getParameter(name);
-  }
-
-  @Override
-  public void addEnvParam(String name, String value) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonBlank("value", value);
-    asssertMasterMode();
-    if (envParameterResolver.getParameter(name) != null) {
-      throw new CaMgmtException(concat("Environment named ", name, " exists"));
-    }
-
-    queryExecutor.addEnvParam(name, value);
-    envParameterResolver.addParameter(name, value);
-  }
-
-  @Override
-  public void removeEnvParam(String name) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    asssertMasterMode();
-    boolean bo = queryExecutor.deleteRowWithName(name, "ENVIRONMENT");
-    if (!bo) {
-      throw new CaMgmtException("unknown environment param " + name);
-    }
-
-    LOG.info("removed environment param '{}'", name);
-    envParameterResolver.removeParamater(name);
-  }
-
-  @Override
-  public void changeEnvParam(String name, String value) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonNull("value", value);
-    asssertMasterMode();
-    assertNotNull("value", value);
-
-    if (envParameterResolver.getParameter(name) == null) {
-      throw new CaMgmtException(concat("could not find environment paramter ", name));
-    }
-
-    queryExecutor.changeEnvParam(name, value);
-    envParameterResolver.addParameter(name, value);
-  } // method changeEnvParam
-
   public Properties getCaConfProperties() {
     return caConfProperties;
   }
@@ -2569,7 +2476,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     try {
       Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(type);
       IdentifiedCertprofile ret = new IdentifiedCertprofile(dbEntry, profile);
-      ret.setEnvParameterResolver(envParameterResolver);
       ret.validate();
       return ret;
     } catch (ObjectCreationException | CertprofileException ex) {
@@ -2760,12 +2666,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return (scepDbEntries == null) ? null : Collections.unmodifiableSet(scepDbEntries.keySet());
   }
 
-  private static void assertNotNull(String parameterName, String parameterValue) {
-    if (CaManager.NULL.equalsIgnoreCase(parameterValue)) {
-      throw new IllegalArgumentException(concat(parameterName, " must not be ", CaManager.NULL));
-    }
-  }
-
   static String canonicalizeSignerConf(String keystoreType, String signerConf,
       X509Certificate[] certChain, SecurityFactory securityFactory) throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
@@ -2870,30 +2770,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         LOG.info("added CMP responder {}", name);
       } catch (CaMgmtException ex) {
         String msg = concat("could not add CMP responder ", name);
-        LogUtil.error(LOG, ex, msg);
-        throw new CaMgmtException(msg);
-      }
-    }
-
-    // Environment
-    for (String name : conf.getEnvironmentNames()) {
-      String entry = conf.getEnvironment(name);
-      String entryB = envParameterResolver.getParameter(name);
-      if (entryB != null) {
-        if (entry.equals(entryB)) {
-          LOG.info("ignore existed environment parameter {}", name);
-          continue;
-        } else {
-          String msg = concat("environment parameter ", name, " existed, could not re-added it");
-          throw logAndCreateException(msg);
-        }
-      }
-
-      try {
-        addEnvParam(name, entry);
-        LOG.info("could not add environment parameter {}", name);
-      } catch (CaMgmtException ex) {
-        String msg = concat("could not add environment parameter ", name);
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -3435,29 +3311,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       // clear the users if the list is empty
       if (users.isEmpty()) {
         root.setUsers(null);
-      }
-
-      // environments
-      Set<String> names = envParameterResolver.allParameterNames();
-      if (CollectionUtil.isNonEmpty(names)) {
-        List<NameValueType> list = new LinkedList<>();
-
-        for (String name : names) {
-          if (ENV_EPOCH.equalsIgnoreCase(name)) {
-            continue;
-          }
-
-          NameValueType jaxb = new NameValueType();
-          jaxb.setName(name);
-          jaxb.setValue(envParameterResolver.getParameter(name));
-
-          list.add(jaxb);
-        }
-
-        if (!list.isEmpty()) {
-          root.setEnvironments(new CaconfType.Environments());
-          root.getEnvironments().getEnvironment().addAll(list);
-        }
       }
 
       // crlsigners

@@ -45,13 +45,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="environments" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="environment" type="nameValueType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="crlsigners" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

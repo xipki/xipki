@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
@@ -57,14 +56,6 @@ public abstract class CertPublisher {
   public abstract boolean publishsGoodCert();
 
   public abstract boolean isAsyn();
-
-  /**
-   * Sets the {{@link EnvParameterResolver}.
-   *
-   * @param parameterResolver
-   *          Parameter resolver. Could be {@code null}.
-   */
-  public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
   /**
    * Publishes the certificate of the CA.

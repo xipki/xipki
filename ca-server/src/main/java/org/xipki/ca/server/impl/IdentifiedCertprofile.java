@@ -52,7 +52,6 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.AuthorityInfoAccessControl;
@@ -173,12 +172,6 @@ class IdentifiedCertprofile {
 
   public List<String> getSignatureAlgorithms() {
     return certprofile.getSignatureAlgorithms();
-  }
-
-  public void setEnvParameterResolver(EnvParameterResolver envParameterResolver) {
-    if (certprofile != null) {
-      certprofile.setEnvParameterResolver(envParameterResolver);
-    }
   }
 
   public Date getNotBefore(Date notBefore) {

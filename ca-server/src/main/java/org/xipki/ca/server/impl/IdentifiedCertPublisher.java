@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
@@ -54,10 +53,6 @@ class IdentifiedCertPublisher {
   public void initialize(PasswordResolver passwordResolver,
       Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
     certPublisher.initialize(entry.getConf(), passwordResolver, datasources);
-  }
-
-  public void setEnvParameterResolver(EnvParameterResolver parameterResolver) {
-    certPublisher.setEnvParameterResolver(parameterResolver);
   }
 
   public boolean caAdded(X509Cert caCert) {

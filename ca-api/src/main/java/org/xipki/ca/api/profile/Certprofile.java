@@ -29,7 +29,6 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
-import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.PublicCaInfo;
 
 /**
@@ -142,14 +141,6 @@ public abstract class Certprofile {
   public abstract Set<KeyUsageControl> getKeyUsage();
 
   public abstract Integer getPathLenBasicConstraint();
-
-  /**
-   * Sets the {{@link EnvParameterResolver}.
-   *
-   * @param parameterResolver
-   *          Parameter resolver. Could be {@code null}.
-   */
-  public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
   /**
    * Checks and gets the granted NotBefore.
