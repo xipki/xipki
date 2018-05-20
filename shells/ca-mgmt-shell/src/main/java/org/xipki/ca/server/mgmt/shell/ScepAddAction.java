@@ -28,7 +28,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.password.PasswordResolver;
@@ -59,7 +59,7 @@ public class ScepAddAction extends CaAction {
 
   @Option(name = "--responder", required = true,
       description = "Responder name\n(required)")
-  @Completion(ResponderNameCompleter.class)
+  @Completion(SignerNameCompleter.class)
   private String responderName;
 
   @Option(name = "--control",

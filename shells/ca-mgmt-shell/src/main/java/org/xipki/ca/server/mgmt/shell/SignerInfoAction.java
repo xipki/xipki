@@ -27,8 +27,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
-import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -37,18 +37,18 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "responder-info",
-    description = "show information of responder")
+@Command(scope = "ca", name = "signer-info",
+    description = "show information of signer")
 @Service
-public class ResponderInfoAction extends CaAction {
+public class SignerInfoAction extends CaAction {
 
   @Argument(index = 0, name = "name",
-      description = "responder name")
-  @Completion(ResponderNameCompleter.class)
+      description = "signer name")
+  @Completion(SignerNameCompleter.class)
   private String name;
 
   @Option(name = "--verbose", aliases = "-v",
-      description = "show responder information verbosely")
+      description = "show signer information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
   @Override
@@ -56,13 +56,13 @@ public class ResponderInfoAction extends CaAction {
     StringBuilder sb = new StringBuilder();
 
     if (name == null) {
-      Set<String> names = caManager.getResponderNames();
+      Set<String> names = caManager.getSignerNames();
       int size = names.size();
 
       if (size == 0 || size == 1) {
-        sb.append((size == 0) ? "no" : "1").append(" responder is configured\n");
+        sb.append((size == 0) ? "no" : "1").append(" signer is configured\n");
       } else {
-        sb.append(size).append(" responders are configured:\n");
+        sb.append(size).append(" signers are configured:\n");
       }
 
       List<String> sorted = new ArrayList<>(names);
@@ -72,9 +72,9 @@ public class ResponderInfoAction extends CaAction {
         sb.append("\t").append(entry).append("\n");
       }
     } else {
-      ResponderEntry entry = caManager.getResponder(name);
+      SignerEntry entry = caManager.getSigner(name);
       if (entry == null) {
-        throw new CmdFailure("could not find CMP responder '" + name + "'");
+        throw new CmdFailure("could not find signer " + name);
       } else {
         sb.append(entry.toString(verbose));
       }

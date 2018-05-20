@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.qa.shell;
 
-import java.util.Set;
-
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.SignererAddAction;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * TODO.
@@ -27,11 +28,22 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
+@Command(scope = "caqa", name = "neg-signer-add",
+    description = "add signer (negative, QA)")
 @Service
-public class ResponderNameCompleter extends MgmtNameCompleter {
+public class NegSignerAddAction extends SignererAddAction {
 
   @Override
-  protected Set<String> getEnums() {
-    return caManager.getResponderNames();
+  protected Object execute0() throws Exception {
+    println("neg-signer-add");
+
+    try {
+      super.execute0();
+    } catch (Exception ex) {
+      return null;
+    }
+
+    throw new CmdFailure("exception expected, but received none");
   }
+
 }

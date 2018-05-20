@@ -38,17 +38,10 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="responders" minOccurs="0">
+      <xs:element name="signers" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="responder" type="responderType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="crlsigners" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="crlsigner" type="crlsignerType" maxOccurs="unbounded"/>
+            <xs:element name="signer" type="signerType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -105,7 +98,7 @@
       </xs:annotation>
     </xs:attribute>
   </xs:complexType>
-  <xs:complexType name="responderType">
+  <xs:complexType name="signerType">
     <xs:all>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
@@ -119,15 +112,6 @@
         <xs:attribute name="name" type="xs:string" use="required"/>
       </xs:extension>
     </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="crlsignerType">
-    <xs:all>
-      <xs:element name="signerType" type="xs:string"/>
-      <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="signerCert" type="fileOrBinaryType" minOccurs="0"/>
-      <xs:element name="crlControl" type="xs:string"/>
-    </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="requestorType">
     <xs:all>
@@ -204,7 +188,6 @@
   <xs:complexType name="caInfoType">
     <xs:all>
       <!-- general CA configuration -->
-      <xs:element name="cmpcontrol" type="xs:string"/>
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0">
         <xs:annotation>
           <xs:documentation>If genSelfIssued is preset, only choice file is allowed and
@@ -224,7 +207,10 @@
       <xs:element name="keepExpiredCertDays" type="xs:int" minOccurs="0"/>
       <xs:element name="permission" type="xs:int"/>
       <xs:element name="maxValidity" type="xs:string"/>
+      <xs:element name="cmpControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlControl" type="xs:string" minOccurs="0"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlSignerName" type="xs:string" minOccurs="0"/>
       <xs:element name="supportRest" type="xs:boolean"/>
       <xs:element name="saveReq" type="xs:boolean"/>
       <xs:element name="signerType" type="xs:string"/>
@@ -235,8 +221,6 @@
           <xs:documentation>Valid values are strict, cutoff and lax. Default is strict</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <!-- X.509 specific CA configuration -->
-      <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
       <xs:element name="nextCrlNo" type="xs:long"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>

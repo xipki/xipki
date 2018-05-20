@@ -27,8 +27,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
-import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
@@ -43,48 +43,47 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "responder-up",
-    description = "update responder")
+@Command(scope = "ca", name = "signer-up",
+    description = "update signer")
 @Service
-public class ResponderUpdateAction extends CaAction {
+public class SignerUpdateAction extends CaAction {
 
   @Reference
   protected PasswordResolver passwordResolver;
 
   @Option(name = "--name", aliases = "-n", required = true,
-      description = "responder name\n(required)")
-  @Completion(ResponderNameCompleter.class)
+      description = "signer name\n(required)")
+  @Completion(SignerNameCompleter.class)
   protected String name;
 
-  @Option(name = "--signer-type",
-      description = "type of the responder signer")
+  @Option(name = "--type",
+      description = "type of the signer")
   @Completion(SignerTypeCompleter.class)
-  protected String signerType;
+  protected String type;
 
   @Option(name = "--cert",
       description = "requestor certificate file or 'null'")
   @Completion(FileCompleter.class)
   protected String certFile;
 
-  @Option(name = "--signer-conf",
-      description = "conf of the responder signer or 'null'")
-  private String signerConf;
+  @Option(name = "--conf",
+      description = "conf of the signer or 'null'")
+  private String conf;
 
   protected String getSignerConf() throws Exception {
-    if (signerConf == null) {
-      return signerConf;
+    if (conf == null) {
+      return null;
     }
-    String tmpSignerType = signerType;
-    if (tmpSignerType == null) {
-      ResponderEntry entry = caManager.getResponder(name);
+    String tmpType = type;
+    if (tmpType == null) {
+      SignerEntry entry = caManager.getSigner(name);
       if (entry == null) {
-        throw new IllegalCmdParamException("please specify the signerType");
+        throw new IllegalCmdParamException("please specify the type");
       }
-      tmpSignerType = entry.getType();
+      tmpType = entry.getType();
     }
 
-    return ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf, passwordResolver,
-        securityFactory);
+    return ShellUtil.canonicalizeSignerConf(tmpType, conf, passwordResolver, securityFactory);
   }
 
   @Override
@@ -98,9 +97,9 @@ public class ResponderUpdateAction extends CaAction {
       cert = Base64.encodeToString(certBytes);
     }
 
-    String msg = "CMP responder " + name;
+    String msg = "signer " + name;
     try {
-      caManager.changeResponder(name, signerType, getSignerConf(), cert);
+      caManager.changeSigner(name, type, getSignerConf(), cert);
       println("updated " + msg);
       return null;
     } catch (CaMgmtException ex) {

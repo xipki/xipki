@@ -37,6 +37,7 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -230,8 +231,8 @@ public class X509Ca {
 
     @Override
     public void run() {
-      CrlSignerEntryWrapper crlSigner = getCrlSigner();
-      if (crlSigner == null || crlSigner.getCrlControl().getUpdateMode() != UpdateMode.interval) {
+      CrlControl crlControl = caInfo.getCrlControl();
+      if (crlControl == null || crlControl.getUpdateMode() != UpdateMode.interval) {
         return;
       }
 
@@ -257,7 +258,7 @@ public class X509Ca {
       long minSinceCrlBaseTime = (thisUpdate.getTime() - caInfo.getCrlBaseTime().getTime())
           / MS_PER_MINUTE;
 
-      CrlControl control = getCrlSigner().getCrlControl();
+      CrlControl control = caInfo.getCrlControl();
       int interval;
 
       if (control.getIntervalMinutes() != null && control.getIntervalMinutes() > 0) {
@@ -462,11 +463,16 @@ public class X509Ca {
       }
     }
 
-    CrlSignerEntryWrapper crlSigner = getCrlSigner();
-    if (crlSigner != null) {
-      // CA signs the CRL
-      if (caManager.getCrlSignerWrapper(caInfo.getCrlSignerName()) == null
-          && !X509Util.hasKeyusage(caCert.getCert(), KeyUsage.cRLSign)) {
+    if (caInfo.getCrlControl() != null) {
+      X509Certificate crlSignerCert;
+      if (caInfo.getCrlSignerName() != null) {
+        crlSignerCert = getCrlSigner().getDbEntry().getCertificate();
+      } else {
+        // CA signs the CRL
+        crlSignerCert = caCert.getCert();
+      }
+
+      if (!X509Util.hasKeyusage(crlSignerCert, KeyUsage.cRLSign)) {
         final String msg = "CRL signer does not have keyusage cRLSign";
         LOG.error(msg);
         throw new OperationException(SYSTEM_FAILURE, msg);
@@ -665,8 +671,7 @@ public class X509Ca {
   } // method cleanupCrls
 
   public X509CRL generateCrlOnDemand(String msgId) throws OperationException {
-    CrlSignerEntryWrapper crlSigner = getCrlSigner();
-    if (crlSigner == null) {
+    if (caInfo.getCrlControl() == null) {
       throw new OperationException(NOT_PERMITTED, "CA could not generate CRL");
     }
 
@@ -714,8 +719,8 @@ public class X509Ca {
 
   private X509CRL generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
       AuditEvent event, String msgId) throws OperationException {
-    CrlSignerEntryWrapper crlSigner = getCrlSigner();
-    if (crlSigner == null) {
+    CrlControl control = caInfo.getCrlControl();
+    if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CRL generation is not allowed");
     }
 
@@ -734,22 +739,14 @@ public class X509Ca {
       }
     }
 
-    CrlControl crlControl = crlSigner.getCrlControl();
     boolean successful = false;
 
     try {
-      ConcurrentContentSigner tmpCrlSigner = crlSigner.getSigner();
-      CrlControl control = crlSigner.getCrlControl();
+      SignerEntryWrapper crlSigner = getCrlSigner();
 
-      boolean indirectCrl;
-      X500Name crlIssuer;
-      if (tmpCrlSigner == null) {
-        indirectCrl = false;
-        crlIssuer = caInfo.getPublicCaInfo().getX500Subject();
-      } else {
-        indirectCrl = true;
-        crlIssuer = tmpCrlSigner.getBcCertificate().getSubject();
-      }
+      boolean indirectCrl = (crlSigner != null);
+      X500Name crlIssuer = indirectCrl ? crlSigner.getSubjectAsX500Name()
+          : caInfo.getPublicCaInfo().getX500Subject();
 
       X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
       if (nextUpdate != null) {
@@ -800,6 +797,7 @@ public class X509Ca {
       Collections.sort(allRevInfos);
 
       boolean isFirstCrlEntry = true;
+      CrlControl crlControl = caInfo.getCrlControl();
 
       for (CertRevInfoWithSerial revInfo : allRevInfos) {
         CrlReason reason = revInfo.getReason();
@@ -870,7 +868,8 @@ public class X509Ca {
 
       try {
         // AuthorityKeyIdentifier
-        byte[] akiValues = indirectCrl ? crlSigner.getSubjectKeyIdentifier()
+        byte[] akiValues = indirectCrl
+            ? X509Util.extractSki(crlSigner.getSigner().getCertificate())
             : caInfo.getPublicCaInfo().getSubjectKeyIdentifer();
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
         crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
@@ -898,15 +897,15 @@ public class X509Ca {
               caInfo.getPublicCaInfo().getX500Subject(), crlIssuer);
           crlBuilder.addExtension(Extension.freshestCRL, false, cdp);
         }
-      } catch (CertIOException ex) {
+      } catch (CertIOException | CertificateEncodingException ex) {
         LogUtil.error(LOG, ex, "crlBuilder.addExtension");
         throw new OperationException(INVALID_EXTENSION, ex);
       }
 
       addXipkiCertset(crlBuilder, deltaCrl, control, notExpireAt, onlyCaCerts, onlyUserCerts);
 
-      ConcurrentContentSigner concurrentSigner = (tmpCrlSigner == null)
-          ? caInfo.getSigner(null) : tmpCrlSigner;
+      ConcurrentContentSigner concurrentSigner = (crlSigner == null)
+          ? caInfo.getSigner(null) : crlSigner.getSigner();
 
       ConcurrentBagEntrySigner signer0;
       try {
@@ -1548,12 +1547,11 @@ public class X509Ca {
   } // doUnrevokeCertificate
 
   private boolean shouldPublishToDeltaCrlCache() {
-    CrlSignerEntryWrapper crlSigner = getCrlSigner();
-    if (crlSigner == null) {
+    CrlControl control = caInfo.getCrlControl();
+    if (control == null) {
       return false;
     }
 
-    CrlControl control = crlSigner.getCrlControl();
     if (control.getUpdateMode() == UpdateMode.onDemand) {
       return false;
     }
@@ -1741,8 +1739,7 @@ public class X509Ca {
 
     boolean successful = false;
     try {
-      CertificateInfo ret = generateCert0(gct, requestor,
-          keyUpdate, reqType, transactionId, event);
+      CertificateInfo ret = generateCert0(gct, requestor, keyUpdate, reqType, transactionId, event);
       successful = (ret != null);
       return ret;
     } finally {
@@ -1796,8 +1793,9 @@ public class X509Ca {
       CertificateInfo ret;
 
       try {
-        CrlSignerEntryWrapper crlSigner = getCrlSigner();
-        X509Certificate crlSignerCert = (crlSigner == null) ? null : crlSigner.getCert();
+        SignerEntryWrapper crlSigner = getCrlSigner();
+        X509Certificate crlSignerCert = (crlSigner == null)
+            ? null : crlSigner.getSigner().getCertificate();
 
         ExtensionValues extensionTuples = certprofile.getExtensions(gct.requestedSubject,
             gct.grantedSubject, gct.extensions, gct.grantedPublicKey, caInfo.getPublicCaInfo(),
@@ -2232,7 +2230,7 @@ public class X509Ca {
 
   private Date getCrlNextUpdate(Date thisUpdate) {
     ParamUtil.requireNonNull("thisUpdate", thisUpdate);
-    CrlControl control = getCrlSigner().getCrlControl();
+    CrlControl control = caInfo.getCrlControl();
     if (control.getUpdateMode() != UpdateMode.interval) {
       return null;
     }
@@ -2410,7 +2408,7 @@ public class X509Ca {
     databaseHealth.setHealthy(databaseHealthy);
     result.addChildCheck(databaseHealth);
 
-    CrlSignerEntryWrapper crlSigner = getCrlSigner();
+    SignerEntryWrapper crlSigner = getCrlSigner();
     if (crlSigner != null && crlSigner.getSigner() != null) {
       boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
       healthy &= crlSignerHealthy;
@@ -2473,11 +2471,17 @@ public class X509Ca {
     }
   } // method verifySignature
 
-  private CrlSignerEntryWrapper getCrlSigner() {
+  private SignerEntryWrapper getCrlSigner() {
+    if (caInfo.getCrlControl() == null) {
+      return null;
+    }
+
     String crlSignerName = caInfo.getCrlSignerName();
-    CrlSignerEntryWrapper crlSigner = (crlSignerName == null) ? null
-        : caManager.getCrlSignerWrapper(crlSignerName);
-    return crlSigner;
+    if (crlSignerName == null) {
+      return null;
+    }
+
+    return caManager.getSignerWrapper(crlSignerName);
   }
 
   public NameId getCaIdent() {

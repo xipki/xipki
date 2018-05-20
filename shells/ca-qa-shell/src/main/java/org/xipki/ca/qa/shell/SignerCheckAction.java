@@ -22,8 +22,8 @@ import java.util.Arrays;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
-import org.xipki.ca.server.mgmt.shell.ResponderUpdateAction;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
+import org.xipki.ca.server.mgmt.shell.SignerUpdateAction;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -34,18 +34,18 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "responder-check",
-    description = "check information of responder (QA)")
+@Command(scope = "caqa", name = "signer-check",
+    description = "check information of signer (QA)")
 @Service
-public class ResponderCheckAction extends ResponderUpdateAction {
+public class SignerCheckAction extends SignerUpdateAction {
 
   @Override
   protected Object execute0() throws Exception {
-    println("checking responder " + name);
+    println("checking signer " + name);
 
-    ResponderEntry cr = caManager.getResponder(name);
+    SignerEntry cr = caManager.getSigner(name);
     if (cr == null) {
-      throw new CmdFailure("responder named '" + name + "' is not configured");
+      throw new CmdFailure("signer named '" + name + "' is not configured");
     }
 
     if (CaManager.NULL.equalsIgnoreCase(certFile)) {
@@ -67,7 +67,7 @@ public class ResponderCheckAction extends ResponderUpdateAction {
       MgmtQaShellUtil.assertEquals("conf", signerConf, cr.getConf());
     }
 
-    println(" checked responder " + name);
+    println(" checked signer " + name);
     return null;
   }
 

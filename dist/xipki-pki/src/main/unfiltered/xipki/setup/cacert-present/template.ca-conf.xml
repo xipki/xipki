@@ -21,27 +21,20 @@
     <property name="token.type">REPLACEME_TOKEN_TYPE</property>
     <property name="ca.signerConf">REPLACEME_CA_SIGNERCONF</property>
   </properties>
-  <responders>
-    <responder name="responder1">
+  <signers>
+    <signer name="responder1">
       <type>pkcs12</type>
       <conf>
         <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server.p12,algo=SHA256withRSA</value>
       </conf>
-    </responder>
-    <responder name="scep-responder1">
+    </signer>
+    <signer name="scep-responder1">
       <type>pkcs12</type>
       <conf>
         <value>password=1234,keystore=file:xipki/setup/keycerts/scep1.p12,algo=SHA256withRSA</value>
       </conf>
-    </responder>
-  </responders>
-  <crlsigners>
-    <crlsigner name="casign-crlsigner">
-      <signerType>CA</signerType>
-      <!-- create CRL at 02:00 UTC, one per day, with overlapping time 90 minutes -->
-      <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00</crlControl>
-    </crlsigner>
-  </crlsigners>
+    </signer>
+  </signers>
   <requestors>
     <requestor name="requestor1">
       <cert>
@@ -91,8 +84,9 @@
   <cas>
     <ca name="myca1">
       <caInfo>
-        <cmpcontrol>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</cmpcontrol>
-        <crlsignerName>casign-crlsigner</crlsignerName>
+        <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</cmpControl>
+         <!-- create CRL at 02:00 UTC, one per day, with overlapping time 90 minutes -->
+        <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00</crlControl>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>

@@ -32,7 +32,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class ResponderEntry {
+public class SignerEntry {
 
   private final String name;
 
@@ -48,7 +48,7 @@ public class ResponderEntry {
 
   private X509Certificate certificate;
 
-  public ResponderEntry(String name, String type, String conf, String base64Cert) {
+  public SignerEntry(String name, String type, String conf, String base64Cert) {
     this.name = ParamUtil.requireNonBlankLower("name", name);
     this.type = ParamUtil.requireNonBlankLower("type", type);
     this.conf = conf;
@@ -133,10 +133,10 @@ public class ResponderEntry {
         sb.append("\tserialNumber: ")
             .append(LogUtil.formatCsn(certificate.getSerialNumber())).append('\n');
         sb.append("\tsubject: ").append(X509Util.getRfc4519Name(
-            certificate.getSubjectX500Principal())).append('\n');
+            certificate.getSubjectX500Principal()));
       }
       if (verbose) {
-        sb.append("\tencoded: ");
+        sb.append("\n\tencoded: ");
         try {
           sb.append(Base64.encodeToString(certificate.getEncoded()));
         } catch (CertificateEncodingException ex) {
@@ -151,11 +151,11 @@ public class ResponderEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ResponderEntry)) {
+    if (!(obj instanceof SignerEntry)) {
       return false;
     }
 
-    ResponderEntry objB = (ResponderEntry) obj;
+    SignerEntry objB = (SignerEntry) obj;
     if (!name.equals(objB.name)) {
       return false;
     }

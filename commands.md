@@ -464,22 +464,6 @@ Feature xipki-camgmt-shell (started by default)
 
      clear publish queue
 
-   * `ca:crlsigner-add`
-
-     add CRL signer
-
-   * `ca:crlsigner-info`
-
-     show information of CRL signer
-
-   * `ca:crlsigner-rm`
-
-     remove CRL signer
-
-   * `ca:crlsigner-up`
-
-     update CRL signer
-
    * `ca:profile-add`
 
      add certificate profile
@@ -540,21 +524,21 @@ Feature xipki-camgmt-shell (started by default)
 
      update requestor
 
-   * `ca:responder-add`
+   * `ca:signer-add`
 
-     add responder
+     add signer
 
-   * `ca:responder-info`
+   * `ca:signer-info`
 
-     show information of responder
+     show information of signer
 
-   * `ca:responder-rm`
+   * `ca:signer-rm`
 
-     remove responder
+     remove signer
 
-   * `ca:responder-up`
+   * `ca:signer-up`
 
-     update responder
+     update signer
 
    * `ca:scep-add`
 

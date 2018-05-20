@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.security.cert.X509Certificate;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -24,8 +26,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
-import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.password.PasswordResolver;
@@ -37,32 +39,28 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "crlsigner-add",
-    description = "add CRL signer")
+@Command(scope = "ca", name = "signer-add",
+    description = "add signer")
 @Service
-public class CrlSignerAddAction extends CaAction {
+public class SignererAddAction extends CaAction {
 
   @Option(name = "--name", aliases = "-n", required = true,
-      description = "CRL signer name\n(required)")
+      description = "signer name\n(required)")
   private String name;
 
-  @Option(name = "--signer-type", required = true,
-      description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n(required)")
-  @Completion(CrlSignerNameCompleter.class)
-  private String signerType;
+  @Option(name = "--type", required = true,
+      description = "type of the signer\n(required)")
+  @Completion(SignerTypeCompleter.class)
+  private String type;
 
-  @Option(name = "--signer-conf",
-      description = "CRL signer configuration")
-  private String signerConf;
+  @Option(name = "--conf", required = true,
+      description = "conf of the signer")
+  private String conf;
 
   @Option(name = "--cert",
-      description = "CRL signer's certificate file")
+      description = "signer certificate file")
   @Completion(FileCompleter.class)
-  private String signerCertFile;
-
-  @Option(name = "--control", required = true,
-      description = "CRL control\n(required)")
-  private String crlControl;
+  private String certFile;
 
   @Reference
   private PasswordResolver passwordResolver;
@@ -70,26 +68,21 @@ public class CrlSignerAddAction extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     String base64Cert = null;
-    if (!"CA".equalsIgnoreCase(signerType)) {
-      if (signerCertFile != null) {
-        byte[] encodedCert = IoUtil.read(signerCertFile);
-        base64Cert = IoUtil.base64Encode(encodedCert, false);
-        X509Util.parseCert(encodedCert);
-      }
-
-      if (signerConf != null) {
-        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-          signerConf = ShellUtil.canonicalizeSignerConf(signerType,
-              signerConf, passwordResolver, securityFactory);
-        }
-      }
+    X509Certificate signerCert = null;
+    if (certFile != null) {
+      signerCert = X509Util.parseCert(certFile);
+      base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
     }
 
-    CrlSignerEntry entry = new CrlSignerEntry(name, signerType, signerConf, base64Cert,
-        crlControl);
-    String msg = "CRL signer " + name;
+    if ("PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type)) {
+      conf = ShellUtil.canonicalizeSignerConf(type, conf, passwordResolver,
+          securityFactory);
+    }
+    SignerEntry entry = new SignerEntry(name, type, conf, base64Cert);
+
+    String msg = "signer " + name;
     try {
-      caManager.addCrlSigner(entry);
+      caManager.addSigner(entry);
       println("added " + msg);
       return null;
     } catch (CaMgmtException ex) {

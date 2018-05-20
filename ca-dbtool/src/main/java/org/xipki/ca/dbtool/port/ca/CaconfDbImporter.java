@@ -43,20 +43,18 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasRequestors;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Signers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
-import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
-import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
+import org.xipki.ca.dbtool.jaxb.ca.SignerType;
 import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.Base64;
@@ -103,12 +101,11 @@ class CaconfDbImporter extends DbPorter {
 
     System.out.println("importing CA configuration to database");
     try {
-      importResponder(caconf.getResponders());
+      importSigner(caconf.getSigners());
       importRequestor(caconf.getRequestors());
       importUser(caconf.getUsers());
       importPublisher(caconf.getPublishers());
       importProfile(caconf.getProfiles());
-      importCrlsigner(caconf.getCrlsigners());
       importCa(caconf.getCas());
       importCaalias(caconf.getCaaliases());
       importCaHasRequestor(caconf.getCaHasRequestors());
@@ -124,31 +121,31 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported CA configuration to database");
   } // method importToDb
 
-  private void importResponder(Responders responders) throws DataAccessException, IOException {
-    System.out.println("importing table RESPONDER");
-    if (responders == null) {
-      System.out.println(" imported table RESPONDER: nothing to import");
+  private void importSigner(Signers signers) throws DataAccessException, IOException {
+    System.out.println("importing table SIGNER");
+    if (signers == null) {
+      System.out.println(" imported table SIGNER: nothing to import");
       return;
     }
-    final String sql = "INSERT INTO RESPONDER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
+    final String sql = "INSERT INTO SIGNER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
 
-      for (ResponderType responder : responders.getResponder()) {
-        byte[] certBytes = binary(responder.getCert());
+      for (SignerType signer : signers.getSigner()) {
+        byte[] certBytes = binary(signer.getCert());
         String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
         try {
           int idx = 1;
-          ps.setString(idx++, responder.getName());
-          ps.setString(idx++, responder.getType());
+          ps.setString(idx++, signer.getName());
+          ps.setString(idx++, signer.getType());
           ps.setString(idx++, b64Cert);
-          ps.setString(idx++, value(responder.getConf()));
+          ps.setString(idx++, value(signer.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import CRLSIGNER with NAME=" + responder.getName());
+          System.err.println("could not import SIGNER with NAME=" + signer.getName());
           throw translate(sql, ex);
         }
       }
@@ -156,38 +153,8 @@ class CaconfDbImporter extends DbPorter {
       releaseResources(ps, null);
     }
 
-    System.out.println(" imported table RESPONDER");
-  } // method importResponder
-
-  private void importCrlsigner(Crlsigners crlsigners) throws DataAccessException, IOException {
-    System.out.println("importing table CRLSIGNER");
-    final String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,"
-        + "SIGNER_CONF) VALUES (?,?,?,?,?)";
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-
-      for (CrlsignerType crlsigner : crlsigners.getCrlsigner()) {
-        byte[] certBytes = binary(crlsigner.getSignerCert());
-        String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
-        try {
-          int idx = 1;
-          ps.setString(idx++, crlsigner.getName());
-          ps.setString(idx++, crlsigner.getSignerType());
-          ps.setString(idx++, b64Cert);
-          ps.setString(idx++, crlsigner.getCrlControl());
-          ps.setString(idx++, value(crlsigner.getSignerConf()));
-          ps.executeUpdate();
-        } catch (SQLException ex) {
-          System.err.println("could not import CRLSIGNER with NAME=" + crlsigner.getName());
-          throw translate(sql, ex);
-        }
-      }
-    } finally {
-      releaseResources(ps, null);
-    }
-    System.out.println(" imported table CRLSIGNER");
-  } // method importCrlsigner
+    System.out.println(" imported table SIGNER");
+  } // method importSigner
 
   private void importRequestor(Requestors requestors) throws DataAccessException, IOException {
     System.out.println("importing table REQUESTOR");
@@ -302,11 +269,11 @@ class CaconfDbImporter extends DbPorter {
   private void importCa(Cas cas) throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
     String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
-        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
-        + "RESPONDER_NAME,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
-        + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
+        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,"
+        + "RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,"
+        + "SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -331,9 +298,10 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getMaxValidity());
           ps.setString(idx++, Base64.encodeToString(certBytes));
           ps.setString(idx++, ca.getSignerType());
-          ps.setString(idx++, ca.getCrlsignerName());
+          ps.setString(idx++, ca.getCrlSignerName());
           ps.setString(idx++, ca.getResponderName());
-          ps.setString(idx++, ca.getCmpcontrol());
+          ps.setString(idx++, ca.getCrlControl());
+          ps.setString(idx++, ca.getCmpControl());
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
           ps.setInt(idx++, ca.getSupportScep());

@@ -22,21 +22,15 @@
     <property name="token.type">REPLACEME-TOKEN_TYPE</property>
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
   </properties>
-  <responders>
-    <responder name="responder1">
+  <signers>
+    <signer name="responder1">
       <type>pkcs12</type>
       <!-- encrypted password 1234 -->
       <conf>
         <value>password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:${security.dir}/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO</value>
       </conf>
-    </responder>
-  </responders>
-  <crlsigners>
-    <crlsigner name="casign-crlsigner">
-      <signerType>ca</signerType>
-      <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
-    </crlsigner>
-  </crlsigners>
+    </signer>
+  </signers>
   <requestors>
     <requestor name="requestor1">
       <cert>
@@ -165,7 +159,7 @@
           <profile>rootca</profile>
           <serialNumber>1</serialNumber>
         </genSelfIssued>
-        <cmpcontrol>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpcontrol>
+        <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpControl>
         <cert>
           <file>${output.dir}/rootca1.der</file>
         </cert>

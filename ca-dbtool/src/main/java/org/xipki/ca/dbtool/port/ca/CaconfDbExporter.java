@@ -42,20 +42,18 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasRequestors;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.CaHasUsers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Caaliases;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Crlsigners;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Responders;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
+import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Signers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
-import org.xipki.ca.dbtool.jaxb.ca.CrlsignerType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
-import org.xipki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.ca.dbtool.jaxb.ca.ScepType;
+import org.xipki.ca.dbtool.jaxb.ca.SignerType;
 import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.XmlUtil;
@@ -88,8 +86,7 @@ class CaconfDbExporter extends DbPorter {
 
     System.out.println("exporting CA configuration from database");
 
-    exportResponder(caconf);
-    exportCrlsigner(caconf);
+    exportSigner(caconf);
     exportRequestor(caconf);
     exportUser(caconf);
     exportPublisher(caconf);
@@ -111,41 +108,6 @@ class CaconfDbExporter extends DbPorter {
 
     System.out.println(" exported CA configuration from database");
   }
-
-  private void exportCrlsigner(CaconfType caconf) throws DataAccessException, IOException {
-    System.out.println("exporting table CRLSIGNER");
-    Crlsigners crlsigners = new Crlsigners();
-    String sql = "SELECT NAME,SIGNER_TYPE,SIGNER_CONF,SIGNER_CERT,CRL_CONTROL FROM CRLSIGNER";
-
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
-
-      while (rs.next()) {
-        String name = rs.getString("NAME");
-
-        CrlsignerType crlsigner = new CrlsignerType();
-        crlsigner.setName(name);
-        crlsigner.setSignerType(rs.getString("SIGNER_TYPE"));
-        crlsigner.setSignerConf(buildFileOrValue(
-            rs.getString("SIGNER_CONF"), "ca-conf/signerconf-crlsigner-" + name));
-        crlsigner.setSignerCert(buildFileOrBase64Binary(
-            rs.getString("SIGNER_CERT"), "ca-conf/signercert-crlsigner-" + name + ".der"));
-        crlsigner.setCrlControl(rs.getString("CRL_CONTROL"));
-
-        crlsigners.getCrlsigner().add(crlsigner);
-      }
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(stmt, rs);
-    }
-
-    caconf.setCrlsigners(crlsigners);
-    System.out.println(" exported table CRLSIGNER");
-  } // method exportCrlsigner
 
   private void exportCaalias(CaconfType caconf) throws DataAccessException {
     System.out.println("exporting table CAALIAS");
@@ -235,10 +197,10 @@ class CaconfDbExporter extends DbPorter {
     System.out.println(" exported table TUSER");
   } // method exportUser
 
-  private void exportResponder(CaconfType caconf) throws DataAccessException, IOException {
-    System.out.println("exporting table RESPONDER");
-    Responders responders = new Responders();
-    final String sql = "SELECT NAME,TYPE,CONF,CERT FROM RESPONDER";
+  private void exportSigner(CaconfType caconf) throws DataAccessException, IOException {
+    System.out.println("exporting table SIGNER");
+    Signers signers = new Signers();
+    final String sql = "SELECT NAME,TYPE,CONF,CERT FROM SIGNER";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -249,13 +211,13 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         String name = rs.getString("NAME");
 
-        ResponderType responder = new ResponderType();
-        responder.setName(name);
-        responder.setType(rs.getString("TYPE"));
-        responder.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-responder-" + name));
-        responder.setCert(buildFileOrBase64Binary(
-            rs.getString("CERT"), "ca-conf/cert-responder-" + name + ".der"));
-        responders.getResponder().add(responder);
+        SignerType signer = new SignerType();
+        signer.setName(name);
+        signer.setType(rs.getString("TYPE"));
+        signer.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-signer-" + name));
+        signer.setCert(buildFileOrBase64Binary(
+            rs.getString("CERT"), "ca-conf/cert-signer-" + name + ".der"));
+        signers.getSigner().add(signer);
       }
     } catch (SQLException ex) {
       throw translate(sql, ex);
@@ -263,9 +225,9 @@ class CaconfDbExporter extends DbPorter {
       releaseResources(stmt, rs);
     }
 
-    caconf.setResponders(responders);
-    System.out.println(" exported table RESPONDER");
-  } // method exportResponder
+    caconf.setSigners(signers);
+    System.out.println(" exported table SIGNER");
+  } // method exportSigner
 
   private void exportPublisher(CaconfType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table PUBLISHER");
@@ -335,10 +297,10 @@ class CaconfDbExporter extends DbPorter {
     System.out.println("exporting table CA");
     Cas cas = new Cas();
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,"
-        + "SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
+        + "SIGNER_CONF,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
         + "REV_INFO,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,DELTACRL_URIS,"
-        + "VALIDITY_MODE,CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CMP_CONTROL,EXTRA_CONTROL "
-        + "FROM CA";
+        + "VALIDITY_MODE,CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CRL_SIGNER_NAME,"
+        + "CMP_CONTROL,CRL_CONTROL,EXTRA_CONTROL FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -365,9 +327,10 @@ class CaconfDbExporter extends DbPorter {
         ca.setSignerType(rs.getString("SIGNER_TYPE"));
         ca.setSignerConf(buildFileOrValue(
             rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
-        ca.setCrlsignerName(rs.getString("CRLSIGNER_NAME"));
         ca.setResponderName(rs.getString("RESPONDER_NAME"));
-        ca.setCmpcontrol(rs.getString("CMP_CONTROL"));
+        ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
+        ca.setCmpControl(rs.getString("CMP_CONTROL"));
+        ca.setCrlControl(rs.getString("CRL_CONTROL"));
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
         ca.setSaveReq(rs.getInt("SUPPORT_REST"));

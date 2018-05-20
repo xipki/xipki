@@ -42,7 +42,6 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.SqlColumn.ColumnType;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
-import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.util.PasswordHash;
@@ -60,10 +59,9 @@ import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CrlControl;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -103,8 +101,7 @@ class CaManagerQueryExecutor {
   private final String sqlSelectPublisher;
   private final String sqlSelectRequestorId;
   private final String sqlSelectRequestor;
-  private final String sqlSelectCrlSigner;
-  private final String sqlSelectResponder;
+  private final String sqlSelectSigner;
   private final String sqlSelectCaId;
   private final String sqlSelectCa;
   private final String sqlNextSelectCrlNo;
@@ -121,13 +118,11 @@ class CaManagerQueryExecutor {
     this.sqlSelectPublisher = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
     this.sqlSelectRequestorId = buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?");
     this.sqlSelectRequestor = buildSelectFirstSql("ID,CERT FROM REQUESTOR WHERE NAME=?");
-    this.sqlSelectCrlSigner = buildSelectFirstSql(
-        "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?");
-    this.sqlSelectResponder = buildSelectFirstSql("TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?");
+    this.sqlSelectSigner = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectCa = buildSelectFirstSql(
         "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
-        + ",CRLSIGNER_NAME,RESPONDER_NAME,CMP_CONTROL,DUPLICATE_KEY"
+        + ",RESPONDER_NAME,CRL_SIGNER_NAME,CMP_CONTROL,CRL_CONTROL,DUPLICATE_KEY"
         + ",DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
         + ",EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
         + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
@@ -399,8 +394,8 @@ class CaManagerQueryExecutor {
     }
   } // method createRequestor
 
-  CrlSignerEntry createCrlSigner(String name) throws CaMgmtException {
-    final String sql = sqlSelectCrlSigner;
+  SignerEntry createSigner(String name) throws CaMgmtException {
+    final String sql = sqlSelectSigner;
     PreparedStatement stmt = null;
     ResultSet rs = null;
 
@@ -410,35 +405,10 @@ class CaManagerQueryExecutor {
       rs = stmt.executeQuery();
 
       if (!rs.next()) {
-        throw new CaMgmtException("unknown CRL signer " + name);
+        throw new CaMgmtException("unknown signer " + name);
       }
 
-      return new CrlSignerEntry(name, rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
-          rs.getString("SIGNER_CERT"), rs.getString("CRL_CONTROL"));
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(ex);
-    } finally {
-      datasource.releaseResources(stmt, rs);
-    }
-  } // method createCrlSigner
-
-  ResponderEntry createResponder(String name) throws CaMgmtException {
-    final String sql = sqlSelectResponder;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-      stmt = prepareStatement(sql);
-      stmt.setString(1, name);
-      rs = stmt.executeQuery();
-
-      if (!rs.next()) {
-        throw new CaMgmtException("unknown responder " + name);
-      }
-
-      return new ResponderEntry(name, rs.getString("TYPE"), rs.getString("CONF"),
+      return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"),
           rs.getString("CERT"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
@@ -447,8 +417,7 @@ class CaManagerQueryExecutor {
     }
   } // method createResponder
 
-  CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
-      throws CaMgmtException {
+  CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore) throws CaMgmtException {
     final String sql = sqlSelectCa;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -496,7 +465,7 @@ class CaManagerQueryExecutor {
       entry.setMaxValidity(CertValidity.getInstance(rs.getString("MAX_VALIDITY")));
       entry.setKeepExpiredCertInDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
 
-      String crlsignerName = rs.getString("CRLSIGNER_NAME");
+      String crlsignerName = rs.getString("CRL_SIGNER_NAME");
       if (StringUtil.isNotBlank(crlsignerName)) {
         entry.setCrlSignerName(crlsignerName);
       }
@@ -517,6 +486,15 @@ class CaManagerQueryExecutor {
           entry.setCmpControl(new CmpControl(cmpcontrol));
         } catch (InvalidConfException ex) {
           throw new CaMgmtException("invalid CMP_CONTROL: " + cmpcontrol);
+        }
+      }
+
+      String crlcontrol = rs.getString("CRL_CONTROL");
+      if (StringUtil.isNotBlank(crlcontrol)) {
+        try {
+          entry.setCrlControl(new CrlControl(crlcontrol));
+        } catch (InvalidConfException ex) {
+          throw new CaMgmtException("invalid CRL_CONTROL: " + crlcontrol, ex);
         }
       }
 
@@ -656,11 +634,11 @@ class CaManagerQueryExecutor {
     }
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
-        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRLSIGNER_NAME,"
-        + "RESPONDER_NAME,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
-        + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,"
+        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,"
+        + "RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,"
+        + "SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,"
         + "EXTRA_CONTROL,SIGNER_CONF) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -683,8 +661,13 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, caEntry.getSignerType());
       ps.setString(idx++, caEntry.getCrlSignerName());
       ps.setString(idx++, caEntry.getResponderName());
+
+      CrlControl crlControl = caEntry.getCrlControl();
+      ps.setString(idx++, (crlControl == null ? null : crlControl.getConf()));
+
       CmpControl cmpControl = caEntry.getCmpControl();
       ps.setString(idx++, (cmpControl == null ? null : cmpControl.getConf()));
+
       setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
       setBoolean(ps, idx++, caEntry.isDuplicateSubjectPermitted());
       setBoolean(ps, idx++, caEntry.isSupportRest());
@@ -907,47 +890,6 @@ class CaManagerQueryExecutor {
     }
   } // method addRequestorToCa
 
-  void addCrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    String crlControl = dbEntry.getCrlControl();
-    // validate crlControl
-    if (crlControl != null) {
-      try {
-        new CrlControl(crlControl);
-      } catch (InvalidConfException ex) {
-        throw new CaMgmtException(concat("invalid CRL control '", crlControl, "'"));
-      }
-    }
-
-    String name = dbEntry.getName();
-    String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF)"
-        + " VALUES (?,?,?,?,?)";
-
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      int idx = 1;
-      ps.setString(idx++, name);
-      ps.setString(idx++, dbEntry.getType());
-      ps.setString(idx++, (dbEntry.getCert() == null) ? null
-            : Base64.encodeToString(dbEntry.getCert().getEncoded()));
-      ps.setString(idx++, crlControl);
-      ps.setString(idx++, dbEntry.getConf());
-
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add CRL signer " + name);
-      }
-
-      LOG.info("added CRL signer '{}': {}", name, dbEntry.toString(false, true));
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } catch (CertificateEncodingException ex) {
-      throw new CaMgmtException(ex);
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method addCrlSigner
-
   void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     final String sql = "INSERT INTO PUBLISHER (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
@@ -1104,9 +1046,10 @@ class CaManagerQueryExecutor {
         col(COLL_STRING, "OCSP_URIS", changeCaEntry.getOcspUris()),
         col(COLL_STRING, "CACERT_URIS", changeCaEntry.getCaCertUris()),
         col(STRING, "MAX_VALIDITY", maxValidity), col(COLL_STRING, "SIGNER_TYPE", signerType),
-        col(STRING, "CRLSIGNER_NAME", changeCaEntry.getCrlSignerName()),
+        col(STRING, "CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
         col(STRING, "RESPONDER_NAME", changeCaEntry.getResponderName()),
         col(STRING, "CMP_CONTROL", changeCaEntry.getCmpControl()),
+        col(STRING, "CRL_CONTROL", changeCaEntry.getCrlControl()),
         col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
         col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
         col(BOOL, "SUPPORT_REST", changeCaEntry.getSupportRest()),
@@ -1303,69 +1246,26 @@ class CaManagerQueryExecutor {
     return requestor;
   } // method changeRequestor
 
-  ResponderEntryWrapper changeResponder(String name, String type, String conf, String base64Cert,
+  SignerEntryWrapper changeSigner(String name, String type, String conf, String base64Cert,
       CaManagerImpl caManager, SecurityFactory securityFactory) throws CaMgmtException {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("caManager", caManager);
 
-    ResponderEntry dbEntry = createResponder(name);
+    SignerEntry dbEntry = createSigner(name);
     String tmpType = (type == null ? dbEntry.getType() : type);
     if (conf != null) {
       conf = CaManagerImpl.canonicalizeSignerConf(tmpType, conf, null, securityFactory);
     }
 
-    ResponderEntry newDbEntry = new ResponderEntry(name, tmpType,
+    SignerEntry newDbEntry = new SignerEntry(name, tmpType,
         (conf == null ? dbEntry.getConf() : conf),
         (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert));
-    ResponderEntryWrapper responder = caManager.createResponder(newDbEntry);
+    SignerEntryWrapper responder = caManager.createSigner(newDbEntry);
 
-    changeIfNotNull("RESPONDER", col(STRING, "NAME", name), col(STRING, "TYPE", type),
+    changeIfNotNull("SIGNER", col(STRING, "NAME", name), col(STRING, "TYPE", type),
         col(STRING, "CERT", base64Cert), col(STRING, "CONF", conf, false, true));
     return responder;
   } // method changeResponder
-
-  CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf,
-      String base64Cert, String crlControl, CaManagerImpl caManager,
-      SecurityFactory securityFactory) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonNull("caManager", caManager);
-
-    CrlSignerEntry dbEntry = createCrlSigner(name);
-    if (crlControl != null) { // validate crlControl
-      try {
-        new CrlControl(crlControl);
-      } catch (InvalidConfException ex) {
-        throw new CaMgmtException(concat("invalid CRL control '", crlControl, "'"));
-      }
-    }
-
-    String tmpSignerType = (signerType == null) ? dbEntry.getType() : signerType;
-    try {
-      if ("ca".equalsIgnoreCase(tmpSignerType)) {
-        dbEntry = new CrlSignerEntry(name, "ca", null, null,
-            (crlControl == null ? dbEntry.getCrlControl() : crlControl));
-      } else {
-        if (signerConf != null) {
-          signerConf = CaManagerImpl.canonicalizeSignerConf(tmpSignerType,
-              signerConf, null, securityFactory);
-        }
-
-        dbEntry = new CrlSignerEntry(name, "ca",
-            (signerConf == null ? dbEntry.getConf() : signerConf),
-            (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert),
-            (crlControl == null ? dbEntry.getCrlControl() : crlControl));
-      }
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(ex);
-    }
-
-    CrlSignerEntryWrapper crlSigner = caManager.createX509CrlSigner(dbEntry);
-
-    changeIfNotNull("CRLSIGNER", col(STRING, "NAME", name), col(STRING, "SIGNER_TYPE", signerType),
-        col(STRING, "SIGNER_CERT", base64Cert), col(STRING, "CRL_CONTROL", crlControl),
-        col(STRING, "SIGNER_CONF", signerConf, false, true));
-    return crlSigner;
-  } // method changeCrlSigner
 
   ScepImpl changeScep(String name, NameId caIdent, Boolean active, String responderName,
       Set<String> certProfiles, String control, CaManagerImpl caManager,
@@ -1528,9 +1428,9 @@ class CaManagerQueryExecutor {
     }
   } // method revokeCa
 
-  void addResponder(ResponderEntry dbEntry) throws CaMgmtException {
+  void addSigner(SignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
-    final String sql = "INSERT INTO RESPONDER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
+    final String sql = "INSERT INTO SIGNER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -1541,10 +1441,10 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, dbEntry.getBase64Cert());
       ps.setString(idx++, dbEntry.getConf());
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add responder " + dbEntry.getName());
+        throw new CaMgmtException("could not add signer " + dbEntry.getName());
       }
 
-      LOG.info("added responder: {}", dbEntry.toString(false, true));
+      LOG.info("added signer: {}", dbEntry.toString(false, true));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {

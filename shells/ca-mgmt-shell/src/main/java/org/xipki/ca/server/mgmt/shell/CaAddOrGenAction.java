@@ -29,11 +29,11 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.common.ConfPairs;
@@ -104,17 +104,21 @@ public abstract class CaAddOrGenAction extends CaAction {
 
   @Option(name = "--crl-signer",
       description = "CRL signer name")
-  @Completion(CrlSignerNameCompleter.class)
+  @Completion(SignerNameCompleter.class)
   private String crlSignerName;
 
   @Option(name = "--responder",
       description = "Responder name")
-  @Completion(ResponderNameCompleter.class)
+  @Completion(SignerNameCompleter.class)
   private String responderName;
 
   @Option(name = "--cmp-control",
       description = "CMP control")
   private String cmpControl;
+
+  @Option(name = "--crl-control",
+      description = "CRL control")
+  private String crlControl;
 
   @Option(name = "--num-crls",
       description = "number of CRLs to be kept in database")
@@ -204,21 +208,27 @@ public abstract class CaAddOrGenAction extends CaAction {
     entry.setValidityMode(validityMode);
 
     entry.setStatus(CaStatus.forName(caStatus));
-    if (crlSignerName != null) {
-      entry.setCrlSignerName(crlSignerName);
+
+    if (cmpControl != null) {
+      entry.setCmpControl(new CmpControl(cmpControl));
+    }
+
+    if (crlControl != null) {
+      entry.setCrlControl(new CrlControl(crlControl));
     }
 
     if (responderName != null) {
       entry.setResponderName(responderName);
     }
 
+    if (crlSignerName != null) {
+      entry.setCrlSignerName(crlSignerName);
+    }
+
     CertValidity tmpMaxValidity = CertValidity.getInstance(maxValidity);
     entry.setMaxValidity(tmpMaxValidity);
 
     entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
-    if (cmpControl != null) {
-      entry.setCmpControl(new CmpControl(cmpControl));
-    }
 
     int intPermission = ShellUtil.getPermission(permissions);
     entry.setPermission(intPermission);

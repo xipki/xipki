@@ -38,9 +38,8 @@ import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.common.ConfPairs;
@@ -112,17 +111,21 @@ public class CaUpdateAction extends CaAction {
 
   @Option(name = "--crl-signer",
       description = "CRL signer name or 'null'")
-  @Completion(CrlSignerNamePlusNullCompleter.class)
+  @Completion(SignerNamePlusNullCompleter.class)
   private String crlSignerName;
 
   @Option(name = "--responder",
       description = "responder name or 'null'")
-  @Completion(ResponderNamePlusNullCompleter.class)
+  @Completion(SignerNamePlusNullCompleter.class)
   private String responderName;
 
   @Option(name = "--cmp-control",
       description = "CMP control or 'null'")
   private String cmpControl;
+
+  @Option(name = "--rl-control",
+      description = "CRL control or 'null'")
+  private String crlControl;
 
   @Option(name = "--num-crls",
       description = "number of CRLs to be kept in database")
@@ -250,16 +253,20 @@ public class CaUpdateAction extends CaAction {
       entry.setMaxValidity(CertValidity.getInstance(maxValidity));
     }
 
-    if (crlSignerName != null) {
-      entry.setCrlSignerName(crlSignerName);
-    }
-
     if (cmpControl != null) {
       entry.setCmpControl(cmpControl);
     }
 
+    if (crlControl != null) {
+      entry.setCrlControl(crlControl);
+    }
+
     if (responderName != null) {
       entry.setResponderName(responderName);
+    }
+
+    if (crlSignerName != null) {
+      entry.setCrlSignerName(crlSignerName);
     }
 
     if (extraControl != null) {

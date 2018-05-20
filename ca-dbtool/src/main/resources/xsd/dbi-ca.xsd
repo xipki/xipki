@@ -22,17 +22,10 @@
   <xs:element name="caconf" type="caconfType"/>
   <xs:complexType name="caconfType">
     <xs:sequence>
-      <xs:element name="responders">
+      <xs:element name="signers">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="responder" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="crlsigners">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="crlsigner" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="signer" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -116,23 +109,13 @@
     </xs:sequence>
     <xs:attribute name="version" type="xs:int" use="required"/>
   </xs:complexType>
-  <xs:element name="responder" type="responderType"/>
-  <xs:complexType name="responderType">
+  <xs:element name="signer" type="signerType"/>
+  <xs:complexType name="signerType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="crlsigner" type="crlsignerType"/>
-  <xs:complexType name="crlsignerType">
-    <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="signerType" type="xs:string"/>
-      <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="signerCert" type="fileOrBinaryType" minOccurs="0"/>
-      <xs:element name="crlControl" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="requestor" type="requestorType"/>
@@ -177,9 +160,10 @@
       <xs:element name="cert" type="fileOrBinaryType"/>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType"/>
-      <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlSignerName" type="xs:string" minOccurs="0"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
-      <xs:element name="cmpcontrol" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlControl" type="xs:string" minOccurs="0"/>
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
       <xs:element name="supportScep" type="xs:int"/>

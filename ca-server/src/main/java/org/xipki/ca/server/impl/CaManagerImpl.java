@@ -88,7 +88,6 @@ import org.xipki.ca.server.api.Scep;
 import org.xipki.ca.server.impl.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
-import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.rest.RestImpl;
 import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertStore;
@@ -108,15 +107,13 @@ import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
-import org.xipki.ca.server.mgmt.api.ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
@@ -129,7 +126,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
@@ -137,8 +133,8 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfilesType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublishersType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.common.ConfPairs;
@@ -285,9 +281,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private final Map<String, CaInfo> caInfos = new ConcurrentHashMap<>();
 
-  private Map<String, ResponderEntryWrapper> responders = new ConcurrentHashMap<>();
+  private Map<String, SignerEntryWrapper> signers = new ConcurrentHashMap<>();
 
-  private Map<String, ResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
+  private Map<String, SignerEntry> signerDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, IdentifiedCertprofile> certprofiles = new ConcurrentHashMap<>();
 
@@ -300,10 +296,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   private final Map<String, RequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
 
   private final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
-
-  private final Map<String, CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
-
-  private final Map<String, CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, ScepImpl> sceps = new ConcurrentHashMap<>();
 
@@ -333,7 +325,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private boolean caSystemSetuped;
 
-  private boolean responderInitialized;
+  private boolean signerInitialized;
 
   private boolean requestorsInitialized;
 
@@ -342,8 +334,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   private boolean certprofilesInitialized;
 
   private boolean publishersInitialized;
-
-  private boolean crlSignersInitialized;
 
   private boolean casInitialized;
 
@@ -531,8 +521,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     initCertprofiles();
     initPublishers();
     initRequestors();
-    initResponders();
-    initCrlSigners();
+    initSigners();
     initCas();
     initSceps();
   } // method init
@@ -594,12 +583,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private void reset() {
     caSystemSetuped = false;
-    responderInitialized = false;
+    signerInitialized = false;
     requestorsInitialized = false;
     caAliasesInitialized = false;
     certprofilesInitialized = false;
     publishersInitialized = false;
-    crlSignersInitialized = false;
     casInitialized = false;
     scepsInitialized = false;
 
@@ -776,24 +764,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    boolean signerRequired = caEntry.isSignerRequired();
-
-    CrlSignerEntryWrapper crlSignerEntry = null;
-    String crlSignerName = caEntry.getCrlSignerName();
-    // CRL will be generated only in master mode
-    if (signerRequired && masterMode && crlSignerName != null) {
-      crlSignerEntry = crlSigners.get(crlSignerName);
-      try {
-        crlSignerEntry.getDbEntry().setConfFaulty(true);
-        crlSignerEntry.initSigner(securityFactory);
-        crlSignerEntry.getDbEntry().setConfFaulty(false);
-      } catch (XiSecurityException | OperationException ex) {
-        LogUtil.error(LOG, ex,
-            concat("CrlSignerEntryWrapper.initSigner(name=", crlSignerName, ")"));
-        return false;
-      }
-    }
-
     X509Ca ca;
     try {
       ca = new X509Ca(this, caEntry, certstore);
@@ -886,13 +856,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public Set<String> getResponderNames() {
-    return responderDbEntries.keySet();
-  }
-
-  @Override
-  public Set<String> getCrlSignerNames() {
-    return crlSigners.keySet();
+  public Set<String> getSignerNames() {
+    return signerDbEntries.keySet();
   }
 
   @Override
@@ -968,32 +933,32 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     requestorsInitialized = true;
   } // method initRequestors
 
-  private void initResponders() throws CaMgmtException {
-    if (responderInitialized) {
+  private void initSigners() throws CaMgmtException {
+    if (signerInitialized) {
       return;
     }
 
-    responderDbEntries.clear();
-    responders.clear();
+    signerDbEntries.clear();
+    signers.clear();
 
-    List<String> names = queryExecutor.namesFromTable("RESPONDER");
+    List<String> names = queryExecutor.namesFromTable("SIGNER");
     for (String name : names) {
-      ResponderEntry dbEntry = queryExecutor.createResponder(name);
+      SignerEntry dbEntry = queryExecutor.createSigner(name);
       if (dbEntry == null) {
-        LOG.error("could not initialize Responder '{}'", name);
+        LOG.error("could not initialize signer '{}'", name);
         continue;
       }
 
       dbEntry.setConfFaulty(true);
-      responderDbEntries.put(name, dbEntry);
+      signerDbEntries.put(name, dbEntry);
 
-      ResponderEntryWrapper responder = createResponder(dbEntry);
-      if (responder != null) {
+      SignerEntryWrapper signer = createSigner(dbEntry);
+      if (signer != null) {
         dbEntry.setConfFaulty(false);
-        responders.put(name, responder);
+        signers.put(name, signer);
       }
     }
-    responderInitialized = true;
+    signerInitialized = true;
   } // method initResponders
 
   private void initCaAliases() throws CaMgmtException {
@@ -1077,29 +1042,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     publishersInitialized = true;
   } // method initPublishers
-
-  private void initCrlSigners() throws CaMgmtException {
-    if (crlSignersInitialized) {
-      return;
-    }
-    crlSigners.clear();
-    crlSignerDbEntries.clear();
-
-    List<String> names = queryExecutor.namesFromTable("CRLSIGNER");
-    for (String name : names) {
-      CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
-      if (dbEntry == null) {
-        LOG.error("could not initialize CRL signer '{}'", name);
-        continue;
-      }
-
-      crlSignerDbEntries.put(name, dbEntry);
-      CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
-      crlSigners.put(name, crlSigner);
-    }
-
-    crlSignersInitialized = true;
-  } // method initCrlSigners
 
   private void initSceps() throws CaMgmtException {
     if (scepsInitialized) {
@@ -1647,12 +1589,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method addCertprofile
 
   @Override
-  public void addResponder(ResponderEntry dbEntry) throws CaMgmtException {
+  public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
     asssertMasterMode();
     String name = dbEntry.getName();
-    if (responderDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("Responder named ", name, " exists"));
+    if (signerDbEntries.containsKey(name)) {
+      throw new CaMgmtException(concat("Signer named ", name, " exists"));
     }
 
     String conf = dbEntry.getConf();
@@ -1663,19 +1605,19 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    ResponderEntryWrapper responder = createResponder(dbEntry);
-    queryExecutor.addResponder(dbEntry);
-    responders.put(name, responder);
-    responderDbEntries.put(name, dbEntry);
+    SignerEntryWrapper signer = createSigner(dbEntry);
+    queryExecutor.addSigner(dbEntry);
+    signers.put(name, signer);
+    signerDbEntries.put(name, dbEntry);
   } // method addResponder
 
   @Override
-  public void removeResponder(String name) throws CaMgmtException {
+  public void removeSigner(String name) throws CaMgmtException {
     name = ParamUtil.requireNonBlankLower("name", name);
     asssertMasterMode();
-    boolean bo = queryExecutor.deleteRowWithName(name, "RESPONDER");
+    boolean bo = queryExecutor.deleteRowWithName(name, "SIGNER");
     if (!bo) {
-      throw new CaMgmtException("unknown Responder " + name);
+      throw new CaMgmtException("unknown signer " + name);
     }
 
     for (String caName : caInfos.keySet()) {
@@ -1683,6 +1625,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       if (name.equals(caInfo.getResponderName())) {
         caInfo.setResponderName(null);
       }
+
+      if (name.equals(caInfo.getCrlSignerName())) {
+        caInfo.setCrlSignerName(null);
+      }
+
     }
 
     for (String scepName : scepDbEntries.keySet()) {
@@ -1696,13 +1643,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    responderDbEntries.remove(name);
-    responders.remove(name);
-    LOG.info("removed Responder '{}'", name);
+    signerDbEntries.remove(name);
+    signers.remove(name);
+    LOG.info("removed signer '{}'", name);
   } // method removeResponder
 
   @Override
-  public void changeResponder(String name, String type, String conf, String base64Cert)
+  public void changeSigner(String name, String type, String conf, String base64Cert)
       throws CaMgmtException {
     name = ParamUtil.requireNonBlankLower("name", name);
     asssertMasterMode();
@@ -1714,13 +1661,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       type = type.toLowerCase();
     }
 
-    ResponderEntryWrapper newResponder = queryExecutor.changeResponder(name, type, conf,
+    SignerEntryWrapper newResponder = queryExecutor.changeSigner(name, type, conf,
         base64Cert, this, securityFactory);
 
-    responders.remove(name);
-    responderDbEntries.remove(name);
-    responderDbEntries.put(name, newResponder.getDbEntry());
-    responders.put(name, newResponder);
+    signers.remove(name);
+    signerDbEntries.remove(name);
+    signerDbEntries.put(name, newResponder.getDbEntry());
+    signers.put(name, newResponder);
 
     for (ScepImpl scep : sceps.values()) {
       if (name.equals(scep.getDbEntry().getResponderName())) {
@@ -1730,85 +1677,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method changeResponder
 
   @Override
-  public ResponderEntry getResponder(String name) {
-    return responderDbEntries.get(ParamUtil.requireNonBlankLower("name", name));
+  public SignerEntry getSigner(String name) {
+    return signerDbEntries.get(ParamUtil.requireNonBlankLower("name", name));
   }
 
-  public ResponderEntryWrapper getResponderWrapper(String name) {
-    return responders.get(ParamUtil.requireNonBlankLower("name", name));
-  }
-
-  @Override
-  public void addCrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    asssertMasterMode();
-    String name = dbEntry.getName();
-    if (crlSigners.containsKey(name)) {
-      throw new CaMgmtException(concat("CRL signer named ", name, " exists"));
-    }
-
-    String conf = dbEntry.getConf();
-    if (conf != null) {
-      String newConf = canonicalizeSignerConf(dbEntry.getType(), conf, null, securityFactory);
-      if (!conf.equals(newConf)) {
-        dbEntry.setConf(newConf);
-      }
-    }
-
-    CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
-    CrlSignerEntry tmpDbEntry = crlSigner.getDbEntry();
-    queryExecutor.addCrlSigner(tmpDbEntry);
-    crlSigners.put(name, crlSigner);
-    crlSignerDbEntries.put(name, tmpDbEntry);
-  } // method addCrlSigner
-
-  @Override
-  public void removeCrlSigner(String name) throws CaMgmtException {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    asssertMasterMode();
-    boolean bo = queryExecutor.deleteRowWithName(name, "CRLSIGNER");
-    if (!bo) {
-      throw new CaMgmtException("unknown CRL signer " + name);
-    }
-    for (String caName : caInfos.keySet()) {
-      CaInfo caInfo = caInfos.get(caName);
-      if (name.equals(caInfo.getCrlSignerName())) {
-        caInfo.setCrlSignerName(null);
-      }
-    }
-
-    crlSigners.remove(name);
-    crlSignerDbEntries.remove(name);
-    LOG.info("removed CRL signer '{}'", name);
-  } // method removeCrlSigner
-
-  @Override
-  public void changeCrlSigner(ChangeCrlSignerEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    asssertMasterMode();
-
-    String name = dbEntry.getName();
-    String signerType = dbEntry.getSignerType();
-    String signerConf = dbEntry.getSignerConf();
-    String signerCert = dbEntry.getBase64Cert();
-    String crlControl = dbEntry.getCrlControl();
-
-    CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(name, signerType,
-        signerConf, signerCert, crlControl, this, securityFactory);
-
-    crlSigners.remove(name);
-    crlSignerDbEntries.remove(name);
-    crlSignerDbEntries.put(name, crlSigner.getDbEntry());
-    crlSigners.put(name, crlSigner);
-  } // method changeCrlSigner
-
-  @Override
-  public CrlSignerEntry getCrlSigner(String name) {
-    return crlSignerDbEntries.get(name.toLowerCase());
-  }
-
-  public CrlSignerEntryWrapper getCrlSignerWrapper(String name) {
-    return crlSigners.get(name.toLowerCase());
+  public SignerEntryWrapper getSignerWrapper(String name) {
+    return signers.get(ParamUtil.requireNonBlankLower("name", name));
   }
 
   @Override
@@ -2379,6 +2253,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         nextCrlNumber, signerType, signerConf, caUris, numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControl(caEntry.getCmpControl());
+    entry.setCrlControl(caEntry.getCrlControl());
+    entry.setResponderName(caEntry.getResponderName());
     entry.setCrlSignerName(caEntry.getCrlSignerName());
     entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
     entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
@@ -2386,7 +2262,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
     entry.setMaxValidity(caEntry.getMaxValidity());
     entry.setPermission(caEntry.getPermission());
-    entry.setResponderName(caEntry.getResponderName());
     entry.setSupportRest(caEntry.isSupportRest());
     entry.setSaveRequest(caEntry.isSaveRequest());
     entry.setStatus(caEntry.getStatus());
@@ -2426,9 +2301,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
   } // method shutdownPublisher
 
-  ResponderEntryWrapper createResponder(ResponderEntry dbEntry) throws CaMgmtException {
+  SignerEntryWrapper createSigner(SignerEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
-    ResponderEntryWrapper ret = new ResponderEntryWrapper();
+    SignerEntryWrapper ret = new SignerEntryWrapper();
     ret.setDbEntry(dbEntry);
     try {
       ret.initSigner(securityFactory);
@@ -2439,31 +2314,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
     return ret;
   } // method createCmpResponder
-
-  CrlSignerEntryWrapper createX509CrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    CrlSignerEntryWrapper signer = new CrlSignerEntryWrapper();
-    try {
-      signer.setDbEntry(dbEntry);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(concat("InvalidConfException: ", ex.getMessage()));
-    }
-    try {
-      signer.initSigner(securityFactory);
-    } catch (XiSecurityException | OperationException ex) {
-      String message = "could not create CRL signer " + dbEntry.getName();
-      LogUtil.error(LOG, ex, message);
-
-      if (ex instanceof OperationException) {
-        throw new CaMgmtException(message + ": "
-            + ((OperationException) ex).getErrorCode() + ", " + ex.getMessage());
-      } else {
-        throw new CaMgmtException(concat(message, ": ", ex.getMessage()));
-      }
-    }
-
-    return signer;
-  } // method createX509CrlSigner
 
   IdentifiedCertprofile createCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
@@ -2752,48 +2602,24 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     // Responder
-    for (String name : conf.getResponderNames()) {
-      ResponderEntry entry = conf.getResponder(name);
-      ResponderEntry entryB = responderDbEntries.get(name);
+    for (String name : conf.getSignerNames()) {
+      SignerEntry entry = conf.getSigner(name);
+      SignerEntry entryB = signerDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
-          LOG.info("ignore existed CMP responder {}", name);
+          LOG.info("ignore existed signer {}", name);
           continue;
         } else {
           throw logAndCreateException(
-              concat("CMP responder ", name, " existed, could not re-added it"));
+              concat("signer ", name, " existed, could not re-added it"));
         }
       }
 
       try {
-        addResponder(entry);
-        LOG.info("added CMP responder {}", name);
+        addSigner(entry);
+        LOG.info("added signer {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add CMP responder ", name);
-        LogUtil.error(LOG, ex, msg);
-        throw new CaMgmtException(msg);
-      }
-    }
-
-    // CRL signer
-    for (String name : conf.getCrlSignerNames()) {
-      CrlSignerEntry entry = conf.getCrlSigner(name);
-      CrlSignerEntry entryB = crlSignerDbEntries.get(name);
-      if (entryB != null) {
-        if (entry.equals(entryB)) {
-          LOG.info("ignore existed CRL signer {}", name);
-          continue;
-        } else {
-          throw logAndCreateException(
-              concat("CRL signer ", name, " existed, could not re-added it"));
-        }
-      }
-
-      try {
-        addCrlSigner(entry);
-        LOG.info("added CRL signer {}", name);
-      } catch (CaMgmtException ex) {
-        String msg = concat("could not add CRL signer ", name);
+        String msg = concat("could not add signer ", name);
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -3154,7 +2980,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     ZipOutputStream zipStream = getZipOutputStream(zipFile);
     try {
-      Set<String> includeResponderNames = new HashSet<>();
+      Set<String> includeSignerNames = new HashSet<>();
       Set<String> includeRequestorNames = new HashSet<>();
       Set<String> includeProfileNames = new HashSet<>();
       Set<String> includePublisherNames = new HashSet<>();
@@ -3266,7 +3092,20 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
           if (entry.getCrlSignerName() != null) {
             includeCrlSignerNames.add(entry.getCrlSignerName());
-            ciJaxb.setCrlsignerName(entry.getCrlSignerName());
+            ciJaxb.setCrlSignerName(entry.getCrlSignerName());
+          }
+
+          if (entry.getResponderName() != null) {
+            includeSignerNames.add(entry.getResponderName());
+            ciJaxb.setResponderName(entry.getResponderName());
+          }
+
+          if (entry.getCmpControl() != null) {
+            ciJaxb.setCmpControl(entry.getCmpControl().getConf());
+          }
+
+          if (entry.getCrlControl() != null) {
+            ciJaxb.setCrlControl(entry.getCrlControl().getConf());
           }
 
           ciJaxb.setCrlUris(createUris(entry.getCrlUris()));
@@ -3285,10 +3124,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setNumCrls(entry.getNumCrls());
           ciJaxb.setOcspUris(createUris(entry.getOcspUris()));
           ciJaxb.setPermission(entry.getPermission());
-          if (entry.getResponderName() != null) {
-            includeResponderNames.add(entry.getResponderName());
-            ciJaxb.setResponderName(entry.getResponderName());
-          }
           ciJaxb.setSaveReq(entry.isSaveRequest());
           ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               concat("files/ca-", name, "-signerconf.conf")));
@@ -3311,34 +3146,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       // clear the users if the list is empty
       if (users.isEmpty()) {
         root.setUsers(null);
-      }
-
-      // crlsigners
-      if (CollectionUtil.isNonEmpty(crlSignerDbEntries)) {
-        List<CrlsignerType> list = new LinkedList<>();
-
-        for (String name : crlSignerDbEntries.keySet()) {
-          if (!includeCrlSignerNames.contains(name)) {
-            continue;
-          }
-
-          CrlSignerEntry entry = crlSignerDbEntries.get(name);
-          CrlsignerType jaxb = new CrlsignerType();
-          jaxb.setName(name);
-          jaxb.setSignerType(entry.getType());
-          jaxb.setSignerConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/crlsigner-", name, ".conf")));
-          jaxb.setSignerCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
-              concat("files/crlsigner-", name, ".der")));
-          jaxb.setCrlControl(entry.getCrlControl());
-
-          list.add(jaxb);
-        }
-
-        if (!list.isEmpty()) {
-          root.setCrlsigners(new CaconfType.Crlsigners());
-          root.getCrlsigners().getCrlsigner().addAll(list);
-        }
       }
 
       // requestors
@@ -3419,7 +3226,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           }
 
           String responderName = entry.getResponderName();
-          includeResponderNames.add(responderName);
+          includeSignerNames.add(responderName);
 
           ScepType jaxb = new ScepType();
           jaxb.setName(name);
@@ -3437,17 +3244,17 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
       }
 
-      // responders
-      if (CollectionUtil.isNonEmpty(responderDbEntries)) {
-        List<ResponderType> list = new LinkedList<>();
+      // signers
+      if (CollectionUtil.isNonEmpty(signerDbEntries)) {
+        List<SignerType> list = new LinkedList<>();
 
-        for (String name : responderDbEntries.keySet()) {
-          if (!includeResponderNames.contains(name)) {
+        for (String name : signerDbEntries.keySet()) {
+          if (!includeSignerNames.contains(name)) {
             continue;
           }
 
-          ResponderEntry entry = responderDbEntries.get(name);
-          ResponderType jaxb = new ResponderType();
+          SignerEntry entry = signerDbEntries.get(name);
+          SignerType jaxb = new SignerType();
           jaxb.setName(name);
           jaxb.setType(entry.getType());
           jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
@@ -3459,8 +3266,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
 
         if (!list.isEmpty()) {
-          root.setResponders(new CaconfType.Responders());
-          root.getResponders().getResponder().addAll(list);
+          root.setSigners(new CaconfType.Signers());
+          root.getSigners().getSigner().addAll(list);
         }
       }
 

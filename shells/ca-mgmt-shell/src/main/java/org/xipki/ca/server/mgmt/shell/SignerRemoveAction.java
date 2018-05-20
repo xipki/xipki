@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.ResponderRemoveAction;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -28,22 +31,26 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-responder-rm",
-    description = "remove responder (negative, QA)")
+@Command(scope = "ca", name = "signer-rm",
+    description = "remove signer")
 @Service
-public class NegResponderRemoveAction extends ResponderRemoveAction {
+public class SignerRemoveAction extends CaAction {
+
+  @Argument(index = 0, name = "name", required = true,
+      description = "signer name")
+  @Completion(SignerNameCompleter.class)
+  private String name;
 
   @Override
   protected Object execute0() throws Exception {
-    println("neg-responder-rm");
-
+    String msg = "signer " + name;
     try {
-      super.execute0();
-    } catch (Exception ex) {
+      caManager.removeSigner(name);
+      println("removed " + msg);
       return null;
+    } catch (CaMgmtException ex) {
+      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
     }
-
-    throw new CmdFailure("exception expected, but received none");
   }
 
 }

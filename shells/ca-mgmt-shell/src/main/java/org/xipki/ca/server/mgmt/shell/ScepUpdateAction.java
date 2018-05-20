@@ -28,7 +28,7 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
-import org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -65,7 +65,7 @@ public class ScepUpdateAction extends CaAction {
 
   @Option(name = "--responder",
       description = "Responder name")
-  @Completion(ResponderNameCompleter.class)
+  @Completion(SignerNameCompleter.class)
   private String responderName;
 
   @Option(name = "--profile", multiValued = true,

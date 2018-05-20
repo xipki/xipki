@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.ca.server.mgmt.shell.completer;
 
-import org.apache.karaf.shell.api.action.Command;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.ResponderAddAction;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.ca.server.mgmt.api.CaManager;
 
 /**
  * TODO.
@@ -28,22 +29,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-responder-add",
-    description = "add responder (negative, QA)")
 @Service
-public class NegResponderAddAction extends ResponderAddAction {
+public class SignerNamePlusNullCompleter extends MgmtNameCompleter {
 
   @Override
-  protected Object execute0() throws Exception {
-    println("neg-responder-add");
-
-    try {
-      super.execute0();
-    } catch (Exception ex) {
-      return null;
-    }
-
-    throw new CmdFailure("exception expected, but received none");
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>();
+    ret.addAll(caManager.getSignerNames());
+    ret.add(CaManager.NULL);
+    return ret;
   }
 
 }

@@ -65,8 +65,8 @@ import org.xipki.ca.server.impl.ByUserRequestorInfo;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.KnowCertResult;
+import org.xipki.ca.server.impl.SignerEntryWrapper;
 import org.xipki.ca.server.impl.X509Ca;
-import org.xipki.ca.server.impl.cmp.ResponderEntryWrapper;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
@@ -166,7 +166,7 @@ public class ScepImpl implements Scep {
         this.control.isSupportGetCrl());
 
     String responderName = dbEntry.getResponderName();
-    ResponderEntryWrapper responder = caManager.getResponderWrapper(responderName);
+    SignerEntryWrapper responder = caManager.getSignerWrapper(responderName);
     if (responder == null) {
       throw new CaMgmtException("Unknown responder " + responderName);
     }
@@ -180,7 +180,7 @@ public class ScepImpl implements Scep {
     setResponder(responder);
   }
 
-  public void setResponder(ResponderEntryWrapper responder) throws CaMgmtException {
+  public void setResponder(SignerEntryWrapper responder) throws CaMgmtException {
     if (responder == null) {
       this.responderKey = null;
       this.responderCert = null;

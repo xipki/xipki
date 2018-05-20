@@ -37,6 +37,7 @@ import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -200,12 +201,12 @@ public class CaInfo {
     caEntry.setCrlSignerName(crlSignerName);
   }
 
-  public CmpControl getCmpControl() {
-    return caEntry.getCmpControl();
+  public CrlControl getCrlControl() {
+    return caEntry.getCrlControl();
   }
 
-  public void setCmpControl(CmpControl cmpControl) {
-    caEntry.setCmpControl(cmpControl);
+  public void setCrlControl(CrlControl crlControl) {
+    caEntry.setCrlControl(crlControl);
   }
 
   public String getResponderName() {
@@ -214,6 +215,14 @@ public class CaInfo {
 
   public void setResponderName(String name) {
     caEntry.setResponderName(name);
+  }
+
+  public CmpControl getCmpControl() {
+    return caEntry.getCmpControl();
+  }
+
+  public void setCmpControl(CmpControl cmpControl) {
+    caEntry.setCmpControl(cmpControl);
   }
 
   public int getNumCrls() {

@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.cmp;
+package org.xipki.ca.server.impl;
 
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
@@ -34,9 +34,9 @@ import org.xipki.security.SignerConf;
  * @since 2.0.0
  */
 
-public class ResponderEntryWrapper {
+public class SignerEntryWrapper {
 
-  private ResponderEntry dbEntry;
+  private SignerEntry dbEntry;
 
   private ConcurrentContentSigner signer;
 
@@ -44,10 +44,10 @@ public class ResponderEntryWrapper {
 
   private GeneralName subjectAsGeneralName;
 
-  public ResponderEntryWrapper() {
+  public SignerEntryWrapper() {
   }
 
-  public void setDbEntry(ResponderEntry dbEntry) {
+  public void setDbEntry(SignerEntry dbEntry) {
     this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
     signer = null;
     if (dbEntry.getCertificate() != null) {
@@ -87,7 +87,7 @@ public class ResponderEntryWrapper {
     }
   } // method initSigner
 
-  public ResponderEntry getDbEntry() {
+  public SignerEntry getDbEntry() {
     return dbEntry;
   }
 

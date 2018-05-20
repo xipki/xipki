@@ -61,8 +61,8 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <!-- table RESPONDER -->
-    <createTable tableName="RESPONDER">
+    <!-- table SIGNER -->
+    <createTable tableName="SIGNER">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -87,18 +87,6 @@
       <column name="PROFILES" type="VARCHAR(200)"/>
       <!-- CONTROL is reserved for future, will currently not be used -->
       <column name="CONTROL" type="VARCHAR(400)"/>
-    </createTable>
-    <!-- table CRLSIGNER -->
-    <createTable tableName="CRLSIGNER">
-      <column name="NAME" type="VARCHAR(45)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="SIGNER_TYPE" type="VARCHAR(100)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="SIGNER_CERT" type="VARCHAR(4000)"/>
-      <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
-      <column name="SIGNER_CONF" type="CLOB"/>
     </createTable>
     <!-- table REQUESTOR -->
     <createTable tableName="REQUESTOR">
@@ -176,8 +164,9 @@
       <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
-      <column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
+      <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
       <column name="CMP_CONTROL" type="VARCHAR(1000)"/>
+      <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="RESPONDER_NAME" type="VARCHAR(45)"/>
       <column defaultValueNumeric="1" name="DUPLICATE_KEY" type="SMALLINT"
           remarks="whether duplicate public key is allowed, default is true (1)">
@@ -441,16 +430,16 @@
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="3">
-    <addForeignKeyConstraint constraintName="FK_CA_CRLSIGNER1"
+    <addForeignKeyConstraint constraintName="FK_CA_CRL_SIGNER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CRLSIGNER_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
-    <addForeignKeyConstraint constraintName="FK_CA_RESPONDER1"
+      baseColumnNames="CRL_SIGNER_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
+    <addForeignKeyConstraint constraintName="FK_CA_RESP_SIGNER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="RESPONDER_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="RESPONDER"/>
+      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
     <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
@@ -506,11 +495,11 @@
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="SCEP"
       referencedColumnNames="ID" referencedTableName="CA"/>
-    <addForeignKeyConstraint constraintName="FK_SCEP_RESPONDER1"
+    <addForeignKeyConstraint constraintName="FK_SCEP_SIGNER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="RESPONDER_NAME" baseTableName="SCEP"
-      referencedColumnNames="NAME" referencedTableName="RESPONDER"/>
+      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="4">

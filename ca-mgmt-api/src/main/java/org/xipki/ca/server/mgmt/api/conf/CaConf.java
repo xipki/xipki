@@ -58,10 +58,10 @@ import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
-import org.xipki.ca.server.mgmt.api.ResponderEntry;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -70,7 +70,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.NameValueType;
@@ -78,8 +77,8 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ObjectFactory;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.common.ConfPairs;
@@ -110,9 +109,7 @@ public class CaConf {
 
   private final Map<String, String> properties = new HashMap<>();
 
-  private final Map<String, ResponderEntry> responders = new HashMap<>();
-
-  private final Map<String, CrlSignerEntry> crlSigners = new HashMap<>();
+  private final Map<String, SignerEntry> signers = new HashMap<>();
 
   private final Map<String, RequestorEntry> requestors = new HashMap<>();
 
@@ -252,22 +249,12 @@ public class CaConf {
       }
     }
 
-    // Responders
-    if (jaxb.getResponders() != null) {
-      for (ResponderType m : jaxb.getResponders().getResponder()) {
-        ResponderEntry en = new ResponderEntry(m.getName(), expandConf(m.getType()),
+    // Signers
+    if (jaxb.getSigners() != null) {
+      for (SignerType m : jaxb.getSigners().getSigner()) {
+        SignerEntry en = new SignerEntry(m.getName(), expandConf(m.getType()),
             getValue(m.getConf(), zipFile), getBase64Binary(m.getCert(), zipFile));
-        addResponder(en);
-      }
-    }
-
-    // CRL signers
-    if (jaxb.getCrlsigners() != null) {
-      for (CrlsignerType m : jaxb.getCrlsigners().getCrlsigner()) {
-        CrlSignerEntry en = new CrlSignerEntry(m.getName(),
-            expandConf(m.getSignerType()), getValue(m.getSignerConf(), zipFile),
-            getBase64Binary(m.getSignerCert(), zipFile), expandConf(m.getCrlControl()));
-        addCrlSigner(en);
+        addSigner(en);
       }
     }
 
@@ -360,8 +347,17 @@ public class CaConf {
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile), caUris,
               numCrls, exprirationPeriod);
 
-          caEntry.setCmpControl(new CmpControl(ci.getCmpcontrol()));
-          caEntry.setCrlSignerName(ci.getCrlsignerName());
+          if (ci.getCmpControl() != null) {
+            caEntry.setCmpControl(new CmpControl(ci.getCmpControl()));
+          }
+
+          if (ci.getCrlControl() != null) {
+            caEntry.setCrlControl(new CrlControl(ci.getCrlControl()));
+          }
+
+          caEntry.setResponderName(ci.getResponderName());
+          caEntry.setCrlSignerName(ci.getCrlSignerName());
+
           caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
           caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
           if (ci.getExtraControl() != null) {
@@ -377,8 +373,6 @@ public class CaConf {
 
           caEntry.setMaxValidity(CertValidity.getInstance(ci.getMaxValidity()));
           caEntry.setPermission(ci.getPermission());
-
-          caEntry.setResponderName(ci.getResponderName());
 
           caEntry.setSupportRest(ci.isSupportRest());
           caEntry.setSaveRequest(ci.isSaveReq());
@@ -482,30 +476,17 @@ public class CaConf {
 
   }
 
-  public void addResponder(ResponderEntry responder) {
-    ParamUtil.requireNonNull("responder", responder);
-    this.responders.put(responder.getName(), responder);
+  public void addSigner(SignerEntry signer) {
+    ParamUtil.requireNonNull("signer", signer);
+    this.signers.put(signer.getName(), signer);
   }
 
-  public Set<String> getResponderNames() {
-    return Collections.unmodifiableSet(responders.keySet());
+  public Set<String> getSignerNames() {
+    return Collections.unmodifiableSet(signers.keySet());
   }
 
-  public ResponderEntry getResponder(String name) {
-    return responders.get(ParamUtil.requireNonNull("name", name));
-  }
-
-  public void addCrlSigner(CrlSignerEntry crlSigner) {
-    ParamUtil.requireNonNull("crlSigner", crlSigner);
-    this.crlSigners.put(crlSigner.getName(), crlSigner);
-  }
-
-  public Set<String> getCrlSignerNames() {
-    return Collections.unmodifiableSet(crlSigners.keySet());
-  }
-
-  public CrlSignerEntry getCrlSigner(String name) {
-    return crlSigners.get(ParamUtil.requireNonNull("name", name));
+  public SignerEntry getSigner(String name) {
+    return signers.get(ParamUtil.requireNonNull("name", name));
   }
 
   public void addRequestor(RequestorEntry requestor) {

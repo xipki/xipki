@@ -59,7 +59,11 @@ public class CaEntry {
 
   private CmpControl cmpControl;
 
+  private CrlControl crlControl;
+
   private String responderName;
+
+  private String crlSignerName;
 
   private boolean duplicateKeyPermitted;
 
@@ -88,8 +92,6 @@ public class CaEntry {
   private List<String> caCertUris;
 
   private X509Certificate cert;
-
-  private String crlSignerName;
 
   private int serialNoBitLen;
 
@@ -195,12 +197,28 @@ public class CaEntry {
     return cmpControl;
   }
 
+  public void setCrlControl(CrlControl crlControl) {
+    this.crlControl = crlControl;
+  }
+
+  public CrlControl getCrlControl() {
+    return crlControl;
+  }
+
   public String getResponderName() {
     return responderName;
   }
 
   public void setResponderName(String responderName) {
     this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+  }
+
+  public String getCrlSignerName() {
+    return crlSignerName;
+  }
+
+  public void setCrlSignerName(String crlSignerName) {
+    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
   public boolean isDuplicateKeyPermitted() {
@@ -298,8 +316,10 @@ public class CaEntry {
         "\nsignerType: ", signerType,
         "\nsignerConf: ", (signerConf == null ? "null" :
           InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\ncmpcontrol: ", cmpControl,
+        "\ncmpControl: ", cmpControl,
+        "\ncrlControl: ", crlControl,
         "\nresponderName: ", responderName,
+        "\ncrlSignerName: ", crlSignerName,
         "\nduplicateKey: ", duplicateKeyPermitted,
         "\nduplicateSubject: ", duplicateSubjectPermitted,
         "\nsupportRest: ", supportRest,
@@ -313,7 +333,6 @@ public class CaEntry {
         "\ndeltaCrlUris:", formatUris(deltaCrlUris), "\ncrlUris:", formatUris(crlUris),
         "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(caCertUris),
         "\ncert: \n", InternUtil.formatCert(cert, verbose),
-        "\ncrlSignerName: ", crlSignerName,
         "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"),
         revInfoText);
   } // method toString
@@ -370,7 +389,15 @@ public class CaEntry {
       return false;
     }
 
+    if (!CompareUtil.equalsObject(crlControl, obj.crlControl)) {
+      return false;
+    }
+
     if (!CompareUtil.equalsObject(responderName, obj.responderName)) {
+      return false;
+    }
+
+    if (!CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)) {
       return false;
     }
 
@@ -429,10 +456,6 @@ public class CaEntry {
     }
 
     if (!CompareUtil.equalsObject(cert, obj.cert)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)) {
       return false;
     }
 
@@ -530,14 +553,6 @@ public class CaEntry {
 
   public int getNumCrls() {
     return numCrls;
-  }
-
-  public String getCrlSignerName() {
-    return crlSignerName;
-  }
-
-  public void setCrlSignerName(String crlSignerName) {
-    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
   public CertRevocationInfo getRevocationInfo() {

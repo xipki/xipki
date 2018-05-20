@@ -135,9 +135,7 @@ public interface CaManager {
 
   Set<String> getRequestorNames();
 
-  Set<String> getResponderNames();
-
-  Set<String> getCrlSignerNames();
+  Set<String> getSignerNames();
 
   Set<String> getCaNames();
 
@@ -366,81 +364,46 @@ public interface CaManager {
   void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException;
 
   /**
-   * Adds a responder.
+   * Adds a signer.
    * @param dbEntry
-   *          Responder entry. Must not be {@code null}.
+   *          Signer entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addResponder(ResponderEntry dbEntry) throws CaMgmtException;
+  void addSigner(SignerEntry dbEntry) throws CaMgmtException;
 
   /**
-   * Removes the responder named {@code name}.
+   * Removes the signer named {@code name}.
    * @param name
-   *          Responder name. Must not be {@code null}.
+   *          Signer name. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void removeResponder(String name) throws CaMgmtException;
+  void removeSigner(String name) throws CaMgmtException;
 
   /**
-   * Returns the responder named {@code name}.
+   * Returns the signer named {@code name}.
    * @param name
-   *          Responder name. Must not be {@code null}.
-   * @return the responder.
+   *          Signer name. Must not be {@code null}.
+   * @return the signer.
    */
-  ResponderEntry getResponder(String name);
+  SignerEntry getSigner(String name);
 
   /**
-   * Changes the responder {@code name}.
+   * Changes the signer {@code name}.
    * @param name
-   *          name of the responder to be changed. Must not be {@code null}.
+   *          name of the signer to be changed. Must not be {@code null}.
    * @param type
    *          Type to be changed. {@code null} indicates no change.
    * @param conf
    *          Configuration to be changed. {@code null} indicates no change.
    * @param base64Cert
-   *          Base64 encoded certificate of the responder. {@code null} indicates no change.
+   *          Base64 encoded certificate of the signer. {@code null} indicates no change.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeResponder(String name, String type, String conf, String base64Cert)
+  void changeSigner(String name, String type, String conf, String base64Cert)
       throws CaMgmtException;
-
-  /**
-   * Adds a CRL signer.
-   * @param dbEntry
-   *          CRL signer entry. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void addCrlSigner(CrlSignerEntry dbEntry) throws CaMgmtException;
-
-  /**
-   * Remove the CRL signer {@code crlSignerName}.
-   * @param crlSignerName
-   *          Name of the CRL signer. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void removeCrlSigner(String crlSignerName) throws CaMgmtException;
-
-  /**
-   * Changes the CRL signer.
-   * @param dbEntry
-   *          CRL signer entry. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void changeCrlSigner(ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
-
-  /**
-   * Returns the CRL signer named {@code name}.
-   * @param name
-   *          CRL signer name. Must not be {@code null}.
-   * @return the CRL Signer
-   */
-  CrlSignerEntry getCrlSigner(String name);
 
   /**
    * Adds a publisher.

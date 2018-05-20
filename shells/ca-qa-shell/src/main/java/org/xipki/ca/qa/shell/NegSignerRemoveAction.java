@@ -19,7 +19,7 @@ package org.xipki.ca.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CrlSignerUpdateAction;
+import org.xipki.ca.server.mgmt.shell.SignerRemoveAction;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -28,14 +28,14 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-crlsigner-up",
-    description = "update CRL signer (negative, QA)")
+@Command(scope = "caqa", name = "neg-signer-rm",
+    description = "remove signer (negative, QA)")
 @Service
-public class NegCrlSignerUpdateAction extends CrlSignerUpdateAction {
+public class NegSignerRemoveAction extends SignerRemoveAction {
 
   @Override
   protected Object execute0() throws Exception {
-    println("neg-crlsigner-up");
+    println("neg-signer-rm");
 
     try {
       super.execute0();

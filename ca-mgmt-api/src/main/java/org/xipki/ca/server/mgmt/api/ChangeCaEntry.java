@@ -45,7 +45,11 @@ public class ChangeCaEntry {
 
   private String cmpControl;
 
+  private String crlControl;
+
   private String responderName;
+
+  private String crlSignerName;
 
   private Boolean duplicateKeyPermitted;
 
@@ -74,8 +78,6 @@ public class ChangeCaEntry {
   private List<String> caCertUris;
 
   private X509Certificate cert;
-
-  private String crlSignerName;
 
   private Integer numCrls;
 
@@ -129,12 +131,28 @@ public class ChangeCaEntry {
     this.cmpControl = cmpControl;
   }
 
+  public String getCrlControl() {
+    return crlControl;
+  }
+
+  public void setCrlControl(String crlControl) {
+    this.crlControl = crlControl;
+  }
+
   public String getResponderName() {
     return responderName;
   }
 
   public void setResponderName(String responderName) {
     this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+  }
+
+  public String getCrlSignerName() {
+    return crlSignerName;
+  }
+
+  public void setCrlSignerName(String crlSignerName) {
+    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
   public Boolean getDuplicateKeyPermitted() {
@@ -258,14 +276,6 @@ public class ChangeCaEntry {
 
   public void setCert(X509Certificate cert) {
     this.cert = cert;
-  }
-
-  public String getCrlSignerName() {
-    return crlSignerName;
-  }
-
-  public void setCrlSignerName(String crlSignerName) {
-    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
   public Integer getNumCrls() {

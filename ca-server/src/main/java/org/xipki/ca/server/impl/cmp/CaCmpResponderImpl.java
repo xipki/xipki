@@ -222,8 +222,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
     boolean healthy = result.isHealthy();
 
-    boolean responderHealthy = caManager.getResponderWrapper(
-        getResponderName()).getSigner().isHealthy();
+    boolean responderHealthy =
+        caManager.getSignerWrapper(getResponderName()).getSigner().isHealthy();
     healthy &= responderHealthy;
 
     HealthCheckResult responderHealth = new HealthCheckResult("Responder");
@@ -1247,12 +1247,12 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
   @Override
   protected ConcurrentContentSigner getSigner() {
     String name = getResponderName();
-    return caManager.getResponderWrapper(name).getSigner();
+    return caManager.getSignerWrapper(name).getSigner();
   }
 
   @Override
   protected GeneralName getSender() {
-    return caManager.getResponderWrapper(getResponderName()).getSubjectAsGeneralName();
+    return caManager.getSignerWrapper(getResponderName()).getSubjectAsGeneralName();
   }
 
   @Override
@@ -1267,8 +1267,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
     if (requestRecipient.getTagNo() == GeneralName.directoryName) {
       X500Name x500Name = X500Name.getInstance(requestRecipient.getName());
-      if (x500Name.equals(
-          caManager.getResponderWrapper(getResponderName()).getSubjectAsX500Name())) {
+      if (x500Name.equals(caManager.getSignerWrapper(getResponderName()).getSubjectAsX500Name())) {
         return true;
       }
     }
