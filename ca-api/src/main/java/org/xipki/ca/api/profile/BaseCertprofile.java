@@ -234,7 +234,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   @Override
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
-      throws BadCertTemplateException {
+      throws CertprofileException, BadCertTemplateException {
     ParamUtil.requireNonNull("publicKey", publicKey);
 
     Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
@@ -543,8 +543,8 @@ public abstract class BaseCertprofile extends Certprofile {
     return ObjectIdentifiers.oidToDisplayName(type);
   }
 
-  private static void checkEcSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid,
-      byte[] encoded) throws BadCertTemplateException {
+  private static void checkEcSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
+      throws BadCertTemplateException {
     ParamUtil.requireNonNull("curveOid", curveOid);
     ParamUtil.requireNonNull("encoded", encoded);
     ParamUtil.requireMin("encoded.length", encoded.length, 1);

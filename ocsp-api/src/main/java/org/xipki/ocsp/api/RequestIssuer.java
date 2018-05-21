@@ -126,11 +126,8 @@ public class RequestIssuer {
     }
 
     RequestIssuer other = (RequestIssuer) obj;
-    if (this.length != other.length) {
-      return false;
-    }
-
-    return CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.length);
+    return (this.length == other.length)
+        && CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.length);
   }
 
   @Override

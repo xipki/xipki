@@ -255,9 +255,8 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
         sum++;
         String resultText = lineNo + ": " + line + ": ";
         try {
-          ValidationResult result = processOcspQuery(ocspQa, line, messageDir,
-              detailsDir,  serverUrl, respIssuer, issuerCert, issuerHash,
-              requestOptions);
+          ValidationResult result = processOcspQuery(ocspQa, line, messageDir, detailsDir,
+              serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
           if (result.isAllSuccessful()) {
             numSucc++;
             resultText += "valid";
@@ -275,8 +274,8 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
         long now = System.currentTimeMillis();
         if (now - lastPrintDate > 980) { // use 980 ms to ensure the output every second.
-          print("\rProcessed " + sum + " requests in "
-              + StringUtil.formatTime((now - startDate) / 1000, false));
+          String duration = StringUtil.formatTime((now - startDate) / 1000, false);
+          print("\rProcessed " + sum + " requests in " + duration);
           lastPrintDate = now;
         }
       }
@@ -291,9 +290,9 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
       String resultText = lineNo + ": " + serialNumber.toString(16) + ",unknown: ";
       try {
-        ValidationResult result = processOcspQuery(ocspQa, serialNumber,
-            OcspCertStatus.unknown, null, messageDir, detailsDir, serverUrl,
-            respIssuer, issuerCert, issuerHash, requestOptions);
+        ValidationResult result = processOcspQuery(ocspQa, serialNumber, OcspCertStatus.unknown,
+            null, messageDir, detailsDir, serverUrl, respIssuer, issuerCert, issuerHash,
+            requestOptions);
         if (result.isAllSuccessful()) {
           numSucc++;
           resultText += "valid";
@@ -314,11 +313,9 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
       println(resultText, resultOut);
 
-      String message = StringUtil.concatObjectsCap(200,
-          "=====BEGIN SUMMARY=====",
+      String message = StringUtil.concatObjectsCap(200, "=====BEGIN SUMMARY=====",
           "\n       url: ", serverUrlStr, "\n       sum: ", numFail + numSucc,
-          "\nsuccessful: ", numSucc,      "\n    failed: ", numFail,
-          "\n=====END SUMMARY=====");
+          "\nsuccessful: ", numSucc,      "\n    failed: ", numFail, "\n=====END SUMMARY=====");
       println(message);
       println(message, resultOut);
     } finally {
@@ -460,7 +457,6 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
     }
 
     IoUtil.save(new File(detailsDir, hexSerial + "." + validity), sb.toString().getBytes());
-
     return ret;
   }
 

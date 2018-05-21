@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -73,8 +74,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
     jaxbUnmarshaller = context.createUnmarshaller();
 
-    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-        javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    final SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     URL url = QaSystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
     jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
   }
@@ -179,8 +179,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
   @Override
   public IssuerInfo getIssuer(String issuerName) {
-    ParamUtil.requireNonNull("issuerName", issuerName);
-    return x509IssuerInfoMap.get(issuerName);
+    return x509IssuerInfoMap.get(ParamUtil.requireNonNull("issuerName", issuerName));
   }
 
   @Override
@@ -190,8 +189,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
   @Override
   public CertprofileQa getCertprofile(String certprofileName) {
-    ParamUtil.requireNonNull("certprofileName", certprofileName);
-    return x509ProfileMap.get(certprofileName);
+    return x509ProfileMap.get(ParamUtil.requireNonNull("certprofileName", certprofileName));
   }
 
   private QaconfType parseQaConf(InputStream confStream)

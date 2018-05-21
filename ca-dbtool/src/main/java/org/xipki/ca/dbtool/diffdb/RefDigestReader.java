@@ -137,7 +137,7 @@ class RefDigestReader {
           String hash;
           if (dbControl == DbControl.XIPKI_OCSP_v3) {
             hash = rs.getString("HASH");
-          } else { // if (dbControl = DbControl.XIPKI_CA_v2) {
+          } else { //if (dbControl == DbControl.XIPKI_CA_v3) {
             if (certhashAlgo == HashAlgo.SHA1) {
               hash = rs.getString("SHA1");
             } else {
@@ -145,6 +145,7 @@ class RefDigestReader {
               hash = certhashAlgo.base64Hash(Base64.decodeFast(b64Cert));
             }
           }
+
           BigInteger serial = new BigInteger(rs.getString("SN"), 16);
           boolean revoked = rs.getBoolean("REV");
 
@@ -212,10 +213,12 @@ class RefDigestReader {
 
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
           Integer.toString(caId), " AND ID>=?");
-    } else { // if (dbControl == DbControl.XIPKI_CA_v3) {
+    } else if (dbControl == DbControl.XIPKI_CA_v3) {
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
           (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
           " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
+    } else {
+      throw new IllegalArgumentException("unknown dbControl " + dbControl);
     }
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 

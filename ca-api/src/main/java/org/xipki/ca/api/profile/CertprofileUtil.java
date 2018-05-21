@@ -81,14 +81,12 @@ public class CertprofileUtil {
         ASN1Sequence reqSeq = ASN1Sequence.getInstance(requestedName.getName());
         int size = reqSeq.size();
         if (size != 2) {
-          throw new BadCertTemplateException("invalid otherName sequence: size is not 2: "
-              + size);
+          throw new BadCertTemplateException("invalid otherName sequence: size is not 2: " + size);
         }
 
         ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
         if (mode != null && !mode.getAllowedTypes().contains(type)) {
-          throw new BadCertTemplateException(
-              "otherName.type " + type.getId() + " is not allowed");
+          throw new BadCertTemplateException("otherName.type " + type.getId() + " is not allowed");
         }
 
         ASN1Encodable asn1 = reqSeq.getObjectAt(1);
@@ -103,11 +101,8 @@ public class CertprofileUtil {
 
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(type);
-        vector.add(new DERTaggedObject(true, 0,
-            ASN1TaggedObject.getInstance(asn1).getObject()));
-        DERSequence seq = new DERSequence(vector);
-
-        return new GeneralName(GeneralName.otherName, seq);
+        vector.add(new DERTaggedObject(true, 0, ASN1TaggedObject.getInstance(asn1).getObject()));
+        return new GeneralName(GeneralName.otherName, new DERSequence(vector));
       case GeneralName.ediPartyName:
         reqSeq = ASN1Sequence.getInstance(requestedName.getName());
 
@@ -129,8 +124,7 @@ public class CertprofileUtil {
           vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
         }
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-        seq = new DERSequence(vector);
-        return new GeneralName(GeneralName.ediPartyName, seq);
+        return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
       default:
         throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch (tag)

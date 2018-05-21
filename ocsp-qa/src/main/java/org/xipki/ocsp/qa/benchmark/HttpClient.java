@@ -118,8 +118,7 @@ final class HttpClient {
     ClassLoader loader = HttpClient.class.getClassLoader();
     if (os.contains("linux")) {
       try {
-        Class<?> checkClazz = Class.forName(
-            "io.netty.channel.epoll.Epoll", false, loader);
+        Class<?> checkClazz = Class.forName("io.netty.channel.epoll.Epoll", false, loader);
         Method mt = checkClazz.getMethod("isAvailable");
         Object obj = mt.invoke(null);
 
@@ -135,8 +134,7 @@ final class HttpClient {
       }
     } else if (os.contains("mac os") || os.contains("os x")) {
       try {
-        Class<?> checkClazz = Class.forName(
-            "io.netty.channel.epoll.kqueue.KQueue", false, loader);
+        Class<?> checkClazz = Class.forName("io.netty.channel.epoll.kqueue.KQueue", false, loader);
         Method mt = checkClazz.getMethod("isAvailable");
         Object obj = mt.invoke(null);
         if (obj instanceof Boolean) {
@@ -180,11 +178,9 @@ final class HttpClient {
     if (epollAvailable != null && epollAvailable.booleanValue()) {
       try {
         channelClass = (Class<? extends SocketChannel>)
-            Class.forName("io.netty.channel.epoll.EpollSocketChannel",
-                false, loader);
+            Class.forName("io.netty.channel.epoll.EpollSocketChannel", false, loader);
 
-        Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup",
-                  true, loader);
+        Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
         Constructor<?> constructor = clazz.getConstructor(int.class);
         this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
         LOG.info("use Epoll Transport");
@@ -200,8 +196,7 @@ final class HttpClient {
     } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
       try {
         channelClass = (Class<? extends SocketChannel>)
-                Class.forName("io.netty.channel.kqueue.KQueueSocketChannel",
-                    false, loader);
+                Class.forName("io.netty.channel.kqueue.KQueueSocketChannel", false, loader);
 
         Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
                     true, loader);

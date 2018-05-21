@@ -82,13 +82,11 @@ public class KeyParametersOption {
     }
 
     public void setMaskGenAlgs(Set<ASN1ObjectIdentifier> maskGenAlgs) {
-      this.maskGenAlgs = CollectionUtil.isEmpty(maskGenAlgs) ? null
-          : new HashSet<>(maskGenAlgs);
+      this.maskGenAlgs = CollectionUtil.isEmpty(maskGenAlgs) ? null : new HashSet<>(maskGenAlgs);
     }
 
     public void setSaltLengths(Set<Integer> saltLengths) {
-      this.saltLengths = CollectionUtil.isEmpty(saltLengths) ? null
-          : new HashSet<>(saltLengths);
+      this.saltLengths = CollectionUtil.isEmpty(saltLengths) ? null : new HashSet<>(saltLengths);
     }
 
     public void setTrailerFields(Set<Integer> trailerFields) {
@@ -215,11 +213,8 @@ public class KeyParametersOption {
     }
 
     public void setPublicKeyParamSets(Set<ASN1ObjectIdentifier> publicKeyParamSets) {
-      if (CollectionUtil.isEmpty(publicKeyParamSets)) {
-        this.publicKeyParamSets = null;
-      } else {
-        this.publicKeyParamSets = new HashSet<>(publicKeyParamSets);
-      }
+      this.publicKeyParamSets = (CollectionUtil.isEmpty(publicKeyParamSets)) ? null
+          : new HashSet<>(publicKeyParamSets);
     }
 
     public void setDigestParamSets(Set<ASN1ObjectIdentifier> digestParamSets) {

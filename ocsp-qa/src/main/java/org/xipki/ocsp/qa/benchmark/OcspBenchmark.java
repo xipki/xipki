@@ -52,8 +52,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
     Testor() throws Exception {
       this.requestor = new OcspBenchRequestor();
-      this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions,
-          queueSize);
+      this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions, queueSize);
     }
 
     @Override

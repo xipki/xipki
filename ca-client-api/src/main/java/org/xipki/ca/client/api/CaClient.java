@@ -100,7 +100,7 @@ public interface CaClient {
       RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
   /**
-   * TODO.
+   * Revokes a certificate.
    * @param caName
    *          CA name. Could be {@code null}.
    * @param serial
@@ -220,7 +220,7 @@ public interface CaClient {
   String getCaNameByIssuer(X500Name issuer) throws CaClientException;
 
   /**
-   * Creates the PKIMessage sent to CA and returned its encoded form.
+   * Creates the PKIMessage sent to CA and returns its encoded form.
    *
    * @param certRequest
    *          Core request to enroll certificate. Must not be {@code null}.
@@ -238,7 +238,7 @@ public interface CaClient {
       String caName) throws CaClientException;
 
   /**
-   * Creates the PKIMessage sent to CA and returned its encoded form.
+   * Creates the PKIMessage sent to CA and returns its encoded form.
    *
    * @param issuer
    *          Issuer of the certificate. Must not be {@code null}.
@@ -254,7 +254,7 @@ public interface CaClient {
       throws CaClientException;
 
   /**
-   * Creates the PKIMessage sent to CA and returned its encoded form.
+   * Creates the PKIMessage sent to CA and returns its encoded form.
    *
    * @param cert
    *          Certificate. Must not be {@code null}.
@@ -284,7 +284,7 @@ public interface CaClient {
             throws CaClientException, PkiErrorException;
 
   /**
-   * Unrevoke certificates.
+   * Unrevokes certificates.
    *
    * @param caName
    *          CA name. Could be {@code null}.
@@ -302,7 +302,7 @@ public interface CaClient {
       throws CaClientException, PkiErrorException;
 
   /**
-   * Unrevoke certificates.
+   * Unrevokes certificates.
    * @param request
    *          Request. Must not be {@code null}.
    * @param debug
@@ -368,7 +368,7 @@ public interface CaClient {
       RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
   /**
-   * Get the health status.
+   * Gets the health status.
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return the health status.

@@ -38,11 +38,9 @@ import org.xipki.common.util.ParamUtil;
 
 public class CertPublisherFactoryRegisterImpl implements CertPublisherFactoryRegister {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-      CertPublisherFactoryRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CertPublisherFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<CertPublisherFactory> services =
-      new ConcurrentLinkedDeque<CertPublisherFactory>();
+  private ConcurrentLinkedDeque<CertPublisherFactory> services = new ConcurrentLinkedDeque<>();
 
   @Override
   public boolean canCreatePublisher(String type) {

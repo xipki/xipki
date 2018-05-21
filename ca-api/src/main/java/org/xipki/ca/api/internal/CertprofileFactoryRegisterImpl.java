@@ -38,11 +38,9 @@ import org.xipki.common.util.ParamUtil;
 
 public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegister {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-      CertprofileFactoryRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CertprofileFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<CertprofileFactory> services =
-      new ConcurrentLinkedDeque<CertprofileFactory>();
+  private ConcurrentLinkedDeque<CertprofileFactory> services = new ConcurrentLinkedDeque<>();
 
   @Override
   public Set<String> getSupportedTypes() {

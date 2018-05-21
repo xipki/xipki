@@ -138,8 +138,8 @@ class TargetDigestRetriever {
       boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
 
       return (batchSupported && size == numPerSelect)
-        ? getCertsViaInArraySelectInB(inArraySelectStmt, serialNumbers)
-        : getCertsViaSingleSelectInB(singleSelectStmt, serialNumbers);
+        ? getCertsViaInArraySelect(inArraySelectStmt, serialNumbers)
+        : getCertsViaSingleSelect(singleSelectStmt, serialNumbers);
     } // method query
 
   } // class Retriever
@@ -199,8 +199,8 @@ class TargetDigestRetriever {
       singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
           Integer.toString(caId), " AND SN=?");
 
-      arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=")
-        .append(caId).append(" AND SN IN (?");
+      arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId)
+        .append(" AND SN IN (?");
       for (int i = 1; i < numPerSelect; i++) {
         arrayBuffer.append(",?");
       }
@@ -216,10 +216,8 @@ class TargetDigestRetriever {
       singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
         " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND SN=?");
 
-      arrayBuffer.append("SN,REV,RR,RT,RIT,")
-        .append(hashOrCertColumn)
-        .append(" FROM CERT WHERE CA_ID=").append(caId)
-        .append(" AND SN IN (?");
+      arrayBuffer.append("SN,REV,RR,RT,RIT,").append(hashOrCertColumn)
+        .append(" FROM CERT WHERE CA_ID=").append(caId).append(" AND SN IN (?");
 
       for (int i = 1; i < numPerSelect; i++) {
         arrayBuffer.append(",?");
@@ -256,9 +254,8 @@ class TargetDigestRetriever {
     }
   }
 
-  private Map<BigInteger, DigestEntry> getCertsViaSingleSelectInB(
-      PreparedStatement singleSelectStmt, List<BigInteger> serialNumbers)
-      throws DataAccessException {
+  private Map<BigInteger, DigestEntry> getCertsViaSingleSelect(PreparedStatement singleSelectStmt,
+      List<BigInteger> serialNumbers) throws DataAccessException {
     Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
     for (BigInteger serialNumber : serialNumbers) {
@@ -271,9 +268,8 @@ class TargetDigestRetriever {
     return ret;
   }
 
-  private Map<BigInteger, DigestEntry> getCertsViaInArraySelectInB(
-      PreparedStatement batchSelectStmt, List<BigInteger> serialNumbers)
-      throws DataAccessException {
+  private Map<BigInteger, DigestEntry> getCertsViaInArraySelect(PreparedStatement batchSelectStmt,
+      List<BigInteger> serialNumbers) throws DataAccessException {
     final int n = serialNumbers.size();
     if (n != numPerSelect) {
       throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect

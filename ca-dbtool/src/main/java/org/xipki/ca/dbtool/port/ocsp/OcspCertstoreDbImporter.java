@@ -96,8 +96,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     try {
       File file = new File(baseDir + File.separator + FILENAME_OCSP_CERTSTORE);
       @SuppressWarnings("unchecked")
-      JAXBElement<CertstoreType> root = (JAXBElement<CertstoreType>)
-          unmarshaller.unmarshal(file);
+      JAXBElement<CertstoreType> root = (JAXBElement<CertstoreType>) unmarshaller.unmarshal(file);
       certstore = root.getValue();
     } catch (JAXBException ex) {
       throw XmlUtil.convert(ex);
@@ -246,8 +245,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         }
 
         try {
-          long lastId = importCert0(psCert, certsFile, minId,
-              processLogFile, processLog, numProcessedBefore);
+          long lastId = importCert0(psCert, certsFile, minId, processLogFile, processLog,
+              numProcessedBefore);
           minId = lastId + 1;
         } catch (Exception ex) {
           System.err.println("\ncould not import certificates from file " + certsFile

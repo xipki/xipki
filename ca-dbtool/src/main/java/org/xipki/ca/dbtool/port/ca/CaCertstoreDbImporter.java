@@ -99,8 +99,7 @@ class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
   private static final String SQL_ADD_REQUEST =
       "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
 
-  private static final String SQL_ADD_REQCERT =
-      "INSERT INTO REQCERT (ID,RID,CID) VALUES (?,?,?)";
+  private static final String SQL_ADD_REQCERT = "INSERT INTO REQCERT (ID,RID,CID) VALUES (?,?,?)";
 
   private final Unmarshaller unmarshaller;
 

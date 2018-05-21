@@ -73,16 +73,11 @@ class DigestDiffReporter {
     dir.mkdirs();
     IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
-    this.missingWriter = new BufferedWriter(
-        new FileWriter(reportDirname + File.separator + "missing"));
-    this.unexpectedWriter = new BufferedWriter(
-        new FileWriter(reportDirname + File.separator + "unexpected"));
-    this.diffWriter = new BufferedWriter(
-        new FileWriter(reportDirname + File.separator + "diff"));
-    this.goodWriter = new BufferedWriter(
-        new FileWriter(reportDirname + File.separator + "good"));
-    this.errorWriter = new BufferedWriter(
-        new FileWriter(reportDirname + File.separator + "error"));
+    this.missingWriter = new BufferedWriter(new FileWriter(new File(dir, "missing")));
+    this.unexpectedWriter = new BufferedWriter(new FileWriter(new File(dir, "unexpected")));
+    this.diffWriter = new BufferedWriter(new FileWriter(new File(dir, "diff")));
+    this.goodWriter = new BufferedWriter(new FileWriter(new File(dir, "good")));
+    this.errorWriter = new BufferedWriter(new FileWriter(new File(dir, "error")));
 
     start();
   }
@@ -115,8 +110,7 @@ class DigestDiffReporter {
     ParamUtil.requireNonNull("targetCert", targetCert);
 
     if (refCert.getSerialNumber().equals(targetCert.getSerialNumber())) {
-      throw new IllegalArgumentException(
-          "refCert and targetCert do not have the same serialNumber");
+      throw new IllegalArgumentException("refCert and targetCert are not of the same serialNumber");
     }
 
     numDiff.incrementAndGet();
@@ -151,7 +145,7 @@ class DigestDiffReporter {
     closeWriter(errorWriter);
 
     int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
-        + numError.get();
+              + numError.get();
     Date now = new Date();
     int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 

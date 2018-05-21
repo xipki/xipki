@@ -30,7 +30,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -63,7 +62,7 @@ public class DigestDiffWorker extends DbPortWorker {
   public DigestDiffWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       boolean revokedOnly, String refDbConfFile, String targetDbConfFile, String reportDirName,
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
-      throws DataAccessException, PasswordResolverException, IOException {
+      throws PasswordResolverException, IOException {
     this.reportDir = reportDirName;
     this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
     this.numCertsPerSelect = numCertsPerSelect;

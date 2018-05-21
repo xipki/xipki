@@ -110,8 +110,10 @@ import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
+import org.xipki.ca.certprofile.xml.jaxb.ExtensionValueType;
 import org.xipki.ca.certprofile.xml.jaxb.ExtensionsType;
 import org.xipki.ca.certprofile.xml.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.xml.jaxb.OidWithDescType;
 import org.xipki.ca.certprofile.xml.jaxb.PdsLocationType;
 import org.xipki.ca.certprofile.xml.jaxb.PdsLocationsType;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
@@ -247,8 +249,8 @@ public class ExtensionsChecker {
     type = Extension.nameConstraints;
     if (extensionControls.containsKey(type)) {
       org.xipki.ca.certprofile.xml.jaxb.NameConstraints extConf =
-          (org.xipki.ca.certprofile.xml.jaxb.NameConstraints) getExtensionValue(type,
-              extensionsType, org.xipki.ca.certprofile.xml.jaxb.NameConstraints.class);
+          (org.xipki.ca.certprofile.xml.jaxb.NameConstraints) getExtensionValue(
+              type, extensionsType, org.xipki.ca.certprofile.xml.jaxb.NameConstraints.class);
       if (extConf != null) {
         this.nameConstraints = new QaNameConstraints(extConf);
       }
@@ -281,8 +283,7 @@ public class ExtensionsChecker {
           type, extensionsType, Restriction.class);
       if (extConf != null) {
         restriction = new QaDirectoryString(
-            XmlCertprofileUtil.convertDirectoryStringType(extConf.getType()),
-            extConf.getText());
+            XmlCertprofileUtil.convertDirectoryStringType(extConf.getType()), extConf.getText());
       }
     }
 
@@ -293,8 +294,7 @@ public class ExtensionsChecker {
           type, extensionsType, AdditionalInformation.class);
       if (extConf != null) {
         additionalInformation = new QaDirectoryString(
-            XmlCertprofileUtil.convertDirectoryStringType(extConf.getType()),
-            extConf.getText());
+            XmlCertprofileUtil.convertDirectoryStringType(extConf.getType()), extConf.getText());
       }
     }
 
@@ -367,8 +367,7 @@ public class ExtensionsChecker {
         smimeCapabilities = new QaExtensionValue(
             extensionControls.get(type).isCritical(), extValue.getEncoded());
       } catch (IOException ex) {
-        throw new CertprofileException(
-            "Cannot encode SMIMECapabilities: " + ex.getMessage());
+        throw new CertprofileException("Cannot encode SMIMECapabilities: " + ex.getMessage());
       }
     }
 
@@ -377,7 +376,7 @@ public class ExtensionsChecker {
   } // constructor
 
   public List<ValidationIssue> checkExtensions(Certificate cert, IssuerInfo issuerInfo,
-      Extensions requestedExtensions, X500Name requestedSubject) {
+      Extensions requestedExtns, X500Name requestedSubject) {
     ParamUtil.requireNonNull("cert", cert);
     ParamUtil.requireNonNull("issuerInfo", issuerInfo);
 
@@ -392,7 +391,7 @@ public class ExtensionsChecker {
 
     // detect the list of extension types in certificate
     Set<ASN1ObjectIdentifier> presentExtenionTypes =
-        getExensionTypes(cert, issuerInfo, requestedExtensions);
+        getExensionTypes(cert, issuerInfo, requestedExtns);
 
     Extensions extensions = cert.getTBSCertificate().getExtensions();
     ASN1ObjectIdentifier[] oids = extensions.getExtensionOIDs();
@@ -414,7 +413,7 @@ public class ExtensionsChecker {
       }
     }
 
-    Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
+    Map<ASN1ObjectIdentifier, ExtensionControl> extnControls =
         certProfile.getExtensionControls();
     for (ASN1ObjectIdentifier oid : certExtTypes) {
       ValidationIssue issue = createExtensionIssue(oid);
@@ -426,127 +425,109 @@ public class ExtensionsChecker {
 
       Extension ext = extensions.getExtension(oid);
       StringBuilder failureMsg = new StringBuilder();
-      ExtensionControl extControl = extensionControls.get(oid);
+      ExtensionControl extnControl = extnControls.get(oid);
 
-      if (extControl.isCritical() != ext.isCritical()) {
-        addViolation(failureMsg, "critical", ext.isCritical(), extControl.isCritical());
+      if (extnControl.isCritical() != ext.isCritical()) {
+        addViolation(failureMsg, "critical", ext.isCritical(), extnControl.isCritical());
       }
 
-      byte[] extensionValue = ext.getExtnValue().getOctets();
+      byte[] extnValue = ext.getExtnValue().getOctets();
       try {
         if (Extension.authorityKeyIdentifier.equals(oid)) {
           // AuthorityKeyIdentifier
-          checkExtensionIssuerKeyIdentifier(failureMsg, extensionValue, issuerInfo);
+          checkExtnIssuerKeyIdentifier(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectKeyIdentifier.equals(oid)) {
           // SubjectKeyIdentifier
-          checkExtensionSubjectKeyIdentifier(failureMsg, extensionValue,
-              cert.getSubjectPublicKeyInfo());
+          checkExtnSubjectKeyIdentifier(failureMsg, extnValue, cert.getSubjectPublicKeyInfo());
         } else if (Extension.keyUsage.equals(oid)) {
           // KeyUsage
-          checkExtensionKeyUsage(failureMsg, extensionValue, jceCert.getKeyUsage(),
-              requestedExtensions, extControl);
+          checkExtnKeyUsage(failureMsg, extnValue, jceCert.getKeyUsage(),
+              requestedExtns, extnControl);
         } else if (Extension.certificatePolicies.equals(oid)) {
           // CertificatePolicies
-          checkExtensionCertificatePolicies(failureMsg, extensionValue,
-              requestedExtensions, extControl);
+          checkExtnCertificatePolicies(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.policyMappings.equals(oid)) {
           // Policy Mappings
-          checkExtensionPolicyMappings(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnPolicyMappings(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.subjectAlternativeName.equals(oid)) {
           // SubjectAltName
-          checkExtensionSubjectAltName(failureMsg, extensionValue, requestedExtensions,
-              extControl, requestedSubject);
+          checkExtnSubjectAltName(failureMsg, extnValue, requestedExtns,
+              extnControl, requestedSubject);
         } else if (Extension.subjectDirectoryAttributes.equals(oid)) {
           // SubjectDirectoryAttributes
-          checkExtensionSubjectDirAttrs(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnSubjectDirAttrs(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.issuerAlternativeName.equals(oid)) {
           // IssuerAltName
-          checkExtensionIssuerAltNames(failureMsg, extensionValue, issuerInfo);
+          checkExtnIssuerAltNames(failureMsg, extnValue, issuerInfo);
         } else if (Extension.basicConstraints.equals(oid)) {
           // Basic Constraints
-          checkExtensionBasicConstraints(failureMsg, extensionValue);
+          checkExtnBasicConstraints(failureMsg, extnValue);
         } else if (Extension.nameConstraints.equals(oid)) {
           // Name Constraints
-          checkExtensionNameConstraints(failureMsg, extensionValue, extensions,
-              extControl);
+          checkExtnNameConstraints(failureMsg, extnValue, extensions, extnControl);
         } else if (Extension.policyConstraints.equals(oid)) {
           // PolicyConstrains
-          checkExtensionPolicyConstraints(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnPolicyConstraints(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.extendedKeyUsage.equals(oid)) {
           // ExtendedKeyUsage
-          checkExtensionExtendedKeyUsage(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnExtendedKeyUsage(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.cRLDistributionPoints.equals(oid)) {
           // CRL Distribution Points
-          checkExtensionCrlDistributionPoints(failureMsg, extensionValue, issuerInfo);
+          checkExtnCrlDistributionPoints(failureMsg, extnValue, issuerInfo);
         } else if (Extension.inhibitAnyPolicy.equals(oid)) {
           // Inhibit anyPolicy
-          checkExtensionInhibitAnyPolicy(failureMsg, extensionValue, extensions,
-              extControl);
+          checkExtnInhibitAnyPolicy(failureMsg, extnValue, extensions, extnControl);
         } else if (Extension.freshestCRL.equals(oid)) {
           // Freshest CRL
-          checkExtensionDeltaCrlDistributionPoints(failureMsg, extensionValue,
-              issuerInfo);
+          checkExtnDeltaCrlDistributionPoints(failureMsg, extnValue, issuerInfo);
         } else if (Extension.authorityInfoAccess.equals(oid)) {
           // Authority Information Access
-          checkExtensionAuthorityInfoAccess(failureMsg, extensionValue, issuerInfo);
+          checkExtnAuthorityInfoAccess(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectInfoAccess.equals(oid)) {
           // SubjectInfoAccess
-          checkExtensionSubjectInfoAccess(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnSubjectInfoAccess(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (ObjectIdentifiers.id_extension_admission.equals(oid)) {
           // Admission
-          checkExtensionAdmission(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnAdmission(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (ObjectIdentifiers.id_extension_pkix_ocsp_nocheck.equals(oid)) {
           // ocsp-nocheck
-          checkExtensionOcspNocheck(failureMsg, extensionValue);
+          checkExtnOcspNocheck(failureMsg, extnValue);
         } else if (ObjectIdentifiers.id_extension_restriction.equals(oid)) {
           // restriction
-          checkExtensionRestriction(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnRestriction(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (ObjectIdentifiers.id_extension_additionalInformation.equals(oid)) {
           // additionalInformation
-          checkExtensionAdditionalInformation(failureMsg, extensionValue,
-              requestedExtensions, extControl);
+          checkExtnAdditionalInformation(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (ObjectIdentifiers.id_extension_validityModel.equals(oid)) {
           // validityModel
-          checkExtensionValidityModel(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnValidityModel(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.privateKeyUsagePeriod.equals(oid)) {
           // privateKeyUsagePeriod
-          checkExtensionPrivateKeyUsagePeriod(failureMsg, extensionValue,
+          checkExtnPrivateKeyUsagePeriod(failureMsg, extnValue,
               jceCert.getNotBefore(), jceCert.getNotAfter());
         } else if (Extension.qCStatements.equals(oid)) {
           // qCStatements
-          checkExtensionQcStatements(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnQcStatements(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.biometricInfo.equals(oid)) {
           // biometricInfo
-          checkExtensionBiometricInfo(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnBiometricInfo(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (ObjectIdentifiers.id_pe_tlsfeature.equals(oid)) {
           // tlsFeature
-          checkExtensionTlsFeature(failureMsg, extensionValue, requestedExtensions,
-              extControl);
+          checkExtnTlsFeature(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid)) {
           // authorizationTemplate
-          checkExtensionAuthorizationTemplate(failureMsg, extensionValue,
-              requestedExtensions, extControl);
+          checkExtnAuthorizationTemplate(failureMsg, extnValue, requestedExtns, extnControl);
         } else {
           byte[] expected;
           if (ObjectIdentifiers.id_smimeCapabilities.equals(oid)) {
             // SMIMECapabilities
             expected = smimeCapabilities.getValue();
           } else {
-            expected = getExpectedExtValue(oid, requestedExtensions, extControl);
+            expected = getExpectedExtValue(oid, requestedExtns, extnControl);
           }
 
-          if (!Arrays.equals(expected, extensionValue)) {
-            addViolation(failureMsg, "extension valus", hex(extensionValue),
+          if (!Arrays.equals(expected, extnValue)) {
+            addViolation(failureMsg, "extension valus", hex(extnValue),
                 (expected == null) ? "not present" : hex(expected));
           }
         }
@@ -555,22 +536,21 @@ public class ExtensionsChecker {
           issue.setFailureMessage(failureMsg.toString());
         }
 
-      } catch (IllegalArgumentException | ClassCastException
-          | ArrayIndexOutOfBoundsException ex) {
+      } catch (IllegalArgumentException | ClassCastException | ArrayIndexOutOfBoundsException ex) {
         LOG.debug("extension value does not have correct syntax", ex);
         issue.setFailureMessage("extension value does not have correct syntax");
       }
     }
 
     return result;
-  } // method checkExtensions
+  } // method checkExtns
 
-  private byte[] getExpectedExtValue(ASN1ObjectIdentifier type,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private byte[] getExpectedExtValue(ASN1ObjectIdentifier type, Extensions requestedExtns,
+      ExtensionControl extControl) {
     if (constantExtensions != null && constantExtensions.containsKey(type)) {
       return constantExtensions.get(type).getValue();
-    } else if (requestedExtensions != null && extControl.isRequest()) {
-      Extension reqExt = requestedExtensions.getExtension(type);
+    } else if (requestedExtns != null && extControl.isRequest()) {
+      Extension reqExt = requestedExtns.getExtension(type);
       if (reqExt != null) {
         return reqExt.getExtnValue().getOctets();
       }
@@ -580,7 +560,7 @@ public class ExtensionsChecker {
   } // getExpectedExtValue
 
   private Set<ASN1ObjectIdentifier> getExensionTypes(Certificate cert,
-      IssuerInfo issuerInfo, Extensions requestedExtensions) {
+      IssuerInfo issuerInfo, Extensions requestedExtns) {
     Set<ASN1ObjectIdentifier> types = new HashSet<>();
     // profile required extension types
     Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
@@ -593,12 +573,11 @@ public class ExtensionsChecker {
 
     Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
 
-    if (requestedExtensions != null) {
-      Extension reqExtension = requestedExtensions.getExtension(
+    if (requestedExtns != null) {
+      Extension reqExtension = requestedExtns.getExtension(
           ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
       if (reqExtension != null) {
-        ExtensionExistence ee = ExtensionExistence.getInstance(
-            reqExtension.getParsedValue());
+        ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
         types.addAll(ee.getNeedExtensions());
         wantedExtensionTypes.addAll(ee.getWantExtensions());
       }
@@ -625,7 +604,7 @@ public class ExtensionsChecker {
     type = Extension.keyUsage;
     if (wantedExtensionTypes.contains(type)) {
       boolean required = false;
-      if (requestedExtensions != null && requestedExtensions.getExtension(type) != null) {
+      if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
         required = true;
       }
 
@@ -660,7 +639,7 @@ public class ExtensionsChecker {
     // SubjectAltNames
     type = Extension.subjectAlternativeName;
     if (wantedExtensionTypes.contains(type)) {
-      if (requestedExtensions != null && requestedExtensions.getExtension(type) != null) {
+      if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
         types.add(type);
       }
     }
@@ -668,8 +647,8 @@ public class ExtensionsChecker {
     // IssuerAltName
     type = Extension.issuerAlternativeName;
     if (wantedExtensionTypes.contains(type)) {
-      if (cert.getTBSCertificate().getExtensions().getExtension(
-          Extension.subjectAlternativeName) != null) {
+      if (cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectAlternativeName)
+          != null) {
         types.add(type);
       }
     }
@@ -700,7 +679,7 @@ public class ExtensionsChecker {
     type = Extension.extendedKeyUsage;
     if (wantedExtensionTypes.contains(type)) {
       boolean required = false;
-      if (requestedExtensions != null && requestedExtensions.getExtension(type) != null) {
+      if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
         required = true;
       }
 
@@ -751,7 +730,7 @@ public class ExtensionsChecker {
     // SubjectInfoAccess
     type = Extension.subjectInfoAccess;
     if (wantedExtensionTypes.contains(type)) {
-      if (requestedExtensions != null && requestedExtensions.getExtension(type) != null) {
+      if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
         types.add(type);
       }
     }
@@ -773,7 +752,7 @@ public class ExtensionsChecker {
     wantedExtensionTypes.removeAll(types);
 
     for (ASN1ObjectIdentifier oid : wantedExtensionTypes) {
-      if (requestedExtensions != null && requestedExtensions.getExtension(oid) != null) {
+      if (requestedExtns != null && requestedExtns.getExtension(oid) != null) {
         if (constantExtensions.containsKey(oid)) {
           types.add(oid);
         }
@@ -784,19 +763,17 @@ public class ExtensionsChecker {
   } // method getExensionTypes
 
   private ValidationIssue createExtensionIssue(ASN1ObjectIdentifier extId) {
-    ValidationIssue issue;
     String extName = ObjectIdentifiers.getName(extId);
     if (extName == null) {
       extName = extId.getId().replace('.', '_');
-      issue = new ValidationIssue("X509.EXT." + extName, "extension " + extId.getId());
+      return new ValidationIssue("X509.EXT." + extName, "extension " + extId.getId());
     } else {
-      issue = new ValidationIssue("X509.EXT." + extName, "extension " + extName
+      return new ValidationIssue("X509.EXT." + extName, "extension " + extName
           + " (" + extId.getId() + ")");
     }
-    return issue;
   } // method createExtensionIssue
 
-  private void checkExtensionBasicConstraints(StringBuilder failureMsg, byte[] extensionValue) {
+  private void checkExtnBasicConstraints(StringBuilder failureMsg, byte[] extensionValue) {
     BasicConstraints bc = BasicConstraints.getInstance(extensionValue);
     CertLevel certLevel = certProfile.getCertLevel();
     boolean ca = (CertLevel.RootCA == certLevel) || (CertLevel.SubCA == certLevel);
@@ -804,24 +781,26 @@ public class ExtensionsChecker {
       addViolation(failureMsg, "ca", bc.isCA(), ca);
     }
 
-    if (bc.isCA()) {
-      BigInteger tmpPathLen = bc.getPathLenConstraint();
-      Integer pathLen = certProfile.getPathLen();
-      if (pathLen == null) {
-        if (tmpPathLen != null) {
-          addViolation(failureMsg, "pathLen", tmpPathLen, "absent");
-        }
-      } else {
-        if (tmpPathLen == null) {
-          addViolation(failureMsg, "pathLen", "null", pathLen);
-        } else if (!BigInteger.valueOf(pathLen).equals(tmpPathLen)) {
-          addViolation(failureMsg, "pathLen", tmpPathLen, pathLen);
-        }
+    if (!bc.isCA()) {
+      return;
+    }
+
+    BigInteger tmpPathLen = bc.getPathLenConstraint();
+    Integer pathLen = certProfile.getPathLen();
+    if (pathLen == null) {
+      if (tmpPathLen != null) {
+        addViolation(failureMsg, "pathLen", tmpPathLen, "absent");
+      }
+    } else {
+      if (tmpPathLen == null) {
+        addViolation(failureMsg, "pathLen", "null", pathLen);
+      } else if (!BigInteger.valueOf(pathLen).equals(tmpPathLen)) {
+        addViolation(failureMsg, "pathLen", tmpPathLen, pathLen);
       }
     }
-  } // method checkExtensionBasicConstraints
+  } // method checkExtnBasicConstraints
 
-  private void checkExtensionSubjectKeyIdentifier(StringBuilder failureMsg,
+  private void checkExtnSubjectKeyIdentifier(StringBuilder failureMsg,
       byte[] extensionValue, SubjectPublicKeyInfo subjectPublicKeyInfo) {
     // subjectKeyIdentifier
     SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extensionValue);
@@ -831,9 +810,9 @@ public class ExtensionsChecker {
     if (!Arrays.equals(expectedSki, ski)) {
       addViolation(failureMsg, "SKI", hex(ski), hex(expectedSki));
     }
-  } // method checkExtensionSubjectKeyIdentifier
+  } // method checkExtnSubjectKeyIdentifier
 
-  private void checkExtensionIssuerKeyIdentifier(StringBuilder failureMsg,
+  private void checkExtnIssuerKeyIdentifier(StringBuilder failureMsg,
       byte[] extensionValue, IssuerInfo issuerInfo) {
     AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
     byte[] keyIdentifier = asn1.getKeyIdentifier();
@@ -895,14 +874,14 @@ public class ExtensionsChecker {
         failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'; ");
       }
     }
-  } // method checkExtensionIssuerKeyIdentifier
+  } // method checkExtnIssuerKeyIdentifier
 
-  private void checkExtensionNameConstraints(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnNameConstraints(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QaNameConstraints conf = nameConstraints;
 
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(Extension.nameConstraints, requestedExtensions,
+      byte[] expected = getExpectedExtValue(Extension.nameConstraints, requestedExtns,
           extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
@@ -914,13 +893,13 @@ public class ExtensionsChecker {
     org.bouncycastle.asn1.x509.NameConstraints tmpNameConstraints =
         org.bouncycastle.asn1.x509.NameConstraints.getInstance(extensionValue);
 
-    checkExtensionNameConstraintsSubtrees(failureMsg, "PermittedSubtrees",
+    checkExtnNameConstraintsSubtrees(failureMsg, "PermittedSubtrees",
         tmpNameConstraints.getPermittedSubtrees(),  conf.getPermittedSubtrees());
-    checkExtensionNameConstraintsSubtrees(failureMsg, "ExcludedSubtrees",
+    checkExtnNameConstraintsSubtrees(failureMsg, "ExcludedSubtrees",
         tmpNameConstraints.getExcludedSubtrees(), conf.getExcludedSubtrees());
-  } // method checkExtensionNameConstraints
+  } // method checkExtnNameConstraints
 
-  private void checkExtensionNameConstraintsSubtrees(StringBuilder failureMsg, String description,
+  private void checkExtnNameConstraintsSubtrees(StringBuilder failureMsg, String description,
       GeneralSubtree[] subtrees, List<QaGeneralSubtree> expectedSubtrees) {
     int isSize = (subtrees == null) ? 0 : subtrees.length;
     int expSize = (expectedSubtrees == null) ? 0 : expectedSubtrees.size();
@@ -956,8 +935,7 @@ public class ExtensionsChecker {
 
       GeneralName expBase;
       if (expSubtree.getDirectoryName() != null) {
-        expBase = new GeneralName(X509Util.reverse(
-            new X500Name(expSubtree.getDirectoryName())));
+        expBase = new GeneralName(X509Util.reverse(new X500Name(expSubtree.getDirectoryName())));
       } else if (expSubtree.getDnsName() != null) {
         expBase = new GeneralName(GeneralName.dNSName, expSubtree.getDnsName());
       } else if (expSubtree.getIpAddress() != null) {
@@ -965,8 +943,7 @@ public class ExtensionsChecker {
       } else if (expSubtree.getRfc822Name() != null) {
         expBase = new GeneralName(GeneralName.rfc822Name, expSubtree.getRfc822Name());
       } else if (expSubtree.getUri() != null) {
-        expBase = new GeneralName(GeneralName.uniformResourceIdentifier,
-            expSubtree.getUri());
+        expBase = new GeneralName(GeneralName.uniformResourceIdentifier, expSubtree.getUri());
       } else {
         throw new RuntimeException("should not reach here, unknown child of GeneralName");
       }
@@ -975,14 +952,14 @@ public class ExtensionsChecker {
         addViolation(failureMsg, "base of " + desc, isBase, expBase);
       }
     }
-  } // method checkExtensionNameConstraintsSubtrees
+  } // method checkExtnNameConstraintsSubtrees
 
-  private void checkExtensionPolicyConstraints(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnPolicyConstraints(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QaPolicyConstraints conf = policyConstraints;
     if (conf == null) {
       byte[] expected = getExpectedExtValue(Extension.policyConstraints,
-          requestedExtensions, extControl);
+          requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1027,10 +1004,10 @@ public class ExtensionsChecker {
       addViolation(failureMsg, "inhibitPolicyMapping", isInhibitPolicyMapping,
           expInhibitPolicyMapping);
     }
-  } // method checkExtensionPolicyConstraints
+  } // method checkExtnPolicyConstraints
 
-  private void checkExtensionKeyUsage(StringBuilder failureMsg, byte[] extensionValue,
-      boolean[] usages, Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnKeyUsage(StringBuilder failureMsg, byte[] extensionValue,
+      boolean[] usages, Extensions requestedExtns, ExtensionControl extControl) {
     int len = usages.length;
 
     if (len > 9) {
@@ -1052,9 +1029,9 @@ public class ExtensionsChecker {
     }
 
     Set<KeyUsageControl> optionalKeyusage = getKeyusage(false);
-    if (requestedExtensions != null && extControl.isRequest()
+    if (requestedExtns != null && extControl.isRequest()
         && CollectionUtil.isNonEmpty(optionalKeyusage)) {
-      Extension extension = requestedExtensions.getExtension(Extension.keyUsage);
+      Extension extension = requestedExtns.getExtension(Extension.keyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
             org.bouncycastle.asn1.x509.KeyUsage.getInstance(extension.getParsedValue());
@@ -1075,19 +1052,17 @@ public class ExtensionsChecker {
 
     Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs.toString())
-        .append(" are present but not expected; ");
+      failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUsages, expectedUsages);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs.toString())
-        .append(" are absent but are required; ");
+      failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
-  } // method checkExtensionKeyUsage
+  } // method checkExtnKeyUsage
 
-  private void checkExtensionExtendedKeyUsage(StringBuilder failureMsg,
-      byte[] extensionValue, Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnExtendedKeyUsage(StringBuilder failureMsg,
+      byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     Set<String> isUsages = new HashSet<>();
     org.bouncycastle.asn1.x509.ExtendedKeyUsage keyusage =
         org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extensionValue);
@@ -1107,9 +1082,9 @@ public class ExtensionsChecker {
     }
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = getExtKeyusage(false);
-    if (requestedExtensions != null && extControl.isRequest()
+    if (requestedExtns != null && extControl.isRequest()
         && CollectionUtil.isNonEmpty(optionalExtKeyusage)) {
-      Extension extension = requestedExtensions.getExtension(Extension.extendedKeyUsage);
+      Extension extension = requestedExtns.getExtension(Extension.extendedKeyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
             org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extension.getParsedValue());
@@ -1130,23 +1105,21 @@ public class ExtensionsChecker {
 
     Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs.toString())
-        .append(" are present but not expected; ");
+      failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUsages, expectedUsages);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs.toString())
-        .append(" are absent but are required; ");
+      failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
-  } // method checkExtensionExtendedKeyUsage
+  } // method checkExtnExtendedKeyUsage
 
-  private void checkExtensionTlsFeature(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnTlsFeature(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QaTlsFeature conf = tlsFeature;
     if (conf == null) {
       byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_pe_tlsfeature,
-          requestedExtensions, extControl);
+          requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1169,23 +1142,21 @@ public class ExtensionsChecker {
 
     Set<String> diffs = strInBnotInA(expFeatures, isFeatures);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append("features ").append(diffs.toString())
-        .append(" are present but not expected; ");
+      failureMsg.append("features ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isFeatures, expFeatures);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append("features ").append(diffs.toString())
-        .append(" are absent but are required; ");
+      failureMsg.append("features ").append(diffs).append(" are absent but are required; ");
     }
-  } // method checkExtensionTlsFeature
+  } // method checkExtnTlsFeature
 
-  private void checkExtensionCertificatePolicies(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnCertificatePolicies(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QaCertificatePolicies conf = certificatePolicies;
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(Extension.certificatePolicies,
-          requestedExtensions, extControl);
+      byte[] expected = getExpectedExtValue(Extension.certificatePolicies, requestedExtns,
+          extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1266,14 +1237,13 @@ public class ExtensionsChecker {
       failureMsg.append("certificate policy '").append(cp.getPolicyId())
         .append("' is absent but is required; ");
     }
-  } // method checkExtensionCertificatePolicies
+  } // method checkExtnCertificatePolicies
 
-  private void checkExtensionPolicyMappings(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnPolicyMappings(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QaPolicyMappingsOption conf = policyMappings;
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(Extension.policyMappings, requestedExtensions,
-          extControl);
+      byte[] expected = getExpectedExtValue(Extension.policyMappings, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1309,14 +1279,13 @@ public class ExtensionsChecker {
       failureMsg.append("issuerDomainPolicies '").append(isMap.keySet())
         .append("' are present but not expected; ");
     }
-  } // method checkExtensionPolicyMappings
+  } // method checkExtnPolicyMappings
 
-  private void checkExtensionInhibitAnyPolicy(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnInhibitAnyPolicy(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QaInhibitAnyPolicy conf = inhibitAnyPolicy;
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(Extension.inhibitAnyPolicy,
-          requestedExtensions, extControl);
+      byte[] expected = getExpectedExtValue(Extension.inhibitAnyPolicy, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", extensionValue,
             (expected == null) ? "not present" : hex(expected));
@@ -1329,10 +1298,10 @@ public class ExtensionsChecker {
     if (isSkipCerts != conf.getSkipCerts()) {
       addViolation(failureMsg, "skipCerts", isSkipCerts, conf.getSkipCerts());
     }
-  } // method checkExtensionInhibitAnyPolicy
+  } // method checkExtnInhibitAnyPolicy
 
-  private void checkExtensionSubjectDirAttrs(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnSubjectDirAttrs(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     SubjectDirectoryAttributesControl conf = certProfile.getSubjectDirAttrsControl();
     if (conf == null) {
       failureMsg.append("extension is present but not expected; ");
@@ -1340,8 +1309,8 @@ public class ExtensionsChecker {
     }
 
     ASN1Encodable extInRequest = null;
-    if (requestedExtensions != null) {
-      extInRequest = requestedExtensions.getExtensionParsedValue(
+    if (requestedExtns != null) {
+      extInRequest = requestedExtns.getExtensionParsedValue(
           Extension.subjectDirectoryAttributes);
     }
 
@@ -1499,13 +1468,13 @@ public class ExtensionsChecker {
     if (!countryOfCitizenshipList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfCitizenshipList, countryOfCitizenshipList);
       if (CollectionUtil.isNonEmpty(diffs)) {
-        failureMsg.append("countryOfCitizenship ").append(diffs.toString())
+        failureMsg.append("countryOfCitizenship ").append(diffs)
           .append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfCitizenshipList, expCountryOfCitizenshipList);
       if (CollectionUtil.isNonEmpty(diffs)) {
-        failureMsg.append("countryOfCitizenship ").append(diffs.toString())
+        failureMsg.append("countryOfCitizenship ").append(diffs)
           .append(" are absent but are required; ");
       }
     }
@@ -1513,13 +1482,13 @@ public class ExtensionsChecker {
     if (!countryOfResidenceList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfResidenceList, countryOfResidenceList);
       if (CollectionUtil.isNonEmpty(diffs)) {
-        failureMsg.append("countryOfResidence ").append(diffs.toString())
+        failureMsg.append("countryOfResidence ").append(diffs)
           .append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfResidenceList, expCountryOfResidenceList);
       if (CollectionUtil.isNonEmpty(diffs)) {
-        failureMsg.append("countryOfResidence ").append(diffs.toString())
+        failureMsg.append("countryOfResidence ").append(diffs)
           .append(" are absent but are required; ");
       }
     }
@@ -1532,6 +1501,7 @@ public class ExtensionsChecker {
               .append(" is present but not requested; ");
           continue;
         }
+
         Set<ASN1Encodable> attrValues = otherAttrs.get(attrType);
         if (!attrValues.equals(expAttrValues)) {
           failureMsg.append("attribute of type ").append(attrType.getId())
@@ -1540,16 +1510,15 @@ public class ExtensionsChecker {
         }
       }
     }
-  } // method checkExtensionSubjectDirectoryAttributes
+  } // method checkExtnSubjectDirectoryAttributes
 
-  private void checkExtensionSubjectAltName(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl,
-      X500Name requestedSubject) {
+  private void checkExtnSubjectAltName(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl, X500Name requestedSubject) {
     Set<GeneralNameMode> conf = certProfile.getSubjectAltNameModes();
 
     GeneralName[] requested;
     try {
-      requested = getRequestedSubjectAltNames(requestedSubject, requestedExtensions);
+      requested = getRequestedSubjectAltNames(requestedSubject, requestedExtns);
     } catch (CertprofileException | BadCertTemplateException ex) {
       String msg = "error while derive grantedSubject from requestedSubject";
       LogUtil.warn(LOG, ex, msg);
@@ -1585,12 +1554,12 @@ public class ExtensionsChecker {
         failureMsg.append(i + 1).append("-th name does not match the requested one; ");
       }
     }
-  } // method checkExtensionSubjectAltName
+  } // method checkExtnSubjectAltName
 
   private GeneralName[] getRequestedSubjectAltNames(X500Name requestedSubject,
-      Extensions requestedExtensions) throws CertprofileException, BadCertTemplateException {
-    ASN1Encodable extValue = (requestedExtensions == null) ? null
-        : requestedExtensions.getExtensionParsedValue(Extension.subjectAlternativeName);
+      Extensions requestedExtns) throws CertprofileException, BadCertTemplateException {
+    ASN1Encodable extValue = (requestedExtns == null) ? null
+        : requestedExtns.getExtensionParsedValue(Extension.subjectAlternativeName);
 
     Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes =
         certProfile.getSubjectToSubjectAltNameModes();
@@ -1651,8 +1620,8 @@ public class ExtensionsChecker {
     return grantedNames.isEmpty() ? null : grantedNames.toArray(new GeneralName[0]);
   }
 
-  private void checkExtensionSubjectInfoAccess(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnSubjectInfoAccess(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> conf =
         certProfile.getSubjectInfoAccessModes();
     if (conf == null) {
@@ -1661,8 +1630,8 @@ public class ExtensionsChecker {
     }
 
     ASN1Encodable requestExtValue = null;
-    if (requestedExtensions != null) {
-      requestExtValue = requestedExtensions.getExtensionParsedValue(Extension.subjectInfoAccess);
+    if (requestedExtns != null) {
+      requestExtValue = requestedExtns.getExtensionParsedValue(Extension.subjectInfoAccess);
     }
     if (requestExtValue == null) {
       failureMsg.append("extension is present but not expected; ");
@@ -1717,9 +1686,9 @@ public class ExtensionsChecker {
         failureMsg.append("accessLocation does not match the requested one; ");
       }
     }
-  } // method checkExtensionSubjectInfoAccess
+  } // method checkExtnSubjectInfoAccess
 
-  private void checkExtensionIssuerAltNames(StringBuilder failureMsg, byte[] extensionValue,
+  private void checkExtnIssuerAltNames(StringBuilder failureMsg, byte[] extensionValue,
       IssuerInfo issuerInfo) {
     Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions()
         .getExtension(Extension.subjectAlternativeName);
@@ -1733,9 +1702,9 @@ public class ExtensionsChecker {
       addViolation(failureMsg, "issuerAltNames", hex(extensionValue),
           hex(caSubjectAltExtensionValue));
     }
-  } // method checkExtensionIssuerAltNames
+  } // method checkExtnIssuerAltNames
 
-  private void checkExtensionCrlDistributionPoints(StringBuilder failureMsg,
+  private void checkExtnCrlDistributionPoints(StringBuilder failureMsg,
       byte[] extensionValue, IssuerInfo issuerInfo) {
     CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
     DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
@@ -1785,9 +1754,9 @@ public class ExtensionsChecker {
         failureMsg.append("CRL URLs ").append(diffs).append(" are absent but are required; ");
       }
     }
-  } // method checkExtensionCrlDistributionPoints
+  } // method checkExtnCrlDistributionPoints
 
-  private void checkExtensionDeltaCrlDistributionPoints(StringBuilder failureMsg,
+  private void checkExtnDeltaCrlDistributionPoints(StringBuilder failureMsg,
       byte[] extensionValue, IssuerInfo issuerInfo) {
     CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
     DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
@@ -1837,14 +1806,14 @@ public class ExtensionsChecker {
         failureMsg.append("deltaCRL URLs ").append(diffs).append(" are absent but are required; ");
       }
     }
-  } // method checkExtensionDeltaCrlDistributionPoints
+  } // method checkExtnDeltaCrlDistributionPoints
 
-  private void checkExtensionAdmission(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnAdmission(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     AdmissionSyntaxOption conf = certProfile.getAdmission();
     ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(type, requestedExtensions, extControl);
+      byte[] expected = getExpectedExtValue(type, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension value", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1853,8 +1822,8 @@ public class ExtensionsChecker {
     }
 
     List<List<String>> reqRegNumsList = null;
-    if (requestedExtensions != null && conf.isInputFromRequestRequired()) {
-      Extension extension = requestedExtensions.getExtension(type);
+    if (requestedExtns != null && conf.isInputFromRequestRequired()) {
+      Extension extension = requestedExtns.getExtension(type);
       if (extension == null) {
         failureMsg.append("no Admission extension is contained in the request;");
         return;
@@ -1886,15 +1855,14 @@ public class ExtensionsChecker {
     } catch (IOException ex) {
       LogUtil.error(LOG, ex);
       failureMsg.append("IOException while computing the expected extension value;");
-      return;
     } catch (BadCertTemplateException ex) {
       LogUtil.error(LOG, ex);
       failureMsg.append("BadCertTemplateException while computing the expected extension value;");
     }
 
-  } // method checkExtensionAdmission
+  } // method checkExtnAdmission
 
-  private void checkExtensionAuthorityInfoAccess(StringBuilder failureMsg,
+  private void checkExtnAuthorityInfoAccess(StringBuilder failureMsg,
       byte[] extensionValue, IssuerInfo issuerInfo) {
     AuthorityInfoAccessControl aiaControl = certProfile.getAiaControl();
     Set<String> expCaIssuerUris = (aiaControl == null || aiaControl.isIncludesCaIssuers())
@@ -1911,31 +1879,31 @@ public class ExtensionsChecker {
     AuthorityInformationAccess isAia = AuthorityInformationAccess.getInstance(extensionValue);
     checkAia(failureMsg, isAia, X509ObjectIdentifiers.id_ad_caIssuers, expCaIssuerUris);
     checkAia(failureMsg, isAia, X509ObjectIdentifiers.id_ad_ocsp, expOcspUris);
-  } // method checkExtensionAuthorityInfoAccess
+  } // method checkExtnAuthorityInfoAccess
 
-  private void checkExtensionOcspNocheck(StringBuilder failureMsg, byte[] extensionValue) {
+  private void checkExtnOcspNocheck(StringBuilder failureMsg, byte[] extensionValue) {
     if (!Arrays.equals(DER_NULL, extensionValue)) {
       failureMsg.append("value is not DER NULL; ");
     }
   }
 
-  private void checkExtensionRestriction(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnRestriction(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     checkDirectoryString(ObjectIdentifiers.id_extension_restriction, restriction,
-        failureMsg, extensionValue, requestedExtensions, extControl);
+        failureMsg, extensionValue, requestedExtns, extControl);
   }
 
-  private void checkExtensionAdditionalInformation(StringBuilder failureMsg,
-      byte[] extensionValue, Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnAdditionalInformation(StringBuilder failureMsg,
+      byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     checkDirectoryString(ObjectIdentifiers.id_extension_additionalInformation,
-        additionalInformation, failureMsg, extensionValue, requestedExtensions, extControl);
+        additionalInformation, failureMsg, extensionValue, requestedExtns, extControl);
   }
 
   private void checkDirectoryString(ASN1ObjectIdentifier extType, QaDirectoryString conf,
-      StringBuilder failureMsg, byte[] extensionValue, Extensions requestedExtensions,
+      StringBuilder failureMsg, byte[] extensionValue, Extensions requestedExtns,
       ExtensionControl extControl) {
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(extType, requestedExtensions, extControl);
+      byte[] expected = getExpectedExtValue(extType, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1982,12 +1950,12 @@ public class ExtensionsChecker {
     }
   } // method checkDirectoryString
 
-  private void checkExtensionValidityModel(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnValidityModel(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     ASN1ObjectIdentifier conf = validityModelId;
     if (conf == null) {
       byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
-          requestedExtensions, extControl);
+          requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -1999,9 +1967,9 @@ public class ExtensionsChecker {
     if (!conf.equals(extValue)) {
       addViolation(failureMsg, "content", extValue, conf);
     }
-  } // method checkExtensionValidityModel
+  } // method checkExtnValidityModel
 
-  private void checkExtensionPrivateKeyUsagePeriod(StringBuilder failureMsg,
+  private void checkExtnPrivateKeyUsagePeriod(StringBuilder failureMsg,
       byte[] extensionValue, Date certNotBefore, Date certNotAfter) {
     ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
     Date dateNotAfter;
@@ -2032,14 +2000,13 @@ public class ExtensionsChecker {
     } else if (!time.equals(notAfter)) {
       addViolation(failureMsg, "notAfter", time.getTimeString(), notAfter.getTimeString());
     }
-  } // method checkExtensionPrivateKeyUsagePeriod
+  } // method checkExtnPrivateKeyUsagePeriod
 
-  private void checkExtensionQcStatements(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnQcStatements(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     QcStatements conf = qcStatements;
     if (conf == null) {
-      byte[] expected = getExpectedExtValue(Extension.qCStatements,
-          requestedExtensions, extControl);
+      byte[] expected = getExpectedExtValue(Extension.qCStatements, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", extensionValue,
             (expected == null) ? "not present" : hex(expected));
@@ -2057,8 +2024,8 @@ public class ExtensionsChecker {
 
     // extract the euLimit and pdsLocations data from request
     Map<String, int[]> reqQcEuLimits = new HashMap<>();
-    Extension reqExtension = (requestedExtensions == null) ? null
-        : requestedExtensions.getExtension(Extension.qCStatements);
+    Extension reqExtension = (requestedExtns == null) ? null
+        : requestedExtns.getExtension(Extension.qCStatements);
     if (reqExtension != null) {
       ASN1Sequence seq = ASN1Sequence.getInstance(reqExtension.getParsedValue());
 
@@ -2170,7 +2137,7 @@ public class ExtensionsChecker {
             value = expAmountExp[1];
           } else {
             failureMsg.append("found no QcEuLimit for currency '").append(expCurrency)
-              .append("'; ");
+            .append("'; ");
             return;
           }
           String expExponent = Integer.toString(value);
@@ -2200,10 +2167,10 @@ public class ExtensionsChecker {
         failureMsg.append("statementInfo[").append(i).append("] has incorrect syntax; ");
       }
     }
-  } // method checkExtensionQcStatements
+  } // method checkExtnQcStatements
 
-  private void checkExtensionBiometricInfo(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnBiometricInfo(StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     BiometricInfoOption conf = certProfile.getBiometricInfo();
 
     if (conf == null) {
@@ -2212,8 +2179,8 @@ public class ExtensionsChecker {
     }
 
     ASN1Encodable extInRequest = null;
-    if (requestedExtensions != null) {
-      extInRequest = requestedExtensions.getExtensionParsedValue(Extension.biometricInfo);
+    if (requestedExtns != null) {
+      extInRequest = requestedExtns.getExtensionParsedValue(Extension.biometricInfo);
     }
 
     if (extInRequest == null) {
@@ -2301,16 +2268,15 @@ public class ExtensionsChecker {
         }
       }
     }
-  } // method checkExtensionBiometricInfo
+  } // method checkExtnBiometricInfo
 
-  private void checkExtensionAuthorizationTemplate(StringBuilder failureMsg,
-      byte[] extensionValue, Extensions requestedExtensions, ExtensionControl extControl) {
+  private void checkExtnAuthorizationTemplate(StringBuilder failureMsg,
+      byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     QaAuthorizationTemplate conf = authorizationTemplate;
 
     if (conf == null) {
       byte[] expected = getExpectedExtValue(
-          ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
-          requestedExtensions, extControl);
+          ObjectIdentifiers.id_xipki_ext_authorizationTemplate, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));
@@ -2329,7 +2295,7 @@ public class ExtensionsChecker {
     if (!Arrays.equals(conf.getAccessRights(), isRights)) {
       addViolation(failureMsg, "accessRights", hex(isRights), hex(conf.getAccessRights()));
     }
-  } // method checkExtensionAuthorizationTemplate
+  } // method checkExtnAuthorizationTemplate
 
   private Set<KeyUsageControl> getKeyusage(boolean required) {
     Set<KeyUsageControl> ret = new HashSet<>();
@@ -2515,9 +2481,8 @@ public class ExtensionsChecker {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(type);
         vector.add(new DERTaggedObject(true, 0, new DERUTF8String(text)));
-        DERSequence seq = new DERSequence(vector);
 
-        return new GeneralName(GeneralName.otherName, seq);
+        return new GeneralName(GeneralName.otherName, new DERSequence(vector));
       case GeneralName.ediPartyName:
         reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
@@ -2539,8 +2504,7 @@ public class ExtensionsChecker {
           vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
         }
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-        seq = new DERSequence(vector);
-        return new GeneralName(GeneralName.ediPartyName, seq);
+        return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
       default:
         throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch
@@ -2607,13 +2571,13 @@ public class ExtensionsChecker {
 
     Set<String> diffs = strInBnotInA(expectedUris, isUris);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append(typeDesc).append(" URIs ").append(diffs.toString());
+      failureMsg.append(typeDesc).append(" URIs ").append(diffs);
       failureMsg.append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUris, expectedUris);
     if (CollectionUtil.isNonEmpty(diffs)) {
-      failureMsg.append(typeDesc).append(" URIs ").append(diffs.toString());
+      failureMsg.append(typeDesc).append(" URIs ").append(diffs);
       failureMsg.append(" are absent but are required; ");
     }
   } // method checkAia

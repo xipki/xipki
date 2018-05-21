@@ -116,14 +116,9 @@ public class RequestorEntry {
   }
 
   public boolean equals(RequestorEntry obj, boolean ignoreId) {
-    if (!ident.equals(obj.ident, ignoreId)) {
-      return false;
-    }
-
-    if (!base64Cert.equals(obj.base64Cert)) {
-      return false;
-    }
-    return true;
+    return (obj != null)
+        && ident.equals(obj.ident, ignoreId)
+        && base64Cert.equals(obj.base64Cert);
   }
 
   @Override

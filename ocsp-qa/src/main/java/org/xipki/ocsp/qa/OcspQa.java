@@ -246,16 +246,15 @@ public class OcspQa {
       }
 
       if (respSigner != null) {
-        issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST",
-            "signer certificate validation");
+        issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST", "signer certificate validation");
         resultIssues.add(issue);
 
         for (int i = 0; i < singleResponses.length; i++) {
           SingleResp singleResp = singleResponses[i];
           if (!respSigner.isValidOn(singleResp.getThisUpdate())) {
             issue.setFailureMessage(String.format(
-                "responder certificate is not valid on the thisUpdate[%d]: %s",
-                i, singleResp.getThisUpdate()));
+                "responder certificate is not valid on the thisUpdate[%d]: %s", i,
+                singleResp.getThisUpdate()));
           }
         } // end for
 
@@ -277,8 +276,7 @@ public class OcspQa {
         try {
           PublicKey responderPubKey = KeyUtil.generatePublicKey(
               respSigner.getSubjectPublicKeyInfo());
-          ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
-              responderPubKey);
+          ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
           boolean sigValid = basicResp.isSignatureValid(cvp);
           if (!sigValid) {
             sigValIssue.setFailureMessage("signature is invalid");
@@ -291,8 +289,7 @@ public class OcspQa {
 
     // nonce
     Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-    resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn,
-        responseOption.getNonceOccurrence()));
+    resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn, responseOption.getNonceOccurrence()));
 
     boolean extendedRevoke = basicResp.getExtension(
         ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;

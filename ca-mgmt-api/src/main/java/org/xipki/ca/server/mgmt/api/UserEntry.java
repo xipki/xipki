@@ -67,11 +67,7 @@ public class UserEntry {
       return false;
     }
 
-    if (!hashedPassword.equals(obj.hashedPassword)) {
-      return false;
-    }
-
-    return true;
+    return hashedPassword.equals(obj.hashedPassword);
   }
 
   @Override

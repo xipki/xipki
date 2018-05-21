@@ -22,8 +22,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
@@ -31,7 +29,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -59,10 +56,9 @@ public class OcspDbExportWorker extends DbPortWorker {
 
   private final boolean evaluateOnly;
 
-  public OcspDbExportWorker(DataSourceFactory datasourceFactory,
-      PasswordResolver passwordResolver, String dbConfFile, String destFolder, boolean resume,
-      int numCertsInBundle, int numCertsPerSelect, boolean evaluateOnly)
-      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+  public OcspDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+      String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
+      int numCertsPerSelect, boolean evaluateOnly) throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
     this.destFolder = ParamUtil.requireNonNull(destFolder, destFolder);

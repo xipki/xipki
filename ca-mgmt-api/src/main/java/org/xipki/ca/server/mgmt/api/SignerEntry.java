@@ -156,23 +156,10 @@ public class SignerEntry {
     }
 
     SignerEntry objB = (SignerEntry) obj;
-    if (!name.equals(objB.name)) {
-      return false;
-    }
-
-    if (!type.equals(objB.type)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(conf, objB.conf)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(base64Cert, objB.base64Cert)) {
-      return false;
-    }
-
-    return true;
+    return name.equals(objB.name)
+        && type.equals(objB.type)
+        && CompareUtil.equalsObject(conf, objB.conf)
+        && CompareUtil.equalsObject(base64Cert, objB.base64Cert);
   }
 
   @Override

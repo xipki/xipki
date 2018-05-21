@@ -81,7 +81,7 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
   private String sigAlg;
 
   @Option(name = "--no-sig-verify",
-      description = "where to verify the signature")
+      description = "no verification of the signature")
   private Boolean noSigVerify = Boolean.FALSE;
 
   @Option(name = "--exp-nextupdate",
@@ -200,8 +200,7 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
 
     StringBuilder sb = new StringBuilder(50);
     sb.append("OCSP response is ");
-    String txt = result.isAllSuccessful() ? "valid" : "invalid";
-    sb.append(txt);
+    sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
     if (verbose.booleanValue()) {
       for (ValidationIssue issue : result.getValidationIssues()) {
@@ -218,11 +217,8 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
   } // method processResponse
 
   static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
-    sb.append(prefix);
-    sb.append(issue.getCode());
-    sb.append(", ").append(issue.getDescription());
-    sb.append(", ");
-    sb.append(issue.isFailed() ? "failed" : "successful");
+    sb.append(prefix).append(issue.getCode()).append(", ").append(issue.getDescription());
+    sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
     if (issue.getFailureMessage() != null) {
       sb.append(", ").append(issue.getFailureMessage());
     }

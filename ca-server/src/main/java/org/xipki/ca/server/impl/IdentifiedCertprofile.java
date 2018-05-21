@@ -504,7 +504,7 @@ class IdentifiedCertprofile {
   }
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
-      throws BadCertTemplateException {
+      throws CertprofileException, BadCertTemplateException {
     ParamUtil.requireNonNull("publicKey", publicKey);
     return certprofile.checkPublicKey(publicKey);
   }

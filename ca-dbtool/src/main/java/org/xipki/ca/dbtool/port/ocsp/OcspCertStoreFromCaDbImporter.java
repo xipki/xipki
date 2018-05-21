@@ -105,8 +105,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       }
     } else {
       if (processLogFile.exists()) {
-        throw new InvalidInputException(
-            "please either specify '--resume' option or delete the file "
+        throw new InvalidInputException("please either specify '--resume' or delete the file "
             + processLogFile.getPath() + " first");
       }
     }

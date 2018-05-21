@@ -34,8 +34,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<AuditService> services =
-      new ConcurrentLinkedDeque<AuditService>();
+  private ConcurrentLinkedDeque<AuditService> services = new ConcurrentLinkedDeque<AuditService>();
 
   private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 

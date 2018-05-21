@@ -305,8 +305,6 @@ public class PkiMessage {
 
       CMSSignedData signedData = generator.generate(content, true);
       return signedData.toASN1Structure();
-    } catch (CMSException ex) {
-      throw new MessageEncodingException(ex);
     } catch (Exception ex) {
       throw new MessageEncodingException(ex);
     }

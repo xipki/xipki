@@ -2027,6 +2027,8 @@ public class X509Ca {
     // public key
     try {
       grantedPublicKeyInfo = certprofile.checkPublicKey(grantedPublicKeyInfo);
+    } catch (CertprofileException ex) {
+      throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(BAD_CERT_TEMPLATE, ex);
     }

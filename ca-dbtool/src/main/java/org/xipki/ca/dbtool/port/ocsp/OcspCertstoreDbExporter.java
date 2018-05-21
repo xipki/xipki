@@ -195,8 +195,7 @@ class OcspCertstoreDbExporter extends DbPorter {
   } // method exportIssuer
 
   private Exception exportCert(CertstoreType certstore, File processLogFile) {
-    final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
-    entriesDir.mkdirs();
+    new File(baseDir, OcspDbEntryType.CERT.getDirName()).mkdirs();
 
     FileOutputStream certsFileOs = null;
 

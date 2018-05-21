@@ -232,8 +232,7 @@ public class CaEmulator {
 
       ContentVerifierProvider cvp = getContentVerifierProvider(pk);
       return p10Req.isSignatureValid(cvp);
-    } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
-        | InvalidKeySpecException ex) {
+    } catch (InvalidKeyException | PKCSException | InvalidKeySpecException ex) {
       LOG.error("could not validate POPO of CSR", ex);
       return false;
     }
@@ -272,7 +271,7 @@ public class CaEmulator {
   }
 
   private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
-      throws NoSuchAlgorithmException, InvalidKeySpecException {
+      throws InvalidKeySpecException {
     ScepUtil.requireNonNull("pkInfo", pkInfo);
 
     X509EncodedKeySpec keyspec;

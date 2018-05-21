@@ -106,7 +106,7 @@ public class CaEntry {
   private String hexSha1OfCert;
 
   public CaEntry(NameId ident, int serialNoBitLen, long nextCrlNumber, String signerType,
-      String signerConf, CaUris caUris, int numCrls, int expirationPeriod) throws CaMgmtException {
+      String signerConf, CaUris caUris, int numCrls, int expirationPeriod) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
     this.signerType = ParamUtil.requireNonBlankLower("signerType", signerType);
     this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
@@ -311,30 +311,24 @@ public class CaEntry {
     return StringUtil.concatObjectsCap(1500,
         "id: ", ident.getId(), "\nname: ", ident.getName(),
         "\nstatus: ", (status == null ? "null" : status.getStatus()),
-        "\nmaxValidity: ", maxValidity,
-        "\nexpirationPeriod: ", expirationPeriod, " days",
+        "\nmaxValidity: ", maxValidity, "\nexpirationPeriod: ", expirationPeriod, " days",
         "\nsignerType: ", signerType,
         "\nsignerConf: ", (signerConf == null ? "null" :
           InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\ncmpControl: ", cmpControl,
-        "\ncrlControl: ", crlControl,
-        "\nresponderName: ", responderName,
-        "\ncrlSignerName: ", crlSignerName,
+        "\ncmpControl: ", cmpControl, "\ncrlControl: ", crlControl,
+        "\nresponderName: ", responderName, "\ncrlSignerName: ", crlSignerName,
         "\nduplicateKey: ", duplicateKeyPermitted,
         "\nduplicateSubject: ", duplicateSubjectPermitted,
-        "\nsupportRest: ", supportRest,
-        "\nsaveRequest: ", saveRequest,
-        "\nvalidityMode: ", validityMode,
-        "\npermission: ", permission,
-        "\nkeepExpiredCerts: ", (keepExpiredCertInDays < 0
-                      ? "forever" : keepExpiredCertInDays + " days"),
+        "\nsupportRest: ", supportRest, "\nsaveRequest: ", saveRequest,
+        "\nvalidityMode: ", validityMode, "\npermission: ", permission,
+        "\nkeepExpiredCerts: ",
+            (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
         "\nextraControl: ", extraCtrlText, "\n",
         "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
         "\ndeltaCrlUris:", formatUris(deltaCrlUris), "\ncrlUris:", formatUris(crlUris),
         "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(caCertUris),
         "\ncert: \n", InternUtil.formatCert(cert, verbose),
-        "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"),
-        revInfoText);
+        "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText);
   } // method toString
 
   protected static String urisToString(Collection<? extends Object> tokens) {
@@ -365,112 +359,37 @@ public class CaEntry {
   }
 
   public boolean equals(CaEntry obj, boolean ignoreDynamicFields, boolean ignoreId) {
-    if (!ident.equals(obj.ident, ignoreId)) {
-      return false;
-    }
-
-    if (!signerType.equals(obj.signerType)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(status, obj.status)) {
-      return false;
-    }
-
-    if (supportRest != obj.supportRest) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(maxValidity, obj.maxValidity)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(cmpControl, obj.cmpControl)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(crlControl, obj.crlControl)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(responderName, obj.responderName)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)) {
-      return false;
-    }
-
-    if (duplicateKeyPermitted != obj.duplicateKeyPermitted) {
-      return false;
-    }
-
-    if (duplicateSubjectPermitted != obj.duplicateSubjectPermitted) {
-      return false;
-    }
-
-    if (saveRequest != obj.saveRequest) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(validityMode, obj.validityMode)) {
-      return false;
-    }
-
-    if (permission != obj.permission) {
-      return false;
-    }
-
-    if (expirationPeriod != obj.expirationPeriod) {
-      return false;
-    }
-
-    if (keepExpiredCertInDays != obj.keepExpiredCertInDays) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(extraControl, obj.extraControl)) {
-      return false;
-    }
-
     if (!ignoreDynamicFields) {
       if (nextCrlNumber != obj.nextCrlNumber) {
         return false;
       }
     }
 
-    if (!CompareUtil.equalsObject(crlUris, obj.crlUris)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(deltaCrlUris, obj.deltaCrlUris)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(ocspUris, obj.ocspUris)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(caCertUris, obj.caCertUris)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(cert, obj.cert)) {
-      return false;
-    }
-
-    if (serialNoBitLen != obj.serialNoBitLen) {
-      return false;
-    }
-
-    if (numCrls != obj.numCrls) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)) {
-      return false;
-    }
-    return true;
+    return ident.equals(obj.ident, ignoreId)
+      && signerType.equals(obj.signerType)
+      && CompareUtil.equalsObject(status, obj.status)
+      && (supportRest == obj.supportRest)
+      && CompareUtil.equalsObject(maxValidity, obj.maxValidity)
+      && CompareUtil.equalsObject(cmpControl, obj.cmpControl)
+      && CompareUtil.equalsObject(crlControl, obj.crlControl)
+      && CompareUtil.equalsObject(responderName, obj.responderName)
+      && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
+      && (duplicateKeyPermitted == obj.duplicateKeyPermitted)
+      && (duplicateSubjectPermitted == obj.duplicateSubjectPermitted)
+      && (saveRequest == obj.saveRequest)
+      && CompareUtil.equalsObject(validityMode, obj.validityMode)
+      && (permission == obj.permission)
+      && (expirationPeriod == obj.expirationPeriod)
+      && (keepExpiredCertInDays == obj.keepExpiredCertInDays)
+      && CompareUtil.equalsObject(extraControl, obj.extraControl)
+      && CompareUtil.equalsObject(crlUris, obj.crlUris)
+      && CompareUtil.equalsObject(deltaCrlUris, obj.deltaCrlUris)
+      && CompareUtil.equalsObject(ocspUris, obj.ocspUris)
+      && CompareUtil.equalsObject(caCertUris, obj.caCertUris)
+      && CompareUtil.equalsObject(cert, obj.cert)
+      && (serialNoBitLen == obj.serialNoBitLen)
+      && (numCrls == obj.numCrls)
+      && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo);
   }
 
   @Override

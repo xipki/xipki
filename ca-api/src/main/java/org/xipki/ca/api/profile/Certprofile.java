@@ -163,7 +163,7 @@ public abstract class Certprofile {
    *         If the publicKey does not have correct format or is not permitted.
    */
   public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
-      throws BadCertTemplateException;
+      throws CertprofileException, BadCertTemplateException;
 
   /**
    * Checks the requested subject. If the check passes, returns the canonicalized subject.

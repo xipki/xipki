@@ -104,11 +104,24 @@ public class CaIdentifier {
 
   @Override
   public boolean equals(Object object) {
-    if (object instanceof CaIdentifier) {
-      CaIdentifier objB = (CaIdentifier) object;
-      return url == objB.url && profile == objB.profile;
+    if (this == object) {
+      return true;
     }
-    return false;
+
+    if (!(object instanceof CaIdentifier)) {
+      return false;
+    }
+
+    CaIdentifier objB = (CaIdentifier) object;
+    if (!url.equals(objB.url)) {
+      return false;
+    }
+
+    if (profile == null) {
+      return objB.profile == null;
+    } else {
+      return profile.equals(objB.profile);
+    }
   }
 
   @Override

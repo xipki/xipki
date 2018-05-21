@@ -79,23 +79,10 @@ public class CaHasUserEntry {
   }
 
   public boolean equals(CaHasUserEntry obj, boolean ignoreId) {
-    if (obj == null) {
-      return false;
-    }
-
-    if (!userIdent.equals(obj.userIdent, ignoreId)) {
-      return false;
-    }
-
-    if (permission != obj.permission) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(profiles, obj.profiles)) {
-      return false;
-    }
-
-    return true;
+    return (obj != null)
+        && userIdent.equals(obj.userIdent, ignoreId)
+        && (permission == obj.permission)
+        && CompareUtil.equalsObject(profiles, obj.profiles);
   }
 
   @Override

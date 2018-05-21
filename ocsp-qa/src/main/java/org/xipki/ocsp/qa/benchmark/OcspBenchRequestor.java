@@ -102,8 +102,7 @@ class OcspBenchRequestor {
     }
 
     this.issuerhashAlg = hashAlgo.getAlgorithmIdentifier();
-    this.issuerNameHash = new DEROctetString(hashAlgo.hash(
-            issuerCert.getSubject().getEncoded()));
+    this.issuerNameHash = new DEROctetString(hashAlgo.hash(issuerCert.getSubject().getEncoded()));
     this.issuerKeyHash = new DEROctetString(hashAlgo.hash(
             issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 

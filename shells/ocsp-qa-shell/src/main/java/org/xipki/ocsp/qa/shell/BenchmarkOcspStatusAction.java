@@ -142,8 +142,7 @@ public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
           try {
             cert = X509Util.parseCert(certFile);
           } catch (Exception ex) {
-            throw new IllegalCmdParamException(
-                "invalid certificate file  '" + certFile + "'", ex);
+            throw new IllegalCmdParamException("invalid certificate file  '" + certFile + "'", ex);
           }
           BigInteger serial = cert.getSerialNumber();
           serialNumbers.add(new BigIntegerRange(serial, serial));

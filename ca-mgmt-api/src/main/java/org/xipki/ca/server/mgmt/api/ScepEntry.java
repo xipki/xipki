@@ -109,27 +109,11 @@ public class ScepEntry {
   }
 
   public boolean equals(ScepEntry obj, boolean ignoreId) {
-    if (this == obj) {
-      return true;
-    }
-
-    if (!caIdent.equals(obj.caIdent, ignoreId)) {
-      return false;
-    }
-
-    if (active != obj.active) {
-      return false;
-    }
-
-    if (!responderName.equals(obj.responderName)) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(control, obj.control)) {
-      return false;
-    }
-
-    return true;
+    return (obj != null)
+        && caIdent.equals(obj.caIdent, ignoreId)
+        && (active == obj.active)
+        && responderName.equals(obj.responderName)
+        && CompareUtil.equalsObject(control, obj.control);
   }
 
   @Override

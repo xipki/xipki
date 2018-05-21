@@ -37,8 +37,7 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
   protected static final String MSG_CERTS_FINISHED = "certs.finished";
 
   protected static final String SQL_ADD_ISSUER =
-      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV_INFO,CERT) "
-      + "VALUES (?,?,?,?,?,?,?)";
+      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV_INFO,CERT) VALUES (?,?,?,?,?,?,?)";
 
   protected static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN,HASH,SUBJECT)"
@@ -86,8 +85,8 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
 
     datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
 
-    datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
-        "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
+    datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT", "IID", "ISSUER", "ID",
+        "CASCADE", "NO ACTION");
     datasource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
 
     long duration = (System.currentTimeMillis() - start) / 1000;

@@ -21,8 +21,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
@@ -60,7 +58,7 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
   public OcspFromCaDbImportWorker(DataSourceFactory datasourceFactory,
       PasswordResolver passwordResolver, String dbConfFile, String publisherName,
       boolean resume, String srcFolder, int batchEntriesPerCommit, boolean evaluateOnly)
-      throws PasswordResolverException, IOException, JAXBException {
+      throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
@@ -81,8 +79,8 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
     // CertStore
     try {
       OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-          datasource, srcFolder, publisherName, batchEntriesPerCommit,
-          resume, stopMe, evaluateOnly);
+          datasource, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe,
+          evaluateOnly);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();
     } finally {

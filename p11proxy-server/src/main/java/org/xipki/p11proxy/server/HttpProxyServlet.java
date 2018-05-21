@@ -69,8 +69,7 @@ public class HttpProxyServlet extends AbstractHttpServlet {
     }
 
     try {
-      if (!REQUEST_MIMETYPE.equalsIgnoreCase(
-          request.headers().get("Content-Type"))) {
+      if (!REQUEST_MIMETYPE.equalsIgnoreCase(request.headers().get("Content-Type"))) {
         return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
       }
 

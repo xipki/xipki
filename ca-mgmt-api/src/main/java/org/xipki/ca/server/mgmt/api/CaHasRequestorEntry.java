@@ -106,27 +106,11 @@ public class CaHasRequestorEntry {
   }
 
   public boolean equals(CaHasRequestorEntry obj, boolean ignoreId) {
-    if (obj == null) {
-      return false;
-    }
-
-    if (ra != obj.ra) {
-      return false;
-    }
-
-    if (!requestorIdent.equals(obj.requestorIdent, ignoreId)) {
-      return false;
-    }
-
-    if (permission != obj.permission) {
-      return false;
-    }
-
-    if (!CompareUtil.equalsObject(profiles, obj.profiles)) {
-      return false;
-    }
-
-    return true;
+    return (obj != null)
+        && (ra == obj.ra)
+        && requestorIdent.equals(obj.requestorIdent, ignoreId)
+        && (permission == obj.permission)
+        && CompareUtil.equalsObject(profiles, obj.profiles);
   }
 
   @Override

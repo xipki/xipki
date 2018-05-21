@@ -56,7 +56,7 @@ public class AddUserEntry {
   @Override
   public String toString() {
     return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
-        "\nactive: ", active, "\npassword: ", password, "\n");
+        "\nactive: ", active, "\npassword: ****\n");
   }
 
 }

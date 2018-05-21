@@ -216,6 +216,9 @@ class SelfSignedCertBuilder {
 
     try {
       certprofile.checkPublicKey(publicKeyInfo);
+    } catch (CertprofileException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+          "exception in cert profile " + certprofile.getIdent());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.checkPublicKey", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);

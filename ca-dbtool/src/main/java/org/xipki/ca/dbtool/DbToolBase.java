@@ -100,12 +100,11 @@ public class DbToolBase {
     }
   }
 
-  public boolean deleteFromTableWithLargerId(String tableName, String idColumn,
-      long id, Logger log) {
-    ParamUtil.requireNonBlank("tableName", tableName);
+  public boolean deleteFromTableWithLargerId(String table, String idColumn, long id, Logger log) {
+    ParamUtil.requireNonBlank("table", table);
     ParamUtil.requireNonBlank("idColumn", idColumn);
 
-    String sql = StringUtil.concatObjects("DELETE FROM ", tableName, " WHERE ", idColumn, ">", id);
+    String sql = StringUtil.concatObjects("DELETE FROM ", table, " WHERE ", idColumn, ">", id);
 
     Statement stmt;
     try {
@@ -118,7 +117,7 @@ public class DbToolBase {
       stmt.execute(sql);
     } catch (Throwable th) {
       String msg = String.format("could not delete columns from table %s with %s > %s",
-          tableName, idColumn, id);
+          table, idColumn, id);
       LogUtil.error(log, th, msg);
       return false;
     } finally {
