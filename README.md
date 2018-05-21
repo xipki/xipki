@@ -11,18 +11,17 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
 
 ## Support
-Just drop me an email.
+Just create [issues](https://github.com/xipki/xipki/issues).
 
 ## Prerequisite
+* OS: Linux, Windows, MacOS
 * JRE / JDK 8 (build 162 or higher)
-## Tested Platforms
+* Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
 
-- Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
-- HSM: [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
-  [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
-  Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
-- JVM: OpenJDK JDK/JRE 8, Oracle JDK/JRE 8, Zulu JDK 8
-- OS: Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
+## Tested PKCS#11 Devices
+* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
+*  [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
+* Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
 
 ## Get Started
 
