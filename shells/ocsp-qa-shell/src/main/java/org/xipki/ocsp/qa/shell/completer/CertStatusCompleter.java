@@ -17,6 +17,9 @@
 
 package org.xipki.ocsp.qa.shell.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.ocsp.qa.OcspCertStatus;
@@ -30,13 +33,11 @@ import org.xipki.ocsp.qa.OcspCertStatus;
 public class CertStatusCompleter extends AbstractEnumCompleter {
 
   public CertStatusCompleter() {
-    StringBuilder enums = new StringBuilder();
-
+    List<String> enums = new LinkedList<>();
     for (OcspCertStatus entry : OcspCertStatus.values()) {
-      enums.append(entry.name()).append(",");
+      enums.add(entry.name());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

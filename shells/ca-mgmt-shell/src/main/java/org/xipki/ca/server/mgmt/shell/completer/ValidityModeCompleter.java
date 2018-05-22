@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.console.karaf.AbstractEnumCompleter;
@@ -31,12 +34,11 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 public class ValidityModeCompleter extends AbstractEnumCompleter {
 
   public ValidityModeCompleter() {
-    StringBuilder enums = new StringBuilder();
+    List<String> enums = new LinkedList<>();
     for (ValidityMode mode : ValidityMode.values()) {
-      enums.append(mode.name()).append(",");
+      enums.add(mode.name());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

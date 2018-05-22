@@ -17,6 +17,9 @@
 
 package org.xipki.console.karaf.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.util.AlgorithmUtil;
@@ -32,12 +35,11 @@ import org.xipki.security.util.AlgorithmUtil;
 public class ECCurveNameCompleter extends AbstractEnumCompleter {
 
   public ECCurveNameCompleter() {
-    StringBuilder enums = new StringBuilder();
+    List<String> enums = new LinkedList<>();
     for (String name : AlgorithmUtil.getECCurveNames()) {
-      enums.append(name).append(",");
+      enums.add(name);
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

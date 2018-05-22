@@ -17,8 +17,10 @@
 
 package org.xipki.console.karaf.completer;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.ObjectIdentifiers;
 
@@ -32,17 +34,17 @@ import org.xipki.security.ObjectIdentifiers;
 public class ExtKeyusageCompleter extends AbstractEnumCompleter {
 
   public ExtKeyusageCompleter() {
-    String tokens = StringUtil.concat(
-        ObjectIdentifiers.id_kp_clientAuth.getId(), ",",
-        ObjectIdentifiers.id_kp_codeSigning.getId(), ",",
-        ObjectIdentifiers.id_kp_emailProtection.getId(), ",",
-        ObjectIdentifiers.id_kp_ipsecEndSystem.getId(), ",",
-        ObjectIdentifiers.id_kp_ipsecTunnel.getId(), ",",
-        ObjectIdentifiers.id_kp_OCSPSigning.getId(), ",",
-        ObjectIdentifiers.id_kp_serverAuth.getId(), ",",
+    List<String> enums = Arrays.asList(
+        ObjectIdentifiers.id_kp_clientAuth.getId(),
+        ObjectIdentifiers.id_kp_codeSigning.getId(),
+        ObjectIdentifiers.id_kp_emailProtection.getId(),
+        ObjectIdentifiers.id_kp_ipsecEndSystem.getId(),
+        ObjectIdentifiers.id_kp_ipsecTunnel.getId(),
+        ObjectIdentifiers.id_kp_OCSPSigning.getId(),
+        ObjectIdentifiers.id_kp_serverAuth.getId(),
         ObjectIdentifiers.id_kp_timeStamping.getId());
 
-    setTokens(tokens);
+    setTokens(enums);
   }
 
 }

@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.console.karaf.AbstractEnumCompleter;
@@ -31,13 +34,11 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 public class CertListSortByCompleter extends AbstractEnumCompleter {
 
   public CertListSortByCompleter() {
-    StringBuilder enums = new StringBuilder();
-
+    List<String> enums = new LinkedList<>();
     for (CertListOrderBy sort : CertListOrderBy.values()) {
-      enums.append(sort.getText()).append(",");
+      enums.add(sort.getText());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

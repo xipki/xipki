@@ -17,6 +17,9 @@
 
 package org.xipki.security.speed.cmd.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 
@@ -33,13 +36,12 @@ public class RSASigAlgCompleter extends AbstractEnumCompleter {
   public RSASigAlgCompleter() {
     String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
       "SHA3-224, SHA3-256, SHA3-384, SHA3-512"};
-    StringBuilder enums = new StringBuilder(200);
+    List<String> enums = new LinkedList<>();
     for (String hashAlg : hashAlgs) {
-      enums.append(hashAlg).append("withRSA,");
-      enums.append(hashAlg).append("RSAandMGF1,");
+      enums.add(hashAlg + "withRSA");
+      enums.add(hashAlg + "RSAandMGF1");
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

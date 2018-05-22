@@ -17,6 +17,9 @@
 
 package org.xipki.console.karaf.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.KeyUsage;
@@ -31,12 +34,11 @@ import org.xipki.security.KeyUsage;
 public class KeyusageCompleter extends AbstractEnumCompleter {
 
   public KeyusageCompleter() {
-    StringBuilder enums = new StringBuilder();
+    List<String> enums = new LinkedList<>();
     for (KeyUsage usage : KeyUsage.values()) {
-      enums.append(usage.getName()).append(",");
+      enums.add(usage.getName());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

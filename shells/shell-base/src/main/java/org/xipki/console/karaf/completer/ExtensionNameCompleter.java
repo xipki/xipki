@@ -73,17 +73,15 @@ public class ExtensionNameCompleter extends AbstractEnumCompleter {
     oids.add(Extension.targetInformation);
     oids.add(ObjectIdentifiers.id_pe_tlsfeature);
 
-    StringBuilder enums = new StringBuilder();
-
+    List<String> enums = new LinkedList<>();
     for (ASN1ObjectIdentifier oid : oids) {
       String name = ObjectIdentifiers.getName(oid);
       if (StringUtil.isBlank(name)) {
         name = oid.getId();
       }
-      enums.append(name).append(",");
+      enums.add(name);
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }

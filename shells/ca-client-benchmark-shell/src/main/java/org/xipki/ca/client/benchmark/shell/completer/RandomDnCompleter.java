@@ -17,6 +17,9 @@
 
 package org.xipki.ca.client.benchmark.shell.completer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.benchmark.shell.BenchmarkEntry.RandomDn;
 import org.xipki.console.karaf.AbstractEnumCompleter;
@@ -31,13 +34,11 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 public class RandomDnCompleter extends AbstractEnumCompleter {
 
   public RandomDnCompleter() {
-    StringBuilder enums = new StringBuilder();
-
+    List<String> enums = new LinkedList<>();
     for (RandomDn dn : RandomDn.values()) {
-      enums.append(dn.name()).append(",");
+      enums.add(dn.name());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
+    setTokens(enums);
   }
 
 }
