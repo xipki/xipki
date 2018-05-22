@@ -37,8 +37,7 @@ import org.xipki.password.PBEPasswordService;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "pbe-enc",
-    description = "encrypt password with master password")
+@Command(scope = "xi", name = "pbe-enc", description = "encrypt password with master password")
 @Service
 // CHECKSTYLE:SKIP
 public class PBEEncryptAction extends SecurityAction {
@@ -47,13 +46,11 @@ public class PBEEncryptAction extends SecurityAction {
       description = "iteration count, between 1 and 65535")
   private int iterationCount = 2000;
 
-  @Option(name = "--out",
-      description = "where to save the encrypted password")
+  @Option(name = "--out", description = "where to save the encrypted password")
   @Completion(FileCompleter.class)
   private String outFile;
 
-  @Option(name = "-k",
-      description = "quorum of the password parts")
+  @Option(name = "-k", description = "quorum of the password parts")
   private Integer quorum = 1;
 
   @Option(name = "--mpassword-file",
@@ -61,8 +58,7 @@ public class PBEEncryptAction extends SecurityAction {
   @Completion(FileCompleter.class)
   private String masterPasswordFile;
 
-  @Option(name = "--mk",
-      description = "quorum of the master password parts")
+  @Option(name = "--mk", description = "quorum of the master password parts")
   private Integer mquorum = 1;
 
   @Override

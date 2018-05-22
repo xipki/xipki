@@ -33,7 +33,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class UserRemoveAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true, description = "user Name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "user Name")
   private String name;
 
   @Override

@@ -40,12 +40,12 @@ import org.xipki.security.util.X509Util;
 @Service
 public class GetCrlAction extends ClientAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate\n(required)")
+  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate")
   @Completion(FileCompleter.class)
   private String certFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate\n(required)")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 

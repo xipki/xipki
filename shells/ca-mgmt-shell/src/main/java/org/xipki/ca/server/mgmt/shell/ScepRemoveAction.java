@@ -35,7 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class ScepRemoveAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "SCEP CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "SCEP CA name")
   @Completion(ScepNameCompleter.class)
   private String name;
 

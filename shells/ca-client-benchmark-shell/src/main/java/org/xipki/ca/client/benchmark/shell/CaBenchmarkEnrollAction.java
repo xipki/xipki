@@ -42,11 +42,10 @@ import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 
   @Option(name = "--profile", aliases = "-p", required = true,
-      description =  "certificate profile that allows duplication of public key\n(required)")
+      description =  "certificate profile that allows duplication of public key")
   private String certprofile;
 
-  @Option(name = "--subject", aliases = "-s", required = true,
-          description = "subject template\n(required)")
+  @Option(name = "--subject", aliases = "-s", required = true, description = "subject template")
   private String subjectTemplate;
 
   @Option(name = "--random-dn", description = "DN name to be incremented")

@@ -39,12 +39,12 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CaProfileRemoveAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--profile", required = true, multiValued = true,
-      description = "certificate profile name\n(required, multi-valued)")
+      description = "certificate profile name")
   @Completion(ProfileNameCompleter.class)
   private List<String> profileNames;
 

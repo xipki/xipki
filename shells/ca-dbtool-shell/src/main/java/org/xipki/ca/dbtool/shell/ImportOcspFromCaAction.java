@@ -45,7 +45,7 @@ public class ImportOcspFromCaAction extends DbPortAction {
   @Completion(FileCompleter.class)
   private String dbconfFile = DFLT_DBCONF_FILE;
 
-  @Option(name = "--in-dir", required = true, description = "input directory\n(required)")
+  @Option(name = "--in-dir", required = true, description = "input directory")
   @Completion(DirCompleter.class)
   private String indir;
 

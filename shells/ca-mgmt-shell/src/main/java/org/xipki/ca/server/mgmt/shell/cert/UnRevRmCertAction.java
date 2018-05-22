@@ -41,7 +41,7 @@ import org.xipki.security.util.X509Util;
 
 public abstract class UnRevRmCertAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   protected String caName;
 

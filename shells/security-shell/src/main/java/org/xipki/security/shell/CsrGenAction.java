@@ -86,21 +86,17 @@ import org.xipki.security.util.X509Util;
 
 public abstract class CsrGenAction extends SecurityAction {
 
-  @Option(name = "--hash",
-      description = "hash algorithm name")
+  @Option(name = "--hash", description = "hash algorithm name")
   @Completion(HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 
-  @Option(name = "--subject-alt-name", multiValued = true,
-      description = "subjectAltName\n(multi-valued)")
+  @Option(name = "--subject-alt-name", multiValued = true, description = "subjectAltName")
   protected List<String> subjectAltNames;
 
-  @Option(name = "--subject-info-access", multiValued = true,
-      description = "subjectInfoAccess\n(multi-valued)")
+  @Option(name = "--subject-info-access", multiValued = true, description = "subjectInfoAccess")
   protected List<String> subjectInfoAccesses;
 
-  @Option(name = "--subject", aliases = "-s", required = true,
-      description = "subject in the CSR\n(required)")
+  @Option(name = "--subject", aliases = "-s", required = true, description = "subject in the CSR")
   private String subject;
 
   @Option(name = "--rsa-mgf1",
@@ -117,56 +113,46 @@ public abstract class CsrGenAction extends SecurityAction {
           + "(only applied to EC key with GM curves)")
   private Boolean gm = Boolean.FALSE;
 
-  @Option(name = "--out", aliases = "-o", required = true,
-      description = "output file name\n(required)")
+  @Option(name = "--out", aliases = "-o", required = true, description = "output file name")
   @Completion(FileCompleter.class)
   private String outputFilename;
 
-  @Option(name = "--challenge-password", aliases = "-c",
-      description = "challenge password")
+  @Option(name = "--challenge-password", aliases = "-c", description = "challenge password")
   private String challengePassword;
 
-  @Option(name = "--keyusage", multiValued = true,
-      description = "keyusage\n(multi-valued)")
+  @Option(name = "--keyusage", multiValued = true, description = "keyusage")
   @Completion(KeyusageCompleter.class)
   private List<String> keyusages;
 
-  @Option(name = "--ext-keyusage", multiValued = true,
-      description = "extended keyusage\n(multi-valued)")
+  @Option(name = "--ext-keyusage", multiValued = true, description = "extended keyusage")
   @Completion(ExtKeyusageCompleter.class)
   private List<String> extkeyusages;
 
   @Option(name = "--qc-eu-limit", multiValued = true,
-      description = "QC EuLimitValue of format <currency>:<amount>:<exponent> (multi-valued)")
+      description = "QC EuLimitValue of format <currency>:<amount>:<exponent>")
   private List<String> qcEuLimits;
 
-  @Option(name = "--biometric-type",
-      description = "Biometric type")
+  @Option(name = "--biometric-type", description = "Biometric type")
   private String biometricType;
 
-  @Option(name = "--biometric-hash",
-      description = "Biometric hash algorithm")
+  @Option(name = "--biometric-hash", description = "Biometric hash algorithm")
   @Completion(HashAlgCompleter.class)
   private String biometricHashAlgo;
 
-  @Option(name = "--biometric-file",
-      description = "Biometric hash algorithm")
+  @Option(name = "--biometric-file", description = "Biometric hash algorithm")
   private String biometricFile;
 
-  @Option(name = "--biometric-uri",
-      description = "Biometric sourcedata URI")
+  @Option(name = "--biometric-uri", description = "Biometric sourcedata URI")
   @Completion(FileCompleter.class)
   private String biometricUri;
 
   @Option(name = "--need-extension", multiValued = true,
-      description = "types of extension that must be contained in the certificate\n"
-          + "(multi-valued)")
+      description = "types of extension that must be contained in the certificate")
   @Completion(ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
   @Option(name = "--want-extension", multiValued = true,
-      description = "types of extension that should be contained in the certificate if"
-          + " possible\n(multi-valued)")
+      description = "types of extension that should be contained in the certificate if possible")
   @Completion(ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 

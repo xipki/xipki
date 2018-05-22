@@ -37,8 +37,7 @@ import org.xipki.security.shell.KeyGenAction;
 
 public abstract class P12KeyGenAction extends KeyGenAction {
 
-  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the key\n"
-          + "(required)")
+  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the key")
   @Completion(FileCompleter.class)
   protected String keyOutFile;
 

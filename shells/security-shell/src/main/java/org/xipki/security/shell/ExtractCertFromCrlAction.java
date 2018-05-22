@@ -46,18 +46,16 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "extract-cert",
-    description = "extract certificates from CRL")
+@Command(scope = "xi", name = "extract-cert", description = "extract certificates from CRL")
 @Service
 public class ExtractCertFromCrlAction extends SecurityAction {
 
-  @Option(name = "--crl", required = true,
-      description = "CRL file\n(required)")
+  @Option(name = "--crl", required = true, description = "CRL file")
   @Completion(FileCompleter.class)
   private String crlFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "ZIP file to save the extracted certificates\n(required)")
+      description = "ZIP file to save the extracted certificates")
   @Completion(FileCompleter.class)
   private String outFile;
 

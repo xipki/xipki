@@ -42,27 +42,23 @@ import org.xipki.security.util.X509Util;
  * @since 2.2.0
  */
 
-@Command(scope = "xi", name = "import-cert",
-    description = "Import certificates to a keystore")
+@Command(scope = "xi", name = "import-cert", description = "Import certificates to a keystore")
 @Service
 public class ImportCertAction extends SecurityAction {
 
-  @Option(name = "--keystore", required = true,
-      description = "Keystore file\n(required)")
+  @Option(name = "--keystore", required = true, description = "Keystore file")
   @Completion(FileCompleter.class)
   private String ksFile;
 
-  @Option(name = "--type", required = true,
-      description = "Type of the keystore\n(required)")
+  @Option(name = "--type", required = true, description = "Type of the keystore")
   @Completion(KeystoreTypeCompleter.class)
   private String ksType;
 
-  @Option(name = "--password",
-      description = "password of the keystore")
+  @Option(name = "--password", description = "password of the keystore")
   private String ksPwd;
 
   @Option(name = "--cert", aliases = "-c", required = true, multiValued = true,
-      description = "Certificate files\n(required, multi-valued)")
+      description = "Certificate files")
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 

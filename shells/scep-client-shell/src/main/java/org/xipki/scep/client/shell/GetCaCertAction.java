@@ -41,14 +41,14 @@ import org.xipki.scep.client.ScepClient;
 @Service
 public class GetCaCertAction extends XiAction {
 
-  @Option(name = "--url", required = true, description = "URL of the SCEP server\n(required)")
+  @Option(name = "--url", required = true, description = "URL of the SCEP server")
   private String url;
 
   @Option(name = "--ca-id", description = "CA identifier")
   private String caId;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the CA certificate\n(required)")
+      description = "where to save the CA certificate")
   @Completion(FileCompleter.class)
   protected String outFile;
 

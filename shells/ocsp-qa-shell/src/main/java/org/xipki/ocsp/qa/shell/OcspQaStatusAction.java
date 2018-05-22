@@ -64,13 +64,12 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
   @Completion(OcspErrorCompleter.class)
   private String errorText;
 
-  @Option(name = "--exp-status", multiValued = true,
-      description = "expected status\n(multi-valued)")
+  @Option(name = "--exp-status", multiValued = true, description = "expected status")
   @Completion(CertStatusCompleter.class)
   private List<String> statusTexts;
 
   @Option(name = "--rev-time", multiValued = true,
-      description = "revocation time, UTC time of format yyyyMMddHHmmss\n(multi-valued)")
+      description = "revocation time, UTC time of format yyyyMMddHHmmss")
   private List<String> revTimeTexts;
 
   @Option(name = "--exp-sig-alg", description = "expected signature algorithm")

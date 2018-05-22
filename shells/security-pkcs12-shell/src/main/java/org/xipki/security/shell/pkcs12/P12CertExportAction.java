@@ -41,7 +41,7 @@ import org.xipki.console.karaf.CmdFailure;
 public class P12CertExportAction extends P12SecurityAction {
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate\n(required)")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outFile;
 

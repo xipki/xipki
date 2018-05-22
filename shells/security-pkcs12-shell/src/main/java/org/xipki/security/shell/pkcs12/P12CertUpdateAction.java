@@ -47,12 +47,11 @@ import org.xipki.security.util.X509Util;
 @Service
 public class P12CertUpdateAction extends P12SecurityAction {
 
-  @Option(name = "--cert", required = true, description = "certificate file\n(required)")
+  @Option(name = "--cert", required = true, description = "certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
-  @Option(name = "--ca-cert", multiValued = true,
-      description = "CA Certificate file\n(multi-valued)")
+  @Option(name = "--ca-cert", multiValued = true, description = "CA Certificate file")
   @Completion(FileCompleter.class)
   private Set<String> caCertFiles;
 

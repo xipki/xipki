@@ -39,8 +39,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class ProfileUpdateAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "profile name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
   @Completion(ProfileNameCompleter.class)
   protected String name;
 

@@ -42,7 +42,7 @@ import org.xipki.console.karaf.XiAction;
 @Service
 public class ReplaceFileAction extends XiAction {
 
-  @Argument(index = 0, name = "file", required = true, description = "file\n(required)")
+  @Argument(index = 0, name = "file", required = true, description = "file")
   @Completion(FileCompleter.class)
   private String source;
 

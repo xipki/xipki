@@ -38,11 +38,10 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class RequestorAddAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "requestor name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
   private String name;
 
-  @Option(name = "--cert", required = true, description = "requestor certificate file\n(required)")
+  @Option(name = "--cert", required = true, description = "requestor certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

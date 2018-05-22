@@ -42,8 +42,7 @@ public abstract class CrlAction extends ClientAction {
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the CRL\n(required)")
+  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
   @Completion(FileCompleter.class)
   protected String outFile;
 

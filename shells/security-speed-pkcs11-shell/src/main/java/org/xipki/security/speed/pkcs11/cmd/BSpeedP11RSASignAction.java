@@ -41,7 +41,7 @@ import org.xipki.security.speed.pkcs11.P11RSASignSpeed;
 // CHECKSTYLE:SKIP
 public class BSpeedP11RSASignAction extends BSpeedP11Action {
 
-  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm")
   @Completion(RSASigAlgCompleter.class)
   private String sigAlgo;
 

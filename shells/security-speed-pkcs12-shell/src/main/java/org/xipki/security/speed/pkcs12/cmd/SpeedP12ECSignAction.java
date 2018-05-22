@@ -38,11 +38,11 @@ import org.xipki.security.speed.pkcs12.P12ECSignSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP12ECSignAction extends SpeedP12SignAction {
 
-  @Option(name = "--curve", required = true, description = "EC curve name\n(required)")
+  @Option(name = "--curve", required = true, description = "EC curve name")
   @Completion(ECCurveNameCompleter.class)
   private String curveName;
 
-  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm")
   @Completion(ECDSASigAlgCompleter.class)
   private String sigAlgo;
 

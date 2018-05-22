@@ -50,7 +50,7 @@ import org.xipki.security.util.KeyUtil;
 @Service
 public class P12CsrGenAction extends CsrGenAction {
 
-  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file\n(required)")
+  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
   @Completion(FileCompleter.class)
   private String p12File;
 

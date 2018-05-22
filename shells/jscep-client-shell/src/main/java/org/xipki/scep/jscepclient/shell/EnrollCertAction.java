@@ -42,12 +42,12 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class EnrollCertAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate\n(required)")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 

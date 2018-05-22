@@ -44,7 +44,7 @@ public abstract class P11SecurityAction extends SecurityAction {
   protected static final String DEFAULT_P11MODULE_NAME =
       P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
-  @Option(name = "--slot", required = true, description = "slot index\n(required)")
+  @Option(name = "--slot", required = true, description = "slot index")
   protected Integer slotIndex;
 
   @Option(name = "--module", description = "name of the PKCS#11 module")

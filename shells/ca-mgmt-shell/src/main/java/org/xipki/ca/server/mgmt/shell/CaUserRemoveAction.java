@@ -35,11 +35,11 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CaUserRemoveAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--user", required = true, description = "user name\n(required)")
+  @Option(name = "--user", required = true, description = "user name")
   private String userName;
 
   @Override

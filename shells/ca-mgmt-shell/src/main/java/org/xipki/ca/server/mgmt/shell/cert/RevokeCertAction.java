@@ -41,8 +41,7 @@ import org.xipki.security.CrlReason;
 @Service
 public class RevokeCertAction extends UnRevRmCertAction {
 
-  @Option(name = "--reason", aliases = "-r", required = true,
-      description = "CRL reason\n(required)")
+  @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
   @Completion(ClientCrlReasonCompleter.class)
   private String reason;
 

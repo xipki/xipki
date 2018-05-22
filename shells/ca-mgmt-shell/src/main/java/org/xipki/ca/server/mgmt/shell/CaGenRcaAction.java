@@ -39,11 +39,11 @@ import org.xipki.common.util.IoUtil;
 @Service
 public class CaGenRcaAction extends CaAddOrGenAction {
 
-  @Option(name = "--csr", required = true, description = "CSR of the Root CA\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR of the Root CA")
   @Completion(FileCompleter.class)
   private String csrFile;
 
-  @Option(name = "--profile", required = true, description = "profile of the Root CA\n(required)")
+  @Option(name = "--profile", required = true, description = "profile of the Root CA")
   private String rootcaProfile;
 
   @Option(name = "--serial", description = "profile of the Root CA")

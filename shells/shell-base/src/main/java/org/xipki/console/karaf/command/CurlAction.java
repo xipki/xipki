@@ -49,7 +49,7 @@ import org.xipki.console.karaf.XiAction;
 @Service
 public class CurlAction extends XiAction {
 
-  @Argument(index = 0, name = "url", required = true, description = "URL\n(required)")
+  @Argument(index = 0, name = "url", required = true, description = "URL")
   private String url;
 
   @Option(name = "--verbose", aliases = "-v", description = "show request and response verbosely")

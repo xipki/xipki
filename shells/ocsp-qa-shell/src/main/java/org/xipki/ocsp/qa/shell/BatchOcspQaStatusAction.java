@@ -85,12 +85,12 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
   @Completion(FileCompleter.class)
   private String respIssuerFile;
 
-  @Option(name = "--url", required = true, description = "OCSP responder URL\n(required)")
+  @Option(name = "--url", required = true, description = "OCSP responder URL")
   private String serverUrlStr;
 
   @Option(name = "--sn-file", required = true,
       description = "file containing the serial number and revocation information"
-          + "\n(required)\nEach line starts with # for comment or is of following format"
+          + "\nEach line starts with # for comment or is of following format"
           + "\nserial-number[,status[,revocation-time]]")
   @Completion(FileCompleter.class)
   private String snFile;

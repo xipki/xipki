@@ -39,11 +39,10 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class PublisherAddAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "publisher Name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "publisher Name")
   private String name;
 
-  @Option(name = "--type", required = true, description = "publisher type\n(required)")
+  @Option(name = "--type", required = true, description = "publisher type")
   @Completion(PublisherTypeCompleter.class)
   private String type;
 

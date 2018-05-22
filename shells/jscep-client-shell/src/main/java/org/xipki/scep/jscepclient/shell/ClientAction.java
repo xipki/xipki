@@ -47,17 +47,17 @@ import org.xipki.security.util.X509Util;
 
 public abstract class ClientAction extends XiAction {
 
-  @Option(name = "--url", required = true, description = "URL of the SCEP server\n(required)")
+  @Option(name = "--url", required = true, description = "URL of the SCEP server")
   private String url;
 
   @Option(name = "--ca-id", description = "CA identifier")
   private String caId;
 
-  @Option(name = "--ca-cert", required = true, description = "CA certificate\n(required)")
+  @Option(name = "--ca-cert", required = true, description = "CA certificate")
   @Completion(FileCompleter.class)
   private String caCertFile;
 
-  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file\n(required)")
+  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
   @Completion(FileCompleter.class)
   private String p12File;
 

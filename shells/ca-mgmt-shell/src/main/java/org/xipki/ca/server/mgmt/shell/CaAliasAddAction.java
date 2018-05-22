@@ -35,11 +35,11 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CaAliasAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--alias", required = true, description = "CA alias\n(required)")
+  @Option(name = "--alias", required = true, description = "CA alias")
   private String caAlias;
 
   @Override

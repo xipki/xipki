@@ -39,12 +39,11 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class ProfileExportAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "profile name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
   private String name;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the profile configuration\n(required)")
+      description = "where to save the profile configuration")
   @Completion(FileCompleter.class)
   private String confFile;
 

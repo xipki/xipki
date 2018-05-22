@@ -51,7 +51,7 @@ import org.xipki.password.PasswordResolver;
 
 public abstract class CaAddOrGenAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true, description = "CA name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "CA name")
   private String caName;
 
   @Option(name = "--status", description = "CA status")
@@ -62,23 +62,19 @@ public abstract class CaAddOrGenAction extends CaAction {
   @Completion(CaStatusCompleter.class)
   private String restStatus = "inactive";
 
-  @Option(name = "--ca-cert-uri", multiValued = true,
-      description = "CA certificate URI\n(multi-valued)")
+  @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
   private List<String> caCertUris;
 
-  @Option(name = "--ocsp-uri", multiValued = true, description = "OCSP URI\n(multi-valued)")
+  @Option(name = "--ocsp-uri", multiValued = true, description = "OCSP URI")
   private List<String> ocspUris;
 
-  @Option(name = "--crl-uri", multiValued = true,
-      description = "CRL distribution point\n(multi-valued)")
+  @Option(name = "--crl-uri", multiValued = true, description = "CRL distribution point")
   private List<String> crlUris;
 
-  @Option(name = "--deltacrl-uri", multiValued = true,
-      description = "CRL distribution point\n(multi-valued)")
+  @Option(name = "--deltacrl-uri", multiValued = true, description = "CRL distribution point")
   private List<String> deltaCrlUris;
 
-  @Option(name = "--permission", required = true, multiValued = true,
-      description = "permission\n(required, multi-valued)")
+  @Option(name = "--permission", required = true, multiValued = true, description = "permission")
   @Completion(PermissionCompleter.class)
   private Set<String> permissions;
 
@@ -86,11 +82,10 @@ public abstract class CaAddOrGenAction extends CaAction {
       description = "number of bits of the serial number, between 63 and 159")
   private int snBitLen = 127;
 
-  @Option(name = "--next-crl-no", required = true,
-      description = "CRL number for the next CRL\n(required)")
+  @Option(name = "--next-crl-no", required = true, description = "CRL number for the next CRL")
   private Long nextCrlNumber;
 
-  @Option(name = "--max-validity", required = true, description = "maximal validity\n (required)")
+  @Option(name = "--max-validity", required = true, description = "maximal validity")
   private String maxValidity;
 
   @Option(name = "--keep-expired-certs", description = "days to keep expired certificates")
@@ -117,7 +112,7 @@ public abstract class CaAddOrGenAction extends CaAction {
       description = "days before expiration time of CA to issue certificates")
   private Integer expirationPeriod = 365;
 
-  @Option(name = "--signer-type", required = true, description = "CA signer type\n(required)")
+  @Option(name = "--signer-type", required = true, description = "CA signer type")
   @Completion(SignerTypeCompleter.class)
   private String signerType;
 

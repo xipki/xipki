@@ -41,7 +41,7 @@ import org.xipki.security.SignerConf;
 @Service
 public class P11EnrollCertAction extends EnrollCertAction {
 
-  @Option(name = "--slot", required = true, description = "slot index\n(required)")
+  @Option(name = "--slot", required = true, description = "slot index")
   private Integer slotIndex;
 
   @Option(name = "--key-id",

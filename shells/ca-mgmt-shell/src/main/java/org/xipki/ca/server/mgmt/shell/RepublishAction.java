@@ -41,12 +41,12 @@ public class RepublishAction extends CaAction {
   @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--publisher", required = true, multiValued = true,
-      description = "publisher name or 'all' for all publishers\n(required, multi-valued)")
+      description = "publisher name or 'all' for all publishers")
   @Completion(PublisherNamePlusAllCompleter.class)
   private List<String> publisherNames;
 

@@ -43,7 +43,7 @@ import org.xipki.security.SignerConf;
 @Service
 public class P12EnrollCertAction extends EnrollCertAction {
 
-  @Option(name = "--p12", required = true, description = "PKCS#12 request file\n(required)")
+  @Option(name = "--p12", required = true, description = "PKCS#12 request file")
   @Completion(FileCompleter.class)
   private String p12File;
 

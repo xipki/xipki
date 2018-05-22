@@ -34,18 +34,15 @@ import org.xipki.password.OBFPasswordService;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "obfuscate",
-    description = "obfuscate password")
+@Command(scope = "xi", name = "obfuscate", description = "obfuscate password")
 @Service
 public class ObfuscateAction extends SecurityAction {
 
-  @Option(name = "--out",
-      description = "where to save the encrypted password")
+  @Option(name = "--out", description = "where to save the encrypted password")
   @Completion(FileCompleter.class)
   private String outFile;
 
-  @Option(name = "-k",
-      description = "quorum of the password parts")
+  @Option(name = "-k", description = "quorum of the password parts")
   private Integer quorum = 1;
 
   @Override

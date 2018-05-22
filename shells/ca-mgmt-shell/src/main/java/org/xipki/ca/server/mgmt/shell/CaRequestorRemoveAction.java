@@ -38,12 +38,11 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CaRequestorRemoveAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--requestor", required = true, multiValued = true,
-      description = "requestor name\n(required, multi-valued)")
+  @Option(name = "--requestor", required = true, multiValued = true, description = "requestor name")
   @Completion(RequestorNameCompleter.class)
   private List<String> requestorNames;
 

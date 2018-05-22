@@ -41,37 +41,30 @@ import org.xipki.security.shell.completer.KeystoreTypeCompleter;
  * @since 2.2.0
  */
 
-@Command(scope = "xi", name = "convert-keystore",
-    description = "Convert keystore")
+@Command(scope = "xi", name = "convert-keystore", description = "Convert keystore")
 @Service
 public class ConvertKeystoreAction extends SecurityAction {
 
-  @Option(name = "--in", required = true,
-      description = "Source keystore file\n(required)")
+  @Option(name = "--in", required = true, description = "Source keystore file")
   @Completion(FileCompleter.class)
   private String inFile;
 
-  @Option(name = "--intype", required = true,
-      description = "Type of the source keystore\n(required)")
+  @Option(name = "--intype", required = true, description = "Type of the source keystore")
   @Completion(KeystoreTypeCompleter.class)
   private String inType;
 
-  @Option(name = "--inpwd",
-      description = "password of the source keystore")
+  @Option(name = "--inpwd", description = "password of the source keystore")
   private String inPwd;
 
-  @Option(name = "--out", required = true,
-      description = "Destination keystore file\n(required)")
+  @Option(name = "--out", required = true, description = "Destination keystore file")
   @Completion(FileCompleter.class)
   private String outFile;
 
-  @Option(name = "--outtype", required = true,
-      description = "Type of the destination keystore\n(required)")
+  @Option(name = "--outtype", required = true, description = "Type of the destination keystore")
   @Completion(KeystoreTypeCompleter.class)
   private String outType;
 
-  @Option(name = "--outpwd",
-      description = "password of the destination keystore")
+  @Option(name = "--outpwd", description = "password of the destination keystore")
   private String outPwd;
 
   @Override

@@ -44,8 +44,7 @@ public class ExportConfAction extends CaAction {
   private String confFile;
 
   @Option(name = "--ca", multiValued = true,
-      description = "CAs whose configuration should be exported."
-          + " Empty list means all CAs\n(multi-valued)")
+      description = "CAs whose configuration should be exported. Empty list means all CAs")
   @Completion(CaNameCompleter.class)
   private List<String> caNames;
 

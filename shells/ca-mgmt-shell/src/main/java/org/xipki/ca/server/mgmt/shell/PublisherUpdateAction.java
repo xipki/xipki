@@ -39,8 +39,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class PublisherUpdateAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "publisher name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "publisher name")
   @Completion(PublisherNameCompleter.class)
   protected String name;
 

@@ -40,8 +40,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
 
   @Option(name = "--template", aliases = "-t", required = true,
-      description = "template file. The contained profiles must allow duplication of public key"
-          + "\n(required)")
+      description = "template file. The contained profiles must allow duplication of public key")
   @Completion(FileCompleter.class)
   private String templateFile;
 

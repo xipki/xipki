@@ -50,7 +50,7 @@ public class SignerUpdateAction extends CaAction {
   @Reference
   protected PasswordResolver passwordResolver;
 
-  @Option(name = "--name", aliases = "-n", required = true, description = "signer name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "signer name")
   @Completion(SignerNameCompleter.class)
   protected String name;
 

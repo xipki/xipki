@@ -39,7 +39,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class GetCertAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   protected String caName;
 

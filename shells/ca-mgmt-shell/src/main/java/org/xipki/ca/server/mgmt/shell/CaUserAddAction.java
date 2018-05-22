@@ -41,20 +41,19 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class CaUserAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--user", required = true, description = "user name\n(required)")
+  @Option(name = "--user", required = true, description = "user name")
   private String userName;
 
-  @Option(name = "--permission", required = true, multiValued = true,
-      description = "permission\n(required, multi-valued)")
+  @Option(name = "--permission", required = true, multiValued = true, description = "permission")
   @Completion(PermissionCompleter.class)
   private Set<String> permissions;
 
   @Option(name = "--profile", required = true, multiValued = true,
-      description = "profile name or 'all' for all profiles\n(required, multi-valued)")
+      description = "profile name or 'all' for all profiles")
   @Completion(ProfileNameAndAllCompleter.class)
   private Set<String> profiles;
 

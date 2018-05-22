@@ -48,7 +48,7 @@ import org.xipki.security.SecurityFactory;
 @Service
 public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
 
-  @Option(name = "--issuer", required = true, description = "issuer certificate file\n(required)")
+  @Option(name = "--issuer", required = true, description = "issuer certificate file")
   @Completion(FileCompleter.class)
   private String issuerCertFile;
 

@@ -43,7 +43,7 @@ public class SpeedP12DSASignAction extends SpeedP12SignAction {
   @Option(name = "--qlen", description = "bit length of the sub-prime")
   private Integer qlen;
 
-  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm")
   @Completion(DSASigAlgCompleter.class)
   private String sigAlgo;
 

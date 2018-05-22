@@ -96,11 +96,10 @@ public abstract class EnrollCertAction extends ClientAction {
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--subject", aliases = "-s", required = true,
-      description = "subject to be requested\n(required)")
+      description = "subject to be requested")
   private String subject;
 
-  @Option(name = "--profile", aliases = "-p", required = true,
-      description = "certificate profile\n(required)")
+  @Option(name = "--profile", aliases = "-p", required = true, description = "certificate profile")
   private String profile;
 
   @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
@@ -110,7 +109,7 @@ public abstract class EnrollCertAction extends ClientAction {
   private String notAfterS;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate\n(required)")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -135,26 +134,22 @@ public abstract class EnrollCertAction extends ClientAction {
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--keyusage", multiValued = true, description = "keyusage\n(multi-valued)")
+  @Option(name = "--keyusage", multiValued = true, description = "keyusage")
   @Completion(KeyusageCompleter.class)
   private List<String> keyusages;
 
-  @Option(name = "--ext-keyusage", multiValued = true,
-      description = "extended keyusage\n(multi-valued)")
+  @Option(name = "--ext-keyusage", multiValued = true, description = "extended keyusage")
   @Completion(ExtKeyusageCompleter.class)
   private List<String> extkeyusages;
 
-  @Option(name = "--subject-alt-name", multiValued = true,
-      description = "subjectAltName\n(multi-valued)")
+  @Option(name = "--subject-alt-name", multiValued = true, description = "subjectAltName")
   private List<String> subjectAltNames;
 
-  @Option(name = "--subject-info-access", multiValued = true,
-      description = "subjectInfoAccess.\n(multi-valued)")
+  @Option(name = "--subject-info-access", multiValued = true, description = "subjectInfoAccess")
   private List<String> subjectInfoAccesses;
 
   @Option(name = "--qc-eu-limit", multiValued = true,
-      description = "QC EuLimitValue of format <currency>:<amount>:<exponent>.\n"
-          + "(multi-valued)")
+      description = "QC EuLimitValue of format <currency>:<amount>:<exponent>.")
   private List<String> qcEuLimits;
 
   @Option(name = "--biometric-type", description = "Biometric type")
@@ -172,14 +167,13 @@ public abstract class EnrollCertAction extends ClientAction {
   private String biometricUri;
 
   @Option(name = "--need-extension", multiValued = true,
-      description = "type (OID or name) of extension that must be contained in the certificate\n"
-          + "(multi-valued)")
+      description = "type (OID or name) of extension that must be contained in the certificate")
   @Completion(ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
   @Option(name = "--want-extension", multiValued = true,
       description = "type (OID or name) of extension that should be contained in the"
-          + " certificate if possible\n(multi-valued)")
+          + " certificate if possible")
   @Completion(ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 

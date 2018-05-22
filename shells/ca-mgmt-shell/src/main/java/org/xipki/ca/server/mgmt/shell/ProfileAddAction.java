@@ -39,11 +39,10 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class ProfileAddAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "profile name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
   private String name;
 
-  @Option(name = "--type", required = true, description = "profile type\n(required)")
+  @Option(name = "--type", required = true, description = "profile type")
   @Completion(ProfileTypeCompleter.class)
   private String type;
 

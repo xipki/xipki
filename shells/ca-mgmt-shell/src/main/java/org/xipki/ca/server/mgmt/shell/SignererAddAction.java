@@ -43,10 +43,10 @@ import org.xipki.security.util.X509Util;
 @Service
 public class SignererAddAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true, description = "signer name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "signer name")
   private String name;
 
-  @Option(name = "--type", required = true, description = "type of the signer\n(required)")
+  @Option(name = "--type", required = true, description = "type of the signer")
   @Completion(SignerTypeCompleter.class)
   private String type;
 

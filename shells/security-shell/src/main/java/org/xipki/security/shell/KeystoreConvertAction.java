@@ -38,26 +38,21 @@ import org.xipki.common.util.StringUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "keystore-convert",
-    description = "convert the keystore format")
+@Command(scope = "xi", name = "keystore-convert", description = "convert the keystore format")
 @Service
 public class KeystoreConvertAction extends SecurityAction {
 
-  @Option(name = "--in-type", required = true,
-      description = "type of source keystore\n(required)")
+  @Option(name = "--in-type", required = true, description = "type of source keystore")
   private String inType;
 
-  @Option(name = "--in", required = true,
-      description = "file of source keystore\n(required)")
+  @Option(name = "--in", required = true, description = "file of source keystore")
   @Completion(FileCompleter.class)
   private String inFile;
 
-  @Option(name = "--in-provider",
-      description = "Security provider of source keystore")
+  @Option(name = "--in-provider", description = "Security provider of source keystore")
   private String inProvider;
 
-  @Option(name = "--in-pass",
-      description = "password of source keystore")
+  @Option(name = "--in-pass", description = "password of source keystore")
   private String inPass;
 
   @Option(name = "--in-keypass-diff",
@@ -65,26 +60,21 @@ public class KeystoreConvertAction extends SecurityAction {
         + "will be ignored if --in-keypass is set")
   private Boolean inKeyPassDiff = Boolean.FALSE;
 
-  @Option(name = "--in-keypass",
-      description = "password for the keys of source keystore\n"
-          + "Default to the keystore password")
+  @Option(name = "--in-keypass", valueToShowInHelp = "keystore password",
+      description = "password for the keys of source keystore")
   private String inKeyPass;
 
-  @Option(name = "--out-type", required = true,
-      description = "type of target keystore\n(required)")
+  @Option(name = "--out-type", required = true, description = "type of target keystore")
   private String outType;
 
-  @Option(name = "--out-provider",
-      description = "Security provider of target keystore")
+  @Option(name = "--out-provider", description = "Security provider of target keystore")
   private String outProvider;
 
-  @Option(name = "--out", required = true,
-      description = "file of target keystore\n(required)")
+  @Option(name = "--out", required = true, description = "file of target keystore")
   @Completion(FileCompleter.class)
   private String outFile;
 
-  @Option(name = "--out-pass",
-      description = "password of target keystore")
+  @Option(name = "--out-pass", description = "password of target keystore")
   private String outPass;
 
   @Option(name = "--out-keypass-diff",
@@ -92,9 +82,8 @@ public class KeystoreConvertAction extends SecurityAction {
           + "will be ignored if --out-keypass is set")
   private Boolean outKeyPassDiff = Boolean.FALSE;
 
-  @Option(name = "--out-keypass",
-      description = "password for the keys of target keystore\n"
-          + "Default to the keystore password")
+  @Option(name = "--out-keypass", valueToShowInHelp = "keystore password",
+      description = "password for the keys of target keystore")
   private String outKeyPass;
 
   @Override

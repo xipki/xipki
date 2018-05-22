@@ -36,7 +36,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class UserUpdateAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true, description = "user Name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "user Name")
   private String name;
 
   @Option(name = "--active", description = "activate this user")

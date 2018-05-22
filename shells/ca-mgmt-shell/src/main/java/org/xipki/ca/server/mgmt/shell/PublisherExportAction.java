@@ -39,13 +39,12 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class PublisherExportAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "publisher name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "publisher name")
   @Completion(PublisherNameCompleter.class)
   private String name;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the publisher configuration\n(required)")
+      description = "where to save the publisher configuration")
   @Completion(FileCompleter.class)
   private String confFile;
 

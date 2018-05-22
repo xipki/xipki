@@ -35,7 +35,7 @@ import org.xipki.security.pkcs11.P11Slot;
 public class P11CertDeleteAction extends P11SecurityAction {
 
   @Option(name = "--id", required = true,
-      description = "id of the certificate in the PKCS#11 device\n(required)")
+      description = "id of the certificate in the PKCS#11 device")
   private String id;
 
   @Override

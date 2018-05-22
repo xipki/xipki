@@ -44,7 +44,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 @Service
 public class ScepUpdateAction extends CaAction {
 
-  @Option(name = "--name", required = true, description = "name\n(required)")
+  @Option(name = "--name", required = true, description = "name")
   @Completion(ScepNameCompleter.class)
   private String name;
 
@@ -63,7 +63,7 @@ public class ScepUpdateAction extends CaAction {
   private String responderName;
 
   @Option(name = "--profile", multiValued = true,
-      description = "profile name or 'all' for all profiles\n(multi-valued)")
+      description = "profile name or 'all' for all profiles")
   @Completion(ProfileNameAndAllCompleter.class)
   private Set<String> profiles;
 

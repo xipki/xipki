@@ -43,17 +43,17 @@ import org.xipki.password.PasswordResolver;
 @Service
 public class ScepAddAction extends CaAction {
 
-  @Option(name = "--name", required = true, description = "name\n(required)")
+  @Option(name = "--name", required = true, description = "name")
   private String name;
 
-  @Option(name = "--ca", required = true, description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name")
   @Completion(ScepNameCompleter.class)
   private String caName;
 
   @Option(name = "--inactive", description = "do not activate this SCEP")
   private Boolean inactive = Boolean.FALSE;
 
-  @Option(name = "--responder", required = true, description = "Responder name\n(required)")
+  @Option(name = "--responder", required = true, description = "Responder name")
   @Completion(SignerNameCompleter.class)
   private String responderName;
 
@@ -61,7 +61,7 @@ public class ScepAddAction extends CaAction {
   private String scepControl;
 
   @Option(name = "--profile", required = true, multiValued = true,
-      description = "profile name or 'all' for all profiles\n(required, multi-valued)")
+      description = "profile name or 'all' for all profiles")
   @Completion(ProfileNameAndAllCompleter.class)
   private Set<String> profiles;
 

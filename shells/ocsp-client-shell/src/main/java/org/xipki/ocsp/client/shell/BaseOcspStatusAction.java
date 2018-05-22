@@ -97,8 +97,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
           + "(at least one of serial and cert must be specified)")
   private String serialNumberList;
 
-  @Option(name = "--cert", aliases = "-c", multiValued = true,
-      description = "certificate\n(multi-valued)")
+  @Option(name = "--cert", aliases = "-c", multiValued = true, description = "certificate")
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 

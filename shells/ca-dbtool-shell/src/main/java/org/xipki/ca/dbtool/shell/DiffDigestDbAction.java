@@ -42,16 +42,16 @@ import org.xipki.console.karaf.completer.DirCompleter;
 public class DiffDigestDbAction extends DbPortAction {
 
   @Option(name = "--ref-db", required = true,
-      description = "database configuration file of the reference system\n(required)")
+      description = "database configuration file of the reference system")
   @Completion(FileCompleter.class)
   private String refDbConf;
 
   @Option(name = "--target", required = true,
-      description = "configuration file of the target database to be evaluated\\n(required)")
+      description = "configuration file of the target database to be evaluated")
   @Completion(FileCompleter.class)
   private String dbconfFile;
 
-  @Option(name = "--report-dir", required = true, description = "report directory\n(required)")
+  @Option(name = "--report-dir", required = true, description = "report directory")
   @Completion(DirCompleter.class)
   private String reportDir;
 
@@ -65,7 +65,7 @@ public class DiffDigestDbAction extends DbPortAction {
   private Integer numTargetThreads = 40;
 
   @Option(name = "--ca-cert", multiValued = true,
-      description = "Certificate of CAs to be considered\n(multi-valued)")
+      description = "Certificate of CAs to be considered")
   @Completion(FileCompleter.class)
   private List<String> caCertFiles;
 

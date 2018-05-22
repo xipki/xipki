@@ -40,12 +40,11 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class GetCertAction extends ClientAction {
 
-  @Option(name = "--serial", aliases = "-s", required = true,
-      description = "serial number\n(required)")
+  @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumber;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate\n(required)")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 

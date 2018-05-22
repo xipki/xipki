@@ -61,7 +61,7 @@ import org.xipki.security.util.X509Util;
 @Service
 public class CaUpdateAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true, description = "CA name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
@@ -73,23 +73,21 @@ public class CaUpdateAction extends CaAction {
   @Completion(CaStatusCompleter.class)
   private String caStatus;
 
-  @Option(name = "--ca-cert-uri", multiValued = true,
-      description = "CA certificate URI\n(multi-valued)")
+  @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
   private List<String> caCertUris;
 
-  @Option(name = "--ocsp-uri", multiValued = true,
-      description = "OCSP URI or 'null'\n(multi-valued)")
+  @Option(name = "--ocsp-uri", multiValued = true, description = "OCSP URI or 'null'")
   private List<String> ocspUris;
 
   @Option(name = "--crl-uri", multiValued = true,
-      description = "CRL distribution point URI or 'null'\n(multi-valued)")
+      description = "CRL distribution point URI or 'null'")
   private List<String> crlUris;
 
   @Option(name = "--deltacrl-uri", multiValued = true,
-      description = "delta CRL distribution point URI or 'null'\n(multi-valued)")
+      description = "delta CRL distribution point URI or 'null'")
   private List<String> deltaCrlUris;
 
-  @Option(name = "--permission", multiValued = true, description = "permission\n(multi-valued)")
+  @Option(name = "--permission", multiValued = true, description = "permission")
   @Completion(PermissionCompleter.class)
   private Set<String> permissions;
 

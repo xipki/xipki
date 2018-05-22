@@ -48,11 +48,11 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
   private static final Logger LOG = LoggerFactory.getLogger(P11SecretKeyGenAction.class);
 
   @Option(name = "--key-type", required = true,
-      description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
+      description = "keytype, current only AES, DES3 and GENERIC are supported")
   @Completion(SecretKeyTypeCompleter.class)
   private String keyType;
 
-  @Option(name = "--key-size", required = true, description = "keysize in bit\n(required)")
+  @Option(name = "--key-size", required = true, description = "keysize in bit")
   private Integer keysize;
 
   @Option(name = "--extern-if-gen-unsupported",

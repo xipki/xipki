@@ -43,7 +43,7 @@ import org.xipki.security.shell.pkcs11.completer.P11ModuleNameCompleter;
 @Service
 public class P11CsrGenAction extends CsrGenAction {
 
-  @Option(name = "--slot", required = true, description = "slot index\n(required)")
+  @Option(name = "--slot", required = true, description = "slot index")
   private Integer slotIndex;
 
   @Option(name = "--id",

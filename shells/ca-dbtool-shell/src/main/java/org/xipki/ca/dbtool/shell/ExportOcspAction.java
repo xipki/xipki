@@ -42,7 +42,7 @@ public class ExportOcspAction extends DbPortAction {
   @Completion(FileCompleter.class)
   private String dbconfFile = DFLT_DBCONF_FILE;
 
-  @Option(name = "--out-dir", required = true, description = "output directory\n(required)")
+  @Option(name = "--out-dir", required = true, description = "output directory")
   @Completion(DirCompleter.class)
   private String outdir;
 

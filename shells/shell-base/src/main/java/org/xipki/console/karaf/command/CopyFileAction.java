@@ -38,13 +38,12 @@ import org.xipki.console.karaf.XiAction;
 @Service
 public class CopyFileAction extends XiAction {
 
-  @Argument(index = 0, name = "source file", required = true,
-      description = "file to be copied\n(required)")
+  @Argument(index = 0, name = "source file", required = true, description = "file to be copied")
   @Completion(FileCompleter.class)
   private String source;
 
   @Argument(index = 1, name = "destination", required = true,
-      description = "destination directory or file\n(required)")
+      description = "destination directory or file")
   @Completion(FileCompleter.class)
   private String dest;
 

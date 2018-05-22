@@ -53,8 +53,7 @@ import org.xipki.console.karaf.XiAction;
 @Service
 public class CheckCertAction extends XiAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true,
-      description = "certificate file\n(required)")
+  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
@@ -63,12 +62,11 @@ public class CheckCertAction extends XiAction {
   @Completion(IssuerNameCompleter.class)
   private String issuerName;
 
-  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
-  @Option(name = "--profile", aliases = "-p", required = true,
-      description = "certificate profile\n(required)")
+  @Option(name = "--profile", aliases = "-p", required = true, description = "certificate profile")
   @Completion(CertprofileNameCompleter.class)
   private String profileName;
 

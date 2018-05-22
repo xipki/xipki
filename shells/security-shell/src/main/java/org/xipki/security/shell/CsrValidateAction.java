@@ -32,13 +32,11 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "validate-csr",
-    description = "validate CSR")
+@Command(scope = "xi", name = "validate-csr", description = "validate CSR")
 @Service
 public class CsrValidateAction extends SecurityAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 

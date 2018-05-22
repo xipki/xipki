@@ -52,12 +52,12 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 public class P11SecretKeyImportAction extends P11KeyGenAction {
 
   @Option(name = "--key-type", required = true,
-      description = "keytype, current only AES, DES3 and GENERIC are supported\n(required)")
+      description = "keytype, current only AES, DES3 and GENERIC are supported")
   @Completion(SecretKeyTypeCompleter.class)
   private String keyType;
 
   @Option(name = "--keystore", required = true,
-      description = "JCEKS keystore from which the key is imported\n(required)")
+      description = "JCEKS keystore from which the key is imported")
   @Completion(FileCompleter.class)
   private String keyOutFile;
 
