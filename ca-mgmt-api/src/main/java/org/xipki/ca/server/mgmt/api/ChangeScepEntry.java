@@ -39,7 +39,7 @@ public class ChangeScepEntry {
 
   private String responderName;
 
-  private Set<String> certProfiles;
+  private Set<String> certprofiles;
 
   private String control;
 
@@ -75,16 +75,16 @@ public class ChangeScepEntry {
     this.responderName = responderName;
   }
 
-  public Set<String> getCertProfiles() {
-    return certProfiles;
+  public Set<String> getCertprofiles() {
+    return certprofiles;
   }
 
-  public void setCertProfiles(Set<String> certProfiles) {
-    if (certProfiles == null) {
-      this.certProfiles = null;
+  public void setCertprofiles(Set<String> certprofiles) {
+    if (certprofiles == null) {
+      this.certprofiles = null;
     } else {
-      this.certProfiles = CollectionUtil.unmodifiableSet(
-          CollectionUtil.toLowerCaseSet(certProfiles));
+      this.certprofiles = CollectionUtil.unmodifiableSet(
+          CollectionUtil.toLowerCaseSet(certprofiles));
     }
   }
 

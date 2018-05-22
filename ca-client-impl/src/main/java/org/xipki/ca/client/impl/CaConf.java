@@ -94,12 +94,12 @@ class CaConf {
     this.subjectKeyIdentifier = X509Util.extractSki(cert);
   }
 
-  public void setCertprofiles(Set<CertprofileInfo> certProfiles) {
+  public void setCertprofiles(Set<CertprofileInfo> certprofiles) {
     if (profiles == null) {
       this.profiles = Collections.emptyMap();
     } else {
       this.profiles = new HashMap<>();
-      for (CertprofileInfo m : certProfiles) {
+      for (CertprofileInfo m : certprofiles) {
         this.profiles.put(m.getName(), m);
       }
     }

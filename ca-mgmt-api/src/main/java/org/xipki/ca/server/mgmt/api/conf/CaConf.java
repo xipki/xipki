@@ -292,7 +292,7 @@ public class CaConf {
       }
     }
 
-    // CertProfiles
+    // Profiles
     if (jaxb.getProfiles() != null) {
       for (ProfileType m : jaxb.getProfiles().getProfile()) {
         CertprofileEntry en = new CertprofileEntry(new NameId(null, m.getName()),
@@ -467,9 +467,9 @@ public class CaConf {
       for (ScepType m : jaxb.getSceps().getScep()) {
         String name = m.getName();
         NameId caIdent = new NameId(null, m.getCaName());
-        List<String> certProfiles = m.getProfiles().getProfile();
+        List<String> profiles = m.getProfiles().getProfile();
         ScepEntry dbEntry = new ScepEntry(name, caIdent, true, m.getResponderName(),
-            new HashSet<>(certProfiles), m.getControl());
+            new HashSet<>(profiles), m.getControl());
         sceps.put(name, dbEntry);
       }
     }
@@ -538,11 +538,11 @@ public class CaConf {
     this.certprofiles.put(profile.getIdent().getName(), profile);
   }
 
-  public Set<String> getCertProfileNames() {
+  public Set<String> getCertprofileNames() {
     return Collections.unmodifiableSet(certprofiles.keySet());
   }
 
-  public CertprofileEntry getCertProfile(String name) {
+  public CertprofileEntry getCertprofile(String name) {
     return certprofiles.get(ParamUtil.requireNonNull("name", name));
   }
 

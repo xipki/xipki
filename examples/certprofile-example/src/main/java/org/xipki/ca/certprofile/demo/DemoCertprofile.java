@@ -149,7 +149,7 @@ public class DemoCertprofile extends XmlCertprofile {
       ExtensionControl extnControl = extensionOccurences.get(type);
       if (extnControl != null) {
         if (sequence == null) {
-          throw new IllegalStateException("CertProfile is not initialized");
+          throw new IllegalStateException("Certprofile is not initialized");
         }
 
         ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(), sequence);

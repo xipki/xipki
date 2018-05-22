@@ -47,7 +47,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public boolean isCertProfilePermitted(String certprofile) {
+  public boolean isCertprofilePermitted(String certprofile) {
     return true;
   }
 
@@ -57,7 +57,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public void assertCertProfilePermitted(String certprofile) throws InsuffientPermissionException {
+  public void assertCertprofilePermitted(String certprofile) throws InsuffientPermissionException {
   }
 
   @Override

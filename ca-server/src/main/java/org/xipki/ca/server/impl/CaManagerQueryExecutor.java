@@ -738,7 +738,7 @@ class CaManagerQueryExecutor {
       String conf = dbEntry.getConf();
       ps.setString(idx++, conf);
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add CertProfile " + dbEntry.getIdent());
+        throw new CaMgmtException("could not add certprofile " + dbEntry.getIdent());
       }
 
       LOG.info("added profile '{}': {}", dbEntry.getIdent(), dbEntry);
@@ -1106,7 +1106,7 @@ class CaManagerQueryExecutor {
 
     IdentifiedCertprofile profile = caManager.createCertprofile(newDbEntry);
     if (profile == null) {
-      throw new CaMgmtException("could not create CertProfile object");
+      throw new CaMgmtException("could not create certprofile object");
     }
 
     boolean failed = true;
@@ -1265,10 +1265,10 @@ class CaManagerQueryExecutor {
     changeIfNotNull("SIGNER", col(STRING, "NAME", name), col(STRING, "TYPE", type),
         col(STRING, "CERT", base64Cert), col(STRING, "CONF", conf, false, true));
     return responder;
-  } // method changeResponder
+  } // method changeSigner
 
   ScepImpl changeScep(String name, NameId caIdent, Boolean active, String responderName,
-      Set<String> certProfiles, String control, CaManagerImpl caManager,
+      Set<String> certprofiles, String control, CaManagerImpl caManager,
       final SecurityFactory securityFactory) throws CaMgmtException {
     ScepImpl scep;
     try {
@@ -1276,7 +1276,7 @@ class CaManagerQueryExecutor {
       ScepEntry newDbEntry = new ScepEntry(name, dbEntry.getCaIdent(),
           (active == null ? dbEntry.isActive() : active),
           (responderName ==  null ? dbEntry.getResponderName() : responderName),
-          (certProfiles == null ? dbEntry.getCertProfiles() : certProfiles),
+          (certprofiles == null ? dbEntry.getCertprofiles() : certprofiles),
           (control == null ? dbEntry.getControl() : getRealString(control)));
       scep = new ScepImpl(newDbEntry, caManager);
     } catch (InvalidConfException ex) {
@@ -1285,7 +1285,7 @@ class CaManagerQueryExecutor {
 
     changeIfNotNull("SCEP", col(STRING, "NAME", name), col(INT, "CA_ID", caIdent.getId()),
         col(BOOL, "ACTIVE", active), col(STRING, "RESPONDER_NAME", responderName),
-        col(COLL_STRING, "PROFILES", certProfiles), col(STRING, "CONTROL", control));
+        col(COLL_STRING, "PROFILES", certprofiles), col(STRING, "CONTROL", control));
     return scep;
   } // method changeScep
 
@@ -1450,7 +1450,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method addResponder
+  } // method addSigner
 
   void unlockCa() throws CaMgmtException {
     final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
@@ -1500,7 +1500,7 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, dbEntry.getName());
       ps.setInt(idx++, dbEntry.getCaIdent().getId());
       setBoolean(ps, idx++, dbEntry.isActive());
-      ps.setString(idx++, StringUtil.collectionAsStringByComma(dbEntry.getCertProfiles()));
+      ps.setString(idx++, StringUtil.collectionAsStringByComma(dbEntry.getCertprofiles()));
       ps.setString(idx++, dbEntry.getControl());
       ps.setString(idx++, dbEntry.getResponderName());
 

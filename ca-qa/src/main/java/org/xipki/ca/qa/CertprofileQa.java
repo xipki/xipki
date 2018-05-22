@@ -94,7 +94,7 @@ public class CertprofileQa {
 
   private final ExtensionsChecker extensionsChecker;
 
-  private final XmlCertprofile certProfile;
+  private final XmlCertprofile certprofile;
 
   public CertprofileQa(String data) throws CertprofileException {
     this(ParamUtil.requireNonNull("data", data).getBytes());
@@ -105,12 +105,12 @@ public class CertprofileQa {
     try {
       X509ProfileType conf = XmlCertprofileUtil.parse(new ByteArrayInputStream(dataBytes));
 
-      certProfile = new XmlCertprofile();
-      certProfile.initialize(conf);
+      certprofile = new XmlCertprofile();
+      certprofile.initialize(conf);
 
-      this.publicKeyChecker = new PublicKeyChecker(certProfile.getKeyAlgorithms());
-      this.subjectChecker = new SubjectChecker(certProfile.getSubjectControl());
-      this.extensionsChecker = new ExtensionsChecker(conf, certProfile);
+      this.publicKeyChecker = new PublicKeyChecker(certprofile.getKeyAlgorithms());
+      this.subjectChecker = new SubjectChecker(certprofile.getSubjectControl());
+      this.extensionsChecker = new ExtensionsChecker(conf, certprofile);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
       throw new CertprofileException(
@@ -137,7 +137,7 @@ public class CertprofileQa {
     issue = new ValidationIssue("X509.SIZE", "certificate size");
     resultIssues.add(issue);
 
-    Integer maxSize = certProfile.getMaxSize();
+    Integer maxSize = certprofile.getMaxSize();
     if (maxSize != 0) {
       int size = certBytes.length;
       if (size > maxSize) {
@@ -163,7 +163,7 @@ public class CertprofileQa {
     resultIssues.add(issue);
     int versionNumber = tbsCert.getVersionNumber();
 
-    X509CertVersion expVersion = certProfile.getVersion();
+    X509CertVersion expVersion = certprofile.getVersion();
     if (versionNumber != expVersion.getVersionNumber()) {
       issue.setFailureMessage("is '" + versionNumber
           + "' but expected '" + expVersion.getVersionNumber() + "'");
@@ -182,7 +182,7 @@ public class CertprofileQa {
     }
 
     // signatureAlgorithm
-    List<String> signatureAlgorithms = certProfile.getSignatureAlgorithms();
+    List<String> signatureAlgorithms = certprofile.getSignatureAlgorithms();
     if (CollectionUtil.isNonEmpty(signatureAlgorithms)) {
       issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
       resultIssues.add(issue);
@@ -225,7 +225,7 @@ public class CertprofileQa {
     checkTime(tbsCert.getStartDate(), issue);
 
     // notBefore
-    if (certProfile.isNotBeforeMidnight()) {
+    if (certprofile.isNotBeforeMidnight()) {
       issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
       resultIssues.add(issue);
       Calendar cal = Calendar.getInstance(UTC);
@@ -248,7 +248,7 @@ public class CertprofileQa {
     } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
       issue.setFailureMessage("notBefore must not be before CA's notBefore");
     } else {
-      CertValidity validity = certProfile.getValidity();
+      CertValidity validity = certprofile.getValidity();
       Date expectedNotAfter = validity.add(cert.getNotBefore());
       if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
         expectedNotAfter = new Date(MAX_CERT_TIME_MS);

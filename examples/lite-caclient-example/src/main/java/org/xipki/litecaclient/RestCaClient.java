@@ -83,9 +83,9 @@ public class RestCaClient {
     return SdkUtil.parseCert(bytes);
   }
 
-  public X509Certificate requestCert(String certProfile, CertificationRequest csr)
+  public X509Certificate requestCert(String certprofile, CertificationRequest csr)
       throws Exception {
-    String url = caUrl + "/enroll-cert?profile=" + certProfile;
+    String url = caUrl + "/enroll-cert?profile=" + certprofile;
     byte[] response = httpPost(url, "application/pkcs10", csr.getEncoded(), CT_pkix_cert);
     X509Certificate cert = SdkUtil.parseCert(response);
     if (!verify(caCert, cert)) {

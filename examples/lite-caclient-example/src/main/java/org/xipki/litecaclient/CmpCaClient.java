@@ -420,7 +420,7 @@ public class CmpCaClient {
     throw new Exception("Server did not return any certificate");
   } // method parseEnrollCertResult
 
-  public X509Certificate requestCertViaCsr(String certProfile, CertificationRequest csr)
+  public X509Certificate requestCertViaCsr(String certprofile, CertificationRequest csr)
       throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
@@ -432,7 +432,7 @@ public class CmpCaClient {
         new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE));
     builder.addGeneralInfo(
         new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-            new DERUTF8String("certprofile?" + certProfile + "%")));
+            new DERUTF8String("certprofile?" + certprofile + "%")));
     builder.setBody(new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr));
     ProtectedPKIMessage request = builder.build(requestorSigner);
 
@@ -480,7 +480,7 @@ public class CmpCaClient {
         && serialNumber.equals(revCert.getSerialNumber().getValue());
   }
 
-  public X509Certificate requestCertViaCrmf(String certProfile, PrivateKey privateKey,
+  public X509Certificate requestCertViaCrmf(String certprofile, PrivateKey privateKey,
       SubjectPublicKeyInfo publicKeyInfo, String subject) throws Exception {
     CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
@@ -498,7 +498,7 @@ public class CmpCaClient {
 
     AttributeTypeAndValue certprofileInfo =
         new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-            new DERUTF8String("certprofile?" + certProfile + "%"));
+            new DERUTF8String("certprofile?" + certprofile + "%"));
 
     AttributeTypeAndValue[] atvs = {certprofileInfo};
     CertReqMsg certReqMsg = new CertReqMsg(certReq, popo, atvs);

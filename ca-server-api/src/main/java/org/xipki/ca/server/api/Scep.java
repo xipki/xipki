@@ -38,8 +38,8 @@ public interface Scep {
 
   ScepCaCertRespBytes getCaCertResp() throws OperationException;
 
-  boolean supportsCertProfile(String profileName);
+  boolean supportsCertprofile(String profileName);
 
-  ContentInfo servicePkiOperation(CMSSignedData requestContent, String certProfileName,
+  ContentInfo servicePkiOperation(CMSSignedData requestContent, String certprofileName,
       String msgId, AuditEvent event) throws MessageDecodingException, OperationException;
 }

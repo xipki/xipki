@@ -1001,7 +1001,7 @@ public class X509Ca {
             profileId = certInfo.getProfile().getId();
           }
         } else if (control.isXipkiCertsetProfilenameIncluded()) {
-          profileId = certstore.getCertProfileForCertId(caIdent, sid.getId());
+          profileId = certstore.getCertprofileForCertId(caIdent, sid.getId());
         }
 
         if (profileId != null) {
@@ -2178,7 +2178,7 @@ public class X509Ca {
         ? null : caManager.getIdentifiedCertprofile(certprofileName);
   } // method getX509Certprofile
 
-  public boolean supportsCertProfile(String certprofileName) {
+  public boolean supportsCertprofile(String certprofileName) {
     ParamUtil.requireNonNull("certprofileLocalName", certprofileName);
     Set<String> profileNames = caManager.getCertprofilesForCa(caIdent.getName());
     return profileNames.contains(certprofileName.toLowerCase());

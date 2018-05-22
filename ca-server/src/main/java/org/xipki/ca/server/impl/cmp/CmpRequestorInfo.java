@@ -61,8 +61,8 @@ public class CmpRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public boolean isCertProfilePermitted(String certprofile) {
-    return caHasRequestor.isCertProfilePermitted(certprofile);
+  public boolean isCertprofilePermitted(String certprofile) {
+    return caHasRequestor.isCertprofilePermitted(certprofile);
   }
 
   @Override
@@ -71,10 +71,10 @@ public class CmpRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public void assertCertProfilePermitted(String certprofile)
+  public void assertCertprofilePermitted(String certprofile)
       throws InsuffientPermissionException {
-    if (!isCertProfilePermitted(certprofile)) {
-      throw new  InsuffientPermissionException("CertProfile " + certprofile + " is not permitted");
+    if (!isCertprofilePermitted(certprofile)) {
+      throw new  InsuffientPermissionException("Certprofile " + certprofile + " is not permitted");
     }
   }
 

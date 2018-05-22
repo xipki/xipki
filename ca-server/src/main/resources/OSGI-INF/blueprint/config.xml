@@ -27,10 +27,10 @@
   <reference id="auditServiceRegister"
       interface="org.xipki.audit.AuditServiceRegister"/>
 
-  <reference id="x509CertProfileFactoryRegister"
+  <reference id="certprofileFactoryRegister"
       interface="org.xipki.ca.api.profile.CertprofileFactoryRegister"/>
 
-  <reference id="x509CertPublisherFactoryRegister"
+  <reference id="certPublisherFactoryRegister"
       interface="org.xipki.ca.api.publisher.CertPublisherFactoryRegister"/>
 
   <bean id="caManager" class="org.xipki.ca.server.impl.CaManagerImpl"
@@ -38,8 +38,8 @@
     <property name="securityFactory" ref="securityFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
-    <property name="x509CertProfileFactoryRegister" ref="x509CertProfileFactoryRegister"/>
-    <property name="x509CertPublisherFactoryRegister" ref="x509CertPublisherFactoryRegister"/>
+    <property name="certprofileFactoryRegister" ref="certprofileFactoryRegister"/>
+    <property name="certPublisherFactoryRegister" ref="certPublisherFactoryRegister"/>
   </bean>
 
   <service ref="caManager">

@@ -260,11 +260,11 @@ public class CertStore {
   }
 
   private void addCert(NameId ca, CertWithDbId certificate, byte[] encodedSubjectPublicKey,
-      NameId certProfile, NameId requestor, Integer userId, RequestType reqType,
+      NameId certprofile, NameId requestor, Integer userId, RequestType reqType,
       byte[] transactionId, X500Name reqSubject) throws DataAccessException, OperationException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("certificate", certificate);
-    ParamUtil.requireNonNull("certProfile", certProfile);
+    ParamUtil.requireNonNull("certprofile", certprofile);
     ParamUtil.requireNonNull("requestor", requestor);
 
     long certId = idGenerator.nextId();
@@ -304,7 +304,7 @@ public class CertStore {
       ps.setLong(idx++, cert.getNotBefore().getTime() / 1000); // notBeforeSeconds
       ps.setLong(idx++, cert.getNotAfter().getTime() / 1000); // notAfterSeconds
       setBoolean(ps, idx++, false);
-      ps.setInt(idx++, certProfile.getId());
+      ps.setInt(idx++, certprofile.getId());
       ps.setInt(idx++, ca.getId());
       setInt(ps, idx++, requestor.getId());
       setInt(ps, idx++, userId);
@@ -1212,7 +1212,7 @@ public class CertStore {
     }
   } // method getCertificateInfo
 
-  public Integer getCertProfileForCertId(NameId ca, long cid) throws OperationException {
+  public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
     ParamUtil.requireNonNull("ca", ca);
 
     final String sql = sqlCertprofileForCertId;
@@ -1233,7 +1233,7 @@ public class CertStore {
     } finally {
       releaseDbResources(ps, rs);
     }
-  } // method getCertProfileForId
+  } // method getCertprofileForId
 
   /**
    * TODO.

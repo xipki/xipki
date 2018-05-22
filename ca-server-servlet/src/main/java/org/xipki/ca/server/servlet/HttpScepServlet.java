@@ -106,7 +106,7 @@ public class HttpScepServlet extends HttpServlet {
     String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
 
     String scepName = null;
-    String certProfileName = null;
+    String certprofileName = null;
     if (path.length() > 1) {
       String scepPath = path;
       if (scepPath.endsWith(CGI_PROGRAM)) {
@@ -115,12 +115,12 @@ public class HttpScepServlet extends HttpServlet {
         String[] tokens = tpath.split("/");
         if (tokens.length == 2) {
           scepName = tokens[0];
-          certProfileName = tokens[1].toLowerCase();
+          certprofileName = tokens[1].toLowerCase();
         }
       } // end if
     } // end if
 
-    if (scepName == null || certProfileName == null) {
+    if (scepName == null || certprofileName == null) {
       sendError(resp, HttpServletResponse.SC_NOT_FOUND);
       return;
     }
@@ -129,7 +129,7 @@ public class HttpScepServlet extends HttpServlet {
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("SCEP");
     event.setName(CaAuditConstants.NAME_perf);
-    event.addEventData(CaAuditConstants.NAME_SCEP_name, scepName + "/" + certProfileName);
+    event.addEventData(CaAuditConstants.NAME_SCEP_name, scepName + "/" + certprofileName);
     event.addEventData(CaAuditConstants.NAME_req_type, RequestType.SCEP.name());
 
     String msgId = RandomUtil.nextHexLong();
@@ -142,8 +142,8 @@ public class HttpScepServlet extends HttpServlet {
     try {
       Scep responder = responderManager.getScep(scepName);
       if (responder == null || !responder.isOnService()
-          || !responder.supportsCertProfile(certProfileName)) {
-        auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
+          || !responder.supportsCertprofile(certprofileName)) {
+        auditMessage = "unknown SCEP '" + scepName + "/" + certprofileName + "'";
         LOG.warn(auditMessage);
 
         auditStatus = AuditStatus.FAILED;
@@ -178,7 +178,7 @@ public class HttpScepServlet extends HttpServlet {
 
         ContentInfo ci;
         try {
-          ci = responder.servicePkiOperation(reqMessage, certProfileName, msgId, event);
+          ci = responder.servicePkiOperation(reqMessage, certprofileName, msgId, event);
         } catch (MessageDecodingException ex) {
           final String msg = "could not decrypt and/or verify the request";
           LogUtil.error(LOG, ex, msg);

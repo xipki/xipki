@@ -40,20 +40,20 @@ public class ScepEntry {
 
   private final boolean active;
 
-  private final Set<String> certProfiles;
+  private final Set<String> certprofiles;
 
   private final String control;
 
   private String responderName;
 
   public ScepEntry(String name, NameId caIdent, boolean active, String responderName,
-      Set<String> certProfiles, String control) throws InvalidConfException {
+      Set<String> certprofiles, String control) throws InvalidConfException {
     this.name = ParamUtil.requireNonBlankLower("name", name);
     this.caIdent = ParamUtil.requireNonNull("caIdent", caIdent);
     this.active = active;
     this.responderName = ParamUtil.requireNonBlank("responderName", responderName);
-    this.certProfiles = CollectionUtil.unmodifiableSet(
-        CollectionUtil.toLowerCaseSet(certProfiles));
+    this.certprofiles = CollectionUtil.unmodifiableSet(
+        CollectionUtil.toLowerCaseSet(certprofiles));
     this.control = control;
   }
 
@@ -65,8 +65,8 @@ public class ScepEntry {
     return active;
   }
 
-  public Set<String> getCertProfiles() {
-    return certProfiles;
+  public Set<String> getCertprofiles() {
+    return certprofiles;
   }
 
   public String getControl() {

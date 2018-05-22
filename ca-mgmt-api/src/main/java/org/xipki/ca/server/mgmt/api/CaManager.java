@@ -165,15 +165,15 @@ public interface CaManager {
   /**
    * Changes a CA.
    *
-   * @param changeCAentry
+   * @param changeCaEntry
    *          ChangeCA entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeCa(ChangeCaEntry changeCAentry) throws CaMgmtException;
+  void changeCa(ChangeCaEntry changeCaEntry) throws CaMgmtException;
 
   /**
-   * Removes the support of the certProfile {@code profileName} from the CA {@code caName}.
+   * Removes the support of the certprofile {@code profileName} from the CA {@code caName}.
    *
    * @param profileName
    *          Profile name. Must not be {@code null}.
@@ -218,10 +218,10 @@ public interface CaManager {
   void addPublisherToCa(String publisherName, String caName) throws CaMgmtException;
 
   /**
-   * Returns the CertProfile names supported by the CA {@code caName}.
+   * Returns the Certprofile names supported by the CA {@code caName}.
    * @param caName
    *          CA name. Must not be {@code null}.
-   * @return the CertProfile names.
+   * @return the Certprofile names.
    */
   Set<String> getCertprofilesForCa(String caName);
 
@@ -738,7 +738,7 @@ public interface CaManager {
    * Retrieves the types of supported certificate profiles.
    * @return types of supported certificate profiles, never {@code null}.
    */
-  Set<String> getSupportedCertProfileTypes();
+  Set<String> getSupportedCertprofileTypes();
 
   /**
    * Retrieves the types of supported publishers.

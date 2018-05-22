@@ -215,9 +215,9 @@ public class RestImpl implements Rest {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
-        if (!requestor.isCertProfilePermitted(profile)) {
+        if (!requestor.isCertprofilePermitted(profile)) {
           throw new OperationException(ErrorCode.NOT_PERMITTED,
-              "certProfile " + profile + " is not allowed");
+              "certprofile " + profile + " is not allowed");
         }
 
         String ct = httpRetriever.getHeader("Content-Type");

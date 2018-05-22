@@ -37,7 +37,7 @@ import org.xipki.console.karaf.completer.ECCurveNameCompleter;
  */
 
 @Command(scope = "xiqa", name = "cmp-benchmark-enroll",
-        description = "CA client enroll (benchmark)")
+    description = "CA client enroll (benchmark)")
 @Service
 public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 

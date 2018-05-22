@@ -424,7 +424,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       }
       certprofileName = certprofileName.toLowerCase();
 
-      if (!tmpRequestor.isCertProfilePermitted(certprofileName)) {
+      if (!tmpRequestor.isCertprofilePermitted(certprofileName)) {
         String msg = "certprofile " + certprofileName + " is not allowed";
         certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg));
         continue;
@@ -579,7 +579,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
             "badCertTemplate");
       } else {
         certprofileName = certprofileName.toLowerCase();
-        if (!requestor.isCertProfilePermitted(certprofileName)) {
+        if (!requestor.isCertprofilePermitted(certprofileName)) {
           String msg = "certprofile " + certprofileName + " is not allowed";
           certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
         } else {

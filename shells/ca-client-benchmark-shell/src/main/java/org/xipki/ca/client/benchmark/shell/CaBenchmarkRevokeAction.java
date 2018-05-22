@@ -58,8 +58,7 @@ public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
   @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--ca-db",
-      description = "CA database configuration file\n"
+  @Option(name = "--ca-db", description = "CA database configuration file\n"
           + "(exactly one of ca-db and serial-file must be specified)")
   @Completion(FileCompleter.class)
   private String caDbConfFile;

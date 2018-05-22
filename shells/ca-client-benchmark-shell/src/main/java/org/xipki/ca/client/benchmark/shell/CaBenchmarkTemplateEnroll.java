@@ -259,8 +259,8 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
       } catch (SAXException ex) {
         throw new InvalidConfException("parsing profile failed, message: " + ex.getMessage(), ex);
       } catch (JAXBException ex) {
-        throw new InvalidConfException("parsing profile failed, message: "
-            + XmlUtil.getMessage(ex), ex);
+        throw new InvalidConfException("parsing profile failed, message: " + XmlUtil.getMessage(ex),
+            ex);
       }
     }
 

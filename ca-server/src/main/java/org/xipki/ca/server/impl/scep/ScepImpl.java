@@ -118,7 +118,7 @@ public class ScepImpl implements Scep {
 
   private final ScepEntry dbEntry;
 
-  private final Set<String> certProfiles;
+  private final Set<String> certprofiles;
 
   private final ScepControl control;
 
@@ -155,7 +155,7 @@ public class ScepImpl implements Scep {
     this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
     this.name = dbEntry.getName();
     this.caIdent = dbEntry.getCaIdent();
-    this.certProfiles = dbEntry.getCertProfiles();
+    this.certprofiles = dbEntry.getCertprofiles();
     try {
       this.control = new ScepControl(dbEntry.getControl());
     } catch (InvalidConfException ex) {
@@ -236,8 +236,8 @@ public class ScepImpl implements Scep {
     return caCertRespBytes;
   }
 
-  public boolean supportsCertProfile(String profileName) {
-    if (certProfiles.contains("all") || certProfiles.contains(profileName.toLowerCase())) {
+  public boolean supportsCertprofile(String profileName) {
+    if (certprofiles.contains("all") || certprofiles.contains(profileName.toLowerCase())) {
       X509Ca ca;
       try {
         ca = caManager.getX509Ca(caIdent);
@@ -245,7 +245,7 @@ public class ScepImpl implements Scep {
         LogUtil.warn(LOG, ex);
         return false;
       }
-      return ca.supportsCertProfile(profileName);
+      return ca.supportsCertprofile(profileName);
     } else {
       return false;
     }
@@ -269,7 +269,7 @@ public class ScepImpl implements Scep {
     }
   }
 
-  public ContentInfo servicePkiOperation(CMSSignedData requestContent, String certProfileName,
+  public ContentInfo servicePkiOperation(CMSSignedData requestContent, String certprofileName,
       String msgId, AuditEvent event) throws MessageDecodingException, OperationException {
     CaStatus status = getStatus();
 
@@ -280,7 +280,7 @@ public class ScepImpl implements Scep {
 
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor, null);
 
-    PkiMessage rep = servicePkiOperation0(requestContent, req, certProfileName, msgId, event);
+    PkiMessage rep = servicePkiOperation0(requestContent, req, certprofileName, msgId, event);
     audit(event, CaAuditConstants.NAME_SCEP_pki_status, rep.getPkiStatus().toString());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setStatus(AuditStatus.FAILED);
@@ -292,7 +292,7 @@ public class ScepImpl implements Scep {
   } // method servicePkiOperation
 
   private PkiMessage servicePkiOperation0(CMSSignedData requestContent,
-      DecodedPkiMessage req, String certProfileName, String msgId, AuditEvent event)
+      DecodedPkiMessage req, String certprofileName, String msgId, AuditEvent event)
       throws MessageDecodingException, OperationException {
     ParamUtil.requireNonNull("requestContent", requestContent);
     ParamUtil.requireNonNull("req", req);
@@ -516,14 +516,14 @@ public class ScepImpl implements Scep {
           } // end if
 
           ByUserRequestorInfo requestor = ca.getByUserRequestor(userIdent);
-          checkUserPermission(requestor, certProfileName);
+          checkUserPermission(requestor, certprofileName);
 
           byte[] tidBytes = getTransactionIdBytes(tid);
 
           Extensions extensions = CaUtil.getExtensions(csrReqInfo);
           CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
               csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
-              certProfileName);
+              certprofileName);
           CertificateInfo cert = ca.generateCert(certTemplateData, requestor,
               RequestType.SCEP, tidBytes, msgId);
           /* Don't save SCEP message, since it contains password in plaintext
@@ -683,7 +683,7 @@ public class ScepImpl implements Scep {
     return ci;
   } // method encodeResponse
 
-  private static void checkUserPermission(ByUserRequestorInfo requestor, String certProfile)
+  private static void checkUserPermission(ByUserRequestorInfo requestor, String certprofile)
       throws OperationException {
     int permission = PermissionConstants.ENROLL_CERT;
     if (!requestor.isPermitted(permission)) {
@@ -692,9 +692,9 @@ public class ScepImpl implements Scep {
           + requestor.getCaHasUser().getUserIdent().getName());
     }
 
-    if (!requestor.isCertProfilePermitted(certProfile)) {
+    if (!requestor.isCertprofilePermitted(certprofile)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
-          "Certificate profile " + certProfile + " is not permitted for user "
+          "Certificate profile " + certprofile + " is not permitted for user "
           + requestor.getCaHasUser().getUserIdent().getName());
     }
   }

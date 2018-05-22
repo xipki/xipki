@@ -343,9 +343,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private AuditServiceRegister auditServiceRegister;
 
-  private CertprofileFactoryRegister x509CertProfileFactoryRegister;
+  private CertprofileFactoryRegister certprofileFactoryRegister;
 
-  private CertPublisherFactoryRegister x509CertPublisherFactoryRegister;
+  private CertPublisherFactoryRegister certPublisherFactoryRegister;
 
   private DataSourceWrapper datasource;
 
@@ -411,13 +411,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public Set<String> getSupportedCertProfileTypes() {
-    return x509CertProfileFactoryRegister.getSupportedTypes();
+  public Set<String> getSupportedCertprofileTypes() {
+    return certprofileFactoryRegister.getSupportedTypes();
   }
 
   @Override
   public Set<String> getSupportedPublisherTypes() {
-    return x509CertPublisherFactoryRegister.getSupportedTypes();
+    return certPublisherFactoryRegister.getSupportedTypes();
   }
 
   private void init() throws CaMgmtException {
@@ -427,11 +427,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     if (datasourceFactory == null) {
       throw new IllegalStateException("datasourceFactory is not set");
     }
-    if (x509CertProfileFactoryRegister == null) {
-      throw new IllegalStateException("x509CertProfileFactoryRegister is not set");
+    if (certprofileFactoryRegister == null) {
+      throw new IllegalStateException("certprofileFactoryRegister is not set");
     }
-    if (x509CertPublisherFactoryRegister == null) {
-      throw new IllegalStateException("x509CertPublisherFactoryRegister is not set");
+    if (certPublisherFactoryRegister == null) {
+      throw new IllegalStateException("certPublisherFactoryRegister is not set");
     }
     if (caConfProperties == null) {
       throw new IllegalStateException("caConfProperties is not set");
@@ -1249,7 +1249,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     NameId ident = idNameMap.getCertprofile(profileName);
     if (ident == null) {
-      throw logAndCreateException(concat("unknown CertProfile ", profileName));
+      throw logAndCreateException(concat("unknown Certprofile ", profileName));
     }
 
     NameId caIdent = idNameMap.getCa(caName);
@@ -1264,7 +1264,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     } else {
       if (set.contains(profileName)) {
         throw logAndCreateException(
-            concat("CertProfile ", profileName, " already associated with CA ", caName));
+            concat("Certprofile ", profileName, " already associated with CA ", caName));
       }
     }
 
@@ -1572,13 +1572,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     asssertMasterMode();
     String name = dbEntry.getIdent().getName();
     if (certprofileDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("CertProfile named ", name, " exists"));
+      throw new CaMgmtException(concat("Certprofile named ", name, " exists"));
     }
 
     dbEntry.setFaulty(true);
     IdentifiedCertprofile profile = createCertprofile(dbEntry);
     if (profile == null) {
-      throw new CaMgmtException("could not create CertProfile object");
+      throw new CaMgmtException("could not create Certprofile object");
     }
 
     dbEntry.setFaulty(false);
@@ -1646,7 +1646,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     signerDbEntries.remove(name);
     signers.remove(name);
     LOG.info("removed signer '{}'", name);
-  } // method removeResponder
+  } // method removeSigner
 
   @Override
   public void changeSigner(String name, String type, String conf, String base64Cert)
@@ -1674,7 +1674,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         scep.setResponder(newResponder);
       }
     }
-  } // method changeResponder
+  } // method changeSigner
 
   @Override
   public SignerEntry getSigner(String name) {
@@ -1783,7 +1783,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     try {
       caConfProps.load(new FileInputStream(IoUtil.expandFilepath(caConfFile)));
     } catch (IOException ex) {
-      throw new IllegalArgumentException("could not parse CA configuration" + caConfFile, ex);
+      throw new IllegalArgumentException("could not parse CA configuration file " + caConfFile, ex);
     }
     this.caConfProperties = caConfProps;
   }
@@ -1950,12 +1950,12 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     auditLogPciEvent(true, concat("UNREVOKE CA ", caName));
   } // method unrevokeCa
 
-  public void setX509CertProfileFactoryRegister(CertprofileFactoryRegister register) {
-    this.x509CertProfileFactoryRegister = register;
+  public void setCertprofileFactoryRegister(CertprofileFactoryRegister register) {
+    this.certprofileFactoryRegister = register;
   }
 
-  public void setX509CertPublisherFactoryRegister(CertPublisherFactoryRegister register) {
-    this.x509CertPublisherFactoryRegister = register;
+  public void setCertPublisherFactoryRegister(CertPublisherFactoryRegister register) {
+    this.certPublisherFactoryRegister = register;
   }
 
   public void setAuditServiceRegister(AuditServiceRegister register) {
@@ -2308,23 +2308,23 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     try {
       ret.initSigner(securityFactory);
     } catch (ObjectCreationException ex) {
-      final String message = "createCmpResponder";
+      final String message = "createSigner";
       LOG.debug(message, ex);
       throw new CaMgmtException(ex.getMessage());
     }
     return ret;
-  } // method createCmpResponder
+  } // method createSigner
 
   IdentifiedCertprofile createCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("dbEntry", dbEntry);
 
     String type = dbEntry.getType();
-    if (!x509CertProfileFactoryRegister.canCreateProfile(type)) {
+    if (!certprofileFactoryRegister.canCreateProfile(type)) {
       throw new CaMgmtException("unsupported cert profile type " + type);
     }
 
     try {
-      Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(type);
+      Certprofile profile = certprofileFactoryRegister.newCertprofile(type);
       IdentifiedCertprofile ret = new IdentifiedCertprofile(dbEntry, profile);
       ret.validate();
       return ret;
@@ -2342,8 +2342,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     CertPublisher publisher;
     IdentifiedCertPublisher ret;
     try {
-      if (x509CertPublisherFactoryRegister.canCreatePublisher(type)) {
-        publisher = x509CertPublisherFactoryRegister.newPublisher(type);
+      if (certPublisherFactoryRegister.canCreatePublisher(type)) {
+        publisher = certPublisherFactoryRegister.newPublisher(type);
       } else {
         throw new CaMgmtException("unsupported publisher type " + type);
       }
@@ -2488,7 +2488,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     ScepImpl scep = queryExecutor.changeScep(name, caId, active, responderName,
-        scepEntry.getCertProfiles(), control, this, securityFactory);
+        scepEntry.getCertprofiles(), control, this, securityFactory);
     if (scep == null) {
       throw new CaMgmtException("could not chagne SCEP " + name);
     }
@@ -2674,25 +2674,25 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    // CertProfile
-    for (String name : conf.getCertProfileNames()) {
-      CertprofileEntry entry = conf.getCertProfile(name);
+    // Certprofile
+    for (String name : conf.getCertprofileNames()) {
+      CertprofileEntry entry = conf.getCertprofile(name);
       CertprofileEntry entryB = certprofileDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB, ignoreId)) {
-          LOG.info("ignore existed certProfile {}", name);
+          LOG.info("ignore existed certprofile {}", name);
           continue;
         } else {
           throw logAndCreateException(
-              concat("certProfile ", name, " existed, could not re-added it"));
+              concat("certprofile ", name, " existed, could not re-added it"));
         }
       }
 
       try {
         addCertprofile(entry);
-        LOG.info("added certProfile {}", name);
+        LOG.info("added certprofile {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add certProfile ", name);
+        String msg = concat("could not add certprofile ", name);
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -3232,7 +3232,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           jaxb.setName(name);
           jaxb.setCaName(caName);
           jaxb.setResponderName(responderName);
-          jaxb.setProfiles(createProfiles(entry.getCertProfiles()));
+          jaxb.setProfiles(createProfiles(entry.getCertprofiles()));
           jaxb.setControl(entry.getControl());
 
           list.add(jaxb);

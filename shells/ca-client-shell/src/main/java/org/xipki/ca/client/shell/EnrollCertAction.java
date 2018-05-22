@@ -129,8 +129,7 @@ public abstract class EnrollCertAction extends ClientAction {
   private Boolean gm = Boolean.FALSE;
 
   @Option(name = "--ca",
-      description = "CA name\n"
-          + "(required if the profile is supported by more than one CA)")
+      description = "CA name\n(required if the profile is supported by more than one CA)")
   @Completion(CaNameCompleter.class)
   private String caName;
 

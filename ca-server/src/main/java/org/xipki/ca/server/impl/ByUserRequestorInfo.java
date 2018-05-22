@@ -63,7 +63,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public boolean isCertProfilePermitted(String certprofile) {
+  public boolean isCertprofilePermitted(String certprofile) {
     Set<String> profiles = caHasUser.getProfiles();
     if (CollectionUtil.isEmpty(profiles)) {
       return false;
@@ -78,9 +78,9 @@ public class ByUserRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public void assertCertProfilePermitted(String certprofile) throws InsuffientPermissionException {
-    if (!isCertProfilePermitted(certprofile)) {
-      throw new  InsuffientPermissionException("CertProfile " + certprofile + " is not permitted");
+  public void assertCertprofilePermitted(String certprofile) throws InsuffientPermissionException {
+    if (!isCertprofilePermitted(certprofile)) {
+      throw new  InsuffientPermissionException("Certprofile " + certprofile + " is not permitted");
     }
   }
 

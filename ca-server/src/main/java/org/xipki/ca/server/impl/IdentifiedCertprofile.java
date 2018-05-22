@@ -150,10 +150,10 @@ class IdentifiedCertprofile {
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
-  IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certProfile)
+  IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
     this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
-    this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
+    this.certprofile = ParamUtil.requireNonNull("certprofile", certprofile);
 
     this.certprofile.initialize(dbEntry.getConf());
   } // constructor

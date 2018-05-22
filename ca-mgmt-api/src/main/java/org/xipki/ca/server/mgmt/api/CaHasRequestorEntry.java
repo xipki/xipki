@@ -78,7 +78,7 @@ public class CaHasRequestorEntry {
     return profiles;
   }
 
-  public boolean isCertProfilePermitted(String certprofile) {
+  public boolean isCertprofilePermitted(String certprofile) {
     if (CollectionUtil.isEmpty(profiles)) {
       return false;
     }
