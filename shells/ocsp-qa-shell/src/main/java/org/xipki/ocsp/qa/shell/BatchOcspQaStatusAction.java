@@ -81,13 +81,11 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
   private static final String FILE_SEP = File.separator;
 
-  @Option(name = "--resp-issuer",
-      description = "certificate file of the responder's issuer")
+  @Option(name = "--resp-issuer", description = "certificate file of the responder's issuer")
   @Completion(FileCompleter.class)
   private String respIssuerFile;
 
-  @Option(name = "--url", required = true,
-      description = "OCSP responder URL\n(required)")
+  @Option(name = "--url", required = true, description = "OCSP responder URL\n(required)")
   private String serverUrlStr;
 
   @Option(name = "--sn-file", required = true,
@@ -97,8 +95,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
   @Completion(FileCompleter.class)
   private String snFile;
 
-  @Option(name = "--hex",
-      description = "serial number without prefix is hex number")
+  @Option(name = "--hex", description = "serial number without prefix is hex number")
   private Boolean hex = Boolean.FALSE;
 
   @Option(name = "--out-dir", required = true,
@@ -106,29 +103,24 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
   @Completion(DirCompleter.class)
   private String outDirStr;
 
-  @Option(name = "--save-req",
-      description = "where to save the request")
+  @Option(name = "--save-req", description = "where to save the request")
   private Boolean saveReq = Boolean.FALSE;
 
-  @Option(name = "--save-resp",
-      description = "where to save the request")
+  @Option(name = "--save-resp", description = "where to save the request")
   private Boolean saveResp = Boolean.FALSE;
 
   @Option(name = "--unknown-as-good",
       description = "where to expect the status good for unknown certificate")
   private Boolean unknownAsGood = Boolean.FALSE;
 
-  @Option(name = "--no-sig-verify",
-      description = "where to verify the signature")
+  @Option(name = "--no-sig-verify", description = "where to verify the signature")
   private Boolean noSigVerify = Boolean.FALSE;
 
-  @Option(name = "--exp-sig-alg",
-      description = "expected signature algorithm")
+  @Option(name = "--exp-sig-alg", description = "expected signature algorithm")
   @Completion(SigAlgCompleter.class)
   private String sigAlg;
 
-  @Option(name = "--exp-nextupdate",
-      description = "occurrence of nextUpdate")
+  @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
   @Completion(OccurrenceCompleter.class)
   private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
@@ -138,13 +130,11 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
   @Completion(OccurrenceCompleter.class)
   private String certhashOccurrenceText = Occurrence.optional.name();
 
-  @Option(name = "--exp-certhash-alg",
-      description = "occurrence of certHash")
+  @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
   @Completion(HashAlgCompleter.class)
   private String certhashAlg;
 
-  @Option(name = "--exp-nonce",
-      description = "occurrence of nonce")
+  @Option(name = "--exp-nonce", description = "occurrence of nonce")
   @Completion(OccurrenceCompleter.class)
   private String nonceOccurrenceText = Occurrence.optional.name();
 

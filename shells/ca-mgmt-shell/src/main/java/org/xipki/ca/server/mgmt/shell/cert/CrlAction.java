@@ -36,13 +36,11 @@ import org.xipki.console.karaf.CmdFailure;
 
 public abstract class CrlAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--out", aliases = "-o",
-      description = "where to save the CRL (optional)")
+  @Option(name = "--out", aliases = "-o", description = "where to save the CRL (optional)")
   @Completion(FileCompleter.class)
   protected String outFile;
 

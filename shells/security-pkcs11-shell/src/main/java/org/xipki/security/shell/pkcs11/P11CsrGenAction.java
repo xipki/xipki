@@ -39,13 +39,11 @@ import org.xipki.security.shell.pkcs11.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "csr-p11",
-    description = "generate CSR request with PKCS#11 device")
+@Command(scope = "xi", name = "csr-p11", description = "generate CSR request with PKCS#11 device")
 @Service
 public class P11CsrGenAction extends CsrGenAction {
 
-  @Option(name = "--slot", required = true,
-      description = "slot index\n(required)")
+  @Option(name = "--slot", required = true, description = "slot index\n(required)")
   private Integer slotIndex;
 
   @Option(name = "--id",

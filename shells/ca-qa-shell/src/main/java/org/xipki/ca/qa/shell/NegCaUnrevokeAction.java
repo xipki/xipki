@@ -28,8 +28,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-ca-unrevoke",
-    description = "unrevoke CA (negative, QA)")
+@Command(scope = "caqa", name = "neg-ca-unrevoke", description = "unrevoke CA (negative, QA)")
 @Service
 public class NegCaUnrevokeAction extends CaUnrevokeAction {
 

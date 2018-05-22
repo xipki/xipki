@@ -34,13 +34,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "clear-publishqueue",
-    description = "clear publish queue")
+@Command(scope = "ca", name = "clear-publishqueue", description = "clear publish queue")
 @Service
 public class ClearPublishQueueAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name or 'all' for all CAs\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name or 'all' for all CAs\n(required)")
   @Completion(CaNamePlusAllCompleter.class)
   private String caName;
 

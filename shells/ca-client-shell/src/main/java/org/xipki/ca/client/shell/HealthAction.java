@@ -34,18 +34,15 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-health",
-    description = "check healty status of CA")
+@Command(scope = "xi", name = "cmp-health", description = "check healty status of CA")
 @Service
 public class HealthAction extends ClientAction {
 
-  @Option(name = "--ca",
-      description = "CA name\n(required if multiple CAs are configured)")
+  @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show status verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
   private Boolean verbose = Boolean.FALSE;
 
   @Override

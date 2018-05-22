@@ -49,8 +49,7 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "check-cert",
-    description = "check the certificate")
+@Command(scope = "caqa", name = "check-cert", description = "check the certificate")
 @Service
 public class CheckCertAction extends XiAction {
 
@@ -64,8 +63,7 @@ public class CheckCertAction extends XiAction {
   @Completion(IssuerNameCompleter.class)
   private String issuerName;
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -74,8 +72,7 @@ public class CheckCertAction extends XiAction {
   @Completion(CertprofileNameCompleter.class)
   private String profileName;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show status verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
   private Boolean verbose = Boolean.FALSE;
 
   @Reference

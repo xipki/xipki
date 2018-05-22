@@ -36,12 +36,10 @@ public abstract class BatchSpeedAction extends SecurityAction {
 
   private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedAction.class);
 
-  @Option(name = "--duration",
-      description = "duration for each test case")
+  @Option(name = "--duration", description = "duration for each test case")
   private String duration = "10s";
 
-  @Option(name = "--thread",
-      description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
   protected abstract BenchmarkExecutor nextTester() throws Exception;

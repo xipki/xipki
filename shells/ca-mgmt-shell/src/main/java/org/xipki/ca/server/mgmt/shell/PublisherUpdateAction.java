@@ -35,8 +35,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "publisher-up",
-    description = "update publisher")
+@Command(scope = "ca", name = "publisher-up", description = "update publisher")
 @Service
 public class PublisherUpdateAction extends CaAction {
 
@@ -45,17 +44,14 @@ public class PublisherUpdateAction extends CaAction {
   @Completion(PublisherNameCompleter.class)
   protected String name;
 
-  @Option(name = "--type",
-      description = "publisher type")
+  @Option(name = "--type", description = "publisher type")
   @Completion(PublisherTypeCompleter.class)
   protected String type;
 
-  @Option(name = "--conf",
-      description = "publisher configuration or 'null'")
+  @Option(name = "--conf", description = "publisher configuration or 'null'")
   protected String conf;
 
-  @Option(name = "--conf-file",
-      description = "profile configuration file")
+  @Option(name = "--conf-file", description = "profile configuration file")
   @Completion(FileCompleter.class)
   protected String confFile;
 

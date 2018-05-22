@@ -42,13 +42,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-csr-enroll",
-    description = "enroll certificate via CSR")
+@Command(scope = "xi", name = "cmp-csr-enroll", description = "enroll certificate via CSR")
 @Service
 public class CsrEnrollCertAction extends ClientAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -56,12 +54,10 @@ public class CsrEnrollCertAction extends ClientAction {
       description = "certificate profile\n(required)")
   private String profile;
 
-  @Option(name = "--not-before",
-      description = "notBefore, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
   private String notBeforeS;
 
-  @Option(name = "--not-after",
-      description = "notAfter, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
   private String notAfterS;
 
   @Option(name = "--out", aliases = "-o", required = true,

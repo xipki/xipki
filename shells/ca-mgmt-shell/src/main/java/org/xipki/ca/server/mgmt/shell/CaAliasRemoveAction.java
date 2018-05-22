@@ -31,8 +31,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "caalias-rm",
-    description = "remove CA alias")
+@Command(scope = "ca", name = "caalias-rm", description = "remove CA alias")
 @Service
 public class CaAliasRemoveAction extends CaAction {
 

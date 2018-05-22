@@ -39,31 +39,25 @@ import org.xipki.password.PasswordResolver;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "scep-add",
-    description = "add SCEP")
+@Command(scope = "ca", name = "scep-add", description = "add SCEP")
 @Service
 public class ScepAddAction extends CaAction {
 
-  @Option(name = "--name", required = true,
-      description = "name\n(required)")
+  @Option(name = "--name", required = true, description = "name\n(required)")
   private String name;
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(ScepNameCompleter.class)
   private String caName;
 
-  @Option(name = "--inactive",
-      description = "do not activate this SCEP")
+  @Option(name = "--inactive", description = "do not activate this SCEP")
   private Boolean inactive = Boolean.FALSE;
 
-  @Option(name = "--responder", required = true,
-      description = "Responder name\n(required)")
+  @Option(name = "--responder", required = true, description = "Responder name\n(required)")
   @Completion(SignerNameCompleter.class)
   private String responderName;
 
-  @Option(name = "--control",
-      description = "SCEP control")
+  @Option(name = "--control", description = "SCEP control")
   private String scepControl;
 
   @Option(name = "--profile", required = true, multiValued = true,

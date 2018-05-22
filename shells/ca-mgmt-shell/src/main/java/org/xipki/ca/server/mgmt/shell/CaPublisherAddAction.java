@@ -34,13 +34,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "capub-add",
-    description = "add publisher to CA")
+@Command(scope = "ca", name = "capub-add", description = "add publisher to CA")
 @Service
 public class CaPublisherAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 

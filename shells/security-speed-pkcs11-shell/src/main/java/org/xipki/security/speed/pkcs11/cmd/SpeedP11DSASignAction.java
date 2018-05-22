@@ -38,16 +38,13 @@ import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP11DSASignAction extends SpeedP11Action {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
+  @Option(name = "--plen", description = "bit length of the prime")
   private Integer plen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
+  @Option(name = "--qlen", description = "bit length of the sub-prime")
   private Integer qlen;
 
-  @Option(name = "--sig-algo", required = true,
-      description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
   @Completion(DSASigAlgCompleter.class)
   private String sigAlgo;
 

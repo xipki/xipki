@@ -80,17 +80,14 @@ import org.xipki.security.util.KeyUtil;
 @Service
 public class P12ComplexCsrGenAction extends CsrGenAction {
 
-  @Option(name = "--p12", required = true,
-      description = "PKCS#12 keystore file\n(required)")
+  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file\n(required)")
   @Completion(FileCompleter.class)
   private String p12File;
 
-  @Option(name = "--password",
-      description = "password of the PKCS#12 file")
+  @Option(name = "--password", description = "password of the PKCS#12 file")
   private String password;
 
-  @Option(name = "--complex-subject",
-      description = "whether complex subject should be used")
+  @Option(name = "--complex-subject", description = "whether complex subject should be used")
   private Boolean complexSubject = Boolean.FALSE;
 
   private char[] getPassword() throws IOException {

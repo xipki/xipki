@@ -41,13 +41,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-certpoll",
-    description = "poll certificate")
+@Command(scope = "xi", name = "jscep-certpoll", description = "poll certificate")
 @Service
 public class CertPollAction extends ClientAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 

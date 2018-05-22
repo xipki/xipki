@@ -30,8 +30,7 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "dsa-p12",
-    description = "generate RSA keypair in PKCS#12 keystore")
+@Command(scope = "xi", name = "dsa-p12", description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12DSAKeyGenAction extends P12KeyGenAction {
@@ -40,12 +39,10 @@ public class P12DSAKeyGenAction extends P12KeyGenAction {
       description = "subject of the self-signed certificate")
   private String subject;
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
+  @Option(name = "--plen", description = "bit length of the prime")
   private Integer plen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
+  @Option(name = "--qlen", description = "bit length of the sub-prime")
   private Integer qlen;
 
   @Override

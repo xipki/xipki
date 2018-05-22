@@ -35,8 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "ca-info",
-    description = "show information of CA")
+@Command(scope = "ca", name = "ca-info", description = "show information of CA")
 @Service
 public class CaInfoAction extends CaAction {
 
@@ -44,8 +43,7 @@ public class CaInfoAction extends CaAction {
   @Completion(CaNameCompleter.class)
   private String name;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show CA information verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show CA information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
   @Override

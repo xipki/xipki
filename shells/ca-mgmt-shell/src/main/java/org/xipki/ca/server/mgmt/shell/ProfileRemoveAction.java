@@ -31,13 +31,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "profile-rm",
-    description = "remove certificate profile")
+@Command(scope = "ca", name = "profile-rm", description = "remove certificate profile")
 @Service
 public class ProfileRemoveAction extends CaAction {
 
-  @Argument(index = 0, name = "name", required = true,
-      description = "certificate profile name")
+  @Argument(index = 0, name = "name", required = true, description = "certificate profile name")
   @Completion(ProfileNameCompleter.class)
   private String name;
 

@@ -31,8 +31,7 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "ec-p12",
-    description = "generate EC keypair in PKCS#12 keystore")
+@Command(scope = "xi", name = "ec-p12", description = "generate EC keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12ECKeyGenAction extends P12KeyGenAction {
@@ -41,8 +40,7 @@ public class P12ECKeyGenAction extends P12KeyGenAction {
       description = "subject of the self-signed certificate")
   protected String subject;
 
-  @Option(name = "--curve",
-      description = "EC curve name or OID")
+  @Option(name = "--curve", description = "EC curve name or OID")
   @Completion(ECCurveNameCompleter.class)
   private String curveName = "secp256r1";
 

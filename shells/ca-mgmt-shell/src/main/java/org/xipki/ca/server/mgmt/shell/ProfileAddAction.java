@@ -35,8 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "profile-add",
-    description = "add certificate profile")
+@Command(scope = "ca", name = "profile-add", description = "add certificate profile")
 @Service
 public class ProfileAddAction extends CaAction {
 
@@ -44,17 +43,14 @@ public class ProfileAddAction extends CaAction {
       description = "profile name\n(required)")
   private String name;
 
-  @Option(name = "--type", required = true,
-      description = "profile type\n(required)")
+  @Option(name = "--type", required = true, description = "profile type\n(required)")
   @Completion(ProfileTypeCompleter.class)
   private String type;
 
-  @Option(name = "--conf",
-      description = "certificate profile configuration")
+  @Option(name = "--conf", description = "certificate profile configuration")
   private String conf;
 
-  @Option(name = "--conf-file",
-      description = "certificate profile configuration file")
+  @Option(name = "--conf-file", description = "certificate profile configuration file")
   @Completion(FileCompleter.class)
   private String confFile;
 

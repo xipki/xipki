@@ -71,31 +71,25 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
   protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP
       = new HashMap<>();
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show status verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
   protected Boolean verbose = Boolean.FALSE;
 
-  @Option(name = "--resp-issuer",
-      description = "certificate file of the responder's issuer")
+  @Option(name = "--resp-issuer", description = "certificate file of the responder's issuer")
   @Completion(FileCompleter.class)
   private String respIssuerFile;
 
-  @Option(name = "--url",
-      description = "OCSP responder URL")
+  @Option(name = "--url", description = "OCSP responder URL")
   private String serverUrl;
 
-  @Option(name = "--req-out",
-      description = "where to save the request")
+  @Option(name = "--req-out", description = "where to save the request")
   @Completion(FileCompleter.class)
   private String reqout;
 
-  @Option(name = "--resp-out",
-      description = "where to save the response")
+  @Option(name = "--resp-out", description = "where to save the response")
   @Completion(FileCompleter.class)
   private String respout;
 
-  @Option(name = "--hex",
-      description = "serial number without prefix is hex number")
+  @Option(name = "--hex", description = "serial number without prefix is hex number")
   private Boolean hex = Boolean.FALSE;
 
   @Option(name = "--serial", aliases = "-s",
@@ -108,8 +102,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 
-  @Option(name = "--ac",
-      description = "the certificates are attribute certificates")
+  @Option(name = "--ac", description = "the certificates are attribute certificates")
   @Completion(FileCompleter.class)
   private Boolean isAttrCert = Boolean.FALSE;
 

@@ -35,13 +35,11 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "ca-add",
-    description = "add CA")
+@Command(scope = "ca", name = "ca-add", description = "add CA")
 @Service
 public class CaAddAction extends CaAddOrGenAction {
 
-  @Option(name = "--cert",
-      description = "CA certificate file")
+  @Option(name = "--cert", description = "CA certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

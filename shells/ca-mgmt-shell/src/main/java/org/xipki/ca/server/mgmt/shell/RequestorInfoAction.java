@@ -37,18 +37,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "requestor-info",
-    description = "show information of requestor")
+@Command(scope = "ca", name = "requestor-info", description = "show information of requestor")
 @Service
 public class RequestorInfoAction extends CaAction {
 
-  @Argument(index = 0, name = "name",
-      description = "requestor name")
+  @Argument(index = 0, name = "name", description = "requestor name")
   @Completion(RequestorNameCompleter.class)
   private String name;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show requestor information verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show requestor information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
   @Override

@@ -32,25 +32,20 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "user-up",
-    description = "update user")
+@Command(scope = "ca", name = "user-up", description = "update user")
 @Service
 public class UserUpdateAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "user Name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "user Name\n(required)")
   private String name;
 
-  @Option(name = "--active",
-      description = "activate this user")
+  @Option(name = "--active", description = "activate this user")
   private Boolean active;
 
-  @Option(name = "--inactive",
-      description = "deactivate this user")
+  @Option(name = "--inactive", description = "deactivate this user")
   private Boolean inactive;
 
-  @Option(name = "--password",
-      description = "user password, 'CONSOLE' to read from console")
+  @Option(name = "--password", description = "user password, 'CONSOLE' to read from console")
   private String password;
 
   @Override

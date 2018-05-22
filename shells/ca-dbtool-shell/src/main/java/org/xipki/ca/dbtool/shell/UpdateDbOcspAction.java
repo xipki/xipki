@@ -29,8 +29,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "updatedb-ocsp",
-    description = "update the OCSP database schema")
+@Command(scope = "ca", name = "updatedb-ocsp", description = "update the OCSP database schema")
 @Service
 public class UpdateDbOcspAction extends LiquibaseAction {
 

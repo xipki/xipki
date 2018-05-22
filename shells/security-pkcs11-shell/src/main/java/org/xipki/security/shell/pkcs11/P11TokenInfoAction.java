@@ -39,22 +39,18 @@ import org.xipki.security.shell.pkcs11.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "token-info-p11",
-    description = "list objects in PKCS#11 device")
+@Command(scope = "xi", name = "token-info-p11", description = "list objects in PKCS#11 device")
 @Service
 public class P11TokenInfoAction extends SecurityAction {
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show object information verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module.")
+  @Option(name = "--module", description = "name of the PKCS#11 module.")
   @Completion(P11ModuleNameCompleter.class)
   private String moduleName = P11SecurityAction.DEFAULT_P11MODULE_NAME;
 
-  @Option(name = "--slot",
-      description = "slot index")
+  @Option(name = "--slot", description = "slot index")
   private Integer slotIndex;
 
   @Reference (optional = true)

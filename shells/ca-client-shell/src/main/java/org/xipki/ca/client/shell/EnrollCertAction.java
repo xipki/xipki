@@ -92,8 +92,7 @@ public abstract class EnrollCertAction extends ClientAction {
   @Reference
   protected SecurityFactory securityFactory;
 
-  @Option(name = "--hash",
-      description = "hash algorithm name for the POPO computation")
+  @Option(name = "--hash", description = "hash algorithm name for the POPO computation")
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--subject", aliases = "-s", required = true,
@@ -104,12 +103,10 @@ public abstract class EnrollCertAction extends ClientAction {
       description = "certificate profile\n(required)")
   private String profile;
 
-  @Option(name = "--not-before",
-      description = "notBefore, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
   private String notBeforeS;
 
-  @Option(name = "--not-after",
-      description = "notAfter, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
   private String notAfterS;
 
   @Option(name = "--out", aliases = "-o", required = true,
@@ -138,8 +135,7 @@ public abstract class EnrollCertAction extends ClientAction {
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--keyusage", multiValued = true,
-      description = "keyusage\n(multi-valued)")
+  @Option(name = "--keyusage", multiValued = true, description = "keyusage\n(multi-valued)")
   @Completion(KeyusageCompleter.class)
   private List<String> keyusages;
 
@@ -161,22 +157,18 @@ public abstract class EnrollCertAction extends ClientAction {
           + "(multi-valued)")
   private List<String> qcEuLimits;
 
-  @Option(name = "--biometric-type",
-      description = "Biometric type")
+  @Option(name = "--biometric-type", description = "Biometric type")
   private String biometricType;
 
-  @Option(name = "--biometric-hash",
-      description = "Biometric hash algorithm")
+  @Option(name = "--biometric-hash", description = "Biometric hash algorithm")
   @Completion(HashAlgCompleter.class)
   private String biometricHashAlgo;
 
-  @Option(name = "--biometric-file",
-      description = "Biometric hash algorithm")
+  @Option(name = "--biometric-file", description = "Biometric hash algorithm")
   @Completion(FileCompleter.class)
   private String biometricFile;
 
-  @Option(name = "--biometric-uri",
-      description = "Biometric source data URI")
+  @Option(name = "--biometric-uri", description = "Biometric source data URI")
   private String biometricUri;
 
   @Option(name = "--need-extension", multiValued = true,

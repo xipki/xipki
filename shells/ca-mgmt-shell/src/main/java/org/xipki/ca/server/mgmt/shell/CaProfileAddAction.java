@@ -35,13 +35,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "caprofile-add",
-    description = "add certificate profile to CA")
+@Command(scope = "ca", name = "caprofile-add", description = "add certificate profile to CA")
 @Service
 public class CaProfileAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 

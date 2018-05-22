@@ -56,13 +56,11 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xiqa", name = "qa-ocsp-status",
-    description = "request certificate status (QA)")
+@Command(scope = "xiqa", name = "qa-ocsp-status", description = "request certificate status (QA)")
 @Service
 public class OcspQaStatusAction extends BaseOcspStatusAction {
 
-  @Option(name = "--exp-error",
-      description = "expected error")
+  @Option(name = "--exp-error", description = "expected error")
   @Completion(OcspErrorCompleter.class)
   private String errorText;
 
@@ -75,17 +73,14 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
       description = "revocation time, UTC time of format yyyyMMddHHmmss\n(multi-valued)")
   private List<String> revTimeTexts;
 
-  @Option(name = "--exp-sig-alg",
-      description = "expected signature algorithm")
+  @Option(name = "--exp-sig-alg", description = "expected signature algorithm")
   @Completion(SigAlgCompleter.class)
   private String sigAlg;
 
-  @Option(name = "--no-sig-verify",
-      description = "no verification of the signature")
+  @Option(name = "--no-sig-verify", description = "no verification of the signature")
   private Boolean noSigVerify = Boolean.FALSE;
 
-  @Option(name = "--exp-nextupdate",
-      description = "occurrence of nextUpdate")
+  @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
   @Completion(OccurrenceCompleter.class)
   private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
@@ -95,13 +90,11 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
   @Completion(OccurrenceCompleter.class)
   private String certhashOccurrenceText = Occurrence.optional.name();
 
-  @Option(name = "--exp-certhash-alg",
-      description = "occurrence of certHash")
+  @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
   @Completion(HashAlgCompleter.class)
   private String certhashAlg;
 
-  @Option(name = "--exp-nonce",
-      description = "occurrence of nonce")
+  @Option(name = "--exp-nonce", description = "occurrence of nonce")
   @Completion(OccurrenceCompleter.class)
   private String nonceOccurrenceText = Occurrence.optional.name();
 

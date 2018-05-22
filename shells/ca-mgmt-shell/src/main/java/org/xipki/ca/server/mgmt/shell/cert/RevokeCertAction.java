@@ -37,19 +37,16 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "revoke-cert",
-    description = "revoke certificate")
+@Command(scope = "ca", name = "revoke-cert", description = "revoke certificate")
 @Service
 public class RevokeCertAction extends UnRevRmCertAction {
 
-  @Option(name = "--reason", aliases = "-r",
-      required = true,
+  @Option(name = "--reason", aliases = "-r", required = true,
       description = "CRL reason\n(required)")
   @Completion(ClientCrlReasonCompleter.class)
   private String reason;
 
-  @Option(name = "--inv-date",
-      description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
   private String invalidityDateS;
 
   @Override

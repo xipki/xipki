@@ -35,8 +35,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "publisher-export",
-    description = "export publisher configuration")
+@Command(scope = "ca", name = "publisher-export", description = "export publisher configuration")
 @Service
 public class PublisherExportAction extends CaAction {
 

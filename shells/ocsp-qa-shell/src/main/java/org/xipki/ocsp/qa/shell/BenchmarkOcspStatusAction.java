@@ -48,12 +48,10 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xiqa", name = "benchmark-ocsp-status",
-    description = "OCSP benchmark")
+@Command(scope = "xiqa", name = "benchmark-ocsp-status", description = "OCSP benchmark")
 @Service
 public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
-  @Option(name = "--hex",
-      description = "serial number without prefix is hex number")
+  @Option(name = "--hex", description = "serial number without prefix is hex number")
   private Boolean hex = Boolean.FALSE;
 
   @Option(name = "--serial", aliases = "-s",
@@ -61,34 +59,28 @@ public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
           + "(exactly one of serial, serial-file and cert must be specified)")
   private String serialNumberList;
 
-  @Option(name = "--serial-file",
-      description = "file that contains serial numbers")
+  @Option(name = "--serial-file", description = "file that contains serial numbers")
   @Completion(FileCompleter.class)
   private String serialNumberFile;
 
-  @Option(name = "--cert", multiValued = true,
-      description = "certificate\n(multi-valued)")
+  @Option(name = "--cert", multiValued = true, description = "certificate\n(multi-valued)")
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 
-  @Option(name = "--duration",
-      description = "duration")
+  @Option(name = "--duration", description = "duration")
   private String duration = "30s";
 
-  @Option(name = "--thread",
-      description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
   @Option(name = "--analyze-response",
       description = "whether to analyze the received OCSP response")
   private Boolean analyzeResponse = Boolean.FALSE;
 
-  @Option(name = "--url", required = true,
-      description = "OCSP responder URL\n(required)")
+  @Option(name = "--url", required = true, description = "OCSP responder URL\n(required)")
   private String serverUrl;
 
-  @Option(name = "--max-num",
-      description = "maximal number of OCSP queries\n0 for unlimited")
+  @Option(name = "--max-num", description = "maximal number of OCSP queries\n0 for unlimited")
   private Integer maxRequests = 0;
 
   @Option(name = "--queue-size",

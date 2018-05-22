@@ -37,14 +37,12 @@ import org.xipki.security.shell.KeyGenAction;
 
 public abstract class P12KeyGenAction extends KeyGenAction {
 
-  @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the key\n"
+  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the key\n"
           + "(required)")
   @Completion(FileCompleter.class)
   protected String keyOutFile;
 
-  @Option(name = "--password",
-      description = "password of the keystore file")
+  @Option(name = "--password", description = "password of the keystore file")
   protected String password;
 
   protected void saveKey(P12KeyGenerationResult keyGenerationResult) throws IOException {

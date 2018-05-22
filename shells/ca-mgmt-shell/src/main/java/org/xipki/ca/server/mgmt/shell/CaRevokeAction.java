@@ -42,8 +42,7 @@ import org.xipki.security.CrlReason;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "ca-revoke",
-    description = "revoke CA")
+@Command(scope = "ca", name = "ca-revoke", description = "revoke CA")
 @Service
 public class CaRevokeAction extends CaAction {
 
@@ -58,18 +57,15 @@ public class CaRevokeAction extends CaAction {
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--reason", required = true,
-      description = "CRL reason\n(required)")
+  @Option(name = "--reason", required = true, description = "CRL reason\n(required)")
   @Completion(CaCrlReasonCompleter.class)
   private String reason;
 
-  @Option(name = "--rev-date",
-      description = "revocation date, UTC time of format yyyyMMddHHmmss\n"
-          + "(defaults to current time)")
+  @Option(name = "--rev-date", valueToShowInHelp = "current time",
+      description = "revocation date, UTC time of format yyyyMMddHHmmss")
   private String revocationDateS;
 
-  @Option(name = "--inv-date",
-      description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
   private String invalidityDateS;
 
   @Override

@@ -41,18 +41,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "enroll-cert",
-    description = "enroll certificate")
+@Command(scope = "ca", name = "enroll-cert", description = "enroll certificate")
 @Service
 public class EnrollCertAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -66,12 +63,10 @@ public class EnrollCertAction extends CaAction {
   @Completion(ProfileNameCompleter.class)
   private String profileName;
 
-  @Option(name = "--not-before",
-      description = "notBefore, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
   private String notBeforeS;
 
-  @Option(name = "--not-after",
-      description = "notAfter, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
   private String notAfterS;
 
   @Override

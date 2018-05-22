@@ -35,22 +35,18 @@ import org.xipki.common.util.IoUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "gen-rootca",
-    description = "generate selfsigned CA")
+@Command(scope = "ca", name = "gen-rootca", description = "generate selfsigned CA")
 @Service
 public class CaGenRcaAction extends CaAddOrGenAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR of the Root CA\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR of the Root CA\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 
-  @Option(name = "--profile", required = true,
-      description = "profile of the Root CA\n(required)")
+  @Option(name = "--profile", required = true, description = "profile of the Root CA\n(required)")
   private String rootcaProfile;
 
-  @Option(name = "--serial",
-      description = "profile of the Root CA")
+  @Option(name = "--serial", description = "profile of the Root CA")
   private String serialS;
 
   @Option(name = "--out", aliases = "-o",

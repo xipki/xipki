@@ -44,8 +44,7 @@ public class P11IdentityDeleteAction extends P11SecurityAction {
           + "either keyId or keyLabel must be specified")
   protected String label;
 
-  @Option(name = "--force", aliases = "-f",
-      description = "remove identifies without prompt")
+  @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
   private Boolean force = Boolean.FALSE;
 
   @Override

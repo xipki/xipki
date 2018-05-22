@@ -30,18 +30,15 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "dsa-p11",
-    description = "generate DSA keypair in PKCS#11 device")
+@Command(scope = "xi", name = "dsa-p11", description = "generate DSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11DSAKeyGenAction extends P11KeyGenAction {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
+  @Option(name = "--plen", description = "bit length of the prime")
   private Integer plen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
+  @Option(name = "--qlen", description = "bit length of the sub-prime")
   private Integer qlen;
 
   @Override

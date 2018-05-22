@@ -38,8 +38,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "getcrl",
-    description = "download CRL")
+@Command(scope = "ca", name = "getcrl", description = "download CRL")
 @Service
 public class GetCrlAction extends CrlAction {
 

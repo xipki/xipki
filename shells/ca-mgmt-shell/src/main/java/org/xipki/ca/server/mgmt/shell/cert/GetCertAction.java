@@ -35,18 +35,15 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
  * @since 2.1.0
  */
 
-@Command(scope = "ca", name = "get-cert",
-    description = "get certificate")
+@Command(scope = "ca", name = "get-cert", description = "get certificate")
 @Service
 public class GetCertAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--serial", aliases = "-s", required = true,
-      description = "serial number")
+  @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumberS;
 
   @Option(name = "--out", aliases = "-o", required = true,

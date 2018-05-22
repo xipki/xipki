@@ -39,23 +39,19 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "careq-add",
-    description = "add requestor to CA")
+@Command(scope = "ca", name = "careq-add", description = "add requestor to CA")
 @Service
 public class CaRequestorAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--requestor", required = true,
-      description = "requestor name\n(required)")
+  @Option(name = "--requestor", required = true, description = "requestor name\n(required)")
   @Completion(RequestorNameCompleter.class)
   private String requestorName;
 
-  @Option(name = "--ra",
-      description = "whether as RA")
+  @Option(name = "--ra", description = "whether as RA")
   @Completion(YesNoCompleter.class)
   private String raS = "no";
 

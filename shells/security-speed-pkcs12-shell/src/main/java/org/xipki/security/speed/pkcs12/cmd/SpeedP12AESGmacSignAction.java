@@ -37,8 +37,7 @@ import org.xipki.security.speed.pkcs12.P12AESGmacSignSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP12AESGmacSignAction extends SpeedP12SignAction {
 
-  @Option(name = "--sig-algo", required = true,
-      description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
   @Completion(GMACSigAlgCompleter.class)
   private String sigAlgo;
 

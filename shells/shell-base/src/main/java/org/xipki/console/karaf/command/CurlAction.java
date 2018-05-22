@@ -45,43 +45,34 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.1.0
  */
 
-@Command(scope = "xi", name = "curl",
-    description = "transfer a URL")
+@Command(scope = "xi", name = "curl", description = "transfer a URL")
 @Service
 public class CurlAction extends XiAction {
 
-  @Argument(index = 0, name = "url", required = true,
-      description = "URL\n(required)")
+  @Argument(index = 0, name = "url", required = true, description = "URL\n(required)")
   private String url;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show request and response verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show request and response verbosely")
   private Boolean verbose = Boolean.FALSE;
 
-  @Option(name = "--post", aliases = "-p",
-      description = "send the request via HTTP POST")
+  @Option(name = "--post", aliases = "-p", description = "send the request via HTTP POST")
   private Boolean usePost = Boolean.FALSE;
 
-  @Option(name = "--data", aliases = "-d",
-      description = "data to be sent in a POST request")
+  @Option(name = "--data", aliases = "-d", description = "data to be sent in a POST request")
   private String postData;
 
-  @Option(name = "--data-charset", aliases = "-c",
-      description = "charset of data")
+  @Option(name = "--data-charset", aliases = "-c", description = "charset of data")
   private String postDataCharSet = "UTF-8";
 
-  @Option(name = "--data-file",
-      description = "file contains the data to be sent in a POST request")
+  @Option(name = "--data-file", description = "file contains the data to be sent in a POST request")
   @Completion(FileCompleter.class)
   private String postDataFile;
 
-  @Option(name = "--out",
-      description = "where to save the response")
+  @Option(name = "--out", description = "where to save the response")
   @Completion(FileCompleter.class)
   private String outFile;
 
-  @Option(name = "--header", aliases = "-h", multiValued = true,
-      description = "header in request")
+  @Option(name = "--header", aliases = "-h", multiValued = true, description = "header in request")
   private List<String> headers;
 
   @Option(name = "--user", aliases = "-u",

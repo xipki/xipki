@@ -40,8 +40,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-revoke",
-    description = "revoke certificate")
+@Command(scope = "xi", name = "cmp-revoke", description = "revoke certificate")
 @Service
 public class RevokeCertAction extends UnRevRemoveCertAction {
 
@@ -50,8 +49,7 @@ public class RevokeCertAction extends UnRevRemoveCertAction {
   @Completion(ClientCrlReasonCompleter.class)
   private String reason;
 
-  @Option(name = "--inv-date",
-      description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+  @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
   private String invalidityDateS;
 
   @Override

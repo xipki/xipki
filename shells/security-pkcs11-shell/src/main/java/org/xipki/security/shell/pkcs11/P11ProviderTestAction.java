@@ -58,12 +58,10 @@ public class P11ProviderTestAction extends P11SecurityAction {
           + "either keyId or keyLabel must be specified")
   protected String label;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show object information verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
-  @Option(name = "--hash",
-      description = "hash algorithm name")
+  @Option(name = "--hash", description = "hash algorithm name")
   @Completion(HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 

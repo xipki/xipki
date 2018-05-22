@@ -43,31 +43,26 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "signer-up",
-    description = "update signer")
+@Command(scope = "ca", name = "signer-up", description = "update signer")
 @Service
 public class SignerUpdateAction extends CaAction {
 
   @Reference
   protected PasswordResolver passwordResolver;
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "signer name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "signer name\n(required)")
   @Completion(SignerNameCompleter.class)
   protected String name;
 
-  @Option(name = "--type",
-      description = "type of the signer")
+  @Option(name = "--type", description = "type of the signer")
   @Completion(SignerTypeCompleter.class)
   protected String type;
 
-  @Option(name = "--cert",
-      description = "requestor certificate file or 'null'")
+  @Option(name = "--cert", description = "requestor certificate file or 'null'")
   @Completion(FileCompleter.class)
   protected String certFile;
 
-  @Option(name = "--conf",
-      description = "conf of the signer or 'null'")
+  @Option(name = "--conf", description = "conf of the signer or 'null'")
   private String conf;
 
   protected String getSignerConf() throws Exception {

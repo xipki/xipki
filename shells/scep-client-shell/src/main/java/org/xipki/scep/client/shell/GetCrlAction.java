@@ -36,8 +36,7 @@ import org.xipki.scep.client.ScepClient;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "scep-getcrl",
-    description = "download CRL")
+@Command(scope = "xi", name = "scep-getcrl", description = "download CRL")
 @Service
 public class GetCrlAction extends ClientAction {
 

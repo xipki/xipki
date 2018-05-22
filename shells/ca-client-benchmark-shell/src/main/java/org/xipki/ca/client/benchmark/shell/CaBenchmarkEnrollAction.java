@@ -49,38 +49,30 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
           description = "subject template\n(required)")
   private String subjectTemplate;
 
-  @Option(name = "--random-dn",
-      description = "DN name to be incremented")
+  @Option(name = "--random-dn", description = "DN name to be incremented")
   @Completion(RandomDnCompleter.class)
   private String randomDnStr = "O";
 
-  @Option(name = "--duration",
-      description = "duration")
+  @Option(name = "--duration", description = "duration")
   private String duration = "30s";
 
-  @Option(name = "--thread",
-      description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--key-type",
-      description = "key type to be requested")
+  @Option(name = "--key-type", description = "key type to be requested")
   private String keyType = "RSA";
 
-  @Option(name = "--key-size",
-      description = "modulus length of RSA key or p length of DSA key")
+  @Option(name = "--key-size", description = "modulus length of RSA key or p length of DSA key")
   private Integer keysize = 2048;
 
-  @Option(name = "--curve",
-          description = "EC curve name or OID of EC key")
+  @Option(name = "--curve", description = "EC curve name or OID of EC key")
   @Completion(ECCurveNameCompleter.class)
   private String curveName;
 
-  @Option(name = "-n",
-      description = "number of certificates to be requested in one request")
+  @Option(name = "-n", description = "number of certificates to be requested in one request")
   private Integer num = 1;
 
-  @Option(name = "--max-num",
-      description = "maximal number of requests\n0 for unlimited")
+  @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
   private Integer maxRequests = 0;
 
   @Override

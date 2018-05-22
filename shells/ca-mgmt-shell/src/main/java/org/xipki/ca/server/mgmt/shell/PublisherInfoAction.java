@@ -36,13 +36,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "publisher-info",
-    description = "show information of publisher")
+@Command(scope = "ca", name = "publisher-info", description = "show information of publisher")
 @Service
 public class PublisherInfoAction extends CaAction {
 
-  @Argument(index = 0, name = "name",
-      description = "publisher name")
+  @Argument(index = 0, name = "name", description = "publisher name")
   @Completion(PublisherNameCompleter.class)
   private String name;
 

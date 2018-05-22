@@ -31,21 +31,17 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "user-add",
-    description = "add user")
+@Command(scope = "ca", name = "user-add", description = "add user")
 @Service
 public class UserAddAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "user Name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "user Name\n(required)")
   private String name;
 
-  @Option(name = "--password",
-      description = "user password")
+  @Option(name = "--password", description = "user password")
   private String password;
 
-  @Option(name = "--inactive",
-      description = "do not activate this user")
+  @Option(name = "--inactive", description = "do not activate this user")
   private Boolean inactive = Boolean.FALSE;
 
   @Override

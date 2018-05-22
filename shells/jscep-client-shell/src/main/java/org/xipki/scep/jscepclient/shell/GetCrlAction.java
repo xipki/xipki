@@ -36,13 +36,11 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-getcrl",
-    description = "download CRL")
+@Command(scope = "xi", name = "jscep-getcrl", description = "download CRL")
 @Service
 public class GetCrlAction extends ClientAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true,
-      description = "certificate\n(required)")
+  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate\n(required)")
   @Completion(FileCompleter.class)
   private String certFile;
 

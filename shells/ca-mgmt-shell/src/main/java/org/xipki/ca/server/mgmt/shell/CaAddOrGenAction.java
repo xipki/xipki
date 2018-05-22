@@ -51,17 +51,14 @@ import org.xipki.password.PasswordResolver;
 
 public abstract class CaAddOrGenAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "CA name\n(required)")
   private String caName;
 
-  @Option(name = "--status",
-      description = "CA status")
+  @Option(name = "--status", description = "CA status")
   @Completion(CaStatusCompleter.class)
   private String caStatus = "active";
 
-  @Option(name = "--rest-status",
-      description = "REST API status")
+  @Option(name = "--rest-status", description = "REST API status")
   @Completion(CaStatusCompleter.class)
   private String restStatus = "inactive";
 
@@ -69,8 +66,7 @@ public abstract class CaAddOrGenAction extends CaAction {
       description = "CA certificate URI\n(multi-valued)")
   private List<String> caCertUris;
 
-  @Option(name = "--ocsp-uri", multiValued = true,
-      description = "OCSP URI\n(multi-valued)")
+  @Option(name = "--ocsp-uri", multiValued = true, description = "OCSP URI\n(multi-valued)")
   private List<String> ocspUris;
 
   @Option(name = "--crl-uri", multiValued = true,
@@ -94,76 +90,61 @@ public abstract class CaAddOrGenAction extends CaAction {
       description = "CRL number for the next CRL\n(required)")
   private Long nextCrlNumber;
 
-  @Option(name = "--max-validity", required = true,
-      description = "maximal validity\n (required)")
+  @Option(name = "--max-validity", required = true, description = "maximal validity\n (required)")
   private String maxValidity;
 
-  @Option(name = "--keep-expired-certs",
-      description = "days to keep expired certificates")
+  @Option(name = "--keep-expired-certs", description = "days to keep expired certificates")
   private Integer keepExpiredCertInDays = -1;
 
-  @Option(name = "--crl-signer",
-      description = "CRL signer name")
+  @Option(name = "--crl-signer", description = "CRL signer name")
   @Completion(SignerNameCompleter.class)
   private String crlSignerName;
 
-  @Option(name = "--responder",
-      description = "Responder name")
+  @Option(name = "--responder", description = "Responder name")
   @Completion(SignerNameCompleter.class)
   private String responderName;
 
-  @Option(name = "--cmp-control",
-      description = "CMP control")
+  @Option(name = "--cmp-control", description = "CMP control")
   private String cmpControl;
 
-  @Option(name = "--crl-control",
-      description = "CRL control")
+  @Option(name = "--crl-control", description = "CRL control")
   private String crlControl;
 
-  @Option(name = "--num-crls",
-      description = "number of CRLs to be kept in database")
+  @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
   private Integer numCrls = 30;
 
   @Option(name = "--expiration-period",
       description = "days before expiration time of CA to issue certificates")
   private Integer expirationPeriod = 365;
 
-  @Option(name = "--signer-type", required = true,
-      description = "CA signer type\n(required)")
+  @Option(name = "--signer-type", required = true, description = "CA signer type\n(required)")
   @Completion(SignerTypeCompleter.class)
   private String signerType;
 
-  @Option(name = "--signer-conf", required = true,
-      description = "CA signer configuration")
+  @Option(name = "--signer-conf", required = true, description = "CA signer configuration")
   private String signerConf;
 
-  @Option(name = "--duplicate-key",
-      description = "whether duplicate key is permitted")
+  @Option(name = "--duplicate-key", description = "whether duplicate key is permitted")
   @Completion(YesNoCompleter.class)
   private String duplicateKeyS = "yes";
 
-  @Option(name = "--duplicate-subject",
-      description = "whether duplicate subject is permitted")
+  @Option(name = "--duplicate-subject", description = "whether duplicate subject is permitted")
   @Completion(YesNoCompleter.class)
   private String duplicateSubjectS = "yes";
 
-  @Option(name = "--support-rest",
-      description = "whether the REST API is supported")
+  @Option(name = "--support-rest", description = "whether the REST API is supported")
   @Completion(YesNoCompleter.class)
   private String supportRestS = "no";
 
-  @Option(name = "--save-req",
-      description = "whether the request is saved")
+  @Option(name = "--save-req", description = "whether the request is saved")
   @Completion(YesNoCompleter.class)
   private String saveReqS = "no";
 
-  @Option(name = "--validity-mode",
-      description = "mode of valditity")
+  @Option(name = "--validity-mode", description = "mode of valditity")
   @Completion(ValidityModeCompleter.class)
   private String validityModeS = "STRICT";
 
-  @Option(name = "--extra-control",
-      description = "extra control")
+  @Option(name = "--extra-control", description = "extra control")
   private String extraControl;
 
   @Reference

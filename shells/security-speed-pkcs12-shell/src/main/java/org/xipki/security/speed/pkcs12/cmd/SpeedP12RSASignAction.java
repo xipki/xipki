@@ -37,16 +37,13 @@ import org.xipki.security.speed.pkcs12.P12RSASignSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP12RSASignAction extends SpeedP12SignAction {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
+  @Option(name = "--key-size", description = "keysize in bit")
   private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
+  @Option(name = "-e", description = "public exponent")
   private String publicExponent = "0x10001";
 
-  @Option(name = "--sig-algo", required = true,
-      description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
   @Completion(RSASigAlgCompleter.class)
   private String sigAlgo;
 

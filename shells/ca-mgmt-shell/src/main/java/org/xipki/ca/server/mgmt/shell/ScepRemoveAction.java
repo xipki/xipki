@@ -31,13 +31,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "scep-rm",
-    description = "remove SCEP")
+@Command(scope = "ca", name = "scep-rm", description = "remove SCEP")
 @Service
 public class ScepRemoveAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "SCEP CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "SCEP CA name\n(required)")
   @Completion(ScepNameCompleter.class)
   private String name;
 

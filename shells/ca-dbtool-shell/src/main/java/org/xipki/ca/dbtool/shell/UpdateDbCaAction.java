@@ -29,8 +29,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "updatedb-ca",
-    description = "update the CA database schema")
+@Command(scope = "ca", name = "updatedb-ca", description = "update the CA database schema")
 @Service
 public class UpdateDbCaAction extends LiquibaseAction {
 

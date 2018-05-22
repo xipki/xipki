@@ -34,8 +34,7 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "copy-file",
-    description = "copy file")
+@Command(scope = "xi", name = "copy-file", description = "copy file")
 @Service
 public class CopyFileAction extends XiAction {
 
@@ -49,8 +48,7 @@ public class CopyFileAction extends XiAction {
   @Completion(FileCompleter.class)
   private String dest;
 
-  @Option(name = "--force", aliases = "-f",
-      description = "override existing file, never prompt")
+  @Option(name = "--force", aliases = "-f", description = "override existing file, never prompt")
   private Boolean force = Boolean.FALSE;
 
   @Override

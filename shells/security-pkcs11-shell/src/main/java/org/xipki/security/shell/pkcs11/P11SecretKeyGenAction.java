@@ -52,8 +52,7 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
   @Completion(SecretKeyTypeCompleter.class)
   private String keyType;
 
-  @Option(name = "--key-size", required = true,
-      description = "keysize in bit\n(required)")
+  @Option(name = "--key-size", required = true, description = "keysize in bit\n(required)")
   private Integer keysize;
 
   @Option(name = "--extern-if-gen-unsupported",

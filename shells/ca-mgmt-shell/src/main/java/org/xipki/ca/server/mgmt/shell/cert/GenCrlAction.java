@@ -28,8 +28,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "gencrl",
-    description = "generate CRL")
+@Command(scope = "ca", name = "gencrl", description = "generate CRL")
 @Service
 public class GenCrlAction extends CrlAction {
 

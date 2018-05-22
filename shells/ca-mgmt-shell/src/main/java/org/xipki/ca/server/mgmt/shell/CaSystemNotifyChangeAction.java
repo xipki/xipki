@@ -28,8 +28,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "notify-change",
-    description = "notify the change of CA system")
+@Command(scope = "ca", name = "notify-change", description = "notify the change of CA system")
 @Service
 public class CaSystemNotifyChangeAction extends CaAction {
 

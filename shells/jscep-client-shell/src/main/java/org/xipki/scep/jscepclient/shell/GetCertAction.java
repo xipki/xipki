@@ -36,8 +36,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "jscep-getcert",
-    description = "download certificate")
+@Command(scope = "xi", name = "jscep-getcert", description = "download certificate")
 @Service
 public class GetCertAction extends ClientAction {
 

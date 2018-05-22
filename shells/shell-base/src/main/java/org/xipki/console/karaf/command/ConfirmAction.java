@@ -29,8 +29,7 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "confirm",
-    description = "confirm an action")
+@Command(scope = "xi", name = "confirm", description = "confirm an action")
 @Service
 public class ConfirmAction extends XiAction {
 

@@ -31,18 +31,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "caalias-add",
-    description = "add CA alias")
+@Command(scope = "ca", name = "caalias-add", description = "add CA alias")
 @Service
 public class CaAliasAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--alias", required = true,
-      description = "CA alias\n(required)")
+  @Option(name = "--alias", required = true, description = "CA alias\n(required)")
   private String caAlias;
 
   @Override

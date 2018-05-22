@@ -42,8 +42,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-getcrl",
-    description = "download CRL")
+@Command(scope = "xi", name = "cmp-getcrl", description = "download CRL")
 @Service
 public class GetCrlAction extends CrlAction {
 

@@ -30,18 +30,15 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "rsa-p11",
-    description = "generate RSA keypair in PKCS#11 device")
+@Command(scope = "xi", name = "rsa-p11", description = "generate RSA keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11RSAKeyGenAction extends P11KeyGenAction {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
+  @Option(name = "--key-size", description = "keysize in bit")
   private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
+  @Option(name = "-e", description = "public exponent")
   private String publicExponent = "0x10001";
 
   @Override

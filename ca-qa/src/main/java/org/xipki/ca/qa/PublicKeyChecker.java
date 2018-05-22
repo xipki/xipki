@@ -155,8 +155,7 @@ public class PublicKeyChecker {
 
       ASN1Integer modulus;
       try {
-        ASN1Sequence seq = ASN1Sequence.getInstance(
-            publicKey.getPublicKeyData().getBytes());
+        ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
         modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
       } catch (IllegalArgumentException ex) {
         throw new BadCertTemplateException("invalid publicKeyData");

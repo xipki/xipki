@@ -33,13 +33,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "careq-info",
-    description = "show information of requestor in CA")
+@Command(scope = "ca", name = "careq-info", description = "show information of requestor in CA")
 @Service
 public class CaRequestorInfoAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 

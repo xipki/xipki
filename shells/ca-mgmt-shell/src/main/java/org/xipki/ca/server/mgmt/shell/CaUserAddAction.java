@@ -37,18 +37,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.2.0
  */
 
-@Command(scope = "ca", name = "causer-add",
-    description = "add user to CA")
+@Command(scope = "ca", name = "causer-add", description = "add user to CA")
 @Service
 public class CaUserAddAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--user", required = true,
-      description = "user name\n(required)")
+  @Option(name = "--user", required = true, description = "user name\n(required)")
   private String userName;
 
   @Option(name = "--permission", required = true, multiValued = true,

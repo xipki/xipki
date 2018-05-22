@@ -34,8 +34,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "export-conf",
-    description = "export configuration to zip file")
+@Command(scope = "ca", name = "export-conf", description = "export configuration to zip file")
 @Service
 public class ExportConfAction extends CaAction {
 

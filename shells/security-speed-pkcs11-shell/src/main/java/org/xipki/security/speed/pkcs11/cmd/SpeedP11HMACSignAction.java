@@ -37,8 +37,7 @@ import org.xipki.security.speed.pkcs11.P11HMACSignSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP11HMACSignAction extends SpeedP11Action {
 
-  @Option(name = "--sig-algo", required = true,
-      description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
   @Completion(HMACSigAlgCompleter.class)
   private String sigAlgo;
 

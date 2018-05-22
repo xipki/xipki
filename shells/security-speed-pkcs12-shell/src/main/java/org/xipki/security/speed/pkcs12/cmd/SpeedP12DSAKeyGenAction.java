@@ -36,12 +36,10 @@ import org.xipki.security.speed.pkcs12.P12DSAKeyGenSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP12DSAKeyGenAction extends SingleSpeedAction {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
+  @Option(name = "--plen", description = "bit length of the prime")
   private Integer plen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
+  @Option(name = "--qlen", description = "bit length of the sub-prime")
   private Integer qlen;
 
   @Override

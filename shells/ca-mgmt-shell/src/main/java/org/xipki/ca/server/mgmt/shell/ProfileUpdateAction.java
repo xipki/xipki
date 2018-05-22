@@ -35,8 +35,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "profile-up",
-    description = "update certificate profile")
+@Command(scope = "ca", name = "profile-up", description = "update certificate profile")
 @Service
 public class ProfileUpdateAction extends CaAction {
 
@@ -45,17 +44,14 @@ public class ProfileUpdateAction extends CaAction {
   @Completion(ProfileNameCompleter.class)
   protected String name;
 
-  @Option(name = "--type",
-      description = "profile type")
+  @Option(name = "--type", description = "profile type")
   @Completion(ProfileTypeCompleter.class)
   protected String type;
 
-  @Option(name = "--conf",
-      description = "certificate profile configuration or 'null'")
+  @Option(name = "--conf", description = "certificate profile configuration or 'null'")
   protected String conf;
 
-  @Option(name = "--conf-file",
-      description = "certificate profile configuration file")
+  @Option(name = "--conf-file", description = "certificate profile configuration file")
   @Completion(FileCompleter.class)
   protected String confFile;
 

@@ -28,8 +28,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-requestor-add",
-    description = "add requestor (negative, QA)")
+@Command(scope = "caqa", name = "neg-requestor-add", description = "add requestor (negative, QA)")
 @Service
 public class NegRequestorAddAction extends RequestorAddAction {
 

@@ -61,8 +61,7 @@ public class P11SecretKeyImportAction extends P11KeyGenAction {
   @Completion(FileCompleter.class)
   private String keyOutFile;
 
-  @Option(name = "--password",
-      description = "password of the keystore file")
+  @Option(name = "--password", description = "password of the keystore file")
   private String password;
 
   @Override

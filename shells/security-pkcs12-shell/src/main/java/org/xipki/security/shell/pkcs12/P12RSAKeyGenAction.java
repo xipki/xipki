@@ -30,8 +30,7 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "rsa-p12",
-    description = "generate RSA keypair in PKCS#12 keystore")
+@Command(scope = "xi", name = "rsa-p12", description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 // CHECKSTYLE:SKIP
 public class P12RSAKeyGenAction extends P12KeyGenAction {
@@ -40,12 +39,10 @@ public class P12RSAKeyGenAction extends P12KeyGenAction {
       description = "subject of the self-signed certificate")
   private String subject;
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
+  @Option(name = "--key-size", description = "keysize in bit")
   private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
+  @Option(name = "-e", description = "public exponent")
   private String publicExponent = "0x10001";
 
   @Override

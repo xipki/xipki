@@ -30,8 +30,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "unrevoke-cert",
-    description = "unrevoke certificate")
+@Command(scope = "ca", name = "unrevoke-cert", description = "unrevoke certificate")
 @Service
 public class UnrevokeCertAction extends UnRevRmCertAction {
 

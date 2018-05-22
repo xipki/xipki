@@ -56,8 +56,7 @@ public class P11ProviderSm2TestAction extends P11SecurityAction {
       description = "show object information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
-  @Option(name = "--ida",
-      description = "IDA (ID user A)")
+  @Option(name = "--ida", description = "IDA (ID user A)")
   protected String ida;
 
   @Override

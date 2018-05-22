@@ -37,13 +37,11 @@ import org.xipki.security.SignerConf;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-enroll",
-    description = "enroll certificate (PKCS#11 token)")
+@Command(scope = "xi", name = "cmp-enroll", description = "enroll certificate (PKCS#11 token)")
 @Service
 public class P11EnrollCertAction extends EnrollCertAction {
 
-  @Option(name = "--slot", required = true,
-      description = "slot index\n(required)")
+  @Option(name = "--slot", required = true, description = "slot index\n(required)")
   private Integer slotIndex;
 
   @Option(name = "--key-id",
@@ -56,8 +54,7 @@ public class P11EnrollCertAction extends EnrollCertAction {
           + "either keyId or keyLabel must be specified")
   private String keyLabel;
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module")
+  @Option(name = "--module", description = "name of the PKCS#11 module")
   private String moduleName = "default";
 
   @Override

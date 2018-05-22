@@ -34,17 +34,14 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "republish",
-    description = "republish certificates")
+@Command(scope = "ca", name = "republish", description = "republish certificates")
 @Service
 public class RepublishAction extends CaAction {
 
-  @Option(name = "--thread",
-      description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   private String caName;
 

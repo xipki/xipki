@@ -48,17 +48,14 @@ import org.xipki.security.SecurityFactory;
 @Service
 public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
 
-  @Option(name = "--issuer", required = true,
-      description = "issuer certificate file\n(required)")
+  @Option(name = "--issuer", required = true, description = "issuer certificate file\n(required)")
   @Completion(FileCompleter.class)
   private String issuerCertFile;
 
-  @Option(name = "--duration",
-          description = "maximal duration")
+  @Option(name = "--duration", description = "maximal duration")
   private String duration = "30s";
 
-  @Option(name = "--thread",
-          description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
   @Option(name = "--ca-db",
@@ -71,8 +68,7 @@ public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
       description = "serial number without prefix in the serial-file is hex number")
   private Boolean hex = Boolean.FALSE;
 
-  @Option(name = "--serial-file",
-      description = "file that contains serial numbers")
+  @Option(name = "--serial-file", description = "file that contains serial numbers")
   @Completion(FileCompleter.class)
   private String serialNumberFile;
 
@@ -80,8 +76,7 @@ public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
       description = "maximal number of certificates to be revoked\n0 for unlimited")
   private Integer maxCerts = 0;
 
-  @Option(name = "-n",
-      description = "number of certificates to be revoked in one request")
+  @Option(name = "-n", description = "number of certificates to be revoked in one request")
   private Integer num = 1;
 
   @Reference

@@ -37,18 +37,15 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "signer-info",
-    description = "show information of signer")
+@Command(scope = "ca", name = "signer-info", description = "show information of signer")
 @Service
 public class SignerInfoAction extends CaAction {
 
-  @Argument(index = 0, name = "name",
-      description = "signer name")
+  @Argument(index = 0, name = "name", description = "signer name")
   @Completion(SignerNameCompleter.class)
   private String name;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show signer information verbosely")
+  @Option(name = "--verbose", aliases = "-v", description = "show signer information verbosely")
   private Boolean verbose = Boolean.FALSE;
 
   @Override

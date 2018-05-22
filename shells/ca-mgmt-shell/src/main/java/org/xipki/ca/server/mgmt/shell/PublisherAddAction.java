@@ -35,8 +35,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "publisher-add",
-    description = "add publisher")
+@Command(scope = "ca", name = "publisher-add", description = "add publisher")
 @Service
 public class PublisherAddAction extends CaAction {
 
@@ -44,17 +43,14 @@ public class PublisherAddAction extends CaAction {
       description = "publisher Name\n(required)")
   private String name;
 
-  @Option(name = "--type", required = true,
-      description = "publisher type\n(required)")
+  @Option(name = "--type", required = true, description = "publisher type\n(required)")
   @Completion(PublisherTypeCompleter.class)
   private String type;
 
-  @Option(name = "--conf",
-      description = "publisher configuration")
+  @Option(name = "--conf", description = "publisher configuration")
   private String conf;
 
-  @Option(name = "--conf-file",
-      description = "publisher configuration file")
+  @Option(name = "--conf-file", description = "publisher configuration file")
   @Completion(FileCompleter.class)
   private String confFile;
 

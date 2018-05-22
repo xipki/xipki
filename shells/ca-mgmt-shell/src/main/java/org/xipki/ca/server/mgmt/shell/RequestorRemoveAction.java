@@ -31,13 +31,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "requestor-rm",
-    description = "remove requestor")
+@Command(scope = "ca", name = "requestor-rm", description = "remove requestor")
 @Service
 public class RequestorRemoveAction extends CaAction {
 
-  @Argument(index = 0, name = "name", required = true,
-      description = "requestor name")
+  @Argument(index = 0, name = "name", required = true, description = "requestor name")
   @Completion(RequestorNameCompleter.class)
   private String name;
 

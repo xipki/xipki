@@ -36,13 +36,11 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-cacert",
-    description = "get CA certificate")
+@Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
 @Service
 public class GetCaCertAction extends ClientAction {
 
-  @Option(name = "--ca",
-      description = "CA name\n(required if multiple CAs are configured)")
+  @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
   @Completion(CaNameCompleter.class)
   protected String caName;
 

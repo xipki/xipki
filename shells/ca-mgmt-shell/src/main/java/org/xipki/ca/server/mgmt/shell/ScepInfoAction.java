@@ -32,13 +32,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "scep-info",
-    description = "show information of SCEP")
+@Command(scope = "ca", name = "scep-info", description = "show information of SCEP")
 @Service
 public class ScepInfoAction extends CaAction {
 
-  @Argument(index = 0, name = "name",
-      description = "SCEP name")
+  @Argument(index = 0, name = "name", description = "SCEP name")
   @Completion(ScepNameCompleter.class)
   private String name;
 

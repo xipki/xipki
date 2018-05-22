@@ -31,14 +31,12 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "ec-p11",
-    description = "generate EC keypair in PKCS#11 device")
+@Command(scope = "xi", name = "ec-p11", description = "generate EC keypair in PKCS#11 device")
 @Service
 // CHECKSTYLE:SKIP
 public class P11ECKeyGenAction extends P11KeyGenAction {
 
-  @Option(name = "--curve",
-      description = "EC curve name")
+  @Option(name = "--curve", description = "EC curve name")
   @Completion(ECCurveNameCompleter.class)
   private String curveName = "secp256r1";
 

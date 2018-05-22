@@ -41,12 +41,10 @@ public abstract class BSpeedP11Action extends BatchSpeedAction {
   @Reference (optional = true)
   protected P11CryptServiceFactory p11CryptServiceFactory;
 
-  @Option(name = "--slot", required = true,
-      description = "slot index\n(required)")
+  @Option(name = "--slot", required = true, description = "slot index\n(required)")
   protected Integer slotIndex;
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module.")
+  @Option(name = "--module", description = "name of the PKCS#11 module.")
   @Completion(P11ModuleNameCompleter.class)
   protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 

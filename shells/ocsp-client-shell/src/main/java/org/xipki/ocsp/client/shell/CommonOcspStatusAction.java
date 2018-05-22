@@ -42,16 +42,13 @@ public abstract class CommonOcspStatusAction extends XiAction {
   @Completion(FileCompleter.class)
   protected String issuerCertFile;
 
-  @Option(name = "--nonce",
-      description = "use nonce")
+  @Option(name = "--nonce", description = "use nonce")
   protected Boolean usenonce = Boolean.FALSE;
 
-  @Option(name = "--nonce-len",
-      description = "nonce length in octects")
+  @Option(name = "--nonce-len", description = "nonce length in octects")
   protected Integer nonceLen;
 
-  @Option(name = "--hash",
-      description = "hash algorithm name")
+  @Option(name = "--hash", description = "hash algorithm name")
   @Completion(HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 
@@ -60,12 +57,10 @@ public abstract class CommonOcspStatusAction extends XiAction {
   @Completion(SigAlgCompleter.class)
   protected List<String> prefSigAlgs;
 
-  @Option(name = "--http-get",
-      description = "use HTTP GET for small request")
+  @Option(name = "--http-get", description = "use HTTP GET for small request")
   protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
 
-  @Option(name = "--sign",
-      description = "sign request")
+  @Option(name = "--sign", description = "sign request")
   protected Boolean signRequest = Boolean.FALSE;
 
   protected RequestOptions getRequestOptions() throws Exception {

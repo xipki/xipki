@@ -28,8 +28,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-signer-up",
-    description = "update signer (negative, QA)")
+@Command(scope = "caqa", name = "neg-signer-up", description = "update signer (negative, QA)")
 @Service
 public class NegSignerUpdateAction extends SignerUpdateAction {
 

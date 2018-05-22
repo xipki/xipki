@@ -40,13 +40,11 @@ public abstract class ClientAction extends XiAction {
   @Reference
   protected CaClient caClient;
 
-  @Option(name = "--req-out",
-      description = "where to save the request")
+  @Option(name = "--req-out", description = "where to save the request")
   @Completion(FileCompleter.class)
   private String reqout;
 
-  @Option(name = "--resp-out",
-      description = "where to save the response")
+  @Option(name = "--resp-out", description = "where to save the response")
   @Completion(FileCompleter.class)
   private String respout;
 

@@ -33,25 +33,21 @@ import org.xipki.password.PasswordProducer;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "produce-password",
-    description = "produce password")
+@Command(scope = "xi", name = "produce-password", description = "produce password")
 @Service
 public class ProducePasswordAction extends XiAction {
 
-  @Option(name = "--name", required = true,
-      description = "name of the password")
+  @Option(name = "--name", required = true, description = "name of the password")
   @Completion(PasswordNameCompleter.class)
   private String name;
 
-  @Option(name = "-k",
-      description = "quorum of the password parts")
+  @Option(name = "-k", description = "quorum of the password parts")
   private Integer quorum = 1;
 
   @Override
   protected Object execute0() throws Exception {
     if (!PasswordProducer.needsPassword(name)) {
-      throw new IllegalCmdParamException("password named '" + name
-          + "' will not be requested");
+      throw new IllegalCmdParamException("password named '" + name  + "' will not be requested");
     }
 
     while (PasswordProducer.needsPassword(name)) {

@@ -34,8 +34,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "requestor-add",
-    description = "add requestor")
+@Command(scope = "ca", name = "requestor-add", description = "add requestor")
 @Service
 public class RequestorAddAction extends CaAction {
 
@@ -43,8 +42,7 @@ public class RequestorAddAction extends CaAction {
       description = "requestor name\n(required)")
   private String name;
 
-  @Option(name = "--cert", required = true,
-      description = "requestor certificate file\n(required)")
+  @Option(name = "--cert", required = true, description = "requestor certificate file\n(required)")
   @Completion(FileCompleter.class)
   private String certFile;
 

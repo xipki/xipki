@@ -28,12 +28,10 @@ import org.xipki.common.BenchmarkExecutor;
 
 public abstract class SingleSpeedAction extends SecurityAction {
 
-  @Option(name = "--duration",
-      description = "duration")
+  @Option(name = "--duration", description = "duration")
   private String duration = "30s";
 
-  @Option(name = "--thread",
-      description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
   protected abstract BenchmarkExecutor getTester() throws Exception;

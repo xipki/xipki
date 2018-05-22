@@ -42,8 +42,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class ProfileInfoAction extends CaAction {
 
-  @Argument(index = 0, name = "name",
-      description = "certificate profile name")
+  @Argument(index = 0, name = "name", description = "certificate profile name")
   @Completion(ProfileNameCompleter.class)
   private String name;
 

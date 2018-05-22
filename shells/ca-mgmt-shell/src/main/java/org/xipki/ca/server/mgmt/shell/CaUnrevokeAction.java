@@ -32,13 +32,11 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "ca-unrevoke",
-    description = "unrevoke CA")
+@Command(scope = "ca", name = "ca-unrevoke", description = "unrevoke CA")
 @Service
 public class CaUnrevokeAction extends CaAction {
 
-  @Argument(index = 0, name = "name", required = true,
-      description = "CA name")
+  @Argument(index = 0, name = "name", required = true, description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 

@@ -37,17 +37,14 @@ import org.xipki.scep.client.ScepClient;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "scep-cacert",
-    description = "get CA certificate")
+@Command(scope = "xi", name = "scep-cacert", description = "get CA certificate")
 @Service
 public class GetCaCertAction extends XiAction {
 
-  @Option(name = "--url", required = true,
-      description = "URL of the SCEP server\n(required)")
+  @Option(name = "--url", required = true, description = "URL of the SCEP server\n(required)")
   private String url;
 
-  @Option(name = "--ca-id",
-      description = "CA identifier")
+  @Option(name = "--ca-id", description = "CA identifier")
   private String caId;
 
   @Option(name = "--out", aliases = "-o", required = true,

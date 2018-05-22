@@ -31,8 +31,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "get-request",
-    description = "get certificate request")
+@Command(scope = "ca", name = "get-request", description = "get certificate request")
 @Service
 public class GetRequestAction extends UnRevRmCertAction {
 

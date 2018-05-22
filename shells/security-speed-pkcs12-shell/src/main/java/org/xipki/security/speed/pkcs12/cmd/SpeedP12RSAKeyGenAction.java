@@ -36,12 +36,10 @@ import org.xipki.security.speed.pkcs12.P12RSAKeyGenSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP12RSAKeyGenAction extends SingleSpeedAction {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
+  @Option(name = "--key-size", description = "keysize in bit")
   private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
+  @Option(name = "-e", description = "public exponent")
   private String publicExponent = "0x10001";
 
   @Override

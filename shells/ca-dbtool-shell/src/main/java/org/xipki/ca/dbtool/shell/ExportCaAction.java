@@ -32,36 +32,30 @@ import org.xipki.console.karaf.completer.DirCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "export-ca",
-    description = "export CA database")
+@Command(scope = "ca", name = "export-ca", description = "export CA database")
 @Service
 public class ExportCaAction extends DbPortAction {
 
   private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 
-  @Option(name = "--db-conf",
-      description = "database configuration file")
+  @Option(name = "--db-conf", description = "database configuration file")
   @Completion(FileCompleter.class)
   private String dbconfFile = DFLT_DBCONF_FILE;
 
-  @Option(name = "--out-dir", required = true,
-      description = "output directory\n(required)")
+  @Option(name = "--out-dir", required = true, description = "output directory\n(required)")
   @Completion(DirCompleter.class)
   private String outdir;
 
-  @Option(name = "-n",
-      description = "number of certificates in one zip file")
+  @Option(name = "-n", description = "number of certificates in one zip file")
   private Integer numCertsInBundle = 10000;
 
-  @Option(name = "-k",
-      description = "number of certificates per SELECT")
+  @Option(name = "-k", description = "number of certificates per SELECT")
   private Integer numCertsPerCommit = 100;
 
-  @Option(name = "--resume")
+  @Option(name = "--resume", description = "resume from the last successful point")
   private Boolean resume = Boolean.FALSE;
 
-  @Option(name = "--test",
-      description = "just test the export, no real export")
+  @Option(name = "--test", description = "just test the export, no real export")
   private Boolean onlyTest = Boolean.FALSE;
 
   @Override

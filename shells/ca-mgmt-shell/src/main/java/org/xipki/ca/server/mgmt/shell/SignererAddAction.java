@@ -39,26 +39,21 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "signer-add",
-    description = "add signer")
+@Command(scope = "ca", name = "signer-add", description = "add signer")
 @Service
 public class SignererAddAction extends CaAction {
 
-  @Option(name = "--name", aliases = "-n", required = true,
-      description = "signer name\n(required)")
+  @Option(name = "--name", aliases = "-n", required = true, description = "signer name\n(required)")
   private String name;
 
-  @Option(name = "--type", required = true,
-      description = "type of the signer\n(required)")
+  @Option(name = "--type", required = true, description = "type of the signer\n(required)")
   @Completion(SignerTypeCompleter.class)
   private String type;
 
-  @Option(name = "--conf", required = true,
-      description = "conf of the signer")
+  @Option(name = "--conf", required = true, description = "conf of the signer")
   private String conf;
 
-  @Option(name = "--cert",
-      description = "signer certificate file")
+  @Option(name = "--cert", description = "signer certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
@@ -75,8 +70,7 @@ public class SignererAddAction extends CaAction {
     }
 
     if ("PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type)) {
-      conf = ShellUtil.canonicalizeSignerConf(type, conf, passwordResolver,
-          securityFactory);
+      conf = ShellUtil.canonicalizeSignerConf(type, conf, passwordResolver, securityFactory);
     }
     SignerEntry entry = new SignerEntry(name, type, conf, base64Cert);
 

@@ -41,15 +41,13 @@ public class JceksSecretKeyGenAction extends P12KeyGenAction {
   @Completion(SecretKeyTypeCompleter.class)
    private String keyType;
 
-  @Option(name = "--key-size", required = true,
-      description = "keysize in bit\n(required)")
+  @Option(name = "--key-size", required = true, description = "keysize in bit\n(required)")
   private Integer keysize;
 
   @Override
   protected Object execute0() throws Exception {
-    if (!("AES".equalsIgnoreCase(keyType)
-        || "DES3".equalsIgnoreCase(keyType)
-        || "GENERIC".equalsIgnoreCase(keyType))) {
+    if (!("AES".equalsIgnoreCase(keyType) || "DES3".equalsIgnoreCase(keyType)
+          || "GENERIC".equalsIgnoreCase(keyType))) {
       throw new IllegalCmdParamException("invalid keyType " + keyType);
     }
 

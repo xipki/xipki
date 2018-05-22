@@ -32,8 +32,7 @@ import org.xipki.console.karaf.completer.DirCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "mkdir",
-    description = "make directories")
+@Command(scope = "xi", name = "mkdir", description = "make directories")
 @Service
 public class MkdirAction extends XiAction {
 

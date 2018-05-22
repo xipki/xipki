@@ -39,13 +39,11 @@ import org.xipki.security.util.KeyUtil;
 
 public abstract class P12SecurityAction extends SecurityAction {
 
-  @Option(name = "--p12", required = true,
-      description = "PKCS#12 keystore file\n(required)")
+  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file\n(required)")
   @Completion(FileCompleter.class)
   protected String p12File;
 
-  @Option(name = "--password",
-      description = "password of the PKCS#12 file")
+  @Option(name = "--password", description = "password of the PKCS#12 file")
   protected String password;
 
   protected char[] getPassword() throws IOException {

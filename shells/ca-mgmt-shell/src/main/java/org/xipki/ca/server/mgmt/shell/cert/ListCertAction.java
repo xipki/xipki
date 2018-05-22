@@ -40,18 +40,15 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "list-cert",
-    description = "show a list of certificates")
+@Command(scope = "ca", name = "list-cert", description = "show a list of certificates")
 @Service
 public class ListCertAction extends CaAction {
 
-  @Option(name = "--ca", required = true,
-      description = "CA name\n(required)")
+  @Option(name = "--ca", required = true, description = "CA name\n(required)")
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--subject",
-      description = "the subject pattern, * is allowed.")
+  @Option(name = "--subject", description = "the subject pattern, * is allowed.")
   protected String subjectPatternS;
 
   @Option(name = "--valid-from",
@@ -64,12 +61,10 @@ public class ListCertAction extends CaAction {
           + "yyyMMdd or yyyyMMddHHmmss")
   private String validToS;
 
-  @Option(name = "-n",
-      description = "maximal number of entries (between 1 and 1000)")
+  @Option(name = "-n", description = "maximal number of entries (between 1 and 1000)")
   private int num = 1000;
 
-  @Option(name = "--order",
-      description = "by which the result is ordered")
+  @Option(name = "--order", description = "by which the result is ordered")
   @Completion(CertListSortByCompleter.class)
   private String orderByS;
 

@@ -31,13 +31,11 @@ import org.xipki.console.karaf.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "publisher-rm",
-    description = "remove publisher")
+@Command(scope = "ca", name = "publisher-rm", description = "remove publisher")
 @Service
 public class PublisherRemoveAction extends CaAction {
 
-  @Argument(index = 0, name = "name", required = true,
-      description = "publisher name")
+  @Argument(index = 0, name = "name", required = true, description = "publisher name")
   @Completion(PublisherNameCompleter.class)
   private String name;
 

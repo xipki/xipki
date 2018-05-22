@@ -56,8 +56,7 @@ public abstract class LiquibaseAction extends XiAction {
   @Reference
   private PasswordResolver passwordResolver;
 
-  @Option(name = "--force", aliases = "-f",
-      description = "never prompt for confirmation")
+  @Option(name = "--force", aliases = "-f", description = "never prompt for confirmation")
   private Boolean force = Boolean.FALSE;
 
   @Option(name = "--log-level",
@@ -65,13 +64,11 @@ public abstract class LiquibaseAction extends XiAction {
   @Completion(LogLevelCompleter.class)
   private String logLevel = "warning";
 
-  @Option(name = "--log-file",
-      description = "log file")
+  @Option(name = "--log-file", description = "log file")
   @Completion(FileCompleter.class)
   private String logFile;
 
-  @Option(name = "--ca-conf",
-      description = "CA configuration file")
+  @Option(name = "--ca-conf", description = "CA configuration file")
   @Completion(FileCompleter.class)
   private String caconfFile = DFLT_CACONF_FILE;
 

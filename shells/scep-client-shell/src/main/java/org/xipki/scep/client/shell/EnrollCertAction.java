@@ -43,8 +43,7 @@ import org.xipki.scep.client.shell.completer.EnrollMetodCompleter;
 @Service
 public class EnrollCertAction extends ClientAction {
 
-  @Option(name = "--csr", required = true,
-      description = "CSR file\n(required)")
+  @Option(name = "--csr", required = true, description = "CSR file\n(required)")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -53,8 +52,7 @@ public class EnrollCertAction extends ClientAction {
   @Completion(FileCompleter.class)
   private String outputFile;
 
-  @Option(name = "--method",
-      description = "method to enroll the certificate.")
+  @Option(name = "--method", description = "method to enroll the certificate.")
   @Completion(EnrollMetodCompleter.class)
   private String method;
 

@@ -40,21 +40,18 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
 
   @Option(name = "--template", aliases = "-t", required = true,
-      description = "template file. Note the contained profiles must allow duplication of"
-          + " public key\n(required)")
+      description = "template file. The contained profiles must allow duplication of public key"
+          + "\n(required)")
   @Completion(FileCompleter.class)
   private String templateFile;
 
-  @Option(name = "--duration",
-      description = "duration")
+  @Option(name = "--duration", description = "duration")
   private String duration = "30s";
 
-  @Option(name = "--thread",
-      description = "number of threads")
+  @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--max-num",
-      description = "maximal number of requests\n0 for unlimited")
+  @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
   private Integer maxRequests = 0;
 
   @Override

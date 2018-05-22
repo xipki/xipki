@@ -42,8 +42,7 @@ import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
 // CHECKSTYLE:SKIP
 public class BSpeedP11DSASignAction extends BSpeedP11Action {
 
-  @Option(name = "--sig-algo", required = true,
-      description = "signature algorithm\n(required)")
+  @Option(name = "--sig-algo", required = true, description = "signature algorithm\n(required)")
   @Completion(DSASigAlgCompleter.class)
   private String sigAlgo;
 
@@ -65,8 +64,7 @@ public class BSpeedP11DSASignAction extends BSpeedP11Action {
 
     if (control.plen() == 1024) {
       if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
-        throw new IllegalCmdParamException(
-            "only SHA1withDSA is permitted for DSA with 1024 bit");
+        throw new IllegalCmdParamException("only SHA1withDSA is permitted for DSA with 1024 bit");
       }
     }
 

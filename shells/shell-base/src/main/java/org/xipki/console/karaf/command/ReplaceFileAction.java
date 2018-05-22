@@ -38,22 +38,18 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "replace",
-    description = "replace text in file")
+@Command(scope = "xi", name = "replace", description = "replace text in file")
 @Service
 public class ReplaceFileAction extends XiAction {
 
-  @Argument(index = 0, name = "file", required = true,
-      description = "file\n(required)")
+  @Argument(index = 0, name = "file", required = true, description = "file\n(required)")
   @Completion(FileCompleter.class)
   private String source;
 
-  @Option(name = "--old", required = true,
-      description = "text to be replaced")
+  @Option(name = "--old", required = true, description = "text to be replaced")
   private String oldText;
 
-  @Option(name = "--new", required = true,
-      description = "next text")
+  @Option(name = "--new", required = true, description = "next text")
   private String newText;
 
   @Override

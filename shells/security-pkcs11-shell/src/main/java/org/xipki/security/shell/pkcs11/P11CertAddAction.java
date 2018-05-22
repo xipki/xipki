@@ -34,13 +34,11 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "add-cert-p11",
-    description = "add certificate to PKCS#11 device")
+@Command(scope = "xi", name = "add-cert-p11", description = "add certificate to PKCS#11 device")
 @Service
 public class P11CertAddAction extends P11SecurityAction {
 
-  @Option(name = "--cert", required = true,
-      description = "certificate file\n(required)")
+  @Option(name = "--cert", required = true, description = "certificate file\n(required)")
   @Completion(FileCompleter.class)
   private String certFile;
 

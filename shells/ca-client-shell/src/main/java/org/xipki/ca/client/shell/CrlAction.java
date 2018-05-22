@@ -38,8 +38,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 public abstract class CrlAction extends ClientAction {
 
-  @Option(name = "--ca",
-      description = "CA name\n(required if multiple CAs are configured)")
+  @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
   @Completion(CaNameCompleter.class)
   protected String caName;
 

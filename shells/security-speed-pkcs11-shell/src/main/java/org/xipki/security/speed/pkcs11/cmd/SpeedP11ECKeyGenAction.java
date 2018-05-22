@@ -37,8 +37,7 @@ import org.xipki.security.speed.pkcs11.P11ECKeyGenSpeed;
 // CHECKSTYLE:SKIP
 public class SpeedP11ECKeyGenAction extends SpeedP11Action {
 
-  @Option(name = "--curve", required = true,
-      description = "EC curve name\n(required)")
+  @Option(name = "--curve", required = true, description = "EC curve name\n(required)")
   @Completion(ECCurveNameCompleter.class)
   private String curveName;
 

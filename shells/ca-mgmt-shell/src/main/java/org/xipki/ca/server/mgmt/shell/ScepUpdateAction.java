@@ -40,31 +40,25 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "scep-up",
-    description = "Update SCEP")
+@Command(scope = "ca", name = "scep-up", description = "Update SCEP")
 @Service
 public class ScepUpdateAction extends CaAction {
 
-  @Option(name = "--name", required = true,
-      description = "name\n(required)")
+  @Option(name = "--name", required = true, description = "name\n(required)")
   @Completion(ScepNameCompleter.class)
   private String name;
 
-  @Option(name = "--ca",
-      description = "CA name")
+  @Option(name = "--ca", description = "CA name")
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--active",
-      description = "activate this SCEP")
+  @Option(name = "--active", description = "activate this SCEP")
   private Boolean active;
 
-  @Option(name = "--inactive",
-      description = "deactivate this SCEP")
+  @Option(name = "--inactive", description = "deactivate this SCEP")
   private Boolean inactive;
 
-  @Option(name = "--responder",
-      description = "Responder name")
+  @Option(name = "--responder", description = "Responder name")
   @Completion(SignerNameCompleter.class)
   private String responderName;
 
@@ -73,8 +67,7 @@ public class ScepUpdateAction extends CaAction {
   @Completion(ProfileNameAndAllCompleter.class)
   private Set<String> profiles;
 
-  @Option(name = "--control",
-      description = "SCEP control or 'null'")
+  @Option(name = "--control", description = "SCEP control or 'null'")
   private String control;
 
   @Override
@@ -82,8 +75,7 @@ public class ScepUpdateAction extends CaAction {
     Boolean realActive;
     if (active != null) {
       if (inactive != null) {
-        throw new IllegalCmdParamException(
-            "maximal one of --active and --inactive can be set");
+        throw new IllegalCmdParamException("maximal one of --active and --inactive can be set");
       }
       realActive = Boolean.TRUE;
     } else if (inactive != null) {

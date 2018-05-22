@@ -46,8 +46,7 @@ import org.xipki.password.PasswordResolverException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "initdb",
-    description = "reset and initialize single database")
+@Command(scope = "ca", name = "initdb", description = "reset and initialize single database")
 @Service
 public class InitDbAction extends XiAction {
 
@@ -56,8 +55,7 @@ public class InitDbAction extends XiAction {
   @Reference
   private PasswordResolver passwordResolver;
 
-  @Option(name = "--force", aliases = "-f",
-      description = "never prompt for confirmation")
+  @Option(name = "--force", aliases = "-f", description = "never prompt for confirmation")
   private Boolean force = Boolean.FALSE;
 
   @Option(name = "--log-level",
@@ -65,18 +63,15 @@ public class InitDbAction extends XiAction {
   @Completion(LogLevelCompleter.class)
   private String logLevel = "warning";
 
-  @Option(name = "--log-file",
-      description = "log file")
+  @Option(name = "--log-file", description = "log file")
   @Completion(FileCompleter.class)
   private String logFile;
 
-  @Option(name = "--db-conf", required = true,
-      description = "DB configuration file")
+  @Option(name = "--db-conf", required = true, description = "DB configuration file")
   @Completion(FileCompleter.class)
   private String dbConfFile;
 
-  @Option(name = "--db-schema", required = true,
-      description = "DB schema file")
+  @Option(name = "--db-schema", required = true, description = "DB schema file")
   @Completion(FileCompleter.class)
   private String dbSchemaFile;
 

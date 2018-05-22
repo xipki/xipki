@@ -42,8 +42,7 @@ import org.xipki.security.util.X509Util;
 
 public abstract class UnRevRemoveCertAction extends ClientAction {
 
-  @Option(name = "--ca",
-      description = "CA name\n(required if more than one CA is configured)")
+  @Option(name = "--ca", description = "CA name\n(required if more than one CA is configured)")
   @Completion(CaNameCompleter.class)
   protected String caName;
 

@@ -41,29 +41,24 @@ public class ImportOcspFromCaAction extends DbPortAction {
 
   private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
 
-  @Option(name = "--db-conf",
-      description = "database configuration file")
+  @Option(name = "--db-conf", description = "database configuration file")
   @Completion(FileCompleter.class)
   private String dbconfFile = DFLT_DBCONF_FILE;
 
-  @Option(name = "--in-dir", required = true,
-      description = "input directory\n(required)")
+  @Option(name = "--in-dir", required = true, description = "input directory\n(required)")
   @Completion(DirCompleter.class)
   private String indir;
 
-  @Option(name = "--publisher",
-      description = "publisher name")
+  @Option(name = "--publisher", description = "publisher name")
   private String publisherName = DFLT_PUBLISHER;
 
-  @Option(name = "-k",
-      description = "number of certificates per commit")
+  @Option(name = "-k", description = "number of certificates per commit")
   private Integer numCertsPerCommit = 100;
 
-  @Option(name = "--resume")
+  @Option(name = "--resume", description = "resume from the last successful point")
   private Boolean resume = Boolean.FALSE;
 
-  @Option(name = "--test",
-      description = "just test the import, no real import")
+  @Option(name = "--test", description = "just test the import, no real import")
   private Boolean testOnly = Boolean.FALSE;
 
   @Override

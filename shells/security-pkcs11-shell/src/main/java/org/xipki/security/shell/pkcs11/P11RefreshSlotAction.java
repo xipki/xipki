@@ -34,13 +34,11 @@ import org.xipki.security.shell.pkcs11.completer.P11ModuleNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "refresh-p11",
-    description = "refresh PKCS#11 module")
+@Command(scope = "xi", name = "refresh-p11", description = "refresh PKCS#11 module")
 @Service
 public class P11RefreshSlotAction extends SecurityAction {
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module.")
+  @Option(name = "--module",  description = "name of the PKCS#11 module.")
   @Completion(P11ModuleNameCompleter.class)
   private String moduleName = P11SecurityAction.DEFAULT_P11MODULE_NAME;
 

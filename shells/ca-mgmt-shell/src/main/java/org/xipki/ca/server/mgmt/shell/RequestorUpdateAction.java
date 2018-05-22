@@ -36,8 +36,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "requestor-up",
-    description = "update requestor")
+@Command(scope = "ca", name = "requestor-up", description = "update requestor")
 @Service
 public class RequestorUpdateAction extends CaAction {
 
@@ -45,8 +44,7 @@ public class RequestorUpdateAction extends CaAction {
       description = "requestor name\n(required)")
   protected String name;
 
-  @Option(name = "--cert", required = true,
-      description = "requestor certificate file\n(required)")
+  @Option(name = "--cert", required = true, description = "requestor certificate file\n(required)")
   @Completion(FileCompleter.class)
   protected String certFile;
 

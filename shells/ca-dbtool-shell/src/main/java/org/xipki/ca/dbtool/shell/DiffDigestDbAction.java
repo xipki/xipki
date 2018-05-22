@@ -37,8 +37,7 @@ import org.xipki.console.karaf.completer.DirCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "diff-digest-db",
-    description = "diff digest XiPKI/EJBCA database")
+@Command(scope = "ca", name = "diff-digest-db", description = "diff digest XiPKI/EJBCA database")
 @Service
 public class DiffDigestDbAction extends DbPortAction {
 
@@ -48,24 +47,21 @@ public class DiffDigestDbAction extends DbPortAction {
   private String refDbConf;
 
   @Option(name = "--target", required = true,
-      description = "configuration file of the target database to be evaluated")
+      description = "configuration file of the target database to be evaluated\\n(required)")
   @Completion(FileCompleter.class)
   private String dbconfFile;
 
-  @Option(name = "--report-dir", required = true,
-      description = "report directory\n(required)")
+  @Option(name = "--report-dir", required = true, description = "report directory\n(required)")
   @Completion(DirCompleter.class)
   private String reportDir;
 
-  @Option(name = "--revoked-only")
+  @Option(name = "--revoked-only", description = "considers only the revoked certificates")
   private Boolean revokedOnly = Boolean.FALSE;
 
-  @Option(name = "-k",
-      description = "number of certificates per SELECT")
+  @Option(name = "-k", description = "number of certificates per SELECT")
   private Integer numCertsPerSelect = 1000;
 
-  @Option(name = "--target-threads",
-      description = "number of threads to query the target database")
+  @Option(name = "--target-threads", description = "number of threads to query the target database")
   private Integer numTargetThreads = 40;
 
   @Option(name = "--ca-cert", multiValued = true,

@@ -110,10 +110,8 @@ import org.xipki.ca.certprofile.xml.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
-import org.xipki.ca.certprofile.xml.jaxb.ExtensionValueType;
 import org.xipki.ca.certprofile.xml.jaxb.ExtensionsType;
 import org.xipki.ca.certprofile.xml.jaxb.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xml.jaxb.OidWithDescType;
 import org.xipki.ca.certprofile.xml.jaxb.PdsLocationType;
 import org.xipki.ca.certprofile.xml.jaxb.PdsLocationsType;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
@@ -227,9 +225,8 @@ public class ExtensionsChecker {
     ASN1ObjectIdentifier type = Extension.certificatePolicies;
     if (extensionControls.containsKey(type)) {
       org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies extConf =
-          (org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies)
-            getExtensionValue(type, extensionsType,
-                org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies.class);
+          (org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies) getExtensionValue(
+              type, extensionsType, org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies.class);
       if (extConf != null) {
         this.certificatePolicies = new QaCertificatePolicies(extConf);
       }

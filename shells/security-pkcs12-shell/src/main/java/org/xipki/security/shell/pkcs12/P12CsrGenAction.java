@@ -46,18 +46,15 @@ import org.xipki.security.util.KeyUtil;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "csr-p12",
-    description = "generate CSR with PKCS#12 keystore")
+@Command(scope = "xi", name = "csr-p12", description = "generate CSR with PKCS#12 keystore")
 @Service
 public class P12CsrGenAction extends CsrGenAction {
 
-  @Option(name = "--p12", required = true,
-      description = "PKCS#12 keystore file\n(required)")
+  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file\n(required)")
   @Completion(FileCompleter.class)
   private String p12File;
 
-  @Option(name = "--password",
-      description = "password of the PKCS#12 file")
+  @Option(name = "--password", description = "password of the PKCS#12 file")
   private String password;
 
   private char[] getPassword() throws IOException {

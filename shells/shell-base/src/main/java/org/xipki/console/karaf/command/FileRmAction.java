@@ -34,8 +34,7 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "rm",
-    description = "remove file or directory")
+@Command(scope = "xi", name = "rm", description = "remove file or directory")
 @Service
 public class FileRmAction extends XiAction {
 
@@ -48,8 +47,7 @@ public class FileRmAction extends XiAction {
       description = "remove directories and their contents recursively")
   private Boolean recursive = Boolean.FALSE;
 
-  @Option(name = "--force", aliases = "-f",
-      description = "remove files without prompt")
+  @Option(name = "--force", aliases = "-f", description = "remove files without prompt")
   private Boolean force = Boolean.FALSE;
 
   @Override
