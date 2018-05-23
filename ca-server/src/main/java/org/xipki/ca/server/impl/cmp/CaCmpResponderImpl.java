@@ -95,6 +95,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.InsuffientPermissionException;
@@ -730,7 +731,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
   }
 
   private PKIBody unRevokeRemoveCertificates(PKIMessage request, RevReqContent rr,
-      int permission, CmpControl cmpControl, String msgId) {
+      int permission, CmpControl cmpControl, String msgId, AuditEvent event) {
     RevDetails[] revContent = rr.toRevDetailsArray();
 
     RevRepContentBuilder repContentBuilder = new RevRepContentBuilder();
@@ -943,6 +944,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
         int failureInfo = getPKiFailureInfo(ex);
         status = generateRejectionStatus(failureInfo, errorMessage);
+        event.setLevel(AuditLevel.ERROR);
+        event.setStatus(AuditStatus.FAILED);
+        event.addEventData(CaAuditConstants.NAME_message, errorMessage);
       } // end try
 
       repContentBuilder.add(status, certId);
@@ -1393,16 +1397,17 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
           new PKIFailureInfo(PKIFailureInfo.badRequest)));
 
       return new PKIBody(PKIBody.TYPE_ERROR, emc);
-    } else {
-      try {
-        checkPermission(requestor, requiredPermission);
-      } catch (InsuffientPermissionException ex) {
-        event.setStatus(AuditStatus.FAILED);
-        event.addEventData(CaAuditConstants.NAME_message, "NOT_PERMITTED");
-        return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized, null);
-      }
-      return unRevokeRemoveCertificates(request, rr, requiredPermission, cmpControl, msgId);
     }
+
+    try {
+      checkPermission(requestor, requiredPermission);
+    } catch (InsuffientPermissionException ex) {
+      event.setStatus(AuditStatus.FAILED);
+      event.addEventData(CaAuditConstants.NAME_message, "NOT_PERMITTED");
+      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized, null);
+    }
+
+    return unRevokeRemoveCertificates(request, rr, requiredPermission, cmpControl, msgId, event);
   } // method cmpRevokeOrUnrevokeOrRemoveCertificates
 
   private PKIBody cmpGeneralMsg(PKIHeaderBuilder respHeader, CmpControl cmpControl,

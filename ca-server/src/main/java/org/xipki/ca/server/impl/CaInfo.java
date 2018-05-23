@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
@@ -105,8 +106,7 @@ public class CaInfo {
     }
     this.certInCmpFormat = new CMPCertificate(bcCert);
 
-    this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaCertUris(), caEntry.getOcspUris(),
-        caEntry.getCrlUris(), caEntry.getDeltaCrlUris(), caEntry.getExtraControl());
+    this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
 
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
@@ -153,28 +153,8 @@ public class CaInfo {
     return caEntry.getIdent();
   }
 
-  public List<String> getCrlUris() {
-    return caEntry.getCrlUris();
-  }
-
-  public String getCrlUrisAsString() {
-    return caEntry.getCrlUrisAsString();
-  }
-
-  public List<String> getDeltaCrlUris() {
-    return caEntry.getDeltaCrlUris();
-  }
-
-  public String getDeltaCrlUrisAsString() {
-    return caEntry.getDeltaCrlUrisAsString();
-  }
-
-  public List<String> getOcspUris() {
-    return caEntry.getOcspUris();
-  }
-
-  public String getOcspUrisAsString() {
-    return caEntry.getOcspUrisAsString();
+  public CaUris getCaUris() {
+    return caEntry.getCaUris();
   }
 
   public CertValidity getMaxValidity() {

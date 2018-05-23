@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertValidity;
@@ -52,7 +53,6 @@ import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
-import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
@@ -121,11 +121,10 @@ class CaManagerQueryExecutor {
     this.sqlSelectSigner = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectCa = buildSelectFirstSql(
-        "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
-        + ",RESPONDER_NAME,CRL_SIGNER_NAME,CMP_CONTROL,CRL_CONTROL,DUPLICATE_KEY"
-        + ",DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
-        + ",EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
-        + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
+        "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE,RESPONDER_NAME,CRL_SIGNER_NAME,"
+        + "CMP_CONTROL,CRL_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
+        + "PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,"
+        + "CA_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
     this.sqlSelectScep = buildSelectFirstSql(
         "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_NAME FROM SCEP WHERE NAME=?");
@@ -430,32 +429,8 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("uknown CA " + name);
       }
 
-      String crlUris = rs.getString("CRL_URIS");
-      String deltaCrlUris = rs.getString("DELTACRL_URIS");
-
-      List<String> tmpCrlUris = null;
-      if (StringUtil.isNotBlank(crlUris)) {
-        tmpCrlUris = StringUtil.splitByComma(crlUris);
-      }
-
-      List<String> tmpDeltaCrlUris = null;
-      if (StringUtil.isNotBlank(deltaCrlUris)) {
-        tmpDeltaCrlUris = StringUtil.splitByComma(deltaCrlUris);
-      }
-
-      String ocspUris = rs.getString("OCSP_URIS");
-      List<String> tmpOcspUris = null;
-      if (StringUtil.isNotBlank(ocspUris)) {
-        tmpOcspUris = StringUtil.splitByComma(ocspUris);
-      }
-
-      String caCertUris = rs.getString("CACERT_URIS");
-      List<String> tmpCaCertUris = null;
-      if (StringUtil.isNotBlank(caCertUris)) {
-        tmpCaCertUris = StringUtil.splitByComma(caCertUris);
-      }
-
-      CaUris caUris = new CaUris(tmpCaCertUris, tmpOcspUris, tmpCrlUris, tmpDeltaCrlUris);
+      String caUrisText = rs.getString("CA_URIS");
+      CaUris caUris = (caUrisText == null) ? null : CaUris.decode(caUrisText);
       CaEntry entry = new CaEntry(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
           rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
           caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
@@ -633,12 +608,11 @@ class CaManagerQueryExecutor {
       throw new CaMgmtException(ex);
     }
 
-    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
-        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,"
-        + "RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,"
-        + "SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,"
-        + "EXTRA_CONTROL,SIGNER_CONF) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
+        + "MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,"
+        + "DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,"
+        + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -651,10 +625,9 @@ class CaManagerQueryExecutor {
       ps.setInt(idx++, caEntry.getSerialNoBitLen());
       ps.setLong(idx++, caEntry.getNextCrlNumber());
       ps.setString(idx++, caEntry.getStatus().getStatus());
-      ps.setString(idx++, caEntry.getCrlUrisAsString());
-      ps.setString(idx++, caEntry.getDeltaCrlUrisAsString());
-      ps.setString(idx++, caEntry.getOcspUrisAsString());
-      ps.setString(idx++, caEntry.getCaCertUrisAsString());
+
+      CaUris caUris = caEntry.getCaUris();
+      ps.setString(idx++, (caUris == null) ? null : caEntry.getCaUris().getEncoded());
       ps.setString(idx++, caEntry.getMaxValidity().toString());
       byte[] encodedCert = caEntry.getCert().getEncoded();
       ps.setString(idx++, Base64.encodeToString(encodedCert));
@@ -942,8 +915,8 @@ class CaManagerQueryExecutor {
     }
   } // method addPublisherToCa
 
-  void changeCa(ChangeCaEntry changeCaEntry, SecurityFactory securityFactory)
-      throws CaMgmtException {
+  void changeCa(ChangeCaEntry changeCaEntry, CaEntry currentCaEntry,
+      SecurityFactory securityFactory) throws CaMgmtException {
     ParamUtil.requireNonNull("changeCaEntry", changeCaEntry);
     ParamUtil.requireNonNull("securityFactory", securityFactory);
 
@@ -1038,14 +1011,35 @@ class CaManagerQueryExecutor {
     String validityMode = (changeCaEntry.getValidityMode() == null) ? null
         : changeCaEntry.getValidityMode().name();
 
+    String caUrisStr = null;
+    CaUris changeUris = changeCaEntry.getCaUris();
+    if (changeUris != null) {
+      CaUris oldCaUris = currentCaEntry.getCaUris();
+
+      List<String> uris = changeUris.getCacertUris();
+      // CHECKSTYLE:SKIP
+      List<String> cacertUris = (uris == null) ? oldCaUris.getCacertUris() : uris;
+
+      uris = changeUris.getOcspUris();
+      List<String> ocspUris = (uris == null) ? oldCaUris.getOcspUris() : uris;
+
+      uris = changeUris.getCrlUris();
+      List<String> crlUris = (uris == null) ? oldCaUris.getCrlUris() : uris;
+
+      uris = changeUris.getDeltaCrlUris();
+      List<String> deltaCrlUris = (uris == null) ? oldCaUris.getDeltaCrlUris() : uris;
+      CaUris newCaUris = new CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
+      caUrisStr = newCaUris.getEncoded();
+      if (caUrisStr.isEmpty()) {
+        caUrisStr = CaManager.NULL;
+      }
+    }
+
     changeIfNotNull("CA", col(INT, "ID", changeCaEntry.getIdent().getId()),
         col(INT, "SN_SIZE", changeCaEntry.getSerialNoBitLen()), col(STRING, "STATUS", status),
         col(STRING, "SUBJECT", subject), col(STRING, "CERT", base64Cert),
-        col(COLL_STRING, "CRL_URIS", changeCaEntry.getCrlUris()),
-        col(COLL_STRING, "DELTACRL_URIS", changeCaEntry.getDeltaCrlUris()),
-        col(COLL_STRING, "OCSP_URIS", changeCaEntry.getOcspUris()),
-        col(COLL_STRING, "CACERT_URIS", changeCaEntry.getCaCertUris()),
-        col(STRING, "MAX_VALIDITY", maxValidity), col(COLL_STRING, "SIGNER_TYPE", signerType),
+        col(STRING, "CA_URIS", caUrisStr),
+        col(STRING, "MAX_VALIDITY", maxValidity), col(STRING, "SIGNER_TYPE", signerType),
         col(STRING, "CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
         col(STRING, "RESPONDER_NAME", changeCaEntry.getResponderName()),
         col(STRING, "CMP_CONTROL", changeCaEntry.getCmpControl()),

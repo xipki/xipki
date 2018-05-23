@@ -103,6 +103,7 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
@@ -743,10 +744,10 @@ public class X509Ca {
 
     try {
       SignerEntryWrapper crlSigner = getCrlSigner();
+      PublicCaInfo pci = caInfo.getPublicCaInfo();
 
       boolean indirectCrl = (crlSigner != null);
-      X500Name crlIssuer = indirectCrl ? crlSigner.getSubjectAsX500Name()
-          : caInfo.getPublicCaInfo().getX500Subject();
+      X500Name crlIssuer = indirectCrl ? crlSigner.getSubjectAsX500Name() : pci.getX500Subject();
 
       X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
       if (nextUpdate != null) {
@@ -846,7 +847,7 @@ public class X509Ca {
           extensions.add(ext);
         }
 
-        Extension ext = createCertificateIssuerExtension(caInfo.getPublicCaInfo().getX500Subject());
+        Extension ext = createCertificateIssuerExtension(pci.getX500Subject());
         extensions.add(ext);
 
         crlBuilder.addCRLEntry(serial, revocationTime,
@@ -870,7 +871,7 @@ public class X509Ca {
         // AuthorityKeyIdentifier
         byte[] akiValues = indirectCrl
             ? X509Util.extractSki(crlSigner.getSigner().getCertificate())
-            : caInfo.getPublicCaInfo().getSubjectKeyIdentifer();
+            : pci.getSubjectKeyIdentifer();
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
         crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
 
@@ -891,10 +892,10 @@ public class X509Ca {
         }
 
         // freshestCRL
-        List<String> deltaCrlUris = getCaInfo().getPublicCaInfo().getDeltaCrlUris();
+        List<String> deltaCrlUris = pci.getCaUris().getDeltaCrlUris();
         if (control.getDeltaCrlIntervals() > 0 && CollectionUtil.isNonEmpty(deltaCrlUris)) {
-          CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris,
-              caInfo.getPublicCaInfo().getX500Subject(), crlIssuer);
+          CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris, pci.getX500Subject(),
+              crlIssuer);
           crlBuilder.addExtension(Extension.freshestCRL, false, cdp);
         }
       } catch (CertIOException | CertificateEncodingException ex) {

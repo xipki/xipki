@@ -102,12 +102,14 @@
         </signerConf>
         <status>active</status>
         <validityMode>cutoff</validityMode>
-        <crlUris>
-          <uri>http://ca.example.org/crl</uri>
-        </crlUris>
-        <ocspUris>
-          <uri>http://localhost:8080/ocsp/responder1</uri>
-        </ocspUris>
+        <caUris>
+          <crlUris>
+            <uri>http://ca.example.org/crl</uri>
+          </crlUris>
+          <ocspUris>
+            <uri>http://localhost:8080/ocsp/responder1</uri>
+          </ocspUris>
+        </caUris>
         <nextCrlNo>2</nextCrlNo>
         <snSize>63</snSize>
       </caInfo>

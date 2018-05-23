@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -32,7 +31,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.common.ConfPairs;
-import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -61,20 +59,14 @@ public class PublicCaInfo {
 
   private X509Certificate crlSignerCert;
 
-  private final List<String> caCertUris;
-
-  private final List<String> ocspUris;
-
-  private final List<String> crlUris;
-
-  private final List<String> deltaCrlUris;
+  private final CaUris caUris;
 
   private final ConfPairs extraControl;
 
-  public PublicCaInfo(X509Certificate caCert, List<String> caCertUris, List<String> ocspUris,
-      List<String> crlUris, List<String> deltaCrlUris, ConfPairs extraControl)
+  public PublicCaInfo(X509Certificate caCert, CaUris caUris, ConfPairs extraControl)
       throws OperationException {
     ParamUtil.requireNonNull("caCert", caCert);
+    this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = new X509Cert(caCert);
     this.serialNumber = caCert.getSerialNumber();
@@ -86,10 +78,6 @@ public class PublicCaInfo {
     } catch (CertificateEncodingException ex) {
       throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
     }
-    this.caCertUris = CollectionUtil.unmodifiableList(caCertUris);
-    this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);
-    this.crlUris = CollectionUtil.unmodifiableList(crlUris);
-    this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
     this.extraControl = extraControl;
 
     byte[] encodedSubjectAltName = caCert.getExtensionValue(
@@ -108,11 +96,11 @@ public class PublicCaInfo {
   } // constructor
 
   public PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
-      byte[] subjectKeyIdentifier, List<String> caCertUris, List<String> ocspUris,
-      List<String> crlUris, List<String> deltaCrlUris, ConfPairs extraControl)
+      byte[] subjectKeyIdentifier, CaUris caUris, ConfPairs extraControl)
       throws OperationException {
     this.x500Subject = ParamUtil.requireNonNull("subject", subject);
     this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+    this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = null;
     this.c14nSubject = X509Util.canonicalizName(subject);
@@ -127,27 +115,15 @@ public class PublicCaInfo {
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
 
     this.subjectAltName = subjectAltName;
-    this.caCertUris = CollectionUtil.unmodifiableList(caCertUris);
-    this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);
-    this.crlUris = CollectionUtil.unmodifiableList(crlUris);
-    this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
     this.extraControl = extraControl;
   } // constructor
 
-  public List<String> getCaCertUris() {
-    return caCertUris;
-  }
-
-  public List<String> getOcspUris() {
-    return ocspUris;
-  }
-
-  public List<String> getCrlUris() {
-    return crlUris;
-  }
-
-  public List<String> getDeltaCrlUris() {
-    return deltaCrlUris;
+  /**
+   * Returns the CA URIs.
+   * @return non-null CaUris.
+   */
+  public CaUris getCaUris() {
+    return caUris;
   }
 
   public X509Certificate getCrlSignerCert() {

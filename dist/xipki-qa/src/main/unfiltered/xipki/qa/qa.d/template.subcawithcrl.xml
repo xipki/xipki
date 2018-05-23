@@ -24,12 +24,6 @@
       <caInfo>
         <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpControl>
         <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
-        <crlUris>
-          <uri>http://subcawithcrl.example.org/crl</uri>
-        </crlUris>
-        <deltacrlUris>
-          <uri>http://subcawithcrl.example.org/deltacrl</uri>
-        </deltacrlUris>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>
@@ -45,13 +39,21 @@
         </signerConf>
         <status>active</status>
         <validityMode>lax</validityMode>
-        <cacertUris>
-          <uri>http://example.org/subcawithcrl1.der</uri>
-        </cacertUris>
+        <caUris>
+          <cacertUris>
+            <uri>http://example.org/subcawithcrl1.der</uri>
+          </cacertUris>
+          <ocspUris>
+            <uri>http://localhost:8080/ocsp/responder2</uri>
+          </ocspUris>
+          <crlUris>
+            <uri>http://subcawithcrl.example.org/crl</uri>
+          </crlUris>
+          <deltacrlUris>
+            <uri>http://subcawithcrl.example.org/deltacrl</uri>
+          </deltacrlUris>
+        </caUris>
         <nextCrlNo>2</nextCrlNo>
-        <ocspUris>
-          <uri>http://localhost:8080/ocsp/responder2</uri>
-        </ocspUris>
         <snSize>63</snSize>
       </caInfo>
       <aliases>

@@ -19,6 +19,7 @@ package org.xipki.ca.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
@@ -47,9 +48,10 @@ public class CaCheckAction extends CaUpdateAction {
       throw new CmdFailure("could not find CA '" + caName + "'");
     }
 
+    CaUris eyUris = ey.getCaUris();
     // CA cert uris
-    if (ey.getCaCertUris() != null) {
-      MgmtQaShellUtil.assertEquals("CA cert URIs", ey.getCaCertUris(), ca.getCaCertUris());
+    if (eyUris != null) {
+      assertObjEquals("CA URIs", ey.getCaUris(), ca.getCaUris());
     }
 
     // CA certificate
@@ -82,16 +84,6 @@ public class CaCheckAction extends CaUpdateAction {
     // CRL signer name
     if (ey.getCrlSignerName() != null) {
       MgmtQaShellUtil.assertEquals("CRL signer name", ey.getCrlSignerName(), ca.getCrlSignerName());
-    }
-
-    // CRL uris
-    if (ey.getCrlUris() != null) {
-      MgmtQaShellUtil.assertEquals("CRL URIs", ey.getCrlUris(), ca.getCrlUris());
-    }
-
-    // DeltaCRL uris
-    if (ey.getDeltaCrlUris() != null) {
-      MgmtQaShellUtil.assertEquals("Delta CRL URIs", ey.getDeltaCrlUris(), ca.getDeltaCrlUris());
     }
 
     // Duplicate key mode
@@ -130,11 +122,6 @@ public class CaCheckAction extends CaUpdateAction {
     // Num CRLs
     if (ey.getNumCrls() != null) {
       assertObjEquals("num CRLs", ey.getNumCrls(), ca.getNumCrls());
-    }
-
-    // OCSP uris
-    if (ey.getOcspUris() != null) {
-      MgmtQaShellUtil.assertEquals("OCSP URIs", ey.getOcspUris(), ca.getOcspUris());
     }
 
     // Permissions

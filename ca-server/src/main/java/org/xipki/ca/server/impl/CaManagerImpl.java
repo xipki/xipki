@@ -67,6 +67,7 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
@@ -101,7 +102,6 @@ import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaSystemStatus;
-import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
@@ -125,6 +125,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaUrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
@@ -1207,7 +1208,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     entry.getIdent().setId(ident.getId());
 
-    queryExecutor.changeCa(entry, securityFactory);
+    queryExecutor.changeCa(entry, caInfos.get(name).getCaEntry(), securityFactory);
 
     if (!createCa(name)) {
       LOG.error("could not create CA {}", name);
@@ -2188,10 +2189,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     ParamUtil.requireNonNull("encodedCsr", encodedCsr);
 
     int numCrls = caEntry.getNumCrls();
-    List<String> crlUris = caEntry.getCrlUris();
-    List<String> deltaCrlUris = caEntry.getDeltaCrlUris();
-    List<String> ocspUris = caEntry.getOcspUris();
-    List<String> caCertUris = caEntry.getCaCertUris();
     String signerType = caEntry.getSignerType();
 
     asssertMasterMode();
@@ -2226,8 +2223,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     GenerateSelfSignedResult result;
     try {
       result = SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
-          caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, caCertUris, ocspUris,
-          crlUris, deltaCrlUris, caEntry.getExtraControl());
+          caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, caEntry.getCaUris(),
+          caEntry.getExtraControl());
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);
     }
@@ -2244,13 +2241,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       }
     }
 
-    CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-
     String name = caEntry.getIdent().getName();
     long nextCrlNumber = caEntry.getNextCrlNumber();
 
     CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoBitLen(),
-        nextCrlNumber, signerType, signerConf, caUris, numCrls, expirationPeriod);
+        nextCrlNumber, signerType, signerConf, caEntry.getCaUris(), numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControl(caEntry.getCmpControl());
     entry.setCrlControl(caEntry.getCrlControl());
@@ -3080,7 +3075,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
           CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
           CaInfoType ciJaxb = new CaInfoType();
-          ciJaxb.setCacertUris(createUris(entry.getCaCertUris()));
           byte[] certBytes;
           try {
             certBytes = entry.getCert().getEncoded();
@@ -3108,8 +3102,16 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             ciJaxb.setCrlControl(entry.getCrlControl().getConf());
           }
 
-          ciJaxb.setCrlUris(createUris(entry.getCrlUris()));
-          ciJaxb.setDeltacrlUris(createUris(entry.getDeltaCrlUris()));
+          CaUris caUris = entry.getCaUris();
+          if (caUris != null) {
+            CaUrisType caUrisType = new CaUrisType();
+            caUrisType.setCacertUris(createUris(caUris.getCacertUris()));
+            caUrisType.setOcspUris(createUris(caUris.getOcspUris()));
+            caUrisType.setCrlUris(createUris(caUris.getCrlUris()));
+            caUrisType.setDeltacrlUris(createUris(caUris.getDeltaCrlUris()));
+            ciJaxb.setCaUris(caUrisType);
+          }
+
           ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
           ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
           ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
@@ -3122,7 +3124,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
           ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
           ciJaxb.setNumCrls(entry.getNumCrls());
-          ciJaxb.setOcspUris(createUris(entry.getOcspUris()));
           ciJaxb.setPermission(entry.getPermission());
           ciJaxb.setSaveReq(entry.isSaveRequest());
           ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.ConfPairs;
@@ -83,13 +84,7 @@ public class CaEntry {
 
   private ConfPairs extraControl;
 
-  private List<String> crlUris;
-
-  private List<String> deltaCrlUris;
-
-  private List<String> ocspUris;
-
-  private List<String> caCertUris;
+  private CaUris caUris;
 
   private X509Certificate cert;
 
@@ -115,11 +110,7 @@ public class CaEntry {
     this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 1);
     this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
     this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
-
-    this.caCertUris = caUris.getCaCertUris();
-    this.ocspUris = caUris.getOcspUris();
-    this.crlUris = caUris.getCrlUris();
-    this.deltaCrlUris = caUris.getDeltaCrlUris();
+    this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
   }
 
   public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
@@ -325,9 +316,7 @@ public class CaEntry {
             (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
         "\nextraControl: ", extraCtrlText, "\n",
         "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
-        "\ndeltaCrlUris:", formatUris(deltaCrlUris), "\ncrlUris:", formatUris(crlUris),
-        "\nocspUris:", formatUris(ocspUris), "\ncaCertUris:", formatUris(caCertUris),
-        "\ncert: \n", InternUtil.formatCert(cert, verbose),
+        "\ncaUris:", caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
         "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText);
   } // method toString
 
@@ -382,10 +371,7 @@ public class CaEntry {
       && (expirationPeriod == obj.expirationPeriod)
       && (keepExpiredCertInDays == obj.keepExpiredCertInDays)
       && CompareUtil.equalsObject(extraControl, obj.extraControl)
-      && CompareUtil.equalsObject(crlUris, obj.crlUris)
-      && CompareUtil.equalsObject(deltaCrlUris, obj.deltaCrlUris)
-      && CompareUtil.equalsObject(ocspUris, obj.ocspUris)
-      && CompareUtil.equalsObject(caCertUris, obj.caCertUris)
+      && CompareUtil.equalsObject(caUris, obj.caUris)
       && CompareUtil.equalsObject(cert, obj.cert)
       && (serialNoBitLen == obj.serialNoBitLen)
       && (numCrls == obj.numCrls)
@@ -434,36 +420,8 @@ public class CaEntry {
     this.nextCrlNumber = crlNumber;
   }
 
-  public List<String> getCrlUris() {
-    return crlUris;
-  }
-
-  public String getCrlUrisAsString() {
-    return urisToString(crlUris);
-  }
-
-  public List<String> getDeltaCrlUris() {
-    return deltaCrlUris;
-  }
-
-  public String getDeltaCrlUrisAsString() {
-    return urisToString(deltaCrlUris);
-  }
-
-  public List<String> getOcspUris() {
-    return ocspUris;
-  }
-
-  public String getOcspUrisAsString() {
-    return urisToString(ocspUris);
-  }
-
-  public List<String> getCaCertUris() {
-    return caCertUris;
-  }
-
-  public String getCaCertUrisAsString() {
-    return urisToString(caCertUris);
+  public CaUris getCaUris() {
+    return caUris;
   }
 
   public X509Certificate getCert() {
@@ -492,17 +450,6 @@ public class CaEntry {
 
   public String getHexSha1OfCert() {
     return hexSha1OfCert;
-  }
-
-  private static String formatUris(List<String> uris) {
-    if (CollectionUtil.isEmpty(uris)) {
-      return "";
-    }
-    StringBuilder sb = new StringBuilder();
-    for (String uri : uris) {
-      sb.append("\n\t").append(uri);
-    }
-    return sb.toString();
   }
 
 }

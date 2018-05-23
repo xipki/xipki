@@ -28,6 +28,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.CaEntry;
@@ -217,10 +218,9 @@ public class CaUpdateAction extends CaAction {
       entry.setPermission(intPermission);
     }
 
-    entry.setCrlUris(getUris(crlUris));
-    entry.setDeltaCrlUris(getUris(deltaCrlUris));
-    entry.setOcspUris(getUris(ocspUris));
-    entry.setCaCertUris(getUris(caCertUris));
+    CaUris caUris = new CaUris(getUris(caCertUris), getUris(ocspUris), getUris(crlUris),
+        getUris(deltaCrlUris));
+    entry.setCaUris(caUris);
 
     if (validityModeS != null) {
       ValidityMode validityMode = ValidityMode.forName(validityModeS);

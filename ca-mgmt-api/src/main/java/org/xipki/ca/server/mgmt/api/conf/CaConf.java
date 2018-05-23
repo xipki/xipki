@@ -47,6 +47,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
@@ -55,7 +56,6 @@ import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
-import org.xipki.ca.server.mgmt.api.CaUris;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
@@ -69,6 +69,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasUserType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaInfoType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.CaUrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
@@ -335,8 +336,9 @@ public class CaConf {
                 csr, serialNumber, certFilename);
           }
 
-          CaUris caUris = new CaUris(getUris(ci.getCacertUris()),
-              getUris(ci.getOcspUris()), getUris(ci.getCrlUris()), getUris(ci.getDeltacrlUris()));
+          CaUrisType uris = ci.getCaUris();
+          CaUris caUris = new CaUris(getUris(uris.getCacertUris()), getUris(uris.getOcspUris()),
+              getUris(uris.getCrlUris()), getUris(uris.getDeltacrlUris()));
 
           int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365
               : ci.getExpirationPeriod().intValue();

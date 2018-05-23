@@ -38,13 +38,15 @@
         </signerConf>
         <status>active</status>
         <validityMode>strict</validityMode>
-        <cacertUris>
-          <uri>http://example.org/subca1.der</uri>
-        </cacertUris>
+        <caUris>
+          <cacertUris>
+            <uri>http://example.org/subca1.der</uri>
+          </cacertUris>
+          <ocspUris>
+            <uri>http://localhost:8080/ocsp/responder1</uri>
+          </ocspUris>
+        </caUris>
         <nextCrlNo>2</nextCrlNo>
-        <ocspUris>
-          <uri>http://localhost:8080/ocsp/responder1</uri>
-        </ocspUris>
         <snSize>63</snSize>
         <extraControl>
           <value>revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d</value>

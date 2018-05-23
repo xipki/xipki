@@ -224,10 +224,7 @@
       <xs:element name="nextCrlNo" type="xs:long"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>
-      <xs:element name="cacertUris" type="urisType" minOccurs="0"/>
-      <xs:element name="crlUris" type="urisType" minOccurs="0"/>
-      <xs:element name="deltacrlUris" type="urisType" minOccurs="0"/>
-      <xs:element name="ocspUris" type="urisType" minOccurs="0"/>
+      <xs:element name="caUris" type="caUrisType" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
   <xs:complexType name="caHasRequestorType">
@@ -259,6 +256,14 @@
     <xs:sequence>
       <xs:element name="alias" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="caUrisType">
+    <xs:all>
+      <xs:element name="cacertUris" type="urisType" minOccurs="0"/>
+      <xs:element name="crlUris" type="urisType" minOccurs="0"/>
+      <xs:element name="deltacrlUris" type="urisType" minOccurs="0"/>
+      <xs:element name="ocspUris" type="urisType" minOccurs="0"/>
+    </xs:all>
   </xs:complexType>
   <xs:complexType name="urisType">
     <xs:sequence>

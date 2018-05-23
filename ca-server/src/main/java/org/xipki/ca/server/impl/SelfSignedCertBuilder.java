@@ -48,6 +48,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
@@ -108,9 +109,8 @@ class SelfSignedCertBuilder {
 
   public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
       String signerType, String signerConf, IdentifiedCertprofile certprofile,
-      CertificationRequest csr, BigInteger serialNumber, List<String> caCertUris,
-      List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-      ConfPairs extraControl) throws OperationException, InvalidConfException {
+      CertificationRequest csr, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl)
+          throws OperationException, InvalidConfException {
     ParamUtil.requireNonNull("securityFactory", securityFactory);
     ParamUtil.requireNonBlank("signerType", signerType);
     ParamUtil.requireNonNull("certprofile", certprofile);
@@ -195,16 +195,14 @@ class SelfSignedCertBuilder {
     }
 
     X509Certificate newCert = generateCertificate(signer, certprofile, csr, serialNumber,
-        publicKeyInfo, caCertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
+        publicKeyInfo, caUris, extraControl);
 
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
 
   private static X509Certificate generateCertificate(ConcurrentContentSigner signer,
-      IdentifiedCertprofile certprofile, CertificationRequest csr,
-      BigInteger serialNumber, SubjectPublicKeyInfo publicKeyInfo,
-      List<String> caCertUris, List<String> ocspUris, List<String> crlUris,
-      List<String> deltaCrlUris, ConfPairs extraControl)
+      IdentifiedCertprofile certprofile, CertificationRequest csr, BigInteger serialNumber,
+      SubjectPublicKeyInfo publicKeyInfo, CaUris caUris, ConfPairs extraControl)
       throws OperationException {
 
     try {
@@ -257,7 +255,7 @@ class SelfSignedCertBuilder {
         serialNumber, notBefore, notAfter, grantedSubject, publicKeyInfo);
 
     PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, serialNumber, null, null,
-        caCertUris, ocspUris, crlUris, deltaCrlUris, extraControl);
+        caUris, extraControl);
 
     Extensions extensions = null;
     ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();

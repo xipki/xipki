@@ -157,10 +157,7 @@
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_URIS" type="VARCHAR(500)"/>
-      <column name="DELTACRL_URIS" type="VARCHAR(500)"/>
-      <column name="OCSP_URIS" type="VARCHAR(500)"/>
-      <column name="CACERT_URIS" type="VARCHAR(500)"/>
+      <column name="CA_URIS" type="VARCHAR(2000)"/>
       <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>

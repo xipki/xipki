@@ -268,12 +268,11 @@ class CaconfDbImporter extends DbPorter {
 
   private void importCa(Cas cas) throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
-    String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS,"
-        + "DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,"
-        + "RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,"
-        + "SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
-        + "REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,MAX_VALIDITY,"
+        + "CERT,SIGNER_TYPE,CRL_SIGNER_NAME,RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,DUPLICATE_KEY,"
+        + "DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
+        + "KEEP_EXPIRED_CERT_DAYS,REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
+        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -291,10 +290,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, ca.getSnSize());
           ps.setLong(idx++, ca.getNextCrlNo());
           ps.setString(idx++, ca.getStatus());
-          ps.setString(idx++, ca.getCrlUris());
-          ps.setString(idx++, ca.getDeltacrlUris());
-          ps.setString(idx++, ca.getOcspUris());
-          ps.setString(idx++, ca.getCacertUris());
+          ps.setString(idx++, ca.getCaUris());
           ps.setString(idx++, ca.getMaxValidity());
           ps.setString(idx++, Base64.encodeToString(certBytes));
           ps.setString(idx++, ca.getSignerType());

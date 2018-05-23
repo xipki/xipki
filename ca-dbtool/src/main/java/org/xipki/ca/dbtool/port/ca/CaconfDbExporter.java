@@ -296,11 +296,10 @@ class CaconfDbExporter extends DbPorter {
   private void exportCa(CaconfType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table CA");
     Cas cas = new Cas();
-    String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,"
-        + "SIGNER_CONF,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,"
-        + "REV_INFO,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,DELTACRL_URIS,"
-        + "VALIDITY_MODE,CACERT_URIS,NEXT_CRLNO,RESPONDER_NAME,CRL_SIGNER_NAME,"
-        + "CMP_CONTROL,CRL_CONTROL,EXTRA_CONTROL FROM CA";
+    String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CA_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,SIGNER_CONF,"
+        + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,DUPLICATE_KEY,"
+        + "DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,RESPONDER_NAME,"
+        + "CRL_SIGNER_NAME,CMP_CONTROL,CRL_CONTROL,EXTRA_CONTROL FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -317,10 +316,7 @@ class CaconfDbExporter extends DbPorter {
         ca.setSnSize(rs.getInt("SN_SIZE"));
         ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
         ca.setStatus(rs.getString("STATUS"));
-        ca.setCrlUris(rs.getString("CRL_URIS"));
-        ca.setDeltacrlUris(rs.getString("DELTACRL_URIS"));
-        ca.setOcspUris(rs.getString("OCSP_URIS"));
-        ca.setCacertUris(rs.getString("CACERT_URIS"));
+        ca.setCaUris(rs.getString("CA_URIS"));
         ca.setMaxValidity(rs.getString("MAX_VALIDITY"));
         ca.setCert(buildFileOrBase64Binary(
             rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));

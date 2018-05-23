@@ -669,8 +669,7 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(ca, serialNumber, idNamMap);
+    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(ca, serialNumber, idNamMap);
     if (certWithRevInfo == null) {
       if (LOG.isWarnEnabled()) {
         LOG.warn("certificate with CA={} and serialNumber={} does not exist",

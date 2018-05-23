@@ -52,6 +52,7 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.AuthorityInfoAccessControl;
@@ -300,17 +301,19 @@ class IdentifiedCertprofile {
     // AuthorityInfoAccess
     extType = Extension.authorityInfoAccess;
     extControl = controls.remove(extType);
+    CaUris caUris = publicCaInfo.getCaUris();
+
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
       AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
 
       List<String> caIssuers = null;
       if (aiaControl == null || aiaControl.isIncludesCaIssuers()) {
-        caIssuers = publicCaInfo.getCaCertUris();
+        caIssuers = caUris.getCacertUris();
       }
 
       List<String> ocspUris = null;
       if (aiaControl == null || aiaControl.isIncludesOcsp()) {
-        ocspUris = publicCaInfo.getOcspUris();
+        ocspUris = caUris.getOcspUris();
       }
 
       if (CollectionUtil.isNonEmpty(caIssuers) || CollectionUtil.isNonEmpty(ocspUris)) {
@@ -330,9 +333,9 @@ class IdentifiedCertprofile {
       extType = Extension.cRLDistributionPoints;
       extControl = controls.remove(extType);
       if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-        if (CollectionUtil.isNonEmpty(publicCaInfo.getCrlUris())) {
-          CRLDistPoint value = CaUtil.createCrlDistributionPoints(
-              publicCaInfo.getCrlUris(), x500CaPrincipal, crlSignerSubject);
+        if (CollectionUtil.isNonEmpty(caUris.getCrlUris())) {
+          CRLDistPoint value = CaUtil.createCrlDistributionPoints(caUris.getCrlUris(),
+              x500CaPrincipal, crlSignerSubject);
           addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
       }
@@ -341,9 +344,9 @@ class IdentifiedCertprofile {
       extType = Extension.freshestCRL;
       extControl = controls.remove(extType);
       if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-        if (CollectionUtil.isNonEmpty(publicCaInfo.getDeltaCrlUris())) {
-          CRLDistPoint value = CaUtil.createCrlDistributionPoints(
-              publicCaInfo.getDeltaCrlUris(), x500CaPrincipal, crlSignerSubject);
+        if (CollectionUtil.isNonEmpty(caUris.getDeltaCrlUris())) {
+          CRLDistPoint value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
+              x500CaPrincipal, crlSignerSubject);
           addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
       }

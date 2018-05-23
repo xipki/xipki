@@ -18,8 +18,8 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.security.cert.X509Certificate;
-import java.util.List;
 
+import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.ConfPairs;
@@ -69,13 +69,7 @@ public class ChangeCaEntry {
 
   private ConfPairs extraControl;
 
-  private List<String> crlUris;
-
-  private List<String> deltaCrlUris;
-
-  private List<String> ocspUris;
-
-  private List<String> caCertUris;
+  private CaUris caUris;
 
   private X509Certificate cert;
 
@@ -238,36 +232,12 @@ public class ChangeCaEntry {
     this.serialNoBitLen = serialNoBitLen;
   }
 
-  public List<String> getCrlUris() {
-    return crlUris;
+  public CaUris getCaUris() {
+    return caUris;
   }
 
-  public void setCrlUris(List<String> crlUris) {
-    this.crlUris = crlUris;
-  }
-
-  public List<String> getDeltaCrlUris() {
-    return deltaCrlUris;
-  }
-
-  public void setDeltaCrlUris(List<String> deltaCrlUris) {
-    this.deltaCrlUris = deltaCrlUris;
-  }
-
-  public List<String> getOcspUris() {
-    return ocspUris;
-  }
-
-  public void setOcspUris(List<String> ocspUris) {
-    this.ocspUris = ocspUris;
-  }
-
-  public List<String> getCaCertUris() {
-    return caCertUris;
-  }
-
-  public void setCaCertUris(List<String> caCertUris) {
-    this.caCertUris = caCertUris;
+  public void setCaUris(CaUris caUris) {
+    this.caUris = caUris;
   }
 
   public X509Certificate getCert() {
