@@ -56,12 +56,12 @@ public class ExportCaAction extends DbPortAction {
   private Boolean resume = Boolean.FALSE;
 
   @Option(name = "--test", description = "just test the export, no real export")
-  private Boolean onlyTest = Boolean.FALSE;
+  private Boolean testOnly = Boolean.FALSE;
 
   @Override
   protected DbPortWorker getDbPortWorker() throws Exception {
     return new CaDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir, resume,
-        numCertsInBundle, numCertsPerCommit, onlyTest);
+        numCertsInBundle, numCertsPerCommit, testOnly);
   }
 
 }

@@ -2180,7 +2180,7 @@ public class X509Ca {
   } // method getX509Certprofile
 
   public boolean supportsCertprofile(String certprofileName) {
-    ParamUtil.requireNonNull("certprofileLocalName", certprofileName);
+    ParamUtil.requireNonNull("certprofileName", certprofileName);
     Set<String> profileNames = caManager.getCertprofilesForCa(caIdent.getName());
     return profileNames.contains(certprofileName.toLowerCase());
   }

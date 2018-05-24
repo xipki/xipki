@@ -194,7 +194,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1"
-          remarks="How long in days should certificates after the expiration be kept. Negative value for kept-for-ever"/>
+          remarks="How long in days should certificates be kept after the expiration. Negative value for kept-for-ever"/>
       <column name="EXTRA_CONTROL" type="VARCHAR(5000)"/>
       <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>

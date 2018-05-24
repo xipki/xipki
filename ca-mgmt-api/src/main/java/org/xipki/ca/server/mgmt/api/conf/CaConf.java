@@ -336,9 +336,14 @@ public class CaConf {
                 csr, serialNumber, certFilename);
           }
 
-          CaUrisType uris = ci.getCaUris();
-          CaUris caUris = new CaUris(getUris(uris.getCacertUris()), getUris(uris.getOcspUris()),
-              getUris(uris.getCrlUris()), getUris(uris.getDeltacrlUris()));
+          CaUris caUris;
+          if (ci.getCaUris() == null) {
+            caUris = CaUris.EMPTY_INSTANCE;
+          } else {
+            CaUrisType uris = ci.getCaUris();
+            caUris = new CaUris(getUris(uris.getCacertUris()), getUris(uris.getOcspUris()),
+                getUris(uris.getCrlUris()), getUris(uris.getDeltacrlUris()));
+          }
 
           int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365
               : ci.getExpirationPeriod().intValue();

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * TODO.
@@ -114,7 +115,10 @@ public class ConfPairs {
   }
 
   public ConfPairs(String confPairs) {
-    ParamUtil.requireNonBlank("confPairs", confPairs);
+    if (StringUtil.isBlank(confPairs)) {
+      return;
+    }
+
     int len = confPairs.length();
     List<String> tokens = new LinkedList<>();
 

@@ -316,7 +316,7 @@ public class CaEntry {
             (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
         "\nextraControl: ", extraCtrlText, "\n",
         "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
-        "\ncaUris:", caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
+        caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
         "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText);
   } // method toString
 

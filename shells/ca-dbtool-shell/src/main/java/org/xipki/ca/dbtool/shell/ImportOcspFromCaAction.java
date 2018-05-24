@@ -39,7 +39,7 @@ public class ImportOcspFromCaAction extends DbPortAction {
 
   private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
-  private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
+  private static final String DFLT_PUBLISHER = "ocsp-publisher";
 
   @Option(name = "--db-conf", description = "database configuration file")
   @Completion(FileCompleter.class)
