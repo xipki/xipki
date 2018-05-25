@@ -31,7 +31,7 @@
         </slot>
       </includeSlots>
       <readonly>false</readonly>
-      <!-- 1 for CKU_USER -->
+      <!-- 0 for CKU_SO, 1 for CKU_USER, and any vendor specific user type -->
       <user>1</user>
       <maxMessageSize>65536</maxMessageSize>
       <passwordSets>

@@ -139,7 +139,9 @@ class IaikP11Slot extends AbstractP11Slot {
 
     Session session;
     try {
-      session = openSession(false);
+      // SO (Security Officer cannot be logged in READ-ONLY session
+      boolean rw = (userType == PKCS11Constants.CKU_SO);
+      session = openSession(rw);
     } catch (P11TokenException ex) {
       LogUtil.error(LOG, ex, "openSession");
       close();
