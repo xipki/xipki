@@ -45,14 +45,12 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Signers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
-import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.jaxb.ca.SignerType;
 import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
@@ -97,7 +95,6 @@ class CaconfDbExporter extends DbPorter {
     exportCaHasUser(caconf);
     exportCaHasPublisher(caconf);
     exportCaHasProfile(caconf);
-    exportScep(caconf);
 
     JAXBElement<CaconfType> root = new ObjectFactory().createCaconf(caconf);
     try {
@@ -298,8 +295,9 @@ class CaconfDbExporter extends DbPorter {
     Cas cas = new Cas();
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CA_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,SIGNER_CONF,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,DUPLICATE_KEY,"
-        + "DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,RESPONDER_NAME,"
-        + "CRL_SIGNER_NAME,CMP_CONTROL,CRL_CONTROL,EXTRA_CONTROL FROM CA";
+        + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,CMP_RESPONDER_NAME,"
+        + "SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,CMP_CONTROL,SCEP_CONTROL,CRL_CONTROL,EXTRA_CONTROL F"
+        + "ROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -323,13 +321,15 @@ class CaconfDbExporter extends DbPorter {
         ca.setSignerType(rs.getString("SIGNER_TYPE"));
         ca.setSignerConf(buildFileOrValue(
             rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
-        ca.setResponderName(rs.getString("RESPONDER_NAME"));
+        ca.setCmpResponderName(rs.getString("CMP_RESPONDER_NAME"));
+        ca.setScepResponderName(rs.getString("SCEP_RESPONDER_NAME"));
         ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
         ca.setCmpControl(rs.getString("CMP_CONTROL"));
+        ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
-        ca.setSaveReq(rs.getInt("SUPPORT_REST"));
+        ca.setProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));
         ca.setSaveReq(rs.getInt("SAVE_REQ"));
         ca.setPermission(rs.getInt("PERMISSION"));
         ca.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
@@ -440,40 +440,6 @@ class CaconfDbExporter extends DbPorter {
     caconf.setCaHasPublishers(caHasPublishers);
     System.out.println(" exported table CA_HAS_PUBLISHER");
   } // method exportCaHasPublisher
-
-  private void exportScep(CaconfType caconf) throws DataAccessException, IOException {
-    System.out.println("exporting table SCEP");
-    Sceps sceps = new Sceps();
-    caconf.setSceps(sceps);
-
-    final String sql = "SELECT NAME,CA_ID,ACTIVE,PROFILES,RESPONDER_NAME,CONTROL FROM SCEP";
-
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
-
-      while (rs.next()) {
-        int caId = rs.getInt("CA_ID");
-
-        ScepType scep = new ScepType();
-        scep.setName(rs.getString("NAME"));
-        scep.setCaId(caId);
-        scep.setActive(rs.getInt("ACTIVE"));
-        scep.setProfiles(rs.getString("PROFILES"));
-        scep.setResponderName(rs.getString("RESPONDER_NAME"));
-        scep.setControl(rs.getString("CONTROL"));
-        sceps.getScep().add(scep);
-      }
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(stmt, rs);
-    }
-
-    System.out.println(" exported table SCEP");
-  } // method exportScep
 
   private void exportCaHasProfile(CaconfType caconf) throws DataAccessException {
     System.out.println("exporting table CA_HAS_PROFILE");

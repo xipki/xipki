@@ -241,7 +241,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
   }
 
   public String getResponderName() {
-    return getCa().getCaInfo().getResponderName();
+    return getCa().getCaInfo().getCmpResponderName();
   }
 
   @Override

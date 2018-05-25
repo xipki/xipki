@@ -30,8 +30,8 @@
         <keepExpiredCertDays>-1</keepExpiredCertDays>
         <permission>255</permission>
         <maxValidity>8000y</maxValidity>
-        <responderName>responder1</responderName>
-        <supportRest>true</supportRest>
+        <cmpResponderName>responder1</cmpResponderName>
+        <protocolSupport>cmp,rest</protocolSupport>
         <saveReq>false</saveReq>
         <signerType>${token.type}</signerType>
         <signerConf>

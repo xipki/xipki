@@ -73,13 +73,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="sceps" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="scep" type="scepType" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="users" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -146,15 +139,6 @@
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
-  <xs:complexType name="scepType">
-    <xs:sequence>
-      <xs:element name="caName" type="xs:string"/>
-      <xs:element name="responderName" type="xs:string"/>
-      <xs:element name="profiles" type="profilesType"/>
-      <xs:element name="control" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute name="name" type="xs:string" use="required"/>
-  </xs:complexType>
   <xs:complexType name="caType">
     <xs:all>
       <xs:element name="caInfo" type="caInfoType" minOccurs="0"/>
@@ -209,9 +193,11 @@
       <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="cmpControl" type="xs:string" minOccurs="0"/>
       <xs:element name="crlControl" type="xs:string" minOccurs="0"/>
-      <xs:element name="responderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="scepControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpResponderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="scepResponderName" type="xs:string" minOccurs="0"/>
       <xs:element name="crlSignerName" type="xs:string" minOccurs="0"/>
-      <xs:element name="supportRest" type="xs:boolean"/>
+      <xs:element name="protocolSupport" type="xs:string"/>
       <xs:element name="saveReq" type="xs:boolean"/>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>

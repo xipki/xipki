@@ -84,13 +84,13 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.Rest;
-import org.xipki.ca.server.api.Scep;
+import org.xipki.ca.server.api.RestResponder;
+import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.ca.server.impl.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
-import org.xipki.ca.server.impl.rest.RestImpl;
-import org.xipki.ca.server.impl.scep.ScepImpl;
+import org.xipki.ca.server.impl.rest.RestResponderImpl;
+import org.xipki.ca.server.impl.scep.ScepResponderImpl;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.PasswordHash;
@@ -107,15 +107,13 @@ import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
-import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
-import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
@@ -134,7 +132,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfilesType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublishersType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
@@ -298,10 +295,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
-  private final Map<String, ScepImpl> sceps = new ConcurrentHashMap<>();
-
-  private final Map<String, ScepEntry> scepDbEntries = new ConcurrentHashMap<>();
-
   private final Map<String, Set<String>> caHasProfiles = new ConcurrentHashMap<>();
 
   private final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
@@ -314,13 +307,15 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-  private final Map<String, CaCmpResponderImpl> x509Responders = new ConcurrentHashMap<>();
+  private final Map<String, CaCmpResponderImpl> cmpResponders = new ConcurrentHashMap<>();
+
+  private final Map<String, ScepResponderImpl> scepResponders = new ConcurrentHashMap<>();
 
   private final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
 
   private final DataSourceFactory datasourceFactory;
 
-  private final RestImpl rest;
+  private final RestResponderImpl restResponder;
 
   private Properties caConfProperties;
 
@@ -337,8 +332,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   private boolean publishersInitialized;
 
   private boolean casInitialized;
-
-  private boolean scepsInitialized;
 
   private Date lastStartTime;
 
@@ -387,7 +380,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     this.lockInstanceId = (hostAddress == null) ? calockId : hostAddress + "/" + calockId;
-    this.rest = new RestImpl(this);
+    this.restResponder = new RestResponderImpl(this);
   } // constructor
 
   public SecurityFactory getSecurityFactory() {
@@ -524,7 +517,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     initRequestors();
     initSigners();
     initCas();
-    initSceps();
   } // method init
 
   @Override
@@ -590,7 +582,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     certprofilesInitialized = false;
     publishersInitialized = false;
     casInitialized = false;
-    scepsInitialized = false;
 
     shutdownScheduledThreadPoolExecutor();
   } // method reset
@@ -654,7 +645,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       this.lastStartTime = new Date();
 
       x509cas.clear();
-      x509Responders.clear();
+      cmpResponders.clear();
+      scepResponders.clear();
 
       scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
       scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
@@ -776,8 +768,16 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     x509cas.put(caName, ca);
     CaCmpResponderImpl caResponder = new CaCmpResponderImpl(this, caName);
-    x509Responders.put(caName, caResponder);
+    cmpResponders.put(caName, caResponder);
 
+    if (caEntry.supportsScep() && caEntry.getScepResponderName() != null) {
+      try {
+        scepResponders.put(caName, new ScepResponderImpl(this, caEntry.getCaEntry()));
+      } catch (CaMgmtException ex) {
+        LogUtil.error(LOG, ex, concat("X509CA.<init> (scep=", caName, ")"));
+        return false;
+      }
+    }
     return true;
   } // method startCa
 
@@ -834,7 +834,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   @Override
   public CaCmpResponder getX509CaResponder(String name) {
-    return x509Responders.get(ParamUtil.requireNonBlankLower("name", name));
+    return cmpResponders.get(ParamUtil.requireNonBlankLower("name", name));
   }
 
   public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {
@@ -1044,33 +1044,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     publishersInitialized = true;
   } // method initPublishers
 
-  private void initSceps() throws CaMgmtException {
-    if (scepsInitialized) {
-      return;
-    }
-
-    sceps.clear();
-    scepDbEntries.clear();
-
-    List<String> names = queryExecutor.namesFromTable("SCEP");
-    for (String name : names) {
-      ScepEntry scepDb = queryExecutor.getScep(name, idNameMap);
-      if (scepDb == null) {
-        continue;
-      }
-
-      scepDbEntries.put(name, scepDb);
-
-      try {
-        ScepImpl scep = new ScepImpl(scepDb, this);
-        sceps.put(name, scep);
-      } catch (CaMgmtException ex) {
-        LogUtil.error(LOG, ex, concat("could not initialize SCEP entry ", name, ", ignore it"));
-      }
-    }
-    scepsInitialized = true;
-  } // method initSceps
-
   private void initCas() throws CaMgmtException {
     if (casInitialized) {
       return;
@@ -1096,7 +1069,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     caHasPublishers.remove(name);
     caHasRequestors.remove(name);
     X509Ca oldCa = x509cas.remove(name);
-    x509Responders.remove(name);
+    cmpResponders.remove(name);
+    scepResponders.remove(name);
     if (oldCa != null) {
       oldCa.shutdown();
     }
@@ -1179,14 +1153,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     queryExecutor.addCa(caEntry);
-    if (!createCa(name)) {
-      LOG.error("could not create CA {}", name);
-    } else {
+    if (createCa(name)) {
       if (startCa(name)) {
         LOG.info("started CA {}", name);
       } else {
         LOG.error("could not start CA {}", name);
       }
+    } else {
+      LOG.error("could not create CA {}", name);
     }
   } // method addCa
 
@@ -1210,9 +1184,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     queryExecutor.changeCa(entry, caInfos.get(name).getCaEntry(), securityFactory);
 
-    if (!createCa(name)) {
-      LOG.error("could not create CA {}", name);
-    } else {
+    if (createCa(name)) {
       CaInfo caInfo = caInfos.get(name);
       if (CaStatus.ACTIVE != caInfo.getCaEntry().getStatus()) {
         return;
@@ -1223,6 +1195,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       } else {
         LOG.error("could not start CA {}", name);
       }
+    } else {
+      LOG.error("could not create CA {}", name);
     }
   } // method changeCa
 
@@ -1623,25 +1597,18 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     for (String caName : caInfos.keySet()) {
       CaInfo caInfo = caInfos.get(caName);
-      if (name.equals(caInfo.getResponderName())) {
-        caInfo.setResponderName(null);
+      if (name.equals(caInfo.getCmpResponderName())) {
+        caInfo.setCmpResponderName(null);
+      }
+
+      if (name.equals(caInfo.getScepResponderName())) {
+        caInfo.setScepResponderName(null);
       }
 
       if (name.equals(caInfo.getCrlSignerName())) {
         caInfo.setCrlSignerName(null);
       }
 
-    }
-
-    for (String scepName : scepDbEntries.keySet()) {
-      ScepEntry scep = scepDbEntries.get(scepName);
-      if (name.equals(scep.getResponderName())) {
-        scep.setResponderName(null);
-        ScepImpl scepImpl = sceps.get(scepName);
-        if (scepImpl != null) {
-          scepImpl.setResponder(null);
-        }
-      }
     }
 
     signerDbEntries.remove(name);
@@ -1670,9 +1637,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     signerDbEntries.put(name, newResponder.getDbEntry());
     signers.put(name, newResponder);
 
-    for (ScepImpl scep : sceps.values()) {
-      if (name.equals(scep.getDbEntry().getResponderName())) {
-        scep.setResponder(newResponder);
+    for (String caName : scepResponders.keySet()) {
+      if (getCa(caName).getScepResponderName().equals(name)) {
+        // update the SCEP responder
+        scepResponders.get(caName).setResponder(newResponder);
       }
     }
   } // method changeSigner
@@ -1870,7 +1838,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     caHasPublishers.remove(name);
     caHasRequestors.remove(name);
     X509Ca ca = x509cas.remove(name);
-    x509Responders.remove(name);
+    cmpResponders.remove(name);
+    scepResponders.remove(name);
     if (ca != null) {
       ca.shutdown();
     }
@@ -2249,7 +2218,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     entry.setCert(caCert);
     entry.setCmpControl(caEntry.getCmpControl());
     entry.setCrlControl(caEntry.getCrlControl());
-    entry.setResponderName(caEntry.getResponderName());
+    entry.setScepControl(caEntry.getScepControl());
+    entry.setCmpResponderName(caEntry.getCmpResponderName());
+    entry.setScepResponderName(caEntry.getScepResponderName());
     entry.setCrlSignerName(caEntry.getCrlSignerName());
     entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
     entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
@@ -2257,7 +2228,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
     entry.setMaxValidity(caEntry.getMaxValidity());
     entry.setPermission(caEntry.getPermission());
-    entry.setSupportRest(caEntry.isSupportRest());
+    entry.setProtocolSupport(caEntry.getProtocoSupport());
     entry.setSaveRequest(caEntry.isSaveRequest());
     entry.setStatus(caEntry.getStatus());
     entry.setValidityMode(caEntry.getValidityMode());
@@ -2427,88 +2398,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method getCurrentCrl
 
   @Override
-  public void addScep(ScepEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    asssertMasterMode();
-
-    final String name = dbEntry.getName();
-    if (scepDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("SCEP named ", name, " exists"));
-    }
-    String caName = dbEntry.getCaIdent().getName();
-    NameId caIdent = idNameMap.getCa(caName);
-    if (caIdent == null) {
-      throw logAndCreateException(concat("unknown CA ", caName));
-    }
-
-    dbEntry.getCaIdent().setId(caIdent.getId());
-
-    ScepImpl scep = new ScepImpl(dbEntry, this);
-    queryExecutor.addScep(dbEntry);
-    scepDbEntries.put(name, dbEntry);
-    sceps.put(name, scep);
-  } // method addScep
-
-  @Override
-  public void removeScep(String name) throws CaMgmtException {
+  public ScepResponder getScepResponder(String name) {
     name = ParamUtil.requireNonBlankLower("name", name);
-    asssertMasterMode();
-    if (!queryExecutor.deleteRowWithName(name, "TUSER")) {
-      throw new CaMgmtException("unknown SCEP " + name);
-    }
-    scepDbEntries.remove(name);
-    sceps.remove(name);
-  } // method removeScep
-
-  public void changeScep(ChangeScepEntry scepEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("scepEntry", scepEntry);
-    asssertMasterMode();
-
-    String name = scepEntry.getName();
-    NameId caId = scepEntry.getCaIdent();
-    Boolean active = scepEntry.getActive();
-    String responderName = scepEntry.getResponderName();
-    String control = scepEntry.getControl();
-
-    if (caId == null && responderName == null && control == null) {
-      throw new IllegalArgumentException("nothing to change or SCEP " + name);
-    }
-
-    if (caId != null && caId.getId() == null) {
-      String caName = caId.getName();
-      caId = idNameMap.getCa(caName);
-      if (caId == null) {
-        throw new CaMgmtException(concat("Unknown CA ", caName));
-      }
-    }
-
-    ScepImpl scep = queryExecutor.changeScep(name, caId, active, responderName,
-        scepEntry.getCertprofiles(), control, this, securityFactory);
-    if (scep == null) {
-      throw new CaMgmtException("could not chagne SCEP " + name);
-    }
-
-    sceps.remove(name);
-    scepDbEntries.remove(name);
-    scepDbEntries.put(name, scep.getDbEntry());
-    sceps.put(name, scep);
-  } // method changeScep
-
-  @Override
-  public ScepEntry getScepEntry(String name) {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    return (scepDbEntries == null) ? null : scepDbEntries.get(name);
-  }
-
-  @Override
-  public Scep getScep(String name) {
-    name = ParamUtil.requireNonBlankLower("name", name);
-    return (sceps == null) ? null : sceps.get(name);
-  }
-
-  @Override
-  public Set<String> getScepNames() {
-    return (scepDbEntries == null) ? null : Collections.unmodifiableSet(scepDbEntries.keySet());
+    return (scepResponders == null) ? null : scepResponders.get(name);
   }
 
   static String canonicalizeSignerConf(String keystoreType, String signerConf,
@@ -2910,29 +2802,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         }
       } // scc.getUsers()
     } // cas
-
-    // SCEP
-    for (String name : conf.getScepNames()) {
-      ScepEntry entry = conf.getScep(name);
-      ScepEntry entryB = scepDbEntries.get(name);
-      if (entryB != null) {
-        if (entry.equals(entryB, ignoreId)) {
-          LOG.error("ignore existed SCEP {}", name);
-          continue;
-        } else {
-          throw logAndCreateException(concat("SCEP ", name, " existed, could not re-added it"));
-        }
-      } else {
-        try {
-          addScep(entry);
-          LOG.info("added SCEP {}", name);
-        } catch (CaMgmtException ex) {
-          String msg = concat("could not add SCEP ", name);
-          LogUtil.error(LOG, ex, msg);
-          throw new CaMgmtException(msg);
-        }
-      }
-    }
   }
 
   @Override
@@ -3089,9 +2958,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             ciJaxb.setCrlSignerName(entry.getCrlSignerName());
           }
 
-          if (entry.getResponderName() != null) {
-            includeSignerNames.add(entry.getResponderName());
-            ciJaxb.setResponderName(entry.getResponderName());
+          if (entry.getCmpResponderName() != null) {
+            includeSignerNames.add(entry.getCmpResponderName());
+            ciJaxb.setCmpResponderName(entry.getCmpResponderName());
+          }
+
+          if (entry.getScepResponderName() != null) {
+            includeSignerNames.add(entry.getScepResponderName());
+            ciJaxb.setScepResponderName(entry.getScepResponderName());
           }
 
           if (entry.getCmpControl() != null) {
@@ -3100,6 +2974,10 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
           if (entry.getCrlControl() != null) {
             ciJaxb.setCrlControl(entry.getCrlControl().getConf());
+          }
+
+          if (entry.getScepControl() != null) {
+            ciJaxb.setScepControl(entry.getScepControl().getConf());
           }
 
           CaUris caUris = entry.getCaUris();
@@ -3132,6 +3010,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setSnSize(entry.getSerialNoBitLen());
           ciJaxb.setStatus(entry.getStatus().getStatus());
           ciJaxb.setValidityMode(entry.getValidityMode().name());
+          ciJaxb.setProtocolSupport(entry.getProtocoSupport().getEncoded());
 
           jaxb.setCaInfo(ciJaxb);
 
@@ -3213,35 +3092,6 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         if (!list.isEmpty()) {
           root.setProfiles(new CaconfType.Profiles());
           root.getProfiles().getProfile().addAll(list);
-        }
-      }
-
-      // sceps
-      if (CollectionUtil.isNonEmpty(scepDbEntries)) {
-        List<ScepType> list = new LinkedList<>();
-        for (String name : scepDbEntries.keySet()) {
-          ScepEntry entry = scepDbEntries.get(name);
-          String caName = entry.getCaIdent().getName();
-          if (!caNames.contains(caName)) {
-            continue;
-          }
-
-          String responderName = entry.getResponderName();
-          includeSignerNames.add(responderName);
-
-          ScepType jaxb = new ScepType();
-          jaxb.setName(name);
-          jaxb.setCaName(caName);
-          jaxb.setResponderName(responderName);
-          jaxb.setProfiles(createProfiles(entry.getCertprofiles()));
-          jaxb.setControl(entry.getControl());
-
-          list.add(jaxb);
-        }
-
-        if (!list.isEmpty()) {
-          root.setSceps(new CaconfType.Sceps());
-          root.getSceps().getScep().addAll(list);
         }
       }
 
@@ -3382,8 +3232,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   }
 
   @Override
-  public Rest getRest() {
-    return rest;
+  public RestResponder getRestResponder() {
+    return restResponder;
   }
 
   private static String concat(String s1, String... strs) {

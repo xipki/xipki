@@ -17,7 +17,12 @@
 
 package org.xipki.ca.server.api;
 
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.cms.CMSSignedData;
 import org.xipki.audit.AuditEvent;
+import org.xipki.ca.api.OperationException;
+import org.xipki.scep.exception.MessageDecodingException;
+import org.xipki.scep.message.CaCaps;
 
 /**
  * TODO.
@@ -25,8 +30,14 @@ import org.xipki.audit.AuditEvent;
  * @since 3.0.1
  */
 
-public interface Rest {
+public interface ScepResponder {
 
-  RestResponse service(String path, AuditEvent event, byte[] request,
-      HttpRequestMetadataRetriever httpRetriever);
+  boolean isOnService();
+
+  CaCaps getCaCaps();
+
+  ScepCaCertRespBytes getCaCertResp() throws OperationException;
+
+  ContentInfo servicePkiOperation(CMSSignedData requestContent, String certprofileName,
+      String msgId, AuditEvent event) throws MessageDecodingException, OperationException;
 }

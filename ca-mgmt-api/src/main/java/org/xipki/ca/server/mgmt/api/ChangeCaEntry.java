@@ -47,7 +47,11 @@ public class ChangeCaEntry {
 
   private String crlControl;
 
-  private String responderName;
+  private String scepControl;
+
+  private String cmpResponderName;
+
+  private String scepResponderName;
 
   private String crlSignerName;
 
@@ -55,7 +59,11 @@ public class ChangeCaEntry {
 
   private Boolean duplicateSubjectPermitted;
 
+  private Boolean supportCmp;
+
   private Boolean supportRest;
+
+  private Boolean supportScep;
 
   private Boolean saveRequest;
 
@@ -133,12 +141,28 @@ public class ChangeCaEntry {
     this.crlControl = crlControl;
   }
 
-  public String getResponderName() {
-    return responderName;
+  public String getScepControl() {
+    return scepControl;
   }
 
-  public void setResponderName(String responderName) {
-    this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+  public void setScepControl(String scepControl) {
+    this.scepControl = scepControl;
+  }
+
+  public String getCmpResponderName() {
+    return cmpResponderName;
+  }
+
+  public void setCmpResponderName(String responderName) {
+    this.cmpResponderName = (responderName == null) ? null : responderName.toLowerCase();
+  }
+
+  public String getScepResponderName() {
+    return scepResponderName;
+  }
+
+  public void setScepResponderName(String responderName) {
+    this.scepResponderName = (responderName == null) ? null : responderName.toLowerCase();
   }
 
   public String getCrlSignerName() {
@@ -173,12 +197,28 @@ public class ChangeCaEntry {
     this.validityMode = validityMode;
   }
 
+  public Boolean getSupportCmp() {
+    return supportCmp;
+  }
+
+  public void setSupportCmp(Boolean supportCmp) {
+    this.supportCmp = supportCmp;
+  }
+
   public Boolean getSupportRest() {
     return supportRest;
   }
 
   public void setSupportRest(Boolean supportRest) {
     this.supportRest = supportRest;
+  }
+
+  public Boolean getSupportScep() {
+    return supportScep;
+  }
+
+  public void setSupportScep(Boolean supportScep) {
+    this.supportScep = supportScep;
   }
 
   public Boolean getSaveRequest() {

@@ -300,7 +300,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/subca1.der \
     --cmp-control $CMP_CONTROL \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes
 
@@ -313,7 +313,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes \
     --validity-mode cutoff
@@ -340,7 +340,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/rootca1-2.der \
     --cmp-control $CMP_CONTROL \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject no \
     --duplicate-key no \
     --validity-mode strict
@@ -372,7 +372,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes \
     --validity-mode cutoff
@@ -393,7 +393,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
     --validity-mode cutoff
@@ -411,7 +411,7 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.der \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
     --validity-mode cutoff
@@ -431,7 +431,7 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1.der \
     --crl-signer crlsigner2 \
     --cmp-control $CMP_CONTROL \
-    --responder responder1 \
+    --cmp-responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
     --validity-mode cutoff
@@ -450,7 +450,7 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
-    --responder responder2 \
+    --cmp-responder responder2 \
     --duplicate-subject  yes \
     --duplicate-key yes \
     --validity-mode cutoff

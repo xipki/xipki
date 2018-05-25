@@ -30,6 +30,8 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
+import org.xipki.ca.server.mgmt.api.ProtocolSupport;
+import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
@@ -95,15 +97,22 @@ public abstract class CaAddOrGenAction extends CaAction {
   @Completion(SignerNameCompleter.class)
   private String crlSignerName;
 
-  @Option(name = "--responder", description = "Responder name")
+  @Option(name = "--cmp-responder", description = "CMP responder name")
   @Completion(SignerNameCompleter.class)
-  private String responderName;
+  private String cmpResponderName;
+
+  @Option(name = "--scep-responder", description = "SCEP responder name")
+  @Completion(SignerNameCompleter.class)
+  private String scepResponderName;
 
   @Option(name = "--cmp-control", description = "CMP control")
   private String cmpControl;
 
   @Option(name = "--crl-control", description = "CRL control")
   private String crlControl;
+
+  @Option(name = "--scep-control", description = "SCEP control")
+  private String scepControl;
 
   @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
   private Integer numCrls = 30;
@@ -127,9 +136,17 @@ public abstract class CaAddOrGenAction extends CaAction {
   @Completion(YesNoCompleter.class)
   private String duplicateSubjectS = "yes";
 
-  @Option(name = "--support-rest", description = "whether the REST API is supported")
+  @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
+  @Completion(YesNoCompleter.class)
+  private String supportCmpS = "no";
+
+  @Option(name = "--support-rest", description = "whether the REST protocol is supported")
   @Completion(YesNoCompleter.class)
   private String supportRestS = "no";
+
+  @Option(name = "--support-scep", description = "whether the SCEP protocol is supported")
+  @Completion(YesNoCompleter.class)
+  private String supportScepS = "no";
 
   @Option(name = "--save-req", description = "whether the request is saved")
   @Completion(YesNoCompleter.class)
@@ -177,7 +194,11 @@ public abstract class CaAddOrGenAction extends CaAction {
     boolean duplicateSubjectPermitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
     entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
-    entry.setSupportRest(isEnabled(supportRestS, false, "support-scep"));
+    ProtocolSupport protocolSupport = new ProtocolSupport(
+        isEnabled(supportCmpS, false, "support-cmp"),
+        isEnabled(supportRestS, false, "support-rest"),
+        isEnabled(supportScepS, false, "support-scep"));
+    entry.setProtocolSupport(protocolSupport);
     entry.setSaveRequest(isEnabled(saveReqS, false, "save-req"));
 
     ValidityMode validityMode = ValidityMode.forName(validityModeS);
@@ -193,8 +214,16 @@ public abstract class CaAddOrGenAction extends CaAction {
       entry.setCrlControl(new CrlControl(crlControl));
     }
 
-    if (responderName != null) {
-      entry.setResponderName(responderName);
+    if (scepControl != null) {
+      entry.setScepControl(new ScepControl(scepControl));
+    }
+
+    if (cmpResponderName != null) {
+      entry.setCmpResponderName(cmpResponderName);
+    }
+
+    if (scepResponderName != null) {
+      entry.setCmpResponderName(scepResponderName);
     }
 
     if (crlSignerName != null) {

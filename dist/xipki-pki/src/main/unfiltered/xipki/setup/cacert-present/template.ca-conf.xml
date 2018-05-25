@@ -87,14 +87,16 @@
         <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</cmpControl>
          <!-- create CRL at 02:00 UTC, one per day, with overlapping time 90 minutes -->
         <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00</crlControl>
+        <scepControl>cacert.included=false,signercert.included=true,support.getcrl=true</scepControl>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>
         <keepExpiredCertDays>-1</keepExpiredCertDays>
         <permission>255</permission>
         <maxValidity>10y</maxValidity>
-        <responderName>responder1</responderName>
-        <supportRest>true</supportRest>
+        <cmpResponderName>responder1</cmpResponderName>
+        <scepResponderName>scep-responder1</scepResponderName>
+        <protocolSupport>cmp,rest,scep</protocolSupport>
         <saveReq>false</saveReq>
         <signerType>${token.type}</signerType>
         <signerConf>
@@ -147,14 +149,4 @@
       </publishers>
     </ca>
   </cas>
-  <sceps>
-    <scep name="scep1">
-      <caName>myca1</caName>
-      <responderName>scep-responder1</responderName>
-      <profiles>
-        <profile>all</profile>
-      </profiles>
-      <control>cacert.included=false,signercert.included=true,support.getcrl=true</control>
-    </scep>
-  </sceps>
 </caconf>

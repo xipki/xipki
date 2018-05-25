@@ -64,13 +64,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="sceps">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="scep" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="users">
         <xs:complexType>
           <xs:sequence>
@@ -158,12 +151,14 @@
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType"/>
       <xs:element name="crlSignerName" type="xs:string" minOccurs="0"/>
-      <xs:element name="responderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpResponderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="scepResponderName" type="xs:string" minOccurs="0"/>
       <xs:element name="cmpControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="scepControl" type="xs:string" minOccurs="0"/>
       <xs:element name="crlControl" type="xs:string" minOccurs="0"/>
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
-      <xs:element name="supportScep" type="xs:int"/>
+      <xs:element name="protocolSupport" type="xs:string"/>
       <xs:element name="saveReq" type="xs:int"/>
       <xs:element name="permission" type="xs:int"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
@@ -203,17 +198,6 @@
     <xs:sequence>
       <xs:element name="caId" type="xs:int"/>
       <xs:element name="profileId" type="xs:int"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="scep" type="scepType"/>
-  <xs:complexType name="scepType">
-    <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="active" type="xs:int"/>
-      <xs:element name="caId" type="xs:int"/>
-      <xs:element name="profiles" type="xs:string" minOccurs="0"/>
-      <xs:element name="responderName" type="xs:string"/>
-      <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="user" type="userType"/>

@@ -46,8 +46,8 @@ echo "# add SCEP"
 ca:signer-add --name scep-responder1 --type pkcs12 \
   --conf password=1234,keystore=file:${KEYCERTS_DIR}/scep1.p12,algo=SHA256withRSA
 
-ca:scep-add --name scep1 --ca myca1 --profile all --responder scep-responder1 \
-  --control cacert.included=false,signercert.included=true,support.getcrl=true
+ca:ca-up --name myca1 --scep-responder scep-responder1 --support-scep yes \
+  --scep-control cacert.included=false,signercert.included=true,support.getcrl=true
 
 echo "# Generate key and certificate for OCSPResponder"
 

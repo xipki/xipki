@@ -59,10 +59,11 @@ import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
+import org.xipki.ca.server.mgmt.api.ProtocolSupport;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
+import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.SignerEntry;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
@@ -78,7 +79,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ObjectFactory;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
-import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
@@ -121,8 +121,6 @@ public class CaConf {
   private final Map<String, CertprofileEntry> certprofiles = new HashMap<>();
 
   private final Map<String, SingleCaConf> cas = new HashMap<>();
-
-  private final Map<String, ScepEntry> sceps = new HashMap<>();
 
   private String baseDir;
 
@@ -362,7 +360,12 @@ public class CaConf {
             caEntry.setCrlControl(new CrlControl(ci.getCrlControl()));
           }
 
-          caEntry.setResponderName(ci.getResponderName());
+          if (ci.getScepControl() != null) {
+            caEntry.setScepControl(new ScepControl(ci.getScepControl()));
+          }
+
+          caEntry.setCmpResponderName(ci.getCmpResponderName());
+          caEntry.setScepResponderName(ci.getScepResponderName());
           caEntry.setCrlSignerName(ci.getCrlSignerName());
 
           caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
@@ -381,7 +384,10 @@ public class CaConf {
           caEntry.setMaxValidity(CertValidity.getInstance(ci.getMaxValidity()));
           caEntry.setPermission(ci.getPermission());
 
-          caEntry.setSupportRest(ci.isSupportRest());
+          if (ci.getProtocolSupport() != null) {
+            caEntry.setProtocolSupport(new ProtocolSupport(ci.getProtocolSupport()));
+          }
+
           caEntry.setSaveRequest(ci.isSaveReq());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 
@@ -469,18 +475,6 @@ public class CaConf {
       }
     }
 
-    // SCEPs
-    if (jaxb.getSceps() != null) {
-      for (ScepType m : jaxb.getSceps().getScep()) {
-        String name = m.getName();
-        NameId caIdent = new NameId(null, m.getCaName());
-        List<String> profiles = m.getProfiles().getProfile();
-        ScepEntry dbEntry = new ScepEntry(name, caIdent, true, m.getResponderName(),
-            new HashSet<>(profiles), m.getControl());
-        sceps.put(name, dbEntry);
-      }
-    }
-
   }
 
   public void addSigner(SignerEntry signer) {
@@ -564,19 +558,6 @@ public class CaConf {
 
   public SingleCaConf getCa(String name) {
     return cas.get(ParamUtil.requireNonNull("name", name));
-  }
-
-  public void addScep(ScepEntry scep) {
-    ParamUtil.requireNonNull("scep", scep);
-    this.sceps.put(scep.getName(), scep);
-  }
-
-  public Set<String> getScepNames() {
-    return Collections.unmodifiableSet(sceps.keySet());
-  }
-
-  public ScepEntry getScep(String name) {
-    return sceps.get(ParamUtil.requireNonNull("name", name));
   }
 
   private String getValue(FileOrValueType fileOrValue, ZipFile zipFile) throws IOException {

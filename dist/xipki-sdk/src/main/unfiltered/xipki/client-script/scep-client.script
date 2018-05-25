@@ -18,7 +18,7 @@
 
 HASH = SHA256
 
-URL = http://localhost:8080/scep/scep1/tls/pkiclient.exe
+URL = http://localhost:8080/scep/myca/tls/pkiclient.exe
 
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"

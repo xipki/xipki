@@ -106,15 +106,22 @@ public class CaUpdateAction extends CaAction {
   @Completion(SignerNamePlusNullCompleter.class)
   private String crlSignerName;
 
-  @Option(name = "--responder", description = "responder name or 'null'")
+  @Option(name = "--cmp-responder", description = "CMP responder name or 'null'")
   @Completion(SignerNamePlusNullCompleter.class)
-  private String responderName;
+  private String cmpResponderName;
+
+  @Option(name = "--scep-responder", description = "SCEP responder name or 'null'")
+  @Completion(SignerNamePlusNullCompleter.class)
+  private String scepResponderName;
 
   @Option(name = "--cmp-control", description = "CMP control or 'null'")
   private String cmpControl;
 
-  @Option(name = "--rl-control", description = "CRL control or 'null'")
+  @Option(name = "--crl-control", description = "CRL control or 'null'")
   private String crlControl;
+
+  @Option(name = "--scep-control", description = "SCEP control or 'null'")
+  private String scepControl;
 
   @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
   private Integer numCrls;
@@ -138,13 +145,21 @@ public class CaUpdateAction extends CaAction {
   @Completion(YesNoCompleter.class)
   private String duplicateSubjectS;
 
-  @Option(name = "--support-rest", description = "whether REST API is supported")
+  @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
   @Completion(YesNoCompleter.class)
-  private String supportRestS = "no";
+  private String supportCmpS;
+
+  @Option(name = "--support-rest", description = "whether the REST protocol is supported")
+  @Completion(YesNoCompleter.class)
+  private String supportRestS;
+
+  @Option(name = "--support-scep", description = "whether the SCEP protocol is supported")
+  @Completion(YesNoCompleter.class)
+  private String supportScepS;
 
   @Option(name = "--save-req", description = "whether the request is saved")
   @Completion(YesNoCompleter.class)
-  private String saveReqS = "yes";
+  private String saveReqS;
 
   @Option(name = "--validity-mode", description = "mode of valditity")
   @Completion(ValidityModeCompleter.class)
@@ -205,8 +220,16 @@ public class CaUpdateAction extends CaAction {
       entry.setDuplicateSubjectPermitted(isEnabled(duplicateSubjectS, true, "duplicate-subject"));
     }
 
+    if (supportCmpS != null) {
+      entry.setSupportCmp(isEnabled(supportCmpS, false, "support-cmp"));
+    }
+
     if (supportRestS != null) {
       entry.setSupportRest(isEnabled(supportRestS, false, "support-rest"));
+    }
+
+    if (supportScepS != null) {
+      entry.setSupportScep(isEnabled(supportScepS, false, "support-scep"));
     }
 
     if (saveReqS != null) {
@@ -239,8 +262,16 @@ public class CaUpdateAction extends CaAction {
       entry.setCrlControl(crlControl);
     }
 
-    if (responderName != null) {
-      entry.setResponderName(responderName);
+    if (scepControl != null) {
+      entry.setScepControl(scepControl);
+    }
+
+    if (cmpResponderName != null) {
+      entry.setCmpResponderName(cmpResponderName);
+    }
+
+    if (scepResponderName != null) {
+      entry.setScepResponderName(scepResponderName);
     }
 
     if (crlSignerName != null) {

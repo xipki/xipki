@@ -30,6 +30,6 @@ ca:signer-add --name scep-responder1 --type PKCS12 \
   --conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/scep1.p12,algo=SHA256withRSA
 
 # with encrypted password 1234
-ca:scep-add --name scep1 --ca subcawithcrl1 --profile all --responder scep-responder1 \
-  --control cacert.included=false,signercert.included=true,support.getcrl=true
+ca:ca-up --name subcawithcrl1 --scep-responder scep-responder1 --support-scep yes \
+  --scep-control cacert.included=false,signercert.included=true,support.getcrl=true
 

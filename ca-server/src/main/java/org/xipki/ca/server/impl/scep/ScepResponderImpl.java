@@ -59,8 +59,8 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.Scep;
 import org.xipki.ca.server.api.ScepCaCertRespBytes;
+import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.ca.server.impl.ByUserRequestorInfo;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
@@ -68,12 +68,11 @@ import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.SignerEntryWrapper;
 import org.xipki.ca.server.impl.X509Ca;
 import org.xipki.ca.server.impl.util.CaUtil;
+import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.ScepControl;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
@@ -104,21 +103,15 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  *
  */
-public class ScepImpl implements Scep {
+public class ScepResponderImpl implements ScepResponder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ScepImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ScepResponderImpl.class);
 
   private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
   private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGOS = new HashSet<>();
 
-  private final String name;
-
   private final NameId caIdent;
-
-  private final ScepEntry dbEntry;
-
-  private final Set<String> certprofiles;
 
   private final ScepControl control;
 
@@ -150,22 +143,12 @@ public class ScepImpl implements Scep {
     AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
   }
 
-  public ScepImpl(ScepEntry dbEntry, CaManagerImpl caManager) throws CaMgmtException {
+  public ScepResponderImpl(CaManagerImpl caManager, CaEntry caEntry) throws CaMgmtException {
     this.caManager = ParamUtil.requireNonNull("caManager", caManager);
-    this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-    this.name = dbEntry.getName();
-    this.caIdent = dbEntry.getCaIdent();
-    this.certprofiles = dbEntry.getCertprofiles();
-    try {
-      this.control = new ScepControl(dbEntry.getControl());
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(ex);
-    }
-    LOG.info("SCEP {}: cacert.included={}, signercert.included={},support.getcrl={}",
-        this.caIdent, this.control.isIncludeCaCert(), this.control.isIncludeSignerCert(),
-        this.control.isSupportGetCrl());
+    this.caIdent = ParamUtil.requireNonNull("caEntry", caEntry).getIdent();
+    this.control = caEntry.getScepControl();
+    String responderName = caEntry.getScepResponderName();
 
-    String responderName = dbEntry.getResponderName();
     SignerEntryWrapper responder = caManager.getSignerWrapper(responderName);
     if (responder == null) {
       throw new CaMgmtException("Unknown responder " + responderName);
@@ -196,14 +179,14 @@ public class ScepImpl implements Scep {
     }
 
     if (!(signer.getCertificate().getPublicKey() instanceof RSAPublicKey)) {
-      throw new IllegalArgumentException("The responder key is not RSA key for SCEP " + name);
+      throw new IllegalArgumentException("The SCEP responder key is not RSA key for CA "
+          + caIdent.getName());
     }
 
     this.responderKey = (PrivateKey) signingKey;
     this.responderCert = signer.getCertificate();
     this.envelopedDataDecryptor =
-        new EnvelopedDataDecryptor(
-            new EnvelopedDataDecryptorInstance(responderCert, responderKey));
+        new EnvelopedDataDecryptor(new EnvelopedDataDecryptorInstance(responderCert, responderKey));
   }
 
   /**
@@ -215,16 +198,8 @@ public class ScepImpl implements Scep {
     this.maxSigningTimeBiasInMs = ms;
   }
 
-  public String getName() {
-    return name;
-  }
-
   public NameId getCaIdent() {
     return caIdent;
-  }
-
-  public ScepEntry getDbEntry() {
-    return dbEntry;
   }
 
   public CaCaps getCaCaps() {
@@ -236,45 +211,30 @@ public class ScepImpl implements Scep {
     return caCertRespBytes;
   }
 
-  public boolean supportsCertprofile(String profileName) {
-    if (certprofiles.contains("all") || certprofiles.contains(profileName.toLowerCase())) {
-      X509Ca ca;
-      try {
-        ca = caManager.getX509Ca(caIdent);
-      } catch (CaMgmtException ex) {
-        LogUtil.warn(LOG, ex);
-        return false;
-      }
-      return ca.supportsCertprofile(profileName);
-    } else {
-      return false;
-    }
-  }
-
   @Override
   public boolean isOnService() {
-    return getStatus() == CaStatus.ACTIVE;
-  }
-
-  public CaStatus getStatus() {
-    if (!dbEntry.isActive()) {
-      return CaStatus.INACTIVE;
-    }
-
+    X509Ca ca;
     try {
-      return caManager.getX509Ca(caIdent).getCaInfo().getStatus();
+      ca = caManager.getX509Ca(caIdent);
     } catch (CaMgmtException ex) {
-      LogUtil.error(LOG, ex);
-      return CaStatus.INACTIVE;
+      LogUtil.warn(LOG, ex);
+      return false;
     }
+
+    if (ca == null) {
+      return false;
+    }
+
+    if (!ca.getCaInfo().supportsScep()) {
+      return false;
+    }
+    return ca.getCaInfo().getStatus() == CaStatus.ACTIVE;
   }
 
   public ContentInfo servicePkiOperation(CMSSignedData requestContent, String certprofileName,
       String msgId, AuditEvent event) throws MessageDecodingException, OperationException {
-    CaStatus status = getStatus();
-
-    if (CaStatus.ACTIVE != status) {
-      LOG.warn("SCEP {} is not active", caIdent);
+    if (!isOnService()) {
+      LOG.warn("SCEP {} is not active", caIdent.getName());
       throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE);
     }
 

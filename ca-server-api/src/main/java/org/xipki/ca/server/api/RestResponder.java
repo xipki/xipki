@@ -15,24 +15,18 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.ca.server.api;
 
-import java.util.Set;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.audit.AuditEvent;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 3.0.1
  */
 
-@Service
-public class ScepNameCompleter extends MgmtNameCompleter {
+public interface RestResponder {
 
-  @Override
-  protected Set<String> getEnums() {
-    return caManager.getScepNames();
-  }
-
+  RestResponse service(String path, AuditEvent event, byte[] request,
+      HttpRequestMetadataRetriever httpRetriever);
 }

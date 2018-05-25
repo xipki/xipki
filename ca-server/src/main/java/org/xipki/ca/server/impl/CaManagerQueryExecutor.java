@@ -27,7 +27,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,7 +42,6 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.SqlColumn.ColumnType;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
-import org.xipki.ca.server.impl.scep.ScepImpl;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
@@ -59,10 +57,11 @@ import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CrlControl;
+import org.xipki.ca.server.mgmt.api.ProtocolSupport;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
+import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.SignerEntry;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.ConfPairs;
@@ -91,7 +90,6 @@ class CaManagerQueryExecutor {
   private static final ColumnType INT = ColumnType.INT;
   private static final ColumnType BOOL = ColumnType.BOOL;
   private static final ColumnType STRING = ColumnType.STRING;
-  private static final ColumnType COLL_STRING = ColumnType.COLL_STRING;
 
   private final DataSourceWrapper datasource;
 
@@ -105,7 +103,6 @@ class CaManagerQueryExecutor {
   private final String sqlSelectCaId;
   private final String sqlSelectCa;
   private final String sqlNextSelectCrlNo;
-  private final String sqlSelectScep;
   private final String sqlSelectSystemEvent;
   private final String sqlSelectUserId;
   private final String sqlSelectUser;
@@ -120,14 +117,12 @@ class CaManagerQueryExecutor {
     this.sqlSelectRequestor = buildSelectFirstSql("ID,CERT FROM REQUESTOR WHERE NAME=?");
     this.sqlSelectSigner = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
-    this.sqlSelectCa = buildSelectFirstSql(
-        "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE,RESPONDER_NAME,CRL_SIGNER_NAME,"
-        + "CMP_CONTROL,CRL_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,"
-        + "PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,"
-        + "CA_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
+    this.sqlSelectCa = buildSelectFirstSql("ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,"
+        + "SIGNER_TYPE,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,"
+        + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,"
+        + "SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV_INFO,"
+        + "VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
-    this.sqlSelectScep = buildSelectFirstSql(
-        "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_NAME FROM SCEP WHERE NAME=?");
     this.sqlSelectSystemEvent = buildSelectFirstSql(
         "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
     this.sqlSelectUserId = buildSelectFirstSql("ID FROM TUSER WHERE NAME=?");
@@ -445,9 +440,14 @@ class CaManagerQueryExecutor {
         entry.setCrlSignerName(crlsignerName);
       }
 
-      String responderName = rs.getString("RESPONDER_NAME");
-      if (StringUtil.isNotBlank(responderName)) {
-        entry.setResponderName(responderName);
+      String cmpResponderName = rs.getString("CMP_RESPONDER_NAME");
+      if (StringUtil.isNotBlank(cmpResponderName)) {
+        entry.setCmpResponderName(cmpResponderName);
+      }
+
+      String scepResponderName = rs.getString("SCEP_RESPONDER_NAME");
+      if (StringUtil.isNotBlank(scepResponderName)) {
+        entry.setScepResponderName(scepResponderName);
       }
 
       String extraControl = rs.getString("EXTRA_CONTROL");
@@ -456,12 +456,11 @@ class CaManagerQueryExecutor {
       }
 
       String cmpcontrol = rs.getString("CMP_CONTROL");
-      if (StringUtil.isNotBlank(cmpcontrol)) {
-        try {
-          entry.setCmpControl(new CmpControl(cmpcontrol));
-        } catch (InvalidConfException ex) {
-          throw new CaMgmtException("invalid CMP_CONTROL: " + cmpcontrol);
-        }
+      // null or blank value is allowed
+      try {
+        entry.setCmpControl(new CmpControl(cmpcontrol));
+      } catch (InvalidConfException ex) {
+        throw new CaMgmtException("invalid CMP_CONTROL: " + cmpcontrol);
       }
 
       String crlcontrol = rs.getString("CRL_CONTROL");
@@ -473,9 +472,17 @@ class CaManagerQueryExecutor {
         }
       }
 
+      String scepcontrol = rs.getString("SCEP_CONTROL");
+      // null or blank value is allowed
+      try {
+        entry.setScepControl(new ScepControl(scepcontrol));
+      } catch (InvalidConfException ex) {
+        throw new CaMgmtException("invalid SCEP_CONTROL: " + scepcontrol, ex);
+      }
+
       entry.setDuplicateKeyPermitted((rs.getInt("DUPLICATE_KEY") != 0));
       entry.setDuplicateSubjectPermitted((rs.getInt("DUPLICATE_SUBJECT") != 0));
-      entry.setSupportRest((rs.getInt("SUPPORT_REST") != 0));
+      entry.setProtocolSupport(new ProtocolSupport(rs.getString("PROTOCOL_SUPPORT")));
       entry.setSaveRequest((rs.getInt("SAVE_REQ") != 0));
       entry.setPermission(rs.getInt("PERMISSION"));
 
@@ -609,10 +616,11 @@ class CaManagerQueryExecutor {
     }
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
-        + "MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,"
-        + "DUPLICATE_KEY,DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,"
-        + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "MAX_VALIDITY,CERT,SIGNER_TYPE,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
+        + "CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,"
+        + "SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,"
+        + "EXTRA_CONTROL,SIGNER_CONF) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -633,7 +641,8 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, Base64.encodeToString(encodedCert));
       ps.setString(idx++, caEntry.getSignerType());
       ps.setString(idx++, caEntry.getCrlSignerName());
-      ps.setString(idx++, caEntry.getResponderName());
+      ps.setString(idx++, caEntry.getCmpResponderName());
+      ps.setString(idx++, caEntry.getScepResponderName());
 
       CrlControl crlControl = caEntry.getCrlControl();
       ps.setString(idx++, (crlControl == null ? null : crlControl.getConf()));
@@ -641,9 +650,15 @@ class CaManagerQueryExecutor {
       CmpControl cmpControl = caEntry.getCmpControl();
       ps.setString(idx++, (cmpControl == null ? null : cmpControl.getConf()));
 
+      ScepControl scepControl = caEntry.getScepControl();
+      ps.setString(idx++, (scepControl == null ? null : scepControl.getConf()));
+
       setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
       setBoolean(ps, idx++, caEntry.isDuplicateSubjectPermitted());
-      setBoolean(ps, idx++, caEntry.isSupportRest());
+
+      ProtocolSupport protocolSupport = caEntry.getProtocoSupport();
+      ps.setString(idx++, (protocolSupport == null ? null : protocolSupport.getEncoded()));
+
       setBoolean(ps, idx++, caEntry.isSaveRequest());
       ps.setInt(idx++, caEntry.getPermission());
       ps.setInt(idx++, caEntry.getNumCrls());
@@ -1013,7 +1028,11 @@ class CaManagerQueryExecutor {
 
     String caUrisStr = null;
     CaUris changeUris = changeCaEntry.getCaUris();
-    if (changeUris != null) {
+    if (changeUris != null
+        && (changeUris.getCacertUris() != null
+          || changeUris.getCrlUris() != null
+          || changeUris.getDeltaCrlUris() != null
+          || changeUris.getOcspUris() != null)) {
       CaUris oldCaUris = currentCaEntry.getCaUris();
 
       List<String> uris = changeUris.getCacertUris();
@@ -1035,18 +1054,44 @@ class CaManagerQueryExecutor {
       }
     }
 
+    String protocolSupportStr = null;
+    Boolean supportCmp = changeCaEntry.getSupportCmp();
+    Boolean supportRest = changeCaEntry.getSupportRest();
+    Boolean supportScep = changeCaEntry.getSupportScep();
+    if (supportCmp != null || supportRest != null || supportScep != null) {
+      ProtocolSupport oldSupport = currentCaEntry.getProtocoSupport();
+      ProtocolSupport support = new ProtocolSupport(oldSupport.supportsCmp(),
+          oldSupport.supportsRest(), oldSupport.supportsScep());
+
+      if (supportCmp != null) {
+        support.setCmp(supportCmp);
+      }
+
+      if (supportRest != null) {
+        support.setRest(supportRest);
+      }
+
+      if (supportScep != null) {
+        support.setScep(supportScep);
+      }
+
+      protocolSupportStr = support.getEncoded();
+    }
+
     changeIfNotNull("CA", col(INT, "ID", changeCaEntry.getIdent().getId()),
         col(INT, "SN_SIZE", changeCaEntry.getSerialNoBitLen()), col(STRING, "STATUS", status),
         col(STRING, "SUBJECT", subject), col(STRING, "CERT", base64Cert),
         col(STRING, "CA_URIS", caUrisStr),
         col(STRING, "MAX_VALIDITY", maxValidity), col(STRING, "SIGNER_TYPE", signerType),
         col(STRING, "CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
-        col(STRING, "RESPONDER_NAME", changeCaEntry.getResponderName()),
+        col(STRING, "CMP_RESPONDER_NAME", changeCaEntry.getCmpResponderName()),
+        col(STRING, "SCEP_RESPONDER_NAME", changeCaEntry.getScepResponderName()),
         col(STRING, "CMP_CONTROL", changeCaEntry.getCmpControl()),
         col(STRING, "CRL_CONTROL", changeCaEntry.getCrlControl()),
+        col(STRING, "SCEP_CONTROL", changeCaEntry.getScepControl()),
         col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
         col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
-        col(BOOL, "SUPPORT_REST", changeCaEntry.getSupportRest()),
+        col(STRING, "PROTOCOL_SUPPORT", protocolSupportStr),
         col(BOOL, "SAVE_REQ", changeCaEntry.getSaveRequest()),
         col(INT, "PERMISSION", changeCaEntry.getPermission()),
         col(INT, "NUM_CRLS", changeCaEntry.getNumCrls()),
@@ -1217,11 +1262,6 @@ class CaManagerQueryExecutor {
         ps.setInt(index, val);
         valText = Integer.toString(val);
       }
-    } else if (type == ColumnType.COLL_STRING) {
-      @SuppressWarnings("unchecked")
-      String val = StringUtil.collectionAsStringByComma((Collection<String>) value);
-      ps.setString(index, val);
-      valText = val;
     } else {
       throw new RuntimeException("should not reach here, unknown type " + column.getType());
     }
@@ -1260,28 +1300,6 @@ class CaManagerQueryExecutor {
         col(STRING, "CERT", base64Cert), col(STRING, "CONF", conf, false, true));
     return responder;
   } // method changeSigner
-
-  ScepImpl changeScep(String name, NameId caIdent, Boolean active, String responderName,
-      Set<String> certprofiles, String control, CaManagerImpl caManager,
-      final SecurityFactory securityFactory) throws CaMgmtException {
-    ScepImpl scep;
-    try {
-      ScepEntry dbEntry = getScep(name, caManager.idNameMap());
-      ScepEntry newDbEntry = new ScepEntry(name, dbEntry.getCaIdent(),
-          (active == null ? dbEntry.isActive() : active),
-          (responderName ==  null ? dbEntry.getResponderName() : responderName),
-          (certprofiles == null ? dbEntry.getCertprofiles() : certprofiles),
-          (control == null ? dbEntry.getControl() : getRealString(control)));
-      scep = new ScepImpl(newDbEntry, caManager);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(ex);
-    }
-
-    changeIfNotNull("SCEP", col(STRING, "NAME", name), col(INT, "CA_ID", caIdent.getId()),
-        col(BOOL, "ACTIVE", active), col(STRING, "RESPONDER_NAME", responderName),
-        col(COLL_STRING, "PROFILES", certprofiles), col(STRING, "CONTROL", control));
-    return scep;
-  } // method changeScep
 
   IdentifiedCertPublisher changePublisher(String name, String type, String conf,
       CaManagerImpl caManager) throws CaMgmtException {
@@ -1481,61 +1499,6 @@ class CaManagerQueryExecutor {
       datasource.releaseResources(ps, null);
     }
   } // method unrevokeCa
-
-  void addScep(ScepEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,CONTROL,RESPONDER_NAME)"
-        + " VALUES (?,?,?,?,?,?)";
-
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      int idx = 1;
-      ps.setString(idx++, dbEntry.getName());
-      ps.setInt(idx++, dbEntry.getCaIdent().getId());
-      setBoolean(ps, idx++, dbEntry.isActive());
-      ps.setString(idx++, StringUtil.collectionAsStringByComma(dbEntry.getCertprofiles()));
-      ps.setString(idx++, dbEntry.getControl());
-      ps.setString(idx++, dbEntry.getResponderName());
-
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add SCEP " + dbEntry.getName());
-      }
-
-      LOG.info("added SCEP '{}': {}", dbEntry.getName(), dbEntry);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method addScep
-
-  ScepEntry getScep(String name, CaIdNameMap idNameMap) throws CaMgmtException {
-    ParamUtil.requireNonBlank("name", name);
-    final String sql = sqlSelectScep;
-    ResultSet rs = null;
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-
-      ps.setString(1, name);
-      rs = ps.executeQuery();
-      if (!rs.next()) {
-        throw new CaMgmtException("unknown SCEP " + name);
-      }
-
-      Set<String> profiles = StringUtil.splitByCommaAsSet(rs.getString("PROFILES"));
-
-      return new ScepEntry(name, idNameMap.getCa(rs.getInt("CA_ID")), rs.getBoolean("ACTIVE"),
-          rs.getString("RESPONDER_NAME"), profiles, rs.getString("CONTROL"));
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource, sql, ex);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException(ex);
-    } finally {
-      datasource.releaseResources(ps, rs);
-    }
-  } // method getScep
 
   void addUser(AddUserEntry userEntry) throws CaMgmtException {
     ParamUtil.requireNonNull("userEntry", userEntry);

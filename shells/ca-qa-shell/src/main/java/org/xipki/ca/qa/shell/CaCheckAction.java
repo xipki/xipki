@@ -76,9 +76,16 @@ public class CaCheckAction extends CaUpdateAction {
       assertObjEquals("CRL control", new CmpControl(ey.getCrlControl()), ca.getCrlControl());
     }
 
-    // Response Signer name
-    if (ey.getResponderName() != null) {
-      MgmtQaShellUtil.assertEquals("responder name", ey.getResponderName(), ca.getResponderName());
+    // CMP responder name
+    if (ey.getCmpResponderName() != null) {
+      MgmtQaShellUtil.assertEquals("CMP responder name",
+          ey.getCmpResponderName(), ca.getCmpResponderName());
+    }
+
+    // SCEP responder name
+    if (ey.getScepResponderName() != null) {
+      MgmtQaShellUtil.assertEquals("SCEP responder name",
+          ey.getScepResponderName(), ca.getScepResponderName());
     }
 
     // CRL signer name

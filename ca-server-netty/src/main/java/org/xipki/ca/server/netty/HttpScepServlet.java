@@ -40,7 +40,7 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.Scep;
+import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.RandomUtil;
@@ -101,7 +101,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
       return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
     }
 
-    String scepName = null;
+    String caAlias = null;
     String certprofileName = null;
     if (servletUri.getPath().length() > 1) {
       String scepPath = servletUri.getPath();
@@ -110,13 +110,13 @@ public class HttpScepServlet extends AbstractHttpServlet {
         String path = scepPath.substring(1, scepPath.length() - CGI_PROGRAM_LEN);
         String[] tokens = path.split("/");
         if (tokens.length == 2) {
-          scepName = tokens[0];
+          caAlias = tokens[0];
           certprofileName = tokens[1].toLowerCase();
         }
       } // end if
     } // end if
 
-    if (scepName == null || certprofileName == null) {
+    if (caAlias == null || certprofileName == null) {
       return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
     }
 
@@ -124,7 +124,7 @@ public class HttpScepServlet extends AbstractHttpServlet {
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("SCEP");
     event.setName(CaAuditConstants.NAME_perf);
-    event.addEventData(CaAuditConstants.NAME_SCEP_name, scepName + "/" + certprofileName);
+    event.addEventData(CaAuditConstants.NAME_SCEP_name, caAlias + "/" + certprofileName);
     event.addEventData(CaAuditConstants.NAME_req_type, RequestType.SCEP.name());
 
     String msgId = RandomUtil.nextHexLong();
@@ -143,12 +143,16 @@ public class HttpScepServlet extends AbstractHttpServlet {
         return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
       }
 
-      Scep responder = responderManager.getScep(scepName);
-      if (responder == null || !responder.isOnService()
-          || !responder.supportsCertprofile(certprofileName)) {
-        auditMessage = "unknown SCEP '" + scepName + "/" + certprofileName + "'";
-        LOG.warn(auditMessage);
+      String caName = responderManager.getCaNameForAlias(caAlias);
+      if (caName == null) {
+        caName = caAlias.toLowerCase();
+      }
 
+      ScepResponder responder = responderManager.getScepResponder(caName);
+      if (responder == null || !responder.isOnService()) {
+        auditMessage = "unknown SCEP '" + caAlias + "/" + certprofileName + "'";
+        LOG.warn(auditMessage);
+        auditLevel = AuditLevel.ERROR;
         auditStatus = AuditStatus.FAILED;
         return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
       }

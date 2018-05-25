@@ -45,7 +45,7 @@ import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
-import org.xipki.ca.server.api.Rest;
+import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.RestResponse;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
@@ -69,13 +69,13 @@ import org.xipki.security.X509Cert;
  * @since 3.0.1
  */
 
-public class RestImpl implements Rest {
+public class RestResponderImpl implements RestResponder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RestImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RestResponderImpl.class);
 
   private final CaManagerImpl responderManager;
 
-  public RestImpl(CaManagerImpl responderManager) {
+  public RestResponderImpl(CaManagerImpl responderManager) {
     this.responderManager = responderManager;
   }
 
@@ -126,14 +126,14 @@ public class RestImpl implements Rest {
         ca = ((CaCmpResponderImpl) responderManager.getX509CaResponder(caName)).getCa();
       }
 
-      if (caName == null || ca == null || !ca.getCaInfo().isSupportRest()
+      if (caName == null || ca == null || !ca.getCaInfo().supportsRest()
           || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
         String message;
         if (caName == null) {
           message = "no CA is specified";
         } else if (ca == null) {
           message = "unknown CA '" + caName + "'";
-        } else if (!ca.getCaInfo().isSupportRest()) {
+        } else if (!ca.getCaInfo().supportsRest()) {
           message = "REST is not supported by the CA '" + caName + "'";
         } else {
           message = "CA '" + caName + "' is out of service";

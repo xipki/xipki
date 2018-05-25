@@ -143,7 +143,7 @@ ca:gen-rootca \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/rootca1.der \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
-  --responder responder1 \
+  --cmp-responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
   --validity-mode cutoff \
@@ -342,7 +342,7 @@ ca:ca-add \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/subca1.der \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
-  --responder responder1 \
+  --cmp-responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
   --support-rest yes \
@@ -405,7 +405,7 @@ ca:ca-add \
   --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --crl-control "updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false" \
-  --responder responder1 \
+  --cmp-responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
   --validity-mode lax \

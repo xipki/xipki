@@ -46,14 +46,12 @@ import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Cas;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Profiles;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Publishers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Requestors;
-import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Sceps;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Signers;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType.Users;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
-import org.xipki.ca.dbtool.jaxb.ca.ScepType;
 import org.xipki.ca.dbtool.jaxb.ca.SignerType;
 import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
@@ -112,7 +110,6 @@ class CaconfDbImporter extends DbPorter {
       importCaHasUser(caconf.getCaHasUsers());
       importCaHasPublisher(caconf.getCaHasPublishers());
       importCaHasCertprofile(caconf.getCaHasProfiles());
-      importScep(caconf.getSceps());
     } catch (Exception ex) {
       System.err.println("could not import CA configuration to database. message: "
           + ex.getMessage());
@@ -269,10 +266,11 @@ class CaconfDbImporter extends DbPorter {
   private void importCa(Cas cas) throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
     String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,MAX_VALIDITY,"
-        + "CERT,SIGNER_TYPE,CRL_SIGNER_NAME,RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,DUPLICATE_KEY,"
-        + "DUPLICATE_SUBJECT,SUPPORT_REST,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
-        + "KEEP_EXPIRED_CERT_DAYS,REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)"
-        + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "CERT,SIGNER_TYPE,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
+        + "CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"
+        + "DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,"
+        + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,"
+        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -295,12 +293,14 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, Base64.encodeToString(certBytes));
           ps.setString(idx++, ca.getSignerType());
           ps.setString(idx++, ca.getCrlSignerName());
-          ps.setString(idx++, ca.getResponderName());
+          ps.setString(idx++, ca.getCmpResponderName());
+          ps.setString(idx++, ca.getScepResponderName());
           ps.setString(idx++, ca.getCrlControl());
           ps.setString(idx++, ca.getCmpControl());
+          ps.setString(idx++, ca.getScepControl());
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
-          ps.setInt(idx++, ca.getSupportScep());
+          ps.setString(idx++, ca.getProtocolSupport());
           ps.setInt(idx++, ca.getSaveReq());
           ps.setInt(idx++, ca.getPermission());
           Integer numCrls = ca.getNumCrls();
@@ -453,32 +453,5 @@ class CaconfDbImporter extends DbPorter {
     }
     System.out.println(" imported table CA_HAS_PROFILE");
   } // method importCaHasCertprofile
-
-  private void importScep(Sceps sceps) throws DataAccessException, IOException {
-    System.out.println("importing table SCEP");
-    final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,RESPONDER_NAME,CONTROL)"
-        + " VALUES (?,?,?,?,?,?)";
-    PreparedStatement ps = prepareStatement(sql);
-    try {
-      for (ScepType entry : sceps.getScep()) {
-        try {
-          int idx = 1;
-          ps.setString(idx++, entry.getName());
-          ps.setInt(idx++, entry.getCaId());
-          ps.setInt(idx++, entry.getActive());
-          ps.setString(idx++, entry.getProfiles());
-          ps.setString(idx++, entry.getResponderName());
-          ps.setString(idx++, entry.getControl());
-          ps.executeUpdate();
-        } catch (SQLException ex) {
-          System.err.println("could not import SCEP with ID=" + entry.getCaId());
-          throw translate(sql, ex);
-        }
-      }
-    } finally {
-      releaseResources(ps, null);
-    }
-    System.out.println(" imported table SCEP");
-  } // method importScep
 
 }

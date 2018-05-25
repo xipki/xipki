@@ -34,7 +34,7 @@ import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.Rest;
+import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.RestResponse;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
@@ -84,7 +84,7 @@ public class HttpRestServlet extends HttpServlet {
     AuditService auditService = auditServiceRegister.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     try {
-      Rest rest = responderManager.getRest();
+      RestResponder rest = responderManager.getRestResponder();
 
       String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);

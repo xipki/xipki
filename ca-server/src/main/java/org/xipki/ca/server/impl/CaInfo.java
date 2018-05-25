@@ -40,7 +40,9 @@ import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
+import org.xipki.ca.server.mgmt.api.ProtocolSupport;
 import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
+import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
@@ -189,12 +191,12 @@ public class CaInfo {
     caEntry.setCrlControl(crlControl);
   }
 
-  public String getResponderName() {
-    return caEntry.getResponderName();
+  public String getCmpResponderName() {
+    return caEntry.getCmpResponderName();
   }
 
-  public void setResponderName(String name) {
-    caEntry.setResponderName(name);
+  public void setCmpResponderName(String name) {
+    caEntry.setCmpResponderName(name);
   }
 
   public CmpControl getCmpControl() {
@@ -203,6 +205,22 @@ public class CaInfo {
 
   public void setCmpControl(CmpControl cmpControl) {
     caEntry.setCmpControl(cmpControl);
+  }
+
+  public String getScepResponderName() {
+    return caEntry.getScepResponderName();
+  }
+
+  public void setScepResponderName(String name) {
+    caEntry.setScepResponderName(name);
+  }
+
+  public ScepControl getSCepControl() {
+    return caEntry.getScepControl();
+  }
+
+  public void setScepControl(ScepControl control) {
+    caEntry.setScepControl(control);
   }
 
   public int getNumCrls() {
@@ -246,12 +264,20 @@ public class CaInfo {
     caEntry.setDuplicateSubjectPermitted(permitted);
   }
 
-  public boolean isSupportRest() {
-    return caEntry.isSupportRest();
+  public boolean supportCmp() {
+    return caEntry.getProtocoSupport().supportsCmp();
   }
 
-  public void setSupportRest(boolean supportRest) {
-    caEntry.setSupportRest(supportRest);
+  public boolean supportsRest() {
+    return caEntry.getProtocoSupport().supportsRest();
+  }
+
+  public boolean supportsScep() {
+    return caEntry.getProtocoSupport().supportsScep();
+  }
+
+  public void setProtocolSupport(ProtocolSupport protocolSupport) {
+    caEntry.setProtocolSupport(protocolSupport);
   }
 
   public boolean isSaveRequest() {

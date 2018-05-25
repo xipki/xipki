@@ -540,22 +540,6 @@ Feature xipki-camgmt-shell (started by default)
 
      update signer
 
-   * `ca:scep-add`
-
-     add SCEP
-
-   * `ca:scep-info`
-
-     show information of SCEP
-
-   * `ca:scep-rm`
-
-     remove SCEP
-
-   * `ca:scep-up`
-
-     update SCEP
-
    * `ca:user-add`
 
      add user

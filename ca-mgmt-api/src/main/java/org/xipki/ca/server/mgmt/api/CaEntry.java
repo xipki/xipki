@@ -58,19 +58,23 @@ public class CaEntry {
 
   private String signerConf;
 
-  private CmpControl cmpControl;
+  private ScepControl scepControl;
 
   private CrlControl crlControl;
 
-  private String responderName;
-
   private String crlSignerName;
+
+  private CmpControl cmpControl;
+
+  private String cmpResponderName;
+
+  private String scepResponderName;
 
   private boolean duplicateKeyPermitted;
 
   private boolean duplicateSubjectPermitted;
 
-  private boolean supportRest;
+  private ProtocolSupport protocolSupport;
 
   private boolean saveRequest;
 
@@ -196,12 +200,28 @@ public class CaEntry {
     return crlControl;
   }
 
-  public String getResponderName() {
-    return responderName;
+  public void setScepControl(ScepControl scepControl) {
+    this.scepControl = scepControl;
   }
 
-  public void setResponderName(String responderName) {
-    this.responderName = (responderName == null) ? null : responderName.toLowerCase();
+  public ScepControl getScepControl() {
+    return scepControl;
+  }
+
+  public String getCmpResponderName() {
+    return cmpResponderName;
+  }
+
+  public void setCmpResponderName(String cmpResponderName) {
+    this.cmpResponderName = (cmpResponderName == null) ? null : cmpResponderName.toLowerCase();
+  }
+
+  public String getScepResponderName() {
+    return scepResponderName;
+  }
+
+  public void setScepResponderName(String scepResponderName) {
+    this.scepResponderName = (scepResponderName == null) ? null : scepResponderName.toLowerCase();
   }
 
   public String getCrlSignerName() {
@@ -228,12 +248,12 @@ public class CaEntry {
     this.duplicateSubjectPermitted = duplicateSubjectPermitted;
   }
 
-  public boolean isSupportRest() {
-    return supportRest;
+  public ProtocolSupport getProtocoSupport() {
+    return protocolSupport;
   }
 
-  public void setSupportRest(boolean supportRest) {
-    this.supportRest = supportRest;
+  public void setProtocolSupport(ProtocolSupport protocolSupport) {
+    this.protocolSupport = protocolSupport;
   }
 
   public boolean isSaveRequest() {
@@ -306,17 +326,17 @@ public class CaEntry {
         "\nsignerType: ", signerType,
         "\nsignerConf: ", (signerConf == null ? "null" :
           InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\ncmpControl: ", cmpControl, "\ncrlControl: ", crlControl,
-        "\nresponderName: ", responderName, "\ncrlSignerName: ", crlSignerName,
-        "\nduplicateKey: ", duplicateKeyPermitted,
+        "\ncmpControl: ", cmpControl, "\ncrlControl: ", crlControl, "\nscepControl", scepControl,
+        "\ncmpResponderName: ", cmpResponderName, "\nscepResponderName: ", scepResponderName,
+        "\ncrlSignerName: ", crlSignerName, "\nduplicateKey: ", duplicateKeyPermitted,
         "\nduplicateSubject: ", duplicateSubjectPermitted,
-        "\nsupportRest: ", supportRest, "\nsaveRequest: ", saveRequest,
+        "\n", protocolSupport, "\nsaveRequest: ", saveRequest,
         "\nvalidityMode: ", validityMode, "\npermission: ", permission,
         "\nkeepExpiredCerts: ",
             (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
         "\nextraControl: ", extraCtrlText, "\n",
         "serialNoBitLen: ", serialNoBitLen, "\nnextCrlNumber: ", nextCrlNumber,
-        caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
+        "\n", caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
         "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText);
   } // method toString
 
@@ -357,11 +377,13 @@ public class CaEntry {
     return ident.equals(obj.ident, ignoreId)
       && signerType.equals(obj.signerType)
       && CompareUtil.equalsObject(status, obj.status)
-      && (supportRest == obj.supportRest)
+      && CompareUtil.equalsObject(protocolSupport, obj.protocolSupport)
       && CompareUtil.equalsObject(maxValidity, obj.maxValidity)
       && CompareUtil.equalsObject(cmpControl, obj.cmpControl)
       && CompareUtil.equalsObject(crlControl, obj.crlControl)
-      && CompareUtil.equalsObject(responderName, obj.responderName)
+      && CompareUtil.equalsObject(scepControl, obj.scepControl)
+      && CompareUtil.equalsObject(cmpResponderName, obj.cmpResponderName)
+      && CompareUtil.equalsObject(scepResponderName, obj.scepResponderName)
       && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
       && (duplicateKeyPermitted == obj.duplicateKeyPermitted)
       && (duplicateSubjectPermitted == obj.duplicateSubjectPermitted)

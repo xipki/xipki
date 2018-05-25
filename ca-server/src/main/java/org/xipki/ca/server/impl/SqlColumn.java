@@ -30,8 +30,7 @@ public class SqlColumn {
   public static enum ColumnType {
     INT,
     STRING,
-    BOOL,
-    COLL_STRING
+    BOOL
   }
 
   private ColumnType type;

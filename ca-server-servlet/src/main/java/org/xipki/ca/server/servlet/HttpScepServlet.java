@@ -43,7 +43,7 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.Scep;
+import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
@@ -105,7 +105,7 @@ public class HttpScepServlet extends HttpServlet {
 
     String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
 
-    String scepName = null;
+    String caAlias = null;
     String certprofileName = null;
     if (path.length() > 1) {
       String scepPath = path;
@@ -114,13 +114,13 @@ public class HttpScepServlet extends HttpServlet {
         String tpath = scepPath.substring(1, scepPath.length() - CGI_PROGRAM_LEN);
         String[] tokens = tpath.split("/");
         if (tokens.length == 2) {
-          scepName = tokens[0];
+          caAlias = tokens[0];
           certprofileName = tokens[1].toLowerCase();
         }
       } // end if
     } // end if
 
-    if (scepName == null || certprofileName == null) {
+    if (caAlias == null || certprofileName == null) {
       sendError(resp, HttpServletResponse.SC_NOT_FOUND);
       return;
     }
@@ -129,7 +129,7 @@ public class HttpScepServlet extends HttpServlet {
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("SCEP");
     event.setName(CaAuditConstants.NAME_perf);
-    event.addEventData(CaAuditConstants.NAME_SCEP_name, scepName + "/" + certprofileName);
+    event.addEventData(CaAuditConstants.NAME_SCEP_name, caAlias + "/" + certprofileName);
     event.addEventData(CaAuditConstants.NAME_req_type, RequestType.SCEP.name());
 
     String msgId = RandomUtil.nextHexLong();
@@ -140,10 +140,14 @@ public class HttpScepServlet extends HttpServlet {
     String auditMessage = null;
 
     try {
-      Scep responder = responderManager.getScep(scepName);
-      if (responder == null || !responder.isOnService()
-          || !responder.supportsCertprofile(certprofileName)) {
-        auditMessage = "unknown SCEP '" + scepName + "/" + certprofileName + "'";
+      String caName = responderManager.getCaNameForAlias(caAlias);
+      if (caName == null) {
+        caName = caAlias.toLowerCase();
+      }
+
+      ScepResponder responder = responderManager.getScepResponder(caName);
+      if (responder == null || !responder.isOnService()) {
+        auditMessage = "unknown SCEP '" + caAlias + "/" + certprofileName + "'";
         LOG.warn(auditMessage);
 
         auditStatus = AuditStatus.FAILED;

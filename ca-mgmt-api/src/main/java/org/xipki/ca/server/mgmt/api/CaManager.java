@@ -622,45 +622,6 @@ public interface CaManager {
   X509CRL getCurrentCrl(String caName) throws CaMgmtException;
 
   /**
-   * Add a SCEP.
-   * @param scepEntry
-   *          SCEP entry. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void addScep(ScepEntry scepEntry) throws CaMgmtException;
-
-  /**
-   * Retmove the SCEP {@code name}.
-   * @param name
-   *          SCEP name. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void removeScep(String name) throws CaMgmtException;
-
-  /**
-   * Changes the SCEP.
-   * @param scepEntry
-   *          SCEP change information. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void changeScep(ChangeScepEntry scepEntry) throws CaMgmtException;
-
-  Set<String> getScepNames();
-
-  /**
-   * Returns the SCEP {@code name}.
-   * @param name
-   *          SCEP name. Must not be {@code null}.
-   * @return the SCEP
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  ScepEntry getScepEntry(String name) throws CaMgmtException;
-
-  /**
    * Returns certificate with status information for the CA {@code caName}
    * and with serial number {@code serialNumber}.
    * @param caName

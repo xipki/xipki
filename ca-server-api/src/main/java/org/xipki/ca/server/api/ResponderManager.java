@@ -41,8 +41,8 @@ public interface ResponderManager {
    */
   CaCmpResponder getX509CaResponder(String caName);
 
-  Scep getScep(String name);
+  ScepResponder getScepResponder(String name);
 
-  Rest getRest();
+  RestResponder getRestResponder();
 
 }
