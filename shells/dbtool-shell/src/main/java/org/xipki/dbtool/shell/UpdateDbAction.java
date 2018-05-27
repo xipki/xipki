@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.shell;
-
-import java.util.Map;
+package org.xipki.dbtool.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
+import org.xipki.dbtool.LiquibaseMain;
 
 /**
  * TODO.
@@ -29,19 +29,37 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "initdb-ca", description = "reset and initialize the CA database")
+@Command(scope = "xi", name = "updatedb", description = "update the database schema")
 @Service
-public class InitDbCaAction extends LiquibaseAction {
-
-  private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
+public class UpdateDbAction extends LiquibaseAction {
 
   @Override
   protected Object execute0() throws Exception {
-    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
-
-    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-    resetAndInit(dbConf, SCHEMA_FILE);
+    LiquibaseDatabaseConf dbConf = getDatabaseConf();
+    update(dbConf, dbSchemaFile);
     return null;
+  }
+
+  protected void update(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
+    ParamUtil.requireNonNull("dbConf", dbConf);
+    ParamUtil.requireNonNull("schemaFile", schemaFile);
+
+    printDatabaseInfo(dbConf, schemaFile);
+    if (!force) {
+      if (!confirm("update")) {
+        println("cancelled");
+        return;
+      }
+    }
+
+    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+    try {
+      liquibase.init(logLevel, logFile);
+      liquibase.update();
+    } finally {
+      liquibase.shutdown();
+    }
+
   }
 
 }

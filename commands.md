@@ -77,28 +77,12 @@ Feature xipki-dbtool (not started by default)
 
      reset and initialize the CA and OCSP databases
 
-   * `ca:initdb`
+   * `xi:initdb`
 
      reset and initialize database
 
-   * `ca:initdb-pki`
-
-     reset and initialize the CA and OCSP databases
-
-   * `ca:initdb-ca`
-
-     reset and initialize the CA database
-
-   * `ca:initdb-ocsp`
-
-     reset and initialize the OCSP databases
-
-   * `ca:updatedb-ca`
-     update the CA database schema
-
-   * `ca:updatedb-ocsp`
-
-     update the OCSP database schema
+   * `xi:updatedb`
+     update the database schema
 
 Feature xipki-security-shell (not started by default)
 -----

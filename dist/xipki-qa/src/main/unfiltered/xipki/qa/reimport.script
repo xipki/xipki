@@ -48,7 +48,10 @@ echo "==========================================================================
 echo "||                             Import CA Database                         ||"
 echo "============================================================================"
 
-ca:initdb-ca --force
+xi:initdb \
+  --force \
+  --db-conf xipki/ca-config/ca-db.properties \
+  --db-schema xipki/sql/ca-init.xml
 
 ca:import-ca --in-dir output/dbexport/ca
 
@@ -58,7 +61,10 @@ echo "==========================================================================
 echo "||                            Import OCSP Database                        ||"
 echo "============================================================================"
 
-ca:initdb-ocsp --force
+xi:initdb \
+  --force \
+  --db-conf xipki/ca-config/ocsp-db.properties \
+  --db-schema xipki/sql/ocsp-init.xml
 
 ca:import-ocsp --in-dir output/dbexport/ocsp
 
@@ -68,7 +74,10 @@ echo "==========================================================================
 echo "||                        IMPORT OCSP DATABASE FROM CA                    ||"
 echo "============================================================================"
 
-ca:initdb-ocsp --force
+xi:initdb \
+  --force \
+  --db-conf xipki/ca-config/ocsp-db.properties \
+  --db-schema xipki/sql/ocsp-init.xml
 
 ca:import-ocspfromca --in-dir output/dbexport/ca
 

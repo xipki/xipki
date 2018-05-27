@@ -129,6 +129,7 @@
     <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/dbtool/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ca-dbtool/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}" description="Audit">

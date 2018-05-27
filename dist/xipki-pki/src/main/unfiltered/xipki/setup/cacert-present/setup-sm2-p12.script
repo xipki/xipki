@@ -22,7 +22,15 @@ echo "#################################################################"
 
 feature:install xipki-dbtool
 
-ca:initdb-pki --force
+xi:initdb \
+  --force \
+  --db-conf xipki/ca-config/ca-db.properties \
+  --db-schema xipki/sql/ca-init.xml
+
+xi:initdb \
+  --force \
+  --db-conf xipki/ca-config/ocsp-db.properties \
+  --db-schema xipki/sql/ocsp-init.xml
 
 feature:uninstall xipki-dbtool
 

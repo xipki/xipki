@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.dbtool.shell;
+package org.xipki.dbtool.shell;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,18 +25,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.ca.dbtool.shell.completer.LogLevelCompleter;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.XiAction;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
-import org.xipki.dbtool.LiquibaseMain;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 
@@ -46,9 +43,7 @@ import org.xipki.password.PasswordResolverException;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "initdb", description = "reset and initialize single database")
-@Service
-public class InitDbAction extends XiAction {
+public abstract class LiquibaseAction extends XiAction {
 
   private static final List<String> YES_NO = Arrays.asList("yes", "no");
 
@@ -56,64 +51,51 @@ public class InitDbAction extends XiAction {
   private PasswordResolver passwordResolver;
 
   @Option(name = "--force", aliases = "-f", description = "never prompt for confirmation")
-  private Boolean force = Boolean.FALSE;
+  protected Boolean force = Boolean.FALSE;
 
   @Option(name = "--log-level",
       description = "log level, valid values are debug, info, warning, severe, off")
-  @Completion(LogLevelCompleter.class)
-  private String logLevel = "warning";
+  @Completion(value = StringsCompleter.class,
+      values = {"debug", "info", "warning", "severe", "off"})
+  protected String logLevel = "warning";
 
   @Option(name = "--log-file", description = "log file")
   @Completion(FileCompleter.class)
-  private String logFile;
+  protected String logFile;
+
+  @Option(name = "--db-schema", required = true, description = "DB schema file")
+  @Completion(FileCompleter.class)
+  protected String dbSchemaFile;
 
   @Option(name = "--db-conf", required = true, description = "DB configuration file")
   @Completion(FileCompleter.class)
   private String dbConfFile;
 
-  @Option(name = "--db-schema", required = true, description = "DB schema file")
-  @Completion(FileCompleter.class)
-  private String dbSchemaFile;
+  static void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile) {
+    String msg = StringUtil.concat("\n--------------------------------------------",
+        "\n     driver: ", dbParams.getDriver(),  "\n       user: ", dbParams.getUsername(),
+        "\n        URL: ", dbParams.getUrl(),
+        (dbParams.getSchema() != null ? "     schema: " + dbParams.getSchema() : ""),
+        "\nschema file: ", schemaFile, "\n");
 
-  @Override
-  protected Object execute0() throws Exception {
-    LiquibaseDatabaseConf dbConf = getDatabaseConf();
-    resetAndInit(dbConf, dbSchemaFile);
-    return null;
+    System.out.println(msg);
   }
 
-  private void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
-    ParamUtil.requireNonNull("dbConf", dbConf);
-    ParamUtil.requireNonNull("schemaFile", schemaFile);
-
-    LiquibaseAction.printDatabaseInfo(dbConf, schemaFile);
-    if (!force) {
-      if (!confirm("reset and initialize")) {
-        println("cancelled");
-        return;
-      }
-    }
-
-    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-    try {
-      liquibase.init(logLevel, logFile);
-      liquibase.releaseLocks();
-      liquibase.dropAll();
-      liquibase.update();
-    } finally {
-      liquibase.shutdown();
-    }
-
-  }
-
-  private LiquibaseDatabaseConf getDatabaseConf()
+  protected LiquibaseDatabaseConf getDatabaseConf()
       throws FileNotFoundException, IOException, PasswordResolverException {
     Properties props = new Properties();
     props.load(new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
   }
 
-  private boolean confirm(String command) throws IOException {
+  protected static Properties getPropertiesFromFile(String propFile)
+      throws FileNotFoundException, IOException {
+    Properties props = new Properties();
+    props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
+    return props;
+  }
+
+  protected boolean confirm(String command) throws IOException {
     String text = read("\nDo you wish to " + command + " the database", YES_NO);
     return "yes".equalsIgnoreCase(text);
   }
