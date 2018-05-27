@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf;
+package org.xipki.shell;
 
 import java.io.File;
 import java.io.FileOutputStream;

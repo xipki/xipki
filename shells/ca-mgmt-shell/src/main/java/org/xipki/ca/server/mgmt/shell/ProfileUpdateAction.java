@@ -26,8 +26,8 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileTypeCompleter;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

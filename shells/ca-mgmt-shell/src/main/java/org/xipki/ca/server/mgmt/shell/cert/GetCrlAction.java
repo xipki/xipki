@@ -30,7 +30,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

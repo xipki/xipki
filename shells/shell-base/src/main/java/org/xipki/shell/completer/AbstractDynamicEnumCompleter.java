@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf;
+package org.xipki.shell.completer;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.console.CommandLine;
 import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.xipki.common.util.ParamUtil;
 
 /**
  * TODO.
@@ -34,32 +31,18 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public abstract class AbstractEnumCompleter implements Completer {
+public abstract class AbstractDynamicEnumCompleter implements Completer {
 
-  private final List<String> enums = new LinkedList<>();
-
-  protected void setTokens(Collection<? extends Object> tokens) {
-    enums.clear();
-    for (Object token : tokens) {
-      enums.add(token.toString());
-    }
-  }
-
-  protected void setTokens(String tokens) {
-    ParamUtil.requireNonNull("tokens", tokens);
-    enums.clear();
-    StringTokenizer st = new StringTokenizer(tokens, ", ");
-    while (st.hasMoreTokens()) {
-      enums.add(st.nextToken());
-    }
-  }
+  protected abstract Set<String> getEnums();
 
   @Override
   public int complete(Session session, CommandLine commandLine, List<String> candidates) {
     StringsCompleter delegate = new StringsCompleter();
-    for (String entry : enums) {
-      delegate.getStrings().add(entry);
+
+    for (String s : getEnums()) {
+      delegate.getStrings().add(s);
     }
+
     return delegate.complete(session, commandLine, candidates);
   }
 

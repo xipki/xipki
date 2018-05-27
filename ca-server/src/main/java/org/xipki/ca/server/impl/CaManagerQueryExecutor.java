@@ -524,7 +524,7 @@ class CaManagerQueryExecutor {
         int id = rs.getInt("REQUESTOR_ID");
         String name = idNameMap.get(id);
 
-        List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
+        List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
         CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
         entry.setRa(rs.getBoolean("RA"));
@@ -862,7 +862,7 @@ class CaManagerQueryExecutor {
 
       setBoolean(ps, idx++, requestor.isRa());
       ps.setInt(idx++, requestor.getPermission());
-      String profilesText = StringUtil.collectionAsStringByComma(requestor.getProfiles());
+      String profilesText = StringUtil.collectionAsString(requestor.getProfiles(), ",");
       ps.setString(idx++, profilesText);
 
       if (ps.executeUpdate() == 0) {
@@ -1622,7 +1622,7 @@ class CaManagerQueryExecutor {
       ps.setInt(idx++, userIdent.getId());
       ps.setInt(idx++, user.getPermission());
 
-      String profilesText = StringUtil.collectionAsStringByComma(user.getProfiles());
+      String profilesText = StringUtil.collectionAsString(user.getProfiles(), ",");
       ps.setString(idx++, profilesText);
 
       if (ps.executeUpdate() == 0) {
@@ -1655,7 +1655,7 @@ class CaManagerQueryExecutor {
 
       Map<String, CaHasUserEntry> ret = new HashMap<>();
       while (rs.next()) {
-        List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
+        List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
         CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
         caHasUser.setPermission(rs.getInt("PERMISSION"));
@@ -1692,7 +1692,7 @@ class CaManagerQueryExecutor {
 
       List<CaHasUserEntry> ret = new LinkedList<>();
       while (rs.next()) {
-        List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
+        List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
         CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, rs.getString("NAME")));
         caHasUser.setPermission(rs.getInt("PERMISSION"));

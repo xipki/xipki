@@ -34,7 +34,7 @@ import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

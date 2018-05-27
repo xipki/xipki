@@ -25,11 +25,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XiAction;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.

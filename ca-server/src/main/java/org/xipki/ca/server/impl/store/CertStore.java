@@ -1505,7 +1505,7 @@ public class CertStore {
         return null;
       }
 
-      List<String> list = StringUtil.splitByComma(rs.getString("PROFILES"));
+      List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
       CaHasUserEntry entry = new CaHasUserEntry(user);

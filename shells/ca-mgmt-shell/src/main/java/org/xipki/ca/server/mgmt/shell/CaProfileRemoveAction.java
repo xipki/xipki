@@ -27,7 +27,7 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

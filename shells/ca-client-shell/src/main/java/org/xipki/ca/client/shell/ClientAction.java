@@ -27,7 +27,7 @@ import org.xipki.ca.client.api.CaClient;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.XiAction;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.

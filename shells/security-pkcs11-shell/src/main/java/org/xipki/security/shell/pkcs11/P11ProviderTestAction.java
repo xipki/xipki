@@ -31,11 +31,11 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.shell.completer.HashAlgCompleter;
 
 /**
  * TODO.

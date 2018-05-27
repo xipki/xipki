@@ -22,11 +22,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.shell.SecurityAction;
 import org.xipki.security.shell.pkcs11.completer.P11ModuleNameCompleter;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

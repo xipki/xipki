@@ -28,11 +28,11 @@ import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.DateUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.ClientCrlReasonCompleter;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.completer.ClientCrlReasonCompleter;
 
 /**
  * TODO.

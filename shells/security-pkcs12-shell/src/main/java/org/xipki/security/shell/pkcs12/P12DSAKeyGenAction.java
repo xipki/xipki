@@ -20,9 +20,9 @@ package org.xipki.security.shell.pkcs12;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

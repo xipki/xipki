@@ -23,8 +23,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

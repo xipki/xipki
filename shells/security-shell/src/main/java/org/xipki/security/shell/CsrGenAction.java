@@ -60,10 +60,6 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.completer.ExtKeyusageCompleter;
-import org.xipki.console.karaf.completer.ExtensionNameCompleter;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
-import org.xipki.console.karaf.completer.KeyusageCompleter;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.ExtensionExistence;
@@ -77,6 +73,10 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.completer.ExtKeyusageCompleter;
+import org.xipki.shell.completer.ExtensionNameCompleter;
+import org.xipki.shell.completer.HashAlgCompleter;
+import org.xipki.shell.completer.KeyusageCompleter;
 
 /**
  * TODO.

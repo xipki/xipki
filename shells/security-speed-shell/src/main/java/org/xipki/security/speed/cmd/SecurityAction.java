@@ -18,8 +18,8 @@
 package org.xipki.security.speed.cmd;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.

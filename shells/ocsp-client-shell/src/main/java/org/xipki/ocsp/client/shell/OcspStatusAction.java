@@ -53,7 +53,6 @@ import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
@@ -62,6 +61,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

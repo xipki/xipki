@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

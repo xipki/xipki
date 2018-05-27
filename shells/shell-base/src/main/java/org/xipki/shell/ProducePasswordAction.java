@@ -15,17 +15,15 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.command;
+package org.xipki.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XiAction;
-import org.xipki.console.karaf.completer.PasswordNameCompleter;
 import org.xipki.password.PasswordProducer;
+import org.xipki.shell.completer.PasswordNameCompleter;
 
 /**
  * TODO.

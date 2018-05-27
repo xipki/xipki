@@ -35,9 +35,9 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.XiAction;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.
@@ -71,8 +71,7 @@ public abstract class ClientAction extends XiAction {
   protected Client getScepClient() throws CertificateException, IOException {
     if (scepClient == null) {
       X509Certificate caCert = X509Util.parseCert(caCertFile);
-      URL tmpUrl = new URL(url);
-      scepClient = new Client(tmpUrl, new PreProvisionedCertificateVerifier(caCert));
+      scepClient = new Client(new URL(url), new PreProvisionedCertificateVerifier(caCert));
     }
     return scepClient;
   }

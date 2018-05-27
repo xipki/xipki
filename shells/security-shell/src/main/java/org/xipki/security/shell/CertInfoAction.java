@@ -27,8 +27,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.security.HashAlgo;
+import org.xipki.shell.completer.HashAlgCompleter;
 
 /**
  * TODO.

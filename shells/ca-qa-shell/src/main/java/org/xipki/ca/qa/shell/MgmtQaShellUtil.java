@@ -20,7 +20,7 @@ package org.xipki.ca.qa.shell;
 import java.util.Collection;
 
 import org.xipki.ca.server.mgmt.api.CaManager;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

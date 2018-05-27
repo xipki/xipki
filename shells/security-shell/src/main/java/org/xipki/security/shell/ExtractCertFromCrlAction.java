@@ -34,11 +34,11 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

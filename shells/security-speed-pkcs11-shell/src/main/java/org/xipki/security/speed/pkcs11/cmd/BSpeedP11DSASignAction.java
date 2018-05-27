@@ -25,10 +25,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.BenchmarkExecutor;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.speed.cmd.DSAControl;
 import org.xipki.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.security.speed.pkcs11.P11DSASignSpeed;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

@@ -23,8 +23,8 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.

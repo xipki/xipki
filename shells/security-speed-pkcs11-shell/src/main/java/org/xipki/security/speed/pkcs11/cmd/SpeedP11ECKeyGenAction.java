@@ -22,8 +22,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.BenchmarkExecutor;
-import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.speed.pkcs11.P11ECKeyGenSpeed;
+import org.xipki.shell.completer.ECCurveNameCompleter;
 
 /**
  * TODO.

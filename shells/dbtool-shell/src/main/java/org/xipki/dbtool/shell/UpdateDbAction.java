@@ -19,7 +19,6 @@ package org.xipki.dbtool.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
 
@@ -36,23 +35,17 @@ public class UpdateDbAction extends LiquibaseAction {
   @Override
   protected Object execute0() throws Exception {
     LiquibaseDatabaseConf dbConf = getDatabaseConf();
-    update(dbConf, dbSchemaFile);
-    return null;
-  }
 
-  protected void update(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
-    ParamUtil.requireNonNull("dbConf", dbConf);
-    ParamUtil.requireNonNull("schemaFile", schemaFile);
+    printDatabaseInfo(dbConf, dbSchemaFile);
 
-    printDatabaseInfo(dbConf, schemaFile);
     if (!force) {
       if (!confirm("update")) {
         println("cancelled");
-        return;
+        return null;
       }
     }
 
-    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+    LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile);
     try {
       liquibase.init(logLevel, logFile);
       liquibase.update();
@@ -60,6 +53,7 @@ public class UpdateDbAction extends LiquibaseAction {
       liquibase.shutdown();
     }
 
+    return null;
   }
 
 }

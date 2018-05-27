@@ -29,9 +29,9 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

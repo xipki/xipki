@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf;
+package org.xipki.shell.completer;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.karaf.shell.api.console.CommandLine;
-import org.apache.karaf.shell.api.console.Completer;
-import org.apache.karaf.shell.api.console.Session;
-import org.apache.karaf.shell.support.completers.StringsCompleter;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.security.KeyUsage;
 
 /**
  * TODO.
@@ -31,19 +29,15 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
  * @since 2.0.0
  */
 
-public abstract class AbstractDynamicEnumCompleter implements Completer {
+@Service
+public class KeyusageCompleter extends AbstractEnumCompleter {
 
-  protected abstract Set<String> getEnums();
-
-  @Override
-  public int complete(Session session, CommandLine commandLine, List<String> candidates) {
-    StringsCompleter delegate = new StringsCompleter();
-
-    for (String s : getEnums()) {
-      delegate.getStrings().add(s);
+  public KeyusageCompleter() {
+    List<String> enums = new LinkedList<>();
+    for (KeyUsage usage : KeyUsage.values()) {
+      enums.add(usage.getName());
     }
-
-    return delegate.complete(session, commandLine, candidates);
+    setTokens(enums);
   }
 
 }

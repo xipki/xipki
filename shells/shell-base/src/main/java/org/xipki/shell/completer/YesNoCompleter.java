@@ -15,14 +15,9 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
-
-import java.util.LinkedList;
-import java.util.List;
+package org.xipki.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.KeyUsage;
 
 /**
  * TODO.
@@ -31,14 +26,10 @@ import org.xipki.security.KeyUsage;
  */
 
 @Service
-public class KeyusageCompleter extends AbstractEnumCompleter {
+public class YesNoCompleter extends AbstractEnumCompleter {
 
-  public KeyusageCompleter() {
-    List<String> enums = new LinkedList<>();
-    for (KeyUsage usage : KeyUsage.values()) {
-      enums.add(usage.getName());
-    }
-    setTokens(enums);
+  public YesNoCompleter() {
+    setTokens("yes, no");
   }
 
 }

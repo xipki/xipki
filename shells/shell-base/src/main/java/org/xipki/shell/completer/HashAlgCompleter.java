@@ -15,13 +15,9 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.command;
+package org.xipki.shell.completer;
 
-import org.apache.karaf.shell.api.action.Argument;
-import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XiAction;
 
 /**
  * TODO.
@@ -29,21 +25,11 @@ import org.xipki.console.karaf.XiAction;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "confirm", description = "confirm an action")
 @Service
-public class ConfirmAction extends XiAction {
+public class HashAlgCompleter extends AbstractEnumCompleter {
 
-  @Argument(index = 0, name = "message", required = true, description = "prompt message")
-  private String prompt;
-
-  @Override
-  protected Object execute0() throws Exception {
-    boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
-    if (!toContinue) {
-      throw new CmdFailure("User cancelled");
-    }
-
-    return null;
+  public HashAlgCompleter() {
+    setTokens("SHA1,SHA224,SHA256,SHA384,SHA512,SHA3-224,SHA3-256,SHA3-384,SHA3-512,SM3");
   }
 
 }

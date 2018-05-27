@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.command;
+package org.xipki.shell;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -30,7 +30,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.XiAction;
 
 /**
  * TODO.

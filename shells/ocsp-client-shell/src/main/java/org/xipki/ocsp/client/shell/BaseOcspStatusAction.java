@@ -52,13 +52,13 @@ import org.xipki.common.util.BigIntegerRange;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.OcspRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

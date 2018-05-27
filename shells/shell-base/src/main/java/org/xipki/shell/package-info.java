@@ -15,28 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
-import org.xipki.password.PasswordProducer;
-
-/**
- * TODO.
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-@Service
-// CHECKSTYLE:SKIP
-public class PasswordNameCompleter extends AbstractDynamicEnumCompleter {
-
-  @Override
-  protected Set<String> getEnums() {
-    return new HashSet<>(PasswordProducer.getNames());
-  }
-
-}
+package org.xipki.shell;

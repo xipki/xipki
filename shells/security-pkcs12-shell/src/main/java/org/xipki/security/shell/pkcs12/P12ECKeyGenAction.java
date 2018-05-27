@@ -21,9 +21,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
+import org.xipki.shell.completer.ECCurveNameCompleter;
 
 /**
  * TODO.

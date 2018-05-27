@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.command;
+package org.xipki.shell;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +36,6 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XiAction;
 
 /**
  * TODO.

@@ -25,7 +25,7 @@ import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.shell.RequestorUpdateAction;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

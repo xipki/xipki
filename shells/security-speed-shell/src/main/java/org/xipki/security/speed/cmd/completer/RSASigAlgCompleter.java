@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
+import org.xipki.shell.completer.AbstractEnumCompleter;
 
 /**
  * TODO.

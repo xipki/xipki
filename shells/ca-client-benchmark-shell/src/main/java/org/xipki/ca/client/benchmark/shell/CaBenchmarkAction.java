@@ -19,7 +19,7 @@ package org.xipki.ca.client.benchmark.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.client.api.CaClient;
-import org.xipki.console.karaf.XiAction;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.

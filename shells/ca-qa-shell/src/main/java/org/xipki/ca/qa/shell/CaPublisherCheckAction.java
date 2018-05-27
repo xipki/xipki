@@ -27,7 +27,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.
@@ -61,8 +61,7 @@ public class CaPublisherCheckAction extends CaAction {
     String upPublisherName = publisherName.toLowerCase();
     for (PublisherEntry m : entries) {
       if (m.getIdent().getName().equals(upPublisherName)) {
-        println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName
-            + "'");
+        println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
         return null;
       }
     }

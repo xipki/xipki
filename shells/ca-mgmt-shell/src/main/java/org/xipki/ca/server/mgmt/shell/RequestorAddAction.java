@@ -26,7 +26,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

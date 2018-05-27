@@ -29,7 +29,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

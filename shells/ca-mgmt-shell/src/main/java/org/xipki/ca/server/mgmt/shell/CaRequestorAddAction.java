@@ -30,8 +30,8 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.YesNoCompleter;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.YesNoCompleter;
 
 /**
  * TODO.

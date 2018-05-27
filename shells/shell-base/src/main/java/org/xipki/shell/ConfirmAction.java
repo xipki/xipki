@@ -15,21 +15,33 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.client.shell.completer;
+package org.xipki.shell;
 
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
  * TODO.
  * @author Lijun Liao
+ * @since 2.0.0
  */
 
+@Command(scope = "xi", name = "confirm", description = "confirm an action")
 @Service
-public class EnrollMetodCompleter extends AbstractEnumCompleter {
+public class ConfirmAction extends XiAction {
 
-  public EnrollMetodCompleter() {
-    setTokens("pkcs,renewal,update");
+  @Argument(index = 0, name = "message", required = true, description = "prompt message")
+  private String prompt;
+
+  @Override
+  protected Object execute0() throws Exception {
+    boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
+    if (!toContinue) {
+      throw new CmdFailure("User cancelled");
+    }
+
+    return null;
   }
 
 }

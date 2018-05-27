@@ -27,9 +27,9 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PBEPasswordService;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

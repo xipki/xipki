@@ -32,10 +32,10 @@ import org.xipki.ca.server.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

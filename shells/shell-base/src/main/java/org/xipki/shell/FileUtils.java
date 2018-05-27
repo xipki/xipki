@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf;
+package org.xipki.shell;
 
 import java.io.Closeable;
 import java.io.File;
@@ -35,7 +35,7 @@ import javax.security.auth.login.Configuration;
  * @since 2.2.0
  */
 
-public class FileUtils {
+class FileUtils {
 
   /**
    * The file copy buffer size (30 MB).

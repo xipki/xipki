@@ -32,8 +32,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.shell.completer.KeystoreTypeCompleter;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

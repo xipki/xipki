@@ -27,8 +27,8 @@ import org.xipki.ca.client.benchmark.shell.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.benchmark.shell.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.benchmark.shell.completer.RandomDnCompleter;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.ECCurveNameCompleter;
+import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.completer.ECCurveNameCompleter;
 
 /**
  * TODO.

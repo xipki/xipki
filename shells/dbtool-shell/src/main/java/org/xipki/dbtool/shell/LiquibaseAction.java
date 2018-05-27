@@ -18,7 +18,6 @@
 package org.xipki.dbtool.shell;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,10 +31,10 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.XiAction;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.
@@ -81,15 +80,13 @@ public abstract class LiquibaseAction extends XiAction {
     System.out.println(msg);
   }
 
-  protected LiquibaseDatabaseConf getDatabaseConf()
-      throws FileNotFoundException, IOException, PasswordResolverException {
+  protected LiquibaseDatabaseConf getDatabaseConf() throws IOException, PasswordResolverException {
     Properties props = new Properties();
     props.load(new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
   }
 
-  protected static Properties getPropertiesFromFile(String propFile)
-      throws FileNotFoundException, IOException {
+  protected static Properties getPropertiesFromFile(String propFile) throws IOException {
     Properties props = new Properties();
     props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
     return props;
@@ -101,18 +98,17 @@ public abstract class LiquibaseAction extends XiAction {
   }
 
   private String read(String prompt, List<String> validValues) throws IOException {
-    String tmpPrompt = prompt;
     List<String> tmpValidValues = validValues;
     if (tmpValidValues == null) {
       tmpValidValues = Collections.emptyList();
     }
 
-    if (tmpPrompt == null) {
-      tmpPrompt = "Please enter";
+    if (prompt == null) {
+      prompt = "Please enter";
     }
 
     if (isNotEmpty(tmpValidValues)) {
-      StringBuilder promptBuilder = new StringBuilder(tmpPrompt);
+      StringBuilder promptBuilder = new StringBuilder(prompt);
       promptBuilder.append(" [");
 
       for (String validValue : tmpValidValues) {
@@ -121,11 +117,11 @@ public abstract class LiquibaseAction extends XiAction {
       promptBuilder.deleteCharAt(promptBuilder.length() - 1);
       promptBuilder.append("] ?");
 
-      tmpPrompt = promptBuilder.toString();
+      prompt = promptBuilder.toString();
     }
 
     while (true) {
-      String answer = readPrompt(tmpPrompt);
+      String answer = readPrompt(prompt);
       if (isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
         return answer;
       } else {
@@ -134,7 +130,7 @@ public abstract class LiquibaseAction extends XiAction {
           retryPromptBuilder.append(validValue).append("/");
         }
         retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-        tmpPrompt = retryPromptBuilder.toString();
+        prompt = retryPromptBuilder.toString();
       }
     }
   } // method read

@@ -52,7 +52,7 @@ public class SimpleXpath {
      *        namespace will not be evaluated.
      */
     SimpleXpathStep(String step, Map<String, String> nsPrefixUriMap)
-            throws XPathExpressionException {
+        throws XPathExpressionException {
       String tmpStep = ParamUtil.requireNonBlank("step", step);
       if (tmpStep.charAt(0) == '@') {
         isElement = false;

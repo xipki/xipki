@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf;
+package org.xipki.shell.completer;
+
+import java.nio.file.Path;
+
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 
 /**
  * TODO.
@@ -23,23 +28,12 @@ package org.xipki.console.karaf;
  * @since 2.0.0
  */
 
-public class IllegalCmdParamException extends Exception {
+@Service
+public class DirCompleter extends FileCompleter {
 
-  private static final long serialVersionUID = 1L;
-
-  public IllegalCmdParamException() {
-  }
-
-  public IllegalCmdParamException(String message) {
-    super(message);
-  }
-
-  public IllegalCmdParamException(Throwable cause) {
-    super(cause);
-  }
-
-  public IllegalCmdParamException(String message, Throwable cause) {
-    super(message, cause);
+  @Override
+  protected boolean accept(Path path) {
+    return path.toFile().isDirectory() && super.accept(path);
   }
 
 }

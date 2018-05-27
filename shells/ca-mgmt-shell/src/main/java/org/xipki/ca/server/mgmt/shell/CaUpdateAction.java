@@ -46,11 +46,11 @@ import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.YesNoCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.completer.YesNoCompleter;
 
 /**
  * TODO.

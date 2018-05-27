@@ -27,8 +27,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.
@@ -44,8 +44,7 @@ public class GetCrlAction extends ClientAction {
   @Completion(FileCompleter.class)
   private String certFile;
 
-  @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
   @Completion(FileCompleter.class)
   private String outputFile;
 

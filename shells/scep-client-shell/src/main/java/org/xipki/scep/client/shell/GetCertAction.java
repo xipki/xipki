@@ -28,8 +28,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

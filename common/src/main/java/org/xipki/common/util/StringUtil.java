@@ -38,10 +38,6 @@ public class StringUtil {
   private StringUtil() {
   }
 
-  public static List<String> splitByComma(String str) {
-    return split(str, ",");
-  }
-
   public static List<String> split(String str, String delim) {
     if (str == null) {
       return null;
@@ -69,10 +65,6 @@ public class StringUtil {
     return str != null && !str.isEmpty();
   }
 
-  public static Set<String> splitByCommaAsSet(String str) {
-    return splitAsSet(str, ",");
-  }
-
   public static Set<String> splitAsSet(String str, String delim) {
     if (str == null) {
       return null;
@@ -90,10 +82,6 @@ public class StringUtil {
     }
 
     return ret;
-  }
-
-  public static String collectionAsStringByComma(Collection<String> set) {
-    return collectionAsString(set, ",");
   }
 
   public static String collectionAsString(Collection<String> set, String delim) {

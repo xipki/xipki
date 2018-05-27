@@ -34,9 +34,6 @@ import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
-import org.xipki.console.karaf.completer.SigAlgCompleter;
 import org.xipki.ocsp.client.shell.BaseOcspStatusAction;
 import org.xipki.ocsp.qa.Occurrence;
 import org.xipki.ocsp.qa.OcspCertStatus;
@@ -49,6 +46,9 @@ import org.xipki.ocsp.qa.shell.completer.OcspErrorCompleter;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.HashAlgCompleter;
+import org.xipki.shell.completer.SigAlgCompleter;
 
 /**
  * TODO.

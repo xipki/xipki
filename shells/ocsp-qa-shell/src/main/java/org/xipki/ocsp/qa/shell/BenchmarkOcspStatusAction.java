@@ -36,11 +36,11 @@ import org.xipki.common.util.FileBigIntegerIterator;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.RangeBigIntegerIterator;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.CommonOcspStatusAction;
 import org.xipki.ocsp.qa.benchmark.OcspBenchmark;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

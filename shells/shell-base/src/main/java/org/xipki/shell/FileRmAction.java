@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.command;
+package org.xipki.shell;
 
 import java.io.File;
 
@@ -25,8 +25,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.console.karaf.FileUtils;
-import org.xipki.console.karaf.XiAction;
 
 /**
  * TODO.

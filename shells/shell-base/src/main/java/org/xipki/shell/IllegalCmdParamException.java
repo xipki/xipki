@@ -15,14 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.util.AlgorithmUtil;
+package org.xipki.shell;
 
 /**
  * TODO.
@@ -30,16 +23,23 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.0.0
  */
 
-@Service
-// CHECKSTYLE:SKIP
-public class ECCurveNameCompleter extends AbstractEnumCompleter {
+public class IllegalCmdParamException extends Exception {
 
-  public ECCurveNameCompleter() {
-    List<String> enums = new LinkedList<>();
-    for (String name : AlgorithmUtil.getECCurveNames()) {
-      enums.add(name);
-    }
-    setTokens(enums);
+  private static final long serialVersionUID = 1L;
+
+  public IllegalCmdParamException() {
+  }
+
+  public IllegalCmdParamException(String message) {
+    super(message);
+  }
+
+  public IllegalCmdParamException(Throwable cause) {
+    super(cause);
+  }
+
+  public IllegalCmdParamException(String message, Throwable cause) {
+    super(message, cause);
   }
 
 }

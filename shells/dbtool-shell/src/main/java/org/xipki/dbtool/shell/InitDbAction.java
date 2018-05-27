@@ -19,7 +19,6 @@ package org.xipki.dbtool.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
 
@@ -36,23 +35,16 @@ public class InitDbAction extends LiquibaseAction {
   @Override
   protected Object execute0() throws Exception {
     LiquibaseDatabaseConf dbConf = getDatabaseConf();
-    resetAndInit(dbConf, dbSchemaFile);
-    return null;
-  }
 
-  protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile) throws Exception {
-    ParamUtil.requireNonNull("dbConf", dbConf);
-    ParamUtil.requireNonNull("schemaFile", schemaFile);
-
-    printDatabaseInfo(dbConf, schemaFile);
+    printDatabaseInfo(dbConf, dbSchemaFile);
     if (!force) {
       if (!confirm("reset and initialize")) {
         println("cancelled");
-        return;
+        return null;
       }
     }
 
-    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+    LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile);
     try {
       liquibase.init(logLevel, logFile);
       liquibase.releaseLocks();
@@ -62,6 +54,7 @@ public class InitDbAction extends LiquibaseAction {
       liquibase.shutdown();
     }
 
+    return null;
   }
 
 }

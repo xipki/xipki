@@ -33,7 +33,7 @@ import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionId;
 import org.jscep.util.CertificationRequestUtils;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.

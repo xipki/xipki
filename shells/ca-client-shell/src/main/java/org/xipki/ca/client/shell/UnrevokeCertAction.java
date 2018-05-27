@@ -24,9 +24,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

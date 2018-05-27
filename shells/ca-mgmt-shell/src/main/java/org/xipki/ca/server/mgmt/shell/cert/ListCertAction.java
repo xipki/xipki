@@ -32,7 +32,7 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CertListSortByCompleter;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

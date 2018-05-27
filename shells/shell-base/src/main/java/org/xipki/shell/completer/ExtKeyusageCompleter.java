@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
+package org.xipki.shell.completer;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
+import org.xipki.security.ObjectIdentifiers;
 
 /**
  * TODO.
@@ -27,10 +30,20 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
  */
 
 @Service
-public class HashAlgCompleter extends AbstractEnumCompleter {
+public class ExtKeyusageCompleter extends AbstractEnumCompleter {
 
-  public HashAlgCompleter() {
-    setTokens("SHA1,SHA224,SHA256,SHA384,SHA512,SHA3-224,SHA3-256,SHA3-384,SHA3-512,SM3");
+  public ExtKeyusageCompleter() {
+    List<String> enums = Arrays.asList(
+        ObjectIdentifiers.id_kp_clientAuth.getId(),
+        ObjectIdentifiers.id_kp_codeSigning.getId(),
+        ObjectIdentifiers.id_kp_emailProtection.getId(),
+        ObjectIdentifiers.id_kp_ipsecEndSystem.getId(),
+        ObjectIdentifiers.id_kp_ipsecTunnel.getId(),
+        ObjectIdentifiers.id_kp_OCSPSigning.getId(),
+        ObjectIdentifiers.id_kp_serverAuth.getId(),
+        ObjectIdentifiers.id_kp_timeStamping.getId());
+
+    setTokens(enums);
   }
 
 }

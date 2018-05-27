@@ -27,9 +27,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.DateUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.ClientCrlReasonCompleter;
 import org.xipki.security.CrlReason;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.ClientCrlReasonCompleter;
 
 /**
  * TODO.

@@ -21,8 +21,8 @@ import java.util.Date;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.common.util.DateUtil;
-import org.xipki.console.karaf.XiAction;
 import org.xipki.security.SecurityFactory;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.

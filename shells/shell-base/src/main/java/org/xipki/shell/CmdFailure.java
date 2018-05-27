@@ -15,10 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
+package org.xipki.shell;
 
 /**
  * TODO.
@@ -26,11 +23,23 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
  * @since 2.0.0
  */
 
-@Service
-public class YesNoCompleter extends AbstractEnumCompleter {
+public class CmdFailure extends Exception {
 
-  public YesNoCompleter() {
-    setTokens("yes, no");
+  private static final long serialVersionUID = 1L;
+
+  public CmdFailure() {
+  }
+
+  public CmdFailure(String message) {
+    super(message);
+  }
+
+  public CmdFailure(Throwable cause) {
+    super(cause);
+  }
+
+  public CmdFailure(String message, Throwable cause) {
+    super(message, cause);
   }
 
 }

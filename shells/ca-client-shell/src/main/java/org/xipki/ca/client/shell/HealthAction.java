@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

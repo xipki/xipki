@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
+package org.xipki.shell.completer;
 
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.util.AlgorithmUtil;
 
 /**
  * TODO.
@@ -31,19 +30,14 @@ import org.xipki.security.ObjectIdentifiers;
  */
 
 @Service
-public class ExtKeyusageCompleter extends AbstractEnumCompleter {
+// CHECKSTYLE:SKIP
+public class ECCurveNameCompleter extends AbstractEnumCompleter {
 
-  public ExtKeyusageCompleter() {
-    List<String> enums = Arrays.asList(
-        ObjectIdentifiers.id_kp_clientAuth.getId(),
-        ObjectIdentifiers.id_kp_codeSigning.getId(),
-        ObjectIdentifiers.id_kp_emailProtection.getId(),
-        ObjectIdentifiers.id_kp_ipsecEndSystem.getId(),
-        ObjectIdentifiers.id_kp_ipsecTunnel.getId(),
-        ObjectIdentifiers.id_kp_OCSPSigning.getId(),
-        ObjectIdentifiers.id_kp_serverAuth.getId(),
-        ObjectIdentifiers.id_kp_timeStamping.getId());
-
+  public ECCurveNameCompleter() {
+    List<String> enums = new LinkedList<>();
+    for (String name : AlgorithmUtil.getECCurveNames()) {
+      enums.add(name);
+    }
     setTokens(enums);
   }
 

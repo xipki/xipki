@@ -48,9 +48,6 @@ import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.completer.DirCompleter;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
-import org.xipki.console.karaf.completer.SigAlgCompleter;
 import org.xipki.ocsp.client.api.OcspRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.CommonOcspStatusAction;
@@ -65,6 +62,9 @@ import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.completer.DirCompleter;
+import org.xipki.shell.completer.HashAlgCompleter;
+import org.xipki.shell.completer.SigAlgCompleter;
 
 /**
  * TODO.

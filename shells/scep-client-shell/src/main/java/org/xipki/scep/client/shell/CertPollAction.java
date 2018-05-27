@@ -29,9 +29,9 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.
@@ -64,9 +64,7 @@ public class CertPollAction extends ClientAction {
         caSubject);
     if (resp.isFailure()) {
       throw new CmdFailure("server returned 'failure'");
-    }
-
-    if (resp.isPending()) {
+    } else if (resp.isPending()) {
       throw new CmdFailure("server returned 'pending'");
     }
 

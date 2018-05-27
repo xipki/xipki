@@ -22,7 +22,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.qa.QaSystemManager;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
  * TODO.

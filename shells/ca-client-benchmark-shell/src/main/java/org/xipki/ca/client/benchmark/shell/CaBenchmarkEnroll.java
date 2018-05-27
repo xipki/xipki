@@ -96,8 +96,7 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
       try {
         EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
         for (Integer certId : certRequests.keySet()) {
-          String id = "id-" + certId;
-          EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(id,
+          EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry("id-" + certId,
               benchmarkEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
           request.addRequestEntry(requestEntry);
         }

@@ -26,13 +26,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.CmdFailure;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
-import org.xipki.scep.client.shell.completer.EnrollMetodCompleter;
+import org.xipki.shell.CmdFailure;
 
 /**
  * TODO.
@@ -53,7 +53,7 @@ public class EnrollCertAction extends ClientAction {
   private String outputFile;
 
   @Option(name = "--method", description = "method to enroll the certificate.")
-  @Completion(EnrollMetodCompleter.class)
+  @Completion(value = StringsCompleter.class, values = {"pkcs", "renewal", "update"})
   private String method;
 
   @Override

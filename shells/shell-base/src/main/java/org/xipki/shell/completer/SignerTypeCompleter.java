@@ -15,4 +15,21 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
+package org.xipki.shell.completer;
+
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+
+/**
+ * TODO.
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+@Service
+public class SignerTypeCompleter extends AbstractEnumCompleter {
+
+  public SignerTypeCompleter() {
+    setTokens("JKS, PKCS11, PKCS12");
+  }
+
+}

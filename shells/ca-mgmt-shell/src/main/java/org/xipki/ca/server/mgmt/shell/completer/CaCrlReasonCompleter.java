@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.CaRevokeAction;
-import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.CrlReason;
+import org.xipki.shell.completer.AbstractEnumCompleter;
 
 /**
  * TODO.

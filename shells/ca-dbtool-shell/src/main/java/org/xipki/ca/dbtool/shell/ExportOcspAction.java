@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.ca.dbtool.port.ocsp.OcspDbExportWorker;
-import org.xipki.console.karaf.completer.DirCompleter;
+import org.xipki.shell.completer.DirCompleter;
 
 /**
  * TODO.

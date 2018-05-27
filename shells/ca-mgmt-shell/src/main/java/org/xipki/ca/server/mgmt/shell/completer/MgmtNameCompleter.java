@@ -19,7 +19,7 @@ package org.xipki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.server.mgmt.api.CaManager;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
  * TODO.

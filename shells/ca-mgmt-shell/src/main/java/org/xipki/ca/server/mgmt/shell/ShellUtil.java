@@ -25,9 +25,9 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.SecurityFactory;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.

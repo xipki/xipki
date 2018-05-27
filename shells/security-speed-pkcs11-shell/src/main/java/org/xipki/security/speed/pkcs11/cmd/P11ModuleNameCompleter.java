@@ -23,8 +23,8 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
+import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
  * TODO.

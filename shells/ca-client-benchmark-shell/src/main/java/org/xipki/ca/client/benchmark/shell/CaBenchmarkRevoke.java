@@ -50,9 +50,7 @@ public class CaBenchmarkRevoke extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaBenchmarkRevoke.class);
 
-  private static final CrlReason[] REASONS = {CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE,
-      CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
-      CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN};
+  private static final List<CrlReason> REASONS = CrlReason.PERMITTED_CLIENT_CRLREASONS;
 
   private final CaClient caClient;
 
@@ -66,9 +64,8 @@ public class CaBenchmarkRevoke extends BenchmarkExecutor {
 
   private AtomicInteger processedCerts = new AtomicInteger(0);
 
-  public CaBenchmarkRevoke(CaClient caClient, Certificate caCert,
-      Iterator<BigInteger> serialNumberIterator, int maxCerts, int num, String description)
-      throws Exception {
+  public CaBenchmarkRevoke(CaClient caClient, Certificate caCert, 
+      Iterator<BigInteger> serialNumberIterator, int maxCerts, int num, String description) {
     super(description);
     ParamUtil.requireNonNull("caCert", caCert);
     this.num = ParamUtil.requireMin("num", num, 1);
@@ -106,7 +103,7 @@ public class CaBenchmarkRevoke extends BenchmarkExecutor {
       RevokeCertRequest request = new RevokeCertRequest();
       int id = 1;
       for (BigInteger serialNumber : serialNumbers) {
-        CrlReason reason = REASONS[Math.abs(serialNumber.intValue()) % REASONS.length];
+        CrlReason reason = REASONS.get(Math.abs(serialNumber.intValue()) % REASONS.size());
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry(Integer.toString(id++),
                 caSubject, serialNumber, reason.getCode(), null);
         request.addRequestEntry(entry);

@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.console.karaf.completer;
+package org.xipki.shell.completer;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.CrlReason;
 
 /**

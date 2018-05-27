@@ -29,7 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.diffdb.DigestDiffWorker;
 import org.xipki.ca.dbtool.port.DbPortWorker;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.DirCompleter;
+import org.xipki.shell.completer.DirCompleter;
 
 /**
  * TODO.

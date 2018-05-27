@@ -32,10 +32,10 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.FileBigIntegerIterator;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.SecurityFactory;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ import org.xipki.security.SecurityFactory;
  */
 
 @Command(scope = "xiqa", name = "cmp-benchmark-revoke",
-        description = "CA client revoke (benchmark)")
+    description = "CA client revoke (benchmark)")
 @Service
 public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
 

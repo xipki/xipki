@@ -20,9 +20,9 @@ package org.xipki.security.shell.pkcs11;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.shell.IllegalCmdParamException;
 
 /**
  * TODO.
