@@ -395,8 +395,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       try {
         zipFile.close();
       } catch (Exception ex2) {
-        LOG.error("could not close ZIP file {}: {}", certsZipFile, ex2.getMessage());
-        LOG.debug("could not close ZIP file " + certsZipFile, ex2);
+        LogUtil.error(LOG, ex2, "could not close ZIP file " + certsZipFile);
       }
       throw ex;
     }
@@ -441,8 +440,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
               Certificate cc = Certificate.getInstance(encodedCert);
               tbsCert = cc.getTBSCertificate();
             } catch (RuntimeException ex) {
-              LOG.error("could not parse certificate in file {}", filename);
-              LOG.debug("could not parse certificate in file " + filename, ex);
+              LogUtil.error(LOG, ex, "could not parse certificate in file " + filename);
               throw new CertificateException(ex.getMessage(), ex);
             }
 

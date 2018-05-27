@@ -60,9 +60,7 @@ public class DbSchemaInfo {
 
       rs = stmt.executeQuery(sql);
       while (rs.next()) {
-        String name = rs.getString("NAME");
-        String value = rs.getString("VALUE2");
-        variables.put(name, value);
+        variables.put(rs.getString("NAME"), rs.getString("VALUE2"));
       }
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

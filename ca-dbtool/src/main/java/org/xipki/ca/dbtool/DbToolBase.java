@@ -69,7 +69,6 @@ public class DbToolBase {
 
   public DbToolBase(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe)
       throws DataAccessException {
-    super();
     ParamUtil.requireNonBlank("baseDir", baseDir);
     this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);

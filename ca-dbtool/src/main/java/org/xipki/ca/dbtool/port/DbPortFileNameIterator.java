@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
@@ -74,8 +75,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
     try {
       reader.close();
     } catch (Throwable th) {
-      LOG.error("could not close reader: {}", th.getMessage());
-      LOG.error("could not close reader", th);
+      LogUtil.error(LOG, th,"could not close reader");
     }
   }
 
