@@ -140,7 +140,7 @@ class IaikP11Slot extends AbstractP11Slot {
     Session session;
     try {
       // SO (Security Officer cannot be logged in READ-ONLY session
-      boolean rw = (userType == PKCS11Constants.CKU_SO);
+      boolean rw = readOnly ? false : (userType == PKCS11Constants.CKU_SO);
       session = openSession(rw);
     } catch (P11TokenException ex) {
       LogUtil.error(LOG, ex, "openSession");
@@ -471,6 +471,10 @@ class IaikP11Slot extends AbstractP11Slot {
   }
 
   private Session openSession(boolean rwSession) throws P11TokenException {
+    if (rwSession && isReadOnly()) {
+      throw new P11TokenException("Cannot open RW session, the token is read only.");
+    }
+
     Session session;
     try {
       session = slot.getToken().openSession(Token.SessionType.SERIAL_SESSION, rwSession, null,
@@ -491,8 +495,9 @@ class IaikP11Slot extends AbstractP11Slot {
       }
 
       if (session == null) {
+        boolean rw = isReadOnly() ? false : (userType == PKCS11Constants.CKU_SO);
         // create new session
-        session = new ConcurrentBagEntry<>(openSession(false));
+        session = new ConcurrentBagEntry<>(openSession(rw));
         sessions.add(session);
       }
     }
