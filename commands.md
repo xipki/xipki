@@ -50,7 +50,7 @@ Feature xipki-shell-base (started by default)
 
      transfer a URL
 
-Feature xipki-database-tool (not started by default)
+Feature xipki-dbtool (not started by default)
 -----
 
    * `ca:diff-digest-db`

@@ -125,7 +125,7 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>database-tool</artifactId>
+        <artifactId>dbtool</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -23,7 +23,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>3.1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>database-tool</artifactId>
+  <artifactId>dbtool</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>

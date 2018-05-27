@@ -294,7 +294,7 @@
                 <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
-                <feature>xipki-database-tool</feature>
+                <feature>xipki-dbtool</feature>
                 <feature>xipki-audit-syslog</feature>
               </features>
             </configuration>
@@ -321,7 +321,7 @@
                 <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
-                <feature>xipki-database-tool</feature>
+                <feature>xipki-dbtool</feature>
                 <feature>xipki-audit-syslog</feature>
               </features>
             </configuration>

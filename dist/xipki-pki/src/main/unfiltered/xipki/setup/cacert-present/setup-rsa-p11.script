@@ -28,11 +28,11 @@ echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
 
-feature:install xipki-database-tool
+feature:install xipki-dbtool
 
 ca:initdb-pki --force
 
-feature:uninstall xipki-database-tool
+feature:uninstall xipki-dbtool
 
 ca:restart
 

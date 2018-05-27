@@ -33,8 +33,8 @@
     <jdbc.mysql.version>5.1.46</jdbc.mysql.version>
     <patchkaraf.main.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.main.repos>
     <patchkaraf.jetty.repos>mvn:org.xipki.features/qa-jetty/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.jetty.repos>
-    <patchkaraf.main.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-database-tool,xipki-security-shell</patchkaraf.main.features>
-    <patchkaraf.jetty.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-database-tool,xipki-security-shell</patchkaraf.jetty.features>
+    <patchkaraf.main.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.main.features>
+    <patchkaraf.jetty.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.jetty.features>
   </properties>
   <dependencies>
     <dependency>
@@ -311,7 +311,7 @@
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>
-                <feature>xipki-database-tool</feature>
+                <feature>xipki-dbtool</feature>
                 <feature>xipki-audit-syslog</feature>
                 <feature>xipki-scepclient-shell</feature>
                 <feature>xipki-jscepclient-shell</feature>
@@ -345,7 +345,7 @@
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>
-                <feature>xipki-database-tool</feature>
+                <feature>xipki-dbtool</feature>
                 <feature>xipki-audit-syslog</feature>
                 <feature>xipki-scepclient-shell</feature>
                 <feature>xipki-jscepclient-shell</feature>

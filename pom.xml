@@ -76,7 +76,7 @@
     <module>audit</module>
     <module>audit-syslog</module>
     <module>datasource</module>
-    <module>database-tool</module>
+    <module>dbtool</module>
     <module>password</module>
     <module>security</module>
     <module>security-pkcs11</module>

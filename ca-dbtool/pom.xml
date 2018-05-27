@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>database-tool</artifactId>
+      <artifactId>dbtool</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

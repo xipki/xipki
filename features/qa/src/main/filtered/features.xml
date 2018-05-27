@@ -123,12 +123,12 @@
     <bundle start-level="80">mvn:org.xipki/ocsp-server/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ocsp-server-netty/${project.version}</bundle>
   </feature>
-  <feature name="xipki-database-tool" version="${project.version}" description="Database tool">
+  <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
     <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/database-tool/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/dbtool/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ca-dbtool/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/ca-dbtool-shell/${project.version}</bundle>
   </feature>
