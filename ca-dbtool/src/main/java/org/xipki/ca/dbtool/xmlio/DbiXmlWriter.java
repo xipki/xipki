@@ -37,8 +37,6 @@ public class DbiXmlWriter {
 
   private static final XMLOutputFactory FACTORY = XMLOutputFactory.newFactory();
 
-  private final String rootElementName;
-
   private final ByteArrayOutputStream stream;
 
   private final XMLStreamWriter writer;
@@ -46,7 +44,6 @@ public class DbiXmlWriter {
   private boolean flushed;
 
   public DbiXmlWriter(String rootElementName, String version) throws XMLStreamException {
-    this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
     ParamUtil.requireNonBlank("version", version);
 
     stream = new ByteArrayOutputStream();
@@ -59,10 +56,6 @@ public class DbiXmlWriter {
     writer.writeStartElement(rootElementName);
     writer.writeAttribute("version", version);
     writeNewline();
-  }
-
-  public String rootElementName() {
-    return rootElementName;
   }
 
   public void writeStartElement(String localName) throws XMLStreamException {

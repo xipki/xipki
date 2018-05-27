@@ -22,8 +22,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
@@ -31,7 +29,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -57,12 +54,9 @@ public class CaDbExportWorker extends DbPortWorker {
 
   private final int numCertsPerSelect;
 
-  private final boolean evaluateOnly;
-
   public CaDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-      int numCertsPerSelect, boolean evaluateOnly)
-      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+      int numCertsPerSelect) throws PasswordResolverException, IOException {
     ParamUtil.requireNonBlank("dbConfFile", dbConfFile);
     ParamUtil.requireNonBlank("destFolder", destFolder);
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
@@ -75,7 +69,6 @@ public class CaDbExportWorker extends DbPortWorker {
     this.resume = resume;
     this.numCertsInBundle = numCertsInBundle;
     this.numCertsPerSelect = numCertsPerSelect;
-    this.evaluateOnly = evaluateOnly;
     checkDestFolder();
   }
 
@@ -112,15 +105,14 @@ public class CaDbExportWorker extends DbPortWorker {
     try {
       if (!resume) {
         // CAConfiguration
-        CaconfDbExporter caConfExporter = new CaconfDbExporter(
-            datasource, destFolder, stopMe, evaluateOnly);
+        CaconfDbExporter caConfExporter = new CaconfDbExporter(datasource, destFolder, stopMe);
         caConfExporter.export();
         caConfExporter.shutdown();
       }
 
       // CertStore
       CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(datasource, destFolder,
-          numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
+          numCertsInBundle, numCertsPerSelect, resume, stopMe);
       certStoreExporter.export();
       certStoreExporter.shutdown();
     } finally {

@@ -54,11 +54,9 @@ public class OcspDbExportWorker extends DbPortWorker {
 
   private final int numCertsPerSelect;
 
-  private final boolean evaluateOnly;
-
   public OcspDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-      int numCertsPerSelect, boolean evaluateOnly) throws PasswordResolverException, IOException {
+      int numCertsPerSelect) throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
     this.destFolder = ParamUtil.requireNonNull(destFolder, destFolder);
@@ -67,7 +65,6 @@ public class OcspDbExportWorker extends DbPortWorker {
         new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
-    this.evaluateOnly = evaluateOnly;
 
     File file = new File(destFolder);
     if (!file.exists()) {
@@ -99,7 +96,7 @@ public class OcspDbExportWorker extends DbPortWorker {
     try {
       // CertStore
       OcspCertstoreDbExporter certStoreExporter = new OcspCertstoreDbExporter(datasource,
-          destFolder, numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
+          destFolder, numCertsInBundle, numCertsPerSelect, resume, stopMe);
       certStoreExporter.export();
       certStoreExporter.shutdown();
     } finally {

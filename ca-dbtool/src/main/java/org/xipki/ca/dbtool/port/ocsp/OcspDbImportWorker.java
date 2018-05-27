@@ -51,11 +51,9 @@ public class OcspDbImportWorker extends DbPortWorker {
 
   private final int batchEntriesPerCommit;
 
-  private final boolean evaluateOnly;
-
   public OcspDbImportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-      String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
-      boolean evaluateOnly) throws PasswordResolverException, IOException {
+      String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit)
+          throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
 
@@ -66,7 +64,6 @@ public class OcspDbImportWorker extends DbPortWorker {
     this.resume = resume;
     this.srcFolder = IoUtil.expandFilepath(srcFolder);
     this.batchEntriesPerCommit = batchEntriesPerCommit;
-    this.evaluateOnly = evaluateOnly;
   }
 
   @Override
@@ -75,7 +72,7 @@ public class OcspDbImportWorker extends DbPortWorker {
     // CertStore
     try {
       OcspCertstoreDbImporter certStoreImporter = new OcspCertstoreDbImporter(datasource,
-          srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+          srcFolder, batchEntriesPerCommit, resume, stopMe);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();
     } finally {

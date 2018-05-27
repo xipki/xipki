@@ -76,9 +76,8 @@ class OcspCertstoreDbExporter extends DbPorter {
   private final boolean resume;
 
   OcspCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
-      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
-      throws Exception {
-    super(datasource, baseDir, stopMe, evaluateOnly);
+      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe) throws Exception {
+    super(datasource, baseDir, stopMe);
 
     this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
     this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
@@ -232,7 +231,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       minId = min("CERT", "ID");
     }
 
-    System.out.println(exportingText() + "table CERT from ID " + minId);
+    System.out.println("exporting table CERT from ID " + minId);
 
     final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,NAFTER,NBEFORE,HASH,SUBJECT "
         + "FROM CERT WHERE ID>=?";
@@ -407,8 +406,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     // all successful, delete the processLogFile
     processLogFile.delete();
 
-    System.out.println(exportedText() + processLog.numProcessed()
-        + " certificates from tables CERT");
+    System.out.println(" exported " + processLog.numProcessed() + " certificates from tables CERT");
   } // method exportCert0
 
   private void finalizeZip(ZipOutputStream zipOutStream, DbiXmlWriter certsType)

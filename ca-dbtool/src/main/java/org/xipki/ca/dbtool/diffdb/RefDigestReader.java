@@ -141,8 +141,7 @@ class RefDigestReader {
             if (certhashAlgo == HashAlgo.SHA1) {
               hash = rs.getString("SHA1");
             } else {
-              String b64Cert = rs.getString("CERT");
-              hash = certhashAlgo.base64Hash(Base64.decodeFast(b64Cert));
+              hash = certhashAlgo.base64Hash(Base64.decodeFast(rs.getString("CERT")));
             }
           }
 

@@ -53,8 +53,6 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
 
   private final int batchEntriesPerCommit;
 
-  private final boolean evaluateOnly;
-
   public OcspFromCaDbImportWorker(DataSourceFactory datasourceFactory,
       PasswordResolver passwordResolver, String dbConfFile, String publisherName,
       boolean resume, String srcFolder, int batchEntriesPerCommit, boolean evaluateOnly)
@@ -70,7 +68,6 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
     this.resume = resume;
     this.srcFolder = IoUtil.expandFilepath(srcFolder);
     this.batchEntriesPerCommit = batchEntriesPerCommit;
-    this.evaluateOnly = evaluateOnly;
   }
 
   @Override
@@ -79,8 +76,7 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
     // CertStore
     try {
       OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-          datasource, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe,
-          evaluateOnly);
+          datasource, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();
     } finally {

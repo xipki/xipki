@@ -52,13 +52,10 @@ public class ImportCaAction extends DbPortAction {
   @Option(name = "--resume", description = "resume from the last successful point")
   private Boolean resume = Boolean.FALSE;
 
-  @Option(name = "--test", description = "just test the import, no real import")
-  private Boolean testOnly = Boolean.FALSE;
-
   @Override
   protected DbPortWorker getDbPortWorker() throws Exception {
     return new CaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile, resume, indir,
-        numCertsPerCommit.intValue(), testOnly);
+        numCertsPerCommit.intValue());
   }
 
 }

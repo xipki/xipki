@@ -127,19 +127,16 @@ public class DbPorter extends DbToolBase {
 
   public static final int VERSION = 1;
 
-  protected final boolean evaulateOnly;
-
   protected final int dbSchemaVersion;
 
   protected final int maxX500nameLen;
 
   protected final DbSchemaInfo dbSchemaInfo;
 
-  public DbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe,
-      boolean evaluateOnly) throws DataAccessException {
+  public DbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe)
+      throws DataAccessException {
     super(datasource, baseDir, stopMe);
 
-    this.evaulateOnly = evaluateOnly;
     this.dbSchemaInfo = new DbSchemaInfo(datasource);
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.getVariableValue("VERSION"));
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.getVariableValue("X500NAME_MAXLEN"));
@@ -227,22 +224,6 @@ public class DbPorter extends DbToolBase {
 
     File file = new File(baseDir, fileOrValue.getFile());
     return IoUtil.read(file);
-  }
-
-  protected String importingText() {
-    return evaulateOnly ? "evaluating import " : "importing ";
-  }
-
-  protected String importedText() {
-    return evaulateOnly ? " evaluated import " : " imported ";
-  }
-
-  protected String exportingText() {
-    return evaulateOnly ? "evaluating export " : "exporting ";
-  }
-
-  protected String exportedText() {
-    return evaulateOnly ? " evaluated export " : " exported ";
   }
 
   public static final Schema retrieveSchema(String schemaPath) throws JAXBException {

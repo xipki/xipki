@@ -22,8 +22,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.port.DbPortWorker;
@@ -31,7 +29,6 @@ import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -55,12 +52,9 @@ public class CaDbImportWorker extends DbPortWorker {
 
   private final int batchEntriesPerCommit;
 
-  private final boolean evaluateOnly;
-
   public CaDbImportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-      String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
-      boolean evaluateOnly)
-      throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+      String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit)
+      throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
     Properties props = DbPorter.getDbConfProperties(
@@ -70,7 +64,6 @@ public class CaDbImportWorker extends DbPortWorker {
     this.resume = resume;
     this.srcFolder = IoUtil.expandFilepath(srcFolder);
     this.batchEntriesPerCommit = batchEntriesPerCommit;
-    this.evaluateOnly = evaluateOnly;
   }
 
   @Override
@@ -91,15 +84,14 @@ public class CaDbImportWorker extends DbPortWorker {
     try {
       if (!resume) {
         // CAConfiguration
-        CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource,
-            srcFolder, stopMe, evaluateOnly);
+        CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource, srcFolder, stopMe);
         caConfImporter.importToDb();
         caConfImporter.shutdown();
       }
 
       // CertStore
       CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(datasource,
-          srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+          srcFolder, batchEntriesPerCommit, resume, stopMe);
       certStoreImporter.importToDb();
       certStoreImporter.shutdown();
     } finally {

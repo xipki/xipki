@@ -55,13 +55,10 @@ public class ExportOcspAction extends DbPortAction {
   @Option(name = "--resume", description = "resume from the last successful point")
   private Boolean resume = Boolean.FALSE;
 
-  @Option(name = "--test", description = "just test the export, no real export")
-  private Boolean testOnly = Boolean.FALSE;
-
   @Override
   protected DbPortWorker getDbPortWorker() throws Exception {
     return new OcspDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir,
-        resume, numCertsInBundle, numCertsPerSelect, testOnly);
+        resume, numCertsInBundle, numCertsPerSelect);
   }
 
 }

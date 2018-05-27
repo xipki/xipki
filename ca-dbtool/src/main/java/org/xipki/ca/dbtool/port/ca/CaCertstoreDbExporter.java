@@ -79,7 +79,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
+class CaCertstoreDbExporter extends DbPorter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbExporter.class);
 
@@ -94,9 +94,9 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
   private final boolean resume;
 
   CaCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
-      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe, boolean evaluateOnly)
+      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
           throws DataAccessException, JAXBException {
-    super(datasource, baseDir, stopMe, evaluateOnly);
+    super(datasource, baseDir, stopMe);
 
     this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
     this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
@@ -259,7 +259,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
         : min(tableName, "ID");
 
     String tablesText = "table " + type.getTableName();
-    System.out.println(exportingText() + tablesText + " from ID " + minId);
+    System.out.println("exporting " + tablesText + " from ID " + minId);
 
     final long maxId = max(tableName, "ID");
     long total = count(tableName) - numProcessedBefore;
@@ -324,19 +324,16 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
           }
 
           if (CaDbEntryType.CERT == type) {
-            String b64Cert = rs.getString("CERT");
-            byte[] certBytes = Base64.decodeFast(b64Cert);
+            byte[] certBytes = Base64.decodeFast(rs.getString("CERT"));
 
             String sha1 = HashAlgo.SHA1.hexHash(certBytes);
             String certFileName = sha1 + ".der";
-            if (!evaulateOnly) {
-              ZipEntry certZipEntry = new ZipEntry(certFileName);
-              currentEntriesZip.putNextEntry(certZipEntry);
-              try {
-                currentEntriesZip.write(certBytes);
-              } finally {
-                currentEntriesZip.closeEntry();
-              }
+            ZipEntry certZipEntry = new ZipEntry(certFileName);
+            currentEntriesZip.putNextEntry(certZipEntry);
+            try {
+              currentEntriesZip.write(certBytes);
+            } finally {
+              currentEntriesZip.closeEntry();
             }
 
             CertType cert = new CertType();
@@ -381,8 +378,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
 
             ((CertsWriter) entriesInCurrentFile).add(cert);
           } else if (CaDbEntryType.CRL == type) {
-            String b64Crl = rs.getString("CRL");
-            byte[] crlBytes = Base64.decodeFast(b64Crl);
+            byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
 
             X509CRL x509Crl = null;
             try {
@@ -403,14 +399,12 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
             String sha1 = HashAlgo.SHA1.hexHash(crlBytes);
 
             final String crlFilename = sha1 + ".crl";
-            if (!evaulateOnly) {
-              ZipEntry certZipEntry = new ZipEntry(crlFilename);
-              currentEntriesZip.putNextEntry(certZipEntry);
-              try {
-                currentEntriesZip.write(crlBytes);
-              } finally {
-                currentEntriesZip.closeEntry();
-              }
+            ZipEntry certZipEntry = new ZipEntry(crlFilename);
+            currentEntriesZip.putNextEntry(certZipEntry);
+            try {
+              currentEntriesZip.write(crlBytes);
+            } finally {
+              currentEntriesZip.closeEntry();
             }
 
             CrlType crl = new CrlType();
@@ -425,23 +419,20 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
 
             ((CrlsWriter) entriesInCurrentFile).add(crl);
           } else if (CaDbEntryType.REQUEST == type) {
-            long update = rs.getLong("LUPDATE");
-            String b64Data = rs.getString("DATA");
-            byte[] dataBytes = Base64.decodeFast(b64Data);
+            byte[] dataBytes = Base64.decodeFast(rs.getString("DATA"));
             String sha1 = HashAlgo.SHA1.hexHash(dataBytes);
             final String dataFilename = sha1 + ".req";
-            if (!evaulateOnly) {
-              ZipEntry certZipEntry = new ZipEntry(dataFilename);
-              currentEntriesZip.putNextEntry(certZipEntry);
-              try {
-                currentEntriesZip.write(dataBytes);
-              } finally {
-                currentEntriesZip.closeEntry();
-              }
+            ZipEntry certZipEntry = new ZipEntry(dataFilename);
+            currentEntriesZip.putNextEntry(certZipEntry);
+            try {
+              currentEntriesZip.write(dataBytes);
+            } finally {
+              currentEntriesZip.closeEntry();
             }
+
             RequestType entry = new RequestType();
             entry.setId(id);
-            entry.setUpdate(update);
+            entry.setUpdate(rs.getLong("LUPDATE"));
             entry.setFile(dataFilename);
             ((RequestsWriter) entriesInCurrentFile).add(entry);
           } else if (CaDbEntryType.REQCERT == type) {
@@ -519,7 +510,7 @@ class CaCertstoreDbExporter extends AbstractCaCertstoreDbPorter {
     processLog.printTrailer();
     // all successful, delete the processLogFile
     processLogFile.delete();
-    System.out.println(exportedText() + sum + " entries from " + tablesText);
+    System.out.println(" exported " + sum + " entries from " + tablesText);
   } // method exportEntries
 
   private void exportPublishQueue(CertstoreType certstore) throws DataAccessException {

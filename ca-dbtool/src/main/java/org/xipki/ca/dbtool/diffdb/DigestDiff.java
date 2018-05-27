@@ -90,11 +90,6 @@ class DigestDiff {
     this.targetDbControl = detectDbControl(targetDatasource);
 
     if (refDbControl == DbControl.XIPKI_OCSP_v3) {
-      if (targetDbControl != DbControl.XIPKI_OCSP_v3) {
-        throw new IllegalArgumentException(
-            "Could not compare refDataSource (CA) and targetDataSource (OCSP)");
-      }
-
       HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
       HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
@@ -104,11 +99,7 @@ class DigestDiff {
       }
       this.certhashAlgo = refAlgo;
     } else if (refDbControl == DbControl.XIPKI_CA_v3) {
-      if (targetDbControl == DbControl.XIPKI_OCSP_v3) {
-        this.certhashAlgo = detectOcspDbCerthashAlgo(targetDatasource);
-      } else {
-        this.certhashAlgo = HashAlgo.SHA1;
-      }
+      this.certhashAlgo = HashAlgo.SHA1;
     } else {
       throw new RuntimeException("should not reach here, unknown dbContro " + refDbControl);
     }
@@ -242,8 +233,8 @@ class DigestDiff {
     }
   } // method diffSingleCa
 
-  private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource,
-      DbControl dbControl) throws DataAccessException {
+  private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource, DbControl dbControl)
+      throws DataAccessException {
     // get a list of available CAs in the target database
     String sql = "SELECT ID,CERT FROM ";
     if (dbControl == DbControl.XIPKI_CA_v3) {
@@ -261,9 +252,7 @@ class DigestDiff {
     try {
       rs = stmt.executeQuery(sql);
       while (rs.next()) {
-        int id = rs.getInt("ID");
-        String b64Cert = rs.getString("CERT");
-        caIdCertMap.put(id, Base64.decodeFast(b64Cert));
+        caIdCertMap.put(rs.getInt("ID"), Base64.decodeFast(rs.getString("CERT")));
       }
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

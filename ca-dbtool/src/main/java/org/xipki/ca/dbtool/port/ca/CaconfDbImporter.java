@@ -72,9 +72,9 @@ class CaconfDbImporter extends DbPorter {
 
   private final Unmarshaller unmarshaller;
 
-  CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe,
-      boolean evaluateOnly) throws DataAccessException, JAXBException {
-    super(datasource, srcDir, stopMe, evaluateOnly);
+  CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
+      throws DataAccessException, JAXBException {
+    super(datasource, srcDir, stopMe);
 
     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
     unmarshaller = jaxbContext.createUnmarshaller();

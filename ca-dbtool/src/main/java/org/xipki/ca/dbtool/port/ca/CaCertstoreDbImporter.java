@@ -83,7 +83,7 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
+class CaCertstoreDbImporter extends DbPorter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbImporter.class);
 
@@ -108,8 +108,8 @@ class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
   private final int numCertsPerCommit;
 
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
-      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
-    super(datasource, srcDir, stopMe, evaluateOnly);
+      boolean resume, AtomicBoolean stopMe) throws Exception {
+    super(datasource, srcDir, stopMe);
 
     this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
     this.resume = resume;
@@ -324,7 +324,7 @@ class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
       final long remainingTotal = total - numProcessedBefore;
       final ProcessLog processLog = new ProcessLog(remainingTotal);
 
-      System.out.println(importingText() + "entries to " + tablesText + " from ID " + minId);
+      System.out.println("importing entries to " + tablesText + " from ID " + minId);
       processLog.printHeader();
 
       DbPortFileNameIterator entriesFileIterator = null;
@@ -379,7 +379,7 @@ class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
       echoToFile(type + ":" + (numProcessedBefore + processLog.numProcessed()) + ":-1",
           processLogFile);
 
-      System.out.println(importedText() + processLog.numProcessed() + " entries");
+      System.out.println(" imported " + processLog.numProcessed() + " entries");
       return null;
     } catch (Exception ex) {
       System.err.println("\nimporting " + tablesText + " has been cancelled due to error,\n"
@@ -615,23 +615,18 @@ class CaCertstoreDbImporter extends AbstractCaCertstoreDbPorter {
         boolean isLastBlock = !entries.hasNext();
         if (numEntriesInBatch > 0
             && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock)) {
-          if (evaulateOnly) {
-            stmt.clearBatch();
-          } else {
-            try {
-              stmt.executeBatch();
-
-              commit("(commit import to CA)");
-            } catch (Throwable th) {
-              rollback();
-              deleteFromTableWithLargerId(type.getTableName(), "ID", id, LOG);
-              if (th instanceof SQLException) {
-                throw translate(sql, (SQLException) th);
-              } else if (th instanceof Exception) {
-                throw (Exception) th;
-              } else {
-                throw new Exception(th);
-              }
+          try {
+            stmt.executeBatch();
+            commit("(commit import to CA)");
+          } catch (Throwable th) {
+            rollback();
+            deleteFromTableWithLargerId(type.getTableName(), "ID", id, LOG);
+            if (th instanceof SQLException) {
+              throw translate(sql, (SQLException) th);
+            } else if (th instanceof Exception) {
+              throw (Exception) th;
+            } else {
+              throw new Exception(th);
             }
           }
 

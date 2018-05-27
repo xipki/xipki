@@ -346,8 +346,8 @@ class TargetDigestRetriever {
           revInvTime = null;
         }
       }
-      String base64CertHash = getBase64HashValue(rs);
-      return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, base64CertHash);
+      return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime,
+          getBase64HashValue(rs));
     } catch (SQLException ex) {
       throw datasource.translate(singleCertSql, ex);
     } finally {

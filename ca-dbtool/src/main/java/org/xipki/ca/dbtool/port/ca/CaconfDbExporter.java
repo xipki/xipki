@@ -68,9 +68,9 @@ class CaconfDbExporter extends DbPorter {
 
   private Marshaller marshaller;
 
-  CaconfDbExporter(DataSourceWrapper datasource, String destDir, AtomicBoolean stopMe,
-      boolean evaluateOnly) throws DataAccessException, JAXBException {
-    super(datasource, destDir, stopMe, evaluateOnly);
+  CaconfDbExporter(DataSourceWrapper datasource, String destDir, AtomicBoolean stopMe)
+      throws DataAccessException, JAXBException {
+    super(datasource, destDir, stopMe);
 
     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
     marshaller = jaxbContext.createMarshaller();
@@ -296,8 +296,8 @@ class CaconfDbExporter extends DbPorter {
     String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CA_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,SIGNER_CONF,"
         + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,DUPLICATE_KEY,"
         + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,CMP_RESPONDER_NAME,"
-        + "SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,CMP_CONTROL,SCEP_CONTROL,CRL_CONTROL,EXTRA_CONTROL F"
-        + "ROM CA";
+        + "SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,CMP_CONTROL,SCEP_CONTROL,CRL_CONTROL,EXTRA_CONTROL "
+        + "FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;

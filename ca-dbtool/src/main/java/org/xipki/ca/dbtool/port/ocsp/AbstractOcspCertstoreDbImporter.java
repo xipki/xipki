@@ -45,9 +45,9 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
 
   protected static final String SQL_DEL_CERT = "DELETE FROM CERT WHERE ID>?";
 
-  AbstractOcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir,
-      AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
-    super(datasource, srcDir, stopMe, evaluateOnly);
+  AbstractOcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
+      throws Exception {
+    super(datasource, srcDir, stopMe);
   }
 
   protected String sha1(byte[] data) {

@@ -69,8 +69,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
   private final int numCertsPerCommit;
 
   OcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
-      boolean resume, AtomicBoolean stopMe, boolean evaluateOnly) throws Exception {
-    super(datasource, srcDir, stopMe, evaluateOnly);
+      boolean resume, AtomicBoolean stopMe) throws Exception {
+    super(datasource, srcDir, stopMe);
 
     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
     unmarshaller = jaxbContext.createUnmarshaller();
@@ -213,7 +213,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     final long total = certstore.getCountCerts() - numProcessedBefore;
     final ProcessLog processLog = new ProcessLog(total);
 
-    System.out.println(importingText() + "certificates from ID " + minId);
+    System.out.println("importing certificates from ID " + minId);
     processLog.printHeader();
 
     PreparedStatement psCert = prepareStatement(SQL_ADD_CERT);
@@ -262,7 +262,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     processLog.printTrailer();
     echoToFile(MSG_CERTS_FINISHED, processLogFile);
-    System.out.println(importedText() + processLog.numProcessed() + " certificates");
+    System.out.println(" imported " + processLog.numProcessed() + " certificates");
   } // method importCert
 
   private long importCert0(PreparedStatement psCert, String certsZipFile, long minId,
@@ -329,22 +329,18 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
         if (numEntriesInBatch > 0
             && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
-          if (evaulateOnly) {
-            psCert.clearBatch();
-          } else {
-            try {
-              psCert.executeBatch();
-              commit("(commit import cert to OCSP)");
-            } catch (Throwable th) {
-              rollback();
-              deleteCertGreatherThan(lastSuccessfulCertId, LOG);
-              if (th instanceof SQLException) {
-                throw translate(SQL_ADD_CERT, (SQLException) th);
-              } else if (th instanceof Exception) {
-                throw (Exception) th;
-              } else {
-                throw new Exception(th);
-              }
+          try {
+            psCert.executeBatch();
+            commit("(commit import cert to OCSP)");
+          } catch (Throwable th) {
+            rollback();
+            deleteCertGreatherThan(lastSuccessfulCertId, LOG);
+            if (th instanceof SQLException) {
+              throw translate(SQL_ADD_CERT, (SQLException) th);
+            } else if (th instanceof Exception) {
+              throw (Exception) th;
+            } else {
+              throw new Exception(th);
             }
           }
 
