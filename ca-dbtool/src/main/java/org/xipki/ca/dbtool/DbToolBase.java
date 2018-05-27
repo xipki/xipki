@@ -90,8 +90,6 @@ public class DbToolBase {
   }
 
   protected PreparedStatement prepareStatement(String sql) throws DataAccessException {
-    ParamUtil.requireNonBlank("sql", sql);
-
     try {
       return connection.prepareStatement(sql);
     } catch (SQLException ex) {
@@ -100,9 +98,6 @@ public class DbToolBase {
   }
 
   public boolean deleteFromTableWithLargerId(String table, String idColumn, long id, Logger log) {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("idColumn", idColumn);
-
     String sql = StringUtil.concatObjects("DELETE FROM ", table, " WHERE ", idColumn, ">", id);
 
     Statement stmt;
@@ -132,49 +127,30 @@ public class DbToolBase {
   }
 
   public long min(String table, String column) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
-
     return datasource.getMin(connection, table, column);
   }
 
   public long min(String table, String column, String condition) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
-
     return datasource.getMin(connection, table, column, condition);
   }
 
   public long max(String table, String column) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
-
     return datasource.getMax(connection, table, column);
   }
 
   public long max(String table, String column, String condition) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
-
     return datasource.getMax(connection, table, column, condition);
   }
 
   public int count(String table) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-
     return datasource.getCount(connection, table);
   }
 
   public boolean tableHasColumn(String table, String column) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
-
     return datasource.tableHasColumn(connection, table, column);
   }
 
   public boolean tableExists(String table) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-
     return datasource.tableExists(connection, table);
   }
 
@@ -226,8 +202,6 @@ public class DbToolBase {
   }
 
   protected static void setLong(PreparedStatement ps, int index, Long value) throws SQLException {
-    ParamUtil.requireNonNull("ps", ps);
-
     if (value != null) {
       ps.setLong(index, value.longValue());
     } else {
@@ -236,8 +210,6 @@ public class DbToolBase {
   }
 
   protected static void setInt(PreparedStatement ps, int index, Integer value) throws SQLException {
-    ParamUtil.requireNonNull("ps", ps);
-
     if (value != null) {
       ps.setInt(index, value.intValue());
     } else {
@@ -247,13 +219,10 @@ public class DbToolBase {
 
   protected static void setBoolean(PreparedStatement ps, int index, boolean value)
       throws SQLException {
-    ParamUtil.requireNonNull("ps", ps);
     ps.setInt(index, value ? 1 : 0);
   }
 
   public static Properties getDbConfProperties(InputStream is) throws IOException {
-    ParamUtil.requireNonNull("is", is);
-
     Properties props = new Properties();
     try {
       props.load(is);
@@ -290,9 +259,6 @@ public class DbToolBase {
   }
 
   protected static void writeLine(OutputStream os, String text) throws IOException {
-    ParamUtil.requireNonNull("os", os);
-    ParamUtil.requireNonNull("text", text);
-
     os.write(text.getBytes());
     os.write('\n');
   }
@@ -324,8 +290,6 @@ public class DbToolBase {
   } // method buildFilename
 
   public static ZipOutputStream getZipOutputStream(File zipFile) throws FileNotFoundException {
-    ParamUtil.requireNonNull("zipFile", zipFile);
-
     BufferedOutputStream out = new BufferedOutputStream(
         new FileOutputStream(zipFile), STREAM_BUFFER_SIZE);
     ZipOutputStream zipOutStream = new ZipOutputStream(out);

@@ -172,13 +172,12 @@ class OcspCertstoreDbExporter extends DbPorter {
 
       while (rs.next()) {
         int id = rs.getInt("ID");
-        String cert = rs.getString("CERT");
 
         IssuerType issuer = new IssuerType();
         issuer.setId(id);
 
         String certFileName = issuerCertsDir + "/cert-issuer-" + id;
-        IoUtil.save(new File(baseDir, certFileName), cert.getBytes("UTF-8"));
+        IoUtil.save(new File(baseDir, certFileName), rs.getString("CERT").getBytes("UTF-8"));
         issuer.setCertFile(certFileName);
         issuer.setRevInfo(rs.getString("REV_INFO"));
 

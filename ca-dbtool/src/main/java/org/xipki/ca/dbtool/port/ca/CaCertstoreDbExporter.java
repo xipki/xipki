@@ -223,12 +223,11 @@ class CaCertstoreDbExporter extends DbPorter {
 
   private void exportEntries(CaDbEntryType type, CertstoreType certstore, File processLogFile,
       FileOutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
-    final int numEntriesPerSelect = Math.max(1,
-        Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
-    final int numEntriesPerZip =
-        Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
-    final File entriesDir = new File(baseDir, type.getDirName());
-    final String tableName = type.getTableName();
+    // CHECKSTYLE:SKIP
+    int numEntriesPerSelect = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
+    int numEntriesPerZip = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
+    File entriesDir = new File(baseDir, type.getDirName());
+    String tableName = type.getTableName();
 
     int numProcessedBefore;
     String coreSql;
@@ -436,12 +435,10 @@ class CaCertstoreDbExporter extends DbPorter {
             entry.setFile(dataFilename);
             ((RequestsWriter) entriesInCurrentFile).add(entry);
           } else if (CaDbEntryType.REQCERT == type) {
-            long cid = rs.getLong("CID");
-            long rid = rs.getLong("RID");
             RequestCertType entry = new RequestCertType();
             entry.setId(id);
-            entry.setCid(cid);
-            entry.setRid(rid);
+            entry.setCid(rs.getLong("CID"));
+            entry.setRid(rs.getLong("RID"));
             ((RequestCertsWriter) entriesInCurrentFile).add(entry);
           } else {
             throw new RuntimeException("unknown CaDbEntryType " + type);
@@ -573,12 +570,9 @@ class CaCertstoreDbExporter extends DbPorter {
       rs = ps.executeQuery();
 
       while (rs.next()) {
-        String serial = rs.getString("SN");
-        int caId = rs.getInt("CA_ID");
-
         DeltaCrlCacheEntryType entry = new DeltaCrlCacheEntryType();
-        entry.setCaId(caId);
-        entry.setSerial(serial);
+        entry.setCaId(rs.getInt("CA_ID"));
+        entry.setSerial(rs.getString("SN"));
         list.add(entry);
       }
     } catch (SQLException ex) {
