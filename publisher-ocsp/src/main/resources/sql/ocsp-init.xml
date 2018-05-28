@@ -24,7 +24,7 @@
   logicalFilePath="ocsp-init.xml">
   <property name="x500name.type" value="VARCHAR(350)"/>
   <changeSet author="xipki" id="1">
-    <!-- table DBSCHEMAINFO -->
+    <!-- table DBSCHEMA -->
     <createTable tableName="DBSCHEMA" remarks="database schema information">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
@@ -35,7 +35,7 @@
     </createTable>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="2"/>
+      <column name="VALUE2" value="4"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>

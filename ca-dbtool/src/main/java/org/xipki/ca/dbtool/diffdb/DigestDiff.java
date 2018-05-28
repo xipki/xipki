@@ -89,7 +89,7 @@ class DigestDiff {
     this.refDbControl = detectDbControl(refDatasource);
     this.targetDbControl = detectDbControl(targetDatasource);
 
-    if (refDbControl == DbControl.XIPKI_OCSP_v3) {
+    if (refDbControl == DbControl.XIPKI_OCSP_v4) {
       HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
       HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
@@ -98,7 +98,7 @@ class DigestDiff {
             refAlgo, ") and targetDataSource (", targetAlgo, ")"));
       }
       this.certhashAlgo = refAlgo;
-    } else if (refDbControl == DbControl.XIPKI_CA_v3) {
+    } else if (refDbControl == DbControl.XIPKI_CA_v4) {
       this.certhashAlgo = HashAlgo.SHA1;
     } else {
       throw new RuntimeException("should not reach here, unknown dbContro " + refDbControl);
@@ -127,9 +127,9 @@ class DigestDiff {
     List<Integer> refCaIds = new LinkedList<>();
 
     String refSql;
-    if (refDbControl == DbControl.XIPKI_OCSP_v3) {
+    if (refDbControl == DbControl.XIPKI_OCSP_v4) {
       refSql = "SELECT ID FROM ISSUER";
-    } else if (refDbControl == DbControl.XIPKI_CA_v3) {
+    } else if (refDbControl == DbControl.XIPKI_CA_v4) {
       refSql = "SELECT ID FROM CA";
     } else {
       throw new RuntimeException("invalid refDbControl " + refDbControl);
@@ -237,9 +237,9 @@ class DigestDiff {
       throws DataAccessException {
     // get a list of available CAs in the target database
     String sql = "SELECT ID,CERT FROM ";
-    if (dbControl == DbControl.XIPKI_CA_v3) {
+    if (dbControl == DbControl.XIPKI_CA_v4) {
       sql += "CA";
-    } else if (dbControl == DbControl.XIPKI_OCSP_v3) {
+    } else if (dbControl == DbControl.XIPKI_OCSP_v4) {
       sql += "ISSUER";
     } else {
       throw new IllegalArgumentException("unknown dbControl " + dbControl);
@@ -267,9 +267,9 @@ class DigestDiff {
     Connection conn = datasource.getConnection();
     try {
       if (datasource.tableExists(conn, "CA")) {
-        return DbControl.XIPKI_CA_v3;
+        return DbControl.XIPKI_CA_v4;
       } else if (datasource.tableExists(conn, "ISSUER")) {
-        return DbControl.XIPKI_OCSP_v3;
+        return DbControl.XIPKI_OCSP_v4;
       } else {
         throw new IllegalArgumentException("unknown database schema");
       }

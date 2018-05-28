@@ -24,6 +24,6 @@ package org.xipki.ca.dbtool.diffdb;
  */
 
 enum DbControl {
-  XIPKI_CA_v3,
-  XIPKI_OCSP_v3;
+  XIPKI_CA_v4,
+  XIPKI_OCSP_v4;
 }

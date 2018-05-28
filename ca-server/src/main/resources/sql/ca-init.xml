@@ -40,14 +40,14 @@
     </createTable>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="3"/>
+      <column name="VALUE2" value="4"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>
       <!-- must be the length of x500name.type -->
       <column name="VALUE2" value="350"/>
     </insert>
-    <!-- table CALOCK -->
+    <!-- table SYSTEM_EVENT -->
     <createTable tableName="SYSTEM_EVENT">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
@@ -250,7 +250,6 @@
     <addUniqueConstraint tableName="CA_HAS_USER" columnNames="CA_ID, USER_ID"
         constraintName="CONST_CA_USER"/>
   </changeSet>
-  <!-- CertStore :: create table -->
   <changeSet author="xipki" id="2">
     <!-- table CRL -->
     <createTable tableName="CRL">

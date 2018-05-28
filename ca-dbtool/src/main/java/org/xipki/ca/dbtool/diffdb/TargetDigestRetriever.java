@@ -183,7 +183,7 @@ class TargetDigestRetriever {
     this.datasource = ParamUtil.requireNonNull("datasource", datasource);
     this.certhashAlgo = ParamUtil.requireNonNull("certhashAlgo", certHashAlgo);
 
-    if (dbControl == DbControl.XIPKI_OCSP_v3) {
+    if (dbControl == DbControl.XIPKI_OCSP_v4) {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
       if (certHashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
@@ -195,7 +195,7 @@ class TargetDigestRetriever {
     String singleSql;
     StringBuilder arrayBuffer = new StringBuilder(200);
 
-    if (dbControl == DbControl.XIPKI_OCSP_v3) {
+    if (dbControl == DbControl.XIPKI_OCSP_v4) {
       singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
           Integer.toString(caId), " AND SN=?");
 
@@ -205,7 +205,7 @@ class TargetDigestRetriever {
         arrayBuffer.append(",?");
       }
       arrayBuffer.append(")");
-    } else if (dbControl == DbControl.XIPKI_CA_v3) {
+    } else if (dbControl == DbControl.XIPKI_CA_v4) {
       String hashOrCertColumn;
       if (certHashAlgo == HashAlgo.SHA1) {
         hashOrCertColumn = "SHA1";
@@ -374,9 +374,9 @@ class TargetDigestRetriever {
   }
 
   private String getBase64HashValue(ResultSet rs) throws SQLException {
-    if (dbControl == DbControl.XIPKI_OCSP_v3) {
+    if (dbControl == DbControl.XIPKI_OCSP_v4) {
       return rs.getString("HASH");
-    } else { // if (dbControl == DbControl.XIPKI_CA_v3) {
+    } else { // if (dbControl == DbControl.XIPKI_CA_v4) {
       if (certhashAlgo == HashAlgo.SHA1) {
         return rs.getString("SHA1");
       } else {

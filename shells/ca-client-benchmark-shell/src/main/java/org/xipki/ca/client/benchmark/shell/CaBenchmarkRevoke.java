@@ -64,7 +64,7 @@ public class CaBenchmarkRevoke extends BenchmarkExecutor {
 
   private AtomicInteger processedCerts = new AtomicInteger(0);
 
-  public CaBenchmarkRevoke(CaClient caClient, Certificate caCert, 
+  public CaBenchmarkRevoke(CaClient caClient, Certificate caCert,
       Iterator<BigInteger> serialNumberIterator, int maxCerts, int num, String description) {
     super(description);
     ParamUtil.requireNonNull("caCert", caCert);
