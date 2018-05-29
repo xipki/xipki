@@ -440,7 +440,7 @@ public class SubjectDnSpec {
       control.setStringLengthRange(RANGES.get(type));
       Pattern pattern = PATTERNS.get(type);
       if (pattern != null) {
-        control.setPatterns(Arrays.asList(pattern));
+        control.setPattern(pattern);
       }
       CONTROLS.put(type, control);
     }
@@ -492,8 +492,8 @@ public class SubjectDnSpec {
       }
     }
 
-    if (control.getPatterns() == null && PATTERNS.containsKey(type)) {
-      control.setPatterns(Arrays.asList(PATTERNS.get(type)));
+    if (control.getPattern() == null && PATTERNS.containsKey(type)) {
+      control.setPattern(PATTERNS.get(type));
     }
 
     Range specRange = RANGES.get(type);

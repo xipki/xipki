@@ -273,7 +273,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -311,7 +311,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -352,7 +352,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -396,7 +396,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
     // Extensions
@@ -506,7 +506,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -555,7 +555,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -597,8 +597,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
 
     // Extensions
     // Extensions - general
@@ -674,7 +674,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -724,8 +724,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
 
     // Extensions
     // Extensions - general
@@ -777,11 +777,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
 
-    final String regexOu1 = "[A-Z]{1,1}[\\d]{5,5}";
-    final String regexOu2 = "[\\d]{5,5}";
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regexOu1, regexOu2},
-        null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -827,7 +824,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -870,7 +867,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
     // Extensions
@@ -930,7 +927,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
@@ -1120,8 +1117,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
 
     // Extensions
     ExtensionsType extensions = profile.getExtensions();
@@ -1165,8 +1162,8 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
 
     // Extensions
     // Extensions - general
@@ -1256,22 +1253,19 @@ public class ProfileConfCreatorDemo {
   }
 
   private static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max,
-      String[] regexArrays, String prefix, String suffix) {
-    return createRdn(type, min, max, regexArrays, prefix, suffix, null);
+      String regex, String prefix, String suffix) {
+    return createRdn(type, min, max, regex, prefix, suffix, null);
   }
 
   private static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max,
-      String[] regexArrays, String prefix, String suffix, String group) {
+      String regex, String prefix, String suffix, String group) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
     ret.setMinOccurs(min);
     ret.setMaxOccurs(max);
 
-    if (regexArrays != null) {
-      ParamUtil.requireRange("regexArrays.length", regexArrays.length, max, max);
-      for (String regex : regexArrays) {
-        ret.getRegex().add(regex);
-      }
+    if (regex != null) {
+      ret.setRegex(regex);
     }
 
     if (StringUtil.isNotBlank(prefix)) {

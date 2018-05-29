@@ -76,35 +76,6 @@ public abstract class BaseCertprofile extends Certprofile {
 
   public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
-  protected String[] sortRdns(RdnControl control, String[] values) {
-    ParamUtil.requireNonNull("values", values);
-
-    if (control == null) {
-      return values;
-    }
-
-    List<Pattern> patterns = control.getPatterns();
-    if (CollectionUtil.isEmpty(patterns)) {
-      return values;
-    }
-
-    List<String> result = new ArrayList<>(values.length);
-    for (Pattern p : patterns) {
-      for (String value : values) {
-        if (!result.contains(value) && p.matcher(value).matches()) {
-          result.add(value);
-        }
-      }
-    }
-    for (String value : values) {
-      if (!result.contains(value)) {
-        result.add(value);
-      }
-    }
-
-    return result.toArray(new String[0]);
-  }
-
   /**
    * Get the SubjectControl.
    *
@@ -181,7 +152,6 @@ public abstract class BaseCertprofile extends Certprofile {
           for (int i = 0; i < len; i++) {
             values[i] = X509Util.rdnValueToString(thisRdns[i].getFirst().getValue());
           }
-          values = sortRdns(control, values);
 
           int idx = 0;
           for (String value : values) {
@@ -476,9 +446,6 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static ASN1Encodable createRdnValue(String text, ASN1ObjectIdentifier type,
       RdnControl option, int index) throws BadCertTemplateException {
-    ParamUtil.requireNonNull("text", text);
-    ParamUtil.requireNonNull("type", type);
-
     String tmpText = text.trim();
 
     StringType stringType = null;
@@ -500,14 +467,11 @@ public abstract class BaseCertprofile extends Certprofile {
         }
       }
 
-      List<Pattern> patterns = option.getPatterns();
-      if (patterns != null) {
-        Pattern pattern = patterns.get(index);
-        if (!pattern.matcher(tmpText).matches()) {
-          throw new BadCertTemplateException(
-            String.format("invalid subject %s '%s' against regex '%s'",
-                ObjectIdentifiers.oidToDisplayName(type), tmpText, pattern.pattern()));
-        }
+      Pattern pattern = option.getPattern();
+      if (pattern != null && !pattern.matcher(tmpText).matches()) {
+        throw new BadCertTemplateException(
+          String.format("invalid subject %s '%s' against regex '%s'",
+              ObjectIdentifiers.oidToDisplayName(type), tmpText, pattern.pattern()));
       }
 
       tmpText = StringUtil.concat((prefix != null ? prefix : ""), tmpText,

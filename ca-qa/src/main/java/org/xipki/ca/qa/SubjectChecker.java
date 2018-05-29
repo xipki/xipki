@@ -17,7 +17,6 @@
 
 package org.xipki.ca.qa;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -179,11 +178,6 @@ public class SubjectChecker {
         String textValue = getRdnTextValueOfRequest(requestedRdn);
         requestedCoreAtvTextValues.add(textValue);
       }
-
-      if (rdnControl != null && rdnControl.getPatterns() != null) {
-        // sort the requestedRDNs
-        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
-      }
     }
 
     if (rdns == null) { // return always false, only to make the null checker happy
@@ -251,11 +245,6 @@ public class SubjectChecker {
       for (RDN requestedRdn : requestedRdns) {
         String textValue = getRdnTextValueOfRequest(requestedRdn);
         requestedCoreAtvTextValues.add(textValue);
-      }
-
-      if (rdnControl != null && rdnControl.getPatterns() != null) {
-        // sort the requestedRDNs
-        requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
       }
     }
 
@@ -338,9 +327,8 @@ public class SubjectChecker {
         }
       }
 
-      List<Pattern> patterns = rdnControl.getPatterns();
-      if (patterns != null) {
-        Pattern pattern = patterns.get(index);
+      Pattern pattern = rdnControl.getPattern();
+      if (pattern != null) {
         boolean matches = pattern.matcher(tmpAtvTextValue).matches();
         if (!matches) {
           failureMsg.append(name).append(" '").append(tmpAtvTextValue)
@@ -364,23 +352,6 @@ public class SubjectChecker {
       }
     }
   } // mehtod checkAttributeTypeAndValue
-
-  private static List<String> sort(List<String> contentList, List<Pattern> patternList) {
-    List<String> sorted = new ArrayList<>(contentList.size());
-    for (Pattern p : patternList) {
-      for (String value : contentList) {
-        if (!sorted.contains(value) && p.matcher(value).matches()) {
-          sorted.add(value);
-        }
-      }
-    }
-    for (String value : contentList) {
-      if (!sorted.contains(value)) {
-        sorted.add(value);
-      }
-    }
-    return sorted;
-  }
 
   private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType) {
     boolean correctStringType = true;

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.api.profile;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -37,7 +36,7 @@ public class RdnControl {
 
   private final ASN1ObjectIdentifier type;
 
-  private List<Pattern> patterns;
+  private Pattern pattern;
 
   private StringType stringType;
 
@@ -80,8 +79,8 @@ public class RdnControl {
     return stringType;
   }
 
-  public List<Pattern> getPatterns() {
-    return patterns;
+  public Pattern getPattern() {
+    return pattern;
   }
 
   public Range getStringLengthRange() {
@@ -96,8 +95,8 @@ public class RdnControl {
     this.stringLengthRange = stringLengthRange;
   }
 
-  public void setPatterns(List<Pattern> patterns) {
-    this.patterns = patterns;
+  public void setPattern(Pattern pattern) {
+    this.pattern = pattern;
   }
 
   public String getPrefix() {

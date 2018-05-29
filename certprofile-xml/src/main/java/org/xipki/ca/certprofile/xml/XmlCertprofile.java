@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -373,22 +372,6 @@ public class XmlCertprofile extends BaseCertprofile {
     for (RdnType rdn : subject.getRdn()) {
       ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(rdn.getType().getValue());
 
-      List<Pattern> patterns = null;
-      if (CollectionUtil.isNonEmpty(rdn.getRegex())) {
-        patterns = new LinkedList<>();
-        for (String regex : rdn.getRegex()) {
-          Pattern pattern = Pattern.compile(regex);
-          patterns.add(pattern);
-        }
-      }
-
-      if (patterns == null) {
-        Pattern pattern = SubjectDnSpec.getPattern(type);
-        if (pattern != null) {
-          patterns = Arrays.asList(pattern);
-        }
-      }
-
       Range range = (rdn.getMinLen() != null || rdn.getMaxLen() != null)
           ? new Range(rdn.getMinLen(), rdn.getMaxLen()) :  null;
 
@@ -398,7 +381,9 @@ public class XmlCertprofile extends BaseCertprofile {
       StringType stringType = XmlCertprofileUtil.convertStringType(rdn.getStringType());
       rdnControl.setStringType(stringType);
       rdnControl.setStringLengthRange(range);
-      rdnControl.setPatterns(patterns);
+      if (rdn.getRegex() != null) {
+        rdnControl.setPattern(Pattern.compile(rdn.getRegex()));
+      }
       rdnControl.setPrefix(rdn.getPrefix());
       rdnControl.setSuffix(rdn.getSuffix());
       rdnControl.setGroup(rdn.getGroup());

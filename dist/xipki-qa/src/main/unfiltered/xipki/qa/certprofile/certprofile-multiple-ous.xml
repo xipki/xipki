@@ -123,8 +123,6 @@
     </rdn>
     <rdn minOccurs="2" maxOccurs="2">
       <type description="ou">2.5.4.11</type>
-      <regex>[A-Z]{1,1}[\d]{5,5}</regex>
-      <regex>[\d]{5,5}</regex>
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
       <type description="serialNumber">2.5.4.5</type>

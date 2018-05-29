@@ -125,7 +125,7 @@
       <xs:element name="minLen" type="xs:int" minOccurs="0"/>
       <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
       <xs:element name="stringType" type="stringType" minOccurs="0"/>
-      <xs:element name="regex" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="regex" type="xs:string" minOccurs="0"/>
       <xs:element name="prefix" type="xs:string" minOccurs="0"/>
       <xs:element name="suffix" type="xs:string" minOccurs="0"/>
     </xs:sequence>
