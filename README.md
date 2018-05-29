@@ -8,7 +8,7 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 * The Apache Software License, Version 2.0
 
 ## Owner
-Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
+Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
 
 ## Support
 Just create [issues](https://github.com/xipki/xipki/issues).
