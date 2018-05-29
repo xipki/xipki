@@ -19,6 +19,7 @@ package org.xipki.ca.server.impl;
 
 import java.util.Date;
 
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -44,8 +45,15 @@ public class CertTemplateData {
 
   private final Extensions extensions;
 
+  private final ASN1Integer certReqId;
+
   public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
       Date notAfter, Extensions extensions, String certprofileName) {
+    this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null);
+  }
+
+  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
+      Date notAfter, Extensions extensions, String certprofileName, ASN1Integer certReqId) {
     this.subject = ParamUtil.requireNonNull("subject", subject);
     this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
     this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
@@ -53,6 +61,7 @@ public class CertTemplateData {
     this.extensions = extensions;
     this.notBefore = notBefore;
     this.notAfter = notAfter;
+    this.certReqId = certReqId;
   }
 
   public X500Name getSubject() {
@@ -77,6 +86,10 @@ public class CertTemplateData {
 
   public Extensions getExtensions() {
     return extensions;
+  }
+
+  public ASN1Integer getCertReqId() {
+    return certReqId;
   }
 
 }

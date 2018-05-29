@@ -29,10 +29,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -387,9 +385,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     CertReqMsg[] certReqMsgs = kur.toCertReqMsgArray();
     final int n = certReqMsgs.length;
 
-    Map<Integer, CertTemplateData> certTemplateDatas = new HashMap<>(n * 10 / 6);
-    Map<Integer, CertResponse> certResponses = new HashMap<>(n * 10 / 6);
-    Map<Integer, ASN1Integer> certReqIds = new HashMap<>(n * 10 / 6);
+    List<CertTemplateData> certTemplateDatas = new ArrayList<>(n);
+    List<CertResponse> certResponses = new ArrayList<>(1);
 
     // pre-process requests
     for (int i = 0; i < n; i++) {
@@ -401,17 +398,15 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       CertReqMsg reqMsg = certReqMsgs[i];
       CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
       ASN1Integer certReqId = reqMsg.getCertReq().getCertReqId();
-      certReqIds.put(i, certReqId);
 
       if (!req.hasProofOfPossession()) {
-        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "no POP"));
+        certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "no POP"));
         continue;
       }
 
       if (!verifyPopo(req, tmpRequestor.isRa())) {
         LOG.warn("could not validate POP for request {}", certReqId.getValue());
-        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP,
-            "invalid POP"));
+        certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "invalid POP"));
         continue;
       }
 
@@ -419,15 +414,15 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       String certprofileName = (keyvalues == null) ? null
           : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
       if (certprofileName == null) {
-        certResponses.put(i, buildErrorCertResponse(
-                              certReqId, PKIFailureInfo.badCertTemplate, "no certificate profile"));
+        certResponses.add(buildErrorCertResponse(
+                            certReqId, PKIFailureInfo.badCertTemplate, "no certificate profile"));
         continue;
       }
       certprofileName = certprofileName.toLowerCase();
 
       if (!tmpRequestor.isCertprofilePermitted(certprofileName)) {
         String msg = "certprofile " + certprofileName + " is not allowed";
-        certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg));
+        certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg));
         continue;
       }
 
@@ -448,8 +443,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       }
 
       CertTemplateData certTempData = new CertTemplateData(certTemp.getSubject(),
-          certTemp.getPublicKey(), notBefore, notAfter,  certTemp.getExtensions(), certprofileName);
-      certTemplateDatas.put(i, certTempData);
+          certTemp.getPublicKey(), notBefore, notAfter,  certTemp.getExtensions(), certprofileName,
+          certReqId);
+      certTemplateDatas.add(certTempData);
     } // end for
 
     if (certResponses.size() == n) {
@@ -464,9 +460,10 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
     if (cmpControl.isGroupEnroll() && certTemplateDatas.size() != n) {
       event.setStatus(AuditStatus.FAILED);
-      // at least one certRequest cannot be used to enroll certificate
+      // GroupEnroll and at least one certRequest cannot be used to enroll certificate
       int lastFailureIndex = certTemplateDatas.size();
-      BigInteger failCertReqId = certReqIds.get(lastFailureIndex).getPositiveValue();
+      BigInteger failCertReqId =
+          certReqMsgs[lastFailureIndex].getCertReq().getCertReqId().getValue();
       CertResponse failCertResp = certResponses.get(lastFailureIndex);
       PKIStatus failStatus = PKIStatus.getInstance(
           new ASN1Integer(failCertResp.getStatus().getStatus()));
@@ -480,7 +477,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
           continue;
         }
 
-        ASN1Integer certReqId = certReqIds.get(i);
+        ASN1Integer certReqId = certResps[i].getCertReqId();
         String msg = "error in certReq " + failCertReqId;
         PKIStatusInfo tmpStatus = generateRejectionStatus(failStatus, failureInfo.intValue(), msg);
         certResps[i] = new CertResponse(certReqId, tmpStatus);
@@ -489,41 +486,32 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       return new CertRepMessage(null, certResps);
     }
 
-    final int k = certTemplateDatas.size();
-    List<CertTemplateData> certTemplateList = new ArrayList<>(k);
-    List<ASN1Integer> certReqIdList = new ArrayList<>(k);
-    Map<Integer, Integer> reqIndexToCertIndexMap = new HashMap<>(k * 10 / 6);
-
-    for (int i = 0; i < n; i++) {
-      if (!certTemplateDatas.containsKey(i)) {
-        continue;
-      }
-
-      certTemplateList.add(certTemplateDatas.get(i));
-      certReqIdList.add(certReqIds.get(i));
-      reqIndexToCertIndexMap.put(i, certTemplateList.size() - 1);
-    }
-
-    List<CertResponse> generateCertResponses = generateCertificates(certTemplateList, certReqIdList,
-        tmpRequestor, tid, keyUpdate, request, cmpControl, msgId, event);
-    boolean anyCertEnrolled = false;
+    List<CertResponse> generateCertResponses = generateCertificates(certTemplateDatas, tmpRequestor,
+        tid, keyUpdate, request, cmpControl, msgId, event);
 
     CertResponse[] certResps = new CertResponse[n];
-    for (int i = 0; i < n; i++) {
-      if (certResponses.containsKey(i)) {
-        certResps[i] = certResponses.get(i);
-      } else {
-        int respIndex = reqIndexToCertIndexMap.get(i);
-        certResps[i] = generateCertResponses.get(respIndex);
-        if (!anyCertEnrolled && certResps[i].getCertifiedKeyPair() != null) {
-          anyCertEnrolled = true;
-        }
-      }
+    int index = 0;
+    for (CertResponse errorResp : certResponses) {
+      // error single CertResponse
+      certResps[index++] = errorResp;
+    }
+
+    for (CertResponse certResp : generateCertResponses) {
+      certResps[index++] = certResp;
     }
 
     CMPCertificate[] caPubs = null;
-    if (anyCertEnrolled && cmpControl.isSendCaCert()) {
-      caPubs = new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()};
+    if (cmpControl.isSendCaCert()) {
+      boolean anyCertEnrolled = false;
+      for (CertResponse certResp : generateCertResponses) {
+        if (certResp.getCertifiedKeyPair() != null) {
+          anyCertEnrolled = true;
+          break;
+        }
+      }
+      if (anyCertEnrolled && cmpControl.isSendCaCert()) {
+        caPubs = new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()};
+      }
     }
 
     return new CertRepMessage(caPubs, certResps);
@@ -585,9 +573,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
           certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
         } else {
           CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-              notBefore, notAfter, extensions, certprofileName);
+              notBefore, notAfter, extensions, certprofileName, certReqId);
 
-          certResp = generateCertificates(Arrays.asList(certTemplateData), Arrays.asList(certReqId),
+          certResp = generateCertificates(Arrays.asList(certTemplateData),
               requestor, tid, false, request, cmpControl, msgId, event).get(0);
           certGenerated = true;
         }
@@ -617,9 +605,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
   } // method processP10cr
 
   private List<CertResponse> generateCertificates(List<CertTemplateData> certTemplates,
-      List<ASN1Integer> certReqIds, CmpRequestorInfo requestor, ASN1OctetString tid,
-      boolean keyUpdate, PKIMessage request, CmpControl cmpControl,
-      String msgId, AuditEvent event) {
+      CmpRequestorInfo requestor, ASN1OctetString tid, boolean keyUpdate, PKIMessage request,
+      CmpControl cmpControl, String msgId, AuditEvent event) {
     X509Ca ca = getCa();
 
     final int n = certTemplates.size();
@@ -649,15 +636,17 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
         for (int i = 0; i < n; i++) {
           CertificateInfo certInfo = certInfos.get(i);
-          ret.add(postProcessCertInfo(certReqIds.get(i), certInfo, tid, cmpControl));
+          ret.add(postProcessCertInfo(certTemplates.get(i).getCertReqId(), certInfo, tid,
+              cmpControl));
           if (reqDbId != null) {
             ca.addRequestCert(reqDbId, certInfo.getCert().getCertId());
           }
         }
       } catch (OperationException ex) {
         event.setStatus(AuditStatus.FAILED);
+        ret.clear();
         for (int i = 0; i < n; i++) {
-          ret.add(postProcessException(certReqIds.get(i), ex));
+          ret.add(postProcessException(certTemplates.get(i).getCertReqId(), ex));
         }
       }
     } else {
@@ -666,7 +655,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
       for (int i = 0; i < n; i++) {
         CertTemplateData certTemplate = certTemplates.get(i);
-        ASN1Integer certReqId = certReqIds.get(i);
+        ASN1Integer certReqId = certTemplate.getCertReqId();
 
         CertificateInfo certInfo;
         try {
@@ -762,12 +751,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
               "serialNumber is not present");
         }
 
-        if (certDetails.getSigningAlg() != null
-            || certDetails.getValidity() != null
-            || certDetails.getSubject() != null
-            || certDetails.getPublicKey() != null
-            || certDetails.getIssuerUID() != null
-            || certDetails.getSubjectUID() != null) {
+        if (certDetails.getSigningAlg() != null   || certDetails.getValidity() != null
+            || certDetails.getSubject() != null   || certDetails.getPublicKey() != null
+            || certDetails.getIssuerUID() != null || certDetails.getSubjectUID() != null) {
           return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
               "only version, issuer and serialNumber in RevDetails.certDetails are "
               + "allowed, but more is specified");
@@ -1082,11 +1068,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       return new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
     }
 
-    ErrorMsgContent emc = new ErrorMsgContent(
-        new PKIStatusInfo(PKIStatus.rejection, null,
-            new PKIFailureInfo(PKIFailureInfo.systemFailure)));
-
-    return new PKIBody(PKIBody.TYPE_ERROR, emc);
+    return new PKIBody(PKIBody.TYPE_ERROR,
+        new ErrorMsgContent(new PKIStatusInfo(PKIStatus.rejection, null,
+                new PKIFailureInfo(PKIFailureInfo.systemFailure))));
   } // method confirmCertificates
 
   private boolean revokePendingCertificates(ASN1OctetString transactionId, String msgId) {
