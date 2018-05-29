@@ -71,6 +71,22 @@ import org.xipki.security.X509Cert;
 
 public class RestResponderImpl implements RestResponder {
 
+  private static final int OK = 200;
+
+  private static final int BAD_REQUEST = 400;
+
+  private static final int UNAUTHORIZED = 401;
+
+  private static final int NOT_FOUND = 404;
+
+  private static final int CONFLICT = 409;
+
+  private static final int UNSUPPORTED_MEDIA_TYPE = 415;
+
+  private static final int INTERNAL_SERVER_ERROR = 500;
+
+  private static final int SERVICE_UNAVAILABLE = 503;
+
   private static final Logger LOG = LoggerFactory.getLogger(RestResponderImpl.class);
 
   private final CaManagerImpl responderManager;
@@ -96,8 +112,8 @@ public class RestResponderImpl implements RestResponder {
       if (responderManager == null) {
         String message = "responderManager in servlet not configured";
         LOG.error(message);
-        throw new HttpRespAuditException(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-            null, message, AuditLevel.ERROR, AuditStatus.FAILED);
+        throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, null, message,
+            AuditLevel.ERROR, AuditStatus.FAILED);
       }
 
       String caName = null;
@@ -111,8 +127,8 @@ public class RestResponderImpl implements RestResponder {
         if (sepIndex == -1 || sepIndex == coreUri.length() - 1) {
           String message = "invalid path " + path;
           LOG.error(message);
-          throw new HttpRespAuditException(HttpResponseStatus.NOT_FOUND, null,
-              message, AuditLevel.ERROR, AuditStatus.FAILED);
+          throw new HttpRespAuditException(NOT_FOUND, null, message,
+              AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
         // skip also the first char ('/')
@@ -139,7 +155,7 @@ public class RestResponderImpl implements RestResponder {
           message = "CA '" + caName + "' is out of service";
         }
         LOG.warn(message);
-        throw new HttpRespAuditException(HttpResponseStatus.NOT_FOUND, null, message,
+        throw new HttpRespAuditException(NOT_FOUND, null, message,
             AuditLevel.INFO, AuditStatus.FAILED);
       }
 
@@ -170,20 +186,20 @@ public class RestResponderImpl implements RestResponder {
         }
 
         if (user == null) {
-          throw new HttpRespAuditException(HttpResponseStatus.UNAUTHORIZED,
-              "invalid Authorization information", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(UNAUTHORIZED, "invalid Authorization information",
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
         NameId userIdent = ca.authenticateUser(user, password);
         if (userIdent == null) {
-          throw new HttpRespAuditException(HttpResponseStatus.UNAUTHORIZED,
-              "could not authenticate user", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user",
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
         requestor = ca.getByUserRequestor(userIdent);
       } else {
         X509Certificate clientCert = httpRetriever.getTlsClientCert();
         if (clientCert == null) {
-          throw new HttpRespAuditException(HttpResponseStatus.UNAUTHORIZED,
-              null, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(UNAUTHORIZED, null, "no client certificate",
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
         requestor = ca.getRequestor(clientCert);
       }
@@ -203,9 +219,9 @@ public class RestResponderImpl implements RestResponder {
       } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
         String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
         if (StringUtil.isBlank(profile)) {
-          throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-              "required parameter " + RestAPIConstants.PARAM_profile
-              + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(BAD_REQUEST, null,
+              "required parameter " + RestAPIConstants.PARAM_profile + " not specified",
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
         profile = profile.toLowerCase();
 
@@ -223,8 +239,8 @@ public class RestResponderImpl implements RestResponder {
         String ct = httpRetriever.getHeader("Content-Type");
         if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
           String message = "unsupported media type " + ct;
-          throw new HttpRespAuditException(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE,
-              message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message,
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         String strNotBefore = httpRetriever.getParameter(RestAPIConstants.PARAM_not_before);
@@ -261,8 +277,8 @@ public class RestResponderImpl implements RestResponder {
         if (cert == null) {
           String message = "could not generate certificate";
           LOG.warn(message);
-          throw new HttpRespAuditException(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              null, message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, null, message,
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
         respCt = RestAPIConstants.CT_pkix_cert;
         respBytes = cert.getEncodedCert();
@@ -282,23 +298,22 @@ public class RestResponderImpl implements RestResponder {
 
         String strCaSha1 = httpRetriever.getParameter(RestAPIConstants.PARAM_ca_sha1);
         if (StringUtil.isBlank(strCaSha1)) {
-          throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-              "required parameter " + RestAPIConstants.PARAM_ca_sha1
-              + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(BAD_REQUEST, null,
+              "required parameter " + RestAPIConstants.PARAM_ca_sha1 + " not specified",
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         String strSerialNumber = httpRetriever.getParameter(
             RestAPIConstants.PARAM_serial_number);
         if (StringUtil.isBlank(strSerialNumber)) {
-          throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-               "required parameter " + RestAPIConstants.PARAM_serial_number
-               + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(BAD_REQUEST, null,
+               "required parameter " + RestAPIConstants.PARAM_serial_number + " not specified",
+               AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         if (!strCaSha1.equalsIgnoreCase(ca.getHexSha1OfCert())) {
-          throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST, null,
-              "unknown " + RestAPIConstants.PARAM_ca_sha1,
-              AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(BAD_REQUEST, null,
+              "unknown " + RestAPIConstants.PARAM_ca_sha1, AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         BigInteger serialNumber = toBigInt(strSerialNumber);
@@ -338,8 +353,8 @@ public class RestResponderImpl implements RestResponder {
           } catch (NumberFormatException ex) {
             String message = "invalid crlNumber '" + strCrlNumber + "'";
             LOG.warn(message);
-            throw new HttpRespAuditException(HttpResponseStatus.BAD_REQUEST,
-                null, message, AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(BAD_REQUEST, null, message,
+                AuditLevel.INFO, AuditStatus.FAILED);
           }
         }
 
@@ -347,8 +362,8 @@ public class RestResponderImpl implements RestResponder {
         if (crl == null) {
           String message = "could not get CRL";
           LOG.warn(message);
-          throw new HttpRespAuditException(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              null, message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, null, message,
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         respCt = RestAPIConstants.CT_pkix_crl;
@@ -364,8 +379,8 @@ public class RestResponderImpl implements RestResponder {
         if (crl == null) {
           String message = "could not generate CRL";
           LOG.warn(message);
-          throw new HttpRespAuditException(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              null, message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, null, message,
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         respCt = RestAPIConstants.CT_pkix_crl;
@@ -373,75 +388,73 @@ public class RestResponderImpl implements RestResponder {
       } else {
         String message = "invalid command '" + command + "'";
         LOG.error(message);
-        throw new HttpRespAuditException(HttpResponseStatus.NOT_FOUND, message,
-            AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       Map<String, String> headers = new HashMap<>();
       headers.put(RestAPIConstants.HEADER_PKISTATUS, RestAPIConstants.PKISTATUS_accepted);
-      return new RestResponse(HttpResponseStatus.OK, respCt, headers, respBytes);
+      return new RestResponse(OK, respCt, headers, respBytes);
     } catch (OperationException ex) {
       ErrorCode code = ex.getErrorCode();
       if (LOG.isWarnEnabled()) {
         String msg = StringUtil.concat("generate certificate, OperationException: code=",
             code.name(), ", message=", ex.getErrorMessage());
-        LOG.warn(msg);
-        LOG.debug(msg, ex);
+        LogUtil.warn(LOG, ex, msg);
       }
 
       int sc;
       String failureInfo;
       switch (code) {
         case ALREADY_ISSUED:
-          sc = HttpResponseStatus.BAD_REQUEST;
+          sc = BAD_REQUEST;
           failureInfo = RestAPIConstants.FAILINFO_badRequest;
           break;
         case BAD_CERT_TEMPLATE:
-          sc = HttpResponseStatus.BAD_REQUEST;
+          sc = BAD_REQUEST;
           failureInfo = RestAPIConstants.FAILINFO_badCertTemplate;
           break;
         case BAD_REQUEST:
-          sc = HttpResponseStatus.BAD_REQUEST;
+          sc = BAD_REQUEST;
           failureInfo = RestAPIConstants.FAILINFO_badRequest;
           break;
         case CERT_REVOKED:
-          sc = HttpResponseStatus.CONFLICT;
+          sc = CONFLICT;
           failureInfo = RestAPIConstants.FAILINFO_certRevoked;
           break;
         case CRL_FAILURE:
-          sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+          sc = INTERNAL_SERVER_ERROR;
           failureInfo = RestAPIConstants.FAILINFO_systemFailure;
           break;
         case DATABASE_FAILURE:
-          sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+          sc = INTERNAL_SERVER_ERROR;
           failureInfo = RestAPIConstants.FAILINFO_systemFailure;
           break;
         case NOT_PERMITTED:
-          sc = HttpResponseStatus.UNAUTHORIZED;
+          sc = UNAUTHORIZED;
           failureInfo = RestAPIConstants.FAILINFO_notAuthorized;
           break;
         case INVALID_EXTENSION:
-          sc = HttpResponseStatus.BAD_REQUEST;
+          sc = BAD_REQUEST;
           failureInfo = RestAPIConstants.FAILINFO_badRequest;
           break;
         case SYSTEM_FAILURE:
-          sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+          sc = INTERNAL_SERVER_ERROR;
           failureInfo = RestAPIConstants.FAILINFO_systemFailure;
           break;
         case SYSTEM_UNAVAILABLE:
-          sc = HttpResponseStatus.SERVICE_UNAVAILABLE;
+          sc = SERVICE_UNAVAILABLE;
           failureInfo = RestAPIConstants.FAILINFO_systemUnavail;
           break;
         case UNKNOWN_CERT:
-          sc = HttpResponseStatus.BAD_REQUEST;
+          sc = BAD_REQUEST;
           failureInfo = RestAPIConstants.FAILINFO_badCertId;
           break;
         case UNKNOWN_CERT_PROFILE:
-          sc = HttpResponseStatus.BAD_REQUEST;
+          sc = BAD_REQUEST;
           failureInfo = RestAPIConstants.FAILINFO_badCertTemplate;
           break;
         default:
-          sc = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+          sc = INTERNAL_SERVER_ERROR;
           failureInfo = RestAPIConstants.FAILINFO_systemFailure;
           break;
       } // end switch (code)
@@ -480,7 +493,7 @@ public class RestResponderImpl implements RestResponder {
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      return new RestResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, null, null, null);
+      return new RestResponse(INTERNAL_SERVER_ERROR, null, null, null);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
