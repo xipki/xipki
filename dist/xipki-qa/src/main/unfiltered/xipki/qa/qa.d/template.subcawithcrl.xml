@@ -23,7 +23,7 @@
     <ca name="subcawithcrl1">
       <caInfo>
         <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpControl>
-        <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
+        <crlControl>update.mode=interval,fullcrl.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>

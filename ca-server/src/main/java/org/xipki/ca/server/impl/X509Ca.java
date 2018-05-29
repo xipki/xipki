@@ -233,7 +233,7 @@ public class X509Ca {
     @Override
     public void run() {
       CrlControl crlControl = caInfo.getCrlControl();
-      if (crlControl == null || crlControl.getUpdateMode() != UpdateMode.interval) {
+      if (crlControl == null || crlControl.getUpdateMode() != UpdateMode.INTERVAL) {
         return;
       }
 
@@ -1553,7 +1553,7 @@ public class X509Ca {
       return false;
     }
 
-    if (control.getUpdateMode() == UpdateMode.onDemand) {
+    if (control.getUpdateMode() == UpdateMode.ONDEMAND) {
       return false;
     }
 
@@ -2234,7 +2234,7 @@ public class X509Ca {
   private Date getCrlNextUpdate(Date thisUpdate) {
     ParamUtil.requireNonNull("thisUpdate", thisUpdate);
     CrlControl control = caInfo.getCrlControl();
-    if (control.getUpdateMode() != UpdateMode.interval) {
+    if (control.getUpdateMode() != UpdateMode.INTERVAL) {
       return null;
     }
 

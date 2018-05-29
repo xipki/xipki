@@ -627,8 +627,7 @@ public class ScepResponderImpl implements ScepResponder {
     ParamUtil.requireNonNull("response", response);
     ParamUtil.requireNonNull("request", request);
 
-    String signatureAlgorithm = getSignatureAlgorithm(responderKey,
-        request.getDigestAlgorithm());
+    String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
     ContentInfo ci;
     try {
       X509Certificate[] cmsCertSet = control.isIncludeSignerCert()

@@ -32,12 +32,12 @@ import org.xipki.common.util.StringUtil;
 /**
  *<pre>
  * Example configuration
- * updateMode=&lt;'interval'|'onDemand'&gt;
+ * update.mode=&lt;'interval'|'ondemand'&gt;
  *
  * # For all updateMode
  *
  * # Whether expired certificates are considered. Default is false
- * expiredCerts.included=&lt;'true'|'false'&gt;
+ * expiredcerts.included=&lt;'true'|'false'&gt;
  *
  * # Whether XiPKI-customized extension xipki-CrlCertSet is included. Default is false
  * xipki.certset=&lt;'true'|'false'&gt;
@@ -57,17 +57,17 @@ import org.xipki.common.util.StringUtil;
  *
  * # Number of intervals to generate a full CRL. Default is 1
  * # Should be greater than 0
- * fullCRL.intervals=&lt;integer&gt;
+ * fullcrl.intervals=&lt;integer&gt;
  *
  * # should be 0 or not greater than baseCRL.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
- * deltaCRL.intervals=&lt;integer&gt;
+ * deltacrl.intervals=&lt;integer&gt;
  *
  * overlap.minutes=&lt;minutes of overlap&gt;
  *
  * # should be less than fullCRL.intervals.
  * # If activated, a deltaCRL will be generated only between two full CRLs
- * deltaCRL.intervals=&lt;integer&gt;
+ * deltacrl.intervals=&lt;integer&gt;
  *
  * # Exactly one of interval.minutes and interval.days should be specified
  * # Number of minutes of one interval. At least 60 minutes
@@ -78,23 +78,23 @@ import org.xipki.common.util.StringUtil;
  *
  * # Whether the nextUpdate of a fullCRL is the update time of the fullCRL
  * # Default is false
- * fullCRL.extendedNextUpdate=&lt;'true'|'false'&gt;
+ * fullcrl.extended.nextupdate=&lt;'true'|'false'&gt;
  *
  * # Whether only user certificates are considered in CRL
  * # Default is false
- * onlyContainsUserCerts=&lt;'true'|'false'&gt;
+ * user.certs.only=&lt;'true'|'false'&gt;
  *
  * # Whether only CA certificates are considered in CRL
  * # Default if false
- * onlyContainsCACerts=&lt;'true'|'false'&gt;
+ * ca.certs.only=&lt;'true'|'false'&gt;
  *
  * # Whether Revocation reason is contained in CRL
  * # Default is false
- * excludeReason=&lt;'true'|'false'&gt;
+ * exclude.reason=&lt;'true'|'false'&gt;
  *
  * # How the CRL entry extension invalidityDate is considered in CRL
  * # Default is false
- * invalidityDate=&lt;'required'|'optional'|'forbidden'&gt;
+ * invalidity.date=&lt;'required'|'optional'|'forbidden'&gt;
  *
  * </pre>
  * @author Lijun Liao
@@ -105,18 +105,24 @@ public class CrlControl {
 
   public enum UpdateMode {
 
-    interval,
-    onDemand;
+    INTERVAL("interval"),
+    ONDEMAND("ondemand");
+
+    private String mode;
+
+    private UpdateMode(String mode) {
+      this.mode = mode;
+    }
 
     public static UpdateMode forName(String mode) {
       ParamUtil.requireNonNull("mode", mode);
       for (UpdateMode v : values()) {
-        if (v.name().equalsIgnoreCase(mode)) {
+        if (v.mode.equalsIgnoreCase(mode)) {
           return v;
         }
       }
 
-      throw new IllegalArgumentException("invalid UpdateMode " + mode);
+      throw new IllegalArgumentException("invalid UpdateMode '" + mode + "'");
     }
 
   } // enum UpdateMode
@@ -163,11 +169,11 @@ public class CrlControl {
 
   } // class HourMinute
 
-  public static final String KEY_UPDATE_MODE = "updateMode";
+  public static final String KEY_UPDATE_MODE = "update.mode";
 
   public static final String KEY_EYTENSIONS = "extensions";
 
-  public static final String KEY_EXPIRED_CERTS_INCLUDED = "expiredCerts.included";
+  public static final String KEY_EXPIRED_CERTS_INCLUDED = "expiredcerts.included";
 
   public static final String KEY_XIPKI_CERTSET = "xipki.certset";
 
@@ -175,9 +181,9 @@ public class CrlControl {
 
   public static final String KEY_XIPKI_CERTSET_PROFILENAME = "xipki.certset.profilename";
 
-  public static final String KEY_FULLCRL_INTERVALS = "fullCRL.intervals";
+  public static final String KEY_FULLCRL_INTERVALS = "fullcrl.intervals";
 
-  public static final String KEY_DELTACRL_INTERVALS = "deltaCRL.intervals";
+  public static final String KEY_DELTACRL_INTERVALS = "deltacrl.intervals";
 
   public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
 
@@ -185,17 +191,17 @@ public class CrlControl {
 
   public static final String KEY_INTERVAL_TIME = "interval.time";
 
-  public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE = "fullCRL.extendedNextUpdate";
+  public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE = "fullcrl.extended.nextupdate";
 
-  public static final String KEY_ONLY_CONTAINS_USERCERTS = "onlyContainsUserCerts";
+  public static final String KEY_ONLY_CONTAINS_USERCERTS = "user.certs.only";
 
-  public static final String KEY_ONLY_CONTAINS_CACERTS = "onlyContainsCACerts";
+  public static final String KEY_ONLY_CONTAINS_CACERTS = "ca.certs.only";
 
-  public static final String KEY_EXCLUDE_REASON = "excludeReason";
+  public static final String KEY_EXCLUDE_REASON = "exclude.reason";
 
-  public static final String KEY_INVALIDITY_DATE = "invalidityDate";
+  public static final String KEY_INVALIDITY_DATE = "invalidity.date";
 
-  private UpdateMode updateMode = UpdateMode.interval;
+  private UpdateMode updateMode = UpdateMode.INTERVAL;
 
   private boolean xipkiCertsetIncluded;
 
@@ -236,7 +242,7 @@ public class CrlControl {
     }
 
     String str = props.value(KEY_UPDATE_MODE);
-    this.updateMode = (str == null) ? UpdateMode.interval : UpdateMode.forName(str);
+    this.updateMode = (str == null) ? UpdateMode.INTERVAL : UpdateMode.forName(str);
 
     str = props.value(KEY_INVALIDITY_DATE);
     if (str != null) {
@@ -272,7 +278,7 @@ public class CrlControl {
     this.onlyContainsUserCerts = getBoolean(props, KEY_ONLY_CONTAINS_USERCERTS, false);
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
 
-    if (this.updateMode != UpdateMode.onDemand) {
+    if (this.updateMode != UpdateMode.ONDEMAND) {
       this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
       this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
       this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
@@ -316,7 +322,7 @@ public class CrlControl {
     pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
     pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
     pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
-    if (updateMode != UpdateMode.onDemand) {
+    if (updateMode != UpdateMode.ONDEMAND) {
       pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
       pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
       pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
@@ -417,7 +423,7 @@ public class CrlControl {
           "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
     }
 
-    if (updateMode == UpdateMode.onDemand) {
+    if (updateMode == UpdateMode.ONDEMAND) {
       return;
     }
 
