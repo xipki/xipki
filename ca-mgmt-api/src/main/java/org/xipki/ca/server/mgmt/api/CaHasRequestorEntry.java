@@ -93,7 +93,7 @@ public class CaHasRequestorEntry {
   @Override
   public String toString() {
     return StringUtil.concatObjectsCap(200, "requestor: ", requestorIdent,
-        "\nra: ", ra,  "\nprofiles: ", profiles, "\npermission: ", permission);
+        ", ra: ", ra,  ", profiles: ", profiles, ", permission: ", permission);
   }
 
   @Override

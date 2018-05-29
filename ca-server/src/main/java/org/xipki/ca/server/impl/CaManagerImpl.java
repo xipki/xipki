@@ -443,6 +443,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     } else {
       masterMode = true;
     }
+    LOG.info("ca.mode: {}", caModeStr);
 
     int shardId;
     String shardIdStr = caConfProperties.getProperty("ca.shardId");
@@ -478,6 +479,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           Connection conn = datasource.getConnection();
           datasource.returnConnection(conn);
 
+          LOG.info("datasource.{}: {}", datasourceName, datasourceFile);
           this.datasources.put(datasourceName, datasource);
         } catch (DataAccessException | PasswordResolverException | IOException
             | RuntimeException ex) {
@@ -502,7 +504,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       queryExecutor.addRequestorIfNeeded(RequestorInfo.NAME_BY_USER);
     }
 
-    long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
+    final long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
     try {
@@ -921,6 +923,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       } else {
         RequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
         if (requestorDbEntry == null) {
+          LOG.error("could not load requestor {}", name);
           continue;
         }
 
@@ -930,6 +933,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         requestor.setDbEntry(requestorDbEntry);
         requestors.put(name, requestor);
       }
+
+      LOG.info("loaded requestor {}", name);
     }
     requestorsInitialized = true;
   } // method initRequestors
@@ -957,6 +962,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       if (signer != null) {
         dbEntry.setConfFaulty(false);
         signers.put(name, signer);
+        LOG.info("loaded signer {}", name);
+      } else {
+        LOG.error("could not load signer {}", name);
       }
     }
     signerInitialized = true;
@@ -973,6 +981,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       caAliases.put(aliasName, map.get(aliasName));
     }
 
+    LOG.info("caAliases: {}", caAliases);
     caAliasesInitialized = true;
   } // method initCaAliases
 
@@ -1004,6 +1013,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       if (profile != null) {
         dbEntry.setFaulty(false);
         certprofiles.put(name, profile);
+        LOG.info("loaded certprofile {}", name);
+      } else {
+        LOG.error("could not load certprofile {}", name);
       }
     }
 
@@ -1038,6 +1050,9 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       if (publisher != null) {
         dbEntry.setFaulty(false);
         publishers.put(name, publisher);
+        LOG.info("loaded publisher {}", name);
+      } else {
+        LOG.error("could not load publisher {}", name);
       }
     }
 
@@ -1076,9 +1091,18 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     CaInfo ca = queryExecutor.createCaInfo(name, masterMode, certstore);
+    LOG.info("created CA {}: {}", name, ca.toString(false));
     caInfos.put(name, ca);
     idNameMap.addCa(ca.getIdent());
-    caHasRequestors.put(name, queryExecutor.createCaHasRequestors(ca.getIdent()));
+    Set<CaHasRequestorEntry> caReqEntries = queryExecutor.createCaHasRequestors(ca.getIdent());
+    caHasRequestors.put(name, caReqEntries);
+    if (LOG.isInfoEnabled()) {
+      StringBuilder sb = new StringBuilder();
+      for (CaHasRequestorEntry entry : caReqEntries) {
+        sb.append("\n    ").append(entry);
+      }
+      LOG.info("CA {} is associated with following requestors:{}", name, sb);
+    }
 
     Set<Integer> profileIds = queryExecutor.createCaHasProfiles(ca.getIdent());
     Set<String> profileNames = new HashSet<>();
@@ -1086,6 +1110,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       profileNames.add(idNameMap.getCertprofileName(id));
     }
     caHasProfiles.put(name, profileNames);
+    LOG.info("CA {} is associated with following profiles: {}", name, profileNames);
 
     Set<Integer> publisherIds = queryExecutor.createCaHasPublishers(ca.getIdent());
     Set<String> publisherNames = new HashSet<>();
@@ -1093,6 +1118,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       publisherNames.add(idNameMap.getPublisherName(id));
     }
     caHasPublishers.put(name, publisherNames);
+    LOG.info("CA {} is associated with following publishers: {}", name, publisherNames);
 
     return true;
   } // method createCa
