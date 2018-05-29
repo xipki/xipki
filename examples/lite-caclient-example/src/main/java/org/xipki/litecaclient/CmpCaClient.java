@@ -32,7 +32,9 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -376,7 +378,8 @@ public class CmpCaClient {
     throw new Exception("invalid signature in PKI protection");
   }
 
-  private X509Certificate parseEnrollCertResult(PKIMessage response) throws Exception {
+  private Map<BigInteger, X509Certificate> parseEnrollCertResult(PKIMessage response, int numCerts)
+      throws Exception {
     PKIBody respBody = response.getBody();
     final int bodyType = respBody.getType();
 
@@ -391,33 +394,40 @@ public class CmpCaClient {
     CertRepMessage certRep = CertRepMessage.getInstance(respBody.getContent());
     CertResponse[] certResponses = certRep.getResponse();
 
-    if (certResponses.length != 1) {
-      throw new Exception("expected 1 CertResponse, but returned " + certResponses.length);
+    if (certResponses.length != numCerts) {
+      throw new Exception("expected " + numCerts + " CertResponse, but returned "
+          + certResponses.length);
     }
 
     // We only accept the certificates which are requested.
-    CertResponse certResp = certResponses[0];
-    PKIStatusInfo statusInfo = certResp.getStatus();
-    int status = statusInfo.getStatus().intValue();
+    Map<BigInteger, X509Certificate> certs = new HashMap<>(numCerts * 2);
+    for (int i = 0; i < numCerts; i++) {
+      CertResponse certResp = certResponses[i];
+      PKIStatusInfo statusInfo = certResp.getStatus();
+      int status = statusInfo.getStatus().intValue();
+      BigInteger certReqId = certResp.getCertReqId().getValue();
 
-    if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS) {
-      throw new Exception("Server returned PKIStatus: " + buildText(statusInfo));
-    }
+      if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS) {
+        throw new Exception("CertReqId " + certReqId
+            + ": server returned PKIStatus: " + buildText(statusInfo));
+      }
 
-    CertifiedKeyPair cvk = certResp.getCertifiedKeyPair();
-    if (cvk != null) {
-      CMPCertificate cmpCert = cvk.getCertOrEncCert().getCertificate();
-      if (cmpCert != null) {
-        X509Certificate cert = SdkUtil.parseCert(cmpCert.getX509v3PKCert().getEncoded());
-        if (!verify(caCert, cert)) {
-          throw new Exception("The returned certificate is not issued by the given CA");
+      CertifiedKeyPair cvk = certResp.getCertifiedKeyPair();
+      if (cvk != null) {
+        CMPCertificate cmpCert = cvk.getCertOrEncCert().getCertificate();
+        if (cmpCert != null) {
+          X509Certificate cert = SdkUtil.parseCert(cmpCert.getX509v3PKCert().getEncoded());
+          if (!verify(caCert, cert)) {
+            throw new Exception("CertReqId " + certReqId
+                + ": the returned certificate is not issued by the given CA");
+          }
+
+          certs.put(certReqId, cert);
         }
-
-        return cert;
       }
     }
 
-    throw new Exception("Server did not return any certificate");
+    return certs;
   } // method parseEnrollCertResult
 
   public X509Certificate requestCertViaCsr(String certprofile, CertificationRequest csr)
@@ -437,7 +447,7 @@ public class CmpCaClient {
     ProtectedPKIMessage request = builder.build(requestorSigner);
 
     PKIMessage response = transmit(request);
-    return parseEnrollCertResult(response);
+    return parseEnrollCertResult(response, 1).values().iterator().next();
   }
 
   private boolean parseRevocationResult(PKIMessage response, BigInteger serialNumber)
@@ -482,28 +492,38 @@ public class CmpCaClient {
 
   public X509Certificate requestCertViaCrmf(String certprofile, PrivateKey privateKey,
       SubjectPublicKeyInfo publicKeyInfo, String subject) throws Exception {
-    CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
+    return requestCertViaCrmf(new String[]{certprofile}, new PrivateKey[]{privateKey},
+        new SubjectPublicKeyInfo[] {publicKeyInfo}, new String[] {subject})[0];
+  }
 
-    certTemplateBuilder.setSubject(new X500Name(subject));
-    certTemplateBuilder.setPublicKey(publicKeyInfo);
+  public X509Certificate[] requestCertViaCrmf(String[] certprofile, PrivateKey[] privateKey,
+      SubjectPublicKeyInfo[] publicKeyInfo, String[] subject) throws Exception {
+    final int n = certprofile.length;
+    CertReqMsg[] certReqMsgs = new CertReqMsg[n];
+    BigInteger[] certReqIds = new BigInteger[n];
 
-    CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
+    for (int i = 0; i < n; i++) {
+      certReqIds[i] = BigInteger.valueOf(i + 1);
 
-    ProofOfPossessionSigningKeyBuilder popoBuilder
-        = new ProofOfPossessionSigningKeyBuilder(certReq);
+      CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
+      certTemplateBuilder.setSubject(new X500Name(subject[i]));
+      certTemplateBuilder.setPublicKey(publicKeyInfo[i]);
+      CertRequest certReq = new CertRequest(new ASN1Integer(certReqIds[i]),
+          certTemplateBuilder.build(), null);
+      ProofOfPossessionSigningKeyBuilder popoBuilder
+          = new ProofOfPossessionSigningKeyBuilder(certReq);
+      ContentSigner popoSigner = buildSigner(privateKey[i]);
+      POPOSigningKey popoSk = popoBuilder.build(popoSigner);
+      ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-    ContentSigner popoSigner = buildSigner(privateKey);
-    POPOSigningKey popoSk = popoBuilder.build(popoSigner);
-    ProofOfPossession popo = new ProofOfPossession(popoSk);
+      AttributeTypeAndValue certprofileInfo =
+          new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
+              new DERUTF8String("certprofile?" + certprofile[i] + "%"));
+      AttributeTypeAndValue[] atvs = {certprofileInfo};
+      certReqMsgs[i] = new CertReqMsg(certReq, popo, atvs);
+    }
 
-    AttributeTypeAndValue certprofileInfo =
-        new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-            new DERUTF8String("certprofile?" + certprofile + "%"));
-
-    AttributeTypeAndValue[] atvs = {certprofileInfo};
-    CertReqMsg certReqMsg = new CertReqMsg(certReq, popo, atvs);
-
-    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsg));
+    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
     builder.setMessageTime(new Date());
@@ -516,7 +536,15 @@ public class CmpCaClient {
 
     ProtectedPKIMessage request = builder.build(requestorSigner);
     PKIMessage response = transmit(request);
-    return parseEnrollCertResult(response);
+    Map<BigInteger, X509Certificate> certs = parseEnrollCertResult(response, n);
+
+    X509Certificate[] ret = new X509Certificate[n];
+    for (int i = 0; i < n; i++) {
+      BigInteger certReqId = certReqIds[i];
+      ret[i] = certs.get(certReqId);
+    }
+
+    return ret;
   } // method requestCerts
 
   public boolean revokeCert(BigInteger serialNumber, CRLReason reason) throws Exception {

@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.CRLReason;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.litecaclient.CmpCaClient;
 import org.xipki.litecaclient.SdkUtil;
 
@@ -43,7 +44,7 @@ public class CmpCaClientExample extends CaClientExample {
   private static final String CA_URL = "https://localhost:8443/cmp/myca";
 
   private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-pki/target/"
-      + "xipki-pki-3.1.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
+      + "xipki-pki-4.0.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
 
   private static final String KEYCERT_DIR =  "../tlskeys-example/src/main/resources";
 
@@ -128,9 +129,16 @@ public class CmpCaClientExample extends CaClientExample {
 
       // Enroll certificate via CRMF - EC
       kp = generateEcKeypair();
-      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
-      printCert("===== EC via CRMF (CMP) =====", cert);
+      MyKeypair kp2 = generateEcKeypair();
+      X509Certificate[] certs = client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
+          new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
+          new SubjectPublicKeyInfo[] {kp.getPublic(), kp2.getPublic()},
+          new String[]{getSubject(), getSubject()});
+      for (int i = 0; i < certs.length; i++) {
+        printCert("===== EC via CRMF (CMP) =====", certs[i]);
+      }
 
+      System.exit(0);
       // Enroll certificate via CRMF - DSA
       kp = generateDsaKeypair();
       cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
