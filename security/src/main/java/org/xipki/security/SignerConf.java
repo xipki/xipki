@@ -106,15 +106,19 @@ public class SignerConf {
   }
 
   public static String eraseSensitiveData(String conf) {
-    if (conf == null || !conf.contains("password?")) {
+    if (conf == null || !conf.toLowerCase().contains("password")) {
       return conf;
     }
 
     try {
       ConfPairs pairs = new ConfPairs(conf);
-      String value = pairs.value("password");
-      if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
-        pairs.putPair("password", "<sensitive>");
+      for (String name : pairs.names()) {
+        if (name.toLowerCase().contains("password")) {
+          String value = pairs.value(name);
+          if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
+            pairs.putPair(name, "<sensitive>");
+          }
+        }
       }
       return pairs.getEncoded();
     } catch (Exception ex) {
