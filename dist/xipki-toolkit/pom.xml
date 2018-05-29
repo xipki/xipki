@@ -31,7 +31,7 @@
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.features/toolkit/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version}),xipki-security</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap/${karaf.version}),xipki-security</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -152,7 +152,6 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
-                <feature>system</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->

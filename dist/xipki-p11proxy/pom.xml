@@ -30,7 +30,7 @@
     <app.name>PKCS#11 proxy</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
     <patchkaraf.repos>mvn:org.xipki.features/p11proxy/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(system/${karaf.version},aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-pkcs11-proxy</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-pkcs11-proxy</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -172,7 +172,6 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
-                <feature>system</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
