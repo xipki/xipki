@@ -77,7 +77,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  EnrollCertResult requestCert(String caName, CertificationRequest csr, String profile,
+  EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
       Date notBefore, Date notAfter, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException;
 
@@ -96,7 +96,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  EnrollCertResult requestCerts(String caName, EnrollCertRequest request,
+  EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
       RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
   /**

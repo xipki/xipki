@@ -37,7 +37,7 @@ import org.xipki.security.SignerConf;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-enroll", description = "enroll certificate (PKCS#11 token)")
+@Command(scope = "xi", name = "cmp-enroll-p11", description = "enroll certificate (PKCS#11 token)")
 @Service
 public class P11EnrollCertAction extends EnrollCertAction {
 

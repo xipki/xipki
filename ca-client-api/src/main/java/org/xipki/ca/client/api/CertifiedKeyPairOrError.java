@@ -19,6 +19,7 @@ package org.xipki.ca.client.api;
 
 import java.security.cert.Certificate;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.util.ParamUtil;
 
@@ -28,24 +29,32 @@ import org.xipki.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CertOrError {
+public class CertifiedKeyPairOrError {
 
   private final Certificate certificate;
 
+  private final PrivateKeyInfo privateKeyInfo;
+
   private final PkiStatusInfo error;
 
-  public CertOrError(Certificate certificate) {
+  public CertifiedKeyPairOrError(Certificate certificate, PrivateKeyInfo privateKeyInfo) {
     this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+    this.privateKeyInfo = privateKeyInfo;
     this.error = null;
   }
 
-  public CertOrError(PkiStatusInfo error) {
+  public CertifiedKeyPairOrError(PkiStatusInfo error) {
     this.certificate = null;
+    this.privateKeyInfo = null;
     this.error = ParamUtil.requireNonNull("error", error);
   }
 
   public Certificate getCertificate() {
     return certificate;
+  }
+
+  public PrivateKeyInfo getPrivateKeyInfo() {
+    return privateKeyInfo;
   }
 
   public PkiStatusInfo getError() {

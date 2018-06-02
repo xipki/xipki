@@ -18,13 +18,26 @@
 package org.xipki.ca.client.impl;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -33,6 +46,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
@@ -45,12 +59,17 @@ import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
+import org.bouncycastle.asn1.crmf.EncryptedValue;
+import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
+import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.slf4j.Logger;
@@ -67,9 +86,11 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.CmpFailureUtil;
 
@@ -496,6 +517,148 @@ abstract class CmpRequestor {
         || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID) {
       throw new PkiErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
           PKIFailureInfo.badMessageCheck, "message check of the response failed");
+    }
+  }
+
+  protected byte[] decrypt(EncryptedValue ev) throws XiSecurityException {
+    if (requestor == null) {
+      throw new XiSecurityException("requestor is null");
+    }
+
+    if (!(requestor.getSigningKey() instanceof PrivateKey)) {
+      throw new XiSecurityException("no decryption key is configured");
+    }
+
+    PrivateKey decKey = (PrivateKey) requestor.getSigningKey();
+    AlgorithmIdentifier keyAlg = ev.getKeyAlg();
+    ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
+
+    byte[] symmKey;
+
+    try {
+      if (decKey instanceof RSAPrivateKey) {
+        Cipher keyCipher;
+        if (keyOid.equals(PKCSObjectIdentifiers.id_RSAES_OAEP)) {
+          // Currently we only support the default RSAESOAEPparams
+          if (keyAlg.getParameters() != null) {
+            RSAESOAEPparams params = RSAESOAEPparams.getInstance(keyAlg.getParameters());
+            ASN1ObjectIdentifier oid = params.getHashAlgorithm().getAlgorithm();
+            if (!oid.equals(RSAESOAEPparams.DEFAULT_HASH_ALGORITHM.getAlgorithm())) {
+              throw new XiSecurityException(
+                  "unsupported RSAESOAEPparams.HashAlgorithm " + oid.getId());
+            }
+
+            oid = params.getMaskGenAlgorithm().getAlgorithm();
+            if (!oid.equals(RSAESOAEPparams.DEFAULT_MASK_GEN_FUNCTION.getAlgorithm())) {
+              throw new XiSecurityException(
+                  "unsupported RSAESOAEPparams.MaskGenAlgorithm " + oid.getId());
+            }
+
+            oid = params.getPSourceAlgorithm().getAlgorithm();
+            if (!params.getPSourceAlgorithm().equals(RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM)) {
+              throw new XiSecurityException(
+                  "unsupported RSAESOAEPparams.PSourceAlgorithm " + oid.getId());
+            }
+          }
+
+          keyCipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+        } else if (keyOid.equals(PKCSObjectIdentifiers.rsaEncryption)) {
+          keyCipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
+        } else {
+          throw new XiSecurityException("unsupported keyAlg " + keyOid.getId());
+        }
+        keyCipher.init(Cipher.DECRYPT_MODE, decKey);
+
+        symmKey = keyCipher.doFinal(ev.getEncSymmKey().getOctets());
+      } else if (decKey instanceof ECPrivateKey) {
+        ASN1Sequence params = ASN1Sequence.getInstance(keyAlg.getParameters());
+        final int n = params.size();
+        for (int i = 0; i < n; i++) {
+          if (!keyOid.equals(ObjectIdentifiers.id_ecies_specifiedParameters)) {
+            throw new XiSecurityException("unsupported keyAlg " + keyOid.getId());
+          }
+
+          ASN1TaggedObject to = (ASN1TaggedObject) params.getObjectAt(i);
+          int tag = to.getTagNo();
+          if (tag == 0) { // KDF
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            if (ObjectIdentifiers.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
+              AlgorithmIdentifier hashAlgorithm =
+                  AlgorithmIdentifier.getInstance(algId.getParameters());
+              if (!hashAlgorithm.getAlgorithm().equals(HashAlgo.SHA1.getOid())) {
+                throw new XiSecurityException("unsupported KeyDerivationFunction.HashAlgorithm "
+                    + hashAlgorithm.getAlgorithm().getId());
+              }
+            } else {
+              throw new XiSecurityException(
+                  "unsupported KeyDerivationFunction " + algId.getAlgorithm().getId());
+            }
+          } else if (tag == 1) { // SymmetricEncryption
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            if (!ObjectIdentifiers.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
+              throw new XiSecurityException("unsupported SymmetricEncryption "
+                  + algId.getAlgorithm().getId());
+            }
+          } else if (tag == 2) { // MessageAuthenticationCode
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            if (ObjectIdentifiers.id_hmac_full_ecies.equals(algId.getAlgorithm())) {
+              AlgorithmIdentifier hashAlgorithm =
+                  AlgorithmIdentifier.getInstance(algId.getParameters());
+              if (!hashAlgorithm.getAlgorithm().equals(HashAlgo.SHA1.getOid())) {
+                throw new XiSecurityException("unsupported MessageAuthenticationCode.HashAlgorithm "
+                    + hashAlgorithm.getAlgorithm().getId());
+              }
+            } else {
+              throw new XiSecurityException("unsupported MessageAuthenticationCode "
+                  + algId.getAlgorithm().getId());
+            }
+          }
+        }
+
+        Cipher keyCipher = Cipher.getInstance("ECIESWITHAES-CBC", "BC");
+        keyCipher.init(Cipher.DECRYPT_MODE, decKey);
+        symmKey = keyCipher.doFinal(ev.getEncSymmKey().getOctets());
+      } else {
+        throw new XiSecurityException("unsupported decryption key type "
+            + decKey.getClass().getName());
+      }
+
+      AlgorithmIdentifier symmAlg = ev.getSymmAlg();
+      if (!(symmAlg.getAlgorithm().equals(CMSAlgorithm.AES128_CBC)
+          || symmAlg.getAlgorithm().equals(CMSAlgorithm.AES192_CBC)
+          || symmAlg.getAlgorithm().equals(CMSAlgorithm.AES256_CBC))) {
+        // currently we only support AES128-CBC
+        throw new XiSecurityException("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
+      }
+
+      
+      byte[] encValue = ev.getEncValue().getOctets();
+      // some implementations, like BouncyCastle encapsulates the encrypted in PKCS#8
+      // EncryptedPrivateKeyInfo.
+      try {
+        EncryptedPrivateKeyInfo epki = EncryptedPrivateKeyInfo.getInstance(encValue);
+        encValue = epki.getEncryptedData();
+      } catch (IllegalArgumentException ex) {
+        // do nothing, it is not an EncryptedPrivateKeyInfo.
+      }
+
+      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      /*
+       * As defined in §4.1 in RFC 3565:
+       * The AlgorithmIdentifier parameters field MUST be present, and the
+       * parameters field MUST contain a AES-IV:
+       *
+       *     AES-IV ::= OCTET STRING (SIZE(16))
+       */
+      byte[] iv = DEROctetString.getInstance(symmAlg.getParameters()).getOctets();
+      AlgorithmParameterSpec algParams = new IvParameterSpec(iv);
+      dataCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symmKey, "AES"), algParams);
+
+      return dataCipher.doFinal(encValue);
+    } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException
+        | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException
+        | BadPaddingException ex) {
+      throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
   }
 

@@ -24,6 +24,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * TODO.
@@ -43,19 +44,27 @@ public class CertTemplateData {
 
   private final String certprofileName;
 
+  private final String genkeyType;
+
   private final Extensions extensions;
 
   private final ASN1Integer certReqId;
 
   public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
       Date notAfter, Extensions extensions, String certprofileName) {
-    this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null);
+    this(subject, null, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null);
   }
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
-      Date notAfter, Extensions extensions, String certprofileName, ASN1Integer certReqId) {
+  public CertTemplateData(X500Name subject, String keygenType, SubjectPublicKeyInfo publicKeyInfo,
+      Date notBefore, Date notAfter, Extensions extensions, String certprofileName,
+      ASN1Integer certReqId) {
+    this.genkeyType = StringUtil.isBlank(keygenType) ? null : keygenType;
+    if (this.genkeyType == null) {
+      ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
+    }
+
+    this.publicKeyInfo = publicKeyInfo;
     this.subject = ParamUtil.requireNonNull("subject", subject);
-    this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
     this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
         .toLowerCase();
     this.extensions = extensions;
@@ -70,6 +79,10 @@ public class CertTemplateData {
 
   public SubjectPublicKeyInfo getPublicKeyInfo() {
     return publicKeyInfo;
+  }
+
+  public String getGenkeyType() {
+    return genkeyType;
   }
 
   public Date getNotBefore() {

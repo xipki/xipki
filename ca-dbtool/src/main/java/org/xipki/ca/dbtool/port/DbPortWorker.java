@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class DbPortWorker implements Runnable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbPortWorker.class);
 
   protected final AtomicBoolean stopMe = new AtomicBoolean(false);
 

@@ -39,8 +39,10 @@ public class PermissionConstants {
   public static final int GEN_CRL = 32;
   public static final int GET_CRL = 64;
   public static final int ENROLL_CROSS = 128;
-  public static final int ALL = ENROLL_CERT | REVOKE_CERT | UNREVOKE_CERT | REMOVE_CERT
-      | KEY_UPDATE | GEN_CRL | GET_CRL | ENROLL_CROSS;
+  public static final int GEN_KEYPAIR = 256;
+
+  public static final int ALL = GEN_KEYPAIR | ENROLL_CERT | REVOKE_CERT | UNREVOKE_CERT
+      | REMOVE_CERT | KEY_UPDATE | GEN_CRL | GET_CRL | ENROLL_CROSS;
 
   static {
     codeTextMap.put(ENROLL_CERT, "enroll_cert");
@@ -51,6 +53,7 @@ public class PermissionConstants {
     codeTextMap.put(GEN_CRL, "gen_crl");
     codeTextMap.put(GET_CRL, "get_crl");
     codeTextMap.put(ENROLL_CROSS, "enroll_cross");
+    codeTextMap.put(GEN_KEYPAIR, "gen_keypair");
     codeTextMap.put(ALL, "all");
 
     for (Integer code : codeTextMap.keySet()) {

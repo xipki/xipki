@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.CaClient;
 import org.xipki.ca.client.api.CaClientException;
-import org.xipki.ca.client.api.CertOrError;
+import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
@@ -109,7 +109,7 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
           request.addRequestEntry(requestEntry);
         }
 
-        result = caClient.requestCerts(null, request, null);
+        result = caClient.enrollCerts(null, request, null);
       } catch (CaClientException | PkiErrorException ex) {
         LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
         return false;
@@ -128,7 +128,7 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
       }
 
       for (String id : ids) {
-        CertOrError certOrError = result.getCertOrError(id);
+        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
         X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
         if (cert == null) {

@@ -221,8 +221,8 @@
     </xs:sequence>
   </xs:complexType>
   <!-- Certstore -->
-  <xs:element name="Certstore" type="CertstoreType"/>
-  <xs:complexType name="CertstoreType">
+  <xs:element name="certstore" type="certstoreType"/>
+  <xs:complexType name="certstoreType">
     <xs:sequence>
       <xs:element name="countCrls" type="xs:int"/>
       <xs:element name="countCerts" type="xs:int"/>

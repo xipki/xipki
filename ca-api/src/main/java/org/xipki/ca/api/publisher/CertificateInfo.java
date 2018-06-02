@@ -17,6 +17,7 @@
 
 package org.xipki.ca.api.publisher;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
@@ -36,6 +37,8 @@ public class CertificateInfo {
   private final byte[] subjectPublicKey;
 
   private final CertWithDbId cert;
+
+  private final PrivateKeyInfo privateKey;
 
   private final NameId issuer;
 
@@ -59,10 +62,11 @@ public class CertificateInfo {
 
   private boolean alreadyIssued;
 
-  public CertificateInfo(CertWithDbId cert, NameId issuer, X509Cert issuerCert,
-      byte[] subjectPublicKey, NameId profile, NameId requestor) {
+  public CertificateInfo(CertWithDbId cert, PrivateKeyInfo privateKey, NameId issuer,
+      X509Cert issuerCert, byte[] subjectPublicKey, NameId profile, NameId requestor) {
     this.profile = ParamUtil.requireNonNull("profile", profile);
     this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.privateKey = privateKey;
     this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
     this.issuer = ParamUtil.requireNonNull("issuer", issuer);
     this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
@@ -75,6 +79,10 @@ public class CertificateInfo {
 
   public CertWithDbId getCert() {
     return cert;
+  }
+
+  public PrivateKeyInfo getPrivateKey() {
+    return privateKey;
   }
 
   public NameId getIssuer() {

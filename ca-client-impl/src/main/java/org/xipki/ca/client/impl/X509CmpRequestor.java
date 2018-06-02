@@ -72,6 +72,7 @@ import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
@@ -118,6 +119,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityConstants;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xml.sax.SAXException;
 
@@ -444,7 +446,20 @@ abstract class X509CmpRequestor extends CmpRequestor {
           return null;
         }
 
-        resultEntry = new EnrollCertResultEntry(thisId, cmpCert, status);
+        PrivateKeyInfo privKeyInfo = null;
+        if (cvk.getPrivateKey() != null) {
+          byte[] decryptedValue;
+          try {
+            decryptedValue = decrypt(cvk.getPrivateKey());
+          } catch (XiSecurityException ex) {
+            resultEntry = new ErrorResultEntry(thisId, ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
+                PKIFailureInfo.systemFailure, "could not decrypt PrivateKeyInfo");
+            continue;
+          }
+          privKeyInfo = PrivateKeyInfo.getInstance(decryptedValue);
+        }
+
+        resultEntry = new EnrollCertResultEntry(thisId, cmpCert, privKeyInfo, status);
 
         if (certConfirmBuilder != null) {
           requireConfirm = true;
@@ -614,10 +629,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
       EnrollCertRequestEntry reqEntry = reqEntries.get(i);
       CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE,
           reqEntry.getCertprofile());
-      AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
+      String genKeyType = reqEntry.getGenKeyType();
+      if (genKeyType != null) {
+        utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_GENERATEKEY, genKeyType);
+      }
 
-      AttributeTypeAndValue[] atvs = (certprofileInfo == null) ? null
-              : new AttributeTypeAndValue[]{certprofileInfo};
+      AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
+
+      AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{atv};
       certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), atvs);
     }
 

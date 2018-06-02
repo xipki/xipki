@@ -19,6 +19,7 @@ package org.xipki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIStatus;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 
 /**
  * TODO.
@@ -30,20 +31,28 @@ public class EnrollCertResultEntry extends ResultEntry {
 
   private final CMPCertificate cert;
 
+  private final PrivateKeyInfo privateKeyInfo;
+
   private final int status;
 
-  public EnrollCertResultEntry(String id, CMPCertificate cert) {
-    this(id, cert, PKIStatus.GRANTED);
+  public EnrollCertResultEntry(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo) {
+    this(id, cert, privateKeyInfo, PKIStatus.GRANTED);
   }
 
-  public EnrollCertResultEntry(String id, CMPCertificate cert, int status) {
+  public EnrollCertResultEntry(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo,
+      int status) {
     super(id);
     this.cert = cert;
+    this.privateKeyInfo = privateKeyInfo;
     this.status = status;
   }
 
   public CMPCertificate getCert() {
     return cert;
+  }
+
+  public PrivateKeyInfo getPrivateKeyInfo() {
+    return privateKeyInfo;
   }
 
   public int getStatus() {

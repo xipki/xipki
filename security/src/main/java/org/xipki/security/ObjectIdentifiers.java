@@ -370,6 +370,18 @@ public class ObjectIdentifiers {
 
   public static final ASN1ObjectIdentifier id_pe_tlsfeature = id_pe.branch("24");
 
+  private static final ASN1ObjectIdentifier id_secg_scheme = new ASN1ObjectIdentifier("1.3.132.1");
+
+  public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies = id_secg_scheme.branch("20.0");
+
+  public static final ASN1ObjectIdentifier id_ecies_specifiedParameters =
+      id_secg_scheme.branch("8");
+
+  public static final ASN1ObjectIdentifier id_hmac_full_ecies = id_secg_scheme.branch("22");
+
+  public static final ASN1ObjectIdentifier id_iso18033_kdf2 =
+      new ASN1ObjectIdentifier("1.0.18033.2.5.2");
+
   private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
   // RFC 4262: SMIMECapatibilities
@@ -459,6 +471,22 @@ public class ObjectIdentifiers {
 
     oidNameMap.put(id_pe_tlsfeature, "tlsFeature");
     oidNameMap.put(id_smimeCapabilities, "SMIMECapatibilities");
+
+    /*
+    public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies = id_secg_scheme.branch("20.0");
+
+    public static final ASN1ObjectIdentifier id_ecies_specifiedParameters =
+        id_secg_scheme.branch("8");
+
+    public static final ASN1ObjectIdentifier id_hmac_full_ecies = id_secg_scheme.branch("22");
+
+    public static final ASN1ObjectIdentifier id_iso18033_kdf2 =
+        new ASN1ObjectIdentifier("1.0.18033.2.5.2");
+     */
+    oidNameMap.put(id_aes128_cbc_in_ecies, "aes128-cbc-in-ecies");
+    oidNameMap.put(id_ecies_specifiedParameters, "ecies-specifiedParameters");
+    oidNameMap.put(id_hmac_full_ecies, "hmac-full-ecies");
+    oidNameMap.put(id_iso18033_kdf2, "kdf2");
   }
 
   private ObjectIdentifiers() {

@@ -27,7 +27,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.ca.client.api.CertOrError;
+import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.RequestResponseDebug;
@@ -84,7 +84,7 @@ public class CsrEnrollCertAction extends ClientAction {
     EnrollCertResult result;
     RequestResponseDebug debug = getRequestResponseDebug();
     try {
-      result = caClient.requestCert(caName, csr, profile, notBefore, notAfter, debug);
+      result = caClient.enrollCert(caName, csr, profile, notBefore, notAfter, debug);
     } finally {
       saveRequestResponse(debug);
     }
@@ -92,7 +92,7 @@ public class CsrEnrollCertAction extends ClientAction {
     X509Certificate cert = null;
     if (result != null) {
       String id = result.getAllIds().iterator().next();
-      CertOrError certOrError = result.getCertOrError(id);
+      CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
       cert = (X509Certificate) certOrError.getCertificate();
     }
 

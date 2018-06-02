@@ -40,6 +40,8 @@ public class CmpUtf8Pairs {
 
   public static final String KEY_NOTAFTER = "notafter";
 
+  public static final String KEY_GENERATEKEY = "generatekey";
+
   private static final char NAME_TERM = '?';
 
   private static final char TOKEN_TERM = '%';

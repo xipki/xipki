@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.CaClient;
 import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.CertIdOrError;
-import org.xipki.ca.client.api.CertOrError;
+import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.PkiErrorException;
@@ -479,7 +479,7 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public EnrollCertResult requestCert(String caName, CertificationRequest csr, String profile,
+  public EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
       Date notBefore, Date notAfter, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("csr", csr);
@@ -512,7 +512,7 @@ public final class CaClientImpl implements CaClient {
   } // method requestCert
 
   @Override
-  public EnrollCertResult requestCerts(String caName, EnrollCertRequest request,
+  public EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
       RequestResponseDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
@@ -1123,21 +1123,21 @@ public final class CaClientImpl implements CaClient {
 
   private EnrollCertResult parseEnrollCertResult(EnrollCertResultResp result)
       throws CaClientException {
-    Map<String, CertOrError> certOrErrors = new HashMap<>();
+    Map<String, CertifiedKeyPairOrError> certOrErrors = new HashMap<>();
     for (ResultEntry resultEntry : result.getResultEntries()) {
-      CertOrError certOrError;
+      CertifiedKeyPairOrError certOrError;
       if (resultEntry instanceof EnrollCertResultEntry) {
         EnrollCertResultEntry entry = (EnrollCertResultEntry) resultEntry;
         try {
           java.security.cert.Certificate cert = getCertificate(entry.getCert());
-          certOrError = new CertOrError(cert);
+          certOrError = new CertifiedKeyPairOrError(cert, entry.getPrivateKeyInfo());
         } catch (CertificateException ex) {
           throw new CaClientException(String.format(
               "CertificateParsingException for request (id=%s): %s",
               entry.getId(), ex.getMessage()));
         }
       } else if (resultEntry instanceof ErrorResultEntry) {
-        certOrError = new CertOrError(((ErrorResultEntry) resultEntry).getStatusInfo());
+        certOrError = new CertifiedKeyPairOrError(((ErrorResultEntry) resultEntry).getStatusInfo());
       } else {
         certOrError = null;
       }
@@ -1161,7 +1161,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     java.security.cert.Certificate caCert = null;
-    for (CertOrError certOrError : certOrErrors.values()) {
+    for (CertifiedKeyPairOrError certOrError : certOrErrors.values()) {
       java.security.cert.Certificate cert = certOrError.getCertificate();
       if (cert == null) {
         continue;
@@ -1183,7 +1183,7 @@ public final class CaClientImpl implements CaClient {
       return new EnrollCertResult(null, certOrErrors);
     }
 
-    for (CertOrError certOrError : certOrErrors.values()) {
+    for (CertifiedKeyPairOrError certOrError : certOrErrors.values()) {
       java.security.cert.Certificate cert = certOrError.getCertificate();
       if (cert == null) {
         continue;

@@ -79,7 +79,7 @@ public class HttpCmpServlet extends HttpServlet {
       return;
     }
 
-    X509Certificate clientCert = ClientCertCache.getTlsClientCert(req);
+    X509Certificate clientCert = TlsHelper.getTlsClientCert(req);
     AuditService auditService = auditServiceRegister.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);

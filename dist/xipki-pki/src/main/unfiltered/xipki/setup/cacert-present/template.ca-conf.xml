@@ -92,7 +92,7 @@
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>
         <keepExpiredCertDays>-1</keepExpiredCertDays>
-        <permission>255</permission>
+        <permission>511</permission>
         <maxValidity>10y</maxValidity>
         <cmpResponderName>responder1</cmpResponderName>
         <scepResponderName>scep-responder1</scepResponderName>
@@ -129,7 +129,7 @@
         <requestor>
           <requestorName>requestor1</requestorName>
           <ra>true</ra>
-          <permission>255</permission>
+          <permission>511</permission>
           <profiles>
             <profile>all</profile>
           </profiles>
@@ -138,7 +138,7 @@
       <users>
         <user>
           <userName>user1</userName>
-          <permission>255</permission>
+          <permission>511</permission>
           <profiles>
             <profile>all</profile>
           </profiles>

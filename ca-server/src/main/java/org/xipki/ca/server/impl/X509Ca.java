@@ -31,16 +31,23 @@ import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT_PROFILE
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +58,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledFuture;
@@ -63,6 +71,7 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
@@ -70,8 +79,12 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.CRLReason;
@@ -86,11 +99,13 @@ import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
 import org.bouncycastle.asn1.x509.ReasonFlags;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -147,6 +162,8 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
 
@@ -166,6 +183,7 @@ public class X509Ca {
     private final Date grantedNotAfter;
     private final X500Name requestedSubject;
     private final SubjectPublicKeyInfo grantedPublicKey;
+    private final PrivateKeyInfo privateKey;
     private final byte[] grantedPublicKeyData;
     private final long fpPublicKey;
     private final String warning;
@@ -176,7 +194,7 @@ public class X509Ca {
 
     public GrantedCertTemplate(Extensions extensions, IdentifiedCertprofile certprofile,
         Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject,
-        SubjectPublicKeyInfo grantedPublicKey, long fpPublicKey,
+        SubjectPublicKeyInfo grantedPublicKey, long fpPublicKey, PrivateKeyInfo privateKey,
         byte[] grantedPublicKeyData, ConcurrentContentSigner signer, String warning) {
       this.extensions = extensions;
       this.certprofile = certprofile;
@@ -185,6 +203,7 @@ public class X509Ca {
       this.requestedSubject = requestedSubject;
       this.grantedPublicKey = grantedPublicKey;
       this.grantedPublicKeyData = grantedPublicKeyData;
+      this.privateKey = privateKey;
       this.fpPublicKey = fpPublicKey;
       this.signer = signer;
       this.warning = warning;
@@ -405,6 +424,9 @@ public class X509Ca {
 
   } // class SuspendedCertsRevoker
 
+  private static final AlgorithmIdentifier ALGID_RSAENC = new AlgorithmIdentifier(
+      PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+
   private static final long MS_PER_SECOND = 1000L;
 
   private static final long MS_PER_MINUTE = 60000L;
@@ -430,6 +452,8 @@ public class X509Ca {
   private final boolean masterMode;
 
   private final CaManagerImpl caManager;
+
+  private SecureRandom random = new SecureRandom();
 
   private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
@@ -1849,7 +1873,7 @@ public class X509Ca {
         }
 
         CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
-        ret = new CertificateInfo(certWithMeta, caIdent, caCert,
+        ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
             gct.grantedPublicKeyData, gct.certprofile.getIdent(), requestor.getIdent());
         if (requestor instanceof ByUserRequestorInfo) {
           ret.setUser((((ByUserRequestorInfo) requestor).getUserId()));
@@ -2017,40 +2041,159 @@ public class X509Ca {
           "CA is not permitted to issue certifate after " + new Date(time));
     }
 
+    String genkeyType = certTemplate.getGenkeyType();
+    PrivateKeyInfo privateKey;
     SubjectPublicKeyInfo grantedPublicKeyInfo;
-    try {
-      grantedPublicKeyInfo = X509Util.toRfc3279Style(certTemplate.getPublicKeyInfo());
-    } catch (InvalidKeySpecException ex) {
-      LogUtil.warn(LOG, ex, "invalid SubjectPublicKeyInfo");
-      throw new OperationException(BAD_CERT_TEMPLATE, "invalid SubjectPublicKeyInfo");
+
+    if (genkeyType == null) {
+      privateKey = null;
+      try {
+        grantedPublicKeyInfo = X509Util.toRfc3279Style(certTemplate.getPublicKeyInfo());
+      } catch (InvalidKeySpecException ex) {
+        LogUtil.warn(LOG, ex, "invalid SubjectPublicKeyInfo");
+        throw new OperationException(BAD_CERT_TEMPLATE, "invalid SubjectPublicKeyInfo");
+      }
+
+      // CHECK weak public key, like RSA key (ROCA)
+      if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
+          PKCSObjectIdentifiers.rsaEncryption)) {
+        try {
+          ASN1Sequence seq = ASN1Sequence.getInstance(
+              grantedPublicKeyInfo.getPublicKeyData().getOctets());
+          if (seq.size() != 2) {
+            throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
+          }
+
+          BigInteger modulus = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+          if (RSABrokenKey.isAffected(modulus)) {
+            throw new OperationException(BAD_CERT_TEMPLATE, "RSA public key is too weak");
+          }
+        } catch (IllegalArgumentException ex) {
+          throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
+        }
+      }
+    } else {
+      genkeyType = genkeyType.toLowerCase();
+      StringTokenizer st = new StringTokenizer(genkeyType, ":");
+      if (st.countTokens() < 2) {
+        throw new OperationException(BAD_CERT_TEMPLATE, "invalid genkey '" + genkeyType + "'");
+      }
+      String keyType = st.nextToken();
+      String spec = st.nextToken();
+
+      try {
+        if ("rsa".equals(keyType)) {
+          int keysize = Integer.parseInt(spec);
+          BigInteger publicExponent;
+          if (st.hasMoreTokens()) {
+            String str = st.nextToken();
+            publicExponent = str.startsWith("0x")
+                ? new BigInteger(str.substring(2), 16) : new BigInteger(str);
+          } else {
+            publicExponent = BigInteger.valueOf(0x10001);
+          }
+
+          KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+          java.security.interfaces.RSAPublicKey rsaPubKey =
+              (java.security.interfaces.RSAPublicKey) kp.getPublic();
+
+          grantedPublicKeyInfo = new SubjectPublicKeyInfo(ALGID_RSAENC,
+              new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
+
+          /*
+           * RSA private keys are BER-encoded according to PKCS #1’s RSAPrivateKey ASN.1 type.
+           *
+           * RSAPrivateKey ::= SEQUENCE {
+           *   version           Version,
+           *   modulus           INTEGER,  -- n
+           *   publicExponent    INTEGER,  -- e
+           *   privateExponent   INTEGER,  -- d
+           *   prime1            INTEGER,  -- p
+           *   prime2            INTEGER,  -- q
+           *   exponent1         INTEGER,  -- d mod (p-1)
+           *   exponent2         INTEGER,  -- d mod (q-1)
+           *   coefficient       INTEGER,  -- (inverse of q) mod p
+           *   otherPrimeInfos   OtherPrimeInfos OPTIONAL.
+           * }
+           */
+          RSAPrivateCrtKey priv = (RSAPrivateCrtKey) kp.getPrivate();
+          privateKey = new PrivateKeyInfo(ALGID_RSAENC,
+             new RSAPrivateKey(priv.getModulus(),
+                 priv.getPublicExponent(), priv.getPrivateExponent(),
+                 priv.getPrimeP(), priv.getPrimeQ(),
+                 priv.getPrimeExponentP(), priv.getPrimeExponentQ(),
+                 priv.getCrtCoefficient()));
+        } else if ("ec".equals(keyType)) {
+          ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(spec);
+          KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
+          AlgorithmIdentifier algId = new AlgorithmIdentifier(
+              X9ObjectIdentifiers.id_ecPublicKey, curveOid);
+          BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
+          byte[] keyData = pub.getQ().getEncoded(false);
+
+          grantedPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
+
+          /*
+           * ECPrivateKey ::= SEQUENCE {
+           *   Version INTEGER { ecPrivkeyVer1(1) }
+           *                   (ecPrivkeyVer1),
+           *   privateKey      OCTET STRING,
+           *   parameters [0]  Parameters OPTIONAL,
+           *   publicKey  [1]  BIT STRING OPTIONAL
+           * }
+           *
+           * Since the EC domain parameters are placed in the PKCS #8’s privateKeyAlgorithm field,
+           * the optional parameters field in an ECPrivateKey must be omitted. A Cryptoki
+           * application must be able to unwrap an ECPrivateKey that contains the optional publicKey
+           * field; however, what is done with this publicKey field is outside the scope of
+           * Cryptoki.
+           */
+          ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
+          int orderBitLength = pub.getParams().getOrder().bitLength();
+          privateKey = new PrivateKeyInfo(algId,
+              new org.bouncycastle.asn1.sec.ECPrivateKey(orderBitLength, priv.getS()));
+        } else if ("dsa".equals(keyType)) {
+          int plen = Integer.parseInt(spec);
+          int qlen;
+          if (st.hasMoreTokens()) {
+            qlen = Integer.parseInt(st.nextToken());
+          } else {
+            if (plen <= 1024) {
+              qlen = 160;
+            } else if (plen <= 2048) {
+              qlen = 224;
+            } else {
+              qlen = 256;
+            }
+          }
+
+          KeyPair kp = KeyUtil.generateDSAKeypair(plen, qlen, random);
+          grantedPublicKeyInfo =
+              KeyUtil.createSubjectPublicKeyInfo((DSAPublicKey) kp.getPublic());
+
+          // DSA private keys are represented as BER-encoded ASN.1 type INTEGER.
+          DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
+          privateKey = new PrivateKeyInfo(grantedPublicKeyInfo.getAlgorithm(),
+              new ASN1Integer(priv.getX()));
+        } else {
+          throw new OperationException(BAD_CERT_TEMPLATE, "invalid genkey '" + genkeyType + "'");
+        }
+      } catch (NumberFormatException | InvalidAlgorithmParameterException
+          | InvalidKeyException ex) {
+        throw new OperationException(BAD_CERT_TEMPLATE, "invalid genkey '" + genkeyType + "'");
+      } catch (NoSuchAlgorithmException | NoSuchProviderException | IOException ex) {
+        throw new OperationException(SYSTEM_FAILURE, ex);
+      }
     }
 
     // public key
     try {
       grantedPublicKeyInfo = certprofile.checkPublicKey(grantedPublicKeyInfo);
     } catch (CertprofileException ex) {
-      throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
+      throw new OperationException(SYSTEM_FAILURE,
+          "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(BAD_CERT_TEMPLATE, ex);
-    }
-
-    // CHECK weak public key, like RSA key (ROCA)
-    if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
-        PKCSObjectIdentifiers.rsaEncryption)) {
-      try {
-        ASN1Sequence seq = ASN1Sequence.getInstance(
-            grantedPublicKeyInfo.getPublicKeyData().getOctets());
-        if (seq.size() != 2) {
-          throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
-        }
-
-        BigInteger modulus = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-        if (RSABrokenKey.isAffected(modulus)) {
-          throw new OperationException(BAD_CERT_TEMPLATE, "RSA public key is too weak");
-        }
-      } catch (IllegalArgumentException ex) {
-        throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
-      }
     }
 
     // subject
@@ -2162,8 +2305,8 @@ public class X509Ca {
       warning = msgBuilder.substring(2);
     }
     GrantedCertTemplate gct = new GrantedCertTemplate(certTemplate.getExtensions(), certprofile,
-        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo,
-        fpPublicKey, subjectPublicKeyData, signer, warning);
+        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo, fpPublicKey,
+        privateKey, subjectPublicKeyData, signer, warning);
     gct.setGrantedSubject(grantedSubject);
     return gct;
 

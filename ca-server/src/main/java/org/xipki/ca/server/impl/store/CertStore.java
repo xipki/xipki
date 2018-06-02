@@ -1060,7 +1060,7 @@ public class CertStore {
     X509Certificate cert = X509Util.parseCert(encodedCert);
     CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
     certWithMeta.setCertId(certId);
-    CertificateInfo certInfo = new CertificateInfo(certWithMeta, ca, caCert,
+    CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
         cert.getPublicKey().getEncoded(), idNameMap.getCertprofile(certprofileId),
         idNameMap.getRequestor(requestorId));
     if (!revoked) {
@@ -1193,8 +1193,9 @@ public class CertStore {
 
       byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
           .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
-      CertificateInfo certInfo = new CertificateInfo(certWithMeta, ca, caCert, subjectPublicKeyInfo,
-          idNameMap.getCertprofile(certprofileId), idNameMap.getRequestor(requestorId));
+      CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
+          subjectPublicKeyInfo, idNameMap.getCertprofile(certprofileId),
+          idNameMap.getRequestor(requestorId));
 
       if (!revoked) {
         return certInfo;

@@ -30,14 +30,22 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.security.util.X509Util;
 
 /**
- * TODO.
+ * For more details please refer to
+ * http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
+ * http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
+ * <p/>
+ * Please forward at least the following headers:
+ * <ul>
+ *   <li>SSL_CLIENT_VERIFY</li>
+ *   <li>SSL_CLIENT_CERT</li>
+ * </ul>
  * @author Lijun Liao
  * @since 2.1.0
  */
 
-public class ClientCertCache {
+public class TlsHelper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ClientCertCache.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TlsHelper.class);
 
   private static final LruCache<String, X509Certificate> clientCerts = new LruCache<>(50);
 
@@ -62,19 +70,14 @@ public class ClientCertCache {
     LOG.info("set reverseProxyMode to {}", reverseProxyMode);
   }
 
-  public static X509Certificate getTlsClientCert(final HttpServletRequest request)
-      throws IOException {
+  public static X509Certificate getTlsClientCert(HttpServletRequest request) throws IOException {
     if (reverseProxyMode == null) {
       X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
           "javax.servlet.request.X509Certificate");
       return (certs == null || certs.length < 1) ? null : certs[0];
     } else if ("APACHE".equals(reverseProxyMode)) {
       // check whether this application is behind a reverse proxy and the TLS client
-      // certificate is forwarded. Following headers should be configured to be forwarded:
-      // SSL_CLIENT_VERIFY and SSL_CLIENT_CERT.
-      // For more details please refer to
-      // http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars
-      // http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
+      // certificate is forwarded.
       String clientVerify = request.getHeader("SSL_CLIENT_VERIFY");
       if (StringUtil.isBlank(clientVerify)) {
         return null;
