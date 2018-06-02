@@ -89,7 +89,7 @@ public abstract class AbstractHttpServlet implements HttpServlet {
 
   protected X509Certificate getClientCert(HttpRequest request, SSLSession sslSession,
       SslReverseProxyMode sslReverseProxyMode) throws IOException {
-    return ClientCertCache.getTlsClientCert(request, sslSession, sslReverseProxyMode);
+    return TlsHelper.getTlsClientCert(request, sslSession, sslReverseProxyMode);
   }
 
 }

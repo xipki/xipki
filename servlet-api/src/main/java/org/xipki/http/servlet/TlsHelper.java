@@ -32,12 +32,20 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.CharsetUtil;
 
 /**
- * TODO.
+ * For more details please refer to
+ * http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
+ * http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
+ * <p/>
+ * Please forward at least the following headers:
+ * <ul>
+ *   <li>SSL_CLIENT_VERIFY</li>
+ *   <li>SSL_CLIENT_CERT</li>
+ * </ul>
  * @author Lijun Liao
  * @since 2.1.0
  */
 
-public class ClientCertCache {
+public class TlsHelper {
   private static CertificateFactory cf;
 
   static {
@@ -75,10 +83,6 @@ public class ClientCertCache {
 
     // check whether this application is behind a reverse proxy and the TLS client certificate
     // is forwarded. Following headers should be configured to be forwarded:
-    // SSL_CLIENT_VERIFY and SSL_CLIENT_CERT.
-    // For more details please refer to
-    // http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars
-    // http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
     String clientVerify = request.headers().get("SSL_CLIENT_VERIFY");
     if (clientVerify == null || clientVerify.isEmpty()) {
       return null;
