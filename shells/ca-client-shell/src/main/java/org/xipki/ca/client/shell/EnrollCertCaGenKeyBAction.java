@@ -94,7 +94,7 @@ public class EnrollCertCaGenKeyBAction extends ClientAction {
       description = "key type to be generated. Valid va'lues are\n"
           + "  rsa:<key size>[:<public exponent>], e.g. rsa:2048, rsa:2048:0x10001\n"
           + "  ec:<curve name>, e.g. rsa:secp256r1\n"
-          + "  dsa:<plen>[:<qlen>], e.g. dsa:2048, dsa:2048:256\n")
+          + "  dsa:<plen>[:<qlen>], e.g. dsa:2048, dsa:2048:256")
   private String keytype;
 
   @Option(name = "--subject", aliases = "-s", required = true,
