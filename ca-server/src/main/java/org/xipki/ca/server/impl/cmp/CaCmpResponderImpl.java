@@ -740,6 +740,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
       return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec), null);
     }
 
+    // Due to the bug mentioned in https://github.com/bcgit/bc-java/issues/359
+    // we cannot use BoucyCastle's EncryptedValueBuilder to build the EncryptedValue.
     PublicKey reqPub = requestor.getCert().getCert().getPublicKey();
 
     try {

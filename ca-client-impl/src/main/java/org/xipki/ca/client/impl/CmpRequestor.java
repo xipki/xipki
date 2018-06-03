@@ -59,7 +59,6 @@ import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.crmf.EncryptedValue;
-import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -699,18 +698,6 @@ abstract class CmpRequestor {
         throw new XiSecurityException("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
       }
 
-      byte[] encValue = ev.getEncValue().getOctets();
-      // some implementations, like BouncyCastle encapsulates the encrypted in PKCS#8
-      // EncryptedPrivateKeyInfo.
-      if (encValue[0] == 0x30) {
-        try {
-          EncryptedPrivateKeyInfo epki = EncryptedPrivateKeyInfo.getInstance(encValue);
-          encValue = epki.getEncryptedData();
-        } catch (IllegalArgumentException ex) {
-          // do nothing, it is not an EncryptedPrivateKeyInfo.
-        }
-      }
-
       Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
       /*
        * As defined in §4.1 in RFC 3565:
@@ -723,6 +710,7 @@ abstract class CmpRequestor {
       AlgorithmParameterSpec algParams = new IvParameterSpec(iv);
       dataCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symmKey, "AES"), algParams);
 
+      byte[] encValue = ev.getEncValue().getOctets();
       return dataCipher.doFinal(encValue);
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
         | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
