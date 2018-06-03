@@ -86,6 +86,26 @@ xi:update-cert-p12 --p12 output/ocsp2.p12 --password 1234 \
   --cert output/ocsp2.der --ca-cert output/subcawithcrl1.der \
   --ca-cert output/rootca1.der
 
+# CMP: Enroll (CA generate key pair) via CRMF
+
+CN = cmp-crmf-ca-genkey-rsa-tls
+
+xi:cmp-enroll-cagenkey --key-type rsa:2048 \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-out output/${CN}.der --profile tls --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+
+CN = cmp-crmf-ca-genkey-ec-tls
+
+xi:cmp-enroll-cagenkey --key-type ec:secp256r1 \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-out output/${CN}.der --profile tls --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+
+CN = cmp-crmf-ca-genkey-dsa-tls
+
+xi:cmp-enroll-cagenkey --key-type dsa:2048 \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-out output/${CN}.der --profile tls --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+
 ## Revocate certificates
 xi:cmp-revoke --ca subcawithcrl1 --cert output/ocsp2.der --reason keyCompromise
 

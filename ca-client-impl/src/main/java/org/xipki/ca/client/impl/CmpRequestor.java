@@ -631,7 +631,6 @@ abstract class CmpRequestor {
         throw new XiSecurityException("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
       }
 
-      
       byte[] encValue = ev.getEncValue().getOctets();
       // some implementations, like BouncyCastle encapsulates the encrypted in PKCS#8
       // EncryptedPrivateKeyInfo.

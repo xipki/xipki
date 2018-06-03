@@ -38,24 +38,51 @@ xi:cmp-cacert \
 
 echo "=====CMP: Enroll via CRMF====="
 
-CN = cmp-crmf-tls-${CUR_TIME}
+CN = cmp-crmf-tls
 
-xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" --subject "CN=${CN}"
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+  --subject "CN=${CN}-${CUR_TIME}"
 
 xi:cmp-enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
-  --out ${OUT_DIR}/${CN}.der --profile tls --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+  --out ${OUT_DIR}/${CN}.der --profile tls \
+  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
 
+echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
+
+CN = cmp-crmf-ca-genkey-rsa-tls
+
+xi:cmp-enroll-cagenkey --key-type rsa:2048 \
+  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${CN}.der --profile tls \
+  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
+
+CN = cmp-crmf-ca-genkey-ec-tls
+
+xi:cmp-enroll-cagenkey --key-type ec:secp256r1 \
+  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${CN}.der --profile tls \
+  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
+
+CN = cmp-crmf-ca-genkey-dsa-tls
+
+xi:cmp-enroll-cagenkey --key-type dsa:2048 \
+  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${CN}.der --profile tls \
+  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
+
 echo "=====CMP: Enroll via CSR====="
 
-CN = cmp-csr-tls-${CUR_TIME}
+CN = cmp-csr-tls
 
-xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 \
+  --subject "CN=${CN}-${CUR_TIME}"
 
 xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
-  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
+  --out ${OUT_DIR}/${CN}.csr \
+  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
 
 xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile tls
 
