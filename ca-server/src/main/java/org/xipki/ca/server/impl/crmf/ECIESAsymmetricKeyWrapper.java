@@ -18,28 +18,34 @@
 package org.xipki.ca.server.impl.crmf;
 
 import java.security.Key;
-import java.security.KeyPair;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
-import java.util.Arrays;
+import java.security.interfaces.ECPublicKey;
 
 import javax.crypto.Cipher;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.engines.IESEngine;
+import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.util.DigestFactory;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.IESCipher;
 import org.bouncycastle.jce.spec.IESParameterSpec;
 import org.bouncycastle.operator.GenericKey;
 import org.bouncycastle.operator.KeyWrapper;
 import org.bouncycastle.operator.OperatorException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.util.KeyUtil;
 
 /**
  * TODO.
@@ -51,11 +57,15 @@ public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
 
   private AlgorithmIdentifier algorithmIdentifier;
 
-  private PublicKey publicKey;
+  private ECPublicKey publicKey;
+
+  private int ephemeralPublicKeyLen = 65; // 1 (04)+ 32 (Qx) + 32 (Qy)
+
+  private int macLen = 20; // SHA1
 
   private final int aesKeySize = 128;
 
-  public ECIESAsymmetricKeyWrapper(PublicKey publicKey) {
+  public ECIESAsymmetricKeyWrapper(ECPublicKey publicKey) {
     this.publicKey = publicKey;
     this.algorithmIdentifier = new AlgorithmIdentifier(
         ObjectIdentifiers.id_ecies_specifiedParameters, buildECIESParameters());
@@ -66,10 +76,28 @@ public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
     return algorithmIdentifier;
   }
 
+  /**
+   * Encrypt the key with the following output.
+   * <pre>
+   * ECIES-Ciphertext-Value ::= SEQUENCE {
+   *     ephemeralPublicKey ECPoint,
+   *     symmetricCiphertext OCTET STRING,
+   *     macTag OCTET STRING
+   * }
+   *
+   * ECPoint ::= OCTET STRING
+   * </pre>
+   */
   @Override
   public byte[] generateWrappedKey(GenericKey encryptionKey) throws OperatorException {
     try {
-      Cipher cipher = Cipher.getInstance("ECIESWITHAES-CBC", "BC");
+      BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
+      IESCipher cipher = new IESCipher(
+          new IESEngine(new ECDHBasicAgreement(),
+              new KDF2BytesGenerator(DigestFactory.createSHA1()),
+              new HMac(DigestFactory.createSHA1()),
+              new PaddedBufferedBlockCipher(cbcCipher)), 16);
+
       // if not AES128, cipher must be initialized with IESParameterSpec which specifies the AES
       // keysize
       // According to the §3.8 in SEC 1, Version 2.0:
@@ -77,9 +105,29 @@ public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
       //  the value 0000000000000000_{16}"
       byte[] iv = new byte[16];
       IESParameterSpec spec = new IESParameterSpec(null, null, aesKeySize, aesKeySize, iv);
-      cipher.init(Cipher.ENCRYPT_MODE, publicKey, spec, new SecureRandom());
+      cipher.engineInit(Cipher.ENCRYPT_MODE, publicKey, spec, new SecureRandom());
       byte[] encryptionKeyBytes = getKeyBytes(encryptionKey);
-      return cipher.doFinal(encryptionKeyBytes);
+      byte[] bcResult = cipher.engineDoFinal(encryptionKeyBytes, 0, encryptionKeyBytes.length);
+      // convert the result to ASN.1 format
+      ASN1Encodable[] array = new ASN1Encodable[3];
+      // ephemeralPublicKey ECPoint
+      byte[] ephemeralPublicKey = new byte[ephemeralPublicKeyLen];
+
+      System.arraycopy(bcResult, 0, ephemeralPublicKey, 0, ephemeralPublicKeyLen);
+      array[0] = new DEROctetString(ephemeralPublicKey);
+
+      // symmetricCiphertext OCTET STRING
+      int symmetricCiphertextLen = bcResult.length - ephemeralPublicKeyLen - macLen;
+      byte[] symmetricCiphertext = new byte[symmetricCiphertextLen];
+      System.arraycopy(bcResult, ephemeralPublicKeyLen,
+          symmetricCiphertext, 0, symmetricCiphertextLen);
+      array[1] = new DEROctetString(symmetricCiphertext);
+
+      // macTag OCTET STRING
+      byte[] macTag = new byte[macLen];
+      System.arraycopy(bcResult, ephemeralPublicKeyLen + symmetricCiphertextLen, macTag, 0, macLen);
+      array[2] = new DEROctetString(macTag);
+      return new DERSequence(array).getEncoded();
     } catch (Exception ex) {
       throw new OperatorException("error while generateWrappedKey", ex);
     }
@@ -164,28 +212,6 @@ public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
         new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
     vec.add(new DERTaggedObject(true, 2, mac));
     return new DERSequence(vec);
-  }
-
-  public static void main(String[] args) {
-    try {
-      Security.addProvider(new BouncyCastleProvider());
-      byte[] iv = new byte[16];
-      Cipher cipher = Cipher.getInstance("ECIESWITHAES-CBC", "BC");
-      KeyPair kp = KeyUtil.generateECKeypair(SECObjectIdentifiers.secp256r1, null);
-      IESParameterSpec spec = new IESParameterSpec(null, null, 128, 128, iv);
-      cipher.init(Cipher.ENCRYPT_MODE, kp.getPublic(), spec, new SecureRandom());
-      byte[] encryptionKeyBytes = new byte[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-      byte[] cipherValues = cipher.doFinal(encryptionKeyBytes);
-
-      Cipher cipher2 = Cipher.getInstance("ECIESWITHAES-CBC", "BC");
-      spec = new IESParameterSpec(null, null, 128, 128, iv);
-      cipher2.init(Cipher.DECRYPT_MODE, kp.getPrivate(), spec, new SecureRandom());
-      byte[] decryptedValues = cipher2.doFinal(cipherValues);
-
-      System.out.println(Arrays.equals(encryptionKeyBytes, decryptedValues));
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
   }
 
 }

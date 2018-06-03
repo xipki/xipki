@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
@@ -70,6 +69,17 @@ import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cms.CMSAlgorithm;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.engines.IESEngine;
+import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.util.DigestFactory;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.IESCipher;
+import org.bouncycastle.jce.spec.IESParameterSpec;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.slf4j.Logger;
@@ -520,6 +530,22 @@ abstract class CmpRequestor {
     }
   }
 
+  public boolean isSendRequestorCert() {
+    return sendRequestorCert;
+  }
+
+  public void setSendRequestorCert(boolean sendRequestorCert) {
+    this.sendRequestorCert = sendRequestorCert;
+  }
+
+  public boolean isSignRequest() {
+    return signRequest;
+  }
+
+  public void setSignRequest(boolean signRequest) {
+    this.signRequest = signRequest;
+  }
+
   protected byte[] decrypt(EncryptedValue ev) throws XiSecurityException {
     if (requestor == null) {
       throw new XiSecurityException("requestor is null");
@@ -529,7 +555,11 @@ abstract class CmpRequestor {
       throw new XiSecurityException("no decryption key is configured");
     }
 
-    PrivateKey decKey = (PrivateKey) requestor.getSigningKey();
+    return decrypt(ev, (PrivateKey) requestor.getSigningKey());
+  }
+
+  private static byte[] decrypt(EncryptedValue ev, PrivateKey decKey)
+      throws XiSecurityException {
     AlgorithmIdentifier keyAlg = ev.getKeyAlg();
     ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
 
@@ -615,9 +645,47 @@ abstract class CmpRequestor {
           }
         }
 
-        Cipher keyCipher = Cipher.getInstance("ECIESWITHAES-CBC", "BC");
-        keyCipher.init(Cipher.DECRYPT_MODE, decKey);
-        symmKey = keyCipher.doFinal(ev.getEncSymmKey().getOctets());
+        int aesKeySize = 128;
+        byte[] iv = new byte[16];
+        AlgorithmParameterSpec spec = new IESParameterSpec(null, null, aesKeySize, aesKeySize, iv);
+
+        BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
+        IESCipher keyCipher = new IESCipher(
+            new IESEngine(new ECDHBasicAgreement(),
+                new KDF2BytesGenerator(DigestFactory.createSHA1()),
+                new HMac(DigestFactory.createSHA1()),
+                new PaddedBufferedBlockCipher(cbcCipher)), 16);
+        // no random is required
+        keyCipher.engineInit(Cipher.DECRYPT_MODE, decKey, spec, null);
+
+        byte[] encSymmKey = ev.getEncSymmKey().getOctets();
+        /*
+         * BouncyCastle expects the input ephemeralPublicKey | symmetricCiphertext | macTag.
+         * So we have to convert it from the following ASN.1 structure
+        * <pre>
+        * ECIES-Ciphertext-Value ::= SEQUENCE {
+        *     ephemeralPublicKey ECPoint,
+        *     symmetricCiphertext OCTET STRING,
+        *     macTag OCTET STRING
+        * }
+        *
+        * ECPoint ::= OCTET STRING
+        * </pre>
+        */
+        ASN1Sequence seq = DERSequence.getInstance(encSymmKey);
+        byte[] ephemeralPublicKey = DEROctetString.getInstance(seq.getObjectAt(0)).getOctets();
+        byte[] symmetricCiphertext = DEROctetString.getInstance(seq.getObjectAt(1)).getOctets();
+        byte[] macTag = DEROctetString.getInstance(seq.getObjectAt(2)).getOctets();
+
+        byte[] bcInput = new byte[ephemeralPublicKey.length + symmetricCiphertext.length
+                                  + macTag.length];
+        System.arraycopy(ephemeralPublicKey, 0, bcInput, 0, ephemeralPublicKey.length);
+        int offset = ephemeralPublicKey.length;
+        System.arraycopy(symmetricCiphertext, 0, bcInput, offset, symmetricCiphertext.length);
+        offset += symmetricCiphertext.length;
+        System.arraycopy(macTag, 0, bcInput, offset, macTag.length);
+
+        symmKey = keyCipher.engineDoFinal(bcInput, 0, bcInput.length);
       } else {
         throw new XiSecurityException("unsupported decryption key type "
             + decKey.getClass().getName());
@@ -654,27 +722,10 @@ abstract class CmpRequestor {
       dataCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symmKey, "AES"), algParams);
 
       return dataCipher.doFinal(encValue);
-    } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException
-        | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException
-        | BadPaddingException ex) {
+    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+        | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
-  }
-
-  public boolean isSendRequestorCert() {
-    return sendRequestorCert;
-  }
-
-  public void setSendRequestorCert(boolean sendRequestorCert) {
-    this.sendRequestorCert = sendRequestorCert;
-  }
-
-  public boolean isSignRequest() {
-    return signRequest;
-  }
-
-  public void setSignRequest(boolean signRequest) {
-    this.signRequest = signRequest;
   }
 
 }

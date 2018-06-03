@@ -743,7 +743,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
         wrapper = new RSAOAEPAsymmetricKeyWrapper(
             requestor.getCert().getCertHolder().getSubjectPublicKeyInfo());
       } else if (reqPub instanceof ECPublicKey) {
-        wrapper = new ECIESAsymmetricKeyWrapper(reqPub);
+        wrapper = new ECIESAsymmetricKeyWrapper((ECPublicKey) reqPub);
       } else {
         String msg = "Requestors's public key cannot be used for encryption";
         LOG.error(msg);
