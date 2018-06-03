@@ -117,9 +117,6 @@ import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.X509Ca;
-import org.xipki.ca.server.impl.crmf.CrmfKeyWrapper;
-import org.xipki.ca.server.impl.crmf.ECIESAsymmetricKeyWrapper;
-import org.xipki.ca.server.impl.crmf.RSAOAEPAsymmetricKeyWrapper;
 import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
@@ -748,9 +745,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     try {
       CrmfKeyWrapper wrapper = null;
       if (reqPub instanceof RSAPublicKey) {
-        wrapper = new RSAOAEPAsymmetricKeyWrapper((RSAPublicKey) reqPub);
+        wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
       } else if (reqPub instanceof ECPublicKey) {
-        wrapper = new ECIESAsymmetricKeyWrapper((ECPublicKey) reqPub);
+        wrapper = new CrmfKeyWrapper.ECIESAsymmetricKeyWrapper(reqPub);
       } else {
         String msg = "Requestors's public key cannot be used for encryption";
         LOG.error(msg);
@@ -760,7 +757,7 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
       PrivateKeyInfo privKey = certInfo.getPrivateKey();
       AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
-      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
 
       byte[] symmKeyBytes = new byte[16];
       synchronized (aesKeyGen) {

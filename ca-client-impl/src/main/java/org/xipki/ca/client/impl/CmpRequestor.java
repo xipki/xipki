@@ -711,7 +711,7 @@ abstract class CmpRequestor {
         }
       }
 
-      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
       /*
        * As defined in §4.1 in RFC 3565:
        * The AlgorithmIdentifier parameters field MUST be present, and the
