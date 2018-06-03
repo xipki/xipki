@@ -57,22 +57,25 @@ public class P11EnrollCertAction extends EnrollCertAction {
   @Option(name = "--module", description = "name of the PKCS#11 module")
   private String moduleName = "default";
 
-  @Override
-  protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
-      throws ObjectCreationException {
-    byte[] keyIdBytes = null;
-    if (keyId != null) {
-      keyIdBytes = Hex.decode(keyId);
-    }
+  private ConcurrentContentSigner signer;
 
-    SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
-        keyIdBytes, HashAlgo.getInstance(hashAlgo), signatureAlgoControl);
-    return securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+  @Override
+  protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+    if (signer == null) {
+      byte[] keyIdBytes = null;
+      if (keyId != null) {
+        keyIdBytes = Hex.decode(keyId);
+      }
+
+      SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
+          keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
+      signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+    }
+    return signer;
   }
 
   public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-      String keyLabel, byte[] keyId, HashAlgo hashAlgo,
-      SignatureAlgoControl signatureAlgoControl) {
+      String keyLabel, byte[] keyId, HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
     ParamUtil.requireNonNull("hashAlgo", hashAlgo);
     ParamUtil.requireNonNull("slotIndex", slotIndex);
 

@@ -29,7 +29,6 @@ import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 
 /**
@@ -50,23 +49,27 @@ public class P12EnrollCertAction extends EnrollCertAction {
   @Option(name = "--password", description = "password of the PKCS#12 file")
   private String password;
 
-  @Override
-  protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
-      throws ObjectCreationException {
-    if (password == null) {
-      try {
-        password = new String(readPassword());
-      } catch (IOException ex) {
-        throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
-      }
-    }
+  private ConcurrentContentSigner signer;
 
-    ConfPairs conf = new ConfPairs("password", password);
-    conf.putPair("parallelism", Integer.toString(1));
-    conf.putPair("keystore", "file:" + p12File);
-    SignerConf signerConf = new SignerConf(conf.getEncoded(),
-        HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
-    return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+  @Override
+  protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+    if (signer == null) {
+      if (password == null) {
+        try {
+          password = new String(readPassword());
+        } catch (IOException ex) {
+          throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
+        }
+      }
+
+      ConfPairs conf = new ConfPairs("password", password);
+      conf.putPair("parallelism", Integer.toString(1));
+      conf.putPair("keystore", "file:" + p12File);
+      SignerConf signerConf = new SignerConf(conf.getEncoded(),
+          HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
+      signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+    }
+    return signer;
   }
 
 }
