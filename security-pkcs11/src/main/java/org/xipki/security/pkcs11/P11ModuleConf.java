@@ -42,6 +42,8 @@ import org.xipki.security.pkcs11.jaxb.PasswordsType;
 import org.xipki.security.pkcs11.jaxb.SlotType;
 import org.xipki.security.pkcs11.jaxb.SlotsType;
 
+import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -78,7 +80,24 @@ public class P11ModuleConf {
     ParamUtil.requireNonNull("mechanismSetsType", mechanismSetsType);
     this.name = moduleType.getName();
     this.readOnly = moduleType.isReadonly();
-    this.userType = moduleType.getUser().longValue();
+
+    String userTypeStr = moduleType.getUser().toUpperCase();
+    if ("CKU_USER".equals(userTypeStr)) {
+      this.userType = PKCS11Constants.CKU_USER;
+    } else if ("CKU_SO".equals(userTypeStr)) {
+      this.userType = PKCS11Constants.CKU_SO;
+    } else {
+      try {
+        if (userTypeStr.startsWith("0X")) {
+          this.userType = Long.parseLong(userTypeStr.substring(2), 16);
+        } else {
+          this.userType = Long.parseLong(userTypeStr);
+        }
+      } catch (NumberFormatException ex) {
+        throw new InvalidConfException("invalid user " + userTypeStr);
+      }
+    }
+
     this.maxMessageSize = moduleType.getMaxMessageSize().intValue();
     this.type = moduleType.getType();
     if (maxMessageSize < 128) {

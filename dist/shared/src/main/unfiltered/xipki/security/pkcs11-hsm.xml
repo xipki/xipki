@@ -31,8 +31,15 @@
         </slot>
       </includeSlots>
       <readonly>false</readonly>
-      <!-- 0 for CKU_SO, 1 for CKU_USER, and any vendor specific user type -->
-      <user>1</user>
+      <!--
+        Specify the user type, use either the long value or identifier as
+        defined in the PKCS#11 standards. In version up to 2.40 the
+        following users are defined.
+          - 1 or 0x1 or CKU_USER
+          - 0 or 0x0 or CKU_SO
+        For vendor user type, only the long value is allowed.
+      -->
+      <user>CKU_USER</user>
       <maxMessageSize>65536</maxMessageSize>
       <passwordSets>
         <passwords>
