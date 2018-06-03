@@ -124,10 +124,6 @@ class IaikP11Slot extends AbstractP11Slot {
 
   private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
-  private boolean writableSessionInUse;
-
-  private Session writableSession;
-
   IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
       long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter)
       throws P11TokenException {
@@ -140,8 +136,7 @@ class IaikP11Slot extends AbstractP11Slot {
     Session session;
     try {
       // SO (Security Officer cannot be logged in READ-ONLY session
-      boolean rw = readOnly ? false : (userType == PKCS11Constants.CKU_SO);
-      session = openSession(rw);
+      session = openSession();
     } catch (P11TokenException ex) {
       LogUtil.error(LOG, ex, "openSession");
       close();
@@ -261,10 +256,6 @@ class IaikP11Slot extends AbstractP11Slot {
     if (slot != null) {
       try {
         LOG.info("close all sessions on token: {}", slot.getSlotID());
-
-        if (writableSession != null) {
-          writableSession.closeSession();
-        }
 
         for (ConcurrentBagEntry<Session> session : sessions.values()) {
           session.value().closeSession();
@@ -470,15 +461,11 @@ class IaikP11Slot extends AbstractP11Slot {
     return ret;
   }
 
-  private Session openSession(boolean rwSession) throws P11TokenException {
-    if (rwSession && isReadOnly()) {
-      throw new P11TokenException("Cannot open RW session, the token is read only.");
-    }
-
+  private Session openSession() throws P11TokenException {
     Session session;
     try {
-      session = slot.getToken().openSession(Token.SessionType.SERIAL_SESSION, rwSession, null,
-          null);
+      boolean rw = !isReadOnly();
+      session = slot.getToken().openSession(Token.SessionType.SERIAL_SESSION, rw, null, null);
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
@@ -495,9 +482,8 @@ class IaikP11Slot extends AbstractP11Slot {
       }
 
       if (session == null) {
-        boolean rw = isReadOnly() ? false : (userType == PKCS11Constants.CKU_SO);
         // create new session
-        session = new ConcurrentBagEntry<>(openSession(rw));
+        session = new ConcurrentBagEntry<>(openSession());
         sessions.add(session);
       }
     }
@@ -784,27 +770,6 @@ class IaikP11Slot extends AbstractP11Slot {
     }
   }
 
-  private synchronized Session borrowWritableSession() throws P11TokenException {
-    if (writableSession == null) {
-      writableSession = openSession(true);
-    }
-
-    if (writableSessionInUse) {
-      throw new P11TokenException("no idle writable session available");
-    }
-
-    writableSessionInUse = true;
-    login(writableSession);
-    return writableSession;
-  }
-
-  private synchronized void returnWritableSession(Session session) throws P11TokenException {
-    if (session != writableSession) {
-      throw new P11TokenException("the returned session does not belong to me");
-    }
-    this.writableSessionInUse = false;
-  }
-
   private List<X509PublicKeyCertificate> getAllCertificateObjects(Session session)
       throws P11TokenException {
     X509PublicKeyCertificate template = new X509PublicKeyCertificate();
@@ -848,8 +813,9 @@ class IaikP11Slot extends AbstractP11Slot {
   }
 
   private int removeObjects(Storage template, String desc) throws P11TokenException {
-    Session session = borrowWritableSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
+      Session session = bagEntry.value();
       List<Storage> objects = getObjects(session, template);
       for (Storage obj : objects) {
         session.destroyObject(obj);
@@ -859,15 +825,15 @@ class IaikP11Slot extends AbstractP11Slot {
       LogUtil.error(LOG, ex, "could not remove " + desc);
       throw new P11TokenException(ex.getMessage(), ex);
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
   @Override
   protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
-    Session session = borrowWritableSession();
-
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
+      Session session = bagEntry.value();
       X509PublicKeyCertificate[] existingCerts = getCertificateObjects(session, objectId.getId(),
           objectId.getLabelChars());
       if (existingCerts == null || existingCerts.length == 0) {
@@ -881,7 +847,7 @@ class IaikP11Slot extends AbstractP11Slot {
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
@@ -890,13 +856,13 @@ class IaikP11Slot extends AbstractP11Slot {
       throws P11TokenException {
     X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
         new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
-    Session session = borrowWritableSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
-      session.createObject(newCaCertTemp);
+      bagEntry.value().createObject(newCaCertTemp);
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
@@ -942,8 +908,9 @@ class IaikP11Slot extends AbstractP11Slot {
 
     Mechanism mechanism = Mechanism.get(mech);
     SecretKey key;
-    Session session = borrowWritableSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
+      Session session = bagEntry.value();
       if (labelExists(session, label)) {
         throw new IllegalArgumentException(
             "label " + label + " exists, please specify another one");
@@ -963,7 +930,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
       return new IaikP11Identity(this, entityId, key);
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
@@ -979,8 +946,9 @@ class IaikP11Slot extends AbstractP11Slot {
     template.getValue().setByteArrayValue(keyValue);
 
     SecretKey key;
-    Session session = borrowWritableSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
+      Session session = bagEntry.value();
       if (labelExists(session, label)) {
         throw new IllegalArgumentException(
             "label " + label + " exists, please specify another one");
@@ -999,7 +967,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
       return new IaikP11Identity(this, entityId, key);
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
@@ -1091,8 +1059,9 @@ class IaikP11Slot extends AbstractP11Slot {
 
     try {
       KeyPair keypair;
-      Session session = borrowWritableSession();
+      ConcurrentBagEntry<Session> bagEntry = borrowSession();
       try {
+        Session session = bagEntry.value();
         if (labelExists(session, label)) {
           throw new IllegalArgumentException(
               "label " + label + " exists, please specify another one");
@@ -1123,7 +1092,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
         return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
       } finally {
-        returnWritableSession(session);
+        sessions.requite(bagEntry);
       }
     } catch (P11TokenException | RuntimeException ex) {
       try {
@@ -1188,13 +1157,13 @@ class IaikP11Slot extends AbstractP11Slot {
     X509PublicKeyCertificate newCertTemp = createPkcs11Template(new X509Cert(newCert),
         objectId.getId(), objectId.getLabelChars());
 
-    Session session = borrowWritableSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
-      session.createObject(newCertTemp);
+      bagEntry.value().createObject(newCertTemp);
     } catch (TokenException ex) {
       throw new P11TokenException("could not createObject: " + ex.getMessage(), ex);
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
@@ -1225,8 +1194,9 @@ class IaikP11Slot extends AbstractP11Slot {
 
   @Override
   protected void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException {
-    Session session = borrowWritableSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
+      Session session = bagEntry.value();
       byte[] id = objectId.getId();
       char[] label = objectId.getLabelChars();
       SecretKey secretKey = getSecretKeyObject(session, id, label);
@@ -1275,7 +1245,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
       }
     } finally {
-      returnWritableSession(session);
+      sessions.requite(bagEntry);
     }
   }
 
