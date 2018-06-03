@@ -2084,6 +2084,11 @@ public class X509Ca {
       try {
         if ("rsa".equals(keyType)) {
           int keysize = Integer.parseInt(spec);
+
+          if (keysize > 4096) {
+            throw new OperationException(BAD_CERT_TEMPLATE, "keysize too large");
+          }
+
           BigInteger publicExponent;
           if (st.hasMoreTokens()) {
             String str = st.nextToken();
@@ -2154,6 +2159,10 @@ public class X509Ca {
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderBitLength, priv.getS()));
         } else if ("dsa".equals(keyType)) {
           int plen = Integer.parseInt(spec);
+          if (plen > 4096) {
+            throw new OperationException(BAD_CERT_TEMPLATE, "plen too large");
+          }
+
           int qlen;
           if (st.hasMoreTokens()) {
             qlen = Integer.parseInt(st.nextToken());
