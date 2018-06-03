@@ -42,7 +42,6 @@ import org.bouncycastle.crypto.util.DigestFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.IESCipher;
 import org.bouncycastle.jce.spec.IESParameterSpec;
 import org.bouncycastle.operator.GenericKey;
-import org.bouncycastle.operator.KeyWrapper;
 import org.bouncycastle.operator.OperatorException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
@@ -53,7 +52,7 @@ import org.xipki.security.ObjectIdentifiers;
  */
 
 // CHECKSTYLE:SKIP
-public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
+public class ECIESAsymmetricKeyWrapper implements CrmfKeyWrapper {
 
   private AlgorithmIdentifier algorithmIdentifier;
 
@@ -89,7 +88,7 @@ public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
    * </pre>
    */
   @Override
-  public byte[] generateWrappedKey(GenericKey encryptionKey) throws OperatorException {
+  public byte[] generateWrappedKey(byte[] keyToWrap) throws OperatorException {
     try {
       BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
       IESCipher cipher = new IESCipher(
@@ -106,8 +105,7 @@ public class ECIESAsymmetricKeyWrapper implements KeyWrapper {
       byte[] iv = new byte[16];
       IESParameterSpec spec = new IESParameterSpec(null, null, aesKeySize, aesKeySize, iv);
       cipher.engineInit(Cipher.ENCRYPT_MODE, publicKey, spec, new SecureRandom());
-      byte[] encryptionKeyBytes = getKeyBytes(encryptionKey);
-      byte[] bcResult = cipher.engineDoFinal(encryptionKeyBytes, 0, encryptionKeyBytes.length);
+      byte[] bcResult = cipher.engineDoFinal(keyToWrap, 0, keyToWrap.length);
       // convert the result to ASN.1 format
       ASN1Encodable[] array = new ASN1Encodable[3];
       // ephemeralPublicKey ECPoint

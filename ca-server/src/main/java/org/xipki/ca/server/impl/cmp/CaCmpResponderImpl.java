@@ -36,6 +36,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Enumerated;
@@ -44,7 +48,9 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
@@ -81,6 +87,7 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -93,11 +100,7 @@ import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
-import org.bouncycastle.cert.crmf.EncryptedValueBuilder;
-import org.bouncycastle.cert.crmf.jcajce.JceCRMFEncryptorBuilder;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.KeyWrapper;
-import org.bouncycastle.operator.OutputEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -114,6 +117,7 @@ import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.X509Ca;
+import org.xipki.ca.server.impl.crmf.CrmfKeyWrapper;
 import org.xipki.ca.server.impl.crmf.ECIESAsymmetricKeyWrapper;
 import org.xipki.ca.server.impl.crmf.RSAOAEPAsymmetricKeyWrapper;
 import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
@@ -183,6 +187,8 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
 
   private final PendingCertificatePool pendingCertPool;
 
+  private final KeyGenerator aesKeyGen;
+
   private final String caName;
 
   private final CaManagerImpl caManager;
@@ -193,9 +199,11 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cacerts.getId());
   }
 
-  public CaCmpResponderImpl(CaManagerImpl caManager, String caName) {
+  public CaCmpResponderImpl(CaManagerImpl caManager, String caName)
+      throws NoSuchAlgorithmException {
     super(caManager.getSecurityFactory());
 
+    this.aesKeyGen = KeyGenerator.getInstance("AES");
     this.caManager = caManager;
     this.pendingCertPool = new PendingCertificatePool();
     this.caName = caName;
@@ -738,10 +746,9 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     PublicKey reqPub = requestor.getCert().getCert().getPublicKey();
 
     try {
-      KeyWrapper wrapper = null;
+      CrmfKeyWrapper wrapper = null;
       if (reqPub instanceof RSAPublicKey) {
-        wrapper = new RSAOAEPAsymmetricKeyWrapper(
-            requestor.getCert().getCertHolder().getSubjectPublicKeyInfo());
+        wrapper = new RSAOAEPAsymmetricKeyWrapper((RSAPublicKey) reqPub);
       } else if (reqPub instanceof ECPublicKey) {
         wrapper = new ECIESAsymmetricKeyWrapper((ECPublicKey) reqPub);
       } else {
@@ -751,11 +758,30 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
             new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
       }
 
-      JceCRMFEncryptorBuilder encryptorBuilder =
-          new JceCRMFEncryptorBuilder(NISTObjectIdentifiers.id_aes128_CBC);
-      OutputEncryptor encryptor = encryptorBuilder.build();
-      EncryptedValueBuilder builder = new EncryptedValueBuilder(wrapper, encryptor);
-      EncryptedValue encKey = builder.build(certInfo.getPrivateKey());
+      PrivateKeyInfo privKey = certInfo.getPrivateKey();
+      AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
+      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+      byte[] symmKeyBytes = new byte[16];
+      synchronized (aesKeyGen) {
+        symmKeyBytes = aesKeyGen.generateKey().getEncoded();
+      }
+
+      // encrypt the symmKey
+      byte[] encSymmKey = wrapper.generateWrappedKey(symmKeyBytes);
+      // get the algorithmIdentifier after the encryption process.
+      AlgorithmIdentifier keyAlg = wrapper.getAlgorithmIdentifier();
+
+      // encrypt the data
+      dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"));
+      byte[] encValue = dataCipher.doFinal(privKey.getEncoded());
+      // get the algorithmIdentifier after the encryption process.
+      byte[] iv = dataCipher.getIV();
+      AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(NISTObjectIdentifiers.id_aes128_CBC,
+          new DEROctetString(iv));
+
+      EncryptedValue encKey = new EncryptedValue(intendedAlg, symmAlg,
+          new DERBitString(encSymmKey), keyAlg, null, new DERBitString(encValue));
 
       return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec, encKey, null), null);
     } catch (Exception ex) {

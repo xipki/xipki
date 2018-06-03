@@ -17,18 +17,14 @@
 
 package org.xipki.ca.server.impl.crmf;
 
-import java.io.IOException;
+import java.security.interfaces.RSAPublicKey;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import javax.crypto.Cipher;
+
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
-import org.bouncycastle.crypto.encodings.OAEPEncoding;
-import org.bouncycastle.crypto.engines.RSAEngine;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
-import org.bouncycastle.operator.bc.BcAsymmetricKeyWrapper;
+import org.bouncycastle.operator.OperatorException;
 
 /**
  * TODO.
@@ -36,20 +32,31 @@ import org.bouncycastle.operator.bc.BcAsymmetricKeyWrapper;
  */
 
 // CHECKSTYLE:SKIP
-public class RSAOAEPAsymmetricKeyWrapper extends BcAsymmetricKeyWrapper {
+public class RSAOAEPAsymmetricKeyWrapper implements CrmfKeyWrapper {
 
   private static final AlgorithmIdentifier OAEP_DFLT = new AlgorithmIdentifier(
       PKCSObjectIdentifiers.id_RSAES_OAEP, new RSAESOAEPparams());
 
-  public RSAOAEPAsymmetricKeyWrapper(SubjectPublicKeyInfo publicKeyInfo) throws IOException {
-    super(OAEP_DFLT, PublicKeyFactory.createKey(publicKeyInfo));
+  private RSAPublicKey publicKey;
+
+  public RSAOAEPAsymmetricKeyWrapper(RSAPublicKey publicKey) {
+    this.publicKey = publicKey;
   }
 
-  protected AsymmetricBlockCipher createAsymmetricWrapper(ASN1ObjectIdentifier algorithm) {
-    if (!PKCSObjectIdentifiers.id_RSAES_OAEP.equals(algorithm)) {
-      throw new IllegalStateException("unsupported algorithm " + algorithm.getId());
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return OAEP_DFLT;
+  }
+
+  @Override
+  public byte[] generateWrappedKey(byte[] encryptionKey) throws OperatorException {
+    try {
+      Cipher cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", "BC");
+      cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+      return cipher.doFinal(encryptionKey);
+    } catch (Exception ex) {
+      throw new OperatorException("error in generateWrappedKey", ex);
     }
-    return new OAEPEncoding(new RSAEngine());
   }
 
 }

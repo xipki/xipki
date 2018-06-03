@@ -702,11 +702,13 @@ abstract class CmpRequestor {
       byte[] encValue = ev.getEncValue().getOctets();
       // some implementations, like BouncyCastle encapsulates the encrypted in PKCS#8
       // EncryptedPrivateKeyInfo.
-      try {
-        EncryptedPrivateKeyInfo epki = EncryptedPrivateKeyInfo.getInstance(encValue);
-        encValue = epki.getEncryptedData();
-      } catch (IllegalArgumentException ex) {
-        // do nothing, it is not an EncryptedPrivateKeyInfo.
+      if (encValue[0] == 0x30) {
+        try {
+          EncryptedPrivateKeyInfo epki = EncryptedPrivateKeyInfo.getInstance(encValue);
+          encValue = epki.getEncryptedData();
+        } catch (IllegalArgumentException ex) {
+          // do nothing, it is not an EncryptedPrivateKeyInfo.
+        }
       }
 
       Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");

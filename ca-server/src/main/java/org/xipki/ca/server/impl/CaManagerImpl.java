@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
@@ -769,7 +770,14 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     x509cas.put(caName, ca);
-    CaCmpResponderImpl caResponder = new CaCmpResponderImpl(this, caName);
+    CaCmpResponderImpl caResponder;
+    try {
+      caResponder = new CaCmpResponderImpl(this, caName);
+    } catch (NoSuchAlgorithmException ex) {
+      LogUtil.error(LOG, ex, concat("CaCmpResponderImpl.<init> (ca=", caName, ")"));
+      return false;
+    }
+
     cmpResponders.put(caName, caResponder);
 
     if (caEntry.supportsScep() && caEntry.getScepResponderName() != null) {
