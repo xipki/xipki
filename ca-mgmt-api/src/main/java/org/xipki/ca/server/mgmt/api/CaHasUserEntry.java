@@ -65,8 +65,8 @@ public class CaHasUserEntry {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "user: ", userIdent,
-        "\nprofiles: ", profiles, "\npermission: ", permission);
+    return StringUtil.concatObjectsCap(200, "user: ", userIdent, "\nprofiles: ", profiles,
+        "\npermission: ", PermissionConstants.permissionToString(permission));
   }
 
   @Override

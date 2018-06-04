@@ -27,7 +27,9 @@
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>
         <keepExpiredCertDays>-1</keepExpiredCertDays>
-        <permission>511</permission>
+        <permissions>
+          <permission>all</permission>
+        </permissions>
         <maxValidity>5y</maxValidity>
         <cmpResponderName>responder1</cmpResponderName>
         <protocolSupport>cmp,rest</protocolSupport>
@@ -67,7 +69,9 @@
         <requestor>
           <requestorName>requestor1</requestorName>
           <ra>true</ra>
-          <permission>511</permission>
+          <permissions>
+            <permission>all</permission>
+          </permissions>
           <profiles>
             <profile>all</profile>
           </profiles>

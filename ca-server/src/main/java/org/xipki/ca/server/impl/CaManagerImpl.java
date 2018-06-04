@@ -110,6 +110,7 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
@@ -128,6 +129,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.CaUrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.CaconfType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.PermissionsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfilesType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
@@ -2939,7 +2941,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
               jaxb2.setRequestorName(requestorName);
               jaxb2.setRa(m.isRa());
               jaxb2.setProfiles(createProfiles(m.getProfiles()));
-              jaxb2.setPermission(m.getPermission());
+              jaxb2.setPermissions(getPermissions(m.getPermission()));
 
               jaxb.getRequestors().getRequestor().add(jaxb2);
             }
@@ -2954,7 +2956,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
               String username = m.getUserIdent().getName();
               CaHasUserType jaxb2 = new CaHasUserType();
               jaxb2.setUserName(username);
-              jaxb2.setPermission(m.getPermission());
+              jaxb2.setPermissions(getPermissions(m.getPermission()));
               jaxb2.setProfiles(createProfiles(m.getProfiles()));
               list2.add(jaxb2);
 
@@ -3036,7 +3038,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
           ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
           ciJaxb.setNumCrls(entry.getNumCrls());
-          ciJaxb.setPermission(entry.getPermission());
+          ciJaxb.setPermissions(getPermissions(entry.getPermission()));
           ciJaxb.setSaveReq(entry.isSaveRequest());
           ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               concat("files/ca-", name, "-signerconf.conf")));
@@ -3278,4 +3280,21 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     LOG.error(msg);
     return new CaMgmtException(msg);
   }
+
+  private static PermissionsType getPermissions(int permission) {
+    List<String> list = new LinkedList<>();
+    if (PermissionConstants.ALL == permission) {
+      list.add(PermissionConstants.getTextForCode(permission));
+    } else {
+      for (Integer code : PermissionConstants.getPermissions()) {
+        if ((permission & code) != 0) {
+          list.add(PermissionConstants.getTextForCode(code));
+        }
+      }
+    }
+    PermissionsType ret = new PermissionsType();
+    ret.getPermission().addAll(list);
+    return ret;
+  }
+
 }

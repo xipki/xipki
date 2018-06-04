@@ -632,14 +632,14 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
     List<CertResponse> ret = new ArrayList<>(n);
 
     if (cmpControl.isGroupEnroll()) {
+      List<CertificateInfo> certInfos = null;
       try {
-        List<CertificateInfo> certInfos;
         if (keyUpdate) {
-          certInfos = ca.regenerateCerts(certTemplates,
-              requestor, RequestType.CMP, tid.getOctets(), msgId);
+          certInfos = ca.regenerateCerts(certTemplates, requestor, RequestType.CMP,
+              tid.getOctets(), msgId);
         } else {
-          certInfos = ca.generateCerts(certTemplates, requestor,
-              RequestType.CMP, tid.getOctets(), msgId);
+          certInfos = ca.generateCerts(certTemplates, requestor, RequestType.CMP,
+              tid.getOctets(), msgId);
         }
 
         // save the request
@@ -662,6 +662,16 @@ public class CaCmpResponderImpl extends CmpResponder implements CaCmpResponder {
           }
         }
       } catch (OperationException ex) {
+        if (certInfos != null) {
+          for (CertificateInfo certInfo : certInfos) {
+            BigInteger sn = certInfo.getCert().getCertHolder().getSerialNumber();
+            try {
+              ca.revokeCert(sn, CrlReason.CESSATION_OF_OPERATION, null, msgId);
+            } catch (OperationException ex2) {
+              LogUtil.error(LOG, ex2, "CA " + getCaName() + " could not revoke certificate " + sn);
+            }
+          }
+        }
         event.setStatus(AuditStatus.FAILED);
         ret.clear();
         for (int i = 0; i < n; i++) {

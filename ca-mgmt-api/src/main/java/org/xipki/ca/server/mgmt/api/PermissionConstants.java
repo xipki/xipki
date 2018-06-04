@@ -17,7 +17,10 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +33,7 @@ public class PermissionConstants {
 
   private static final Map<Integer, String> codeTextMap = new HashMap<>();
   private static final Map<String, Integer> textCodeMap = new HashMap<>();
+  private static final List<Integer> permissions;
 
   public static final int ENROLL_CERT = 1;
   public static final int REVOKE_CERT = 2;
@@ -59,6 +63,10 @@ public class PermissionConstants {
     for (Integer code : codeTextMap.keySet()) {
       textCodeMap.put(codeTextMap.get(code), code);
     }
+
+    List<Integer> tmpPermissions = new ArrayList<>(codeTextMap.keySet());
+    Collections.sort(tmpPermissions);
+    permissions = Collections.unmodifiableList(tmpPermissions);
   }
 
   private PermissionConstants() {
@@ -77,4 +85,26 @@ public class PermissionConstants {
     return (text == null) ? Integer.toString(code) : text;
   }
 
+  public static List<Integer> getPermissions() {
+    return permissions;
+  }
+
+  public static String permissionToString(int permission) {
+    if (ALL == permission) {
+      return getTextForCode(permission);
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (Integer code : codeTextMap.keySet()) {
+      if ((permission & code) != 0) {
+        sb.append(codeTextMap.get(code)).append("|");
+      }
+    }
+    if (sb.length() > 0) {
+      // remove the last |
+      sb.deleteCharAt(sb.length() - 1);
+    }
+
+    return sb.toString();
+  }
 }

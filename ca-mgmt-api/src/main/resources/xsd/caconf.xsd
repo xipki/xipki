@@ -189,7 +189,7 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="keepExpiredCertDays" type="xs:int" minOccurs="0"/>
-      <xs:element name="permission" type="xs:int"/>
+      <xs:element name="permissions" type="permissionsType"/>
       <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="cmpControl" type="xs:string" minOccurs="0"/>
       <xs:element name="crlControl" type="xs:string" minOccurs="0"/>
@@ -213,18 +213,23 @@
       <xs:element name="caUris" type="caUrisType" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
+  <xs:complexType name="permissionsType">
+    <xs:sequence>
+      <xs:element name="permission" type="xs:string" minOccurs="0" maxOccurs="99"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="caHasRequestorType">
     <xs:sequence>
       <xs:element name="requestorName" type="xs:string"/>
       <xs:element name="ra" type="xs:boolean"/>
-      <xs:element name="permission" type="xs:int"/>
+      <xs:element name="permissions" type="permissionsType"/>
       <xs:element name="profiles" type="profilesType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="caHasUserType">
     <xs:sequence>
       <xs:element name="userName" type="xs:string"/>
-      <xs:element name="permission" type="xs:int"/>
+      <xs:element name="permissions" type="permissionsType"/>
       <xs:element name="profiles" type="profilesType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>

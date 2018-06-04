@@ -59,6 +59,7 @@ import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
+import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.ProtocolSupport;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
@@ -76,6 +77,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.NameValueType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ObjectFactory;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.PermissionsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
@@ -382,7 +384,7 @@ public class CaConf {
           caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
           caEntry.setMaxValidity(CertValidity.getInstance(ci.getMaxValidity()));
-          caEntry.setPermission(ci.getPermission());
+          caEntry.setPermission(getIntPermission(ci.getPermissions()));
 
           if (ci.getProtocolSupport() != null) {
             caEntry.setProtocolSupport(new ProtocolSupport(ci.getProtocolSupport()));
@@ -437,7 +439,7 @@ public class CaConf {
               en.setProfiles(new HashSet<>(req.getProfiles().getProfile()));
             }
 
-            en.setPermission(req.getPermission());
+            en.setPermission(getIntPermission(req.getPermissions()));
             caHasRequestors.add(en);
           }
         }
@@ -447,7 +449,7 @@ public class CaConf {
           caHasUsers = new LinkedList<>();
           for (CaHasUserType req : m.getUsers().getUser()) {
             CaHasUserEntry en = new CaHasUserEntry(new NameId(null, req.getUserName()));
-            en.setPermission(req.getPermission());
+            en.setPermission(getIntPermission(req.getPermissions()));
             if (req.getProfiles() != null && !req.getProfiles().getProfile().isEmpty()) {
               en.setProfiles(new HashSet<>(req.getProfiles().getProfile()));
             }
@@ -645,6 +647,18 @@ public class CaConf {
   private String resolveFilePath(String filePath) {
     File file = new File(filePath);
     return file.isAbsolute() ? filePath : new File(baseDir, filePath).getPath();
+  }
+
+  private static int getIntPermission(PermissionsType type) throws InvalidConfException {
+    int ret = 0;
+    for (String permission : type.getPermission()) {
+      Integer ii = PermissionConstants.getPermissionForText(permission);
+      if (ii == null) {
+        throw new InvalidConfException("invalid permission " + type);
+      }
+      ret |= ii;
+    }
+    return ret;
   }
 
 }
