@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.common.util;
+package org.xipki.common.qa;
 
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
+
+import org.xipki.common.util.ParamUtil;
 
 /**
  * TODO.

@@ -48,7 +48,6 @@ import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
-import org.xipki.common.util.BigIntegerRange;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
@@ -67,6 +66,27 @@ import org.xipki.shell.IllegalCmdParamException;
  */
 
 public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
+
+  private static class BigIntegerRange {
+    private final BigInteger from;
+    private final BigInteger to;
+    private final BigInteger diff;
+
+    BigIntegerRange(BigInteger from, BigInteger to) {
+      if (from.compareTo(to) > 0) {
+        throw new IllegalArgumentException(
+            "from (" + from + ") must not be larger than to (" + to + ")");
+      }
+      this.from = from;
+      this.to = to;
+      this.diff = to.subtract(from);
+    }
+
+    boolean isInRange(BigInteger num) {
+      return num.compareTo(from) >= 0 && num.compareTo(to) <= 0;
+    }
+
+  }
 
   protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP
       = new HashMap<>();
@@ -230,11 +250,11 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
           sns.add(from);
         } else {
           BigIntegerRange range = new BigIntegerRange(from, to);
-          if (range.getDiff().compareTo(BigInteger.valueOf(10)) > 0) {
+          if (range.diff.compareTo(BigInteger.valueOf(10)) > 0) {
             throw new IllegalCmdParamException("to many serial numbers");
           }
 
-          BigInteger sn = range.getFrom();
+          BigInteger sn = range.from;
           while (range.isInRange(sn)) {
             sns.add(sn);
             sn = sn.add(BigInteger.ONE);

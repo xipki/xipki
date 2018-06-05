@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.common;
+package org.xipki.ocsp.api;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

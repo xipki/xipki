@@ -22,9 +22,9 @@ import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;

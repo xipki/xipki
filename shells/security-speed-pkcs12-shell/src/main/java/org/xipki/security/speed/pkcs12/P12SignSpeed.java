@@ -25,8 +25,8 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;

@@ -33,7 +33,6 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.impl.store.CertStore;
-import org.xipki.common.EndOfQueue;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.QueueEntry;
 import org.xipki.common.util.LogUtil;
@@ -89,7 +88,7 @@ class CertRepublisher {
           startId = maxId + 1;
         } while (serials.size() >= numEntries && !failed && !stopMe.get());
 
-        queue.put(EndOfQueue.INSTANCE);
+        queue.put(QueueEntry.END_OF_QUEUE);
       } catch (OperationException ex) {
         LogUtil.error(LOG, ex, "error in RepublishProducer");
         failed = true;
@@ -98,9 +97,9 @@ class CertRepublisher {
         failed = true;
       }
 
-      if (!queue.contains(EndOfQueue.INSTANCE)) {
+      if (!queue.contains(QueueEntry.END_OF_QUEUE)) {
         try {
-          queue.put(EndOfQueue.INSTANCE);
+          queue.put(QueueEntry.END_OF_QUEUE);
         } catch (InterruptedException ex) {
           LogUtil.error(LOG, ex, "error in RepublishProducer");
           failed = true;
@@ -128,7 +127,7 @@ class CertRepublisher {
           break;
         }
 
-        if (entry instanceof EndOfQueue) {
+        if (entry instanceof QueueEntry.EndOfQueue) {
           // re-add it to queue so that other consumers know it
           try {
             queue.put(entry);

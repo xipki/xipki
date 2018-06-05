@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.naming.spi.ObjectFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -54,9 +55,8 @@ import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.ca.client.benchmark.shell.jaxb.EnrollCertType;
 import org.xipki.ca.client.benchmark.shell.jaxb.EnrollTemplateType;
-import org.xipki.ca.client.benchmark.shell.jaxb.ObjectFactory;
-import org.xipki.common.BenchmarkExecutor;
 import org.xipki.common.InvalidConfException;
+import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xml.sax.SAXException;

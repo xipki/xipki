@@ -19,7 +19,7 @@ package org.xipki.ocsp.server.impl.type;
 
 import java.math.BigInteger;
 
-import org.xipki.common.ASN1Type;
+import org.xipki.ocsp.api.ASN1Type;
 import org.xipki.ocsp.api.RequestIssuer;
 
 /**

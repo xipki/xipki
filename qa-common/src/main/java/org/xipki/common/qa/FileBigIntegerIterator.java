@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.common.util;
+package org.xipki.common.qa;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.xipki.common.util.ParamUtil;
 
 /**
  * TODO.

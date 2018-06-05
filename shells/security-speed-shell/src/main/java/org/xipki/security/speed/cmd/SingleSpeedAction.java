@@ -18,7 +18,7 @@
 package org.xipki.security.speed.cmd;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.common.BenchmarkExecutor;
+import org.xipki.common.qa.BenchmarkExecutor;
 
 /**
  * TODO.

@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.DbToolBase;
-import org.xipki.common.EndOfQueue;
 import org.xipki.common.QueueEntry;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
@@ -175,7 +174,7 @@ class RefDigestReader {
 
       if (result.getEntries().isEmpty()) {
         endReached = true;
-        outQueue.put(EndOfQueue.INSTANCE);
+        outQueue.put(QueueEntry.END_OF_QUEUE);
       } else {
         outQueue.put(result);
       }
@@ -325,7 +324,7 @@ class RefDigestReader {
       next = outQueue.poll(1, TimeUnit.SECONDS);
     }
 
-    if (next instanceof EndOfQueue) {
+    if (next instanceof QueueEntry.EndOfQueue) {
       endReached.set(true);
       return null;
     } else if (!(next instanceof DigestEntrySet)) {

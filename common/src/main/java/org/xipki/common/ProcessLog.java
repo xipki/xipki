@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.xipki.common.qa.MeasurePoint;
 import org.xipki.common.util.StringUtil;
 
 /**

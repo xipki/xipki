@@ -39,7 +39,7 @@ import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.common.BenchmarkExecutor;
+import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.common.util.ParamUtil;
 
 /**

@@ -72,6 +72,7 @@
     <module>scep-server-emulator</module>
     <!-- Base components -->
     <module>common</module>
+    <module>qa-common</module>
     <module>cmp</module>
     <module>audit</module>
     <module>audit-syslog</module>

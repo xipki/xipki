@@ -19,7 +19,7 @@ package org.xipki.ocsp.server.impl.type;
 
 import java.util.List;
 
-import org.xipki.common.ASN1Type;
+import org.xipki.ocsp.api.ASN1Type;
 
 /**
  * TODO.

@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.xipki.common.ASN1Type;
 import org.xipki.common.util.Hex;
+import org.xipki.ocsp.api.ASN1Type;
 import org.xipki.ocsp.server.impl.type.CertID;
 import org.xipki.ocsp.server.impl.type.Extensions;
 import org.xipki.ocsp.server.impl.type.ResponderID;

@@ -23,8 +23,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.common.ASN1Type;
 import org.xipki.common.util.CompareUtil;
+import org.xipki.ocsp.api.ASN1Type;
 import org.xipki.security.ObjectIdentifiers;
 
 /**

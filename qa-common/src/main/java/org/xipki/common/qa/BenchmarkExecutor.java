@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.common;
+package org.xipki.common.qa;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 

@@ -19,6 +19,7 @@
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-security" version="${project.version}" description="security">
     <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/qa-common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>

@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import org.xipki.common.ASN1Type;
+import org.xipki.ocsp.api.ASN1Type;
 
 /**
  * TODO.

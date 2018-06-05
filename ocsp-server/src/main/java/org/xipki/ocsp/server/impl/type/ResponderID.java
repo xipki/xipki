@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.common.ASN1Type;
+import org.xipki.ocsp.api.ASN1Type;
 
 /**
  * TODO.

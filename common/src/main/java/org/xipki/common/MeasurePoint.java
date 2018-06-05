@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.common.qa;
+package org.xipki.common;
 
 /**
  * TODO.

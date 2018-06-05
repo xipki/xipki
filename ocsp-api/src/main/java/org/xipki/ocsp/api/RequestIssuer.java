@@ -20,7 +20,6 @@ package org.xipki.ocsp.api;
 import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.ASN1Type;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.security.HashAlgo;

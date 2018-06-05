@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
-import org.xipki.common.ASN1Type;
+import org.xipki.ocsp.api.ASN1Type;
 import org.xipki.ocsp.server.impl.type.ExtendedExtension;
 import org.xipki.ocsp.server.impl.type.Extension;
 import org.xipki.ocsp.server.impl.type.OID;

@@ -24,4 +24,14 @@ package org.xipki.common;
  */
 
 public interface QueueEntry {
+
+  public static final EndOfQueue END_OF_QUEUE = new EndOfQueue();
+
+  public static class EndOfQueue implements QueueEntry {
+
+    private EndOfQueue() {
+    }
+
+  }
+
 }

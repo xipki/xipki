@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.BenchmarkExecutor;
+import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.common.util.LogUtil;
 import org.xipki.security.util.AlgorithmUtil;
 

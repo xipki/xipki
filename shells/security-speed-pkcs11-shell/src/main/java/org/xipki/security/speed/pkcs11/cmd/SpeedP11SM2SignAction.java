@@ -19,7 +19,7 @@ package org.xipki.security.speed.pkcs11.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.BenchmarkExecutor;
+import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.speed.pkcs11.P11SM2SignSpeed;
 
 /**
