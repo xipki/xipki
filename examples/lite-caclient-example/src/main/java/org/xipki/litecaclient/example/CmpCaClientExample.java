@@ -46,15 +46,13 @@ public class CmpCaClientExample extends CaClientExample {
   private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-pki/target/"
       + "xipki-pki-4.0.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
 
-  private static final String KEYCERT_DIR =  "../tlskeys-example/src/main/resources";
+  private static final String KEYCERT_DIR =  "target/tlskeys";
 
-  private static final String REQUESTOR_KEYSTORE_FILE =
-      KEYCERT_DIR + "/tls-client.p12";
+  private static final String REQUESTOR_KEYSTORE_FILE = KEYCERT_DIR + "/tls-client.p12";
 
   private static final String REQUESTOR_KEYSTORE_PASSWORD = "1234";
 
-  private static final String RESPONDER_CERT_FILE =
-      KEYCERT_DIR + "/tls-server.der";
+  private static final String RESPONDER_CERT_FILE = KEYCERT_DIR + "/tls-server.der";
 
   private static final String HASH_ALGO = "SHA256";
 

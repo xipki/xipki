@@ -41,4 +41,34 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!--  include additional artifacts -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Extract the TLS keys -->
+            <id>unpack-tlskeys</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/tlskeys</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.tools</groupId>
+                  <artifactId>tlskeys-example</artifactId>
+                  <version>${xipki.tools.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
