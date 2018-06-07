@@ -59,7 +59,6 @@ import org.xipki.common.util.Base64;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.dbtool.InvalidInputException;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -93,7 +92,7 @@ class CaconfDbImporter extends DbPorter {
     }
 
     if (caconf.getVersion() > VERSION) {
-      throw new InvalidInputException("could not import CA configuration greater than "
+      throw new Exception("could not import CA configuration greater than "
           + VERSION + ": " + caconf.getVersion());
     }
 

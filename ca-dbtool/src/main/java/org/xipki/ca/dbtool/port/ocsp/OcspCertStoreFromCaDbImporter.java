@@ -63,7 +63,6 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.dbtool.InvalidInputException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
@@ -100,11 +99,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
     if (resume) {
       if (!processLogFile.exists()) {
-        throw new InvalidInputException("could not process with '--resume' option");
+        throw new Exception("could not process with '--resume' option");
       }
     } else {
       if (processLogFile.exists()) {
-        throw new InvalidInputException("please either specify '--resume' or delete the file "
+        throw new Exception("please either specify '--resume' or delete the file "
             + processLogFile.getPath() + " first");
       }
     }
@@ -123,7 +122,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
 
     if (certstore.getVersion() > VERSION) {
-      throw new InvalidInputException("could not import CertStore greater than " + VERSION + ": "
+      throw new Exception("could not import CertStore greater than " + VERSION + ": "
           + certstore.getVersion());
     }
 
@@ -138,7 +137,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
 
     if (caconf.getVersion() > VERSION) {
-      throw new InvalidInputException("could not import CA Configuration greater than "
+      throw new Exception("could not import CA Configuration greater than "
           + VERSION + ": " + certstore.getVersion());
     }
 
@@ -157,12 +156,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       }
 
       if (publisherType == null) {
-        throw new InvalidInputException("unknown publisher " + publisherName);
+        throw new Exception("unknown publisher " + publisherName);
       }
 
       String type = publisherType.getType();
       if (!"ocsp".equalsIgnoreCase(type)) {
-        throw new InvalidInputException("Unkwown publisher type " + type);
+        throw new Exception("Unkwown publisher type " + type);
       }
 
       ConfPairs confPairs = new ConfPairs(value(publisherType.getConf()));

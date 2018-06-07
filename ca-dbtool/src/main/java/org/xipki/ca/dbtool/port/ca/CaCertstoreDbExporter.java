@@ -69,7 +69,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.dbtool.InvalidInputException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 
@@ -127,7 +126,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
       certstore = root.getValue();
       if (certstore.getVersion() > VERSION) {
-        throw new InvalidInputException("could not continue with CertStore greater than "
+        throw new Exception("could not continue with CertStore greater than "
             + VERSION + ": " + certstore.getVersion());
       }
     } else {
