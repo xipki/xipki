@@ -17,11 +17,12 @@
 
 package org.xipki.shell.completer;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.ObjectIdentifiers;
 
 /**
  * TODO.
@@ -32,18 +33,34 @@ import org.xipki.security.ObjectIdentifiers;
 @Service
 public class ExtKeyusageCompleter extends AbstractEnumCompleter {
 
-  public ExtKeyusageCompleter() {
-    List<String> enums = Arrays.asList(
-        ObjectIdentifiers.id_kp_clientAuth.getId(),
-        ObjectIdentifiers.id_kp_codeSigning.getId(),
-        ObjectIdentifiers.id_kp_emailProtection.getId(),
-        ObjectIdentifiers.id_kp_ipsecEndSystem.getId(),
-        ObjectIdentifiers.id_kp_ipsecTunnel.getId(),
-        ObjectIdentifiers.id_kp_OCSPSigning.getId(),
-        ObjectIdentifiers.id_kp_serverAuth.getId(),
-        ObjectIdentifiers.id_kp_timeStamping.getId());
+  private static final Map<String, String> nameToIdMap = new HashMap<>();
 
-    setTokens(enums);
+  private static final Set<String> tokens;
+
+  static {
+    Map<String, String> map = new HashMap<>();
+    map.put("serverAuth",      "1.3.6.1.5.5.7.3.1");
+    map.put("clientAuth",      "1.3.6.1.5.5.7.3.2");
+    map.put("codeSigning",     "1.3.6.1.5.5.7.3.3");
+    map.put("emailProtection", "1.3.6.1.5.5.7.3.4");
+    map.put("ipsecEndSystem",  "1.3.6.1.5.5.7.3.5");
+    map.put("ipsecTunnel",     "1.3.6.1.5.5.7.3.6");
+    map.put("timeStamping",    "1.3.6.1.5.5.7.3.8");
+    map.put("OCSPSigning",     "1.3.6.1.5.5.7.3.9");
+
+    tokens = new HashSet<>(map.keySet());
+
+    for (String name : map.keySet()) {
+      nameToIdMap.put(name.toLowerCase(), map.get(name));
+    }
+  }
+
+  public static String getIdForUsageName(String name) {
+    return nameToIdMap.get(name.toLowerCase());
+  }
+
+  public ExtKeyusageCompleter() {
+    setTokens(tokens);
   }
 
 }

@@ -17,14 +17,12 @@
 
 package org.xipki.shell.completer;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.common.util.StringUtil;
-import org.xipki.security.ObjectIdentifiers;
 
 /**
  * TODO.
@@ -35,52 +33,59 @@ import org.xipki.security.ObjectIdentifiers;
 @Service
 public class ExtensionNameCompleter extends AbstractEnumCompleter {
 
-  public ExtensionNameCompleter() {
-    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-    oids.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
-    oids.add(ObjectIdentifiers.id_extension_admission);
-    oids.add(Extension.auditIdentity);
-    oids.add(Extension.authorityInfoAccess);
-    oids.add(Extension.authorityKeyIdentifier);
-    oids.add(Extension.basicConstraints);
-    oids.add(Extension.biometricInfo);
-    oids.add(Extension.certificateIssuer);
-    oids.add(Extension.certificatePolicies);
-    oids.add(Extension.cRLDistributionPoints);
-    oids.add(Extension.cRLNumber);
-    oids.add(Extension.deltaCRLIndicator);
-    oids.add(Extension.extendedKeyUsage);
-    oids.add(Extension.freshestCRL);
-    oids.add(Extension.inhibitAnyPolicy);
-    oids.add(Extension.instructionCode);
-    oids.add(Extension.invalidityDate);
-    oids.add(Extension.issuerAlternativeName);
-    oids.add(Extension.issuingDistributionPoint);
-    oids.add(Extension.keyUsage);
-    oids.add(Extension.logoType);
-    oids.add(Extension.nameConstraints);
-    oids.add(Extension.noRevAvail);
-    oids.add(Extension.policyConstraints);
-    oids.add(Extension.policyMappings);
-    oids.add(Extension.privateKeyUsagePeriod);
-    oids.add(Extension.qCStatements);
-    oids.add(Extension.reasonCode);
-    oids.add(Extension.subjectAlternativeName);
-    oids.add(Extension.subjectDirectoryAttributes);
-    oids.add(Extension.subjectInfoAccess);
-    oids.add(Extension.subjectKeyIdentifier);
-    oids.add(Extension.targetInformation);
-    oids.add(ObjectIdentifiers.id_pe_tlsfeature);
+  private static final Map<String, String> nameToIdMap = new HashMap<>();
 
-    List<String> enums = new LinkedList<>();
-    for (ASN1ObjectIdentifier oid : oids) {
-      String name = ObjectIdentifiers.getName(oid);
-      if (StringUtil.isBlank(name)) {
-        name = oid.getId();
-      }
-      enums.add(name);
+  private static final Set<String> tokens;
+
+  static {
+    Map<String, String> map = new HashMap<>();
+    map.put("admission", "1.3.36.8.3.3");
+    map.put("auditIdentity", "1.3.6.1.5.5.7.1.4");
+    map.put("authorityInfoAccess", "1.3.6.1.5.5.7.1.1");
+    map.put("authorityKeyIdentifier", "2.5.29.35");
+    map.put("basicConstraints", "2.5.29.19");
+    map.put("biometricInfo", "1.3.6.1.5.5.7.1.2");
+    map.put("cRLDistributionPoints", "2.5.29.31");
+    map.put("cRLNumber", "2.5.29.20");
+    map.put("certificateIssuer", "2.5.29.29");
+    map.put("certificatePolicies", "2.5.29.32");
+    map.put("deltaCRLIndicator", "2.5.29.27");
+    map.put("extendedKeyUsage", "2.5.29.37");
+    map.put("freshestCRL", "2.5.29.46");
+    map.put("inhibitAnyPolicy", "2.5.29.54");
+    map.put("instructionCode", "2.5.29.23");
+    map.put("invalidityDate", "2.5.29.24");
+    map.put("issuerAlternativeName", "2.5.29.18");
+    map.put("issuingDistributionPoint", "2.5.29.28");
+    map.put("keyUsage", "2.5.29.15");
+    map.put("logoType", "1.3.6.1.5.5.7.1.12");
+    map.put("nameConstraints", "2.5.29.30");
+    map.put("noRevAvail", "2.5.29.56");
+    map.put("ocspNocheck", "1.3.6.1.5.5.7.48.1.5");
+    map.put("policyConstraints", "2.5.29.36");
+    map.put("policyMappings", "2.5.29.33");
+    map.put("privateKeyUsagePeriod", "2.5.29.16");
+    map.put("qCStatements", "1.3.6.1.5.5.7.1.3");
+    map.put("reasonCode", "2.5.29.21");
+    map.put("subjectAlternativeName", "2.5.29.17");
+    map.put("subjectDirectoryAttributes", "2.5.29.9");
+    map.put("subjectInfoAccess", "1.3.6.1.5.5.7.1.11");
+    map.put("subjectKeyIdentifier", "2.5.29.14");
+    map.put("targetInformation", "2.5.29.55");
+    map.put("tlsfeature", "1.3.6.1.5.5.7.1.24");
+
+    tokens = new HashSet<>(map.keySet());
+    for (String name : map.keySet()) {
+      nameToIdMap.put(name.toLowerCase(), map.get(name));
     }
-    setTokens(enums);
+  }
+
+  public ExtensionNameCompleter() {
+    setTokens(tokens);
+  }
+
+  public static String getIdForExtensionName(String name) {
+    return nameToIdMap.get(name.toLowerCase());
   }
 
 }

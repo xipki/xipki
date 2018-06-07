@@ -36,7 +36,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>security</artifactId>
+      <artifactId>password</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

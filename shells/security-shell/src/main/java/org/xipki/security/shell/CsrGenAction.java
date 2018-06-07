@@ -73,6 +73,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.ExtKeyusageCompleter;
 import org.xipki.shell.completer.ExtensionNameCompleter;
 import org.xipki.shell.completer.HashAlgCompleter;
@@ -124,7 +125,8 @@ public abstract class CsrGenAction extends SecurityAction {
   @Completion(KeyusageCompleter.class)
   private List<String> keyusages;
 
-  @Option(name = "--ext-keyusage", multiValued = true, description = "extended keyusage")
+  @Option(name = "--ext-keyusage", multiValued = true,
+      description = "extended keyusage (name or OID")
   @Completion(ExtKeyusageCompleter.class)
   private List<String> extkeyusages;
 
@@ -147,12 +149,13 @@ public abstract class CsrGenAction extends SecurityAction {
   private String biometricUri;
 
   @Option(name = "--need-extension", multiValued = true,
-      description = "types of extension that must be contained in the certificate")
+      description = "types (name or OID) of extension that must be contained in the certificate")
   @Completion(ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
   @Option(name = "--want-extension", multiValued = true,
-      description = "types of extension that should be contained in the certificate if possible")
+      description = "types (name or OID) of extension that should be contained in the certificate "
+                    + "if possible")
   @Completion(ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 
@@ -172,12 +175,32 @@ public abstract class CsrGenAction extends SecurityAction {
       hashAlgo = hashAlgo.replaceAll("-", "");
     }
 
-    if (needExtensionTypes == null) {
+    if (needExtensionTypes != null) {
+      needExtensionTypes = resolveExtensionTypes(needExtensionTypes);
+    } else {
       needExtensionTypes = new LinkedList<>();
     }
 
-    if (wantExtensionTypes == null) {
+    if (wantExtensionTypes != null) {
+      wantExtensionTypes = resolveExtensionTypes(wantExtensionTypes);
+    } else {
       wantExtensionTypes = new LinkedList<>();
+    }
+
+    if (extkeyusages != null) {
+      List<String> list = new ArrayList<>(extkeyusages.size());
+      for (String m : extkeyusages) {
+        String id = ExtKeyusageCompleter.getIdForUsageName(m);
+        if (id == null) {
+          try {
+            id = new ASN1ObjectIdentifier(m).getId();
+          } catch (Exception ex) {
+            throw new IllegalCmdParamException("invalid extended key usage " + m);
+          }
+        }
+      }
+
+      extkeyusages = list;
     }
 
     // SubjectAltNames
@@ -372,36 +395,12 @@ public abstract class CsrGenAction extends SecurityAction {
         continue;
       }
 
-      ASN1ObjectIdentifier oid = toOid(oidText);
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(oidText);
       if (!ret.contains(oid)) {
         ret.add(oid);
       }
     }
     return ret;
-  }
-
-  private static ASN1ObjectIdentifier toOid(String str) throws InvalidOidOrNameException {
-    final int n = str.length();
-    boolean isName = false;
-    for (int i = 0; i < n; i++) {
-      char ch = str.charAt(i);
-      if (!((ch >= '0' && ch <= '1') || ch == '.')) {
-        isName = true;
-      }
-    }
-
-    if (!isName) {
-      try {
-        return new ASN1ObjectIdentifier(str);
-      } catch (IllegalArgumentException ex) { // CHECKSTYLE:SKIP
-      }
-    }
-
-    ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(str);
-    if (oid == null) {
-      throw new InvalidOidOrNameException(str);
-    }
-    return oid;
   }
 
   private PKCS10CertificationRequest generateRequest(ConcurrentContentSigner signer,
@@ -431,4 +430,20 @@ public abstract class CsrGenAction extends SecurityAction {
       signer.requiteSigner(signer0);
     }
   }
+
+  private List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
+    List<String> list = new ArrayList<>(types.size());
+    for (String m : types) {
+      String id = ExtensionNameCompleter.getIdForExtensionName(m);
+      if (id == null) {
+        try {
+          id = new ASN1ObjectIdentifier(m).getId();
+        } catch (Exception ex) {
+          throw new IllegalCmdParamException("invalid extension type " + m);
+        }
+      }
+    }
+    return list;
+  }
+
 }

@@ -17,11 +17,9 @@
 
 package org.xipki.shell.completer;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.KeyUsage;
 
 /**
  * TODO.
@@ -33,11 +31,9 @@ import org.xipki.security.KeyUsage;
 public class KeyusageCompleter extends AbstractEnumCompleter {
 
   public KeyusageCompleter() {
-    List<String> enums = new LinkedList<>();
-    for (KeyUsage usage : KeyUsage.values()) {
-      enums.add(usage.getName());
-    }
-    setTokens(enums);
+    setTokens(Arrays.asList("digitalSignature", "contentCommitment", "keyEncipherment",
+        "dataEncipherment", "keyAgreement", "keyCertSign", "cRLSign", "encipherOnly",
+        "decipherOnly"));
   }
 
 }

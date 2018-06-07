@@ -17,11 +17,9 @@
 
 package org.xipki.shell.completer;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.CrlReason;
 
 /**
  * TODO.
@@ -33,11 +31,8 @@ import org.xipki.security.CrlReason;
 public class ClientCrlReasonCompleter extends AbstractEnumCompleter {
 
   public ClientCrlReasonCompleter() {
-    List<String> enums = new LinkedList<>();
-    for (CrlReason reason : CrlReason.PERMITTED_CLIENT_CRLREASONS) {
-      enums.add(reason.getDescription());
-    }
-    setTokens(enums);
+    setTokens(Arrays.asList("unspecified", "keyCompromise", "affiliationChanged", "superseded",
+        "cessationOfOperation", "certificateHold", "privilegeWithdrawn"));
   }
 
 }
