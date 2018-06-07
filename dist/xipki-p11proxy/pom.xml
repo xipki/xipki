@@ -142,9 +142,9 @@
               <outputDirectory>${output.directory}/xipki/security/tlskeys</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.examples</groupId>
+                  <groupId>org.xipki.tools</groupId>
                   <artifactId>tlskeys-example</artifactId>
-                  <version>${project.version}</version>
+                  <version>${xipki.tools.version}</version>
                   <type>zip</type>
                   <includes>tls-server.p12,tls-ca-cert.p12</includes>
                 </artifactItem>
