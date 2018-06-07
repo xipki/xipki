@@ -564,8 +564,10 @@ class IaikP11Slot extends AbstractP11Slot {
 
     try {
       session.login(userType, tmpPin);
+      LOG.info("login successful as user " + userType);
     } catch (TokenException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      LOG.info("login failed as user " + userType);
+      throw new P11TokenException("login failed as user " + userType + ": " + ex.getMessage(), ex);
     }
   }
 
@@ -644,7 +646,7 @@ class IaikP11Slot extends AbstractP11Slot {
     return (Key) tmpObjects.get(0);
   }
 
-  private static boolean checkSessionLoggedIn(Session session) throws P11TokenException {
+  private boolean checkSessionLoggedIn(Session session) throws P11TokenException {
     SessionInfo info;
     try {
       info = session.getSessionInfo();
@@ -659,11 +661,19 @@ class IaikP11Slot extends AbstractP11Slot {
     long deviceError = info.getDeviceError();
 
     LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
+    if (deviceError != 0) {
+      LOG.error("deviceError {}", deviceError);
+      return false;
+    }
 
-    boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
-    boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
+    boolean sessionLoggedIn;
+    if (userType == PKCS11Constants.CKU_SO) {
+      sessionLoggedIn = state.equals(State.RW_SO_FUNCTIONS);
+    } else {
+      sessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS)
+          || state.equals(State.RW_USER_FUNCTIONS);
+    }
 
-    boolean sessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn) && deviceError == 0);
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
     return sessionLoggedIn;
   }
