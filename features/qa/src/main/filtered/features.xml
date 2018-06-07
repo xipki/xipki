@@ -75,7 +75,8 @@
     <bundle start-level="70">mvn:org.xipki/pkcs11-proxy/${project.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" version="${project.version}" description="shall base">
-    <feature>xipki-security</feature>
+    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.shells/shell-base/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" description="datasource">
@@ -108,6 +109,7 @@
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" description="CA security shell">
     <feature>xipki-shell-base</feature>
+    <feature>xipki-security</feature>
     <bundle start-level="80">mvn:org.xipki.shells/security-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
@@ -126,6 +128,7 @@
   <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
     <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
+    <feature>xipki-security</feature>
     <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/dbtool/${project.version}</bundle>

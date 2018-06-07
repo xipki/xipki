@@ -48,6 +48,7 @@
   </prerequisites>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <xipki.tools.version>1.0.0-SNAPSHOT</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.compile.version>4.1.5</karaf.compile.version>
     <karaf.version>4.2.0</karaf.version>
@@ -65,7 +66,6 @@
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
   <modules>
-    <module>patch-karaf</module>
     <!-- SCEP -->
     <module>scep-common</module>
     <module>scep-client</module>
@@ -212,6 +212,13 @@
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.8</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.xipki.tools</groupId>
+              <artifactId>patch-karaf</artifactId>
+              <version>${xipki.tools.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
@@ -457,6 +464,19 @@
                         <versionRange>[1.0.0,)</versionRange>
                         <goals>
                           <goal>enforce</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <versionRange>[3.0.0,)</versionRange>
+                        <goals>
+                          <goal>unpack</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>

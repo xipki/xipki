@@ -187,13 +187,6 @@
             </goals>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.xipki</groupId>
-            <artifactId>patch-karaf</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
