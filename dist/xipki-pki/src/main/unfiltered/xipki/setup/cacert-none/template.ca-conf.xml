@@ -100,7 +100,7 @@
         <cert>
           <file>xipki/setup/keycerts/myca1.der</file>
         </cert>
-        <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</cmpControl>
+        <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2</cmpControl>
          <!-- create CRL at 02:00 UTC, one per day, with overlapping time 90 minutes -->
         <crlControl>update.mode=interval,fullcrl.intervals=1,overlap.minutes=90,interval.time=02:00</crlControl>
         <duplicateKey>true</duplicateKey>

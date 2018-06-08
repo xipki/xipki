@@ -239,6 +239,9 @@ public final class HttpServers {
         throw new RuntimeException("should not reach here, unknown SssProvider " + sslProvider);
     }
 
+    LOG.debug("available SSL protocols {}", availableProtocols);
+    LOG.debug("available SSL cipher suites {}", availableCiphersuits);
+
     // protocols
     List<String> protocols;
     if (tt.getProtocols() != null) {

@@ -235,6 +235,7 @@
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>
                   <artifactId>tlskeys-example</artifactId>
+                  <classifier>rsa</classifier>
                   <version>${xipki.tools.version}</version>
                   <type>zip</type>
                   <includes>tls-ca*,tls-server*,tls-client.der</includes>
@@ -255,6 +256,7 @@
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>
                   <artifactId>tlskeys-example</artifactId>
+                  <classifier>rsa</classifier>
                   <version>${xipki.tools.version}</version>
                   <type>zip</type>
                   <includes>tls-client*</includes>

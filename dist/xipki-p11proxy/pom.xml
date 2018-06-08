@@ -144,6 +144,7 @@
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>
                   <artifactId>tlskeys-example</artifactId>
+                  <classifier>rsa</classifier>
                   <version>${xipki.tools.version}</version>
                   <type>zip</type>
                   <includes>tls-server.p12,tls-ca-cert.p12</includes>
