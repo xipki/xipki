@@ -17,6 +17,7 @@
 
 package org.xipki.litecaclient.example;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -47,6 +48,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.xipki.litecaclient.KeyAndCert;
 
 /**
  * TODO.
@@ -174,6 +176,14 @@ public class CaClientExample {
 
     ContentSigner signer = buildSigner(keypair.privateKey, "SHA256");
     return csrBuilder.build(signer).toASN1Structure();
+  }
+
+  protected static void printKeyAndCert(String prefix, KeyAndCert keyAndCert)
+      throws CertificateEncodingException, IOException {
+    printCert(prefix, keyAndCert.getCert());
+    System.out.println("-----BEGIN PRIVATE KEY-----");
+    System.out.println(Base64.encodeToString(keyAndCert.getKey().getEncoded(), true));
+    System.out.println("-----END PRIVATE KEY-----");
   }
 
   protected static void printCert(String prefix, X509Certificate cert)

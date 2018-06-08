@@ -61,6 +61,7 @@
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>
                   <artifactId>tlskeys-example</artifactId>
+                  <classifier>rsa</classifier>
                   <version>${xipki.tools.version}</version>
                   <type>zip</type>
                 </artifactItem>

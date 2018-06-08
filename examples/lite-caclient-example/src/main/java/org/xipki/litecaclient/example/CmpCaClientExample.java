@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
@@ -29,7 +30,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.litecaclient.CmpCaClient;
+import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.SdkUtil;
 
 /**
@@ -56,12 +59,19 @@ public class CmpCaClientExample extends CaClientExample {
 
   private static final String HASH_ALGO = "SHA256";
 
-  private static final String CERT_PROFILE = "TLS";
+  private static final String CERT_PROFILE = "tls";
 
   private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
 
   public static void main(String[] args) {
     //System.setProperty("javax.net.debug", "all");
+
+    if (!new File(KEYCERT_DIR).exists()) {
+      System.err.println("Please call \"mvn generate-resources\" first.");
+      return;
+    }
+
+    Security.addProvider(new BouncyCastleProvider());
 
     try {
       KeyStore ks = KeyStore.getInstance("PKCS12");
@@ -102,6 +112,23 @@ public class CmpCaClientExample extends CaClientExample {
       // retrieve CA certificate
       printCert("===== CA Certificate =====", client.getCaCert());
 
+      // Enroll certificate via CRMF - RSA (CA generate keypair)
+      KeyAndCert keyAndCert = client.requestCertViaCrmf(CERT_PROFILE,"rsa:2048", getSubject());
+      printKeyAndCert("===== RSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
+
+      // Enroll certificate via CRMF - EC (CA generate keypair)
+      KeyAndCert[] keyAndCerts =
+          client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
+          new String[] {"ec:secp256r1", "ec:secp256r1"},
+          new String[]{getSubject(), getSubject()});
+      for (int i = 0; i < keyAndCerts.length; i++) {
+        printKeyAndCert("===== EC via CRMF (CMP, CA generate keypair) =====", keyAndCerts[i]);
+      }
+
+      // Enroll certificate via CRMF - DSA (CA generate keypair)
+      keyAndCert = client.requestCertViaCrmf(CERT_PROFILE, "dsa:2048", getSubject());
+      printKeyAndCert("===== DSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
+
       // Enroll certificate via CSR - RSA
       MyKeypair kp = generateRsaKeypair();
       CertificationRequest csr = genCsr(kp, getSubject());
@@ -136,7 +163,6 @@ public class CmpCaClientExample extends CaClientExample {
         printCert("===== EC via CRMF (CMP) =====", certs[i]);
       }
 
-      System.exit(0);
       // Enroll certificate via CRMF - DSA
       kp = generateDsaKeypair();
       cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());

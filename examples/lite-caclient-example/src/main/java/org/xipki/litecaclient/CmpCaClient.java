@@ -23,19 +23,31 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
@@ -43,8 +55,10 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
@@ -69,12 +83,16 @@ import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
+import org.bouncycastle.asn1.crmf.EncryptedValue;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -88,10 +106,22 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.bouncycastle.cms.CMSAlgorithm;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.engines.IESEngine;
+import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.util.DigestFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.IESCipher;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.jce.spec.IESParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
@@ -127,6 +157,8 @@ public class CmpCaClient {
 
   private final ContentSigner requestorSigner;
 
+  private final PrivateKey requestorKey;
+
   private final X509Certificate responderCert;
 
   private final GeneralName requestorSubject;
@@ -153,7 +185,7 @@ public class CmpCaClient {
       throws Exception {
     this.caUrl = new URL(SdkUtil.requireNonBlank("caUrl", caUrl));
 
-    SdkUtil.requireNonNull("requestorKey", requestorKey);
+    this.requestorKey = SdkUtil.requireNonNull("requestorKey", requestorKey);
     SdkUtil.requireNonNull("requestorCert", requestorCert);
 
     this.hashAlgo = hashAlgo.replaceAll("-", "").toUpperCase();
@@ -368,6 +400,8 @@ public class CmpCaClient {
       int bodyType = respBody.getType();
       if (bodyType != PKIBody.TYPE_ERROR) {
         throw new Exception("response is not signed");
+      } else {
+        return response.toASN1Structure();
       }
     }
 
@@ -378,7 +412,7 @@ public class CmpCaClient {
     throw new Exception("invalid signature in PKI protection");
   }
 
-  private Map<BigInteger, X509Certificate> parseEnrollCertResult(PKIMessage response, int numCerts)
+  private Map<BigInteger, KeyAndCert> parseEnrollCertResult(PKIMessage response, int numCerts)
       throws Exception {
     PKIBody respBody = response.getBody();
     final int bodyType = respBody.getType();
@@ -400,7 +434,7 @@ public class CmpCaClient {
     }
 
     // We only accept the certificates which are requested.
-    Map<BigInteger, X509Certificate> certs = new HashMap<>(numCerts * 2);
+    Map<BigInteger, KeyAndCert> keycerts = new HashMap<>(numCerts * 2);
     for (int i = 0; i < numCerts; i++) {
       CertResponse certResp = certResponses[i];
       PKIStatusInfo statusInfo = certResp.getStatus();
@@ -415,19 +449,24 @@ public class CmpCaClient {
       CertifiedKeyPair cvk = certResp.getCertifiedKeyPair();
       if (cvk != null) {
         CMPCertificate cmpCert = cvk.getCertOrEncCert().getCertificate();
-        if (cmpCert != null) {
-          X509Certificate cert = SdkUtil.parseCert(cmpCert.getX509v3PKCert().getEncoded());
-          if (!verify(caCert, cert)) {
-            throw new Exception("CertReqId " + certReqId
-                + ": the returned certificate is not issued by the given CA");
-          }
-
-          certs.put(certReqId, cert);
+        X509Certificate cert = SdkUtil.parseCert(cmpCert.getX509v3PKCert().getEncoded());
+        if (!verify(caCert, cert)) {
+          throw new Exception("CertReqId " + certReqId
+              + ": the returned certificate is not issued by the given CA");
         }
+
+        EncryptedValue encKey = cvk.getPrivateKey();
+        PrivateKeyInfo key = null;
+        if (encKey != null) {
+          byte[] keyBytes = decrypt(encKey);
+          key = PrivateKeyInfo.getInstance(keyBytes);
+        }
+
+        keycerts.put(certReqId, new KeyAndCert(key, cert));
       }
     }
 
-    return certs;
+    return keycerts;
   } // method parseEnrollCertResult
 
   public X509Certificate requestCertViaCsr(String certprofile, CertificationRequest csr)
@@ -447,7 +486,7 @@ public class CmpCaClient {
     ProtectedPKIMessage request = builder.build(requestorSigner);
 
     PKIMessage response = transmit(request);
-    return parseEnrollCertResult(response, 1).values().iterator().next();
+    return parseEnrollCertResult(response, 1).values().iterator().next().getCert();
   }
 
   private boolean parseRevocationResult(PKIMessage response, BigInteger serialNumber)
@@ -536,12 +575,64 @@ public class CmpCaClient {
 
     ProtectedPKIMessage request = builder.build(requestorSigner);
     PKIMessage response = transmit(request);
-    Map<BigInteger, X509Certificate> certs = parseEnrollCertResult(response, n);
+    Map<BigInteger, KeyAndCert> keyCerts = parseEnrollCertResult(response, n);
 
     X509Certificate[] ret = new X509Certificate[n];
     for (int i = 0; i < n; i++) {
       BigInteger certReqId = certReqIds[i];
-      ret[i] = certs.get(certReqId);
+      ret[i] = keyCerts.get(certReqId).getCert();
+    }
+
+    return ret;
+  } // method requestCerts
+
+  public KeyAndCert requestCertViaCrmf(String certprofile, String genkeyType,
+      String subject) throws Exception {
+    return requestCertViaCrmf(new String[]{certprofile}, new String[]{genkeyType},
+        new String[] {subject})[0];
+  }
+
+  public KeyAndCert[] requestCertViaCrmf(String[] certprofile, String[] genkeyTypes,
+      String[] subject) throws Exception {
+    final int n = certprofile.length;
+    CertReqMsg[] certReqMsgs = new CertReqMsg[n];
+    BigInteger[] certReqIds = new BigInteger[n];
+
+    for (int i = 0; i < n; i++) {
+      certReqIds[i] = BigInteger.valueOf(i + 1);
+
+      CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
+      certTemplateBuilder.setSubject(new X500Name(subject[i]));
+      CertRequest certReq = new CertRequest(new ASN1Integer(certReqIds[i]),
+          certTemplateBuilder.build(), null);
+
+      AttributeTypeAndValue certprofileInfo =
+          new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
+              new DERUTF8String("certprofile?" + certprofile[i] + "%"
+                  + "generatekey?" + genkeyTypes[i] + "%"));
+      AttributeTypeAndValue[] atvs = {certprofileInfo};
+      certReqMsgs[i] = new CertReqMsg(certReq, null, atvs);
+    }
+
+    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
+    ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
+        PKIHeader.CMP_2000, requestorSubject, responderSubject);
+    builder.setMessageTime(new Date());
+    builder.setTransactionID(randomTransactionId());
+    builder.setSenderNonce(randomSenderNonce());
+
+    builder.addGeneralInfo(
+        new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE));
+    builder.setBody(body);
+
+    ProtectedPKIMessage request = builder.build(requestorSigner);
+    PKIMessage response = transmit(request);
+    Map<BigInteger, KeyAndCert> keyCerts = parseEnrollCertResult(response, n);
+
+    KeyAndCert[] ret = new KeyAndCert[n];
+    for (int i = 0; i < n; i++) {
+      BigInteger certReqId = certReqIds[i];
+      ret[i] = keyCerts.get(certReqId);
     }
 
     return ret;
@@ -640,6 +731,165 @@ public class CmpCaClient {
       sigAlgo = hashAlgo + "WITH" + keyAlgo;
     }
     return new JcaContentSignerBuilder(sigAlgo).build(signingKey);
+  }
+
+  private byte[] decrypt(EncryptedValue ev) throws Exception {
+    AlgorithmIdentifier keyAlg = ev.getKeyAlg();
+    ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
+
+    byte[] symmKey;
+
+    try {
+      if (requestorKey instanceof RSAPrivateKey) {
+        Cipher keyCipher;
+        if (keyOid.equals(PKCSObjectIdentifiers.id_RSAES_OAEP)) {
+          // Currently we only support the default RSAESOAEPparams
+          if (keyAlg.getParameters() != null) {
+            RSAESOAEPparams params = RSAESOAEPparams.getInstance(keyAlg.getParameters());
+            ASN1ObjectIdentifier oid = params.getHashAlgorithm().getAlgorithm();
+            if (!oid.equals(RSAESOAEPparams.DEFAULT_HASH_ALGORITHM.getAlgorithm())) {
+              throw new Exception(
+                  "unsupported RSAESOAEPparams.HashAlgorithm " + oid.getId());
+            }
+
+            oid = params.getMaskGenAlgorithm().getAlgorithm();
+            if (!oid.equals(RSAESOAEPparams.DEFAULT_MASK_GEN_FUNCTION.getAlgorithm())) {
+              throw new Exception(
+                  "unsupported RSAESOAEPparams.MaskGenAlgorithm " + oid.getId());
+            }
+
+            oid = params.getPSourceAlgorithm().getAlgorithm();
+            if (!params.getPSourceAlgorithm().equals(RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM)) {
+              throw new Exception(
+                  "unsupported RSAESOAEPparams.PSourceAlgorithm " + oid.getId());
+            }
+          }
+
+          keyCipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+        } else if (keyOid.equals(PKCSObjectIdentifiers.rsaEncryption)) {
+          keyCipher = Cipher.getInstance("RSA/NONE/PKCS1PADDING");
+        } else {
+          throw new Exception("unsupported keyAlg " + keyOid.getId());
+        }
+        keyCipher.init(Cipher.DECRYPT_MODE, requestorKey);
+
+        symmKey = keyCipher.doFinal(ev.getEncSymmKey().getOctets());
+      } else if (requestorKey instanceof ECPrivateKey) {
+        ASN1Sequence params = ASN1Sequence.getInstance(keyAlg.getParameters());
+        final int n = params.size();
+        for (int i = 0; i < n; i++) {
+          if (!keyOid.equals(ObjectIdentifiers.id_ecies_specifiedParameters)) {
+            throw new Exception("unsupported keyAlg " + keyOid.getId());
+          }
+
+          ASN1TaggedObject to = (ASN1TaggedObject) params.getObjectAt(i);
+          int tag = to.getTagNo();
+          if (tag == 0) { // KDF
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            if (ObjectIdentifiers.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
+              AlgorithmIdentifier hashAlgorithm =
+                  AlgorithmIdentifier.getInstance(algId.getParameters());
+              if (!hashAlgorithm.getAlgorithm().equals(ObjectIdentifiers.id_sha1)) {
+                throw new Exception("unsupported KeyDerivationFunction.HashAlgorithm "
+                    + hashAlgorithm.getAlgorithm().getId());
+              }
+            } else {
+              throw new Exception(
+                  "unsupported KeyDerivationFunction " + algId.getAlgorithm().getId());
+            }
+          } else if (tag == 1) { // SymmetricEncryption
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            if (!ObjectIdentifiers.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
+              throw new Exception("unsupported SymmetricEncryption "
+                  + algId.getAlgorithm().getId());
+            }
+          } else if (tag == 2) { // MessageAuthenticationCode
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            if (ObjectIdentifiers.id_hmac_full_ecies.equals(algId.getAlgorithm())) {
+              AlgorithmIdentifier hashAlgorithm =
+                  AlgorithmIdentifier.getInstance(algId.getParameters());
+              if (!hashAlgorithm.getAlgorithm().equals(ObjectIdentifiers.id_sha1)) {
+                throw new Exception("unsupported MessageAuthenticationCode.HashAlgorithm "
+                    + hashAlgorithm.getAlgorithm().getId());
+              }
+            } else {
+              throw new Exception("unsupported MessageAuthenticationCode "
+                  + algId.getAlgorithm().getId());
+            }
+          }
+        }
+
+        int aesKeySize = 128;
+        byte[] iv = new byte[16];
+        AlgorithmParameterSpec spec = new IESParameterSpec(null, null, aesKeySize, aesKeySize, iv);
+
+        BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
+        IESCipher keyCipher = new IESCipher(
+            new IESEngine(new ECDHBasicAgreement(),
+                new KDF2BytesGenerator(DigestFactory.createSHA1()),
+                new HMac(DigestFactory.createSHA1()),
+                new PaddedBufferedBlockCipher(cbcCipher)), 16);
+        // no random is required
+        keyCipher.engineInit(Cipher.DECRYPT_MODE, requestorKey, spec, null);
+
+        byte[] encSymmKey = ev.getEncSymmKey().getOctets();
+        /*
+         * BouncyCastle expects the input ephemeralPublicKey | symmetricCiphertext | macTag.
+         * So we have to convert it from the following ASN.1 structure
+        * <pre>
+        * ECIES-Ciphertext-Value ::= SEQUENCE {
+        *     ephemeralPublicKey ECPoint,
+        *     symmetricCiphertext OCTET STRING,
+        *     macTag OCTET STRING
+        * }
+        *
+        * ECPoint ::= OCTET STRING
+        * </pre>
+        */
+        ASN1Sequence seq = DERSequence.getInstance(encSymmKey);
+        byte[] ephemeralPublicKey = DEROctetString.getInstance(seq.getObjectAt(0)).getOctets();
+        byte[] symmetricCiphertext = DEROctetString.getInstance(seq.getObjectAt(1)).getOctets();
+        byte[] macTag = DEROctetString.getInstance(seq.getObjectAt(2)).getOctets();
+
+        byte[] bcInput = new byte[ephemeralPublicKey.length + symmetricCiphertext.length
+                                  + macTag.length];
+        System.arraycopy(ephemeralPublicKey, 0, bcInput, 0, ephemeralPublicKey.length);
+        int offset = ephemeralPublicKey.length;
+        System.arraycopy(symmetricCiphertext, 0, bcInput, offset, symmetricCiphertext.length);
+        offset += symmetricCiphertext.length;
+        System.arraycopy(macTag, 0, bcInput, offset, macTag.length);
+
+        symmKey = keyCipher.engineDoFinal(bcInput, 0, bcInput.length);
+      } else {
+        throw new Exception("unsupported decryption key type " + requestorKey.getClass().getName());
+      }
+
+      AlgorithmIdentifier symmAlg = ev.getSymmAlg();
+      if (!(symmAlg.getAlgorithm().equals(CMSAlgorithm.AES128_CBC)
+          || symmAlg.getAlgorithm().equals(CMSAlgorithm.AES192_CBC)
+          || symmAlg.getAlgorithm().equals(CMSAlgorithm.AES256_CBC))) {
+        // currently we only support AES128-CBC
+        throw new Exception("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
+      }
+
+      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+      /*
+       * As defined in §4.1 in RFC 3565:
+       * The AlgorithmIdentifier parameters field MUST be present, and the
+       * parameters field MUST contain a AES-IV:
+       *
+       *     AES-IV ::= OCTET STRING (SIZE(16))
+       */
+      byte[] iv = DEROctetString.getInstance(symmAlg.getParameters()).getOctets();
+      AlgorithmParameterSpec algParams = new IvParameterSpec(iv);
+      dataCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symmKey, "AES"), algParams);
+
+      byte[] encValue = ev.getEncValue().getOctets();
+      return dataCipher.doFinal(encValue);
+    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+        | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+      throw new Exception("Error while decrypting the EncryptedValue", ex);
+    }
   }
 
   private static String buildText(PKIStatusInfo pkiStatusInfo) {
