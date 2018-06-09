@@ -48,9 +48,8 @@
   </prerequisites>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <xipki.tools.version>1.0.0-SNAPSHOT</xipki.tools.version>
+    <xipki.tools.version>1.0.0</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.compile.version>4.1.5</karaf.compile.version>
     <karaf.version>4.2.0</karaf.version>
     <karaf.plugin.version>4.2.0</karaf.plugin.version>
     <netty.version>4.1.18.Final</netty.version>
@@ -361,7 +360,7 @@
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>
         <artifactId>org.apache.karaf.shell.core</artifactId>
-        <version>${karaf.compile.version}</version>
+        <version>${karaf.version}</version>
       </dependency>
       <dependency>
         <groupId>org.liquibase</groupId>
