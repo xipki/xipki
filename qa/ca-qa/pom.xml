@@ -19,31 +19,31 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.shells</groupId>
-    <artifactId>shells-parent</artifactId>
+    <groupId>org.xipki.qa</groupId>
+    <artifactId>qa-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>security-speed-shell</artifactId>
+  <artifactId>ca-qa</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <Karaf-Commands>*</Karaf-Commands>
-  </properties>
+  <name>XiPKI qa :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>qa-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>security</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shell-base</artifactId>
+      <artifactId>certprofile-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

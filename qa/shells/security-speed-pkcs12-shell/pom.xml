@@ -19,46 +19,26 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
-    <artifactId>xipki-parent</artifactId>
+    <groupId>org.xipki.qa.shells</groupId>
+    <artifactId>shells-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ocsp-qa</artifactId>
+  <artifactId>security-speed-pkcs12-shell</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <name>XiPKI qa :: ${project.artifactId}</name>
   <properties>
-    <Import-Package>*,io.netty.channel.epoll;resolution:=optional;version="[4.1,5)",io.netty.channel.kqueue;resolution:=optional;version="[4.1,5)"</Import-Package>
+    <Karaf-Commands>*</Karaf-Commands>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>qa-common</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>security-pkcs12</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-client-api</artifactId>
+      <artifactId>security-speed-shell</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-handler</artifactId>
-      <version>${netty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-codec-http</artifactId>
-      <version>${netty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

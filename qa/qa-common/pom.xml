@@ -19,31 +19,28 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
-    <artifactId>xipki-parent</artifactId>
+    <groupId>org.xipki.qa</groupId>
+    <artifactId>qa-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>scep-server-emulator</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
-  <properties>
-    <jetty.version>9.4.7.v20170914</jetty.version>
-  </properties>
+  <artifactId>qa-common</artifactId>
+  <name>XiPKI qa :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>scep-common</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>util</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>${jetty.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <version>${jetty.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

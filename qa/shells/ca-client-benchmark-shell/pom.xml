@@ -19,34 +19,44 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
-    <artifactId>xipki-parent</artifactId>
+    <groupId>org.xipki.qa.shells</groupId>
+    <artifactId>shells-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>scep-client</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <artifactId>ca-client-benchmark-shell</artifactId>
   <packaging>bundle</packaging>
+  <name>XiPKI qa :: ${project.artifactId}</name>
+  <properties>
+    <Karaf-Commands>*</Karaf-Commands>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>scep-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xipki.qa</groupId>
-      <artifactId>scep-server-emulator</artifactId>
+      <artifactId>qa-common</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.xipki</groupId>
+      <artifactId>ca-client-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
+      <groupId>org.xipki</groupId>
+      <artifactId>datasource</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shells</groupId>
+      <artifactId>shell-base</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

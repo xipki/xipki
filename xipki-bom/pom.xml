@@ -90,11 +90,6 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>ca-qa</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
         <artifactId>ca-server</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -151,11 +146,6 @@
       <dependency>
         <groupId>org.xipki</groupId>
         <artifactId>ocsp-client-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
-        <artifactId>ocsp-qa</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -220,11 +210,6 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>scep-server-emulator</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
         <artifactId>security</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -246,11 +231,6 @@
       <!-- shells -->
       <dependency>
         <groupId>org.xipki.shells</groupId>
-        <artifactId>ca-client-benchmark-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
         <artifactId>ca-client-shell</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -266,22 +246,7 @@
       </dependency>
       <dependency>
         <groupId>org.xipki.shells</groupId>
-        <artifactId>ca-qa-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
-        <artifactId>jscep-client-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
         <artifactId>ocsp-client-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
-        <artifactId>ocsp-qa-shell</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -302,21 +267,6 @@
       <dependency>
         <groupId>org.xipki.shells</groupId>
         <artifactId>security-pkcs12-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
-        <artifactId>security-speed-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
-        <artifactId>security-speed-pkcs11-shell</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.shells</groupId>
-        <artifactId>security-speed-pkcs12-shell</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -68,10 +68,8 @@
     <!-- SCEP -->
     <module>scep-common</module>
     <module>scep-client</module>
-    <module>scep-server-emulator</module>
     <!-- Base components -->
     <module>util</module>
-    <module>qa-common</module>
     <module>cmp</module>
     <module>audit</module>
     <module>audit-syslog</module>
@@ -94,10 +92,8 @@
     <module>ca-client-impl</module>
     <module>ocsp-client-api</module>
     <module>ocsp-client-impl</module>
-    <module>ocsp-qa</module>
     <!-- PKI -->
     <module>ca-api</module>
-    <module>ca-qa</module>
     <module>ca-mgmt-api</module>
     <module>ca-server-api</module>
     <module>ca-server</module>
@@ -114,6 +110,7 @@
     <module>shells</module>
     <module>features</module>
     <module>examples</module>
+    <module>qa</module>
     <module>xipki-bom</module>
   </modules>
   <scm>

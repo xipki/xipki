@@ -19,7 +19,6 @@
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-security" version="${project.version}" description="security">
     <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/qa-common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
@@ -36,8 +35,9 @@
     <bundle start-level="70">mvn:org.xipki.shells/security-shell/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.shells/security-speed-shell/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.shells/security-speed-pkcs11-shell/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.shells/security-speed-pkcs12-shell/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.qa.shells/security-speed-shell/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.qa.shells/security-speed-pkcs11-shell/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.qa.shells/security-speed-pkcs12-shell/${project.version}</bundle>
   </feature>
 </features>

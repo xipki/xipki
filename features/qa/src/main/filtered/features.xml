@@ -113,9 +113,10 @@
     <bundle start-level="80">mvn:org.xipki.shells/security-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/security-speed-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/security-speed-pkcs11-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/security-speed-pkcs12-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-pkcs11-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-pkcs12-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}" description="OCSP server">
     <feature>xipki-datasource</feature>
@@ -160,9 +161,9 @@
     <feature>xipki-caclient</feature>
     <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki/qa-common/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-client-benchmark-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/ca-client-benchmark-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}"
       description="SCEP client shell">
@@ -185,9 +186,9 @@
   <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
     <feature prerequisite="true">xipki-camgmt-shell</feature>
     <bundle start-level="70">mvn:org.xipki/certprofile-xml/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/qa-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ca-qa/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-qa-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa/ca-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/ca-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}"
       description="SCEP client shell using JSCEP">
@@ -197,7 +198,7 @@
     <bundle start-level="80">mvn:commons-codec/commons-codec/1.7</bundle>
     <bundle start-level="80">mvn:commons-io/commons-io/2.4</bundle>
     <bundle start-level="80">mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/jscep-client-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/jscep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspqa-shell" version="${project.version}" description="OCSP QA shell">
     <feature prerequisite="true">xipki-ocspclient-shell</feature>
@@ -208,8 +209,8 @@
     <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/qa-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ocsp-qa/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/ocsp-qa-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa/ocsp-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.qa.shells/ocsp-qa-shell/${project.version}</bundle>
   </feature>
 </features>

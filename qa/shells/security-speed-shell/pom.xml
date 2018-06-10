@@ -19,25 +19,30 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.shells</groupId>
+    <groupId>org.xipki.qa.shells</groupId>
     <artifactId>shells-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>security-speed-pkcs11-shell</artifactId>
+  <artifactId>security-speed-shell</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <name>XiPKI qa :: ${project.artifactId}</name>
   <properties>
     <Karaf-Commands>*</Karaf-Commands>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>security-pkcs11</artifactId>
+      <groupId>org.xipki.qa</groupId>
+      <artifactId>qa-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security-speed-shell</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>security</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shells</groupId>
+      <artifactId>shell-base</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
