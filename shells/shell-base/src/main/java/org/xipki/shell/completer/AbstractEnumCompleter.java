@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.console.CommandLine;
 import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

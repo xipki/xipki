@@ -19,10 +19,10 @@ package org.xipki.security.speed.pkcs11;
 
 import java.math.BigInteger;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

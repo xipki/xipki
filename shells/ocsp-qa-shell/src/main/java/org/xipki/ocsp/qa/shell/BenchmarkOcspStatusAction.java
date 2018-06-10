@@ -33,14 +33,14 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.qa.BigIntegerRange;
 import org.xipki.common.qa.FileBigIntegerIterator;
 import org.xipki.common.qa.RangeBigIntegerIterator;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.CommonOcspStatusAction;
 import org.xipki.ocsp.qa.benchmark.OcspBenchmark;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

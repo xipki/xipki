@@ -20,7 +20,7 @@ package org.xipki.security.pkcs11;
 import java.security.InvalidKeyException;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

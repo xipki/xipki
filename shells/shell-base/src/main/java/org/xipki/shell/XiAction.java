@@ -30,12 +30,12 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.console.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.SecurePasswordInputPanel;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -30,9 +30,9 @@ import org.xipki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CertListSortByCompleter;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.DateUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

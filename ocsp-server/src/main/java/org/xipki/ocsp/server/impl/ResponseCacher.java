@@ -36,12 +36,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.bouncycastle.crypto.Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.concurrent.ConcurrentBag;
-import org.xipki.common.concurrent.ConcurrentBagEntry;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataAccessException.Reason;
 import org.xipki.datasource.DataSourceWrapper;
@@ -53,6 +47,12 @@ import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.concurrent.ConcurrentBag;
+import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
  * TODO.

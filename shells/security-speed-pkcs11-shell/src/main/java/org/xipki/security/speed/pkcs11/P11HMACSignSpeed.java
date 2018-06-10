@@ -19,10 +19,10 @@ package org.xipki.security.speed.pkcs11;
 
 import java.security.SecureRandom;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.util.ParamUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 

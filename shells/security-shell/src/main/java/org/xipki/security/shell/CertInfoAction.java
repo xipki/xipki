@@ -25,10 +25,10 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.IoUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.shell.completer.HashAlgCompleter;
+import org.xipki.util.Hex;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.xml.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.certprofile.xml.jaxb.NameConstraints;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

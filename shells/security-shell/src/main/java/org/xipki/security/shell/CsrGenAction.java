@@ -56,10 +56,6 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.ExtensionExistence;
@@ -78,6 +74,10 @@ import org.xipki.shell.completer.ExtKeyusageCompleter;
 import org.xipki.shell.completer.ExtensionNameCompleter;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.KeyusageCompleter;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -25,10 +25,10 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

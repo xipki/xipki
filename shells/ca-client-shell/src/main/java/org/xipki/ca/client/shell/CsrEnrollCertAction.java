@@ -30,11 +30,11 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.DateUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

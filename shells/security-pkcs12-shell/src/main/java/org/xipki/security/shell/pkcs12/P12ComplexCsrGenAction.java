@@ -58,8 +58,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
@@ -68,6 +66,8 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.exception.BadInputException;
 import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.util.KeyUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

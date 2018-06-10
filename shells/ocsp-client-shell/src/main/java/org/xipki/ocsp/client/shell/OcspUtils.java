@@ -20,9 +20,9 @@ package org.xipki.ocsp.client.shell;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.client.api.InvalidOcspResponseException;
 import org.xipki.ocsp.client.api.OcspResponseException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

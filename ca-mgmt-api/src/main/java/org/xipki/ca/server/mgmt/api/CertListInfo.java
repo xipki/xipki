@@ -20,7 +20,7 @@ package org.xipki.ca.server.mgmt.api;
 import java.math.BigInteger;
 import java.util.Date;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

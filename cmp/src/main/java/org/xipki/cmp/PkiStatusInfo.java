@@ -18,8 +18,8 @@
 package org.xipki.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.CmpFailureUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

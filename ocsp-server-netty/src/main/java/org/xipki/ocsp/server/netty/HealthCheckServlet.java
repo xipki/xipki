@@ -23,13 +23,13 @@ import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
 import org.xipki.http.servlet.SslReverseProxyMode;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.ResponderAndPath;
+import org.xipki.util.HealthCheckResult;
+import org.xipki.util.LogUtil;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;

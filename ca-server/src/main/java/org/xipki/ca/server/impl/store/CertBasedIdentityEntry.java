@@ -19,8 +19,8 @@ package org.xipki.ca.server.impl.store;
 
 import java.util.Arrays;
 
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.Base64;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

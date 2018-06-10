@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

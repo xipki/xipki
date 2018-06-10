@@ -20,12 +20,12 @@ package org.xipki.ca.server.mgmt.api;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * For internal use only.

@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

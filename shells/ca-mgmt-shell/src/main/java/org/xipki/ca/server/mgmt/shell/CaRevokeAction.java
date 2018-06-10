@@ -30,11 +30,11 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaCrlReasonCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.common.util.DateUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.DateUtil;
 
 /**
  * TODO.

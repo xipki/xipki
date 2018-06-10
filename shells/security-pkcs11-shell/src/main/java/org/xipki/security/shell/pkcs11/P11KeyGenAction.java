@@ -18,9 +18,9 @@
 package org.xipki.security.shell.pkcs11;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

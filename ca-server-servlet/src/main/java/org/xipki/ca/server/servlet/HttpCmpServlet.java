@@ -39,9 +39,9 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

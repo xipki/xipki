@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.xipki.common.util.Hex;
 import org.xipki.ocsp.api.ASN1Type;
 import org.xipki.ocsp.server.impl.type.CertID;
 import org.xipki.ocsp.server.impl.type.Extensions;
@@ -36,6 +35,7 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.util.Hex;
 
 /**
  * Generator for OCSP response objects.

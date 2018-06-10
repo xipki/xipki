@@ -30,10 +30,10 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.DateUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

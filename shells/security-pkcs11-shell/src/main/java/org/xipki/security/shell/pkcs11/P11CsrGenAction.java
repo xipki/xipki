@@ -23,15 +23,15 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.shell.pkcs11.completer.P11ModuleNameCompleter;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.Hex;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

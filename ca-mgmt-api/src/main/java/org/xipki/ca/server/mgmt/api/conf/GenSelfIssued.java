@@ -19,7 +19,7 @@ package org.xipki.ca.server.mgmt.api.conf;
 
 import java.math.BigInteger;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

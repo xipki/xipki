@@ -43,14 +43,14 @@ import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.YesNoCompleter;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

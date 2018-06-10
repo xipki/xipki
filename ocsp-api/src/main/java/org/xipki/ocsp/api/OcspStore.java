@@ -21,8 +21,8 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

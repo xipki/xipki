@@ -19,7 +19,7 @@ package org.xipki.ca.qa.internal;
 
 import java.util.Arrays;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

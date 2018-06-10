@@ -44,14 +44,14 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.ScepResponder;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.RandomUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.RandomUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe

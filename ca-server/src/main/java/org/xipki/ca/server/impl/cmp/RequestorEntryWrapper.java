@@ -19,7 +19,7 @@ package org.xipki.ca.server.impl.cmp;
 
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

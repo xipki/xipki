@@ -29,9 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.HealthCheckResult;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

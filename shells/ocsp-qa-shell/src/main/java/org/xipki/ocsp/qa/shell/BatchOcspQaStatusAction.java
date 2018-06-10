@@ -40,14 +40,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponseDebug.RequestResponsePair;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.OcspRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.CommonOcspStatusAction;
@@ -65,6 +59,12 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.completer.DirCompleter;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.SigAlgCompleter;
+import org.xipki.util.DateUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

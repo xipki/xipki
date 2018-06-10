@@ -44,14 +44,14 @@ import org.xipki.ca.server.mgmt.api.ProtocolSupport;
 import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

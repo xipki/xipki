@@ -17,7 +17,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

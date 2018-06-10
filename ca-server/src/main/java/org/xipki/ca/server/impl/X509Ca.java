@@ -145,13 +145,6 @@ import org.xipki.ca.server.mgmt.api.CrlControl.HourMinute;
 import org.xipki.ca.server.mgmt.api.CrlControl.UpdateMode;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
@@ -166,6 +159,13 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.DateUtil;
+import org.xipki.util.HealthCheckResult;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

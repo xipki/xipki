@@ -21,7 +21,7 @@ import java.security.cert.Certificate;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.cmp.PkiStatusInfo;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

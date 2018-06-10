@@ -17,7 +17,7 @@
 
 package org.xipki.dbtool;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;

@@ -20,14 +20,14 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.Set;
 
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.Base64;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

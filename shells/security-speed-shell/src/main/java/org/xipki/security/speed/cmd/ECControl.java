@@ -17,7 +17,7 @@
 
 package org.xipki.security.speed.cmd;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

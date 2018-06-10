@@ -26,9 +26,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.xipki.common.ProcessLog;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.ProcessLog;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

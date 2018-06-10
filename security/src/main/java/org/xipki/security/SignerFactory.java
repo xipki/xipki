@@ -20,7 +20,7 @@ package org.xipki.security;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.xipki.common.ObjectCreationException;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

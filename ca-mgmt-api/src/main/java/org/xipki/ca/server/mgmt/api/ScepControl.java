@@ -17,9 +17,9 @@
 
 package org.xipki.ca.server.mgmt.api;
 
-import org.xipki.common.ConfPairs;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.StringUtil;
 
 /**
  * Example configuration.

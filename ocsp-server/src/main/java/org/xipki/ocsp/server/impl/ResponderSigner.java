@@ -30,11 +30,11 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.server.impl.type.ResponderID;
 import org.xipki.ocsp.server.impl.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -35,9 +35,9 @@ import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.certprofile.xml.XmlCertprofile;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.XmlUtil;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.XmlUtil;
 
 /**
  * This class adds two extensions to the certificate.

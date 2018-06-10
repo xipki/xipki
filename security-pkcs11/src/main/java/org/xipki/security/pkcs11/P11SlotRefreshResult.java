@@ -22,8 +22,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -19,7 +19,7 @@ package org.xipki.security.pkcs12;
 
 import java.security.SecureRandom;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

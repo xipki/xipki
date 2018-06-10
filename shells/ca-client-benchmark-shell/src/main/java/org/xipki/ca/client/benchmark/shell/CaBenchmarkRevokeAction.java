@@ -30,12 +30,12 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.qa.FileBigIntegerIterator;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

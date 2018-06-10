@@ -20,8 +20,8 @@ package org.xipki.security.pkcs11;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -21,11 +21,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreFactory;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

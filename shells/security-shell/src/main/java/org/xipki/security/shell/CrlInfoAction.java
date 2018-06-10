@@ -28,8 +28,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.IoUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

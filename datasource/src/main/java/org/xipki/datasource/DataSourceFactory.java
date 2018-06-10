@@ -26,10 +26,10 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

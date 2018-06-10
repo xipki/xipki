@@ -54,10 +54,6 @@ import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -70,6 +66,10 @@ import org.xipki.shell.completer.ExtKeyusageCompleter;
 import org.xipki.shell.completer.ExtensionNameCompleter;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.KeyusageCompleter;
+import org.xipki.util.DateUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

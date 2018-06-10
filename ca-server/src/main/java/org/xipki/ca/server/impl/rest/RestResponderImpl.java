@@ -55,13 +55,13 @@ import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.RandomUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Base64;
+import org.xipki.util.DateUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.RandomUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

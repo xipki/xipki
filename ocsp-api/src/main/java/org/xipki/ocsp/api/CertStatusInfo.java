@@ -20,9 +20,9 @@ package org.xipki.ocsp.api;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -20,7 +20,7 @@ package org.xipki.ca.client.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

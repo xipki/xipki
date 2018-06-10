@@ -38,10 +38,10 @@ import org.xipki.ca.qa.shell.completer.CertprofileNameCompleter;
 import org.xipki.ca.qa.shell.completer.IssuerNameCompleter;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.IoUtil;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

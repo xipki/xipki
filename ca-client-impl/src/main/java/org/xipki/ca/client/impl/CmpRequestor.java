@@ -89,11 +89,6 @@ import org.xipki.cmp.CmpUtil;
 import org.xipki.cmp.PkiResponse;
 import org.xipki.cmp.ProtectionResult;
 import org.xipki.cmp.ProtectionVerificationResult;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponseDebug.RequestResponsePair;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
@@ -102,6 +97,11 @@ import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.CmpFailureUtil;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.RequestResponseDebug.RequestResponsePair;
 
 /**
  * TODO.

@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.Hex;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -35,6 +33,8 @@ import org.xipki.security.SignerFactory;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

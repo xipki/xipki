@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

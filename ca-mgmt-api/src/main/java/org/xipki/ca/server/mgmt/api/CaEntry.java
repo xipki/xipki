@@ -28,17 +28,17 @@ import java.util.List;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

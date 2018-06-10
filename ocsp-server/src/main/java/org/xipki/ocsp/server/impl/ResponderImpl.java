@@ -19,9 +19,9 @@ package org.xipki.ocsp.server.impl;
 
 import java.util.List;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.Responder;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -33,10 +33,10 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.impl.store.CertStore;
-import org.xipki.common.ProcessLog;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.ProcessLog;
 
 /**
  * TODO.

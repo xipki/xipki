@@ -21,7 +21,7 @@ import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import org.xipki.ca.client.api.CertprofileInfo;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

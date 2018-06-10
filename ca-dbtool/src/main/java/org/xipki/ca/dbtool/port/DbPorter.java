@@ -31,11 +31,11 @@ import org.xipki.ca.dbtool.DbSchemaInfo;
 import org.xipki.ca.dbtool.DbToolBase;
 import org.xipki.ca.dbtool.jaxb.ca.FileOrBinaryType;
 import org.xipki.ca.dbtool.jaxb.ca.FileOrValueType;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
 import org.xml.sax.SAXException;
 
 /**

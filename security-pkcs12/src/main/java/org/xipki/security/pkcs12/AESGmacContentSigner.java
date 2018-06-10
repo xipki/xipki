@@ -37,10 +37,10 @@ import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

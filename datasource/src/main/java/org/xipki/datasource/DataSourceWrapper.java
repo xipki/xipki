@@ -29,11 +29,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LruCache;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException.Reason;
+import org.xipki.util.LogUtil;
+import org.xipki.util.LruCache;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

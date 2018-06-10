@@ -18,7 +18,7 @@
 package org.xipki.cmp;
 
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

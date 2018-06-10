@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

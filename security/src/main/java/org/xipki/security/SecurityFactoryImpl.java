@@ -52,9 +52,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
@@ -62,6 +59,9 @@ import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

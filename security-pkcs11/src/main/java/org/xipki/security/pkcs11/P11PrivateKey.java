@@ -23,9 +23,9 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

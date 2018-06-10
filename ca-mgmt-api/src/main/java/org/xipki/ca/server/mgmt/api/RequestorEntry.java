@@ -23,10 +23,10 @@ import java.security.cert.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

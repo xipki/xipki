@@ -33,10 +33,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.TripleState;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.server.impl.jaxb.NonceType;
@@ -48,6 +44,10 @@ import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.TripleState;
 
 /**
  * TODO.

@@ -21,7 +21,7 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.xipki.audit.AuditEvent;
-import org.xipki.common.HealthCheckResult;
+import org.xipki.util.HealthCheckResult;
 
 /**
  * TODO.

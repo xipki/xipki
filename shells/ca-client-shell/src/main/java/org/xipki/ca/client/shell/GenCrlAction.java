@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.common.RequestResponseDebug;
+import org.xipki.util.RequestResponseDebug;
 
 /**
  * TODO.

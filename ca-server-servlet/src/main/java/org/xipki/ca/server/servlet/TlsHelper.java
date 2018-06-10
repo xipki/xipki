@@ -25,9 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LruCache;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.LruCache;
+import org.xipki.util.StringUtil;
 
 /**
  * For more details please refer to

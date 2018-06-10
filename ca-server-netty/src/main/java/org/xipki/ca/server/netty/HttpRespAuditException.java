@@ -19,7 +19,7 @@ package org.xipki.ca.server.netty;
 
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 

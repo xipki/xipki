@@ -18,7 +18,7 @@
 package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>common</artifactId>
+      <artifactId>util</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!--dependency>

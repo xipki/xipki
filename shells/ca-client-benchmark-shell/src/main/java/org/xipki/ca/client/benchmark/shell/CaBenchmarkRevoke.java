@@ -35,10 +35,10 @@ import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntry;
 import org.xipki.common.qa.BenchmarkExecutor;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.security.CrlReason;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

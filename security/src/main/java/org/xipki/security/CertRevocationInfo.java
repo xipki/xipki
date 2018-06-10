@@ -19,9 +19,9 @@ package org.xipki.security;
 
 import java.util.Date;
 
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -19,7 +19,7 @@ package org.xipki.publisher.ocsp;
 
 import java.util.Arrays;
 
-import org.xipki.common.util.Base64;
+import org.xipki.util.Base64;
 
 /**
  * TODO.

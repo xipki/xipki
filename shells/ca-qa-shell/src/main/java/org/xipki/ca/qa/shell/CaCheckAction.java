@@ -24,8 +24,8 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.shell.CaUpdateAction;
-import org.xipki.common.ConfPairs;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.ConfPairs;
 
 /**
  * TODO.

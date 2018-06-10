@@ -32,8 +32,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.RequestResponseDebug;
+import org.xipki.util.HealthCheckResult;
+import org.xipki.util.RequestResponseDebug;
 
 /**
  * TODO.

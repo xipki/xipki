@@ -50,12 +50,6 @@ import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponseDebug.RequestResponsePair;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.InvalidOcspResponseException;
 import org.xipki.ocsp.client.api.OcspNonceUnmatchedException;
 import org.xipki.ocsp.client.api.OcspRequestor;
@@ -72,6 +66,12 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

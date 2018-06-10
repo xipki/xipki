@@ -22,8 +22,8 @@ import java.security.cert.X509Certificate;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

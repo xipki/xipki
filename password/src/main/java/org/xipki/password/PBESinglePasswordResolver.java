@@ -17,14 +17,14 @@
 
 package org.xipki.password;
 
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.callback.FilePasswordCallback;
 import org.xipki.password.callback.GuiPasswordCallback;
 import org.xipki.password.callback.OBFPasswordCallback;
 import org.xipki.password.callback.PBEConsumerPasswordCallback;
 import org.xipki.password.callback.PBEGuiPasswordCallback;
 import org.xipki.password.callback.PasswordCallback;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -125,13 +125,13 @@ import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.SignatureAlgorithms;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.Subject;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XmlUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
 /**

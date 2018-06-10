@@ -32,8 +32,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.client.shell.BaseOcspStatusAction;
 import org.xipki.ocsp.qa.Occurrence;
 import org.xipki.ocsp.qa.OcspCertStatus;
@@ -49,6 +47,8 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.SigAlgCompleter;
+import org.xipki.util.DateUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

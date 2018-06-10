@@ -27,11 +27,11 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

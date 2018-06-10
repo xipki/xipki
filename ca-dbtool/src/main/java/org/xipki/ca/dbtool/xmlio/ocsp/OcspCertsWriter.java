@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xipki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.ca.dbtool.xmlio.InvalidDataObjectException;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

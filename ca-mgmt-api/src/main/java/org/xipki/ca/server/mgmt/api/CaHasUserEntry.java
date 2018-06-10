@@ -20,10 +20,10 @@ package org.xipki.ca.server.mgmt.api;
 import java.util.Set;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

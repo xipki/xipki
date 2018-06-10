@@ -24,9 +24,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.shell.SignerUpdateAction;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

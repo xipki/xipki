@@ -51,8 +51,6 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
@@ -61,6 +59,8 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.DateUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

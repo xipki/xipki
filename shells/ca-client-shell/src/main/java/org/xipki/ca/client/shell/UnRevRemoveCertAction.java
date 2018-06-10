@@ -31,8 +31,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.client.shell.completer.CaNameCompleter;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

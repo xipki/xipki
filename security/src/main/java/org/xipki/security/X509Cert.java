@@ -26,8 +26,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -42,13 +42,13 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.util.Base64;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

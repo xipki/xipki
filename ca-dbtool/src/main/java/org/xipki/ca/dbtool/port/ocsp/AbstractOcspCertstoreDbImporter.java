@@ -21,10 +21,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.xipki.ca.dbtool.port.DbPorter;
-import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -20,7 +20,7 @@ package org.xipki.publisher.ocsp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -22,7 +22,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.RequestResponseDebug;
+import org.xipki.util.RequestResponseDebug;
 
 /**
  * TODO.

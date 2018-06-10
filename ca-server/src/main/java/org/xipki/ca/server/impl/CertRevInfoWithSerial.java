@@ -20,9 +20,9 @@ package org.xipki.ca.server.impl;
 import java.math.BigInteger;
 import java.util.Date;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

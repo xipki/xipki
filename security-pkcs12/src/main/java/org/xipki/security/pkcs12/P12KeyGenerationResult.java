@@ -19,8 +19,8 @@ package org.xipki.security.pkcs12;
 
 import java.security.KeyStore;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.KeypairGenerationResult;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

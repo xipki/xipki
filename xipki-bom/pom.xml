@@ -120,7 +120,7 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>common</artifactId>
+        <artifactId>util</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

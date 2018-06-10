@@ -73,11 +73,6 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.ScepControl;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.exception.MessageEncodingException;
@@ -96,6 +91,11 @@ import org.xipki.scep.transaction.TransactionId;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

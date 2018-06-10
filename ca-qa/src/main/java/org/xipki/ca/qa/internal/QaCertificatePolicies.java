@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

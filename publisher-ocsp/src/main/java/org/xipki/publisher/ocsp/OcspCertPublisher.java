@@ -32,15 +32,15 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -19,7 +19,7 @@ package org.xipki.ocsp.api;
 
 import java.io.UnsupportedEncodingException;
 
-import org.xipki.common.HealthCheckResult;
+import org.xipki.util.HealthCheckResult;
 
 /**
  * TODO.

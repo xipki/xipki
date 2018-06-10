@@ -19,7 +19,7 @@ package org.xipki.ca.dbtool.xmlio;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

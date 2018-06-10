@@ -18,7 +18,7 @@
 package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

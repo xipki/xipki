@@ -17,9 +17,9 @@
 
 package org.xipki.ocsp.store;
 
-import org.xipki.common.ObjectCreationException;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreFactory;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

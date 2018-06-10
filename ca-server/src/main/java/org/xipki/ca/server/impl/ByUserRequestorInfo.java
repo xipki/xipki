@@ -24,8 +24,8 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

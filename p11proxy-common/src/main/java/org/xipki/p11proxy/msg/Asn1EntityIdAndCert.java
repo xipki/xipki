@@ -27,9 +27,9 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.BadAsn1ObjectException;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

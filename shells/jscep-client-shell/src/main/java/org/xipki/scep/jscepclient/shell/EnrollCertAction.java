@@ -28,8 +28,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
-import org.xipki.common.util.IoUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

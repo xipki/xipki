@@ -20,9 +20,9 @@ package org.xipki.security.shell;
 import java.util.Date;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.common.util.DateUtil;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.XiAction;
+import org.xipki.util.DateUtil;
 
 /**
  * TODO.

@@ -19,7 +19,7 @@ package org.xipki.password;
 
 import java.nio.charset.StandardCharsets;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

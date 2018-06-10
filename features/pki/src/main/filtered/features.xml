@@ -54,13 +54,13 @@
     <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
   </feature>
   <feature name="xipki-httpserver" version="${project.version}" description="HTTP server">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/servlet-api/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/http-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}" description="security">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
@@ -75,12 +75,12 @@
     <bundle start-level="70">mvn:org.xipki/pkcs11-proxy/${project.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" version="${project.version}" description="shall base">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.shells/shell-base/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" description="datasource">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/datasource/${project.version}</bundle>

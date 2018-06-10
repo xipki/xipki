@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
-import org.xipki.common.ObjectCreationException;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

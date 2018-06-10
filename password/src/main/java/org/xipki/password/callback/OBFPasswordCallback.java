@@ -17,9 +17,9 @@
 
 package org.xipki.password.callback;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

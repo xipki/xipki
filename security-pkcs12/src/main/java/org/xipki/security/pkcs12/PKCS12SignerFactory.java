@@ -32,10 +32,6 @@ import java.util.Set;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.ConcurrentContentSigner;
@@ -44,6 +40,10 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

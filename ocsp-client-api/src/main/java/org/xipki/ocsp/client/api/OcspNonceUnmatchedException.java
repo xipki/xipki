@@ -17,8 +17,8 @@
 
 package org.xipki.ocsp.client.api;
 
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

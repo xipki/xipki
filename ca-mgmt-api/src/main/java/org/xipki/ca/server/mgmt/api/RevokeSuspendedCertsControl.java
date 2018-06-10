@@ -18,9 +18,9 @@
 package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CrlReason;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ParamUtil;
 
 /**
  * Example configuration

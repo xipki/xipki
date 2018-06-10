@@ -32,8 +32,8 @@ import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionId;
 import org.jscep.util.CertificationRequestUtils;
-import org.xipki.common.util.IoUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

@@ -17,7 +17,7 @@
 
 package org.xipki.security;
 
-import org.xipki.common.concurrent.ConcurrentBagEntry;
+import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
  * TODO.

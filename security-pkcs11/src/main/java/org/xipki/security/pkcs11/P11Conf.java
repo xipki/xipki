@@ -34,15 +34,15 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.pkcs11.jaxb.MechnanismSetsType;
 import org.xipki.security.pkcs11.jaxb.ModuleType;
 import org.xipki.security.pkcs11.jaxb.ModulesType;
 import org.xipki.security.pkcs11.jaxb.ObjectFactory;
 import org.xipki.security.pkcs11.jaxb.Pkcs11ConfType;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
 import org.xml.sax.SAXException;
 
 /**

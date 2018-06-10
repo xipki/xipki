@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.ca.api.publisher.CertificateInfo;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

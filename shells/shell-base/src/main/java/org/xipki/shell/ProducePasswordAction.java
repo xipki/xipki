@@ -21,9 +21,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordProducer;
 import org.xipki.shell.completer.PasswordNameCompleter;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

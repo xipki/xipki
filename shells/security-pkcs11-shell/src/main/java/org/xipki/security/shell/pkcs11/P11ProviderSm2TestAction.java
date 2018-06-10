@@ -27,9 +27,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -37,8 +37,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.common.util.StringUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

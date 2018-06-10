@@ -25,15 +25,15 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.ConfPairs;
 import org.xipki.common.qa.BenchmarkExecutor;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.Base64;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

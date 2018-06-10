@@ -17,8 +17,8 @@
 
 package org.xipki.ca.server.impl.scep;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.scep.transaction.FailInfo;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

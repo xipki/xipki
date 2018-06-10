@@ -26,8 +26,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
-import org.xipki.common.util.StringUtil;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

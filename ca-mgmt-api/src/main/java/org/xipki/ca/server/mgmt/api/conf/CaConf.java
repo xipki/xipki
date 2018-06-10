@@ -84,19 +84,19 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UrisType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XmlUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
 /**

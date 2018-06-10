@@ -107,12 +107,12 @@ import org.xipki.ca.certprofile.xml.jaxb.RsapssParameters;
 import org.xipki.ca.certprofile.xml.jaxb.UsageType;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XmlUtil;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
 /**

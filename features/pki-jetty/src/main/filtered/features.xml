@@ -18,7 +18,7 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-security" version="${project.version}" description="security">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
@@ -33,12 +33,12 @@
     <bundle start-level="70">mvn:org.xipki/pkcs11-proxy/${project.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" version="${project.version}" description="shall base">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.shells/shell-base/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" description="datasource">
-    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/datasource/${project.version}</bundle>

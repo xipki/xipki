@@ -32,11 +32,11 @@ import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.common.ObjectCreationException;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

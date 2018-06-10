@@ -17,8 +17,8 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.KeyUsage;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -21,8 +21,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.shell.ProfileUpdateAction;
-import org.xipki.common.util.IoUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

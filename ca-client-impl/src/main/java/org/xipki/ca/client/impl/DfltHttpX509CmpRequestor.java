@@ -25,10 +25,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

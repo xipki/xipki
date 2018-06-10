@@ -20,9 +20,9 @@ package org.xipki.ca.server.impl.store;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

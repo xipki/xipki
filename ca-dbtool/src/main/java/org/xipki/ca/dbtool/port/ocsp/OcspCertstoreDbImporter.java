@@ -43,14 +43,14 @@ import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
 import org.xipki.ca.dbtool.port.DbPorter;
 import org.xipki.ca.dbtool.xmlio.ocsp.OcspCertType;
 import org.xipki.ca.dbtool.xmlio.ocsp.OcspCertsReader;
-import org.xipki.common.ProcessLog;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.ProcessLog;
+import org.xipki.util.XmlUtil;
 
 /**
  * TODO.

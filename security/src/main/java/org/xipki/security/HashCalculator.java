@@ -22,11 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.common.concurrent.ConcurrentBag;
-import org.xipki.common.concurrent.ConcurrentBagEntry;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.Base64;
+import org.xipki.util.Hex;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.concurrent.ConcurrentBag;
+import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
  * TODO.

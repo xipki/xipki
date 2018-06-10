@@ -32,9 +32,9 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.common.RequestResponseDebug;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.RequestResponseDebug;
 
 /**
  * TODO.

@@ -17,11 +17,11 @@
 
 package org.xipki.ocsp.server.impl;
 
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.server.impl.jaxb.CacheType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

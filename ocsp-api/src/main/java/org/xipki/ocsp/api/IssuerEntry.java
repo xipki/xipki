@@ -26,11 +26,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.CompareUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

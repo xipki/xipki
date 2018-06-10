@@ -17,8 +17,8 @@
 
 package org.xipki.ocsp.server.servlet;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.OcspServer;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

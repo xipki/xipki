@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.concurrent.CountLatch;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.client.api.OcspRequestorException;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.concurrent.CountLatch;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

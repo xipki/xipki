@@ -36,8 +36,8 @@ import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.RestResponse;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -20,7 +20,7 @@ package org.xipki.security;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

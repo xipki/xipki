@@ -23,8 +23,8 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.xipki.common.ObjectCreationException;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -42,10 +42,10 @@ import org.xipki.ca.api.profile.StringType;
 import org.xipki.ca.api.profile.SubjectControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.common.qa.ValidationIssue;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

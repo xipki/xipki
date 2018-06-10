@@ -19,12 +19,12 @@ package org.xipki.password.callback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.PBEPasswordService;
 import org.xipki.password.PasswordProducer;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

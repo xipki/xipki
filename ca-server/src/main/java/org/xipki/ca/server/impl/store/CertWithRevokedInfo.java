@@ -18,7 +18,7 @@
 package org.xipki.ca.server.impl.store;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

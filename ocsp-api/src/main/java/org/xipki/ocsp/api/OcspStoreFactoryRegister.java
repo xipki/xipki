@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.api;
 
-import org.xipki.common.ObjectCreationException;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

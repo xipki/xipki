@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.common.ObjectCreationException;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

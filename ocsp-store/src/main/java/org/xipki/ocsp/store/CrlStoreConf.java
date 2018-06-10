@@ -21,8 +21,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.api.OcspStoreException;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

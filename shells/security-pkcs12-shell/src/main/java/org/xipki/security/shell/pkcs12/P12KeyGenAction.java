@@ -24,10 +24,10 @@ import java.security.SecureRandom;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.shell.KeyGenAction;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

@@ -30,7 +30,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.common.util.StringUtil;
 import org.xipki.p11proxy.P11ProxyConstants;
 import org.xipki.p11proxy.msg.Asn1EntityIdAndCert;
 import org.xipki.p11proxy.msg.Asn1GenDSAKeypairParams;
@@ -58,6 +57,7 @@ import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

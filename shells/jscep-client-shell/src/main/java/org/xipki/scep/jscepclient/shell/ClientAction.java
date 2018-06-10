@@ -34,10 +34,10 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.XiAction;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

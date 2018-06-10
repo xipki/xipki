@@ -46,11 +46,6 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.AttributeCertificateIssuer;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponseDebug.RequestResponsePair;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.client.api.OcspRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
@@ -58,6 +53,11 @@ import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

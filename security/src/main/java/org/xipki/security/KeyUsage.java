@@ -17,7 +17,7 @@
 
 package org.xipki.security;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

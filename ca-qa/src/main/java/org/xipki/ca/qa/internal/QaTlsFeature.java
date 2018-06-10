@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.xipki.ca.certprofile.xml.jaxb.IntWithDescType;
 import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

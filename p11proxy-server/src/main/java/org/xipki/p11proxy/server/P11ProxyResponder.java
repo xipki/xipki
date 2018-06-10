@@ -35,9 +35,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.Hex;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
 import org.xipki.p11proxy.P11ProxyConstants;
 import org.xipki.p11proxy.msg.Asn1DigestSecretKeyTemplate;
 import org.xipki.p11proxy.msg.Asn1EntityIdAndCert;
@@ -72,6 +69,9 @@ import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Hex;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 
 /**
  * TODO.

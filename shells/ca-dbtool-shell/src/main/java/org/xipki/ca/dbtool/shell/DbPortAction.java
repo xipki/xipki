@@ -23,10 +23,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.dbtool.port.DbPortWorker;
-import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.shell.XiAction;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

@@ -54,9 +54,9 @@ import org.xipki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.ca.dbtool.jaxb.ca.SignerType;
 import org.xipki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.ca.dbtool.port.DbPorter;
-import org.xipki.common.util.XmlUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.XmlUtil;
 
 /**
  * TODO.

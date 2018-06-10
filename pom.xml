@@ -70,7 +70,7 @@
     <module>scep-client</module>
     <module>scep-server-emulator</module>
     <!-- Base components -->
-    <module>common</module>
+    <module>util</module>
     <module>qa-common</module>
     <module>cmp</module>
     <module>audit</module>

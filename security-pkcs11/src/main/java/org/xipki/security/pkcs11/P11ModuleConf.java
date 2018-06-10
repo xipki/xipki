@@ -26,10 +26,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.pkcs11.jaxb.MechanismFilterType;
 import org.xipki.security.pkcs11.jaxb.MechanismFiltersType;
@@ -41,6 +37,10 @@ import org.xipki.security.pkcs11.jaxb.PasswordSetsType;
 import org.xipki.security.pkcs11.jaxb.PasswordsType;
 import org.xipki.security.pkcs11.jaxb.SlotType;
 import org.xipki.security.pkcs11.jaxb.SlotsType;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 

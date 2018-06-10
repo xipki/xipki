@@ -26,8 +26,8 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.xipki.ca.certprofile.xml.jaxb.BiometricInfo;
 import org.xipki.ca.certprofile.xml.jaxb.BiometricTypeType;
 import org.xipki.ca.certprofile.xml.jaxb.TripleState;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

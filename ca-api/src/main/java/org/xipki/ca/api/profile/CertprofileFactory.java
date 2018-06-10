@@ -19,7 +19,7 @@ package org.xipki.ca.api.profile;
 
 import java.util.Set;
 
-import org.xipki.common.ObjectCreationException;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * TODO.

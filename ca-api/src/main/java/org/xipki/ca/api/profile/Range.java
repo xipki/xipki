@@ -17,7 +17,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

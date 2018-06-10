@@ -30,9 +30,9 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.qa.BenchmarkExecutor;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.util.ParamUtil;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;

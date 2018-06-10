@@ -17,10 +17,10 @@
 
 package org.xipki.password.callback;
 
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.StringUtil;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.password.SecurePasswordInputPanel;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

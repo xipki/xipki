@@ -20,8 +20,8 @@ package org.xipki.security.speed.pkcs12;
 import java.security.SecureRandom;
 
 import org.xipki.common.qa.BenchmarkExecutor;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.SecurityFactory;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

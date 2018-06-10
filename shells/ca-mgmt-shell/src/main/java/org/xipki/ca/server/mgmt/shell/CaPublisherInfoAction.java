@@ -25,8 +25,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.common.util.StringUtil;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

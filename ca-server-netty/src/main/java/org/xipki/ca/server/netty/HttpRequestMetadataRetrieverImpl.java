@@ -23,9 +23,9 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLSession;
 
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
-import org.xipki.http.servlet.TlsHelper;
 import org.xipki.http.servlet.ServletURI;
 import org.xipki.http.servlet.SslReverseProxyMode;
+import org.xipki.http.servlet.TlsHelper;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 

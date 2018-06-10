@@ -26,13 +26,13 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.cmp.PkiStatusInfo;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.util.DateUtil;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.ClientCrlReasonCompleter;
+import org.xipki.util.DateUtil;
+import org.xipki.util.RequestResponseDebug;
 
 /**
  * TODO.

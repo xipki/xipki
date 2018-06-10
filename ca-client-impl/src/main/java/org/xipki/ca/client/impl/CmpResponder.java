@@ -19,8 +19,8 @@ package org.xipki.ca.client.impl;
 
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.AlgorithmValidator;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.

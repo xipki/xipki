@@ -20,7 +20,7 @@ package org.xipki.ca.server.impl;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.util.ParamUtil;
 
 /**
  * Unique Identifier Generator.

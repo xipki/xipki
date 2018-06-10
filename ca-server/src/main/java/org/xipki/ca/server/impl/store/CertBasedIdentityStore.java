@@ -20,8 +20,8 @@ package org.xipki.ca.server.impl.store;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.

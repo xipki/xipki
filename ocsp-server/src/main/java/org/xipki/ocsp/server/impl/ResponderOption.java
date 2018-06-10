@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.OcspMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponderType;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
