@@ -25,5 +25,5 @@
   </parent>
   <artifactId>pki-jetty</artifactId>
   <packaging>pom</packaging>
-  <name>XiPKI :: features :: ${project.artifactId}</name>
+  <name>XiPKI features :: ${project.artifactId}</name>
 </project>
