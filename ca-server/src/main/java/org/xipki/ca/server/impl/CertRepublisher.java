@@ -34,7 +34,6 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.common.ProcessLog;
-import org.xipki.common.QueueEntry;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
@@ -46,6 +45,19 @@ import org.xipki.security.X509Cert;
  */
 
 class CertRepublisher {
+
+  private static interface QueueEntry {
+
+    public static final EndOfQueue END_OF_QUEUE = new EndOfQueue();
+
+    public static class EndOfQueue implements QueueEntry {
+
+      private EndOfQueue() {
+      }
+
+    }
+
+  }
 
   private class SerialWithIdQueueEntry implements QueueEntry {
 

@@ -32,6 +32,19 @@ import org.xipki.common.util.StringUtil;
 
 public class ProcessLog {
 
+  private static class MeasurePoint {
+
+    private final long measureTime;
+
+    private final long measureAccount;
+
+    public MeasurePoint(long measureTime, long measureAccount) {
+      this.measureTime = measureTime;
+      this.measureAccount = measureAccount;
+    }
+
+  }
+
   private static final long MS_900 = 900L;
 
   private static final long DAY_IN_SEC = 24L * 60 * 60;
@@ -196,9 +209,9 @@ public class ProcessLog {
 
     // current speed
     long currentSpeed = 0;
-    long t2inms = nowMs - referenceMeasurePoint.getMeasureTime(); // in ms
+    long t2inms = nowMs - referenceMeasurePoint.measureTime; // in ms
     if (t2inms > 0) {
-      currentSpeed = (tmpNumProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+      currentSpeed = (tmpNumProcessed - referenceMeasurePoint.measureAccount) * 1000 / t2inms;
     }
     sb.append(StringUtil.formatAccount(currentSpeed, true));
 

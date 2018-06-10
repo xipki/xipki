@@ -90,7 +90,7 @@ import org.xipki.cmp.PkiResponse;
 import org.xipki.cmp.ProtectionResult;
 import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
+import org.xipki.common.RequestResponseDebug.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.Hex;
 import org.xipki.common.util.ParamUtil;

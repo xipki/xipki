@@ -41,7 +41,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
+import org.xipki.common.RequestResponseDebug.RequestResponsePair;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.DateUtil;

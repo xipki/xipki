@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.dbtool.DbToolBase;
-import org.xipki.common.QueueEntry;
+import org.xipki.ca.dbtool.diffdb.QueueEntry.DigestEntrySet;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;

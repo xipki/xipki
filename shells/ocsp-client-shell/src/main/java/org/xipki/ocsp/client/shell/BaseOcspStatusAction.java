@@ -47,7 +47,7 @@ import org.bouncycastle.cert.AttributeCertificateIssuer;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
+import org.xipki.common.RequestResponseDebug.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;

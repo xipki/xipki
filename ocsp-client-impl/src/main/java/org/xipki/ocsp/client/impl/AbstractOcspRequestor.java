@@ -51,7 +51,7 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
+import org.xipki.common.RequestResponseDebug.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
