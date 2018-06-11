@@ -112,6 +112,8 @@ class IaikP11Slot extends AbstractP11Slot {
 
   private Slot slot;
 
+  private final String userTypeText;
+
   private final long userType;
 
   private List<char[]> password;
@@ -130,7 +132,17 @@ class IaikP11Slot extends AbstractP11Slot {
     super(moduleName, slotId, readOnly, mechanismFilter);
     this.slot = ParamUtil.requireNonNull("slot", slot);
     this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
-    this.userType = ParamUtil.requireMin("userType", userType, 0);
+    this.userType = userType;
+    if (userType == PKCS11Constants.CKU_SO) {
+      userTypeText = "CKU_SO";
+    } else if (userType == PKCS11Constants.CKU_USER) {
+      userTypeText = "CKU_USER";
+    } else if (userType == PKCS11Constants.CKU_CONTEXT_SPECIFIC) {
+      userTypeText = "CKU_CONTEXT_SPECIFIC";
+    } else {
+      userTypeText = "VENDOR_" + userType;
+    }
+
     this.password = password;
 
     Session session;
@@ -564,10 +576,11 @@ class IaikP11Slot extends AbstractP11Slot {
 
     try {
       session.login(userType, tmpPin);
-      LOG.info("login successful as user " + userType);
+      LOG.info("login successful as user " + userTypeText);
     } catch (TokenException ex) {
-      LOG.info("login failed as user " + userType);
-      throw new P11TokenException("login failed as user " + userType + ": " + ex.getMessage(), ex);
+      LOG.info("login failed as user " + userTypeText);
+      throw new P11TokenException(
+          "login failed as user " + userTypeText + ": " + ex.getMessage(), ex);
     }
   }
 

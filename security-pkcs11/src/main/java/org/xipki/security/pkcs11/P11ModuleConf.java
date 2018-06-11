@@ -86,6 +86,8 @@ public class P11ModuleConf {
       this.userType = PKCS11Constants.CKU_USER;
     } else if ("CKU_SO".equals(userTypeStr)) {
       this.userType = PKCS11Constants.CKU_SO;
+    } else if ("CKU_CONTEXT_SPECIFIC".equals(userTypeStr)) {
+      this.userType = PKCS11Constants.CKU_CONTEXT_SPECIFIC;
     } else {
       try {
         if (userTypeStr.startsWith("0X")) {
