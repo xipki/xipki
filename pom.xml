@@ -81,12 +81,8 @@
     <module>security-pkcs12</module>
     <module>pkcs11-emulator</module>
     <module>pkcs11-iaik</module>
-    <module>pkcs11-proxy</module>
     <module>servlet-api</module>
     <module>http-server</module>
-    <!-- PKCS#11 Proxy -->
-    <module>p11proxy-common</module>
-    <module>p11proxy-server</module>
     <!-- PKI Client -->
     <module>ca-client-api</module>
     <module>ca-client-impl</module>
