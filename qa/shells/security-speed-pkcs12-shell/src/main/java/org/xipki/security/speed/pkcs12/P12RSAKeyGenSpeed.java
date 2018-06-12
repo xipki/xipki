@@ -36,8 +36,8 @@ public class P12RSAKeyGenSpeed extends P12KeyGenSpeed {
 
   public P12RSAKeyGenSpeed(int keysize, BigInteger publicExponent,
       SecurityFactory securityFactory) throws Exception {
-    super("PKCS#12 RSA key generation\nkeysize: " + keysize + "\n"
-        + "public exponent: " + publicExponent, securityFactory);
+    super("PKCS#12 RSA key generation\nkeysize: " + keysize
+        + "\npublic exponent: " + publicExponent, securityFactory);
 
     this.keysize = keysize;
     this.publicExponent = publicExponent;

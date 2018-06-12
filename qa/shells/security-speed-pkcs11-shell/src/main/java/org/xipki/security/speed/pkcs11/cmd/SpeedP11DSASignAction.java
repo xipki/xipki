@@ -56,8 +56,7 @@ public class SpeedP11DSASignAction extends SpeedP11Action {
 
     if (plen == 1024) {
       if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
-        throw new IllegalCmdParamException(
-            "only SHA1withDSA is permitted for DSA with 1024 bit");
+        throw new IllegalCmdParamException("only SHA1withDSA is permitted for DSA with 1024 bit");
       }
     }
 

@@ -34,8 +34,7 @@ public class P11RSAKeyGenSpeed extends P11KeyGenSpeed {
 
   private final BigInteger publicExponent;
 
-  public P11RSAKeyGenSpeed(P11Slot slot, int keysize, BigInteger publicExponent)
-      throws Exception {
+  public P11RSAKeyGenSpeed(P11Slot slot, int keysize, BigInteger publicExponent) throws Exception {
     super(slot, "PKCS#11 RSA key generation\nkeysize: " + keysize
         + "\npublic exponent: " + publicExponent);
     this.keysize = keysize;

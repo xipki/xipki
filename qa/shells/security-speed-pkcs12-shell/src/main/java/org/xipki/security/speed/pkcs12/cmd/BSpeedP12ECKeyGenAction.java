@@ -50,11 +50,7 @@ public class BSpeedP12ECKeyGenAction extends BatchSpeedAction {
   @Override
   protected BenchmarkExecutor nextTester() throws Exception {
     ECControl control = queue.poll();
-    if (control == null) {
-      return null;
-    }
-
-    return new P12ECKeyGenSpeed(control.curveName(), securityFactory);
+    return (control == null) ? null : new P12ECKeyGenSpeed(control.curveName(), securityFactory);
   }
 
 }

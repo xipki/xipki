@@ -51,12 +51,8 @@ public class BSpeedP12RSAKeyGenAction extends BatchSpeedAction {
   @Override
   protected BenchmarkExecutor nextTester() throws Exception {
     RSAControl control = queue.poll();
-    if (control == null) {
-      return null;
-    }
-
-    return new P12RSAKeyGenSpeed(control.modulusLen(), toBigInt("0x10001"),
-        securityFactory);
+    return (control == null) ? null
+        : new P12RSAKeyGenSpeed(control.modulusLen(), toBigInt("0x10001"), securityFactory);
   }
 
 }

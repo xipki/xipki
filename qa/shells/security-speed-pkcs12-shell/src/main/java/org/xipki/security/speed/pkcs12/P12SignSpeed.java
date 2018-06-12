@@ -121,11 +121,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   private static SignerConf getKeystoreSignerConf(InputStream keystoreStream,
       String password, String signatureAlgorithm, int parallelism) throws IOException {
-    ParamUtil.requireNonNull("keystoreStream", keystoreStream);
-    ParamUtil.requireNonBlank("password", password);
-    ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
-    ParamUtil.requireMin("parallelism", parallelism, 1);
-
     ConfPairs conf = new ConfPairs("password", password);
     conf.putPair("algo", signatureAlgorithm);
     conf.putPair("parallelism", Integer.toString(parallelism));

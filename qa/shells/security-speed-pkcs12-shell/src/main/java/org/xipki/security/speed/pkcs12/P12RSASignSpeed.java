@@ -36,8 +36,8 @@ public class P12RSASignSpeed extends P12SignSpeed {
   public P12RSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
       int keysize, BigInteger publicExponent) throws Exception {
     super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
-        "PKCS#12 RSA signature creation\nkeysize: " + keysize + "\n"
-            + "public exponent: " + publicExponent);
+        "PKCS#12 RSA signature creation\nkeysize: " + keysize
+            + "\npublic exponent: " + publicExponent);
   }
 
   private static byte[] generateKeystore(int keysize, BigInteger publicExponent)

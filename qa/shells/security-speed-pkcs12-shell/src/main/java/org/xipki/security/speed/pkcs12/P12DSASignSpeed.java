@@ -35,10 +35,8 @@ public class P12DSASignSpeed extends P12SignSpeed {
   public P12DSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
       int plength, int qlength) throws Exception {
     super(securityFactory, signatureAlgorithm,
-        generateKeystore(plength, qlength),
-        "PKCS#12 DSA signature creation\n"
-          + "plength: " + plength + "\n"
-          + "qlength: " + qlength);
+        generateKeystore(plength, qlength), "PKCS#12 DSA signature creation\nplength: " + plength
+            + "\nqlength: " + qlength);
   }
 
   private static byte[] generateKeystore(int plength, int qlength) throws Exception {

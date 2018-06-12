@@ -48,8 +48,6 @@ public abstract class BSpeedP11Action extends BatchSpeedAction {
   @Completion(P11ModuleNameCompleter.class)
   protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
-;
-
   protected P11Slot getSlot()
       throws XiSecurityException, P11TokenException, IllegalCmdParamException {
     P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);

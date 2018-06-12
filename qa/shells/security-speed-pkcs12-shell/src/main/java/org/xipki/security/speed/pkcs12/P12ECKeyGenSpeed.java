@@ -34,8 +34,7 @@ public class P12ECKeyGenSpeed extends P12KeyGenSpeed {
 
   private final ASN1ObjectIdentifier curveOid;
 
-  public P12ECKeyGenSpeed(String curveNameOrOid, SecurityFactory securityFactory)
-      throws Exception {
+  public P12ECKeyGenSpeed(String curveNameOrOid, SecurityFactory securityFactory) throws Exception {
     super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
 
     ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
@@ -49,7 +48,6 @@ public class P12ECKeyGenSpeed extends P12KeyGenSpeed {
   @Override
   protected void generateKeypair(SecureRandom random) throws Exception {
     KeyUtil.generateECKeypair(curveOid, random);
-
   }
 
 }

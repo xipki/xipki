@@ -32,8 +32,8 @@ import org.xipki.util.ParamUtil;
 // CHECKSTYLE:SKIP
 public class P11RSASignSpeed extends P11SignSpeed {
 
-  public P11RSASignSpeed(SecurityFactory securityFactory, P11Slot slot,
-      String signatureAlgorithm, int keysize, BigInteger publicExponent) throws Exception {
+  public P11RSASignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
+      int keysize, BigInteger publicExponent) throws Exception {
     super(securityFactory, slot, signatureAlgorithm,
         generateKey(slot, keysize, publicExponent),
         "PKCS#11 RSA signature creation\n" + "keysize: " + keysize + "\n"

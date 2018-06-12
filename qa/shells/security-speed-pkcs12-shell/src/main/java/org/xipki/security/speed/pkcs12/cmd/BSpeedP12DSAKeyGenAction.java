@@ -51,11 +51,8 @@ public class BSpeedP12DSAKeyGenAction extends BatchSpeedAction {
   @Override
   protected BenchmarkExecutor nextTester() throws Exception {
     DSAControl control = queue.poll();
-    if (control == null) {
-      return null;
-    }
-
-    return new P12DSAKeyGenSpeed(control.plen(), control.qlen(), securityFactory);
+    return (control == null) ? null
+        : new P12DSAKeyGenSpeed(control.plen(), control.qlen(), securityFactory);
   }
 
 }

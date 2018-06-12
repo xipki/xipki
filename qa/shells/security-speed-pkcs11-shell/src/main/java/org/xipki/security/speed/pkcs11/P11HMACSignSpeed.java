@@ -34,8 +34,8 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11HMACSignSpeed extends P11SignSpeed {
 
-  public P11HMACSignSpeed(SecurityFactory securityFactory, P11Slot slot,
-      String signatureAlgorithm) throws Exception {
+  public P11HMACSignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm)
+      throws Exception {
     super(securityFactory, slot, signatureAlgorithm,
         generateKey(slot, signatureAlgorithm), "PKCS#11 HMAC signature creation");
   }

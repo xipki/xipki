@@ -44,15 +44,16 @@ public class P12AESGmacSignSpeed extends P12SignSpeed {
   }
 
   public static int getKeysize(String hmacAlgorithm) {
+    hmacAlgorithm = hmacAlgorithm.toUpperCase();
     int keysize;
-    if ("AES128-GMAC".equalsIgnoreCase(hmacAlgorithm)) {
+    if ("AES128-GMAC".equals(hmacAlgorithm)) {
       keysize = 128;
-    } else if ("AES192-GMAC".equalsIgnoreCase(hmacAlgorithm)) {
+    } else if ("AES192-GMAC".equals(hmacAlgorithm)) {
       keysize = 192;
-    } else if ("AES256-GMAC".equalsIgnoreCase(hmacAlgorithm)) {
+    } else if ("AES256-GMAC".equals(hmacAlgorithm)) {
       keysize = 256;
     } else {
-      throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
+      throw new IllegalArgumentException("unknown GMAC algorithm " + hmacAlgorithm);
     }
     return keysize;
   }
