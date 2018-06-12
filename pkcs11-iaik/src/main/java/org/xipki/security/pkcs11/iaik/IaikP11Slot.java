@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -47,6 +48,7 @@ import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11NewKeyControl;
+import org.xipki.security.pkcs11.P11NewKeyControl.KeyUsage;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
@@ -924,9 +926,35 @@ class IaikP11Slot extends AbstractP11Slot {
 
     template.getToken().setBooleanValue(true);
     template.getLabel().setCharArrayValue(label.toCharArray());
-    template.getSign().setBooleanValue(true);
     template.getSensitive().setBooleanValue(true);
-    template.getExtractable().setBooleanValue(control.isExtractable());
+    if (control.getExtractable() != null) {
+      template.getExtractable().setBooleanValue(control.getExtractable());
+    }
+
+    Set<KeyUsage> usages = control.getUsages();
+    // CHECKSTYLE:SKIP
+    final Boolean TRUE = Boolean.TRUE;
+    if (CollectionUtil.isNonEmpty(usages)) {
+      for (KeyUsage usage : usages) {
+        switch (usage) {
+          case DECRYPT:
+            template.getDecrypt().setBooleanValue(TRUE);
+            break;
+          case DERIVE:
+            template.getDerive().setBooleanValue(TRUE);
+            break;
+          case SIGN:
+            template.getSign().setBooleanValue(TRUE);
+            break;
+          case UNWRAP:
+            template.getUnwrap().setBooleanValue(TRUE);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
     template.getValueLen().setLongValue((long) (keysize / 8));
 
     Mechanism mechanism = Mechanism.get(mech);
@@ -963,10 +991,35 @@ class IaikP11Slot extends AbstractP11Slot {
     ValuedSecretKey template = new ValuedSecretKey(keyType);
     template.getToken().setBooleanValue(true);
     template.getLabel().setCharArrayValue(label.toCharArray());
-    template.getSign().setBooleanValue(true);
     template.getSensitive().setBooleanValue(true);
-    template.getExtractable().setBooleanValue(control.isExtractable());
+    if (control.getExtractable() != null) {
+      template.getExtractable().setBooleanValue(control.getExtractable());
+    }
     template.getValue().setByteArrayValue(keyValue);
+
+    Set<KeyUsage> usages = control.getUsages();
+    // CHECKSTYLE:SKIP
+    final Boolean TRUE = Boolean.TRUE;
+    if (CollectionUtil.isNonEmpty(usages)) {
+      for (KeyUsage usage : usages) {
+        switch (usage) {
+          case DECRYPT:
+            template.getDecrypt().setBooleanValue(TRUE);
+            break;
+          case DERIVE:
+            template.getDerive().setBooleanValue(TRUE);
+            break;
+          case SIGN:
+            template.getSign().setBooleanValue(TRUE);
+            break;
+          case UNWRAP:
+            template.getUnwrap().setBooleanValue(TRUE);
+            break;
+          default:
+            break;
+        }
+      }
+    }
 
     SecretKey key;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
@@ -1152,10 +1205,51 @@ class IaikP11Slot extends AbstractP11Slot {
       privateKey.getToken().setBooleanValue(true);
       privateKey.getLabel().setCharArrayValue(label.toCharArray());
       privateKey.getKeyType().setLongValue(keyType);
-      privateKey.getSign().setBooleanValue(true);
       privateKey.getPrivate().setBooleanValue(true);
       privateKey.getSensitive().setBooleanValue(true);
-      privateKey.getExtractable().setBooleanValue(control.isExtractable());
+      if (control.getExtractable() != null) {
+        privateKey.getExtractable().setBooleanValue(control.getExtractable());
+      }
+
+      Set<KeyUsage> usages = control.getUsages();
+      // CHECKSTYLE:SKIP
+      final Boolean TRUE = Boolean.TRUE;
+      if (CollectionUtil.isNonEmpty(usages)) {
+        for (KeyUsage usage : usages) {
+          switch (usage) {
+            case DECRYPT:
+              privateKey.getDecrypt().setBooleanValue(TRUE);
+              break;
+            case DERIVE:
+              privateKey.getDerive().setBooleanValue(TRUE);
+              break;
+            case SIGN:
+              privateKey.getSign().setBooleanValue(TRUE);
+              break;
+            case SIGN_RECOVER:
+              privateKey.getSignRecover().setBooleanValue(TRUE);
+              break;
+            case UNWRAP:
+              privateKey.getUnwrap().setBooleanValue(TRUE);
+              break;
+            default:
+              break;
+          }
+        }
+      } else {
+        // if not set
+        if (keyType == PKCS11Constants.CKK_EC
+            || keyType == PKCS11Constants.CKK_RSA
+            || keyType == PKCS11Constants.CKK_DSA
+            || keyType == PKCS11Constants.CKK_VENDOR_SM2) {
+          privateKey.getSign().setBooleanValue(TRUE);
+        }
+
+        if (keyType == PKCS11Constants.CKK_RSA) {
+          privateKey.getUnwrap().setBooleanValue(TRUE);
+          privateKey.getDecrypt().setBooleanValue(TRUE);
+        }
+      }
     }
 
     if (publicKey != null) {
@@ -1163,7 +1257,6 @@ class IaikP11Slot extends AbstractP11Slot {
       publicKey.getLabel().setCharArrayValue(label.toCharArray());
       publicKey.getKeyType().setLongValue(keyType);
       publicKey.getVerify().setBooleanValue(true);
-      publicKey.getModifiable().setBooleanValue(Boolean.TRUE);
     }
   }
 

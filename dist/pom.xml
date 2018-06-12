@@ -31,7 +31,6 @@
     <module>xipki-toolkit</module>
     <module>xipki-pki</module>
     <module>xipki-sdk</module>
-    <module>xipki-p11proxy</module>
     <!-- DO NOT INCLUDE xipki-qa -->
   </modules>
 </project>

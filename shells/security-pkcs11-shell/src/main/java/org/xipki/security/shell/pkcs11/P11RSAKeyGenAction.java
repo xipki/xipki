@@ -54,9 +54,4 @@ public class P11RSAKeyGenAction extends P11KeyGenAction {
     return null;
   }
 
-  @Override
-  protected boolean getDefaultExtractable() {
-    return false;
-  }
-
 }

@@ -112,11 +112,6 @@ public class P11SecretKeyImportAction extends P11KeyGenAction {
     return null;
   }
 
-  @Override
-  protected boolean getDefaultExtractable() {
-    return true;
-  }
-
   protected char[] getPassword() throws IOException {
     char[] pwdInChar = readPasswordIfNotSet(password);
     if (pwdInChar != null) {

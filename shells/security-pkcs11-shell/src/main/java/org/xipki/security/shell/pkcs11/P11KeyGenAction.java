@@ -17,10 +17,17 @@
 
 package org.xipki.security.shell.pkcs11;
 
+import java.util.List;
+
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.shell.pkcs11.completer.Pkcs11KeyUsageCompleter;
+import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -33,20 +40,29 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
   @Option(name = "--label", required = true, description = "label of the PKCS#11 objects")
   protected String label;
 
-  @Option(name = "--extractable", aliases = {"-x"}, description = "whether the key is extractable")
-  private Boolean extractable;
+  @Option(name = "--extractable", aliases = {"-x"},
+      description = "whether the key is extractable, valid values are yes|no|true|false")
+  private String extractable;
 
-  protected abstract boolean getDefaultExtractable();
+  @Option(name = "--key-usage", multiValued = true,
+      description = "key usage of the private key")
+  @Completion(Pkcs11KeyUsageCompleter.class)
+  private List<String> keyusages;
 
   protected void finalize(String keyType, P11ObjectIdentifier objectId) throws Exception {
     ParamUtil.requireNonNull("objectId", objectId);
     println("generated " + keyType + " key " + objectId);
   }
 
-  protected P11NewKeyControl getControl() {
+  protected P11NewKeyControl getControl() throws IllegalCmdParamException {
     P11NewKeyControl control = new P11NewKeyControl();
-    control.setExtractable((extractable == null)
-        ? getDefaultExtractable() : extractable.booleanValue());
+    if (StringUtil.isNotBlank(extractable)) {
+      control.setExtractable(isEnabled(extractable, false, "extractable"));
+    }
+    if (CollectionUtil.isNonEmpty(keyusages)) {
+      control.setUsages(Pkcs11KeyUsageCompleter.parseUsages(keyusages));
+    }
+
     return control;
   }
 

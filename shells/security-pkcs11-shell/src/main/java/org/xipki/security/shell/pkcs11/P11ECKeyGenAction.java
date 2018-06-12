@@ -48,9 +48,4 @@ public class P11ECKeyGenAction extends P11KeyGenAction {
     return null;
   }
 
-  @Override
-  protected boolean getDefaultExtractable() {
-    return false;
-  }
-
 }

@@ -69,7 +69,6 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
     long p11KeyType;
     if ("AES".equalsIgnoreCase(keyType)) {
       p11KeyType = PKCS11Constants.CKK_AES;
-
     } else if ("DES3".equalsIgnoreCase(keyType)) {
       p11KeyType = PKCS11Constants.CKK_DES3;
     } else if ("GENERIC".equalsIgnoreCase(keyType)) {
@@ -107,11 +106,6 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
     }
 
     return null;
-  }
-
-  @Override
-  protected boolean getDefaultExtractable() {
-    return true;
   }
 
 }

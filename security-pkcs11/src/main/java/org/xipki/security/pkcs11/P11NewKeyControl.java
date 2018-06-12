@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -25,14 +28,35 @@ package org.xipki.security.pkcs11;
 
 public class P11NewKeyControl {
 
-  private boolean extractable;
+  public static enum KeyUsage {
+    DECRYPT,
+    DERIVE,
+    SIGN,
+    SIGN_RECOVER,
+    UNWRAP
+  }
 
-  public boolean isExtractable() {
+  private Boolean extractable;
+
+  private Set<KeyUsage> usages;
+
+  public Boolean getExtractable() {
     return extractable;
   }
 
-  public void setExtractable(boolean extractable) {
+  public void setExtractable(Boolean extractable) {
     this.extractable = extractable;
+  }
+
+  public Set<KeyUsage> getUsages() {
+    if (usages == null) {
+      usages = new HashSet<>();
+    }
+    return usages;
+  }
+
+  public void setUsages(Set<KeyUsage> usages) {
+    this.usages = usages;
   }
 
 }

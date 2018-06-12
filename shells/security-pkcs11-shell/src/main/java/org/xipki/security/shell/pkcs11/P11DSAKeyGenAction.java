@@ -63,9 +63,4 @@ public class P11DSAKeyGenAction extends P11KeyGenAction {
     return null;
   }
 
-  @Override
-  protected boolean getDefaultExtractable() {
-    return true;
-  }
-
 }
