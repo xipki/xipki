@@ -48,15 +48,20 @@ public class CaProfileRemoveAction extends CaAction {
   @Completion(ProfileNameCompleter.class)
   private List<String> profileNames;
 
+  @Option(name = "--force", aliases = "-f", description = "without prompt")
+  private Boolean force = Boolean.FALSE;
+
   @Override
   protected Object execute0() throws Exception {
     for (String profileName : profileNames) {
       String msg = StringUtil.concat("certificate profile ", profileName, " from CA ", caName);
-      try {
-        caManager.removeCertprofileFromCa(profileName, caName);
-        println("removed " + msg);
-      } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      if (force || confirm("Do you want to remove " + msg, 3)) {
+        try {
+          caManager.removeCertprofileFromCa(profileName, caName);
+          println("removed " + msg);
+        } catch (CaMgmtException ex) {
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+        }
       }
     }
 

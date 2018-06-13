@@ -44,15 +44,21 @@ public class P11ObjectsDeleteAction extends P11SecurityAction {
           + "at least one of id and label must be specified")
   private String label;
 
+  @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
+  private Boolean force = Boolean.FALSE;
+
   @Override
   protected Object execute0() throws Exception {
-    P11Slot slot = getSlot();
-    byte[] idBytes = null;
-    if (id != null) {
-      idBytes = Hex.decode(id);
+    if (force || confirm("Do you want to remove the PKCS#11 objects (id = " + id
+        + ", label = " + label + ")", 3)) {
+      P11Slot slot = getSlot();
+      byte[] idBytes = null;
+      if (id != null) {
+        idBytes = Hex.decode(id);
+      }
+      int num = slot.removeObjects(idBytes, label);
+      println("deleted " + num + " objects");
     }
-    int num = slot.removeObjects(idBytes, label);
-    println("deleted " + num + " objects");
     return null;
   }
 

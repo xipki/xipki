@@ -38,12 +38,17 @@ public class P11CertDeleteAction extends P11SecurityAction {
       description = "id of the certificate in the PKCS#11 device")
   private String id;
 
+  @Option(name = "--force", aliases = "-f", description = "without prompt")
+  private Boolean force = Boolean.FALSE;
+
   @Override
   protected Object execute0() throws Exception {
-    P11Slot slot = getSlot();
-    P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
-    slot.removeCerts(objectId);
-    println("deleted certificates");
+    if (force || confirm("Do you want to remove PKCS#11 certificate object with id " + id, 3)) {
+      P11Slot slot = getSlot();
+      P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
+      slot.removeCerts(objectId);
+      println("deleted certificates");
+    }
     return null;
   }
 

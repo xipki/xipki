@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt.shell.cert;
 import java.math.BigInteger;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.shell.CmdFailure;
@@ -30,21 +31,26 @@ import org.xipki.shell.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "remove-cert", description = "remove certificate")
+@Command(scope = "ca", name = "rm-cert", description = "remove certificate")
 @Service
 public class RemoveCertAction extends UnRevRmCertAction {
+
+  @Option(name = "--force", aliases = "-f", description = "without prompt")
+  private Boolean force = Boolean.FALSE;
 
   @Override
   protected Object execute0() throws Exception {
     BigInteger serialNo = getSerialNumber();
     String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
-    try {
-      caManager.removeCertificate(caName, serialNo);
-      println("removed " + msg);
-      return null;
-    } catch (CaMgmtException ex) {
-      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    if (force || confirm("Do you want to remove " + msg, 3)) {
+      try {
+        caManager.removeCertificate(caName, serialNo);
+        println("removed " + msg);
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      }
     }
+    return null;
   }
 
 }

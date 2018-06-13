@@ -46,15 +46,20 @@ public class CaRequestorRemoveAction extends CaAction {
   @Completion(RequestorNameCompleter.class)
   private List<String> requestorNames;
 
+  @Option(name = "--force", aliases = "-f", description = "without prompt")
+  private Boolean force = Boolean.FALSE;
+
   @Override
   protected Object execute0() throws Exception {
     for (String requestorName : requestorNames) {
       String msg = "requestor " + requestorName + " from CA " + caName;
-      try {
-        caManager.removeRequestorFromCa(requestorName, caName);
-        println("removed " + msg);
-      } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      if (force || confirm("Do you want to remove " + msg, 3)) {
+        try {
+          caManager.removeRequestorFromCa(requestorName, caName);
+          println("removed " + msg);
+        } catch (CaMgmtException ex) {
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+        }
       }
     }
 

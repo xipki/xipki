@@ -187,7 +187,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
     --cert output/ocsp99.der --ca-cert output/rootca1.der
 }
 
-ca:caprofile-rm --ca rootca1 --profile ocsp
+ca:caprofile-rm -f --ca rootca1 --profile ocsp
 
 echo "#################################################################"
 echo "#                        Add subca with OCSP                    #"
@@ -221,7 +221,7 @@ ca:load-conf --conf-file xipki/qa/qa.d/subca.xml
 
 # Remove CertProfile rootca
 
-ca:profile-rm rootca
+ca:profile-rm -f rootca
 
 ## Restart the CA
 #ca:restart

@@ -214,10 +214,10 @@ if { $printUsage equals "true" } then {
   caqa:requestor-check --name qa-requestor1 \
     --cert xipki/security/tlskeys/tls-client.der
 
-  ca:requestor-rm qa-requestor1
+  ca:requestor-rm -f qa-requestor1
 
   # name does not exist
-  caqa:neg-requestor-rm qa-requestor1
+  caqa:neg-requestor-rm -f qa-requestor1
 
   echo "#################################################################"
   echo "#                            Signer                             #"
@@ -249,10 +249,10 @@ if { $printUsage equals "true" } then {
   caqa:signer-check --name qa-responder1 --type pkcs12 \
     --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA256withRSA
 
-  ca:signer-rm qa-responder1
+  ca:signer-rm -f qa-responder1
 
   # name does not exist
-  caqa:neg-signer-rm qa-responder1
+  caqa:neg-signer-rm -f qa-responder1
 
   echo "#################################################################"
   echo "#                    Add certificate profile                    #"
@@ -283,10 +283,10 @@ if { $printUsage equals "true" } then {
   caqa:profile-check --name qa-subca --type xml \
     --conf-file xipki/qa/certprofile/certprofile-subca-complex.xml
 
-  ca:profile-rm qa-subca
+  ca:profile-rm -f qa-subca
 
   # name does not exist
-  caqa:neg-profile-rm qa-subca
+  caqa:neg-profile-rm -f qa-subca
 
   echo "#################################################################"
   echo "#                              CA                               #"
@@ -377,7 +377,7 @@ if { $printUsage equals "true" } then {
     --duplicate-key yes \
     --validity-mode cutoff
 
-  ca:profile-rm rootca
+  ca:profile-rm -f rootca
 
   echo "neg-ca-add: certificate and key do not match"
 
@@ -468,7 +468,7 @@ if { $printUsage equals "true" } then {
 
   caqa:caalias-check --ca rootca1 --alias rootca-1
 
-  ca:caalias-rm rootca-1
+  ca:caalias-rm -f rootca-1
 
   echo "#################################################################"
   echo "#                          CA-has-profile                       #"
@@ -494,7 +494,7 @@ if { $printUsage equals "true" } then {
 
   # invalid permission
 
-  caqa:neg-caprofile-rm --ca rootca1 --profile profile-dummy
+  caqa:neg-caprofile-rm -f --ca rootca1 --profile profile-dummy
 
   echo "#################################################################"
   echo "#                         CA-has-publisher                      #"
@@ -505,13 +505,13 @@ if { $printUsage equals "true" } then {
   caqa:neg-capub-add --ca rootca10 --publisher publisher-dummy
 
   # CA name does not exist
-  caqa:neg-capub-rm --ca rootca10 --publisher publisher-dummy
+  caqa:neg-capub-rm -f --ca rootca10 --publisher publisher-dummy
 
   # Publisher name does not exist
   caqa:neg-capub-add --ca rootca1 --publisher publisher-dummy
 
   # Publisher name does not exist
-  caqa:neg-capub-rm --ca rootca1 --publisher publisher-dummy
+  caqa:neg-capub-rm -f --ca rootca1 --publisher publisher-dummy
 
   echo "#################################################################"
   echo "#                         CA-has-requestor                      #"
@@ -519,7 +519,7 @@ if { $printUsage equals "true" } then {
   caqa:careq-check --ca rootca1 --requestor requestor1 --ra yes \
     --permission all --profile all
 
-  ca:careq-rm --ca rootca1 --requestor requestor1 \
+  ca:careq-rm -f --ca rootca1 --requestor requestor1 \
 
   ca:careq-add --ca rootca1 --requestor requestor1 --ra yes \
     --permission enroll_cert --permission revoke_cert
@@ -532,14 +532,14 @@ if { $printUsage equals "true" } then {
     --permission all --profile all
 
   # CA name does not exist
-  caqa:neg-careq-rm --ca rootca10 --requestor requestor-dummy
+  caqa:neg-careq-rm -f --ca rootca10 --requestor requestor-dummy
 
   # Requestor name does not exist
   caqa:neg-careq-add --ca rootca1 --requestor requestor-dummy \
     --permission all --profile all
 
   # Requestor name does not exist
-  caqa:neg-careq-rm --ca rootca1 --requestor requestor-dummy
+  caqa:neg-careq-rm -f --ca rootca1 --requestor requestor-dummy
 
   # Requestor name does not exist
   caqa:neg-careq-add --ca rootca1 --requestor requestor-dummy \
@@ -553,7 +553,7 @@ if { $printUsage equals "true" } then {
 
   ca:caalias-info rootca
 
-  ca:caalias-rm rootca
+  ca:caalias-rm -f rootca
 
   ca:caalias-add --alias rootca --ca rootca1
 
@@ -561,7 +561,7 @@ if { $printUsage equals "true" } then {
 
   ca:caprofile-info --ca rootca1
 
-  ca:caprofile-rm --profile subca --ca rootca1
+  ca:caprofile-rm -f --profile subca --ca rootca1
 
   ca:caprofile-add --profile subca --ca rootca1
 
@@ -569,7 +569,7 @@ if { $printUsage equals "true" } then {
 
   ca:capub-info --ca rootca1
 
-  ca:capub-rm --publisher ocsp-publisher --ca rootca1
+  ca:capub-rm -f --publisher ocsp-publisher --ca rootca1
 
   ca:capub-add --ca rootca1 --publisher ocsp-publisher
 
@@ -577,7 +577,7 @@ if { $printUsage equals "true" } then {
 
   ca:careq-info --ca rootca1
 
-  ca:careq-rm --requestor requestor1 --ca rootca1
+  ca:careq-rm -f --requestor requestor1 --ca rootca1
 
   ca:careq-add --requestor requestor1 --ca rootca1 --profile all \
     --ra yes --permission all
@@ -611,7 +611,7 @@ if { $printUsage equals "true" } then {
   ca:publisher-add --name ocsp-publisher2 --type ocsp \
     --conf-file output/publisher.export
 
-  ca:publisher-rm ocsp-publisher2
+  ca:publisher-rm -f ocsp-publisher2
 
   ##### requestor #####
 
@@ -623,7 +623,7 @@ if { $printUsage equals "true" } then {
 
   ca:requestor-up --name requestor2 --cert xipki/security/tlskeys/tls-client.der
 
-  ca:requestor-rm requestor2
+  ca:requestor-rm -f requestor2
 
   ##### signer #####
 
@@ -637,7 +637,7 @@ if { $printUsage equals "true" } then {
  ca:signer-up --name responder2 \
     --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA1withRSA
 
-  ca:signer-rm responder2
+  ca:signer-rm -f responder2
 
   ##### cert #####
 
@@ -653,9 +653,9 @@ if { $printUsage equals "true" } then {
 
   ca:revoke-cert --ca rootca1 --reason keyCompromise --cert output/subca1.der
 
-  ca:remove-cert --ca rootca1 --cert output/subcawithcrl1.der
+  ca:rm-cert -f --ca rootca1 --cert output/subcawithcrl1.der
 
-  ca:remove-cert --ca rootca1 --cert output/subca1.der
+  ca:rm-cert -f --ca rootca1 --cert output/subca1.der
 
   ##### CA #####
 

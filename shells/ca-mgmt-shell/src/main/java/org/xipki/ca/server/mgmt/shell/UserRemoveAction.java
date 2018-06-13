@@ -36,16 +36,21 @@ public class UserRemoveAction extends CaAction {
   @Option(name = "--name", aliases = "-n", required = true, description = "user Name")
   private String name;
 
+  @Option(name = "--force", aliases = "-f", description = "without prompt")
+  private Boolean force = Boolean.FALSE;
+
   @Override
   protected Object execute0() throws Exception {
     String msg = "user " + name;
-    try {
-      caManager.removeUser(name);
-      println("removed " + msg);
-      return null;
-    } catch (CaMgmtException ex) {
-      throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+    if (force || confirm("Do you want to remove " + msg, 3)) {
+      try {
+        caManager.removeUser(name);
+        println("removed " + msg);
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      }
     }
+    return null;
   }
 
 }

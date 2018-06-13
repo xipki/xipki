@@ -28,8 +28,7 @@ import org.xipki.shell.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-remove-cert",
-    description = "remove certificate (negative, QA)")
+@Command(scope = "caqa", name = "neg-rm-cert", description = "remove certificate (negative, QA)")
 @Service
 public class NegRemoveCertAction extends RemoveCertAction {
 

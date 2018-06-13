@@ -34,7 +34,7 @@ import org.xipki.util.RequestResponseDebug;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "cmp-remove-cert", description = "remove certificate")
+@Command(scope = "xi", name = "cmp-rm-cert", description = "remove certificate")
 @Service
 public class RemoveCertAction extends UnRevRemoveCertAction {
 

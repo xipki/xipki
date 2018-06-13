@@ -46,15 +46,20 @@ public class CaPublisherRemoveAction extends CaAction {
   @Completion(PublisherNameCompleter.class)
   private List<String> publisherNames;
 
+  @Option(name = "--force", aliases = "-f", description = "without prompt")
+  private Boolean force = Boolean.FALSE;
+
   @Override
   protected Object execute0() throws Exception {
     for (String publisherName : publisherNames) {
       String msg = "publisher " + publisherName + " from CA " + caName;
-      try {
-        caManager.removePublisherFromCa(publisherName, caName);
-        println("removed " + msg);
-      } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+      if (force || confirm("Do you want to remove " + msg, 3)) {
+        try {
+          caManager.removePublisherFromCa(publisherName, caName);
+          println("removed " + msg);
+        } catch (CaMgmtException ex) {
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+        }
       }
     }
 
