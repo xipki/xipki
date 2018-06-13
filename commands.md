@@ -534,7 +534,7 @@ Feature xipki-camgmt-shell (started by default)
 
    * `ca:user-rm`
 
-      remove user
+     remove user
 
    * `ca:user-up`
 
@@ -556,7 +556,7 @@ Feature xipki-camgmt-shell (started by default)
 
      download CRL
 
-   * `ca:remove-cert`
+   * `ca:rm-cert`
 
      remove certificate
 
