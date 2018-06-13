@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.client.benchmark.shell.completer;
+package org.xipki.ca.client.shell;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.client.benchmark.shell.BenchmarkEntry.RandomDn;
-import org.xipki.shell.completer.AbstractEnumCompleter;
+import org.xipki.ca.client.api.CaClient;
+import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
  * TODO.
@@ -31,14 +31,14 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
  */
 
 @Service
-public class RandomDnCompleter extends AbstractEnumCompleter {
+public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
-  public RandomDnCompleter() {
-    List<String> enums = new LinkedList<>();
-    for (RandomDn dn : RandomDn.values()) {
-      enums.add(dn.name());
-    }
-    setTokens(enums);
+  @Reference
+  protected CaClient caClient;
+
+  @Override
+  protected Set<String> getEnums() {
+    return caClient.getCaNames();
   }
 
 }

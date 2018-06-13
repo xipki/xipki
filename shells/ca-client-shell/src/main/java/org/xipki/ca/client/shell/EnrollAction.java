@@ -53,7 +53,6 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;

@@ -29,7 +29,6 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;

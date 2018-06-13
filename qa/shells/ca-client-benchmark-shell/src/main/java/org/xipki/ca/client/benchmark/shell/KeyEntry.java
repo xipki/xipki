@@ -232,13 +232,7 @@ public abstract class KeyEntry {
           throw new IllegalArgumentException("invalid DSA pLength " + plength);
         }
 
-        int qlength;
-        if (plength >= 2048) {
-          qlength = 256;
-        } else {
-          qlength = 160;
-        }
-
+        int qlength = (plength >= 2048) ? 256 : 160;
         KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, new SecureRandom());
         DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
 

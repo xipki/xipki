@@ -21,11 +21,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.xipki.ca.client.benchmark.shell.BenchmarkEntry.RandomDn;
 import org.xipki.ca.client.benchmark.shell.KeyEntry.DSAKeyEntry;
 import org.xipki.ca.client.benchmark.shell.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.benchmark.shell.KeyEntry.RSAKeyEntry;
-import org.xipki.ca.client.benchmark.shell.completer.RandomDnCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.ECCurveNameCompleter;
 import org.xipki.util.StringUtil;
@@ -49,7 +49,8 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
   private String subjectTemplate;
 
   @Option(name = "--random-dn", description = "DN name to be incremented")
-  @Completion(RandomDnCompleter.class)
+  @Completion(value = StringsCompleter.class, values = {"GIVENNAME", "SURNAME", "STREET",
+      "POSTALCODE", "O", "OU", "CN"})
   private String randomDnStr = "O";
 
   @Option(name = "--duration", description = "duration")
