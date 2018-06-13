@@ -27,6 +27,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +76,7 @@ import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.objects.Attribute;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
@@ -302,6 +305,10 @@ class IaikP11Slot extends AbstractP11Slot {
     X509Cert cert = refreshResult.getCertForId(id);
     if (cert != null) {
       pubKey = cert.getCert().getPublicKey();
+      if (LOG.isDebugEnabled()) {
+        // just for analysis.
+        getPublicKeyObject(session, id, null);
+      }
     } else {
       PublicKey p11PublicKey = getPublicKeyObject(session, id, null);
       if (p11PublicKey == null) {
@@ -598,8 +605,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     List<PrivateKey> privateKeys = new ArrayList<>(n);
     for (Storage tmpObject : tmpObjects) {
-      PrivateKey privateKey = (PrivateKey) tmpObject;
-      privateKeys.add(privateKey);
+      privateKeys.add((PrivateKey) tmpObject);
     }
 
     return privateKeys;
@@ -617,8 +623,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     List<SecretKey> keys = new ArrayList<>(n);
     for (Storage tmpObject : tmpObjects) {
-      SecretKey key = (SecretKey) tmpObject;
-      keys.add(key);
+      keys.add((SecretKey) tmpObject);
     }
 
     return keys;
@@ -712,9 +717,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         for (PKCS11Object object : foundObjects) {
-          if (LOG.isTraceEnabled()) {
-            LOG.debug("found object: {}", object);
-          }
+          logPkcs11ObjectAttributes("found object: ", object);
           objList.add((Storage) object);
         }
       }
@@ -1455,6 +1458,26 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     return objects.length > 0;
+  }
+
+  private static void logPkcs11ObjectAttributes(String prefix, PKCS11Object p11Object) {
+    if (!LOG.isErrorEnabled()) {
+      return;
+    }
+
+    Hashtable<Long, Attribute> table = p11Object.getAttributeTable();
+    StringBuilder sb = new StringBuilder();
+    if (prefix != null) {
+      sb.append(prefix);
+    }
+
+    Enumeration<Long> keys = table.keys();
+    while (keys.hasMoreElements()) {
+      Attribute attr = p11Object.getAttribute(keys.nextElement());
+      sb.append("\n  ").append(attr.toString(true));
+    }
+
+    LOG.debug(sb.toString());
   }
 
 }
