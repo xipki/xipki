@@ -19,13 +19,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
-    <artifactId>xipki-parent</artifactId>
+    <groupId>org.xipki.assemblies</groupId>
+    <artifactId>assemblies</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.features</groupId>
-  <artifactId>features-parent</artifactId>
-  <name>XiPKI features :: ${project.artifactId}</name>
+  <groupId>org.xipki.assemblies.features</groupId>
+  <artifactId>features</artifactId>
+  <name>XiPKI :: Assemblies :: Features</name>
   <packaging>pom</packaging>
   <modules>
     <module>pki</module>

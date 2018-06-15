@@ -24,8 +24,8 @@
     <version>4.0.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.examples</groupId>
-  <artifactId>examples-parent</artifactId>
-  <name>XiPKI examples :: ${project.artifactId}</name>
+  <artifactId>examples</artifactId>
+  <name>XiPKI :: Examples</name>
   <packaging>pom</packaging>
   <modules>
     <module>certprofile-example</module>

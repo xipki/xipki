@@ -1194,10 +1194,10 @@ class IaikP11Slot extends AbstractP11Slot {
     newCertTemp.getLabel().setCharArrayValue(label);
     newCertTemp.getToken().setBooleanValue(true);
     newCertTemp.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
-    newCertTemp.getSubject().setByteArrayValue(
-        cert.getCert().getSubjectX500Principal().getEncoded());
-    newCertTemp.getIssuer().setByteArrayValue(cert.getCert().getIssuerX500Principal().getEncoded());
-    newCertTemp.getSerialNumber().setByteArrayValue(cert.getCert().getSerialNumber().toByteArray());
+    //TODO: newCertTemp.getSubject().setByteArrayValue(
+    //    cert.getCert().getSubjectX500Principal().getEncoded());
+    //newCertTemp.getIssuer().setByteArrayValue(cert.getCert().getIssuerX500Principal().getEncoded());
+    //newCertTemp.getSerialNumber().setByteArrayValue(cert.getCert().getSerialNumber().toByteArray());
     newCertTemp.getValue().setByteArrayValue(cert.getEncodedCert());
     return newCertTemp;
   }
@@ -1209,7 +1209,7 @@ class IaikP11Slot extends AbstractP11Slot {
       privateKey.getLabel().setCharArrayValue(label.toCharArray());
       privateKey.getKeyType().setLongValue(keyType);
       privateKey.getPrivate().setBooleanValue(true);
-      privateKey.getSensitive().setBooleanValue(true);
+      //privateKey.getSensitive().setBooleanValue(true);
       if (control.getExtractable() != null) {
         privateKey.getExtractable().setBooleanValue(control.getExtractable());
       }

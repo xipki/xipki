@@ -20,12 +20,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki.examples</groupId>
-    <artifactId>examples-parent</artifactId>
+    <artifactId>examples</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>certprofile-example</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI examples :: ${project.artifactId}</name>
+  <name>XiPKI :: Examples :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>

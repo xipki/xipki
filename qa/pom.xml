@@ -24,8 +24,8 @@
     <version>4.0.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.qa</groupId>
-  <artifactId>qa-parent</artifactId>
-  <name>XiPKI qa :: ${project.artifactId}</name>
+  <artifactId>qa</artifactId>
+  <name>XiPKI :: QA</name>
   <packaging>pom</packaging>
   <modules>
     <module>scep-server-emulator</module>

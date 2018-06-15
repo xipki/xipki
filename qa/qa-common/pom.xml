@@ -20,12 +20,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki.qa</groupId>
-    <artifactId>qa-parent</artifactId>
+    <artifactId>qa</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
   <artifactId>qa-common</artifactId>
-  <name>XiPKI qa :: ${project.artifactId}</name>
+  <name>XiPKI :: QA :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>

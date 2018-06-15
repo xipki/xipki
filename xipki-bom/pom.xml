@@ -170,21 +170,6 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>pkcs11-proxy</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
-        <artifactId>p11proxy-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
-        <artifactId>p11proxy-server</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
         <artifactId>password</artifactId>
         <version>${project.version}</version>
       </dependency>

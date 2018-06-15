@@ -46,7 +46,7 @@ public class CmpCaClientExample extends CaClientExample {
 
   private static final String CA_URL = "https://localhost:8443/cmp/myca";
 
-  private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-pki/target/"
+  private static final String CA_CERT_FILE = "~/source/xipki/assemblies/xipki-pki/target/"
       + "xipki-pki-4.0.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
 
   private static final String KEYCERT_DIR =  "target/tlskeys";

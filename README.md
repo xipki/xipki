@@ -49,7 +49,7 @@ follows.
   ```
 
   Then you will find `xipki-pki-*.tar.gz` in the directory
-  `dist/xipki-pki/target`.
+  `assemblies/xipki-pki/target`.
 
 ## Configure the CA and OCSP Responder
 

@@ -104,7 +104,6 @@
     <module>ocsp-server-servlet</module>
     <module>ocsp-server-netty</module>
     <module>shells</module>
-    <module>features</module>
     <module>examples</module>
     <module>qa</module>
     <module>xipki-bom</module>
@@ -375,7 +374,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
-        <module>dist</module>
+        <module>assemblies</module>
       </modules>
     </profile>
     <profile>
