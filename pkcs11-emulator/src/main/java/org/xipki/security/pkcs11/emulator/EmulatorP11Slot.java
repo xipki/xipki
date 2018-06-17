@@ -71,6 +71,8 @@ import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11NewKeyControl;
+import org.xipki.security.pkcs11.P11NewObjectConf;
+import org.xipki.security.pkcs11.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
@@ -233,7 +235,6 @@ class EmulatorP11Slot extends AbstractP11Slot {
   private final PrivateKeyCryptor privateKeyCryptor;
 
   private final SecureRandom random = new SecureRandom();
-  //private final SecurityFactory securityFactory;
 
   private final int maxSessions;
 
@@ -241,8 +242,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
       char[] password, PrivateKeyCryptor privateKeyCryptor, P11MechanismFilter mechanismFilter,
-      int maxSessions) throws P11TokenException {
-    super(moduleName, slotId, readOnly, mechanismFilter);
+      P11NewObjectConf newObjectConf, int maxSessions) throws P11TokenException {
+    super(moduleName, slotId, readOnly, mechanismFilter, newObjectConf);
 
     this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
     this.password = ParamUtil.requireNonNull("password", password);
@@ -763,13 +764,21 @@ class EmulatorP11Slot extends AbstractP11Slot {
   }
 
   @Override
-  protected void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
+  protected P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException {
-    savePkcs11Cert(objectId.getId(), objectId.getLabel(), cert);
+    byte[] id = control.getId();
+    if (id == null) {
+      id = generateId();
+    }
+
+    String label = control.getLabel();
+
+    savePkcs11Cert(id, label, cert);
+    return new P11ObjectIdentifier(id, label);
   }
 
   @Override
-  protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
+  protected P11Identity generateSecretKey0(long keyType, int keysize,
       P11NewKeyControl control) throws P11TokenException {
     if (keysize % 8 != 0) {
       throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
@@ -799,14 +808,14 @@ class EmulatorP11Slot extends AbstractP11Slot {
     byte[] keyBytes = new byte[keysize / 8];
     random.nextBytes(keyBytes);
     SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
-    return saveP11Entity(key, label);
+    return saveP11Entity(key, control);
   }
 
   @Override
-  protected P11Identity importSecretKey0(long keyType, byte[] keyValue, String label,
+  protected P11Identity importSecretKey0(long keyType, byte[] keyValue,
       P11NewKeyControl control) throws P11TokenException {
     SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
-    return saveP11Entity(key, label);
+    return saveP11Entity(key, control);
   }
 
   private static String getSecretKeyAlgorithm(long keyType) {
@@ -841,7 +850,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   @Override
   protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
-      String label, P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control) throws P11TokenException {
     assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
 
     KeyPair keypair;
@@ -851,13 +860,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
         | InvalidAlgorithmParameterException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-    return saveP11Entity(keypair, label);
+    return saveP11Entity(keypair, control);
   }
 
   @Override
   // CHECKSTYLE:SKIP
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
-      String label, P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control) throws P11TokenException {
     assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
     DSAParameters dsaParams = new DSAParameters(p, q, g);
     KeyPair keypair;
@@ -867,18 +876,18 @@ class EmulatorP11Slot extends AbstractP11Slot {
         | InvalidAlgorithmParameterException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-    return saveP11Entity(keypair, label);
+    return saveP11Entity(keypair, control);
   }
 
   @Override
-  protected P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
+  protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
     assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
-    return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, label, control);
+    return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, control);
   }
 
   @Override
-  protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, String label,
+  protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control) throws P11TokenException {
     assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
 
@@ -889,11 +898,18 @@ class EmulatorP11Slot extends AbstractP11Slot {
         | InvalidAlgorithmParameterException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-    return saveP11Entity(keypair, label);
+    return saveP11Entity(keypair, control);
   }
 
-  private P11Identity saveP11Entity(KeyPair keypair, String label) throws P11TokenException {
-    byte[] id = generateId();
+  private P11Identity saveP11Entity(KeyPair keypair, P11NewObjectControl control)
+      throws P11TokenException {
+    byte[] id = control.getId();
+    if (id == null) {
+      id = generateId();
+    }
+
+    String label = control.getLabel();
+
     savePkcs11PrivateKey(id, label, keypair.getPrivate());
     savePkcs11PublicKey(id, label, keypair.getPublic());
     P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
@@ -907,8 +923,15 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
   }
 
-  private P11Identity saveP11Entity(SecretKey key, String label) throws P11TokenException {
-    byte[] id = generateId();
+  private P11Identity saveP11Entity(SecretKey key, P11NewObjectControl control)
+      throws P11TokenException {
+    byte[] id = control.getId();
+    if (id == null) {
+      id = generateId();
+    }
+
+    String label = control.getLabel();
+
     savePkcs11SecretKey(id, label, key);
     P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
         new P11ObjectIdentifier(id, label));
@@ -919,7 +942,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
   protected void updateCertificate0(P11ObjectIdentifier objectId, X509Certificate newCert)
       throws P11TokenException, CertificateException {
     removePkcs11Cert(objectId);
-    addCert0(objectId, newCert);
+    savePkcs11Cert(objectId.getId(), objectId.getLabel(), newCert);
   }
 
 }

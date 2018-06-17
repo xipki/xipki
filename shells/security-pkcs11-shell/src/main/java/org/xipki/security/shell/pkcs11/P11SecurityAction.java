@@ -75,9 +75,9 @@ public abstract class P11SecurityAction extends SecurityAction {
     P11Slot slot = getSlot();
     P11ObjectIdentifier objIdentifier;
     if (hexId != null && label == null) {
-      objIdentifier = slot.getObjectIdForId(Hex.decode(hexId));
+      objIdentifier = slot.getObjectId(Hex.decode(hexId), null);
     } else if (hexId == null && label != null) {
-      objIdentifier = slot.getObjectIdForLabel(label);
+      objIdentifier = slot.getObjectId(null, label);
     } else {
       throw new IllegalCmdParamException(
           "exactly one of keyId or keyLabel should be specified");

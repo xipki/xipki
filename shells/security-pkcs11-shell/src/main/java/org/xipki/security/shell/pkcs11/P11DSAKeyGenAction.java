@@ -58,7 +58,7 @@ public class P11DSAKeyGenAction extends P11KeyGenAction {
     }
 
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objId = slot.generateDSAKeypair(plen, qlen, label, getControl());
+    P11ObjectIdentifier objId = slot.generateDSAKeypair(plen, qlen, getControl());
     finalize("DSA", objId);
     return null;
   }

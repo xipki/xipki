@@ -43,7 +43,7 @@ public class P11ECKeyGenAction extends P11KeyGenAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label, getControl());
+    P11ObjectIdentifier objId = slot.generateECKeypair(curveName, getControl());
     finalize("EC", objId);
     return null;
   }

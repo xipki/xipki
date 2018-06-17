@@ -37,7 +37,7 @@ public class P11SM2KeyGenAction extends P11KeyGenAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objId = slot.generateSM2Keypair(label, getControl());
+    P11ObjectIdentifier objId = slot.generateSM2Keypair(getControl());
     finalize("SM2", objId);
     return null;
   }

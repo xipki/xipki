@@ -165,7 +165,7 @@ public class EmulatorP11Module extends AbstractP11Module {
       int maxSessions = 20;
       P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
           moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.getP11MechanismFilter(),
-          maxSessions);
+          moduleConf.getP11NewObjectConf(), maxSessions);
       slots.add(slot);
     }
 

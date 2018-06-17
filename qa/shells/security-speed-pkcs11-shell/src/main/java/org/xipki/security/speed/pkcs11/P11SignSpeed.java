@@ -107,7 +107,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   }
 
   protected static P11NewKeyControl getNewKeyControl() {
-    P11NewKeyControl control = new P11NewKeyControl();
+    P11NewKeyControl control = new P11NewKeyControl(null, "speed-" + System.currentTimeMillis());
     control.setExtractable(true);
     return control;
   }

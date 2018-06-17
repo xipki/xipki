@@ -33,7 +33,7 @@ public class P11SM2KeyGenSpeed extends P11KeyGenSpeed {
 
   @Override
   protected void genKeypair() throws Exception {
-    P11ObjectIdentifier objId = slot.generateSM2Keypair(getDummyLabel(), getControl());
+    P11ObjectIdentifier objId = slot.generateSM2Keypair(getControl());
     slot.removeIdentity(objId);
   }
 

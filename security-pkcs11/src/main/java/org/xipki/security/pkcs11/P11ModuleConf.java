@@ -74,6 +74,8 @@ public class P11ModuleConf {
 
   private final long userType;
 
+  private final P11NewObjectConf newObjectConf;
+
   public P11ModuleConf(ModuleType moduleType, MechnanismSetsType mechanismSetsType,
       PasswordResolver passwordResolver) throws InvalidConfException {
     ParamUtil.requireNonNull("moduleType", moduleType);
@@ -215,6 +217,9 @@ public class P11ModuleConf {
       throw new InvalidConfException("could not find PKCS#11 library for OS " + osName);
     }
     this.nativeLibrary = nativeLibraryPath;
+
+    this.newObjectConf = (moduleType.getNewObjectConf() == null) ? new P11NewObjectConf()
+        : new P11NewObjectConf(moduleType.getNewObjectConf());
   }
 
   public String getName() {
@@ -279,6 +284,10 @@ public class P11ModuleConf {
 
   public P11MechanismFilter getP11MechanismFilter() {
     return mechanismFilter;
+  }
+
+  public P11NewObjectConf getP11NewObjectConf() {
+    return newObjectConf;
   }
 
   private static Set<P11SlotIdFilter> getSlotIdFilters(SlotsType type)

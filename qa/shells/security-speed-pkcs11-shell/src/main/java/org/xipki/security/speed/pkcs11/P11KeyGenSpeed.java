@@ -59,12 +59,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   protected abstract void genKeypair() throws Exception;
 
-  protected String getDummyLabel() {
-    return "speed-" + idx.getAndIncrement();
-  }
-
   protected P11NewKeyControl getControl() {
-    P11NewKeyControl control = new P11NewKeyControl();
+    P11NewKeyControl control = new P11NewKeyControl(null, "speed-" + idx.getAndIncrement());
     control.setExtractable(true);
     return control;
   }

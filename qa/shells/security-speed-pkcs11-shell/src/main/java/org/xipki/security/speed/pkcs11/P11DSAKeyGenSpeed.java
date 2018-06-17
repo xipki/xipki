@@ -40,8 +40,7 @@ public class P11DSAKeyGenSpeed extends P11KeyGenSpeed {
 
   @Override
   protected void genKeypair() throws Exception {
-    P11ObjectIdentifier objId = slot.generateDSAKeypair(plength, qlength, getDummyLabel(),
-        getControl());
+    P11ObjectIdentifier objId = slot.generateDSAKeypair(plength, qlength, getControl());
     slot.removeIdentity(objId);
   }
 

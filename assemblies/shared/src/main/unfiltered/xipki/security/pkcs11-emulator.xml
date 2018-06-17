@@ -40,6 +40,17 @@
         For vendor user type, only the long value is allowed.
       -->
       <user>CKU_USER</user>
+      <newObjectConf>
+        <ignoreLabel>false</ignoreLabel>
+        <idLength>8</idLength>
+        <setCertAttributes>
+          <attribute>CKA_END_DATE</attribute>
+          <attribute>CKA_START_DATE</attribute>
+          <attribute>CKA_SUBJECT</attribute>
+          <attribute>CKA_ISSUER</attribute>
+          <attribute>CKA_SERIAL_NUMBER</attribute>
+        </setCertAttributes>
+      </newObjectConf>
       <passwordSets>
         <passwords>
           <password>123456</password>

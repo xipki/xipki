@@ -68,6 +68,8 @@ public abstract class AbstractP11Slot implements P11Slot {
 
   protected final P11SlotIdentifier slotId;
 
+  protected final P11NewObjectConf newObjectConf;
+
   private final boolean readOnly;
 
   private final SecureRandom random = new SecureRandom();
@@ -83,10 +85,11 @@ public abstract class AbstractP11Slot implements P11Slot {
   private final P11MechanismFilter mechanismFilter;
 
   protected AbstractP11Slot(String moduleName, P11SlotIdentifier slotId, boolean readOnly,
-      P11MechanismFilter mechanismFilter) throws P11TokenException {
+      P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf) throws P11TokenException {
     this.mechanismFilter = ParamUtil.requireNonNull("mechanismFilter", mechanismFilter);
     this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
     this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+    this.newObjectConf = ParamUtil.requireNonNull("newObjectConf", newObjectConf);
     this.readOnly = readOnly;
   }
 
@@ -151,16 +154,17 @@ public abstract class AbstractP11Slot implements P11Slot {
   /**
    * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
    *
-   * @param objectId
-   *          Object identifier. Must not be {@code null}.
    * @param cert
    *          Certificate to be added. Must not be {@code null}.
+   * @param control
+   *          Control of the object creation process. Must not be {@code null}.
+   * @return the PKCS#11 identifier of the added certificate.
    * @throws CertificateException
    *         if process with certificate fails.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract void addCert0(P11ObjectIdentifier objectId, X509Certificate cert)
+  protected abstract P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException;
 
   /**
@@ -170,8 +174,6 @@ public abstract class AbstractP11Slot implements P11Slot {
    *          key type
    * @param keysize
    *          key size
-   * @param label
-   *          Label of the generated key. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#11 token.
@@ -179,7 +181,7 @@ public abstract class AbstractP11Slot implements P11Slot {
    *         if PKCS#11 token exception occurs.
    */
   protected abstract P11Identity generateSecretKey0(long keyType, int keysize,
-      String label, P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
@@ -189,8 +191,6 @@ public abstract class AbstractP11Slot implements P11Slot {
    *          key type.
    * @param keyValue
    *          Key value. Must not be {@code null}.
-   * @param label
-   *          Label of the created key. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -198,7 +198,7 @@ public abstract class AbstractP11Slot implements P11Slot {
    *         if PKCS#11 token exception occurs.
    */
   protected abstract P11Identity importSecretKey0(long keyType, byte[] keyValue,
-      String label, P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates a DSA keypair.
@@ -209,8 +209,6 @@ public abstract class AbstractP11Slot implements P11Slot {
    *          q of DSA. Must not be {@code null}.
    * @param g
    *          g of DSA. Must not be {@code null}.
-   * @param label
-   *          Label of the generated keys. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -218,16 +216,14 @@ public abstract class AbstractP11Slot implements P11Slot {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q,
-      BigInteger g, String label, P11NewKeyControl control) throws P11TokenException;
+  protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
+      P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates an EC keypair.
    *
    * @param curveId
    *         Object identifier of the EC curve. Must not be {@code null}.
-   * @param label
-   *          Label of the generated keys. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -236,13 +232,11 @@ public abstract class AbstractP11Slot implements P11Slot {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
-      String label, P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates an SM2p256v1 keypair.
    *
-   * @param label
-   *          Label of the generated keys. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -250,7 +244,7 @@ public abstract class AbstractP11Slot implements P11Slot {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  protected abstract P11Identity generateSM2Keypair0(String label, P11NewKeyControl control)
+  protected abstract P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException;
 
   /**
@@ -260,8 +254,6 @@ public abstract class AbstractP11Slot implements P11Slot {
    *          key size
    * @param publicExponent
    *          RSA public exponent. Could be {@code null}.
-   * @param label
-   *          Label of the generated keys. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -270,7 +262,7 @@ public abstract class AbstractP11Slot implements P11Slot {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
-      String label, P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control) throws P11TokenException;
 
   protected abstract P11SlotRefreshResult refresh0() throws P11TokenException;
 
@@ -488,33 +480,77 @@ public abstract class AbstractP11Slot implements P11Slot {
     return ident;
   }
 
-  @Override
-  public P11ObjectIdentifier getObjectIdForId(byte[] id) {
+  protected void assertNotExists(byte[] id, boolean ignoreLabel, String label)
+      throws P11DuplicateEntityException {
+    if (ignoreLabel) {
+      label = null;
+    }
+
+    if (id == null && label == null) {
+      return;
+    }
+
     for (P11ObjectIdentifier objectId : identities.keySet()) {
-      if (objectId.matchesId(id)) {
-        return objectId;
+      boolean match = true;
+      if (id != null) {
+        match = objectId.matchesId(id);
+      }
+
+      if (label != null) {
+        match = label.equals(objectId.getLabel());
+      }
+
+      if (match) {
+        StringBuilder sb = new StringBuilder("Identity or Certificate with ");
+        if (id != null) {
+          sb.append("id=0x").append(Hex.encodeUpper(id));
+          if (label != null) {
+            sb.append(" and ");
+          }
+        }
+
+        if (label != null) {
+          sb.append("label=").append(label);
+        }
+
+        sb.append(" already exists");
+        throw new P11DuplicateEntityException(sb.toString());
       }
     }
-
-    for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      if (objectId.matchesId(id)) {
-        return objectId;
-      }
-    }
-
-    return null;
   }
 
   @Override
-  public P11ObjectIdentifier getObjectIdForLabel(String label) {
+  public P11ObjectIdentifier getObjectId(byte[] id, String label) {
+    if (id == null && label == null) {
+      return null;
+    }
+
     for (P11ObjectIdentifier objectId : identities.keySet()) {
-      if (objectId.getLabel().equals(label)) {
+      boolean match = true;
+      if (id != null) {
+        match = objectId.matchesId(id);
+      }
+
+      if (label != null) {
+        match = label.equals(objectId.getLabel());
+      }
+
+      if (match) {
         return objectId;
       }
     }
 
     for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      if (objectId.getLabel().equals(label)) {
+      boolean match = true;
+      if (id != null) {
+        match = objectId.matchesId(id);
+      }
+
+      if (label != null) {
+        match = label.equals(objectId.getLabel());
+      }
+
+      if (match) {
         return objectId;
       }
     }
@@ -572,38 +608,26 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier addCert(X509Certificate cert)
+  public P11ObjectIdentifier addCert(X509Certificate cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException {
     ParamUtil.requireNonNull("cert", cert);
+    ParamUtil.requireNonNull("control", control);
     assertWritable("addCert");
 
-    byte[] encodedCert = cert.getEncoded();
-    for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      X509Cert tmpCert = certificates.get(objectId);
-      if (Arrays.equals(encodedCert, tmpCert.getEncodedCert())) {
-        return objectId;
-      }
+    if (!newObjectConf.isIgnoreLabel() && control.getLabel() == null) {
+      String cn = X509Util.getCommonName(cert.getSubjectX500Principal());
+      control = new P11NewObjectControl(control.getId(), generateLabel(cn));
     }
 
-    byte[] id = generateId();
-    String cn = X509Util.getCommonName(cert.getSubjectX500Principal());
-    String label = generateLabel(cn);
-    P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, label);
-    addCert(objectId, cert);
-    return objectId;
-  }
-
-  @Override
-  public void addCert(P11ObjectIdentifier objectId, X509Certificate cert)
-      throws P11TokenException, CertificateException {
-    addCert0(objectId, cert);
+    P11ObjectIdentifier objectId = addCert0(cert, control);
     certificates.put(objectId, new X509Cert(cert));
     updateCaCertsOfIdentities();
     LOG.info("added certificate {}", objectId);
+    return objectId;
   }
 
   protected byte[] generateId() throws P11TokenException {
-    byte[] id = new byte[8];
+    byte[] id = new byte[newObjectConf.getIdLength()];
 
     while (true) {
       random.nextBytes(id);
@@ -662,16 +686,13 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier generateSecretKey(long keyType, int keysize, String label,
-      P11NewKeyControl control)
-      throws P11TokenException {
-    ParamUtil.requireNonBlank("label", label);
+  public P11ObjectIdentifier generateSecretKey(long keyType, int keysize,
+      P11NewKeyControl control) throws P11TokenException {
     assertWritable("generateSecretKey");
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
+    ParamUtil.requireNonNull("control", control);
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
 
-    P11Identity identity = generateSecretKey0(keyType, keysize, label, control);
+    P11Identity identity = generateSecretKey0(keyType, keysize, control);
     addIdentity(identity);
 
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
@@ -680,15 +701,13 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue, String label,
+  public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue,
       P11NewKeyControl control) throws P11TokenException {
-    ParamUtil.requireNonBlank("label", label);
+    ParamUtil.requireNonNull("control", control);
     assertWritable("createSecretKey");
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
 
-    P11Identity identity = importSecretKey0(keyType, keyValue, label, control);
+    P11Identity identity = importSecretKey0(keyType, keyValue, control);
     addIdentity(identity);
 
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
@@ -698,24 +717,23 @@ public abstract class AbstractP11Slot implements P11Slot {
 
   @Override
   public P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
-      String label, P11NewKeyControl control) throws P11TokenException {
-    ParamUtil.requireNonBlank("label", label);
+      P11NewKeyControl control) throws P11TokenException {
+    ParamUtil.requireNonNull("control", control);
     ParamUtil.requireMin("keysize", keysize, 1024);
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
     assertWritable("generateRSAKeypair");
+
     assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
 
     BigInteger tmpPublicExponent = publicExponent;
     if (tmpPublicExponent == null) {
       tmpPublicExponent = BigInteger.valueOf(65537);
     }
 
-    P11Identity identity = generateRSAKeypair0(keysize, tmpPublicExponent, label, control);
+    P11Identity identity = generateRSAKeypair0(keysize, tmpPublicExponent, control);
     addIdentity(identity);
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
     LOG.info("generated RSA keypair {}", objId);
@@ -723,22 +741,20 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, String label,
-      P11NewKeyControl control) throws P11TokenException {
+  public P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, P11NewKeyControl control)
+      throws P11TokenException {
     ParamUtil.requireMin("plength", plength, 1024);
     if (plength % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
     }
+    ParamUtil.requireNonNull("control", control);
     assertWritable("generateDSAKeypair");
     assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
 
-    DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength,
-        random);
-    P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(),
-        dsaParams.getG(), label, control);
+    DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
+    P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(),
+        control);
     addIdentity(identity);
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
     LOG.info("generated DSA keypair {}", objId);
@@ -747,18 +763,16 @@ public abstract class AbstractP11Slot implements P11Slot {
 
   @Override
   public P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-      String label, P11NewKeyControl control) throws P11TokenException {
-    ParamUtil.requireNonBlank("label", label);
+      P11NewKeyControl control) throws P11TokenException {
     ParamUtil.requireNonNull("p", p);
     ParamUtil.requireNonNull("q", q);
     ParamUtil.requireNonNull("g", g);
+    ParamUtil.requireNonNull("control", control);
     assertWritable("generateDSAKeypair");
     assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
 
-    P11Identity identity = generateDSAKeypair0(p, q, g, label, control);
+    P11Identity identity = generateDSAKeypair0(p, q, g, control);
     addIdentity(identity);
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
     LOG.info("generated DSA keypair {}", objId);
@@ -766,21 +780,19 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier generateECKeypair(String curveNameOrOid, String label,
-      P11NewKeyControl control) throws P11TokenException {
+  public P11ObjectIdentifier generateECKeypair(String curveNameOrOid, P11NewKeyControl control)
+      throws P11TokenException {
     ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
-    ParamUtil.requireNonBlank("label", label);
+    ParamUtil.requireNonNull("control", control);
     assertWritable("generateECKeypair");
     assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
 
     ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
     if (curveId == null) {
       throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
     }
-    P11Identity identity = generateECKeypair0(curveId, label, control);
+    P11Identity identity = generateECKeypair0(curveId, control);
     addIdentity(identity);
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
     LOG.info("generated EC keypair {}", objId);
@@ -788,16 +800,13 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier generateSM2Keypair(String label, P11NewKeyControl control)
-      throws P11TokenException {
-    ParamUtil.requireNonBlank("label", label);
+  public P11ObjectIdentifier generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
+    ParamUtil.requireNonNull("control", control);
     assertWritable("generateSM2Keypair");
-
     assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
-    if (getObjectIdForLabel(label) != null) {
-      throw new P11DuplicateEntityException("identity with label " + label + " already exists");
-    }
-    P11Identity identity = generateSM2Keypair0(label, control);
+    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+
+    P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
     P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
     LOG.info("generated SM2 keypair {}", objId);

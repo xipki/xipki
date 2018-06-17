@@ -49,7 +49,7 @@ public class P11RSAKeyGenAction extends P11KeyGenAction {
 
     P11Slot slot = getSlot();
     P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
-        label, getControl());
+        getControl());
     finalize("RSA", objId);
     return null;
   }

@@ -46,8 +46,7 @@ public class P11HMACSignSpeed extends P11SignSpeed {
     int keysize = getKeysize(signatureAlgorithm);
     byte[] keyBytes = new byte[keysize / 8];
     new SecureRandom().nextBytes(keyBytes);
-    return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
-        "speed-" + System.currentTimeMillis(), getNewKeyControl());
+    return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes, getNewKeyControl());
   }
 
   private static int getKeysize(String hmacAlgorithm) {

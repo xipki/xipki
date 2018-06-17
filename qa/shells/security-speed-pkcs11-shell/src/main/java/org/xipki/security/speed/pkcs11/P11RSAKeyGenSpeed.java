@@ -43,8 +43,7 @@ public class P11RSAKeyGenSpeed extends P11KeyGenSpeed {
 
   @Override
   protected void genKeypair() throws Exception {
-    P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent, getDummyLabel(),
-        getControl());
+    P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent, getControl());
     slot.removeIdentity(objId);
   }
 

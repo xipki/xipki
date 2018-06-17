@@ -26,6 +26,7 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.shell.pkcs11.completer.Pkcs11KeyUsageCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.Hex;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
 
@@ -36,6 +37,9 @@ import org.xipki.util.StringUtil;
  */
 
 public abstract class P11KeyGenAction extends P11SecurityAction {
+
+  @Option(name = "--id", description = "id of the PKCS#11 objects")
+  private String hexId;
 
   @Option(name = "--label", required = true, description = "label of the PKCS#11 objects")
   protected String label;
@@ -55,7 +59,8 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
   }
 
   protected P11NewKeyControl getControl() throws IllegalCmdParamException {
-    P11NewKeyControl control = new P11NewKeyControl();
+    byte[] id = (hexId == null) ? null : Hex.decode(hexId);
+    P11NewKeyControl control = new P11NewKeyControl(id, label);
     if (StringUtil.isNotBlank(extractable)) {
       control.setExtractable(isEnabled(extractable, false, "extractable"));
     }

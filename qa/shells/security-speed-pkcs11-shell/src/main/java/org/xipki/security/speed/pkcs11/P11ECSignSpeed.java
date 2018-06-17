@@ -40,8 +40,7 @@ public class P11ECSignSpeed extends P11SignSpeed {
       throws Exception {
     ParamUtil.requireNonNull("slot", slot);
     ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
-    return slot.generateECKeypair(curveNameOrOid, "speed-" + System.currentTimeMillis(),
-        getNewKeyControl());
+    return slot.generateECKeypair(curveNameOrOid, getNewKeyControl());
   }
 
 }

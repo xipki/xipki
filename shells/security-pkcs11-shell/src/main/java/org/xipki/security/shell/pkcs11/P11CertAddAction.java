@@ -24,6 +24,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.pkcs11.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.util.X509Util;
@@ -38,15 +40,26 @@ import org.xipki.security.util.X509Util;
 @Service
 public class P11CertAddAction extends P11SecurityAction {
 
+  @Option(name = "--id", description = "id of the PKCS#11 objects")
+  private String hexId;
+
+  @Option(name = "--label", description = "label of the PKCS#11 objects.")
+  protected String label;
+
   @Option(name = "--cert", required = true, description = "certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
   @Override
   protected Object execute0() throws Exception {
+    byte[] id = (hexId == null) ? null : Hex.decode(hexId);
     X509Certificate cert = X509Util.parseCert(certFile);
+    if (label == null) {
+      label = X509Util.getCommonName(cert.getSubjectX500Principal());
+    }
+    P11NewObjectControl control = new P11NewObjectControl(id, label);
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objectId = slot.addCert(cert);
+    P11ObjectIdentifier objectId = slot.addCert(cert, control);
     println("added certificate under " + objectId);
     return null;
   }

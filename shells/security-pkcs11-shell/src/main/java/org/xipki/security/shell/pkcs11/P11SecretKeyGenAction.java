@@ -22,6 +22,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11NewKeyControl;
@@ -82,25 +83,38 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
 
     P11ObjectIdentifier objId = null;
     try {
-      objId = slot.generateSecretKey(p11KeyType, keysize, label, control);
+      objId = slot.generateSecretKey(p11KeyType, keysize, control);
       finalize(keyType, objId);
     } catch (P11UnsupportedMechanismException ex) {
       if (!createExternIfGenUnsupported) {
         throw ex;
       }
 
+      String msgPrefix = "could not generate secret key ";
+      if (control.getId() != null) {
+        msgPrefix += "id=" + Hex.toHexString(control.getId());
+
+        if (control.getLabel() != null) {
+          msgPrefix += " and ";
+        }
+      }
+
+      if (control.getLabel() != null) {
+        msgPrefix += "label=" + control.getLabel();
+      }
+
       if (LOG.isInfoEnabled()) {
-        LOG.info("could not generate secret key {}: ", label, ex.getMessage());
+        LOG.info(msgPrefix + ex.getMessage());
       }
 
       if (LOG.isDebugEnabled()) {
-        LOG.debug("could not generate secret key " + label, ex);
+        LOG.debug(msgPrefix, ex);
       }
 
       byte[] keyValue = new byte[keysize / 8];
       securityFactory.getRandom4Key().nextBytes(keyValue);
 
-      objId = slot.importSecretKey(p11KeyType, keyValue, label, control);
+      objId = slot.importSecretKey(p11KeyType, keyValue, control);
       Arrays.fill(keyValue, (byte) 0); // clear the memory
       println("generated in memory and imported " + keyType + " key " + objId);
     }

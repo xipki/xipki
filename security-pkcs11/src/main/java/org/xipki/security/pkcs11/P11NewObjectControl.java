@@ -17,8 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
@@ -26,41 +25,23 @@ import java.util.Set;
  * @since 2.2.0
  */
 
-public class P11NewKeyControl extends P11NewObjectControl {
+public class P11NewObjectControl {
 
-  public static enum KeyUsage {
-    DECRYPT,
-    DERIVE,
-    SIGN,
-    SIGN_RECOVER,
-    UNWRAP
+  private final byte[] id;
+
+  private final String label;
+
+  public P11NewObjectControl(byte[] id, String label) {
+    this.id = id;
+    this.label = ParamUtil.requireNonBlank("label", label);
   }
 
-  private Boolean extractable;
-
-  private Set<KeyUsage> usages;
-
-  public P11NewKeyControl(byte[] id, String label) {
-    super(id, label);
+  public byte[] getId() {
+    return id;
   }
 
-  public Boolean getExtractable() {
-    return extractable;
-  }
-
-  public void setExtractable(Boolean extractable) {
-    this.extractable = extractable;
-  }
-
-  public Set<KeyUsage> getUsages() {
-    if (usages == null) {
-      usages = new HashSet<>();
-    }
-    return usages;
-  }
-
-  public void setUsages(Set<KeyUsage> usages) {
-    this.usages = usages;
+  public String getLabel() {
+    return label;
   }
 
 }

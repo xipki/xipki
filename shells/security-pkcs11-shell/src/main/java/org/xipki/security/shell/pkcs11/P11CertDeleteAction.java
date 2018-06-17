@@ -45,7 +45,7 @@ public class P11CertDeleteAction extends P11SecurityAction {
   protected Object execute0() throws Exception {
     if (force || confirm("Do you want to remove PKCS#11 certificate object with id " + id, 3)) {
       P11Slot slot = getSlot();
-      P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
+      P11ObjectIdentifier objectId = slot.getObjectId(Hex.decode(id), null);
       slot.removeCerts(objectId);
       println("deleted certificates");
     }

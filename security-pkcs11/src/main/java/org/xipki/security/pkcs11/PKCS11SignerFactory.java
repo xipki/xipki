@@ -143,8 +143,7 @@ public class PKCS11SignerFactory implements SignerFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
 
-    P11ObjectIdentifier p11ObjId = (keyId != null)
-        ? slot.getObjectIdForId(keyId) : slot.getObjectIdForLabel(keyLabel);
+    P11ObjectIdentifier p11ObjId = slot.getObjectId(keyId, keyLabel);
     if (p11ObjId == null) {
       String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
       throw new ObjectCreationException("cound not find identity with " + str2);
