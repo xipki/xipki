@@ -251,9 +251,6 @@ class IaikP11Slot extends AbstractP11Slot {
 
       for (PrivateKey privKey : privKeys) {
         byte[] keyId = privKey.getId().getByteArrayValue();
-        if (keyId == null || keyId.length == 0) {
-          continue;
-        }
 
         try {
           analyseSingleKey(session.value(), privKey, ret);
@@ -332,8 +329,7 @@ class IaikP11Slot extends AbstractP11Slot {
     } else {
       PublicKey p11PublicKey = getPublicKeyObject(session, id, null);
       if (p11PublicKey == null) {
-        LOG.info("neither certificate nor public key for the key (" + hex(id)
-            + " is available");
+        LOG.info("neither certificate nor public key for the key (" + hex(id) + " is available");
         return;
       }
 

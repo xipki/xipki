@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.security.pkcs11.jaxb.NewObjectConfType;
-import org.xipki.security.pkcs11.jaxb.NewObjectConfType.SetCertAttributes;
 import org.xipki.util.ParamUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
@@ -48,11 +47,12 @@ public class P11NewObjectConf {
     Integer ii = jaxb.getIdLength();
     this.idLength = (ii == null) ? 8 : ii.intValue();
 
-    SetCertAttributes attrs = jaxb.getSetCertAttributes();
+    NewObjectConfType.CertAttributes attrs = jaxb.getCertAttributes();
     Set<Long> set = new HashSet<>();
     if (attrs != null) {
       for (String attr : attrs.getAttribute()) {
         attr = attr.toUpperCase();
+
         if ("CKA_START_DATE".equals(attr)) {
           set.add(PKCS11Constants.CKA_START_DATE);
         } else if ("CKA_END_DATE".equals(attr)) {

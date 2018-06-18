@@ -112,17 +112,17 @@
       <!-- If ID is generated randomly, this element specifies the number of bytes of an ID -->
       <xs:element name="ignoreLabel" type="xs:boolean" minOccurs="0"/>
       <xs:element name="idLength" type="xs:int" minOccurs="0"/>
-      <xs:element name="setCertAttributes" minOccurs="0">
+      <xs:element name="certAttributes" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
             <!-- Valid values are
-                   - CKA_END_DATE
                    - CKA_START_DATE
+                   - CKA_END_DATE
                    - CKA_SUBJECT
                    - CKA_ISSUER
                    - CKA_SERIAL_NUMBER
             -->
-            <xs:element name="attribute" type="xs:string" maxOccurs="99"/>
+            <xs:element name="attribute" type="xs:string" minOccurs="0" maxOccurs="99"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

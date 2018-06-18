@@ -37,7 +37,7 @@
           - 0 or 0x0 or CKU_SO
           - 1 or 0x1 or CKU_USER.
 
-        In Yubikey token, the user must be set to CKU_SO if you want to 
+        In Yubikey token, the user must be set to CKU_SO if you want to
         generate keys. Set it back to CKU_USER for normal use.
       -->
       <user>CKU_USER</user>
@@ -45,13 +45,13 @@
       <newObjectConf>
         <ignoreLabel>true</ignoreLabel>
         <idLength>1</idLength>
-        <!--setCertAttributes>
+        <certAttributes>
+          <!--attribute>CKA_START_DATE</attribute>
           <attribute>CKA_END_DATE</attribute>
-          <attribute>CKA_START_DATE</attribute>
           <attribute>CKA_SUBJECT</attribute>
           <attribute>CKA_ISSUER</attribute>
-          <attribute>CKA_SERIAL_NUMBER</attribute>
-        </setCertAttributes-->
+          <attribute>CKA_SERIAL_NUMBER</attribute-->
+        </certAttributes>
       </newObjectConf>
       <passwordSets>
         <passwords>

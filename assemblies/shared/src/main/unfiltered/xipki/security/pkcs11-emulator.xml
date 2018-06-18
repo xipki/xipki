@@ -43,13 +43,13 @@
       <newObjectConf>
         <ignoreLabel>false</ignoreLabel>
         <idLength>8</idLength>
-        <setCertAttributes>
-          <attribute>CKA_END_DATE</attribute>
+        <certAttributes>
           <attribute>CKA_START_DATE</attribute>
+          <attribute>CKA_END_DATE</attribute>
           <attribute>CKA_SUBJECT</attribute>
           <attribute>CKA_ISSUER</attribute>
           <attribute>CKA_SERIAL_NUMBER</attribute>
-        </setCertAttributes>
+        </certAttributes>
       </newObjectConf>
       <passwordSets>
         <passwords>
