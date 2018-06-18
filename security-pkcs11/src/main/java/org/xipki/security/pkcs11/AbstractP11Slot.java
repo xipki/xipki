@@ -52,6 +52,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
 
+import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
@@ -366,7 +367,7 @@ public abstract class AbstractP11Slot implements P11Slot {
       List<Long> sortedMechs = new ArrayList<>(mechanisms);
       Collections.sort(sortedMechs);
       for (Long mech : sortedMechs) {
-        sb.append("\t").append(Pkcs11Functions.getMechanismDesc(mech)).append("\n");
+        sb.append("\t").append(Functions.getMechanismDescription(mech)).append("\n");
       }
 
       sb.append("\nsupported by device but ignored mechanisms:\n");
@@ -375,7 +376,7 @@ public abstract class AbstractP11Slot implements P11Slot {
       } else {
         Collections.sort(ignoreMechs);
         for (Long mech : ignoreMechs) {
-          sb.append("\t").append(Pkcs11Functions.getMechanismDesc(mech)).append("\n");
+          sb.append("\t").append(Functions.getMechanismDescription(mech)).append("\n");
         }
       }
 

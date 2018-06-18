@@ -19,7 +19,8 @@ package org.xipki.security.pkcs11.exception;
 
 import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.Pkcs11Functions;
+
+import iaik.pkcs.pkcs11.constants.Functions;
 
 /**
  * TODO.
@@ -32,12 +33,12 @@ public class P11UnsupportedMechanismException extends P11TokenException {
   private static final long serialVersionUID = 1L;
 
   public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
-    super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
+    super("mechanism " + Functions.getMechanismDescription(mechanism)
       + " is not supported by PKCS11 slot " + slotId);
   }
 
   public P11UnsupportedMechanismException(long mechanism, P11EntityIdentifier entityId) {
-    super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
+    super("mechanism " + Functions.getMechanismDescription(mechanism)
       + " is not supported by PKCS11 entity " + entityId);
   }
 

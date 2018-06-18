@@ -32,6 +32,7 @@ import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ParamUtil;
 
+import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
@@ -98,7 +99,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       throw new P11UnsupportedMechanismException(mechanism, identityId);
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("sign with mechanism {}", Pkcs11Functions.getMechanismDesc(mechanism));
+      LOG.debug("sign with mechanism {}", Functions.getMechanismDescription(mechanism));
     }
     return sign0(mechanism, parameters, content);
   }
@@ -122,7 +123,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("digest secret with mechanism {}", Pkcs11Functions.getMechanismDesc(mechanism));
+      LOG.debug("digest secret with mechanism {}", Functions.getMechanismDescription(mechanism));
     }
     return digestSecretKey0(mechanism);
   }
