@@ -42,6 +42,7 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
 
+import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
@@ -127,7 +128,7 @@ public class P11ModuleConf {
 
         Long mech = null;
         if (mechStr.startsWith("CKM_")) {
-          mech = Pkcs11Functions.mechanismStringToCode(mechStr);
+          mech = Functions.mechanismStringToCode(mechStr);
         } else {
           int radix = 10;
           if (mechStr.startsWith("0X")) {

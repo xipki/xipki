@@ -58,7 +58,6 @@ import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
-import org.xipki.security.pkcs11.Pkcs11Functions;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -1201,7 +1200,7 @@ class IaikP11Slot extends AbstractP11Slot {
           labelChars = keypair.getPrivateKey().getLabel().getCharArrayValue();
         } catch (TokenException ex) {
           throw new P11TokenException("could not generate keypair "
-              + Pkcs11Functions.mechanismCodeToString(mech), ex);
+              + Functions.mechanismCodeToString(mech), ex);
         }
 
         P11ObjectIdentifier objId = new P11ObjectIdentifier(id, new String(labelChars));

@@ -26,20 +26,6 @@ import iaik.pkcs.pkcs11.constants.Functions;
  */
 
 public class Pkcs11Functions {
-  public static String mechanismCodeToString(long mechanism) {
-    return Functions.mechanismCodeToString(mechanism);
-  }
-
-  /**
-   * get the code of the given mechanism name.
-   * @param mechanismName
-   *          Mechanism name. Must not be {@code null}.
-   * @return the code if could be found, -1 otherwise.
-   */
-  public static long mechanismStringToCode(String mechanismName) {
-    Long mech = Functions.mechanismStringToCode(mechanismName);
-    return mech == null ? -1 : mech.longValue();
-  }
 
   public static String getMechanismDesc(long mechanism) {
     StringBuilder sb = new StringBuilder();

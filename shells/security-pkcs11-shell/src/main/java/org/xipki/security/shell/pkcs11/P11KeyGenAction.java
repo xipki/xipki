@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.shell.pkcs11.completer.Pkcs11KeyUsageCompleter;
+import org.xipki.security.shell.pkcs11.completer.P11KeyUsageCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
@@ -50,7 +50,7 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
 
   @Option(name = "--key-usage", multiValued = true,
       description = "key usage of the private key")
-  @Completion(Pkcs11KeyUsageCompleter.class)
+  @Completion(P11KeyUsageCompleter.class)
   private List<String> keyusages;
 
   protected void finalize(String keyType, P11ObjectIdentifier objectId) throws Exception {
@@ -65,7 +65,7 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
       control.setExtractable(isEnabled(extractable, false, "extractable"));
     }
     if (CollectionUtil.isNonEmpty(keyusages)) {
-      control.setUsages(Pkcs11KeyUsageCompleter.parseUsages(keyusages));
+      control.setUsages(P11KeyUsageCompleter.parseUsages(keyusages));
     }
 
     return control;

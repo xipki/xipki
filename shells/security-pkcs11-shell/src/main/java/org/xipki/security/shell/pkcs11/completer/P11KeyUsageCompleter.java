@@ -30,9 +30,9 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
  * @author Lijun Liao
  * @since 2.0.0
  */
-public class Pkcs11KeyUsageCompleter extends AbstractEnumCompleter {
+public class P11KeyUsageCompleter extends AbstractEnumCompleter {
 
-  public Pkcs11KeyUsageCompleter() {
+  public P11KeyUsageCompleter() {
     Set<String> names = new HashSet<>();
     for (KeyUsage usage : KeyUsage.values()) {
       names.add(usage.name());
