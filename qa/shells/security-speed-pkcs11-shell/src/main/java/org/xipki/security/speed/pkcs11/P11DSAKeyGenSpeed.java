@@ -32,8 +32,8 @@ public class P11DSAKeyGenSpeed extends P11KeyGenSpeed {
 
   private final int qlength;
 
-  public P11DSAKeyGenSpeed(P11Slot slot, int plength, int qlength) throws Exception {
-    super(slot, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
+  public P11DSAKeyGenSpeed(P11Slot slot, byte[] id, int plength, int qlength) throws Exception {
+    super(slot, id, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
     this.plength = plength;
     this.qlength = qlength;
   }

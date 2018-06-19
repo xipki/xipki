@@ -27,8 +27,8 @@ import org.xipki.security.pkcs11.P11Slot;
  */
 // CHECKSTYLE:SKIP
 public class P11SM2KeyGenSpeed extends P11KeyGenSpeed {
-  public P11SM2KeyGenSpeed(P11Slot slot) throws Exception {
-    super(slot, "PKCS#11 SM2 key generation");
+  public P11SM2KeyGenSpeed(P11Slot slot, byte[] id) throws Exception {
+    super(slot, id, "PKCS#11 SM2 key generation");
   }
 
   @Override

@@ -29,15 +29,15 @@ import org.xipki.security.pkcs11.P11Slot;
 // CHECKSTYLE:SKIP
 public class P11DSASignSpeed extends P11SignSpeed {
 
-  public P11DSASignSpeed(SecurityFactory securityFactory, P11Slot slot,
+  public P11DSASignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
       String signatureAlgorithm, int plength, int qlength) throws Exception {
-    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, plength, qlength),
+    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, keyId, plength, qlength),
         "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength);
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, int plength, int qlength)
-      throws Exception {
-    return slot.generateDSAKeypair(plength, qlength, getNewKeyControl());
+  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId,
+      int plength, int qlength) throws Exception {
+    return slot.generateDSAKeypair(plength, qlength, getNewKeyControl(keyId));
   }
 
 }

@@ -32,18 +32,18 @@ import org.xipki.util.ParamUtil;
 // CHECKSTYLE:SKIP
 public class P11RSASignSpeed extends P11SignSpeed {
 
-  public P11RSASignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
-      int keysize, BigInteger publicExponent) throws Exception {
+  public P11RSASignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
+      String signatureAlgorithm, int keysize, BigInteger publicExponent) throws Exception {
     super(securityFactory, slot, signatureAlgorithm,
-        generateKey(slot, keysize, publicExponent),
+        generateKey(slot, keyId, keysize, publicExponent),
         "PKCS#11 RSA signature creation\n" + "keysize: " + keysize + "\n"
             + "public exponent: " + publicExponent);
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, int keysize,
+  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId, int keysize,
       BigInteger publicExponent) throws Exception {
     ParamUtil.requireNonNull("slot", slot);
-    return slot.generateRSAKeypair(keysize, publicExponent, getNewKeyControl());
+    return slot.generateRSAKeypair(keysize, publicExponent, getNewKeyControl(keyId));
   }
 
 }

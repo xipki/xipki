@@ -48,7 +48,7 @@ public class SpeedP11ECSignAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11ECSignSpeed(securityFactory, getSlot(), sigAlgo, curveName);
+    return new P11ECSignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, curveName);
   }
 
 }

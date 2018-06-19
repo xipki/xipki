@@ -61,8 +61,8 @@ public class BSpeedP11RSASignAction extends BSpeedP11Action {
       return null;
     }
 
-    return new P11RSASignSpeed(securityFactory, getSlot(), sigAlgo, control.modulusLen(),
-                toBigInt("0x10001"));
+    return new P11RSASignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo,
+        control.modulusLen(), toBigInt("0x10001"));
   }
 
 }

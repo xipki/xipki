@@ -46,7 +46,12 @@ public class SpeedP11DSAKeyGenAction extends SpeedP11Action {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }
-    return new P11DSAKeyGenSpeed(getSlot(), plen, qlen);
+    return new P11DSAKeyGenSpeed(getSlot(), getKeyId(), plen, qlen);
+  }
+
+  @Override
+  protected int getNumThreads(int numThreads) {
+    return (getKeyId() == null) ? numThreads : 1;
   }
 
 }

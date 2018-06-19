@@ -43,7 +43,12 @@ public class SpeedP11ECKeyGenAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11ECKeyGenSpeed(getSlot(), curveName);
+    return new P11ECKeyGenSpeed(getSlot(), getKeyId(), curveName);
+  }
+
+  @Override
+  protected int getNumThreads(int numThreads) {
+    return (getKeyId() == null) ? numThreads : 1;
   }
 
 }

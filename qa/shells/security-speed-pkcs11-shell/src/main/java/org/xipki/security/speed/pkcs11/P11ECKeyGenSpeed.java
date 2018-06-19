@@ -31,8 +31,8 @@ public class P11ECKeyGenSpeed extends P11KeyGenSpeed {
 
   private final String curveNameOrOid;
 
-  public P11ECKeyGenSpeed(P11Slot slot, String curveNameOrOid) throws Exception {
-    super(slot, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
+  public P11ECKeyGenSpeed(P11Slot slot, byte[] id, String curveNameOrOid) throws Exception {
+    super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
     this.curveNameOrOid = ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
   }
 

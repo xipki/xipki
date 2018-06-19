@@ -30,13 +30,15 @@ import org.xipki.util.ParamUtil;
 // CHECKSTYLE:SKIP
 public class P11SM2SignSpeed extends P11SignSpeed {
 
-  public P11SM2SignSpeed(SecurityFactory securityFactory, P11Slot slot) throws Exception {
-    super(securityFactory, slot, "SM3WITHSM2", generateKey(slot), "PKCS#11 SM2 signature creation");
+  public P11SM2SignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId)
+      throws Exception {
+    super(securityFactory, slot, "SM3WITHSM2", generateKey(slot, keyId),
+        "PKCS#11 SM2 signature creation");
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot) throws Exception {
+  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId) throws Exception {
     ParamUtil.requireNonNull("slot", slot);
-    return slot.generateSM2Keypair(getNewKeyControl());
+    return slot.generateSM2Keypair(getNewKeyControl(keyId));
   }
 
 }

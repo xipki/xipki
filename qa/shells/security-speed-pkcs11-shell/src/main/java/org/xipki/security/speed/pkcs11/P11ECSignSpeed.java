@@ -30,17 +30,17 @@ import org.xipki.util.ParamUtil;
 // CHECKSTYLE:SKIP
 public class P11ECSignSpeed extends P11SignSpeed {
 
-  public P11ECSignSpeed(SecurityFactory securityFactory, P11Slot slot,
+  public P11ECSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
       String signatureAlgorithm, String curveNameOrOid) throws Exception {
-    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, curveNameOrOid),
+    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, keyId, curveNameOrOid),
         "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid);
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, String curveNameOrOid)
+  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId, String curveNameOrOid)
       throws Exception {
     ParamUtil.requireNonNull("slot", slot);
     ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
-    return slot.generateECKeypair(curveNameOrOid, getNewKeyControl());
+    return slot.generateECKeypair(curveNameOrOid, getNewKeyControl(keyId));
   }
 
 }

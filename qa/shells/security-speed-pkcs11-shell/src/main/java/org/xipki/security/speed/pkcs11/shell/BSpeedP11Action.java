@@ -29,6 +29,8 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.speed.shell.BatchSpeedAction;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.Hex;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -40,6 +42,9 @@ public abstract class BSpeedP11Action extends BatchSpeedAction {
 
   @Reference (optional = true)
   protected P11CryptServiceFactory p11CryptServiceFactory;
+
+  @Option(name = "--key-id", description = "id of the PKCS#11 key")
+  private String hexKeyId;
 
   @Option(name = "--slot", required = true, description = "slot index")
   protected Integer slotIndex;
@@ -57,6 +62,10 @@ public abstract class BSpeedP11Action extends BatchSpeedAction {
     P11Module module = p11Service.getModule();
     P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
     return module.getSlot(slotId);
+  }
+
+  protected byte[] getKeyId() {
+    return StringUtil.isBlank(hexKeyId) ? null : Hex.decode(hexKeyId);
   }
 
 }

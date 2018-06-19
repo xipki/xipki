@@ -36,7 +36,12 @@ public class SpeedP11SM2KeyGenAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11SM2KeyGenSpeed(getSlot());
+    return new P11SM2KeyGenSpeed(getSlot(), getKeyId());
+  }
+
+  @Override
+  protected int getNumThreads(int numThreads) {
+    return (getKeyId() == null) ? numThreads : 1;
   }
 
 }

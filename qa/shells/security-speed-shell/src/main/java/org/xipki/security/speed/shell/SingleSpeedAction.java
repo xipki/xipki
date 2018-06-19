@@ -40,10 +40,14 @@ public abstract class SingleSpeedAction extends SecurityAction {
   protected Object execute0() throws Exception {
     BenchmarkExecutor tester = getTester();
     tester.setDuration(duration);
-    tester.setThreads(Math.min(20, numThreads));
+    tester.setThreads(getNumThreads(numThreads));
 
     tester.execute();
     return null;
+  }
+
+  protected int getNumThreads(int numThreads) {
+    return numThreads;
   }
 
 }

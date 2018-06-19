@@ -54,7 +54,12 @@ public class BSpeedP11DSAKeyGenAction extends BSpeedP11Action {
       return null;
     }
 
-    return new P11DSAKeyGenSpeed(getSlot(), control.plen(), control.qlen());
+    return new P11DSAKeyGenSpeed(getSlot(), getKeyId(), control.plen(), control.qlen());
+  }
+
+  @Override
+  protected int getNumThreads(int numThreads) {
+    return (getKeyId() == null) ? numThreads : 1;
   }
 
 }

@@ -54,7 +54,12 @@ public class BSpeedP11RSAKeyGenAction extends BSpeedP11Action {
       return null;
     }
 
-    return new P11RSAKeyGenSpeed(getSlot(), control.modulusLen(), toBigInt("0x10001"));
+    return new P11RSAKeyGenSpeed(getSlot(), getKeyId(), control.modulusLen(), toBigInt("0x10001"));
+  }
+
+  @Override
+  protected int getNumThreads(int numThreads) {
+    return (getKeyId() == null) ? numThreads : 1;
   }
 
 }

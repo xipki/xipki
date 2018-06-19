@@ -43,7 +43,12 @@ public class SpeedP11RSAKeyGenAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11RSAKeyGenSpeed(getSlot(), keysize, toBigInt(publicExponent));
+    return new P11RSAKeyGenSpeed(getSlot(), getKeyId(), keysize, toBigInt(publicExponent));
+  }
+
+  @Override
+  protected int getNumThreads(int numThreads) {
+    return (getKeyId() == null) ? numThreads : 1;
   }
 
 }

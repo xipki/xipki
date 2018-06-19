@@ -68,7 +68,8 @@ public class BSpeedP11DSASignAction extends BSpeedP11Action {
       }
     }
 
-    return new P11DSASignSpeed(securityFactory, getSlot(), sigAlgo, control.plen(), control.qlen());
+    return new P11DSASignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo,
+        control.plen(), control.qlen());
   }
 
 }

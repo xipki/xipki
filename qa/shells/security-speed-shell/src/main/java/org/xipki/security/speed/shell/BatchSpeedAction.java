@@ -63,7 +63,7 @@ public abstract class BatchSpeedAction extends SecurityAction {
       }
 
       tester.setDuration(duration);
-      tester.setThreads(Math.min(20, numThreads));
+      tester.setThreads(getNumThreads(numThreads));
       tester.execute();
       if (tester.isInterrupted()) {
         throw new InterruptedException("cancelled by the user");
@@ -75,6 +75,10 @@ public abstract class BatchSpeedAction extends SecurityAction {
   // CHECKSTYLE:SKIP
   protected List<String> getECCurveNames() {
     return AlgorithmUtil.getECCurveNames();
+  }
+
+  protected int getNumThreads(int numThreads) {
+    return numThreads;
   }
 
 }

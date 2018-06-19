@@ -50,17 +50,20 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   protected final P11Slot slot;
 
+  private byte[] id;
+
   private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
 
-  public P11KeyGenSpeed(P11Slot slot, String description) {
+  public P11KeyGenSpeed(P11Slot slot, byte[] id, String description) {
     super(description);
     this.slot = ParamUtil.requireNonNull("slot", slot);
+    this.id = id;
   }
 
   protected abstract void genKeypair() throws Exception;
 
   protected P11NewKeyControl getControl() {
-    P11NewKeyControl control = new P11NewKeyControl(null, "speed-" + idx.getAndIncrement());
+    P11NewKeyControl control = new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());
     control.setExtractable(true);
     return control;
   }

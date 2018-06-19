@@ -60,7 +60,7 @@ public class SpeedP11DSASignAction extends SpeedP11Action {
       }
     }
 
-    return new P11DSASignSpeed(securityFactory, getSlot(), sigAlgo, plen, qlen);
+    return new P11DSASignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, plen, qlen);
   }
 
 }

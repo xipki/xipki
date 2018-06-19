@@ -43,7 +43,7 @@ public class SpeedP11HMACSignAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11HMACSignSpeed(securityFactory, getSlot(), sigAlgo);
+    return new P11HMACSignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo);
   }
 
 }

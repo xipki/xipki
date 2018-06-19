@@ -34,19 +34,20 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 // CHECKSTYLE:SKIP
 public class P11HMACSignSpeed extends P11SignSpeed {
 
-  public P11HMACSignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm)
-      throws Exception {
+  public P11HMACSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
+      String signatureAlgorithm) throws Exception {
     super(securityFactory, slot, signatureAlgorithm,
-        generateKey(slot, signatureAlgorithm), "PKCS#11 HMAC signature creation");
+        generateKey(slot, keyId, signatureAlgorithm), "PKCS#11 HMAC signature creation");
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, String signatureAlgorithm)
-      throws Exception {
+  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId,
+      String signatureAlgorithm) throws Exception {
     ParamUtil.requireNonNull("slot", slot);
     int keysize = getKeysize(signatureAlgorithm);
     byte[] keyBytes = new byte[keysize / 8];
     new SecureRandom().nextBytes(keyBytes);
-    return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes, getNewKeyControl());
+    return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
+        getNewKeyControl(keyId));
   }
 
   private static int getKeysize(String hmacAlgorithm) {
