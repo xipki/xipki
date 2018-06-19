@@ -35,10 +35,10 @@ public class DSASigAlgCompleter extends AbstractEnumCompleter {
 
   public DSASigAlgCompleter() {
     String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
-      "SHA3-224, SHA3-256, SHA3-384, SHA3-512"};
+      "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512"};
     List<String> enums = new LinkedList<>();
     for (String hashAlg : hashAlgs) {
-      enums.add(hashAlg + "withDSA,");
+      enums.add(hashAlg + "withDSA");
     }
     setTokens(enums);
   }
