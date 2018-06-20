@@ -48,7 +48,7 @@
   </prerequisites>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <xipki.tools.version>1.0.1-SNAPSHOT</xipki.tools.version>
+    <xipki.tools.version>1.0.2</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.0</karaf.version>
     <karaf.plugin.version>4.2.0</karaf.plugin.version>
@@ -123,7 +123,7 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-  <pluginRepositories>
+  <!--pluginRepositories>
     <pluginRepository>
       <id>oss-snapshots</id>
       <name>OSS Sonatype Snapshots Repository</name>
@@ -135,7 +135,7 @@
         <enabled>true</enabled>
       </snapshots>
     </pluginRepository>
-  </pluginRepositories>
+  </pluginRepositories-->
   <build>
     <plugins>
       <plugin>
