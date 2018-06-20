@@ -485,25 +485,19 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     for (P11ObjectIdentifier objectId : identities.keySet()) {
-      boolean match = true;
-      if (id != null) {
-        match = objectId.matchesId(id);
-      }
+      boolean matchId = (id == null) ? false : objectId.matchesId(id);
+      boolean matchLabel = (label == null) ? false : label.equals(objectId.getLabel());
 
-      if (label != null) {
-        match = label.equals(objectId.getLabel());
-      }
-
-      if (match) {
+      if (matchId || matchLabel) {
         StringBuilder sb = new StringBuilder("Identity or Certificate with ");
-        if (id != null) {
+        if (matchId) {
           sb.append("id=0x").append(Hex.encodeUpper(id));
-          if (label != null) {
+          if (matchLabel) {
             sb.append(" and ");
           }
         }
 
-        if (label != null) {
+        if (matchLabel) {
           sb.append("label=").append(label);
         }
 
