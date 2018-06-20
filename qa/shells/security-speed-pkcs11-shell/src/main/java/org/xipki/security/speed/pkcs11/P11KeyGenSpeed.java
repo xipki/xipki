@@ -65,9 +65,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
   protected abstract void genKeypair() throws Exception;
 
   protected P11NewKeyControl getControl() {
-    P11NewKeyControl control = new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());
-    control.setExtractable(true);
-    return control;
+    return new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());
   }
 
   @Override
