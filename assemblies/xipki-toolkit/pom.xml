@@ -184,6 +184,14 @@
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
                 </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
+                  <arg value="--value-file"/>
+                  <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
+                </java>
               </target>
             </configuration>
             <goals>
