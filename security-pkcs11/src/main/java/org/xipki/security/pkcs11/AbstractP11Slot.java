@@ -69,8 +69,6 @@ public abstract class AbstractP11Slot implements P11Slot {
 
   protected final P11SlotIdentifier slotId;
 
-  protected final P11NewObjectConf newObjectConf;
-
   private final boolean readOnly;
 
   private final SecureRandom random = new SecureRandom();
@@ -86,11 +84,10 @@ public abstract class AbstractP11Slot implements P11Slot {
   private final P11MechanismFilter mechanismFilter;
 
   protected AbstractP11Slot(String moduleName, P11SlotIdentifier slotId, boolean readOnly,
-      P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf) throws P11TokenException {
+      P11MechanismFilter mechanismFilter) throws P11TokenException {
     this.mechanismFilter = ParamUtil.requireNonNull("mechanismFilter", mechanismFilter);
     this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
     this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-    this.newObjectConf = ParamUtil.requireNonNull("newObjectConf", newObjectConf);
     this.readOnly = readOnly;
   }
 
@@ -481,12 +478,8 @@ public abstract class AbstractP11Slot implements P11Slot {
     return ident;
   }
 
-  protected void assertNotExists(byte[] id, boolean ignoreLabel, String label)
+  protected void assertNotExists(byte[] id, String label)
       throws P11DuplicateEntityException {
-    if (ignoreLabel) {
-      label = null;
-    }
-
     if (id == null && label == null) {
       return;
     }
@@ -615,7 +608,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonNull("control", control);
     assertWritable("addCert");
 
-    if (!newObjectConf.isIgnoreLabel() && control.getLabel() == null) {
+    if (control.getLabel() == null) {
       String cn = X509Util.getCommonName(cert.getSubjectX500Principal());
       control = new P11NewObjectControl(control.getId(), generateLabel(cn));
     }
@@ -625,34 +618,6 @@ public abstract class AbstractP11Slot implements P11Slot {
     updateCaCertsOfIdentities();
     LOG.info("added certificate {}", objectId);
     return objectId;
-  }
-
-  protected byte[] generateId() throws P11TokenException {
-    byte[] id = new byte[newObjectConf.getIdLength()];
-
-    while (true) {
-      random.nextBytes(id);
-      boolean duplicated = false;
-      for (P11ObjectIdentifier objectId : identities.keySet()) {
-        if (objectId.matchesId(id)) {
-          duplicated = true;
-          break;
-        }
-      }
-
-      if (!duplicated) {
-        for (P11ObjectIdentifier objectId : certificates.keySet()) {
-          if (objectId.matchesId(id)) {
-            duplicated = true;
-            break;
-          }
-        }
-      }
-
-      if (!duplicated) {
-        return id;
-      }
-    }
   }
 
   protected String generateLabel(String label) throws P11TokenException {
@@ -691,7 +656,7 @@ public abstract class AbstractP11Slot implements P11Slot {
       P11NewKeyControl control) throws P11TokenException {
     assertWritable("generateSecretKey");
     ParamUtil.requireNonNull("control", control);
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     P11Identity identity = generateSecretKey0(keyType, keysize, control);
     addIdentity(identity);
@@ -706,7 +671,7 @@ public abstract class AbstractP11Slot implements P11Slot {
       P11NewKeyControl control) throws P11TokenException {
     ParamUtil.requireNonNull("control", control);
     assertWritable("createSecretKey");
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     P11Identity identity = importSecretKey0(keyType, keyValue, control);
     addIdentity(identity);
@@ -727,7 +692,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     assertWritable("generateRSAKeypair");
 
     assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     BigInteger tmpPublicExponent = publicExponent;
     if (tmpPublicExponent == null) {
@@ -751,7 +716,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonNull("control", control);
     assertWritable("generateDSAKeypair");
     assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
     P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(),
@@ -771,7 +736,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonNull("control", control);
     assertWritable("generateDSAKeypair");
     assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     P11Identity identity = generateDSAKeypair0(p, q, g, control);
     addIdentity(identity);
@@ -787,7 +752,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonNull("control", control);
     assertWritable("generateECKeypair");
     assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
     if (curveId == null) {
@@ -805,7 +770,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonNull("control", control);
     assertWritable("generateSM2Keypair");
     assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), newObjectConf.isIgnoreLabel(), control.getLabel());
+    assertNotExists(control.getId(), control.getLabel());
 
     P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
@@ -898,6 +863,26 @@ public abstract class AbstractP11Slot implements P11Slot {
     if (readOnly) {
       throw new P11PermissionException("Operation " + operationName + " is not permitted");
     }
+  }
+
+  protected boolean existsIdentityForId(byte[] id) {
+    for (P11ObjectIdentifier objectId : identities.keySet()) {
+      if (objectId.matchesId(id)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  protected boolean existsCertForId(byte[] id) {
+    for (P11ObjectIdentifier objectId : certificates.keySet()) {
+      if (objectId.matchesId(id)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private static void formatString(Integer index, boolean verbose, StringBuilder sb,

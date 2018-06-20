@@ -105,6 +105,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   }
 
+  private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
+
   // slotinfo
   private static final String FILE_SLOTINFO = "slot.info";
   private static final String PROP_NAMED_CURVE_SUPPORTED = "namedCurveSupported";
@@ -238,13 +240,14 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   private final int maxSessions;
 
-  private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
+  private final P11NewObjectConf newObjectConf;
 
   EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
       char[] password, PrivateKeyCryptor privateKeyCryptor, P11MechanismFilter mechanismFilter,
       P11NewObjectConf newObjectConf, int maxSessions) throws P11TokenException {
-    super(moduleName, slotId, readOnly, mechanismFilter, newObjectConf);
+    super(moduleName, slotId, readOnly, mechanismFilter);
 
+    this.newObjectConf = ParamUtil.requireNonNull("newObjectConf", newObjectConf);
     this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
     this.password = ParamUtil.requireNonNull("password", password);
     this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
@@ -943,6 +946,18 @@ class EmulatorP11Slot extends AbstractP11Slot {
       throws P11TokenException, CertificateException {
     removePkcs11Cert(objectId);
     savePkcs11Cert(objectId.getId(), objectId.getLabel(), newCert);
+  }
+
+  private byte[] generateId() throws P11TokenException {
+    while (true) {
+      byte[] id = new byte[newObjectConf.getIdLength()];
+      random.nextBytes(id);
+
+      boolean duplicated = existsIdentityForId(id) || existsCertForId(id);
+      if (!duplicated) {
+        return id;
+      }
+    }
   }
 
 }

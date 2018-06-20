@@ -84,6 +84,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     if (instance == null) {
       P11Module p11Module = p11ModuleFactoryRegister.getP11Module(conf);
       instance = new P11CryptService(p11Module);
+      LOG.info("added PKCS#11 module {}\n{}", moduleName, instance.getModule().getDescription());
       services.put(moduleName, instance);
     }
 
