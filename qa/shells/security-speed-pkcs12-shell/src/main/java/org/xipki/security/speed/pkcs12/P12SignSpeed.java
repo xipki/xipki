@@ -25,6 +25,8 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -58,6 +60,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
           signer.sign(data);
           account(1, 0);
         } catch (Exception ex) {
+          LOG.error("P12SignSpeed.Testor.run()", ex);
           account(1, 1);
         }
       }
@@ -66,6 +69,8 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   } // class Testor
 
   protected static final String PASSWORD = "1234";
+
+  private static Logger LOG = LoggerFactory.getLogger(P12SignSpeed.class);
 
   private final ConcurrentContentSigner signer;
 

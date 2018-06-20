@@ -19,6 +19,7 @@ package org.xipki.security.speed.pkcs11;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jline.utils.Log;
 import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
@@ -41,6 +42,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
           genKeypair();
           account(1, 0);
         } catch (Exception ex) {
+          Log.error("P11KeyGenSpeed.Testor.run()", ex);
           account(1, 1);
         }
       }

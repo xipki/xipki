@@ -20,6 +20,7 @@ package org.xipki.security.speed.pkcs11;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
+import org.jline.utils.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.qa.BenchmarkExecutor;
@@ -59,6 +60,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
           signer.sign(data);
           account(1, 0);
         } catch (Exception ex) {
+          Log.error("P11SignSpeed.Testor.run()", ex);
           account(1, 1);
         }
       }

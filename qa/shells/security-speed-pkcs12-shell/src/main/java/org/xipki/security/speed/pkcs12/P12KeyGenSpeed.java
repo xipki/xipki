@@ -19,6 +19,8 @@ package org.xipki.security.speed.pkcs12;
 
 import java.security.SecureRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.ParamUtil;
@@ -40,12 +42,15 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
           generateKeypair(securityFactory.getRandom4Key());
           account(1, 0);
         } catch (Exception ex) {
+          LOG.error("P12KeyGenSpeed.Testor.run()", ex);
           account(1, 1);
         }
       }
     }
 
   } // class Testor
+
+  private static final Logger LOG = LoggerFactory.getLogger(P12KeyGenSpeed.class);
 
   private final SecurityFactory securityFactory;
 
