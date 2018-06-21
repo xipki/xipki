@@ -50,7 +50,7 @@
     <bundle start-level="70">mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/certprofile-xml/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/scep-common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/ca-server-api/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/publisher-ocsp/${project.version}</bundle>
   </feature>
@@ -125,8 +125,8 @@
       description="SCEP client shell">
     <feature>xipki-shell-base</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki/scep-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/scep-client/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.scep/scep-client/${xipki.scep.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client">

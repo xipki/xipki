@@ -30,6 +30,5 @@
   <modules>
     <module>certprofile-example</module>
     <module>lite-caclient-example</module>
-    <module>scep-example</module>
   </modules>
 </project>

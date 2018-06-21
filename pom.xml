@@ -50,6 +50,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.1</xipki.tools.version>
     <xipki.p11proxy.version>4.0.0-SNAPSHOT</xipki.p11proxy.version>
+    <xipki.scep.version>4.0.0-SNAPSHOT</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.0</karaf.version>
     <karaf.plugin.version>4.2.0</karaf.plugin.version>
@@ -66,9 +67,6 @@
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
   <modules>
-    <!-- SCEP -->
-    <module>scep-common</module>
-    <module>scep-client</module>
     <!-- Base components -->
     <module>util</module>
     <module>cmp</module>
@@ -323,6 +321,16 @@
   </build>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.xipki.scep</groupId>
+        <artifactId>scep-common</artifactId>
+        <version>${xipki.scep.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.scep</groupId>
+        <artifactId>scep-client</artifactId>
+        <version>${xipki.scep.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>

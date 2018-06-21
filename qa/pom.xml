@@ -28,7 +28,6 @@
   <name>XiPKI :: QA</name>
   <packaging>pom</packaging>
   <modules>
-    <module>scep-server-emulator</module>
     <module>qa-common</module>
     <module>ocsp-qa</module>
     <module>ca-qa</module>

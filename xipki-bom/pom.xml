@@ -185,16 +185,6 @@
       </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
-        <artifactId>scep-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
-        <artifactId>scep-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
         <artifactId>security</artifactId>
         <version>${project.version}</version>
       </dependency>

@@ -43,9 +43,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.scep</groupId>
       <artifactId>scep-common</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
