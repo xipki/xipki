@@ -54,7 +54,7 @@ public class IaikP11Module extends AbstractP11Module {
 
   public enum Vendor {
 
-    YUBICO,
+    YUBIKEY,
     GENERAL
 
   }
@@ -74,7 +74,7 @@ public class IaikP11Module extends AbstractP11Module {
     String library = moduleConf.getNativeLibrary();
     Vendor vendor;
     if (library.contains("ykcs11")) {
-      vendor = Vendor.YUBICO;
+      vendor = Vendor.YUBIKEY;
     } else {
       vendor = Vendor.GENERAL;
     }

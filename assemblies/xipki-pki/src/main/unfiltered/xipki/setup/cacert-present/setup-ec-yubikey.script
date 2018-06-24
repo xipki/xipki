@@ -16,12 +16,10 @@
 #
 ################################################################################
 
-echo "To reduce the risk, please set user to CKU_USERs"
-
 # Please adapt me
 HASH = SHA256
 
-P11_LABEL = myca1-ec
+P11_ID = 16
 
 echo "#################################################################"
 echo "#                      Initialize the database                  #"
@@ -54,7 +52,7 @@ xi:replace --old "REPLACEME_TOKEN_TYPE" --new "PKCS11" \
   xipki/setup/cacert-present/ca-conf.xml
 
 xi:replace --old "REPLACEME_CA_SIGNERCONF" \
-  --new "algo=${HASH}withECDSA,slot=0,key-label=${P11_LABEL}" \
+  --new "algo=${HASH}withECDSA,slot=0,key-id=${P11_ID}" \
   xipki/setup/cacert-present/ca-conf.xml
 
 ca:load-conf --conf-file xipki/setup/cacert-present/ca-conf.xml

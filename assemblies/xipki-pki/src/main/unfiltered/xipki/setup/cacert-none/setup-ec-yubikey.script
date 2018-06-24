@@ -16,12 +16,29 @@
 #
 ################################################################################
 
-echo "To reduce the risk, please set user to CKU_USERs"
+echo "You need set the user to CKU_SO for the key generation"
+
+# Please adapt me
+CA_SUBJECT="CN=myca1,O=xipki,C=DE"
 
 # Please adapt me
 HASH = SHA256
 
-P11_LABEL = myca1-ec
+# Please adapt me
+CURVE = secp256r1
+
+P11_ID = 16
+
+KEYCERTS_DIR = xipki/setup/keycerts
+
+echo "#################################################################"
+echo "#                     Generate Key and CSR                      #"
+echo "#################################################################"
+
+xi:ec-p11  --slot 0 --id ${P11_ID} --curve ${CURVE} --label dummy
+
+xi:csr-p11 --hash ${HASH} --slot 0 --id ${P11_ID} \
+  --out ${KEYCERTS_DIR}/myca1.csr --subject "${CA_SUBJECT}"
 
 echo "#################################################################"
 echo "#                      Initialize the database                  #"
@@ -47,22 +64,28 @@ echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"
 echo "#################################################################"
 
-xi:copy-file -f xipki/setup/cacert-present/template.ca-conf.xml \
-  xipki/setup/cacert-present/ca-conf.xml
+xi:copy-file -f xipki/setup/cacert-none/template.ca-conf.xml \
+  xipki/setup/cacert-none/ca-conf.xml
 
-xi:replace --old "REPLACEME_TOKEN_TYPE" --new "PKCS11" \
-  xipki/setup/cacert-present/ca-conf.xml
+xi:replace --old "REPLACEME_TOKEN_TYPE" --new "pkcs11" \
+  xipki/setup/cacert-none/ca-conf.xml
 
 xi:replace --old "REPLACEME_CA_SIGNERCONF" \
-  --new "algo=${HASH}withECDSA,slot=0,key-label=${P11_LABEL}" \
-  xipki/setup/cacert-present/ca-conf.xml
+  --new "algo=${HASH}withECDSA,slot=0,key-id=${P11_ID}" \
+  xipki/setup/cacert-none/ca-conf.xml
 
-ca:load-conf --conf-file xipki/setup/cacert-present/ca-conf.xml
+ca:load-conf --conf-file xipki/setup/cacert-none/ca-conf.xml
+
+echo "# Update the certificate in the device"
+xi:update-cert-p11 --slot 0 --id ${P11_ID} --cert ${KEYCERTS_DIR}/myca1.der
+
+source xipki/setup/cacert-none/configure-ca.script
 
 echo "create initial CRL"
 ca:gencrl --ca myca1
 
 echo "# Restart OCSP server"
+
 feature:uninstall xipki-ocspserver
 
 feature:install xipki-ocspserver

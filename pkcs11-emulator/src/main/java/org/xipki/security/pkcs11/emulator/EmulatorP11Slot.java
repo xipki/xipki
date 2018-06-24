@@ -600,7 +600,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
   private String savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
       throws P11TokenException {
     assertValidId(id);
-    if (vendor == Vendor.YUBICO) {
+    if (vendor == Vendor.YUBIKEY) {
       label = "Secret key " + id[0];
     }
 
@@ -625,7 +625,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
   private String savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
       throws P11TokenException {
     assertValidId(id);
-    if (vendor == Vendor.YUBICO) {
+    if (vendor == Vendor.YUBIKEY) {
       label = "Private Key " + id[0];
     }
 
@@ -645,7 +645,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
   private String savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
       throws P11TokenException {
     String hexId = hex(id);
-    if (vendor == Vendor.YUBICO) {
+    if (vendor == Vendor.YUBIKEY) {
       label = "Public Key " + id[0];
     }
 
@@ -970,7 +970,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     String pubKeyLabel = savePkcs11PublicKey(id, label, keypair.getPublic());
     String certLabel = null;
     X509Certificate[] certs = null;
-    if (vendor == Vendor.YUBICO) {
+    if (vendor == Vendor.YUBIKEY) {
       try {
         // Yubico generates always a self-signed certificate during keypair generation
         SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
@@ -1043,7 +1043,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
   }
 
   private void assertValidId(byte[] id) throws P11TokenException {
-    if (vendor == Vendor.YUBICO) {
+    if (vendor == Vendor.YUBIKEY) {
       if (!(id.length == 1 && (id[0] >= 0 && id[0] <= 23))) {
         throw buildP11TokenException(PKCS11Constants.CKR_ATTRIBUTE_VALUE_INVALID);
       }

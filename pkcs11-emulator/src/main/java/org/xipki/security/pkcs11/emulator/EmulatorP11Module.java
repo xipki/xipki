@@ -49,7 +49,7 @@ public class EmulatorP11Module extends AbstractP11Module {
 
   public static enum Vendor {
 
-    YUBICO,
+    YUBIKEY,
     GENERAL
 
   }
@@ -69,11 +69,11 @@ public class EmulatorP11Module extends AbstractP11Module {
     Vendor vendor = null;
     File baseDir;
     String modulePath = moduleConf.getNativeLibrary().trim();
-
+    String parametersStr = "";
     if (!modulePath.isEmpty()) {
       int idx = modulePath.indexOf('&');
       if (idx != -1) {
-        String parametersStr = modulePath.substring(idx + 1);
+        parametersStr = modulePath.substring(idx);
         modulePath = modulePath.substring(0, idx);
 
         StringTokenizer tokens = new StringTokenizer(parametersStr, "&");
@@ -110,7 +110,8 @@ public class EmulatorP11Module extends AbstractP11Module {
       LOG.info("Use explicit base directory: " + baseDir.getPath());
     }
 
-    this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ", baseDir.getAbsolutePath());
+    this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ",
+        baseDir.getAbsolutePath() + parametersStr);
 
     File[] children = baseDir.listFiles();
 

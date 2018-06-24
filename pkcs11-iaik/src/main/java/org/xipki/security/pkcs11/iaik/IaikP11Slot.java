@@ -1473,7 +1473,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
       }
 
-      if (vendor != Vendor.YUBICO) {
+      if (vendor != Vendor.YUBIKEY) {
         // Yubico: deletion of certificate implies the deletion of key pairs.
         PrivateKey privKey = getPrivateKeyObject(session, id, label);
         if (privKey != null) {
