@@ -56,7 +56,7 @@ public class P11SlotRefreshResult {
 
   public void addIdentity(P11Identity identity) {
     ParamUtil.requireNonNull("identity", identity);
-    this.identities.put(identity.getIdentityId().getObjectId(), identity);
+    this.identities.put(identity.getIdentityId().getKeyId(), identity);
   }
 
   public void addMechanism(long mechanism) {
@@ -83,4 +83,20 @@ public class P11SlotRefreshResult {
     }
     return null;
   }
+
+  /**
+   * Returns the PKCS#11 label for certificate of the given {@code id}.
+   * @param id
+   *          Identifier. Must not be {@code null}.
+   * @return the label.
+   */
+  public String getCertLabelForId(byte[] id) {
+    for (P11ObjectIdentifier objId : certificates.keySet()) {
+      if (objId.matchesId(id)) {
+        return objId.getLabel();
+      }
+    }
+    return null;
+  }
+
 }

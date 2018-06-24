@@ -17,8 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.util.CompareUtil;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -30,26 +30,52 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
 
   private final P11SlotIdentifier slotId;
 
-  private final P11ObjectIdentifier objectId;
+  private final P11ObjectIdentifier keyId;
+
+  private final P11ObjectIdentifier publicKeyId;
+
+  private final P11ObjectIdentifier certId;
 
   /**
    * TODO.
    * @param slotId
    *          Slot identifier. Must not be {@code null}.
-   * @param objectId
+   * @param keyId
    *          Object identifier. Must not be {@code null}.
    */
-  public P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+  public P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
+      String publicKeyLabel, String certLabel) {
     this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-    this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+    this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+    if (publicKeyLabel != null) {
+      this.publicKeyId = publicKeyLabel.equals(keyId.getLabel())
+          ? keyId : new P11ObjectIdentifier(keyId.getId(), publicKeyLabel);
+    } else {
+      this.publicKeyId = null;
+    }
+
+    if (certLabel != null) {
+      this.certId = certLabel.equals(keyId.getLabel())
+        ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
+    } else {
+      this.certId = null;
+    }
   }
 
   public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public P11ObjectIdentifier getObjectId() {
-    return objectId;
+  public P11ObjectIdentifier getKeyId() {
+    return keyId;
+  }
+
+  public P11ObjectIdentifier getPublicKeyId() {
+    return publicKeyId;
+  }
+
+  public P11ObjectIdentifier getCertId() {
+    return certId;
   }
 
   @Override
@@ -58,7 +84,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     if (ct != 0) {
       return ct;
     }
-    return objectId.compareTo(obj.objectId);
+    return keyId.compareTo(obj.keyId);
   }
 
   @Override
@@ -68,23 +94,41 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     }
 
     P11EntityIdentifier ei = (P11EntityIdentifier) obj;
-    return this.slotId.equals(ei.slotId) && this.objectId.equals(ei.objectId);
+    return this.slotId.equals(ei.slotId)
+        && this.keyId.equals(ei.keyId)
+        && CompareUtil.equalsObject(publicKeyId, ei.publicKeyId)
+        && CompareUtil.equalsObject(certId, ei.certId);
   }
 
   public boolean match(P11SlotIdentifier slotId, String objectLabel) {
     ParamUtil.requireNonNull("objectLabel", objectLabel);
-    return this.slotId.equals(slotId) && objectLabel.equals(this.objectId.getLabel());
+    return this.slotId.equals(slotId) && objectLabel.equals(this.keyId.getLabel());
   }
 
   @Override
   public String toString() {
-    return StringUtil.concatObjects("slot ", slotId, ", object ", objectId);
+    StringBuilder sb = new StringBuilder();
+    sb.append("slot ").append(slotId).append(", key ").append(keyId);
+    if (publicKeyId != null && publicKeyId != keyId) {
+      sb.append(", public key ").append(publicKeyId);
+    }
+    if (certId != null && certId != keyId) {
+      sb.append(", certificate ").append(certId);
+    }
+
+    return sb.toString();
   }
 
   @Override
   public int hashCode() {
-    int hashCode = slotId.hashCode();
-    return hashCode + 31 * objectId.hashCode();
+    int hashCode = slotId.hashCode() + 31 * keyId.hashCode();
+    if (publicKeyId != null) {
+      hashCode += 31 * 31 * publicKeyId.hashCode();
+    }
+    if (certId != null) {
+      hashCode += 31 * 31 * 31 * certId.hashCode();
+    }
+    return hashCode;
   }
 
 }

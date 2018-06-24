@@ -38,7 +38,7 @@ public class P11SM2SignSpeed extends P11SignSpeed {
 
   private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId) throws Exception {
     ParamUtil.requireNonNull("slot", slot);
-    return slot.generateSM2Keypair(getNewKeyControl(keyId));
+    return slot.generateSM2Keypair(getNewKeyControl(keyId)).getKeyId();
   }
 
 }

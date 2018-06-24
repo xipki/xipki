@@ -50,15 +50,15 @@ public class P11IdentityDeleteAction extends P11SecurityAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
-    if (objIdentifier == null) {
+    P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
+    if (keyId == null) {
       println(" unkown identity");
       return null;
     }
 
-    if (force || confirm("Do you want to remove the identity " + objIdentifier, 3)) {
-      slot.removeIdentity(objIdentifier);
-      println("deleted identity " + objIdentifier);
+    if (force || confirm("Do you want to remove the identity " + keyId, 3)) {
+      slot.removeIdentityByKeyId(keyId);
+      println("deleted identity " + keyId);
     }
     return null;
   }

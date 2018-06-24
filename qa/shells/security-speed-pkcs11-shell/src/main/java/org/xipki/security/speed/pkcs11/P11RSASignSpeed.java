@@ -43,7 +43,7 @@ public class P11RSASignSpeed extends P11SignSpeed {
   private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId, int keysize,
       BigInteger publicExponent) throws Exception {
     ParamUtil.requireNonNull("slot", slot);
-    return slot.generateRSAKeypair(keysize, publicExponent, getNewKeyControl(keyId));
+    return slot.generateRSAKeypair(keysize, publicExponent, getNewKeyControl(keyId)).getKeyId();
   }
 
 }

@@ -102,7 +102,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   @Override
   protected void shutdown() {
     try {
-      slot.removeIdentity(objectId);
+      slot.removeIdentityByKeyId(objectId);
     } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
     }

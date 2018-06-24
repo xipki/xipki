@@ -17,7 +17,7 @@
 
 package org.xipki.security.speed.pkcs11;
 
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
@@ -33,7 +33,7 @@ public class P11SM2KeyGenSpeed extends P11KeyGenSpeed {
 
   @Override
   protected void genKeypair() throws Exception {
-    P11ObjectIdentifier objId = slot.generateSM2Keypair(getControl());
+    P11EntityIdentifier objId = slot.generateSM2Keypair(getControl());
     slot.removeIdentity(objId);
   }
 

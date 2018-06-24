@@ -25,6 +25,7 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
@@ -81,10 +82,10 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
     P11Slot slot = getSlot();
     P11NewKeyControl control = getControl();
 
-    P11ObjectIdentifier objId = null;
+    P11EntityIdentifier identityId = null;
     try {
-      objId = slot.generateSecretKey(p11KeyType, keysize, control);
-      finalize(keyType, objId);
+      identityId = slot.generateSecretKey(p11KeyType, keysize, control);
+      finalize(keyType, identityId);
     } catch (P11UnsupportedMechanismException ex) {
       if (!createExternIfGenUnsupported) {
         throw ex;
@@ -114,7 +115,7 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
       byte[] keyValue = new byte[keysize / 8];
       securityFactory.getRandom4Key().nextBytes(keyValue);
 
-      objId = slot.importSecretKey(p11KeyType, keyValue, control);
+      P11ObjectIdentifier objId = slot.importSecretKey(p11KeyType, keyValue, control);
       Arrays.fill(keyValue, (byte) 0); // clear the memory
       println("generated in memory and imported " + keyType + " key " + objId);
     }

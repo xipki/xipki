@@ -37,13 +37,17 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,14 +57,26 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.bc.BcContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +92,7 @@ import org.xipki.security.pkcs11.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
+import org.xipki.security.pkcs11.emulator.EmulatorP11Module.Vendor;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
@@ -240,11 +257,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
   private final int maxSessions;
 
+  private final Vendor vendor;
+
   private final P11NewObjectConf newObjectConf;
 
   EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
       char[] password, PrivateKeyCryptor privateKeyCryptor, P11MechanismFilter mechanismFilter,
-      P11NewObjectConf newObjectConf, int maxSessions) throws P11TokenException {
+      P11NewObjectConf newObjectConf, int maxSessions, Vendor vendor) throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
     this.newObjectConf = ParamUtil.requireNonNull("newObjectConf", newObjectConf);
@@ -252,6 +271,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     this.password = ParamUtil.requireNonNull("password", password);
     this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
     this.maxSessions = ParamUtil.requireMin("maxSessions", maxSessions, 1);
+    this.vendor = (vendor == null) ? Vendor.GENERAL : vendor;
 
     this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
     if (!this.privKeyDir.exists()) {
@@ -305,8 +325,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
           String label = props.getProperty(PROP_LABEL);
 
           P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
-          byte[] encodedValue = IoUtil.read(
-              new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
+          byte[] encodedValue = IoUtil.read(new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
 
           KeyStore ks = KeyStore.getInstance("JCEKS");
           ks.load(new ByteArrayInputStream(encodedValue), password);
@@ -321,7 +340,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
           }
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
-              new P11EntityIdentifier(slotId, p11ObjId), key, maxSessions, random);
+              new P11EntityIdentifier(slotId, p11ObjId, null, null), key, maxSessions, random);
           LOG.info("added PKCS#11 secret key {}", p11ObjId);
           ret.addIdentity(identity);
         } catch (ClassCastException ex) {
@@ -382,7 +401,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
           X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
-              new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
+              new P11EntityIdentifier(slotId, p11ObjId, label, label), privateKey, publicKey, certs,
               maxSessions, random);
           LOG.info("added PKCS#11 key {}", p11ObjId);
           ret.addIdentity(identity);
@@ -578,8 +597,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
     return ids.size();
   }
 
-  private void savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
+  private String savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
       throws P11TokenException {
+    assertValidId(id);
+    if (vendor == Vendor.YUBICO) {
+      label = "Secret key " + id[0];
+    }
+
     byte[] encrytedValue;
     try {
       KeyStore ks = KeyStore.getInstance("JCEKS");
@@ -594,10 +618,17 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     savePkcs11Entry(secKeyDir, id, label, encrytedValue);
+
+    return label;
   }
 
-  private void savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
+  private String savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
       throws P11TokenException {
+    assertValidId(id);
+    if (vendor == Vendor.YUBICO) {
+      label = "Private Key " + id[0];
+    }
+
     PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
     byte[] encoded;
     try {
@@ -606,12 +637,17 @@ class EmulatorP11Slot extends AbstractP11Slot {
       LogUtil.error(LOG, ex);
       throw new P11TokenException("could not encode PrivateKey");
     }
+
     savePkcs11Entry(privKeyDir, id, label, encoded);
+    return label;
   }
 
-  private void savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
+  private String savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
       throws P11TokenException {
     String hexId = hex(id);
+    if (vendor == Vendor.YUBICO) {
+      label = "Public Key " + id[0];
+    }
 
     StringBuilder sb = new StringBuilder(100);
     sb.append(PROP_ID).append('=').append(hexId).append('\n');
@@ -695,6 +731,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
+
+    return label;
   }
 
   private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos,
@@ -717,12 +755,14 @@ class EmulatorP11Slot extends AbstractP11Slot {
     savePkcs11Entry(certDir, id, label, cert.getEncoded());
   }
 
-  private static void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
+  private void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
       throws P11TokenException {
     ParamUtil.requireNonNull("dir", dir);
     ParamUtil.requireNonNull("id", id);
     ParamUtil.requireNonBlank("label", label);
     ParamUtil.requireNonNull("value", value);
+
+    assertValidId(id);
 
     String hexId = hex(id);
 
@@ -751,13 +791,24 @@ class EmulatorP11Slot extends AbstractP11Slot {
   }
 
   @Override
-  protected void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException {
-    boolean b1 = removePkcs11Entry(certDir, objectId);
-    boolean b2 = removePkcs11Entry(privKeyDir, objectId);
-    boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
-    boolean b4 = removePkcs11Entry(secKeyDir, objectId);
+  protected void removeIdentity0(P11EntityIdentifier entityId) throws P11TokenException {
+    P11ObjectIdentifier keyId = entityId.getKeyId();
+
+    boolean b1 = true;
+    if (entityId.getCertId() != null) {
+      removePkcs11Entry(certDir, entityId.getCertId());
+    }
+
+    boolean b2 = removePkcs11Entry(privKeyDir, keyId);
+
+    boolean b3 = true;
+    if (entityId.getPublicKeyId() != null) {
+      b3 = removePkcs11Entry(pubKeyDir, entityId.getPublicKeyId());
+    }
+
+    boolean b4 = removePkcs11Entry(secKeyDir, keyId);
     if (! (b1 || b2 || b3 || b4)) {
-      throw new P11UnknownEntityException(slotId, objectId);
+      throw new P11UnknownEntityException(slotId, keyId);
     }
   }
 
@@ -911,15 +962,45 @@ class EmulatorP11Slot extends AbstractP11Slot {
       id = generateId();
     }
 
+    assertValidId(id);
+
     String label = control.getLabel();
 
-    savePkcs11PrivateKey(id, label, keypair.getPrivate());
-    savePkcs11PublicKey(id, label, keypair.getPublic());
+    String keyLabel = savePkcs11PrivateKey(id, label, keypair.getPrivate());
+    String pubKeyLabel = savePkcs11PublicKey(id, label, keypair.getPublic());
+    String certLabel = null;
+    X509Certificate[] certs = null;
+    if (vendor == Vendor.YUBICO) {
+      try {
+        // Yubico generates always a self-signed certificate during keypair generation
+        SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+        Date now = new Date();
+        Date notBefore = new Date(now.getTime()); // 10 minutes past
+        Date notAfter = new Date(notBefore.getTime() + 3650L * 24 * 3600 * 1000); // 10 years
+
+        certLabel = "Certificate " + id[0];
+        X500Name subjectDn = new X500Name("CN=" + certLabel);
+        ContentSigner contentSigner = getContentSigner(keypair.getPrivate());
+
+        // Generate keystore
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
+            BigInteger.ONE, notBefore, notAfter, subjectDn, spki);
+        X509CertificateHolder bcCert = certGenerator.build(contentSigner);
+        byte[] encodedCert = bcCert.getEncoded();
+        X509Certificate cert = X509Util.parseCert(encodedCert);
+        savePkcs11Entry(certDir, id, label, encodedCert);
+
+        certs = new X509Certificate[] {cert};
+      } catch (Exception ex) {
+        throw new P11TokenException("cannot generate self-signed certificate", ex);
+      }
+    }
+
     P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
-        new P11ObjectIdentifier(id, label));
+        new P11ObjectIdentifier(id, keyLabel), pubKeyLabel, certLabel);
     try {
       return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
-          keypair.getPublic(), null, maxSessions, random);
+          keypair.getPublic(), certs, maxSessions, random);
     } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
       throw new P11TokenException(
           "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
@@ -932,12 +1013,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
     if (id == null) {
       id = generateId();
     }
+    assertValidId(id);
 
     String label = control.getLabel();
 
     savePkcs11SecretKey(id, label, key);
     P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
-        new P11ObjectIdentifier(id, label));
+        new P11ObjectIdentifier(id, label), null, null);
     return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
   }
 
@@ -958,6 +1040,67 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return id;
       }
     }
+  }
+
+  private void assertValidId(byte[] id) throws P11TokenException {
+    if (vendor == Vendor.YUBICO) {
+      if (!(id.length == 1 && (id[0] >= 0 && id[0] <= 23))) {
+        throw buildP11TokenException(PKCS11Constants.CKR_ATTRIBUTE_VALUE_INVALID);
+      }
+    }
+  }
+
+  private static P11TokenException buildP11TokenException(long p11ErrorCode) {
+    return new P11TokenException(new PKCS11Exception(p11ErrorCode));
+  }
+
+  private static ContentSigner getContentSigner(PrivateKey key) throws Exception {
+    BcContentSignerBuilder builder;
+
+    if (key instanceof RSAPrivateKey) {
+      ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
+      ASN1ObjectIdentifier sigOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+
+      builder = new BcRSAContentSignerBuilder(buildAlgId(sigOid), buildAlgId(hashOid));
+    } else if (key instanceof DSAPrivateKey) {
+      ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
+      AlgorithmIdentifier sigId = new AlgorithmIdentifier(
+          X9ObjectIdentifiers.id_dsa_with_sha1);
+
+      builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
+    } else if (key instanceof ECPrivateKey) {
+      HashAlgo hashAlgo;
+      ASN1ObjectIdentifier sigOid;
+
+      int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
+      if (keysize > 384) {
+        hashAlgo = HashAlgo.SHA512;
+        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+      } else if (keysize > 256) {
+        hashAlgo = HashAlgo.SHA384;
+        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+      } else if (keysize > 224) {
+        hashAlgo = HashAlgo.SHA224;
+        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+      } else if (keysize > 160) {
+        hashAlgo = HashAlgo.SHA256;
+        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+      } else {
+        hashAlgo = HashAlgo.SHA1;
+        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+      }
+
+      builder = new BcECContentSignerBuilder(new AlgorithmIdentifier(sigOid),
+          buildAlgId(hashAlgo.getOid()));
+    } else {
+      throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
+    }
+
+    return builder.build(KeyUtil.generatePrivateKeyParameter(key));
+  } // method getContentSigner
+
+  private static AlgorithmIdentifier buildAlgId(ASN1ObjectIdentifier identifier) {
+    return new AlgorithmIdentifier(identifier, DERNull.INSTANCE);
   }
 
 }

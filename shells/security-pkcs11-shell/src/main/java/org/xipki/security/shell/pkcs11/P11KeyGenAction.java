@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.shell.pkcs11.completer.P11KeyUsageCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
@@ -53,9 +53,9 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
   @Completion(P11KeyUsageCompleter.class)
   private List<String> keyusages;
 
-  protected void finalize(String keyType, P11ObjectIdentifier objectId) throws Exception {
-    ParamUtil.requireNonNull("objectId", objectId);
-    println("generated " + keyType + " key " + objectId);
+  protected void finalize(String keyType, P11EntityIdentifier identityId) throws Exception {
+    ParamUtil.requireNonNull("identityId", identityId);
+    println("generated " + keyType + " key \"" + identityId + "\"");
   }
 
   protected P11NewKeyControl getControl() throws IllegalCmdParamException {

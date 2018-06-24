@@ -17,7 +17,7 @@
 
 package org.xipki.security.speed.pkcs11;
 
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.util.ParamUtil;
 
@@ -38,7 +38,7 @@ public class P11ECKeyGenSpeed extends P11KeyGenSpeed {
 
   @Override
   protected void genKeypair() throws Exception {
-    P11ObjectIdentifier objId = slot.generateECKeypair(curveNameOrOid, getControl());
+    P11EntityIdentifier objId = slot.generateECKeypair(curveNameOrOid, getControl());
     slot.removeIdentity(objId);
   }
 

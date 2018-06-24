@@ -62,6 +62,8 @@ public interface P11Slot {
 
   P11ObjectIdentifier getObjectId(byte[] id, String label);
 
+  P11EntityIdentifier getEntityId(byte[] id, String label);
+
   /*
   P11ObjectIdentifier getObjectIdForId(byte[] id);
 
@@ -101,12 +103,23 @@ public interface P11Slot {
    * Removes the key (private key, public key, secret key, and certificates) associated with
    * the given identifier {@code objectId}.
    *
-   * @param objectId
-   *          Object identifier. Must not be {@code null}.
+   * @param entityId
+   *          Entity identifier. Must not be {@code null}.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  void removeIdentity(P11ObjectIdentifier objectId) throws P11TokenException;
+  void removeIdentity(P11EntityIdentifier entityId) throws P11TokenException;
+
+  /**
+   * Removes the key (private key, public key, secret key, and certificates) associated with
+   * the given identifier {@code objectId}.
+   *
+   * @param keyId
+   *          Key identifier. Must not be {@code null}.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  void removeIdentityByKeyId(P11ObjectIdentifier keyId) throws P11TokenException;
 
   /**
    * TODO.
@@ -141,12 +154,12 @@ public interface P11Slot {
    *          RSA public exponent. Could be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the key within the PKCS#P11 token.
+   * @return the identifier of the entity within the PKCS#P11 token.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
+  P11EntityIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
@@ -158,12 +171,12 @@ public interface P11Slot {
    *          bit length of Q
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the key within the PKCS#P11 token.
+   * @return the identifier of the entity within the PKCS#P11 token.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  P11ObjectIdentifier generateDSAKeypair(int plength, int qlength,
+  P11EntityIdentifier generateDSAKeypair(int plength, int qlength,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
@@ -177,12 +190,12 @@ public interface P11Slot {
    *          g of DSA. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the key within the PKCS#P11 token.
+   * @return the identifier of the entity within the PKCS#P11 token.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
+  P11EntityIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
@@ -192,12 +205,12 @@ public interface P11Slot {
    *         Object identifier or name of the EC curve. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the key within the PKCS#P11 token.
+   * @return the identifier of the entity within the PKCS#P11 token.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  P11ObjectIdentifier generateECKeypair(String curveNameOrOid,
+  P11EntityIdentifier generateECKeypair(String curveNameOrOid,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
@@ -205,12 +218,12 @@ public interface P11Slot {
    *
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the key within the PKCS#P11 token.
+   * @return the identifier of the entity within the PKCS#P11 token.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  P11ObjectIdentifier generateSM2Keypair(P11NewKeyControl control) throws P11TokenException;
+  P11EntityIdentifier generateSM2Keypair(P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates a secret key in the PKCS#11 token.
@@ -221,11 +234,11 @@ public interface P11Slot {
    *          Key size
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the key within the PKCS#11 token.
+   * @return the identifier of the entity within the PKCS#11 token.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  P11ObjectIdentifier generateSecretKey(long keyType, int keysize,
+  P11EntityIdentifier generateSecretKey(long keyType, int keysize,
       P11NewKeyControl control) throws P11TokenException;
 
   /**

@@ -37,7 +37,7 @@ public class P11DSASignSpeed extends P11SignSpeed {
 
   private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId,
       int plength, int qlength) throws Exception {
-    return slot.generateDSAKeypair(plength, qlength, getNewKeyControl(keyId));
+    return slot.generateDSAKeypair(plength, qlength, getNewKeyControl(keyId)).getKeyId();
   }
 
 }

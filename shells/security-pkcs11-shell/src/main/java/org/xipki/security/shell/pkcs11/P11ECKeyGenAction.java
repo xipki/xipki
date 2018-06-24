@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.shell.completer.ECCurveNameCompleter;
 
@@ -43,8 +43,8 @@ public class P11ECKeyGenAction extends P11KeyGenAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11ObjectIdentifier objId = slot.generateECKeypair(curveName, getControl());
-    finalize("EC", objId);
+    P11EntityIdentifier identityId = slot.generateECKeypair(curveName, getControl());
+    finalize("EC", identityId);
     return null;
   }
 

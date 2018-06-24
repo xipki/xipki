@@ -142,12 +142,12 @@ public abstract class AbstractP11Slot implements P11Slot {
    * Removes the key (private key, public key, secret key, and certificates) associated with
    * the given identifier {@code objectId}.
    *
-   * @param objectId
-   *          Object identifier. Must not be {@code null}.
+   * @param entityId
+   *          Entity identifier. Must not be {@code null}.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException;
+  protected abstract void removeIdentity0(P11EntityIdentifier entityId) throws P11TokenException;
 
   /**
    * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
@@ -412,18 +412,18 @@ public abstract class AbstractP11Slot implements P11Slot {
       throw new IllegalArgumentException("invalid identity");
     }
 
-    P11ObjectIdentifier objectId = identity.getIdentityId().getObjectId();
-    if (hasIdentity(objectId)) {
-      throw new P11DuplicateEntityException(slotId, objectId);
+    P11ObjectIdentifier keyId = identity.getIdentityId().getKeyId();
+    if (hasIdentity(keyId)) {
+      throw new P11DuplicateEntityException(slotId, keyId);
     }
 
-    identities.put(objectId, identity);
+    identities.put(keyId, identity);
     updateCaCertsOfIdentity(identity);
   }
 
   @Override
-  public boolean hasIdentity(P11ObjectIdentifier objectId) {
-    return identities.containsKey(objectId);
+  public boolean hasIdentity(P11ObjectIdentifier keyId) {
+    return identities.containsKey(keyId);
   }
 
   @Override
@@ -478,13 +478,15 @@ public abstract class AbstractP11Slot implements P11Slot {
     return ident;
   }
 
-  protected void assertNotExists(byte[] id, String label)
-      throws P11DuplicateEntityException {
+  protected void assertNotExists(byte[] id, String label) throws P11DuplicateEntityException {
     if (id == null && label == null) {
       return;
     }
 
-    for (P11ObjectIdentifier objectId : identities.keySet()) {
+    Set<P11ObjectIdentifier> objectIds = new HashSet<>(identities.keySet());
+    objectIds.addAll(certificates.keySet());
+
+    for (P11ObjectIdentifier objectId : objectIds) {
       boolean matchId = (id == null) ? false : objectId.matchesId(id);
       boolean matchLabel = (label == null) ? false : label.equals(objectId.getLabel());
 
@@ -547,6 +549,30 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
+  public P11EntityIdentifier getEntityId(byte[] id, String label) {
+    if (id == null && label == null) {
+      return null;
+    }
+
+    for (P11ObjectIdentifier objectId : identities.keySet()) {
+      boolean match = true;
+      if (id != null) {
+        match = objectId.matchesId(id);
+      }
+
+      if (label != null) {
+        match = label.equals(objectId.getLabel());
+      }
+
+      if (match) {
+        return identities.get(objectId).getIdentityId();
+      }
+    }
+
+    return null;
+  }
+
+  @Override
   public X509Certificate exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
     ParamUtil.requireNonNull("objectId", objectId);
     try {
@@ -567,9 +593,18 @@ public abstract class AbstractP11Slot implements P11Slot {
     ParamUtil.requireNonNull("objectId", objectId);
     assertWritable("removeCerts");
 
-    if (identities.containsKey(objectId)) {
+    P11ObjectIdentifier keyId = null;
+    for (P11ObjectIdentifier m : identities.keySet()) {
+      P11Identity identity = identities.get(m);
+      if (objectId.equals(identity.getIdentityId().getCertId())) {
+        keyId = m;
+        break;
+      }
+    }
+
+    if (keyId != null) {
       certificates.remove(objectId);
-      identities.get(objectId).setCertificates(null);
+      identities.get(keyId).setCertificates(null);
     } else if (certificates.containsKey(objectId)) {
       certificates.remove(objectId);
     } else {
@@ -581,18 +616,40 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public void removeIdentity(P11ObjectIdentifier objectId) throws P11TokenException {
-    ParamUtil.requireNonNull("objectId", objectId);
+  public void removeIdentity(P11EntityIdentifier entityId) throws P11TokenException {
+    ParamUtil.requireNonNull("entityId", entityId);
     assertWritable("removeIdentity");
-
-    if (identities.containsKey(objectId)) {
-      certificates.remove(objectId);
-      identities.get(objectId).setCertificates(null);
-      identities.remove(objectId);
+    P11ObjectIdentifier keyId = entityId.getKeyId();
+    if (identities.containsKey(keyId)) {
+      if (entityId.getCertId() != null) {
+        certificates.remove(entityId.getCertId());
+      }
+      identities.get(keyId).setCertificates(null);
+      identities.remove(keyId);
       updateCaCertsOfIdentities();
     }
 
-    removeIdentity0(objectId);
+    removeIdentity0(entityId);
+  }
+
+  @Override
+  public void removeIdentityByKeyId(P11ObjectIdentifier keyId) throws P11TokenException {
+    ParamUtil.requireNonNull("keyId", keyId);
+    assertWritable("removeIdentityByKeyId");
+
+    P11EntityIdentifier entityId = null;
+    if (identities.containsKey(keyId)) {
+      entityId = identities.get(keyId).getIdentityId();
+      if (entityId.getCertId() != null) {
+        certificates.remove(entityId.getCertId());
+      }
+      identities.get(keyId).setCertificates(null);
+      identities.remove(keyId);
+      updateCaCertsOfIdentities();
+
+      removeIdentity0(entityId);
+    }
+
   }
 
   @Override
@@ -621,7 +678,13 @@ public abstract class AbstractP11Slot implements P11Slot {
     while (true) {
       boolean duplicated = false;
       for (P11ObjectIdentifier objectId : identities.keySet()) {
-        if (objectId.getLabel().equals(label)) {
+        P11EntityIdentifier entityId = identities.get(objectId).getIdentityId();
+        P11ObjectIdentifier pubKeyId = entityId.getPublicKeyId();
+        P11ObjectIdentifier certId = entityId.getCertId();
+
+        if (label.equals(objectId.getLabel())
+            || (pubKeyId != null && label.equals(pubKeyId.getLabel())
+            || (certId != null && label.equals(certId.getLabel())))) {
           duplicated = true;
           break;
         }
@@ -646,7 +709,7 @@ public abstract class AbstractP11Slot implements P11Slot {
   }
 
   @Override
-  public P11ObjectIdentifier generateSecretKey(long keyType, int keysize,
+  public P11EntityIdentifier generateSecretKey(long keyType, int keysize,
       P11NewKeyControl control) throws P11TokenException {
     assertWritable("generateSecretKey");
     ParamUtil.requireNonNull("control", control);
@@ -655,9 +718,9 @@ public abstract class AbstractP11Slot implements P11Slot {
     P11Identity identity = generateSecretKey0(keyType, keysize, control);
     addIdentity(identity);
 
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("generated secret key {}", objId);
-    return objId;
+    return identity.getIdentityId();
   }
 
   @Override
@@ -670,13 +733,13 @@ public abstract class AbstractP11Slot implements P11Slot {
     P11Identity identity = importSecretKey0(keyType, keyValue, control);
     addIdentity(identity);
 
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("created secret key {}", objId);
     return objId;
   }
 
   @Override
-  public P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
+  public P11EntityIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
       P11NewKeyControl control) throws P11TokenException {
     ParamUtil.requireNonNull("control", control);
     ParamUtil.requireMin("keysize", keysize, 1024);
@@ -695,13 +758,13 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     P11Identity identity = generateRSAKeypair0(keysize, tmpPublicExponent, control);
     addIdentity(identity);
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("generated RSA keypair {}", objId);
-    return objId;
+    return identity.getIdentityId();
   }
 
   @Override
-  public P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, P11NewKeyControl control)
+  public P11EntityIdentifier generateDSAKeypair(int plength, int qlength, P11NewKeyControl control)
       throws P11TokenException {
     ParamUtil.requireMin("plength", plength, 1024);
     if (plength % 1024 != 0) {
@@ -716,13 +779,13 @@ public abstract class AbstractP11Slot implements P11Slot {
     P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(),
         control);
     addIdentity(identity);
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("generated DSA keypair {}", objId);
-    return objId;
+    return identity.getIdentityId();
   }
 
   @Override
-  public P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
+  public P11EntityIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control) throws P11TokenException {
     ParamUtil.requireNonNull("p", p);
     ParamUtil.requireNonNull("q", q);
@@ -734,13 +797,13 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     P11Identity identity = generateDSAKeypair0(p, q, g, control);
     addIdentity(identity);
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("generated DSA keypair {}", objId);
-    return objId;
+    return identity.getIdentityId();
   }
 
   @Override
-  public P11ObjectIdentifier generateECKeypair(String curveNameOrOid, P11NewKeyControl control)
+  public P11EntityIdentifier generateECKeypair(String curveNameOrOid, P11NewKeyControl control)
       throws P11TokenException {
     ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
     ParamUtil.requireNonNull("control", control);
@@ -754,13 +817,13 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
     P11Identity identity = generateECKeypair0(curveId, control);
     addIdentity(identity);
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("generated EC keypair {}", objId);
-    return objId;
+    return identity.getIdentityId();
   }
 
   @Override
-  public P11ObjectIdentifier generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
+  public P11EntityIdentifier generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
     ParamUtil.requireNonNull("control", control);
     assertWritable("generateSM2Keypair");
     assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
@@ -768,9 +831,9 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
-    P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
+    P11ObjectIdentifier objId = identity.getIdentityId().getKeyId();
     LOG.info("generated SM2 keypair {}", objId);
-    return objId;
+    return identity.getIdentityId();
   }
 
   @Override
@@ -802,17 +865,32 @@ public abstract class AbstractP11Slot implements P11Slot {
       throws IOException, P11TokenException {
     ParamUtil.requireNonNull("stream", stream);
 
-    List<P11ObjectIdentifier> sortedObjectIds = getSortedObjectIds(identities.keySet());
-    int size = sortedObjectIds.size();
+    List<P11ObjectIdentifier> sortedKeyIds = getSortedObjectIds(identities.keySet());
+    int size = sortedKeyIds.size();
 
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < size; i++) {
-      P11ObjectIdentifier objectId = sortedObjectIds.get(i);
-      sb.append("\t").append(i + 1).append(". ").append(objectId.getLabel());
-      sb.append(" (").append("id: ").append(objectId.getIdHex()).append(")\n");
-      P11Identity identity = identities.get(objectId);
+      P11ObjectIdentifier keyId = sortedKeyIds.get(i);
+      P11Identity identity = identities.get(keyId);
+
+      String label = keyId.getLabel();
+      sb.append("\t").append(i + 1).append(". ").append(label);
+      sb.append(" (").append("id: ").append(keyId.getIdHex());
+      P11EntityIdentifier identityId = identity.getIdentityId();
+      P11ObjectIdentifier certId = identityId.getCertId();
+      if (certId != null && !certId.equals(keyId)) {
+        sb.append(", certificate label: ").append(identityId.getCertId().getLabel());
+      }
+
+      P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
+      if (pubKeyId != null && !pubKeyId.equals(keyId)) {
+        sb.append(", publicKey label: ").append(pubKeyId.getLabel());
+      }
+
+      sb.append(")\n");
 
       if (identity.getPublicKey() != null) {
+
         String algo = identity.getPublicKey().getAlgorithm();
         sb.append("\t\tAlgorithm: ").append(algo).append("\n");
         X509Certificate[] certs = identity.certificateChain();
@@ -828,20 +906,20 @@ public abstract class AbstractP11Slot implements P11Slot {
       }
     }
 
-    sortedObjectIds.clear();
+    sortedKeyIds.clear();
     for (P11ObjectIdentifier objectId : certificates.keySet()) {
       if (!identities.containsKey(objectId)) {
-        sortedObjectIds.add(objectId);
+        sortedKeyIds.add(objectId);
       }
     }
 
-    Collections.sort(sortedObjectIds);
+    Collections.sort(sortedKeyIds);
 
-    if (!sortedObjectIds.isEmpty()) {
-      Collections.sort(sortedObjectIds);
-      size = sortedObjectIds.size();
+    if (!sortedKeyIds.isEmpty()) {
+      Collections.sort(sortedKeyIds);
+      size = sortedKeyIds.size();
       for (int i = 0; i < size; i++) {
-        P11ObjectIdentifier objectId = sortedObjectIds.get(i);
+        P11ObjectIdentifier objectId = sortedKeyIds.get(i);
         sb.append("\tCert-").append(i + 1).append(". ").append(objectId.getLabel());
         sb.append(" (").append("id: ").append(objectId.getLabel()).append(")\n");
         formatString(null, verbose, sb, certificates.get(objectId).getCert());

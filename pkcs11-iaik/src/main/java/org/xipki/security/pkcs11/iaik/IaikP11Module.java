@@ -52,6 +52,13 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 public class IaikP11Module extends AbstractP11Module {
 
+  public enum Vendor {
+
+    YUBICO,
+    GENERAL
+
+  }
+
   public static final String TYPE = "native";
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
@@ -64,10 +71,18 @@ public class IaikP11Module extends AbstractP11Module {
     super(moduleConf);
     this.module = ParamUtil.requireNonNull("module", module);
 
+    String library = moduleConf.getNativeLibrary();
+    Vendor vendor;
+    if (library.contains("ykcs11")) {
+      vendor = Vendor.YUBICO;
+    } else {
+      vendor = Vendor.GENERAL;
+    }
+
     try {
       Info info = module.getInfo();
       this.description = StringUtil.concatObjects("PKCS#11 IAIK",
-          "\n\tPath: ", moduleConf.getNativeLibrary(),
+          "\n\tPath: ", library,
           "\n\tCryptoki Version: ", info.getCryptokiVersion(),
           "\n\tManufacturerID: ", info.getManufacturerID(),
           "\n\tLibrary Description: ", info.getLibraryDescription(),
@@ -142,7 +157,7 @@ public class IaikP11Module extends AbstractP11Module {
       }
       P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
-          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf());
+          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(), vendor);
 
       slots.add(p11Slot);
     }

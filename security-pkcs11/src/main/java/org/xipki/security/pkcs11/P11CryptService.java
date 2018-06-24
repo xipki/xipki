@@ -73,7 +73,7 @@ public class P11CryptService {
 
   public P11Identity getIdentity(P11EntityIdentifier identityId) throws P11TokenException {
     ParamUtil.requireNonNull("identityId", identityId);
-    return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
+    return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getKeyId());
   }
 
   @Override
