@@ -48,8 +48,8 @@
   </prerequisites>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <xipki.tools.version>1.0.1</xipki.tools.version>
-    <xipki.scep.version>4.0.0-SNAPSHOT</xipki.scep.version>
+    <xipki.tools.version>1.0.2</xipki.tools.version>
+    <xipki.scep.version>3.1.0</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.0</karaf.version>
     <karaf.plugin.version>4.2.0</karaf.plugin.version>
