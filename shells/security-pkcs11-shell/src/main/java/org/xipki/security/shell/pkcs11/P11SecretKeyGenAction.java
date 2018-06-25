@@ -25,7 +25,7 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
@@ -82,7 +82,7 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
     P11Slot slot = getSlot();
     P11NewKeyControl control = getControl();
 
-    P11EntityIdentifier identityId = null;
+    P11IdentityId identityId = null;
     try {
       identityId = slot.generateSecretKey(p11KeyType, keysize, control);
       finalize(keyType, identityId);

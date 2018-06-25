@@ -48,7 +48,7 @@ class P11MacContentSigner implements XiContentSigner {
 
   private final P11CryptService cryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   private final AlgorithmIdentifier algorithmIdentifier;
 
@@ -58,7 +58,7 @@ class P11MacContentSigner implements XiContentSigner {
 
   private final ByteArrayOutputStream outputStream;
 
-  P11MacContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+  P11MacContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier macAlgId) throws XiSecurityException, P11TokenException {
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);
     this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
@@ -117,9 +117,9 @@ class P11MacContentSigner implements XiContentSigner {
       byte[] dataToSign = outputStream.toByteArray();
       outputStream.reset();
       return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
-    } catch (XiSecurityException ex) {
+    } catch (P11TokenException ex) {
       LogUtil.warn(LOG, ex);
-      throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
+      throw new RuntimeCryptoException("P11TokenException: " + ex.getMessage());
     } catch (Throwable th) {
       LogUtil.warn(LOG, th);
       throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());

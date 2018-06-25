@@ -19,7 +19,7 @@ package org.xipki.security.speed.pkcs11;
 
 import java.math.BigInteger;
 
-import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
@@ -44,7 +44,7 @@ public class P11RSAKeyGenSpeed extends P11KeyGenSpeed {
 
   @Override
   protected void genKeypair() throws Exception {
-    P11EntityIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent, getControl());
+    P11IdentityId objId = slot.generateRSAKeypair(keysize, publicExponent, getControl());
     slot.removeIdentity(objId);
   }
 

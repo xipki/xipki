@@ -26,7 +26,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
+public class P11IdentityId implements Comparable<P11IdentityId> {
 
   private final P11SlotIdentifier slotId;
 
@@ -43,7 +43,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
    * @param keyId
    *          Object identifier. Must not be {@code null}.
    */
-  public P11EntityIdentifier(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
       String publicKeyLabel, String certLabel) {
     this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     this.keyId = ParamUtil.requireNonNull("keyId", keyId);
@@ -79,7 +79,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
   }
 
   @Override
-  public int compareTo(P11EntityIdentifier obj) {
+  public int compareTo(P11IdentityId obj) {
     int ct = slotId.compareTo(obj.slotId);
     if (ct != 0) {
       return ct;
@@ -89,20 +89,20 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof P11EntityIdentifier)) {
+    if (!(obj instanceof P11IdentityId)) {
       return false;
     }
 
-    P11EntityIdentifier ei = (P11EntityIdentifier) obj;
+    P11IdentityId ei = (P11IdentityId) obj;
     return this.slotId.equals(ei.slotId)
         && this.keyId.equals(ei.keyId)
         && CompareUtil.equalsObject(publicKeyId, ei.publicKeyId)
         && CompareUtil.equalsObject(certId, ei.certId);
   }
 
-  public boolean match(P11SlotIdentifier slotId, String objectLabel) {
-    ParamUtil.requireNonNull("objectLabel", objectLabel);
-    return this.slotId.equals(slotId) && objectLabel.equals(this.keyId.getLabel());
+  public boolean match(P11SlotIdentifier slotId, String keyLabel) {
+    ParamUtil.requireNonNull("objectLabel", keyLabel);
+    return this.slotId.equals(slotId) && keyLabel.equals(this.keyId.getLabel());
   }
 
   @Override

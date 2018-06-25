@@ -143,8 +143,8 @@ public class PKCS11SignerFactory implements SignerFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
 
-    P11EntityIdentifier entityId = slot.getEntityId(keyId, keyLabel);
-    if (entityId == null) {
+    P11IdentityId identityId = slot.getIdentityId(keyId, keyLabel);
+    if (identityId == null) {
       String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
       throw new ObjectCreationException("cound not find identity with " + str2);
     }
@@ -162,19 +162,19 @@ public class PKCS11SignerFactory implements SignerFactory {
 
       if (macAlgId != null) {
         P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(
-            p11Service, entityId);
+            p11Service, identityId);
         return signerBuilder.createSigner(macAlgId, parallelism);
       } else {
         AlgorithmIdentifier signatureAlgId;
         if (conf.getHashAlgo() == null) {
           signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
         } else {
-          PublicKey pubKey = slot.getIdentity(entityId.getKeyId()).getPublicKey();
+          PublicKey pubKey = slot.getIdentity(identityId.getKeyId()).getPublicKey();
           signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
         }
 
         P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,
-            securityFactory, entityId, certificateChain);
+            securityFactory, identityId, certificateChain);
         return signerBuilder.createSigner(signatureAlgId, parallelism);
       }
     } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {

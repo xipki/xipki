@@ -162,7 +162,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
           continue;
         }
 
-        P11PrivateKey key = new P11PrivateKey(p11Service, identity.getIdentityId());
+        P11PrivateKey key = new P11PrivateKey(p11Service, identity.getId());
         KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
         keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keyid-"
             + objId.getIdHex(), keyCertEntry);

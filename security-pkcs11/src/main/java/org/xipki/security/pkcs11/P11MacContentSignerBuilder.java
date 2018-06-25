@@ -46,10 +46,9 @@ public class P11MacContentSignerBuilder {
 
   private final P11CryptService cryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
-  public P11MacContentSignerBuilder(P11CryptService cryptService, P11EntityIdentifier identityId)
-      throws XiSecurityException, P11TokenException {
+  public P11MacContentSignerBuilder(P11CryptService cryptService, P11IdentityId identityId) {
     this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);
   } // constructor

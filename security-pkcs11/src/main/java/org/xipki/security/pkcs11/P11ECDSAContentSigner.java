@@ -58,7 +58,7 @@ class P11ECDSAContentSigner implements XiContentSigner {
 
   private final P11CryptService cryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   private final AlgorithmIdentifier algorithmIdentifier;
 
@@ -98,7 +98,7 @@ class P11ECDSAContentSigner implements XiContentSigner {
     hashMechMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_ECDSA_SHA3_512);
   }
 
-  P11ECDSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+  P11ECDSAContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier signatureAlgId, boolean plain)
       throws XiSecurityException, P11TokenException {
     this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);

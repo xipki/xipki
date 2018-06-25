@@ -19,7 +19,7 @@ package org.xipki.security.shell.pkcs11;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 
 /**
@@ -37,7 +37,7 @@ public class P11SM2KeyGenAction extends P11KeyGenAction {
   @Override
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
-    P11EntityIdentifier identityId = slot.generateSM2Keypair(getControl());
+    P11IdentityId identityId = slot.generateSM2Keypair(getControl());
     finalize("SM2", identityId);
     return null;
   }

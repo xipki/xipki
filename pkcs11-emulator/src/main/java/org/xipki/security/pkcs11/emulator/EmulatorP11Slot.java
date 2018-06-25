@@ -83,8 +83,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.AbstractP11Slot;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11Identity;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11NewObjectConf;
@@ -340,7 +340,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
           }
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
-              new P11EntityIdentifier(slotId, p11ObjId, null, null), key, maxSessions, random);
+              new P11IdentityId(slotId, p11ObjId, null, null), key, maxSessions, random);
           LOG.info("added PKCS#11 secret key {}", p11ObjId);
           ret.addIdentity(identity);
         } catch (ClassCastException ex) {
@@ -401,8 +401,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
           X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
-              new P11EntityIdentifier(slotId, p11ObjId, label, label), privateKey, publicKey, certs,
-              maxSessions, random);
+              new P11IdentityId(slotId, p11ObjId, label, label), privateKey, publicKey, certs,
+                  maxSessions, random);
           LOG.info("added PKCS#11 key {}", p11ObjId);
           ret.addIdentity(identity);
         } catch (InvalidKeyException ex) {
@@ -791,19 +791,19 @@ class EmulatorP11Slot extends AbstractP11Slot {
   }
 
   @Override
-  protected void removeIdentity0(P11EntityIdentifier entityId) throws P11TokenException {
-    P11ObjectIdentifier keyId = entityId.getKeyId();
+  protected void removeIdentity0(P11IdentityId identityId) throws P11TokenException {
+    P11ObjectIdentifier keyId = identityId.getKeyId();
 
     boolean b1 = true;
-    if (entityId.getCertId() != null) {
-      removePkcs11Entry(certDir, entityId.getCertId());
+    if (identityId.getCertId() != null) {
+      removePkcs11Entry(certDir, identityId.getCertId());
     }
 
     boolean b2 = removePkcs11Entry(privKeyDir, keyId);
 
     boolean b3 = true;
-    if (entityId.getPublicKeyId() != null) {
-      b3 = removePkcs11Entry(pubKeyDir, entityId.getPublicKeyId());
+    if (identityId.getPublicKeyId() != null) {
+      b3 = removePkcs11Entry(pubKeyDir, identityId.getPublicKeyId());
     }
 
     boolean b4 = removePkcs11Entry(secKeyDir, keyId);
@@ -996,7 +996,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
       }
     }
 
-    P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
+    P11IdentityId identityId = new P11IdentityId(slotId,
         new P11ObjectIdentifier(id, keyLabel), pubKeyLabel, certLabel);
     try {
       return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
@@ -1018,16 +1018,16 @@ class EmulatorP11Slot extends AbstractP11Slot {
     String label = control.getLabel();
 
     savePkcs11SecretKey(id, label, key);
-    P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
+    P11IdentityId identityId = new P11IdentityId(slotId,
         new P11ObjectIdentifier(id, label), null, null);
     return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
   }
 
   @Override
-  protected void updateCertificate0(P11ObjectIdentifier objectId, X509Certificate newCert)
+  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
       throws P11TokenException, CertificateException {
-    removePkcs11Cert(objectId);
-    savePkcs11Cert(objectId.getId(), objectId.getLabel(), newCert);
+    removePkcs11Cert(keyId);
+    savePkcs11Cert(keyId.getId(), keyId.getLabel(), newCert);
   }
 
   private byte[] generateId() throws P11TokenException {

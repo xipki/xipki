@@ -62,10 +62,10 @@ public class P11ContentSignerBuilder {
 
   private final SecurityFactory securityFactory;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   public P11ContentSignerBuilder(P11CryptService cryptService, SecurityFactory securityFactory,
-      P11EntityIdentifier identityId, X509Certificate[] certificateChain)
+      P11IdentityId identityId, X509Certificate[] certificateChain)
       throws XiSecurityException, P11TokenException {
     this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
     this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);

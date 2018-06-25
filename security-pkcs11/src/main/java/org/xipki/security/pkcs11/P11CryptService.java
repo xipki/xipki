@@ -71,7 +71,7 @@ public class P11CryptService {
     return module.getSlot(slotId);
   }
 
-  public P11Identity getIdentity(P11EntityIdentifier identityId) throws P11TokenException {
+  public P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException {
     ParamUtil.requireNonNull("identityId", identityId);
     return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getKeyId());
   }

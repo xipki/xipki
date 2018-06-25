@@ -28,13 +28,13 @@ import org.xipki.util.ParamUtil;
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult {
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
-  public P11KeypairGenerationResult(P11EntityIdentifier identityId) {
+  public P11KeypairGenerationResult(P11IdentityId identityId) {
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);
   }
 
-  public P11EntityIdentifier getIdentityId() {
+  public P11IdentityId getIdentityId() {
     return identityId;
   }
 

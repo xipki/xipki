@@ -56,7 +56,7 @@ public class P11SlotRefreshResult {
 
   public void addIdentity(P11Identity identity) {
     ParamUtil.requireNonNull("identity", identity);
-    this.identities.put(identity.getIdentityId().getKeyId(), identity);
+    this.identities.put(identity.getId().getKeyId(), identity);
   }
 
   public void addMechanism(long mechanism) {

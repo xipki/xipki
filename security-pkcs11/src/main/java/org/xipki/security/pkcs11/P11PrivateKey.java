@@ -39,7 +39,7 @@ public class P11PrivateKey implements PrivateKey {
 
   private final P11CryptService p11CryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   private final String algorithm;
 
@@ -47,7 +47,7 @@ public class P11PrivateKey implements PrivateKey {
 
   private final PublicKey publicKey;
 
-  public P11PrivateKey(P11CryptService p11CryptService, P11EntityIdentifier identityId)
+  public P11PrivateKey(P11CryptService p11CryptService, P11IdentityId identityId)
       throws P11TokenException {
     this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
     this.identityId = ParamUtil.requireNonNull("entityId", identityId);
@@ -122,7 +122,7 @@ public class P11PrivateKey implements PrivateKey {
     return p11CryptService;
   }
 
-  public P11EntityIdentifier getIdentityId() {
+  public P11IdentityId getIdentityId() {
     return identityId;
   }
 

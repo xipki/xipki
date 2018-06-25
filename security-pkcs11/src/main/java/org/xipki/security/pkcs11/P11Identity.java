@@ -47,7 +47,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   protected final P11Slot slot;
 
-  protected final P11EntityIdentifier identityId;
+  protected final P11IdentityId id;
 
   protected final PublicKey publicKey;
 
@@ -55,17 +55,17 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   protected X509Certificate[] certificateChain;
 
-  protected P11Identity(P11Slot slot, P11EntityIdentifier identityId, int signatureBitLen) {
+  protected P11Identity(P11Slot slot, P11IdentityId id, int signatureBitLen) {
     this.slot = ParamUtil.requireNonNull("slot", slot);
-    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.id = ParamUtil.requireNonNull("id", id);
     this.publicKey = null;
     this.signatureKeyBitLength = signatureBitLen;
   } // constructor
 
-  protected P11Identity(P11Slot slot, P11EntityIdentifier identityId, PublicKey publicKey,
+  protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey,
       X509Certificate[] certificateChain) {
     this.slot = ParamUtil.requireNonNull("slot", slot);
-    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.id = ParamUtil.requireNonNull("id", id);
 
     if (certificateChain != null && certificateChain.length > 0 && certificateChain[0] != null) {
       this.publicKey = certificateChain[0].getPublicKey();
@@ -92,11 +92,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   } // constructor
 
   public byte[] sign(long mechanism, P11Params parameters, byte[] content)
-      throws P11TokenException, XiSecurityException {
+      throws P11TokenException {
     ParamUtil.requireNonNull("content", content);
     slot.assertMechanismSupported(mechanism);
     if (!supportsMechanism(mechanism, parameters)) {
-      throw new P11UnsupportedMechanismException(mechanism, identityId);
+      throw new P11UnsupportedMechanismException(mechanism, id);
     }
     if (LOG.isDebugEnabled()) {
       LOG.debug("sign with mechanism {}", Functions.getMechanismDescription(mechanism));
@@ -130,8 +130,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   protected abstract byte[] digestSecretKey0(long mechanism) throws P11TokenException;
 
-  public P11EntityIdentifier getIdentityId() {
-    return identityId;
+  public P11IdentityId getId() {
+    return id;
   }
 
   public X509Certificate getCertificate() {
@@ -159,12 +159,12 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
   }
 
-  public boolean match(P11EntityIdentifier identityId) {
-    return this.identityId.equals(identityId);
+  public boolean match(P11IdentityId id) {
+    return this.id.equals(id);
   }
 
   public boolean match(P11SlotIdentifier slotId, String keyLabel) {
-    return identityId.match(slotId, keyLabel);
+    return id.match(slotId, keyLabel);
   }
 
   public int getSignatureKeyBitLength() {
@@ -173,7 +173,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   @Override
   public int compareTo(P11Identity obj) {
-    return identityId.compareTo(obj.identityId);
+    return id.compareTo(obj.id);
   }
 
   public boolean supportsMechanism(long mechanism, P11Params parameters) {

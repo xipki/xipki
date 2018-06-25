@@ -20,7 +20,7 @@ package org.xipki.security.shell.pkcs11;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.shell.IllegalCmdParamException;
 
@@ -48,7 +48,7 @@ public class P11RSAKeyGenAction extends P11KeyGenAction {
     }
 
     P11Slot slot = getSlot();
-    P11EntityIdentifier identityId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+    P11IdentityId identityId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
         getControl());
     finalize("RSA", identityId);
     return null;

@@ -67,7 +67,7 @@ class P11RSAContentSigner implements XiContentSigner {
 
   private final P11CryptService cryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   private final byte[] digestPkcsPrefix;
 
@@ -99,7 +99,7 @@ class P11RSAContentSigner implements XiContentSigner {
     hashAlgMecMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS);
   }
 
-  P11RSAContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+  P11RSAContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
     this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
     this.identityId = ParamUtil.requireNonNull("identityId", identityId);

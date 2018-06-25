@@ -35,11 +35,11 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
   private final P11CryptService p11CryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   private final int keysize;
 
-  private P11RSAKeyParameter(P11CryptService p11CryptService, P11EntityIdentifier identityId,
+  private P11RSAKeyParameter(P11CryptService p11CryptService, P11IdentityId identityId,
       BigInteger modulus, BigInteger publicExponent) {
     super(true, modulus, publicExponent);
 
@@ -58,12 +58,12 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
     return p11CryptService;
   }
 
-  P11EntityIdentifier getIdentityId() {
+  P11IdentityId getIdentityId() {
     return identityId;
   }
 
   public static P11RSAKeyParameter getInstance(P11CryptService p11CryptService,
-      P11EntityIdentifier identityId) throws InvalidKeyException {
+      P11IdentityId identityId) throws InvalidKeyException {
     ParamUtil.requireNonNull("p11CryptService", p11CryptService);
     ParamUtil.requireNonNull("identityId", identityId);
 

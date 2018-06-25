@@ -45,9 +45,9 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.AbstractP11Slot;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11NewKeyControl.KeyUsage;
@@ -316,7 +316,7 @@ class IaikP11Slot extends AbstractP11Slot {
     P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, new String(label));
 
     IaikP11Identity identity = new IaikP11Identity(this,
-        new P11EntityIdentifier(slotId, objectId, null, null), secretKey);
+        new P11IdentityId(slotId, objectId, null, null), secretKey);
     refreshResult.addIdentity(identity);
   }
 
@@ -352,7 +352,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
     IaikP11Identity identity = new IaikP11Identity(this,
-        new P11EntityIdentifier(slotId, objectId, pubKeyLabel, certLabel), privKey, pubKey, certs);
+        new P11IdentityId(slotId, objectId, pubKeyLabel, certLabel), privKey, pubKey, certs);
     refreshResult.addIdentity(identity);
   }
 
@@ -1045,7 +1045,7 @@ class IaikP11Slot extends AbstractP11Slot {
       labelChars = key.getLabel().getCharArrayValue();
 
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, new String(labelChars));
-      P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId, null, null);
+      P11IdentityId entityId = new P11IdentityId(slotId, objId, null, null);
 
       return new IaikP11Identity(this, entityId, key);
     } finally {
@@ -1122,7 +1122,7 @@ class IaikP11Slot extends AbstractP11Slot {
       labelChars = key.getLabel().getCharArrayValue();
 
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, new String(labelChars));
-      P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId, null, null);
+      P11IdentityId entityId = new P11IdentityId(slotId, objId, null, null);
 
       return new IaikP11Identity(this, entityId, key);
     } finally {
@@ -1276,8 +1276,7 @@ class IaikP11Slot extends AbstractP11Slot {
           }
         }
 
-        P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId,
-            publicKeyLabel, certLabel);
+        P11IdentityId entityId = new P11IdentityId(slotId, objId, publicKeyLabel, certLabel);
         IaikP11Identity ret = new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, certs);
         succ = true;
         return ret;
@@ -1406,16 +1405,16 @@ class IaikP11Slot extends AbstractP11Slot {
   }
 
   @Override
-  protected void updateCertificate0(P11ObjectIdentifier objectId, X509Certificate newCert)
+  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
       throws P11TokenException {
-    removeCerts(objectId);
+    removeCerts(keyId);
     try {
       Thread.sleep(1000);
     } catch (InterruptedException ex) {
       // CHECKSTYLE:SKIP
     }
 
-    P11NewObjectControl control = new P11NewObjectControl(objectId.getId(), objectId.getLabel());
+    P11NewObjectControl control = new P11NewObjectControl(keyId.getId(), keyId.getLabel());
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
@@ -1455,7 +1454,7 @@ class IaikP11Slot extends AbstractP11Slot {
   }
 
   @Override
-  protected void removeIdentity0(P11EntityIdentifier identityId) throws P11TokenException {
+  protected void removeIdentity0(P11IdentityId identityId) throws P11TokenException {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();

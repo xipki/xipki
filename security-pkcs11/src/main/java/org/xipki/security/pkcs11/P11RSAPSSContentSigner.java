@@ -123,7 +123,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
 
   private final P11CryptService cryptService;
 
-  private final P11EntityIdentifier identityId;
+  private final P11IdentityId identityId;
 
   private final long mechanism;
 
@@ -131,7 +131,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
 
   private final OutputStream outputStream;
 
-  P11RSAPSSContentSigner(P11CryptService cryptService, P11EntityIdentifier identityId,
+  P11RSAPSSContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier signatureAlgId, SecureRandom random)
       throws XiSecurityException, P11TokenException {
     this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
@@ -234,7 +234,7 @@ class P11RSAPSSContentSigner implements XiContentSigner {
 
     try {
       return cryptService.getIdentity(identityId).sign(mechanism, parameters, dataToSign);
-    } catch (XiSecurityException | P11TokenException ex) {
+    } catch (P11TokenException ex) {
       LogUtil.warn(LOG, ex, "could not sign");
       throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
     }

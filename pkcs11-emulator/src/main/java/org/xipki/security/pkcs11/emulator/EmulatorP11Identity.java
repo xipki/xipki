@@ -51,9 +51,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
-import org.xipki.security.pkcs11.P11EntityIdentifier;
 import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot;
@@ -88,14 +88,14 @@ public class EmulatorP11Identity extends P11Identity {
 
   private final SecureRandom random;
 
-  public EmulatorP11Identity(P11Slot slot, P11EntityIdentifier identityId,
+  public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId,
       SecretKey signingKey, int maxSessions, SecureRandom random) {
     super(slot, identityId, 0);
     this.signingKey = ParamUtil.requireNonNull("signingKey", signingKey);
     this.random = ParamUtil.requireNonNull("random", random);
   } // constructor
 
-  public EmulatorP11Identity(P11Slot slot, P11EntityIdentifier identityId, PrivateKey privateKey,
+  public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
       PublicKey publicKey, X509Certificate[] certificateChain, int maxSessions,
       SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
