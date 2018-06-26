@@ -306,8 +306,9 @@ public class CaCmpResponderImpl extends CmpResponder {
           }
 
           String dfltCertprofileName = (parameters == null) ? null : parameters.get("certprofile");
-          respBody = cmpEnrollCert(dfltCertprofileName, request, respHeader, cmpControl, reqHeader,
-              reqBody, cmpRequestor, tid, msgId, event);
+          String dfltKeyGenType = (parameters == null) ? null : parameters.get("generatekey");
+          respBody = cmpEnrollCert(dfltCertprofileName, dfltKeyGenType, request, respHeader,
+              cmpControl, reqHeader, reqBody, cmpRequestor, tid, msgId, event);
           break;
         case PKIBody.TYPE_CERT_CONFIRM:
           event.addEventType(CaAuditConstants.TYPE_CMP_certConf);
@@ -363,35 +364,35 @@ public class CaCmpResponderImpl extends CmpResponder {
     return new PKIMessage(respHeader.build(), respBody);
   } // method processPKIMessage0
 
-  private PKIBody processCr(String dfltCertprofileName, PKIMessage request,
+  private PKIBody processCr(String dfltCertprofileName, String dfltKeyGenType, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
       CmpControl cmpControl, String msgId, AuditEvent event) throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, request, requestor, tid,
-        reqHeader, cr, false, true, cmpControl, msgId, event);
+    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltKeyGenType, request,
+        requestor, tid, reqHeader, cr, false, true, cmpControl, msgId, event);
     return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
   }
 
-  private PKIBody processKur(String dfltCertprofileName, PKIMessage request,
+  private PKIBody processKur(String dfltCertprofileName, String dfltKeyGenType, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages kur,
       CmpControl cmpControl,
       String msgId, AuditEvent event) throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, request, requestor, tid,
-        reqHeader, kur, true, true, cmpControl, msgId, event);
+    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltKeyGenType, request,
+        requestor, tid, reqHeader, kur, true, true, cmpControl, msgId, event);
     return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
   }
 
   private PKIBody processCcp(String dfltCertprofileName, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
       CmpControl cmpControl, String msgId, AuditEvent event) throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, request, requestor, tid,
-        reqHeader, cr, false, false, cmpControl, msgId, event);
+    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, null, request,
+        requestor, tid, reqHeader, cr, false, false, cmpControl, msgId, event);
     return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
   }
 
-  private CertRepMessage processCertReqMessages(String dfltCertprofileName, PKIMessage request,
-      CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
-      boolean keyUpdate, boolean allowKeyGen, CmpControl cmpControl, String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
+  private CertRepMessage processCertReqMessages(String dfltCertprofileName, String dfltKeyGenType,
+      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
+      CertReqMessages cr, boolean keyUpdate, boolean allowKeyGen, CmpControl cmpControl,
+      String msgId, AuditEvent event) throws InsuffientPermissionException {
     CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
 
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
@@ -434,8 +435,14 @@ public class CaCmpResponderImpl extends CmpResponder {
       CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
 
       String genkeyType = null;
-      if (allowKeyGen && keyvalues != null) {
-        genkeyType = keyvalues.value(CmpUtf8Pairs.KEY_GENERATEKEY);
+      if (allowKeyGen) {
+        if (keyvalues != null) {
+          genkeyType = keyvalues.value(CmpUtf8Pairs.KEY_GENERATEKEY);
+        }
+
+        if (genkeyType == null) {
+          genkeyType = dfltKeyGenType;
+        }
       }
 
       if (StringUtil.isBlank(genkeyType)) {
@@ -1368,10 +1375,10 @@ public class CaCmpResponderImpl extends CmpResponder {
     return getCa().getRequestor(requestorCert);
   }
 
-  private PKIBody cmpEnrollCert(String certprofileName, PKIMessage request,
-      PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader, PKIBody reqBody,
-      CmpRequestorInfo requestor, ASN1OctetString tid, String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
+  private PKIBody cmpEnrollCert(String dfltCertprofileName, String dfltKeyGenType,
+      PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
+      PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
+      AuditEvent event) throws InsuffientPermissionException {
     long confirmWaitTime = cmpControl.getConfirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;
@@ -1384,22 +1391,22 @@ public class CaCmpResponderImpl extends CmpResponder {
     switch (type) {
       case PKIBody.TYPE_CERT_REQ:
         checkPermission(requestor, PermissionConstants.ENROLL_CERT);
-        respBody = processCr(certprofileName, request, requestor, tid, reqHeader,
-            CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
+        respBody = processCr(dfltCertprofileName, dfltKeyGenType, request, requestor, tid,
+            reqHeader, CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
         break;
       case PKIBody.TYPE_KEY_UPDATE_REQ:
         checkPermission(requestor, PermissionConstants.KEY_UPDATE);
-        respBody = processKur(certprofileName, request, requestor, tid, reqHeader,
-            CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
+        respBody = processKur(dfltCertprofileName, dfltKeyGenType, request, requestor, tid,
+            reqHeader, CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
         break;
       case PKIBody.TYPE_P10_CERT_REQ:
         checkPermission(requestor, PermissionConstants.ENROLL_CERT);
-        respBody = processP10cr(certprofileName, request, requestor, tid, reqHeader,
+        respBody = processP10cr(dfltCertprofileName, request, requestor, tid, reqHeader,
             CertificationRequest.getInstance(reqBody.getContent()), cmpControl, msgId, event);
         break;
       case PKIBody.TYPE_CROSS_CERT_REQ:
         checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
-        respBody = processCcp(certprofileName, request, requestor, tid, reqHeader,
+        respBody = processCcp(dfltCertprofileName, request, requestor, tid, reqHeader,
             CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
         break;
       default:

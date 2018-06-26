@@ -63,7 +63,7 @@ public class CmpCaClientExample extends CaClientExample {
 
   private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
 
-  private static final boolean profileInUri = true;
+  private static final boolean profileAndKeyTypeInUri = true;
 
   public static void main(String[] args) {
     //System.setProperty("javax.net.debug", "all");
@@ -116,44 +116,45 @@ public class CmpCaClientExample extends CaClientExample {
 
       // Enroll certificate via CRMF - RSA (CA generate keypair)
       KeyAndCert keyAndCert = client.requestCertViaCrmf(CERT_PROFILE,"rsa:2048", getSubject(),
-          profileInUri);
+          profileAndKeyTypeInUri);
       printKeyAndCert("===== RSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
 
       // Enroll certificate via CRMF - EC (CA generate keypair)
       KeyAndCert[] keyAndCerts =
           client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
           new String[] {"ec:secp256r1", "ec:secp256r1"},
-          new String[]{getSubject(), getSubject()}, profileInUri);
+          new String[]{getSubject(), getSubject()}, profileAndKeyTypeInUri);
       for (int i = 0; i < keyAndCerts.length; i++) {
         printKeyAndCert("===== EC via CRMF (CMP, CA generate keypair) =====", keyAndCerts[i]);
       }
 
       // Enroll certificate via CRMF - DSA (CA generate keypair)
-      keyAndCert = client.requestCertViaCrmf(CERT_PROFILE, "dsa:2048", getSubject(), profileInUri);
+      keyAndCert = client.requestCertViaCrmf(CERT_PROFILE, "dsa:2048", getSubject(),
+          profileAndKeyTypeInUri);
       printKeyAndCert("===== DSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
 
       // Enroll certificate via CSR - RSA
       MyKeypair kp = generateRsaKeypair();
       CertificationRequest csr = genCsr(kp, getSubject());
-      X509Certificate cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileInUri);
+      X509Certificate cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileAndKeyTypeInUri);
       printCert("===== RSA via CSR (CMP) =====", cert);
 
       // Enroll certificate via CSR - EC
       kp = generateEcKeypair();
       csr = genCsr(kp, getSubject());
-      cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileInUri);
+      cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileAndKeyTypeInUri);
       printCert("===== EC via CSR (CMP) =====", cert);
 
       // Enroll certificate via CSR - DSA
       kp = generateDsaKeypair();
       csr = genCsr(kp, getSubject());
-      cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileInUri);
+      cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileAndKeyTypeInUri);
       printCert("===== DSA via CSR (CMP) =====", cert);
 
       // Enroll certificate via CRMF - RSA
       kp = generateRsaKeypair();
       cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject(),
-          profileInUri);
+          profileAndKeyTypeInUri);
       printCert("===== RSA via CRMF (CMP) =====", cert);
 
       // Enroll certificate via CRMF - EC
@@ -162,7 +163,7 @@ public class CmpCaClientExample extends CaClientExample {
       X509Certificate[] certs = client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
           new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
           new SubjectPublicKeyInfo[] {kp.getPublic(), kp2.getPublic()},
-          new String[]{getSubject(), getSubject()}, profileInUri);
+          new String[]{getSubject(), getSubject()}, profileAndKeyTypeInUri);
       for (int i = 0; i < certs.length; i++) {
         printCert("===== EC via CRMF (CMP) =====", certs[i]);
       }
@@ -170,7 +171,7 @@ public class CmpCaClientExample extends CaClientExample {
       // Enroll certificate via CRMF - DSA
       kp = generateDsaKeypair();
       cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject(),
-          profileInUri);
+          profileAndKeyTypeInUri);
       printCert("===== DSA via CRMF (CMP) =====", cert);
 
       BigInteger serialNumber = cert.getSerialNumber();

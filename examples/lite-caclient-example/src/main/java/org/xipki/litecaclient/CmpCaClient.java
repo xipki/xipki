@@ -538,9 +538,13 @@ public class CmpCaClient {
   }
 
   public X509Certificate requestCertViaCrmf(String certprofile, PrivateKey privateKey,
-      SubjectPublicKeyInfo publicKeyInfo, String subject, boolean profileInUri) throws Exception {
-    return requestCertViaCrmf(new String[]{certprofile}, new PrivateKey[]{privateKey},
-        new SubjectPublicKeyInfo[] {publicKeyInfo}, new String[] {subject}, profileInUri)[0];
+      SubjectPublicKeyInfo publicKeyInfo, String subject, boolean profileInUri)
+          throws Exception {
+    return requestCertViaCrmf(new String[]{certprofile},
+        new PrivateKey[]{privateKey},
+        new SubjectPublicKeyInfo[] {publicKeyInfo},
+        new String[] {subject},
+        profileInUri)[0];
   }
 
   public X509Certificate[] requestCertViaCrmf(String[] certprofiles, PrivateKey[] privateKey,
@@ -553,7 +557,7 @@ public class CmpCaClient {
       if (n > 1) {
         for (int i = 1; i < n; i++) {
           if (!certprofiles[0].equalsIgnoreCase(certprofiles[i])) {
-            throw new IllegalArgumentException("not all certprofiles are the same");
+            throw new IllegalArgumentException("not all certprofiles are of the same");
           }
         }
       }
@@ -612,25 +616,35 @@ public class CmpCaClient {
   } // method requestCerts
 
   public KeyAndCert requestCertViaCrmf(String certprofile, String genkeyType,
-      String subject, boolean profileInUri) throws Exception {
+      String subject, boolean profileAndKeyTypeInUri) throws Exception {
     return requestCertViaCrmf(new String[]{certprofile}, new String[]{genkeyType},
-        new String[] {subject}, profileInUri)[0];
+        new String[] {subject}, profileAndKeyTypeInUri)[0];
   }
 
   public KeyAndCert[] requestCertViaCrmf(String[] certprofiles, String[] genkeyTypes,
-      String[] subject, boolean profileInUri) throws Exception {
+      String[] subject, boolean profileAndKeyTypeInUri) throws Exception {
     final int n = certprofiles.length;
 
     String uri = null;
-    if (profileInUri) {
+    if (profileAndKeyTypeInUri) {
       if (n > 1) {
         for (int i = 1; i < n; i++) {
           if (!certprofiles[0].equalsIgnoreCase(certprofiles[i])) {
-            throw new IllegalArgumentException("not all certificates are the same");
+            throw new IllegalArgumentException("not all certprofiles are of the same");
           }
         }
       }
-      uri = caUri + "?certprofile=" + certprofiles[0];
+
+      final int ng = genkeyTypes.length;
+      if (ng > 1) {
+        for (int i = 1; i < ng; i++) {
+          if (!genkeyTypes[0].equalsIgnoreCase(genkeyTypes[i])) {
+            throw new IllegalArgumentException("not all genkeyTypes are of the same");
+          }
+        }
+      }
+
+      uri = caUri + "?certprofile=" + certprofiles[0] + "&generatekey=" + genkeyTypes[0];
     }
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
@@ -645,15 +659,14 @@ public class CmpCaClient {
           certTemplateBuilder.build(), null);
 
       AttributeTypeAndValue[] atvs = null;
-      String utf8pairs = "generatekey?" + genkeyTypes[i] + "%";
       if (uri == null) {
-        utf8pairs += "certprofile?" + certprofiles[i] + "%";
-      }
-
-      AttributeTypeAndValue certprofileInfo =
+        String utf8pairs =
+            "certprofile?" + certprofiles[i] + "%generatekey?" + genkeyTypes[i] + "%";
+        AttributeTypeAndValue certprofileInfo =
             new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8pairs));
-      atvs = new AttributeTypeAndValue[]{certprofileInfo};
+        atvs = new AttributeTypeAndValue[]{certprofileInfo};
+      }
 
       certReqMsgs[i] = new CertReqMsg(certReq, null, atvs);
     }
