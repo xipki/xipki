@@ -71,12 +71,12 @@ public class EmulatorP11Module extends AbstractP11Module {
     String modulePath = moduleConf.getNativeLibrary().trim();
     String parametersStr = "";
     if (!modulePath.isEmpty()) {
-      int idx = modulePath.indexOf('&');
+      int idx = modulePath.indexOf('?');
       if (idx != -1) {
         parametersStr = modulePath.substring(idx);
         modulePath = modulePath.substring(0, idx);
 
-        StringTokenizer tokens = new StringTokenizer(parametersStr, "&");
+        StringTokenizer tokens = new StringTokenizer(parametersStr, "?");
         while (tokens.hasMoreTokens()) {
           String token = tokens.nextToken();
           List<String> strs = StringUtil.split(token, "=");

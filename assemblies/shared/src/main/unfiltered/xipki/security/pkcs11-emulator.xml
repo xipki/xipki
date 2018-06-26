@@ -22,7 +22,7 @@
       <nativeLibraries>
         <nativeLibrary>
           <path></path>
-          <!--path>&amp;vendor=yubikey</path-->
+          <!--path>?vendor=yubikey</path-->
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>
