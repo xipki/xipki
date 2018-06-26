@@ -359,13 +359,13 @@ class IaikP11Slot extends AbstractP11Slot {
   byte[] digestKey(long mechanism, IaikP11Identity identity) throws P11TokenException {
     ParamUtil.requireNonNull("identity", identity);
     assertMechanismSupported(mechanism);
-    Key signingKey = identity.getSigningKey();
-    if (!(signingKey instanceof SecretKey)) {
+    Key key = identity.getSigningKey();
+    if (!(key instanceof SecretKey)) {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
 
     if (LOG.isTraceEnabled()) {
-      LOG.debug("digest (init, digestKey, then finish)\n{}", signingKey);
+      LOG.debug("digest (init, digestKey, then finish)\n{}", key);
     }
 
     int digestLen;
@@ -388,19 +388,40 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     ConcurrentBagEntry<Session> session0 = borrowSession();
+    Mechanism mechanismObj = Mechanism.get(mechanism);
 
     try {
       Session session = session0.value();
-      session.digestInit(Mechanism.get(mechanism));
-      session.digestKey((SecretKey) signingKey);
-      byte[] digest = new byte[digestLen];
-      session.digestFinal(digest, 0, digestLen);
-      return digest;
-    } catch (TokenException ex) {
-      throw new P11TokenException(ex);
+      try {
+        return digestKey0(session, digestLen, mechanismObj, (SecretKey) key);
+      } catch (PKCS11Exception ex) {
+        if (ex.getErrorCode() != PKCS11Constants.CKR_USER_NOT_LOGGED_IN) {
+          throw new P11TokenException(ex.getMessage(), ex);
+        }
+
+        LOG.info("digestKey ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
+        // force the login
+        forceLogin(session);
+        try {
+          return digestKey0(session, digestLen, mechanismObj, (SecretKey) key);
+        } catch (TokenException ex2) {
+          throw new P11TokenException(ex2.getMessage(), ex2);
+        }
+      } catch (TokenException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
     } finally {
       sessions.requite(session0);
     }
+  }
+
+  private byte[] digestKey0(Session session, int digestLen, Mechanism mechanism, SecretKey key)
+      throws TokenException {
+    session.digestInit(mechanism);
+    session.digestKey(key);
+    byte[] digest = new byte[digestLen];
+    session.digestFinal(digest, 0, digestLen);
+    return digest;
   }
 
   byte[] sign(long mechanism, P11Params parameters, byte[] content, IaikP11Identity identity)
@@ -408,7 +429,6 @@ class IaikP11Slot extends AbstractP11Slot {
     ParamUtil.requireNonNull("content", content);
     assertMechanismSupported(mechanism);
 
-    int len = content.length;
     int expectedSignatureLen;
     if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC) {
       expectedSignatureLen = 20;
@@ -431,51 +451,64 @@ class IaikP11Slot extends AbstractP11Slot {
       expectedSignatureLen = identity.getExpectedSignatureLen();
     }
 
-    ConcurrentBagEntry<Session> session0 = borrowSession();
+    Mechanism mechanismObj = getMechanism(mechanism, parameters);
+    Key signingKey = identity.getSigningKey();
 
+    ConcurrentBagEntry<Session> session0 = borrowSession();
     try {
       Session session = session0.value();
-      if (len <= maxMessageSize) {
-        return singleSign(session, mechanism, parameters, content, identity);
-      }
+      try {
+        return sign0(session, expectedSignatureLen, mechanismObj, content, signingKey);
+      } catch (PKCS11Exception ex) {
+        if (ex.getErrorCode() != PKCS11Constants.CKR_USER_NOT_LOGGED_IN) {
+          throw new P11TokenException(ex.getMessage(), ex);
+        }
 
-      Key signingKey = identity.getSigningKey();
-      Mechanism mechanismObj = getMechanism(mechanism, parameters);
-      if (LOG.isTraceEnabled()) {
-        LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
+        LOG.info("sign ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
+        // force the login
+        forceLogin(session);
+        try {
+          return sign0(session, expectedSignatureLen, mechanismObj, content, signingKey);
+        } catch (TokenException ex2) {
+          throw new P11TokenException(ex2.getMessage(), ex2);
+        }
+      } catch (TokenException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
       }
-
-      session.signInit(mechanismObj, signingKey);
-      for (int i = 0; i < len; i += maxMessageSize) {
-        int blockLen = Math.min(maxMessageSize, len - i);
-        //byte[] block = new byte[blockLen];
-        //System.arraycopy(content, i, block, 0, blockLen);
-        session.signUpdate(content, i, blockLen);
-      }
-
-      return session.signFinal(expectedSignatureLen);
-    } catch (TokenException ex) {
-      throw new P11TokenException(ex);
     } finally {
       sessions.requite(session0);
     }
   }
 
-  private byte[] singleSign(Session session, long mechanism, P11Params parameters, byte[] content,
-      IaikP11Identity identity) throws P11TokenException {
-    Key signingKey = identity.getSigningKey();
-    Mechanism mechanismObj = getMechanism(mechanism, parameters);
+  private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
+      byte[] content, Key signingKey) throws TokenException {
+    int len = content.length;
+
+    if (len <= maxMessageSize) {
+      return singleSign(session, mechanism, content, signingKey);
+    }
+
+    if (LOG.isTraceEnabled()) {
+      LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
+    }
+
+    session.signInit(mechanism, signingKey);
+    for (int i = 0; i < len; i += maxMessageSize) {
+      int blockLen = Math.min(maxMessageSize, len - i);
+      session.signUpdate(content, i, blockLen);
+    }
+
+    return session.signFinal(expectedSignatureLen);
+  }
+
+  private byte[] singleSign(Session session, Mechanism mechanism, byte[] content,
+      Key signingKey) throws TokenException {
     if (LOG.isTraceEnabled()) {
       LOG.debug("sign with signing key:\n{}", signingKey);
     }
 
-    byte[] signature;
-    try {
-      session.signInit(mechanismObj, signingKey);
-      signature = session.sign(content);
-    } catch (TokenException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
-    }
+    session.signInit(mechanism, signingKey);
+    byte[] signature = session.sign(content);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("signature:\n{}", hex(signature));
@@ -598,6 +631,18 @@ class IaikP11Slot extends AbstractP11Slot {
     if (CollectionUtil.isEmpty(password)) {
       singleLogin(session, null);
     } else {
+      for (char[] singlePwd : password) {
+        singleLogin(session, singlePwd);
+      }
+    }
+  }
+
+  private void forceLogin(Session session) throws P11TokenException {
+    if (CollectionUtil.isEmpty(password)) {
+      LOG.info("verify on PKCS11Module with NULL PIN");
+      singleLogin(session, null);
+    } else {
+      LOG.info("verify on PKCS11Module with PIN");
       for (char[] singlePwd : password) {
         singleLogin(session, singlePwd);
       }
@@ -745,7 +790,7 @@ class IaikP11Slot extends AbstractP11Slot {
       sessionLoggedIn = state.equals(State.RW_SO_FUNCTIONS);
     } else {
       sessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS)
-          || state.equals(State.RW_USER_FUNCTIONS);
+          || state.equals(State.RO_USER_FUNCTIONS);
     }
 
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
