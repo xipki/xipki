@@ -22,6 +22,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -49,6 +50,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.api.CaCmpResponder;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.cmp.CmpUtil;
@@ -68,7 +70,7 @@ import org.xipki.util.RandomUtil;
  * @since 2.0.0
  */
 
-abstract class CmpResponder {
+abstract class CmpResponder implements CaCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
@@ -128,15 +130,19 @@ abstract class CmpResponder {
    *          PKI message. Must not be {@code null}.
    * @param msgId
    *          Message id. Must not be {@code null}.
+   * @param parameters
+   *          Additional parameters.
    * @param event
    *          Audit event. Must not be {@code null}.
    * @return the response
    */
   protected abstract PKIMessage processPkiMessage0(PKIMessage request, RequestorInfo requestor,
-      ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId, AuditEvent event);
+      ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId,
+      Map<String, String> parameters, AuditEvent event);
 
+  @Override
   public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
-      AuditEvent event) {
+      Map<String, String> parameters, AuditEvent event) {
     ParamUtil.requireNonNull("pkiMessage", pkiMessage);
     ParamUtil.requireNonNull("event", event);
     GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -288,7 +294,8 @@ abstract class CmpResponder {
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
     }
 
-    PKIMessage resp = processPkiMessage0(pkiMessage, requestor, tid, message, msgId, event);
+    PKIMessage resp = processPkiMessage0(pkiMessage, requestor, tid, message, msgId, parameters,
+        event);
 
     if (isProtected) {
       resp = addProtection(resp, event);

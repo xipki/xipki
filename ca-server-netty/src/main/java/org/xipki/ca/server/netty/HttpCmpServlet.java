@@ -141,7 +141,8 @@ public class HttpCmpServlet extends AbstractHttpServlet {
             "bad request", AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, event);
+      PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert,
+          servletUri.getParameters(), event);
       byte[] encodedPkiResp = pkiResp.getEncoded();
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);

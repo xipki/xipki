@@ -38,7 +38,7 @@ public class RestCaClientExample extends CaClientExample {
 
   private static final String PASSWORD = "password1";
 
-  private static final String CERT_PROFILE = "TLS";
+  private static final String CERT_PROFILE = "tls";
 
   private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
 

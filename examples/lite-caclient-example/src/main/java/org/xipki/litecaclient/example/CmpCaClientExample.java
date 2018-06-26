@@ -63,6 +63,8 @@ public class CmpCaClientExample extends CaClientExample {
 
   private static final AtomicLong index = new AtomicLong(System.currentTimeMillis());
 
+  private static final boolean profileInUri = true;
+
   public static void main(String[] args) {
     //System.setProperty("javax.net.debug", "all");
 
@@ -113,43 +115,45 @@ public class CmpCaClientExample extends CaClientExample {
       printCert("===== CA Certificate =====", client.getCaCert());
 
       // Enroll certificate via CRMF - RSA (CA generate keypair)
-      KeyAndCert keyAndCert = client.requestCertViaCrmf(CERT_PROFILE,"rsa:2048", getSubject());
+      KeyAndCert keyAndCert = client.requestCertViaCrmf(CERT_PROFILE,"rsa:2048", getSubject(),
+          profileInUri);
       printKeyAndCert("===== RSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
 
       // Enroll certificate via CRMF - EC (CA generate keypair)
       KeyAndCert[] keyAndCerts =
           client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
           new String[] {"ec:secp256r1", "ec:secp256r1"},
-          new String[]{getSubject(), getSubject()});
+          new String[]{getSubject(), getSubject()}, profileInUri);
       for (int i = 0; i < keyAndCerts.length; i++) {
         printKeyAndCert("===== EC via CRMF (CMP, CA generate keypair) =====", keyAndCerts[i]);
       }
 
       // Enroll certificate via CRMF - DSA (CA generate keypair)
-      keyAndCert = client.requestCertViaCrmf(CERT_PROFILE, "dsa:2048", getSubject());
+      keyAndCert = client.requestCertViaCrmf(CERT_PROFILE, "dsa:2048", getSubject(), profileInUri);
       printKeyAndCert("===== DSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
 
       // Enroll certificate via CSR - RSA
       MyKeypair kp = generateRsaKeypair();
       CertificationRequest csr = genCsr(kp, getSubject());
-      X509Certificate cert = client.requestCertViaCsr(CERT_PROFILE, csr);
+      X509Certificate cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileInUri);
       printCert("===== RSA via CSR (CMP) =====", cert);
 
       // Enroll certificate via CSR - EC
       kp = generateEcKeypair();
       csr = genCsr(kp, getSubject());
-      cert = client.requestCertViaCsr(CERT_PROFILE, csr);
+      cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileInUri);
       printCert("===== EC via CSR (CMP) =====", cert);
 
       // Enroll certificate via CSR - DSA
       kp = generateDsaKeypair();
       csr = genCsr(kp, getSubject());
-      cert = client.requestCertViaCsr(CERT_PROFILE, csr);
+      cert = client.requestCertViaCsr(CERT_PROFILE, csr, profileInUri);
       printCert("===== DSA via CSR (CMP) =====", cert);
 
       // Enroll certificate via CRMF - RSA
       kp = generateRsaKeypair();
-      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
+      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject(),
+          profileInUri);
       printCert("===== RSA via CRMF (CMP) =====", cert);
 
       // Enroll certificate via CRMF - EC
@@ -158,14 +162,15 @@ public class CmpCaClientExample extends CaClientExample {
       X509Certificate[] certs = client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
           new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
           new SubjectPublicKeyInfo[] {kp.getPublic(), kp2.getPublic()},
-          new String[]{getSubject(), getSubject()});
+          new String[]{getSubject(), getSubject()}, profileInUri);
       for (int i = 0; i < certs.length; i++) {
         printCert("===== EC via CRMF (CMP) =====", certs[i]);
       }
 
       // Enroll certificate via CRMF - DSA
       kp = generateDsaKeypair();
-      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject());
+      cert = client.requestCertViaCrmf(CERT_PROFILE, kp.getPrivate(), kp.getPublic(), getSubject(),
+          profileInUri);
       printCert("===== DSA via CRMF (CMP) =====", cert);
 
       BigInteger serialNumber = cert.getSerialNumber();

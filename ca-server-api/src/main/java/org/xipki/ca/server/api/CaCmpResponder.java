@@ -18,6 +18,7 @@
 package org.xipki.ca.server.api;
 
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.xipki.audit.AuditEvent;
@@ -36,7 +37,7 @@ public interface CaCmpResponder {
   HealthCheckResult healthCheck();
 
   PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
-      AuditEvent event);
+      Map<String, String> parameters, AuditEvent event);
 
   String getCaName();
 

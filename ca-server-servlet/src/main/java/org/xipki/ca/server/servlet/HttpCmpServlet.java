@@ -21,6 +21,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -134,7 +136,13 @@ public class HttpCmpServlet extends HttpServlet {
             "bad request", AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, event);
+      Map<String, String[]> map = req.getParameterMap();
+      Map<String, String> parameters = new HashMap<>();
+      for (String name : map.keySet()) {
+        parameters.put(name, map.get(name)[0]);
+      }
+
+      PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, parameters, event);
       byte[] encodedPkiResp = pkiResp.getEncoded();
 
       resp.setContentType(CT_RESPONSE);

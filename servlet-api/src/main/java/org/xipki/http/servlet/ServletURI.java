@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -73,28 +74,37 @@ public class ServletURI {
     return fragement;
   }
 
+  public Set<String> getParameterNames() {
+    initParameters();
+    return parameters.keySet();
+  }
+
   public String getParameter(String name) {
-    if (query == null) {
-      return null;
-    }
+    initParameters();
+    return parameters.get(name);
+  }
 
-    if (parameters != null) {
-      return parameters.get(name);
-    }
+  public Map<String, String> getParameters() {
+    initParameters();
+    return parameters;
+  }
 
-    parameters = new HashMap<>();
-    StringTokenizer st = new StringTokenizer(query, "&");
-    while (st.hasMoreTokens()) {
-      String token = st.nextToken();
-      int idx = token.indexOf('=');
-      if (idx != -1 && idx != token.length()) {
-        String pn = token.substring(0, idx);
-        String pv = token.substring(idx + 1);
-        parameters.put(pn, pv);
+  private void initParameters() {
+    if (parameters == null) {
+      parameters = new HashMap<>();
+      if (query != null) {
+        StringTokenizer st = new StringTokenizer(query, "&");
+        while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          int idx = token.indexOf('=');
+          if (idx != -1 && idx != token.length()) {
+            String pn = token.substring(0, idx);
+            String pv = token.substring(idx + 1);
+            parameters.put(pn, pv);
+          }
+        }
       }
     }
-
-    return parameters.get(name);
   }
 
 }
