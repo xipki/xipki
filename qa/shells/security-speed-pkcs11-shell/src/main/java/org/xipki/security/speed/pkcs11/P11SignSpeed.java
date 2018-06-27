@@ -27,6 +27,7 @@ import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
@@ -36,6 +37,7 @@ import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -76,8 +78,11 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   private final P11ObjectIdentifier objectId;
 
+  private final boolean deleteKeyAfterTest;
+
   public P11SignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
-      P11ObjectIdentifier objectId, String description) throws ObjectCreationException {
+      boolean deleteKeyAfterTest, P11ObjectIdentifier objectId, String description)
+          throws ObjectCreationException {
     super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
     ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -85,6 +90,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
     ParamUtil.requireNonNull("objectId", objectId);
 
+    this.deleteKeyAfterTest = deleteKeyAfterTest;
     this.slot = slot;
     this.objectId = objectId;
 
@@ -101,15 +107,29 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   @Override
   protected void shutdown() {
-    try {
-      slot.removeIdentityByKeyId(objectId);
-    } catch (Exception ex) {
-      LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
+    if (deleteKeyAfterTest) {
+      try {
+        slot.removeIdentityByKeyId(objectId);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
+      }
     }
   }
 
-  protected static P11NewKeyControl getNewKeyControl(byte[] id) {
-    return new P11NewKeyControl(id, "speed-" + System.currentTimeMillis());
+  protected static P11NewKeyControl getNewKeyControl(byte[] id, String label) {
+    if (StringUtil.isBlank(label)) {
+      label = "speed-" + System.currentTimeMillis();
+    }
+    return new P11NewKeyControl(id, label);
+  }
+
+  protected static P11ObjectIdentifier getNonNullKeyId(P11Slot slot,
+      byte[] keyId, String keyLabel) {
+    P11IdentityId p11Id = slot.getIdentityId(keyId, keyLabel);
+    if (p11Id == null) {
+      throw new IllegalArgumentException("unknown key");
+    }
+    return p11Id.getKeyId();
   }
 
   @Override

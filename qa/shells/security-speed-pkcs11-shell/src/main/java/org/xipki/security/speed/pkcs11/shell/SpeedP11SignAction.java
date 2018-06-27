@@ -17,10 +17,7 @@
 
 package org.xipki.security.speed.pkcs11.shell;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.qa.BenchmarkExecutor;
-import org.xipki.security.speed.pkcs11.P11SM2SignSpeed;
+import org.apache.karaf.shell.api.action.Option;
 
 /**
  * TODO.
@@ -28,15 +25,12 @@ import org.xipki.security.speed.pkcs11.P11SM2SignSpeed;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "speed-sm2-sign-p11",
-    description = "performance test of PKCS#11 SM2 signature creation")
-@Service
-// CHECKSTYLE:SKIP
-public class SpeedP11SM2SignAction extends SpeedP11SignAction {
+public abstract class SpeedP11SignAction extends SpeedP11Action {
 
-  @Override
-  protected BenchmarkExecutor getTester() throws Exception {
-    return new P11SM2SignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel);
-  }
+  @Option(name = "--key-present", description = "the PKCS#11 key is present")
+  protected Boolean keyPresent = Boolean.FALSE;
+
+  @Option(name = "--key-label", description = "label of the PKCS#11 key")
+  protected String keyLabel;
 
 }

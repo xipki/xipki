@@ -36,11 +36,11 @@ import org.xipki.shell.completer.ECCurveNameCompleter;
     description = "performance test of PKCS#11 EC signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11ECSignAction extends SpeedP11Action {
+public class SpeedP11ECSignAction extends SpeedP11SignAction {
 
-  @Option(name = "--curve", required = true, description = "EC curve name")
+  @Option(name = "--curve", description = "EC curve name")
   @Completion(ECCurveNameCompleter.class)
-  private String curveName;
+  private String curveName = "secp256r1";
 
   @Option(name = "--sig-algo", required = true, description = "signature algorithm")
   @Completion(ECDSASigAlgCompleter.class)
@@ -48,7 +48,8 @@ public class SpeedP11ECSignAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11ECSignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, curveName);
+    return new P11ECSignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
+        sigAlgo, curveName);
   }
 
 }

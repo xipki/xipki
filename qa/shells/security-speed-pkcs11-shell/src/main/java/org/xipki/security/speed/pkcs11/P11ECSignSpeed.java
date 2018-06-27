@@ -20,7 +20,6 @@ package org.xipki.security.speed.pkcs11;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
@@ -32,15 +31,24 @@ public class P11ECSignSpeed extends P11SignSpeed {
 
   public P11ECSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
       String signatureAlgorithm, String curveNameOrOid) throws Exception {
-    super(securityFactory, slot, signatureAlgorithm, generateKey(slot, keyId, curveNameOrOid),
+    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, curveNameOrOid);
+  }
+
+  public P11ECSignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
+      byte[] keyId, String keyLabel, String signatureAlgorithm, String curveNameOrOid)
+          throws Exception {
+    super(securityFactory, slot, signatureAlgorithm, !keyPresent,
+        generateKey(keyPresent, slot, keyId, keyLabel, curveNameOrOid),
         "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid);
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId, String curveNameOrOid)
-      throws Exception {
-    ParamUtil.requireNonNull("slot", slot);
-    ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
-    return slot.generateECKeypair(curveNameOrOid, getNewKeyControl(keyId)).getKeyId();
+  private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
+      String keyLabel, String curveNameOrOid) throws Exception {
+    if (keyPresent) {
+      return getNonNullKeyId(slot, keyId, keyLabel);
+    }
+
+    return slot.generateECKeypair(curveNameOrOid, getNewKeyControl(keyId, keyLabel)).getKeyId();
   }
 
 }

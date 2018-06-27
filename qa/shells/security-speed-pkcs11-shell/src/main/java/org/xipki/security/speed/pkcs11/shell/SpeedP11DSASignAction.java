@@ -36,7 +36,7 @@ import org.xipki.shell.IllegalCmdParamException;
     description = "performance test of PKCS#11 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11DSASignAction extends SpeedP11Action {
+public class SpeedP11DSASignAction extends SpeedP11SignAction {
 
   @Option(name = "--plen", description = "bit length of the prime")
   private Integer plen = 2048;
@@ -60,7 +60,8 @@ public class SpeedP11DSASignAction extends SpeedP11Action {
       }
     }
 
-    return new P11DSASignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, plen, qlen);
+    return new P11DSASignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
+        sigAlgo, plen, qlen);
   }
 
 }

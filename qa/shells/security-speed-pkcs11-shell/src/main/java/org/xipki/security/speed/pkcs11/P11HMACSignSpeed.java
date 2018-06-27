@@ -22,7 +22,6 @@ import java.security.SecureRandom;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.util.ParamUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -36,18 +35,27 @@ public class P11HMACSignSpeed extends P11SignSpeed {
 
   public P11HMACSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
       String signatureAlgorithm) throws Exception {
-    super(securityFactory, slot, signatureAlgorithm,
-        generateKey(slot, keyId, signatureAlgorithm), "PKCS#11 HMAC signature creation");
+    this(!false, securityFactory, slot, keyId, null, signatureAlgorithm);
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId,
-      String signatureAlgorithm) throws Exception {
-    ParamUtil.requireNonNull("slot", slot);
+  public P11HMACSignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
+      byte[] keyId, String keyLabel, String signatureAlgorithm) throws Exception {
+    super(securityFactory, slot, signatureAlgorithm, !keyPresent,
+        generateKey(keyPresent, slot, keyId, keyLabel, signatureAlgorithm),
+        "PKCS#11 HMAC signature creation");
+  }
+
+  private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot,
+      byte[] keyId, String keyLabel, String signatureAlgorithm) throws Exception {
+    if (keyPresent) {
+      return getNonNullKeyId(slot, keyId, keyLabel);
+    }
+
     int keysize = getKeysize(signatureAlgorithm);
     byte[] keyBytes = new byte[keysize / 8];
     new SecureRandom().nextBytes(keyBytes);
     return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
-        getNewKeyControl(keyId));
+        getNewKeyControl(keyId, keyLabel));
   }
 
   private static int getKeysize(String hmacAlgorithm) {

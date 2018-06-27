@@ -20,7 +20,6 @@ package org.xipki.security.speed.pkcs11;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
@@ -32,13 +31,22 @@ public class P11SM2SignSpeed extends P11SignSpeed {
 
   public P11SM2SignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId)
       throws Exception {
-    super(securityFactory, slot, "SM3WITHSM2", generateKey(slot, keyId),
-        "PKCS#11 SM2 signature creation");
+    this(!false, securityFactory, slot, keyId, null);
   }
 
-  private static P11ObjectIdentifier generateKey(P11Slot slot, byte[] keyId) throws Exception {
-    ParamUtil.requireNonNull("slot", slot);
-    return slot.generateSM2Keypair(getNewKeyControl(keyId)).getKeyId();
+  public P11SM2SignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
+      byte[] keyId, String keyLabel) throws Exception {
+    super(securityFactory, slot, "SM3WITHSM2", !keyPresent,
+        generateKey(keyPresent, slot, keyId, keyLabel), "PKCS#11 SM2 signature creation");
+  }
+
+  private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot,
+      byte[] keyId, String keyLabel) throws Exception {
+    if (keyPresent) {
+      return getNonNullKeyId(slot, keyId, keyLabel);
+    }
+
+    return slot.generateSM2Keypair(getNewKeyControl(keyId, keyLabel)).getKeyId();
   }
 
 }

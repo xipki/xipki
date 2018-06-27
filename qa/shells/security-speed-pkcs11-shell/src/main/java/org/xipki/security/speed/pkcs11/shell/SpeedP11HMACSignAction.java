@@ -35,7 +35,7 @@ import org.xipki.security.speed.shell.completer.HMACSigAlgCompleter;
     description = "performance test of PKCS#11 HMAC signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11HMACSignAction extends SpeedP11Action {
+public class SpeedP11HMACSignAction extends SpeedP11SignAction {
 
   @Option(name = "--sig-algo", required = true, description = "signature algorithm")
   @Completion(HMACSigAlgCompleter.class)
@@ -43,7 +43,8 @@ public class SpeedP11HMACSignAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11HMACSignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo);
+    return new P11HMACSignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
+        sigAlgo);
   }
 
 }

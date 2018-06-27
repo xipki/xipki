@@ -35,7 +35,7 @@ import org.xipki.security.speed.shell.completer.RSASigAlgCompleter;
     description = "performance test of PKCS#11 RSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11RSASignAction extends SpeedP11Action {
+public class SpeedP11RSASignAction extends SpeedP11SignAction {
 
   @Option(name = "--key-size", description = "keysize in bit")
   private Integer keysize = 2048;
@@ -49,8 +49,8 @@ public class SpeedP11RSASignAction extends SpeedP11Action {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P11RSASignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, keysize,
-        toBigInt(publicExponent));
+    return new P11RSASignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
+        sigAlgo, keysize, toBigInt(publicExponent));
   }
 
 }
