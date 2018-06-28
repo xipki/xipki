@@ -939,6 +939,16 @@ class IaikP11Slot extends AbstractP11Slot {
       Session session = bagEntry.value();
       List<Storage> objects = getObjects(session, template);
       for (Storage obj : objects) {
+        if (vendor == Vendor.YUBIKEY) {
+          if (obj instanceof X509PublicKeyCertificate) {
+            throw new P11TokenException("cannot delete certificates in Yubikey token");
+          } else if (obj instanceof PrivateKey
+              || obj instanceof PublicKey) {
+            // do nothing: In yubikey, the triple (private key, public key, certificate) will be
+            // deleted only be deleting the certificate.
+          }
+        }
+
         session.destroyObject(obj);
       }
       return objects.size();
@@ -952,6 +962,10 @@ class IaikP11Slot extends AbstractP11Slot {
 
   @Override
   protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
+    if (vendor == Vendor.YUBIKEY) {
+      throw new P11TokenException("Unsupported operation removeCerts() in yubikey token");
+    }
+
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
