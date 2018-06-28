@@ -76,8 +76,9 @@ xi:replace --old "REPLACEME_CA_SIGNERCONF" \
 
 ca:load-conf --conf-file xipki/setup/cacert-none/ca-conf.xml
 
-echo "# Update the certificate in the device"
-xi:update-cert-p11 --slot 0 --id ${P11_ID} --cert ${KEYCERTS_DIR}/myca1.der
+# Need to review the update-cert-p11 for yubikey
+# echo "# Update the certificate in the device"
+# xi:update-cert-p11 --slot 0 --id ${P11_ID} --cert ${KEYCERTS_DIR}/myca1.der
 
 source xipki/setup/cacert-none/configure-ca.script
 
