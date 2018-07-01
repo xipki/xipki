@@ -249,7 +249,7 @@ public abstract class P11Slot {
    * Generates an RSA keypair.
    *
    * @param keysize
-   *          key size
+   *          key size in bit
    * @param publicExponent
    *          RSA public exponent. Could be {@code null}.
    * @param control
@@ -271,8 +271,7 @@ public abstract class P11Slot {
   /**
    * TODO.
    * @param id
-   *         Id of the objects to be deleted. At least one of id and label must not be
-   *         {@code null}.
+   *         Id of the objects to be deleted. At least one of id and label must not be {@code null}.
    * @param label
    *         Label of the objects to be deleted
    * @return how many objects have been deleted
@@ -482,7 +481,8 @@ public abstract class P11Slot {
     return ident;
   }
 
-  protected void assertNotExists(byte[] id, String label) throws P11DuplicateEntityException {
+  protected void assertNoIdentityAndCert(byte[] id, String label)
+      throws P11DuplicateEntityException {
     if (id == null && label == null) {
       return;
     }
@@ -759,7 +759,7 @@ public abstract class P11Slot {
    * @param keyType
    *          Key type
    * @param keysize
-   *          Key size
+   *          Key size in bit
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#11 token.
@@ -770,7 +770,7 @@ public abstract class P11Slot {
       throws P11TokenException {
     assertWritable("generateSecretKey");
     ParamUtil.requireNonNull("control", control);
-    assertNotExists(control.getId(), control.getLabel());
+    assertNoIdentityAndCert(control.getId(), control.getLabel());
 
     P11Identity identity = generateSecretKey0(keyType, keysize, control);
     addIdentity(identity);
@@ -798,7 +798,7 @@ public abstract class P11Slot {
       P11NewKeyControl control) throws P11TokenException {
     ParamUtil.requireNonNull("control", control);
     assertWritable("createSecretKey");
-    assertNotExists(control.getId(), control.getLabel());
+    assertNoIdentityAndCert(control.getId(), control.getLabel());
 
     P11Identity identity = importSecretKey0(keyType, keyValue, control);
     addIdentity(identity);
@@ -812,7 +812,7 @@ public abstract class P11Slot {
    * Generates an RSA keypair.
    *
    * @param keysize
-   *          key size
+   *          key size in bit
    * @param publicExponent
    *          RSA public exponent. Could be {@code null}.
    * @param control
@@ -824,15 +824,11 @@ public abstract class P11Slot {
   // CHECKSTYLE:SKIP
   public P11IdentityId generateRSAKeypair(int keysize, BigInteger publicExponent,
       P11NewKeyControl control) throws P11TokenException {
-    ParamUtil.requireNonNull("control", control);
     ParamUtil.requireMin("keysize", keysize, 1024);
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
-    assertWritable("generateRSAKeypair");
-
-    assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), control.getLabel());
+    assertCanGenKeypair("generateRSAKeypair", PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, control);
 
     BigInteger tmpPublicExponent = publicExponent;
     if (tmpPublicExponent == null) {
@@ -866,10 +862,7 @@ public abstract class P11Slot {
     if (plength % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
     }
-    ParamUtil.requireNonNull("control", control);
-    assertWritable("generateDSAKeypair");
-    assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), control.getLabel());
+    assertCanGenKeypair("generateDSAKeypair", PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, control);
 
     DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
     P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(),
@@ -901,10 +894,7 @@ public abstract class P11Slot {
     ParamUtil.requireNonNull("p", p);
     ParamUtil.requireNonNull("q", q);
     ParamUtil.requireNonNull("g", g);
-    ParamUtil.requireNonNull("control", control);
-    assertWritable("generateDSAKeypair");
-    assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), control.getLabel());
+    assertCanGenKeypair("generateDSAKeypair", PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, control);
 
     P11Identity identity = generateDSAKeypair0(p, q, g, control);
     addIdentity(identity);
@@ -928,10 +918,7 @@ public abstract class P11Slot {
   public P11IdentityId generateECKeypair(String curveNameOrOid, P11NewKeyControl control)
       throws P11TokenException {
     ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
-    ParamUtil.requireNonNull("control", control);
-    assertWritable("generateECKeypair");
-    assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), control.getLabel());
+    assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_KEY_PAIR_GEN, control);
 
     ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
     if (curveId == null) {
@@ -956,10 +943,7 @@ public abstract class P11Slot {
    */
   // CHECKSTYLE:SKIP
   public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
-    ParamUtil.requireNonNull("control", control);
-    assertWritable("generateSM2Keypair");
-    assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
-    assertNotExists(control.getId(), control.getLabel());
+    assertCanGenKeypair("generateSM2Keypair", PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN, control);
 
     P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
@@ -968,8 +952,16 @@ public abstract class P11Slot {
     return id;
   }
 
+  private void assertCanGenKeypair(String methodName, long mechanism, P11NewKeyControl control)
+      throws P11UnsupportedMechanismException, P11PermissionException, P11DuplicateEntityException {
+    ParamUtil.requireNonNull("control", control);
+    assertWritable(methodName);
+    assertMechanismSupported(mechanism);
+    assertNoIdentityAndCert(control.getId(), control.getLabel());
+  }
+
   /**
-   * Updates the certificate associated with the given {@code objectId} with the given certificate
+   * Updates the certificate associated with the given ID {@code keyId} with the given certificate
    * {@code newCert}.
    *
    * @param keyId
@@ -1010,13 +1002,10 @@ public abstract class P11Slot {
    *          Output stream. Must not be {@code null}.
    * @param verbose
    *          Whether to show the details verbosely.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
    * @throws IOException
    *         if IO error occurs.
    */
-  public void showDetails(OutputStream stream, boolean verbose)
-      throws IOException, P11TokenException {
+  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
     ParamUtil.requireNonNull("stream", stream);
 
     List<P11ObjectIdentifier> sortedKeyIds = getSortedObjectIds(identities.keySet());
@@ -1087,7 +1076,7 @@ public abstract class P11Slot {
 
   protected void assertWritable(String operationName) throws P11PermissionException {
     if (readOnly) {
-      throw new P11PermissionException("Operation " + operationName + " is not permitted");
+      throw new P11PermissionException("Writable operation " + operationName + " is not permitted");
     }
   }
 
