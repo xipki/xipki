@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.AbstractP11Slot;
 import org.xipki.security.pkcs11.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11IVParams;
 import org.xipki.security.pkcs11.P11Identity;
@@ -56,6 +55,7 @@ import org.xipki.security.pkcs11.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
+import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.pkcs11.exception.P11TokenException;
@@ -107,7 +107,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
  * @author Lijun Liao
  * @since 2.0.0
  */
-class IaikP11Slot extends AbstractP11Slot {
+class IaikP11Slot extends P11Slot {
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
 

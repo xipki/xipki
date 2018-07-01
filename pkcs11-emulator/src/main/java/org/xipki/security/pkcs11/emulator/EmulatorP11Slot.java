@@ -82,7 +82,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.AbstractP11Slot;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11MechanismFilter;
@@ -90,6 +89,7 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11NewObjectConf;
 import org.xipki.security.pkcs11.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.pkcs11.emulator.EmulatorP11Module.Vendor;
@@ -111,7 +111,7 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
  * @since 2.0.0
  */
 
-class EmulatorP11Slot extends AbstractP11Slot {
+class EmulatorP11Slot extends P11Slot {
 
   private static class InfoFilenameFilter implements FilenameFilter {
 
