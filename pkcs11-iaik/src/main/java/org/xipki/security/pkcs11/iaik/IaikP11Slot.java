@@ -1047,9 +1047,12 @@ class IaikP11Slot extends P11Slot {
       template.getLabel().setCharArrayValue(labelChars);
     }
 
-    template.getSensitive().setBooleanValue(true);
     if (control.getExtractable() != null) {
       template.getExtractable().setBooleanValue(control.getExtractable());
+    }
+
+    if (control.getSensitive() != null) {
+      template.getSensitive().setBooleanValue(control.getSensitive());
     }
 
     Set<KeyUsage> usages = control.getUsages();
@@ -1124,10 +1127,14 @@ class IaikP11Slot extends P11Slot {
       template.getLabel().setCharArrayValue(labelChars);
     }
 
-    template.getSensitive().setBooleanValue(true);
     if (control.getExtractable() != null) {
       template.getExtractable().setBooleanValue(control.getExtractable());
     }
+
+    if (control.getSensitive() != null) {
+      template.getSensitive().setBooleanValue(control.getSensitive());
+    }
+
     template.getValue().setByteArrayValue(keyValue);
 
     Set<KeyUsage> usages = control.getUsages();
@@ -1406,10 +1413,13 @@ class IaikP11Slot extends P11Slot {
         privateKey.getLabel().setCharArrayValue(control.getLabel().toCharArray());
       }
       privateKey.getPrivate().setBooleanValue(true);
-      // privateKey.getSensitive().setBooleanValue(true);
 
       if (control.getExtractable() != null) {
         privateKey.getExtractable().setBooleanValue(control.getExtractable());
+      }
+
+      if (control.getSensitive() != null) {
+        privateKey.getSensitive().setBooleanValue(control.getSensitive());
       }
 
       Set<KeyUsage> usages = control.getUsages();

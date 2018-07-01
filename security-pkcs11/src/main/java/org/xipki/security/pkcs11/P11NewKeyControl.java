@@ -38,6 +38,8 @@ public class P11NewKeyControl extends P11NewObjectControl {
 
   private Boolean extractable;
 
+  private Boolean sensitive;
+
   private Set<KeyUsage> usages;
 
   public P11NewKeyControl(byte[] id, String label) {
@@ -50,6 +52,14 @@ public class P11NewKeyControl extends P11NewObjectControl {
 
   public void setExtractable(Boolean extractable) {
     this.extractable = extractable;
+  }
+
+  public Boolean getSensitive() {
+    return sensitive;
+  }
+
+  public void setSensitive(Boolean sensitive) {
+    this.sensitive = sensitive;
   }
 
   public Set<KeyUsage> getUsages() {

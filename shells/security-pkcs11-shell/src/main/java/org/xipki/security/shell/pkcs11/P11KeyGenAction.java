@@ -48,6 +48,10 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
       description = "whether the key is extractable, valid values are yes|no|true|false")
   private String extractable;
 
+  @Option(name = "--sensitive",
+      description = "whether the key is sensitive, valid values are yes|no|true|false")
+  private String sensitive;
+
   @Option(name = "--key-usage", multiValued = true,
       description = "key usage of the private key")
   @Completion(P11KeyUsageCompleter.class)
@@ -63,6 +67,9 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
     P11NewKeyControl control = new P11NewKeyControl(id, label);
     if (StringUtil.isNotBlank(extractable)) {
       control.setExtractable(isEnabled(extractable, false, "extractable"));
+    }
+    if (StringUtil.isNotBlank(sensitive)) {
+      control.setSensitive(isEnabled(sensitive, false, "sensitive"));
     }
     if (CollectionUtil.isNonEmpty(keyusages)) {
       control.setUsages(P11KeyUsageCompleter.parseUsages(keyusages));
