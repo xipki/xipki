@@ -54,13 +54,23 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="validity" type="xs:string"/>
+      <xs:element name="validity" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            The validity of the certificate to be generated, namely notAfter - notBefore.
+            Examples are:
+              5y: 5 years
+              365d: 365 days
+              120h: 120 hours
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="notBeforeTime" type="xs:string">
         <xs:annotation>
           <xs:documentation>
             Format of the notBefore field.
-              current: current time
-              midnight: mid night, namely 00:00:00 UTC
+              - current: current time
+              - midnight: mid night, namely 00:00:00 UTC of current day.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
