@@ -28,8 +28,7 @@ import org.xipki.shell.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "unlock",
-    description = "unlock CA system")
+@Command(scope = "ca", name = "unlock", description = "unlock CA system")
 @Service
 public class CaSystemUnlockAction extends CaAction {
 
