@@ -286,6 +286,7 @@ public class CaCmpResponderImpl extends CmpResponder {
 
     try {
       switch (type) {
+        case PKIBody.TYPE_INIT_REQ:
         case PKIBody.TYPE_CERT_REQ:
         case PKIBody.TYPE_KEY_UPDATE_REQ:
         case PKIBody.TYPE_P10_CERT_REQ:
@@ -293,6 +294,8 @@ public class CaCmpResponderImpl extends CmpResponder {
           String eventType = null;
           if (PKIBody.TYPE_CERT_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_cr;
+          } else if (PKIBody.TYPE_INIT_REQ == type) {
+            eventType = CaAuditConstants.TYPE_CMP_ir;
           } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
             eventType = CaAuditConstants.TYPE_CMP_kur;
           } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
@@ -363,6 +366,14 @@ public class CaCmpResponderImpl extends CmpResponder {
 
     return new PKIMessage(respHeader.build(), respBody);
   } // method processPKIMessage0
+
+  private PKIBody processIr(String dfltCertprofileName, String dfltKeyGenType, PKIMessage request,
+      CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
+      CmpControl cmpControl, String msgId, AuditEvent event) throws InsuffientPermissionException {
+    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltKeyGenType, request,
+        requestor, tid, reqHeader, cr, false, true, cmpControl, msgId, event);
+    return new PKIBody(PKIBody.TYPE_INIT_REP, repMessage);
+  }
 
   private PKIBody processCr(String dfltCertprofileName, String dfltKeyGenType, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
@@ -1389,6 +1400,11 @@ public class CaCmpResponderImpl extends CmpResponder {
 
     int type = reqBody.getType();
     switch (type) {
+      case PKIBody.TYPE_INIT_REQ:
+        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+        respBody = processIr(dfltCertprofileName, dfltKeyGenType, request, requestor, tid,
+            reqHeader, CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
+        break;
       case PKIBody.TYPE_CERT_REQ:
         checkPermission(requestor, PermissionConstants.ENROLL_CERT);
         respBody = processCr(dfltCertprofileName, dfltKeyGenType, request, requestor, tid,

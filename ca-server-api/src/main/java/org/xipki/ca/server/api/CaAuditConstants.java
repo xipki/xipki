@@ -102,6 +102,8 @@ public class CaAuditConstants {
 
   public static final String TYPE_CMP_certConf = "cert_conf";
 
+  public static final String TYPE_CMP_ir = "ir";
+
   public static final String TYPE_CMP_cr = "cr";
 
   public static final String TYPE_CMP_error = "error";
