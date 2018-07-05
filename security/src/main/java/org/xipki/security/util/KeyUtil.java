@@ -41,6 +41,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -68,8 +69,6 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.util.BigIntegers;
 import org.xipki.util.ParamUtil;
 
@@ -171,7 +170,7 @@ public class KeyUtil {
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     ParamUtil.requireNonNull("curveId", curveId);
 
-    ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
+    ECGenParameterSpec spec = new ECGenParameterSpec(curveId.getId());
     KeyPairGenerator kpGen = getKeyPairGenerator("EC");
     synchronized (kpGen) {
       if (random == null) {
