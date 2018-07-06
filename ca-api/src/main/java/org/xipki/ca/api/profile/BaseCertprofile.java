@@ -84,9 +84,9 @@ public abstract class BaseCertprofile extends Certprofile {
   protected abstract SubjectControl getSubjectControl();
 
   @Override
-  public Date getNotBefore(Date notBefore) {
+  public Date getNotBefore(Date requestedNotBefore) {
     Date now = new Date();
-    return (notBefore != null && notBefore.after(now)) ? notBefore : now;
+    return (requestedNotBefore != null && requestedNotBefore.after(now)) ? requestedNotBefore : now;
   }
 
   @Override

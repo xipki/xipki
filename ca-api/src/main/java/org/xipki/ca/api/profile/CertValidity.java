@@ -35,7 +35,8 @@ public class CertValidity implements Comparable<CertValidity> {
 
     YEAR("y"),
     DAY("d"),
-    HOUR("h");
+    HOUR("h"),
+    MINUTE("m");
 
     private String suffix;
 
@@ -51,7 +52,9 @@ public class CertValidity implements Comparable<CertValidity> {
 
   private static final long SECOND = 1000L;
 
-  private static final long HOUR = 60L * 60 * SECOND;
+  private static final long MINUTE = 60L * SECOND;
+
+  private static final long HOUR = 60L * MINUTE;
 
   private static final long DAY = 24L * HOUR;
 
@@ -81,6 +84,9 @@ public class CertValidity implements Comparable<CertValidity> {
     } else if (suffix == 'h' || suffix == 'H') {
       unit = Unit.HOUR;
       numValdityS = validityS.substring(0, len - 1);
+    } else if (suffix == 'm' || suffix == 'm') {
+      unit = Unit.MINUTE;
+      numValdityS = validityS.substring(0, len - 1);
     } else if (suffix >= '0' && suffix <= '9') {
       unit = Unit.DAY;
       numValdityS = validityS;
@@ -107,8 +113,6 @@ public class CertValidity implements Comparable<CertValidity> {
 
   public Date add(Date referenceDate) {
     switch (unit) {
-      case HOUR:
-        return new Date(referenceDate.getTime() + HOUR - SECOND);
       case DAY:
         return new Date(referenceDate.getTime() + DAY - SECOND);
       case YEAR:
@@ -128,20 +132,24 @@ public class CertValidity implements Comparable<CertValidity> {
         }
 
         return cal.getTime();
+      case HOUR:
+        return new Date(referenceDate.getTime() + HOUR - SECOND);
+      case MINUTE:
+        return new Date(referenceDate.getTime() + MINUTE - SECOND);
       default:
         throw new RuntimeException(String.format(
             "should not reach here, unknown CertValidity.Unit %s", unit));
     }
   } // method add
 
-  private int approxHours() {
+  private int approxMinutes() {
     switch (unit) {
       case HOUR:
-        return validity;
+        return 60 * validity;
       case DAY:
-        return 24 * validity;
+        return 24 * 60 * validity;
       case YEAR:
-        return (365 * validity + validity / 4) * 24;
+        return (365 * 24 * validity + 6 * validity) * 60;
       default:
         throw new RuntimeException(String.format(
             "should not reach here, unknown CertValidity.Unit %s", unit));
@@ -163,12 +171,12 @@ public class CertValidity implements Comparable<CertValidity> {
 
       return (validity < obj.validity) ? -1 : 1;
     } else {
-      int thisHours = approxHours();
-      int thatHours = obj.approxHours();
-      if (thisHours == thatHours) {
+      int thisMinutes = approxMinutes();
+      int thatMinutes = obj.approxMinutes();
+      if (thisMinutes == thatMinutes) {
         return 0;
       } else {
-        return (thisHours < thatHours) ? -1 : 1;
+        return (thisMinutes < thatMinutes) ? -1 : 1;
       }
     }
   }

@@ -224,18 +224,16 @@ public class CertprofileQa {
     issue = new ValidationIssue("X509.NOTAFTER.ENCODING", "notAfter encoding");
     checkTime(tbsCert.getStartDate(), issue);
 
-    // notBefore
-    if (certprofile.isNotBeforeMidnight()) {
+    if (certprofile.getNotBeforeOption().getMidNightTimeZone() != null) {
       issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
       resultIssues.add(issue);
       Calendar cal = Calendar.getInstance(UTC);
       cal.setTime(cert.getNotBefore());
-      int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
       int minute = cal.get(Calendar.MINUTE);
       int second = cal.get(Calendar.SECOND);
 
-      if (hourOfDay != 0 || minute != 0 || second != 0) {
-        issue.setFailureMessage(" '" + cert.getNotBefore() + "' is not midnight time (UTC)");
+      if (minute != 0 || second != 0) {
+        issue.setFailureMessage(" '" + cert.getNotBefore() + "' is not midnight time");
       }
     }
 

@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -38,8 +37,6 @@ import org.xipki.ca.api.PublicCaInfo;
  */
 
 public abstract class Certprofile {
-
-  private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
   public boolean isOnlyForRa() {
     return false;
@@ -100,14 +97,6 @@ public abstract class Certprofile {
    */
   public boolean isSerialNumberInReqPermitted() {
     return true;
-  }
-
-  public boolean hasMidnightNotBefore() {
-    return false;
-  }
-
-  public TimeZone getTimezone() {
-    return timeZone;
   }
 
   public Set<ExtKeyUsageControl> getExtendedKeyUsages() {

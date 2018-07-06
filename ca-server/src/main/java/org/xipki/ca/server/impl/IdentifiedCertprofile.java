@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -181,14 +180,6 @@ class IdentifiedCertprofile {
 
   public CertValidity getValidity() {
     return certprofile.getValidity();
-  }
-
-  public boolean hasMidnightNotBefore() {
-    return certprofile.hasMidnightNotBefore();
-  }
-
-  public TimeZone getTimezone() {
-    return certprofile.getTimezone();
   }
 
   public SubjectInfo getSubject(X500Name requestedSubject)

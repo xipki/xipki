@@ -431,6 +431,8 @@ public class X509Ca {
 
   private static final long MS_PER_MINUTE = 60000L;
 
+  private static final long MS_PER_10MINUTES = 300000L;
+
   private static final int MINUTE_PER_DAY = 24 * 60;
 
   private static final long DAY_IN_MS = MS_PER_MINUTE * MINUTE_PER_DAY;
@@ -2011,28 +2013,14 @@ public class X509Ca {
       }
     }
 
-    Date now = new Date();
-    Date reqNotBefore;
-    if (certTemplate.getNotBefore() != null && certTemplate.getNotBefore().after(now)) {
-      reqNotBefore = certTemplate.getNotBefore();
-    } else {
-      reqNotBefore = now;
-    }
+    Date reqNotBefore = certTemplate.getNotBefore();
+
     Date grantedNotBefore = certprofile.getNotBefore(reqNotBefore);
-    // notBefore in the past is not permitted
-    if (grantedNotBefore.before(now)) {
-      grantedNotBefore = now;
-    }
-
-    if (certprofile.hasMidnightNotBefore()) {
-      grantedNotBefore = setToMidnight(grantedNotBefore, certprofile.getTimezone());
-    }
-
-    if (grantedNotBefore.before(caInfo.getNotBefore())) {
-      grantedNotBefore = caInfo.getNotBefore();
-      if (certprofile.hasMidnightNotBefore()) {
-        grantedNotBefore = setToMidnight(grantedNotBefore, certprofile.getTimezone());
-      }
+    // notBefore in the past is not permitted (due to the fact that some clients may not have
+    // accurate time, we allow max. 5 minutes in the past)
+    long currentMillis = System.currentTimeMillis();
+    if (currentMillis - grantedNotBefore.getTime() > MS_PER_10MINUTES) {
+      grantedNotBefore = new Date(currentMillis - MS_PER_10MINUTES);
     }
 
     long time = caInfo.getNoNewCertificateAfter();
@@ -2271,9 +2259,6 @@ public class X509Ca {
       maxNotAfter = new Date(MAX_CERT_TIME_MS);
     }
 
-    // CHECKSTYLE:SKIP
-    Date origMaxNotAfter = maxNotAfter;
-
     Date grantedNotAfter = certTemplate.getNotAfter();
     if (grantedNotAfter != null) {
       if (grantedNotAfter.after(maxNotAfter)) {
@@ -2298,16 +2283,6 @@ public class X509Ca {
             "should not reach here, unknown CA ValidityMode " + mode);
       } // end if (mode)
     } // end if (notAfter)
-
-    if (certprofile.hasMidnightNotBefore() && !maxNotAfter.equals(origMaxNotAfter)) {
-      Calendar cal = Calendar.getInstance(certprofile.getTimezone());
-      cal.setTime(new Date(grantedNotAfter.getTime() - DAY_IN_MS));
-      cal.set(Calendar.HOUR_OF_DAY, 23);
-      cal.set(Calendar.MINUTE, 59);
-      cal.set(Calendar.SECOND, 59);
-      cal.set(Calendar.MILLISECOND, 0);
-      grantedNotAfter = cal.getTime();
-    }
 
     String warning = null;
     if (msgBuilder.length() > 2) {
@@ -2756,17 +2731,6 @@ public class X509Ca {
 
     return new Object[]{newName, newSerialNumber};
   } // method incSerialNumber
-
-  private static Date setToMidnight(Date date, TimeZone timezone) {
-    Calendar cal = Calendar.getInstance(timezone);
-    // the next midnight time
-    cal.setTime(new Date(date.getTime() + DAY_IN_MS - 1));
-    cal.set(Calendar.HOUR_OF_DAY, 0);
-    cal.set(Calendar.MINUTE, 0);
-    cal.set(Calendar.SECOND, 0);
-    cal.set(Calendar.MILLISECOND, 0);
-    return cal.getTime();
-  }
 
   private void finish(AuditEvent event, boolean successful) {
     event.finish();

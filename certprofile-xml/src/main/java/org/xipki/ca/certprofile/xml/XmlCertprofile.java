@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -191,8 +193,6 @@ public class XmlCertprofile extends BaseCertprofile {
 
   private ExtensionValue nameConstraints;
 
-  private boolean notBeforeMidnight;
-
   private Integer pathLen;
 
   private ExtensionValue policyConstraints;
@@ -210,6 +210,8 @@ public class XmlCertprofile extends BaseCertprofile {
   private ExtensionValue restriction;
 
   private boolean serialNumberInReqPermitted;
+
+  private NotBeforeOption notBeforeOption;
 
   private List<String> signatureAlgorithms;
 
@@ -248,7 +250,6 @@ public class XmlCertprofile extends BaseCertprofile {
     keyusages = null;
     maxSize = null;
     nameConstraints = null;
-    notBeforeMidnight = false;
     pathLen = null;
     policyConstraints = null;
     policyMappings = null;
@@ -259,6 +260,7 @@ public class XmlCertprofile extends BaseCertprofile {
     restriction = null;
     serialNumberInReqPermitted = true;
     signatureAlgorithms = null;
+    notBeforeOption = null;
     smimeCapabilities = null;
     subjectControl = null;
     tlsFeature = null;
@@ -347,13 +349,38 @@ public class XmlCertprofile extends BaseCertprofile {
       throw new CertprofileException("invalid CertLevel '" + str + "'");
     }
 
-    str = conf.getNotBeforeTime();
-    if ("midnight".equalsIgnoreCase(str)) {
-      this.notBeforeMidnight = true;
+    str = conf.getNotBeforeTime().toLowerCase();
+    Long offsetSeconds = null;
+    TimeZone midnightTimeZone = null;
+    if (str.startsWith("midnight")) {
+      int seperatorIdx = str.indexOf(':');
+      String timezoneId = (seperatorIdx == -1)
+          ? "GMT+0" : str.substring(seperatorIdx + 1).toUpperCase();
+      final List<String> validIds = Arrays.asList(new String[]{
+          "GMT+0", "GMT+1", "GMT+2", "GMT+3", "GMT+4", "GMT+5",
+          "GMT+6", "GMT+7", "GMT+8", "GMT+09", "GMT+10", "GMT+11", "GMT+12",
+          "GMT-0", "GMT-1", "GMT-2", "GMT-3", "GMT-4", "GMT-5",
+          "GMT-6", "GMT-7", "GMT-8", "GMT-09", "GMT-10", "GMT-11", "GMT-12"});
+
+      if (!validIds.contains(timezoneId)) {
+        throw new CertprofileException("invalid time zone id " + timezoneId);
+      }
+
+      midnightTimeZone = TimeZone.getTimeZone(timezoneId);
     } else if ("current".equalsIgnoreCase(str)) {
-      this.notBeforeMidnight = false;
+      offsetSeconds = 0L;
+    } else if (str.startsWith("+")) {
+      offsetSeconds = Long.parseLong(str.substring(1));
+    } else if (str.startsWith("-")) {
+      offsetSeconds = -1 * Long.parseLong(str.substring(1));
     } else {
       throw new CertprofileException("invalid notBefore '" + str + "'");
+    }
+
+    if (offsetSeconds != null) {
+      this.notBeforeOption = NotBeforeOption.getOffsetOption(offsetSeconds);
+    } else {
+      this.notBeforeOption = NotBeforeOption.getMidNightOption(midnightTimeZone);
     }
 
     this.serialNumberInReqPermitted = conf.isSerialNumberInReq();
@@ -1723,11 +1750,6 @@ public class XmlCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public boolean hasMidnightNotBefore() {
-    return notBeforeMidnight;
-  }
-
-  @Override
   public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
     return extensionControls;
   }
@@ -1750,6 +1772,15 @@ public class XmlCertprofile extends BaseCertprofile {
   @Override
   public SubjectControl getSubjectControl() {
     return subjectControl;
+  }
+
+  public NotBeforeOption getNotBeforeOption() {
+    return notBeforeOption;
+  }
+
+  @Override
+  public Date getNotBefore(Date requestedNotBefore) {
+    return notBeforeOption.getNotBefore(requestedNotBefore);
   }
 
   @Override
@@ -1840,10 +1871,6 @@ public class XmlCertprofile extends BaseCertprofile {
 
   public ExtensionValue getNameConstraints() {
     return nameConstraints;
-  }
-
-  public boolean isNotBeforeMidnight() {
-    return notBeforeMidnight;
   }
 
   public Integer getPathLen() {
