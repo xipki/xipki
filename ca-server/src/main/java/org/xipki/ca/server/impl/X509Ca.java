@@ -2029,6 +2029,11 @@ public class X509Ca {
           "CA is not permitted to issue certifate after " + new Date(time));
     }
 
+    if (grantedNotBefore.before(caInfo.getNotBefore())) {
+      // notBefore must not be before CA's notBefore
+      grantedNotBefore = caInfo.getNotBefore();
+    }
+
     String genkeyType = certTemplate.getGenkeyType();
     PrivateKeyInfo privateKey;
     SubjectPublicKeyInfo grantedPublicKeyInfo;
