@@ -63,7 +63,7 @@
   </signatureAlgorithms>
   <certLevel>EndEntity</certLevel>
   <validity>5y</validity>
-  <notBeforeTime>+600</notBeforeTime>
+  <notBeforeTime>+600s</notBeforeTime>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>

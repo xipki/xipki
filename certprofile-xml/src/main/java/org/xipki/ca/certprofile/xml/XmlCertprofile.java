@@ -349,7 +349,7 @@ public class XmlCertprofile extends BaseCertprofile {
       throw new CertprofileException("invalid CertLevel '" + str + "'");
     }
 
-    str = conf.getNotBeforeTime().toLowerCase();
+    str = conf.getNotBeforeTime().toLowerCase().trim();
     Long offsetSeconds = null;
     TimeZone midnightTimeZone = null;
     if (str.startsWith("midnight")) {
@@ -369,10 +369,32 @@ public class XmlCertprofile extends BaseCertprofile {
       midnightTimeZone = TimeZone.getTimeZone(timezoneId);
     } else if ("current".equalsIgnoreCase(str)) {
       offsetSeconds = 0L;
-    } else if (str.startsWith("+")) {
-      offsetSeconds = Long.parseLong(str.substring(1));
-    } else if (str.startsWith("-")) {
-      offsetSeconds = -1 * Long.parseLong(str.substring(1));
+    } else if (str.length() > 2){
+      char sign = str.charAt(0);
+      char suffix = str.charAt(str.length() - 1);
+      if (sign == '+' || sign == '-') {
+        long digit = Long.parseLong(str.substring(1, str.length() - 1));
+        long seconds;
+        switch (suffix) {
+          case 'd':
+            seconds = digit * (24L * 60 * 60);
+            break;
+          case 'h':
+            seconds = digit * (60L * 60);
+            break;
+          case 'm':
+            seconds = digit * 60L;
+            break;
+          case 's':
+            seconds = digit;
+            break;
+          default:
+            throw new CertprofileException("invalid notBefore " + str);
+        }
+        offsetSeconds = (sign == '+') ? seconds : -1 * seconds;
+      } else {
+        throw new CertprofileException("invalid notBefore '" + str + "'");
+      }
     } else {
       throw new CertprofileException("invalid notBefore '" + str + "'");
     }

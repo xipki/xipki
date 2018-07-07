@@ -74,9 +74,15 @@
               - 'midnight'[:timezone]: the next mid night time for the given timezone.
                            Valid timezones are: GMT+0, GMT+1, ..., GMT+12,
                                                        GMT-1, ..., GMT-12
-              - '+'offset: offset (seconds) after current time..
-              - '-'offset: offset (seconds) before current time.In the current implementation,
-                           offset of maximal 600 seconds (10 minutes) allowed.
+              - '+'offset: offset after current time,
+              - '-'offset: before after current time, In the current implementation,
+                           offset of maximal 10 minutes is allowed.
+
+                           The offset must have following suffixes:
+                           - 'd' for day, e.g. '2d' for 2 days,
+                           - 'h' for day, e.g. '2h' for 2 hours,
+                           - 'm' for day, e.g. '2m' for 2 minutes,
+                           - 's' for day, e.g. '2s' for 2 seconds.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
