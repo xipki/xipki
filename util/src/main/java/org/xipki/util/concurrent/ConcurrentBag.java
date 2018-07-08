@@ -378,9 +378,9 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
    */
   private boolean useWeakThreadLocals() {
     try {
-      if (System.getProperty("com.zaxxer.hikari.useWeakReferences") != null) {
+      if (System.getProperty("org.xipki.useWeakReferences") != null) {
         // undocumented manual override of WeakReference behavior
-        return Boolean.getBoolean("com.zaxxer.hikari.useWeakReferences");
+        return Boolean.getBoolean("org.xipki.useWeakReferences");
       }
 
       return getClass().getClassLoader() != ClassLoader.getSystemClassLoader();

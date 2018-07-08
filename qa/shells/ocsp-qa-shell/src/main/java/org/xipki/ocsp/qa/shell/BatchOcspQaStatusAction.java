@@ -62,8 +62,8 @@ import org.xipki.shell.completer.SigAlgCompleter;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.RequestResponseDebug;
-import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.ReqRespDebug;
+import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
 
 /**
@@ -392,9 +392,9 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
       status = OcspCertStatus.good;
     }
 
-    RequestResponseDebug debug = null;
+    ReqRespDebug debug = null;
     if (saveReq || saveResp) {
-      debug = new RequestResponseDebug(saveReq, saveResp);
+      debug = new ReqRespDebug(saveReq, saveResp);
     }
 
     OCSPResp response;
@@ -402,7 +402,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
       response = requestor.ask(issuerCert, serialNumber, serverUrl, requestOptions, debug);
     } finally {
       if (debug != null && debug.size() > 0) {
-        RequestResponsePair reqResp = debug.get(0);
+        ReqRespPair reqResp = debug.get(0);
         String filename = serialNumber.toString(16);
 
         if (saveReq) {

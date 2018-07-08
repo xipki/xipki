@@ -67,7 +67,7 @@ import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.KeyusageCompleter;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
 
 /**
@@ -322,7 +322,7 @@ public abstract class EnrollAction extends ClientAction {
     EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.Type.CERT_REQ);
     request.addRequestEntry(reqEntry);
 
-    RequestResponseDebug debug = getRequestResponseDebug();
+    ReqRespDebug debug = getReqRespDebug();
     EnrollCertResult result;
     try {
       result = caClient.enrollCerts(caName, request, debug);

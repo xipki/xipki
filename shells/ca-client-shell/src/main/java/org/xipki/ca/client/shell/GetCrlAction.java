@@ -34,7 +34,7 @@ import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 
 /**
  * TODO.
@@ -57,7 +57,7 @@ public class GetCrlAction extends CrlAction {
 
   @Override
   protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
-    RequestResponseDebug debug = getRequestResponseDebug();
+    ReqRespDebug debug = getReqRespDebug();
     try {
       return caClient.downloadCrl(caName, debug);
     } finally {
@@ -119,7 +119,7 @@ public class GetCrlAction extends CrlAction {
     byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
     BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
-    RequestResponseDebug debug = getRequestResponseDebug();
+    ReqRespDebug debug = getReqRespDebug();
     try {
       crl = caClient.downloadCrl(caName, baseCrlNumber, debug);
     } catch (PkiErrorException ex) {

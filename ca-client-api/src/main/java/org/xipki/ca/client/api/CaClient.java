@@ -33,7 +33,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 import org.xipki.util.HealthCheckResult;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 
 /**
  * TODO.
@@ -78,7 +78,7 @@ public interface CaClient {
    *          if client error occurs.
    */
   EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
-      Date notBefore, Date notAfter, RequestResponseDebug debug)
+      Date notBefore, Date notAfter, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -96,8 +96,8 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+  EnrollCertResult enrollCerts(String caName, EnrollCertRequest request, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException;
 
   /**
    * Revokes a certificate.
@@ -118,7 +118,7 @@ public interface CaClient {
    *          if client error occurs.
    */
   CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityTime,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+      ReqRespDebug debug) throws CaClientException, PkiErrorException;
 
   /**
    * TODO.
@@ -141,7 +141,7 @@ public interface CaClient {
    *          if client error occurs.
    */
   CertIdOrError revokeCert(String caName, X509Certificate cert, int reason, Date invalidityTime,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+      ReqRespDebug debug) throws CaClientException, PkiErrorException;
 
   /**
    * Revoke a set of certificates.
@@ -156,7 +156,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, RequestResponseDebug debug)
+  Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -172,7 +172,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  X509CRL downloadCrl(String caName, RequestResponseDebug debug)
+  X509CRL downloadCrl(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -190,7 +190,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  X509CRL downloadCrl(String caName, BigInteger crlNumber, RequestResponseDebug debug)
+  X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -206,7 +206,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  X509CRL generateCrl(String caName, RequestResponseDebug debug)
+  X509CRL generateCrl(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -280,8 +280,8 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  CertIdOrError unrevokeCert(String caName, BigInteger serial, RequestResponseDebug debug)
-            throws CaClientException, PkiErrorException;
+  CertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException;
 
   /**
    * Unrevokes certificates.
@@ -298,7 +298,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  CertIdOrError unrevokeCert(String caName, X509Certificate cert, RequestResponseDebug debug)
+  CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -313,8 +313,8 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+  Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException;
 
   /**
    * Removes a certificate.
@@ -331,7 +331,7 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  CertIdOrError removeCert(String caName, BigInteger serial, RequestResponseDebug debug)
+  CertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException;
 
   /**
@@ -349,8 +349,8 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  CertIdOrError removeCert(String caName, X509Certificate cert,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+  CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException;
 
   /**
    * Removes certificates.
@@ -364,8 +364,8 @@ public interface CaClient {
    * @throws CaClientException
    *          if client error occurs.
    */
-  Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+  Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException;
 
   /**
    * Gets the health status.

@@ -119,7 +119,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
@@ -155,20 +155,19 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
     xmlDocBuilder = newDocumentBuilder();
   }
 
-  public X509CRL generateCrl(RequestResponseDebug debug)
-      throws CaClientException, PkiErrorException {
+  public X509CRL generateCrl(ReqRespDebug debug) throws CaClientException, PkiErrorException {
     int action = XiSecurityConstants.CMP_ACTION_GEN_CRL;
     PKIMessage request = buildMessageWithXipkAction(action, null);
     PkiResponse response = signAndSend(request, debug);
     return evaluateCrlResponse(response, action);
   }
 
-  public X509CRL downloadCurrentCrl(RequestResponseDebug debug)
+  public X509CRL downloadCurrentCrl(ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     return downloadCrl((BigInteger) null, debug);
   }
 
-  public X509CRL downloadCrl(BigInteger crlNumber, RequestResponseDebug debug)
+  public X509CRL downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     Integer action = null;
     PKIMessage request;
@@ -239,7 +238,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
   } // method evaluateCrlResponse
 
   public RevokeCertResultType revokeCertificate(RevokeCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     PKIMessage reqMessage = buildRevokeCertRequest(request);
@@ -248,7 +247,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
   }
 
   public RevokeCertResultType unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
@@ -258,7 +257,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
   }
 
   public RevokeCertResultType removeCertificate(UnrevokeOrRemoveCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
@@ -342,7 +341,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
   } // method parse
 
   public EnrollCertResultResp requestCertificate(CsrEnrollCertRequest csr, Date notBefore,
-      Date notAfter, RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      Date notAfter, ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("csr", csr);
 
     PKIMessage request = buildPkiMessage(csr, notBefore, notAfter);
@@ -351,7 +350,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
     return requestCertificate0(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
   }
 
-  public EnrollCertResultResp requestCertificate(EnrollCertRequest req, RequestResponseDebug debug)
+  public EnrollCertResultResp requestCertificate(EnrollCertRequest req, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("req", req);
 
@@ -379,7 +378,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
   }
 
   private EnrollCertResultResp requestCertificate0(PKIMessage reqMessage,
-      Map<BigInteger, String> reqIdIdMap, int expectedBodyType, RequestResponseDebug debug)
+      Map<BigInteger, String> reqIdIdMap, int expectedBodyType, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     PkiResponse response = signAndSend(reqMessage, debug);
     checkProtection(response);
@@ -685,7 +684,7 @@ abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
     return reqMessage;
   }
 
-  public ClientCaInfo retrieveCaInfo(String caName, RequestResponseDebug debug)
+  public ClientCaInfo retrieveCaInfo(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonBlank("caName", caName);
 

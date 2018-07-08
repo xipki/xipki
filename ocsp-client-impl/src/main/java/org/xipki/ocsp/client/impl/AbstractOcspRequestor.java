@@ -69,8 +69,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.RequestResponseDebug;
-import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.ReqRespDebug;
+import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
 
 /**
@@ -110,12 +110,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
    * @throws IOException
    *           if the transmission failed.
    */
-  protected abstract byte[] send(byte[] request, URL responderUrl,
-      RequestOptions requestOptions) throws IOException;
+  protected abstract byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
+      throws IOException;
 
   @Override
-  public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-      URL responderUrl, RequestOptions requestOptions, RequestResponseDebug debug)
+  public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     ParamUtil.requireNonNull("issuerCert", issuerCert);
     ParamUtil.requireNonNull("cert", cert);
@@ -134,7 +134,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
   @Override
   public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     ParamUtil.requireNonNull("issuerCert", issuerCert);
     ParamUtil.requireNonNull("certs", certs);
@@ -159,14 +159,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
   @Override
   public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
   }
 
   @Override
   public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     ParamUtil.requireNonNull("issuerCert", issuerCert);
     ParamUtil.requireNonNull("requestOptions", requestOptions);
@@ -185,9 +185,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(), ex);
     }
 
-    RequestResponsePair msgPair = null;
+    ReqRespPair msgPair = null;
     if (debug != null) {
-      msgPair = new RequestResponsePair();
+      msgPair = new ReqRespPair();
       debug.add(msgPair);
       if (debug.saveRequest()) {
         msgPair.setRequest(encodedReq);

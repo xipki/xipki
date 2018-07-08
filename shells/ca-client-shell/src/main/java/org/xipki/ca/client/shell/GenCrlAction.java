@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 
 /**
  * TODO.
@@ -37,7 +37,7 @@ public class GenCrlAction extends CrlAction {
 
   @Override
   protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
-    RequestResponseDebug debug = getRequestResponseDebug();
+    ReqRespDebug debug = getReqRespDebug();
     try {
       return caClient.generateCrl(caName, debug);
     } finally {

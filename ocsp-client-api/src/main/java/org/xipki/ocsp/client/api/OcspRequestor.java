@@ -22,7 +22,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 
 /**
  * TODO.
@@ -53,7 +53,7 @@ public interface OcspRequestor {
    *         certificate.
    */
   OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -77,7 +77,7 @@ public interface OcspRequestor {
    *         certificate.
    */
   OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -101,7 +101,7 @@ public interface OcspRequestor {
    *         certificate.
    */
   OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -125,7 +125,7 @@ public interface OcspRequestor {
    *         certificates.
    */
   OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
-      RequestOptions requestOptions, RequestResponseDebug debug)
+      RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
 }

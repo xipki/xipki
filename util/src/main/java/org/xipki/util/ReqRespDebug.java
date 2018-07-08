@@ -26,9 +26,9 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class RequestResponseDebug {
+public class ReqRespDebug {
 
-  public static class RequestResponsePair {
+  public static class ReqRespPair {
 
     private byte[] request;
 
@@ -52,13 +52,13 @@ public class RequestResponseDebug {
 
   }
 
-  private final List<RequestResponsePair> pairs = new LinkedList<>();
+  private final List<ReqRespPair> pairs = new LinkedList<>();
 
   private final boolean saveRequest;
 
   private final boolean saveResponse;
 
-  public RequestResponseDebug(boolean saveRequest, boolean saveResponse) {
+  public ReqRespDebug(boolean saveRequest, boolean saveResponse) {
     if (!(saveRequest || saveResponse)) {
       throw new IllegalArgumentException("saveRequest and saveResponse must not be both false");
     }
@@ -74,7 +74,7 @@ public class RequestResponseDebug {
     return saveResponse;
   }
 
-  public void add(RequestResponsePair pair) {
+  public void add(ReqRespPair pair) {
     pairs.add(pair);
   }
 
@@ -82,15 +82,15 @@ public class RequestResponseDebug {
     return pairs.size();
   }
 
-  public RequestResponsePair get(int index) {
+  public ReqRespPair get(int index) {
     return pairs.get(index);
   }
 
-  public boolean remove(RequestResponsePair pair) {
+  public boolean remove(ReqRespPair pair) {
     return pairs.remove(pair);
   }
 
-  public RequestResponsePair remove(int index) {
+  public ReqRespPair remove(int index) {
     return pairs.remove(index);
   }
 

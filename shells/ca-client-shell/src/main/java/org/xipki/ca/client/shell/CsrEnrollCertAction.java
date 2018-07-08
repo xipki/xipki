@@ -32,7 +32,7 @@ import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
 
 /**
@@ -81,7 +81,7 @@ public class CsrEnrollCertAction extends ClientAction {
     Date notAfter = StringUtil.isNotBlank(notAfterS)
           ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
     EnrollCertResult result;
-    RequestResponseDebug debug = getRequestResponseDebug();
+    ReqRespDebug debug = getReqRespDebug();
     try {
       result = caClient.enrollCert(caName, csr, profile, notBefore, notAfter, debug);
     } finally {

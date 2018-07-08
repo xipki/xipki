@@ -32,7 +32,7 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.ClientCrlReasonCompleter;
 import org.xipki.util.DateUtil;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 
 /**
  * TODO.
@@ -70,23 +70,18 @@ public class RevokeCertAction extends UnRevRemoveCertAction {
       invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
     }
 
-    if (certFile != null) {
-      X509Certificate cert = X509Util.parseCert(certFile);
-      RequestResponseDebug debug = getRequestResponseDebug();
-      try {
+    ReqRespDebug debug = getReqRespDebug();
+    try {
+      if (certFile != null) {
+        X509Certificate cert = X509Util.parseCert(certFile);
         certIdOrError = caClient.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
             debug);
-      } finally {
-        saveRequestResponse(debug);
-      }
-    } else {
-      RequestResponseDebug debug = getRequestResponseDebug();
-      try {
+      } else {
         certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
             invalidityDate, debug);
-      } finally {
-        saveRequestResponse(debug);
       }
+    } finally {
+      saveRequestResponse(debug);
     }
 
     if (certIdOrError.getError() != null) {

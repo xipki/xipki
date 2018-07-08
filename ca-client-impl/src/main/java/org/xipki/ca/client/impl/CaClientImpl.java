@@ -107,7 +107,7 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
@@ -480,7 +480,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
-      Date notBefore, Date notAfter, RequestResponseDebug debug)
+      Date notBefore, Date notAfter, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("csr", csr);
 
@@ -509,7 +509,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     List<EnrollCertRequestEntry> requestEntries = request.getRequestEntries();
@@ -585,7 +585,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
-      Date invalidityDate, RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      Date invalidityDate, ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -594,13 +594,13 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityDate,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ClientCaConf ca = getCa(caName);
     return revokeCert(ca, serial, reason, invalidityDate, debug);
   }
 
   private CertIdOrError revokeCert(ClientCaConf ca, BigInteger serial, int reason,
-      Date invalidityDate, RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      Date invalidityDate, ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
 
@@ -618,8 +618,8 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+  public Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     List<RevokeCertRequestEntry> requestEntries = request.getRequestEntries();
@@ -675,14 +675,14 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public X509CRL downloadCrl(String caName, RequestResponseDebug debug)
+  public X509CRL downloadCrl(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
     return downloadCrl(caName, (BigInteger) null, debug);
   }
 
   @Override
-  public X509CRL downloadCrl(String caName, BigInteger crlNumber, RequestResponseDebug debug)
+  public X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
     init0(false);
@@ -700,7 +700,7 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public X509CRL generateCrl(String caName, RequestResponseDebug debug)
+  public X509CRL generateCrl(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
 
@@ -868,8 +868,8 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public CertIdOrError unrevokeCert(String caName, X509Certificate cert,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+  public CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+      throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -877,13 +877,13 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public CertIdOrError unrevokeCert(String caName, BigInteger serial, RequestResponseDebug debug)
+  public CertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ClientCaConf ca = getCa(caName);
     return unrevokeCert(ca, serial, debug);
   }
 
-  private CertIdOrError unrevokeCert(ClientCaConf ca, BigInteger serial, RequestResponseDebug debug)
+  private CertIdOrError unrevokeCert(ClientCaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
@@ -901,7 +901,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     init0(false);
@@ -925,7 +925,7 @@ public final class CaClientImpl implements CaClient {
   } // method unrevokeCerts
 
   @Override
-  public CertIdOrError removeCert(String caName, X509Certificate cert, RequestResponseDebug debug)
+  public CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
     ClientCaConf ca = getCa(caName);
@@ -934,13 +934,13 @@ public final class CaClientImpl implements CaClient {
   }
 
   @Override
-  public CertIdOrError removeCert(String caName, BigInteger serial, RequestResponseDebug debug)
+  public CertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ClientCaConf ca = getCa(caName);
     return removeCert(ca, serial, debug);
   }
 
-  private CertIdOrError removeCert(ClientCaConf ca, BigInteger serial, RequestResponseDebug debug)
+  private CertIdOrError removeCert(ClientCaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
@@ -958,7 +958,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+      ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
     init0(false);

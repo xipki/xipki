@@ -26,8 +26,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.client.api.CaClient;
 import org.xipki.shell.XiAction;
 import org.xipki.util.IoUtil;
-import org.xipki.util.RequestResponseDebug;
-import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.ReqRespDebug;
+import org.xipki.util.ReqRespDebug.ReqRespPair;
 
 /**
  * TODO.
@@ -48,16 +48,16 @@ public abstract class ClientAction extends XiAction {
   @Completion(FileCompleter.class)
   private String respout;
 
-  protected RequestResponseDebug getRequestResponseDebug() {
+  protected ReqRespDebug getReqRespDebug() {
     boolean saveReq = isNotBlank(reqout);
     boolean saveResp = isNotBlank(respout);
     if (saveReq || saveResp) {
-      return new RequestResponseDebug(saveReq, saveResp);
+      return new ReqRespDebug(saveReq, saveResp);
     }
     return null;
   }
 
-  protected void saveRequestResponse(RequestResponseDebug debug) {
+  protected void saveRequestResponse(ReqRespDebug debug) {
     boolean saveReq = isNotBlank(reqout);
     boolean saveResp = isNotBlank(respout);
     if (!saveReq && !saveResp) {
@@ -70,7 +70,7 @@ public abstract class ClientAction extends XiAction {
 
     final int n = debug.size();
     for (int i = 0; i < n; i++) {
-      RequestResponsePair reqResp = debug.get(i);
+      ReqRespPair reqResp = debug.get(i);
       if (saveReq) {
         byte[] bytes = reqResp.getRequest();
         if (bytes != null) {

@@ -55,8 +55,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
-import org.xipki.util.RequestResponseDebug;
-import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.ReqRespDebug;
+import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
 
 /**
@@ -277,9 +277,9 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
     checkParameters(respIssuer, sns, encodedCerts);
     boolean saveReq = isNotBlank(reqout);
     boolean saveResp = isNotBlank(respout);
-    RequestResponseDebug debug = null;
+    ReqRespDebug debug = null;
     if (saveReq || saveResp) {
-      debug = new RequestResponseDebug(saveReq, saveResp);
+      debug = new ReqRespDebug(saveReq, saveResp);
     }
 
     IssuerHash issuerHash = new IssuerHash(
@@ -291,7 +291,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
           options, debug);
     } finally {
       if (debug != null && debug.size() > 0) {
-        RequestResponsePair reqResp = debug.get(0);
+        ReqRespPair reqResp = debug.get(0);
         if (saveReq) {
           byte[] bytes = reqResp.getRequest();
           if (bytes != null) {

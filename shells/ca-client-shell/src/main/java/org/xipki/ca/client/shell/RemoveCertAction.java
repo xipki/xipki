@@ -26,7 +26,7 @@ import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.RequestResponseDebug;
+import org.xipki.util.ReqRespDebug;
 
 /**
  * TODO.
@@ -44,22 +44,17 @@ public class RemoveCertAction extends UnRevRemoveCertAction {
       throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
     }
 
+    ReqRespDebug debug = getReqRespDebug();
     CertIdOrError certIdOrError;
-    if (certFile != null) {
-      X509Certificate cert = X509Util.parseCert(certFile);
-      RequestResponseDebug debug = getRequestResponseDebug();
-      try {
+    try {
+      if (certFile != null) {
+        X509Certificate cert = X509Util.parseCert(certFile);
         certIdOrError = caClient.removeCert(caName, cert, debug);
-      } finally {
-        saveRequestResponse(debug);
-      }
-    } else {
-      RequestResponseDebug debug = getRequestResponseDebug();
-      try {
+      } else {
         certIdOrError = caClient.removeCert(caName, getSerialNumber(), debug);
-      } finally {
-        saveRequestResponse(debug);
       }
+    } finally {
+      saveRequestResponse(debug);
     }
 
     if (certIdOrError.getError() != null) {

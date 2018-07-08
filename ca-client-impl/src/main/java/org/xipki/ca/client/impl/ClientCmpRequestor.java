@@ -101,8 +101,8 @@ import org.xipki.security.util.CmpFailureUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.RequestResponseDebug;
-import org.xipki.util.RequestResponseDebug.RequestResponsePair;
+import org.xipki.util.ReqRespDebug;
+import org.xipki.util.ReqRespDebug.ReqRespPair;
 
 /**
  * TODO.
@@ -189,7 +189,7 @@ abstract class ClientCmpRequestor {
     }
   }
 
-  protected PkiResponse signAndSend(PKIMessage request, RequestResponseDebug debug)
+  protected PkiResponse signAndSend(PKIMessage request, ReqRespDebug debug)
       throws CaClientException {
     ParamUtil.requireNonNull("request", request);
 
@@ -203,9 +203,9 @@ abstract class ClientCmpRequestor {
       throw new CaClientException(ex.getMessage(), ex);
     }
 
-    RequestResponsePair reqResp = null;
+    ReqRespPair reqResp = null;
     if (debug != null) {
-      reqResp = new RequestResponsePair();
+      reqResp = new ReqRespPair();
       debug.add(reqResp);
       if (debug.saveRequest()) {
         reqResp.setRequest(encodedRequest);
