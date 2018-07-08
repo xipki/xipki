@@ -17,8 +17,6 @@
 
 package org.xipki.shell.completer;
 
-import java.util.Arrays;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
@@ -32,7 +30,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class ECCurveNameCompleter extends AbstractEnumCompleter {
 
   public ECCurveNameCompleter() {
-    setTokens(Arrays.asList("b-163", "b-233", "b-283", "b-409", "b-571",
+    setTokens("b-163", "b-233", "b-283", "b-409", "b-571",
         "brainpoolp160r1", "brainpoolp160t1", "brainpoolp192r1", "brainpoolp192t1",
         "brainpoolp224r1", "brainpoolp224t1", "brainpoolp256r1", "brainpoolp256t1",
         "brainpoolp320r1", "brainpoolp320t1", "brainpoolp384r1", "brainpoolp384t1",
@@ -47,8 +45,7 @@ public class ECCurveNameCompleter extends AbstractEnumCompleter {
         "secp192k1", "secp192r1", "secp224k1", "secp224r1", "secp256k1", "secp256r1", "secp384r1",
         "secp521r1", "sect113r1", "sect113r2", "sect131r1", "sect131r2", "sect163k1", "sect163r1",
         "sect163r2", "sect193r1", "sect193r2", "sect233k1", "sect233r1", "sect239k1", "sect283k1",
-        "sect283r1", "sect409k1", "sect409r1", "sect571k1", "sect571r1", "sm2p256v1", "wapip192v1"
-        ));
+        "sect283r1", "sect409k1", "sect409r1", "sect571k1", "sect571r1", "sm2p256v1", "wapip192v1");
   }
 
 }

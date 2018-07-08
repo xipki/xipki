@@ -17,16 +17,15 @@
 
 package org.xipki.shell.completer;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.console.CommandLine;
 import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
@@ -45,13 +44,8 @@ public abstract class AbstractEnumCompleter implements Completer {
     }
   }
 
-  protected void setTokens(String tokens) {
-    ParamUtil.requireNonNull("tokens", tokens);
-    enums.clear();
-    StringTokenizer st = new StringTokenizer(tokens, ", ");
-    while (st.hasMoreTokens()) {
-      enums.add(st.nextToken());
-    }
+  protected void setTokens(String... a) {
+    setTokens(Arrays.asList(a));
   }
 
   @Override

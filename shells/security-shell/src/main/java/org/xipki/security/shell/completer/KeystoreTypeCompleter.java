@@ -30,7 +30,6 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
 public class KeystoreTypeCompleter extends AbstractEnumCompleter {
 
   public KeystoreTypeCompleter() {
-    setTokens("PKCS12,JKS,JCEKS");
+    setTokens("PKCS12", "JKS", "JCEKS");
   }
-
 }

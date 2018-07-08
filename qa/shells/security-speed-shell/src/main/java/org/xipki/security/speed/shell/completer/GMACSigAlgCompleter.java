@@ -31,7 +31,7 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
 public class GMACSigAlgCompleter extends AbstractEnumCompleter {
 
   public GMACSigAlgCompleter() {
-    setTokens("AES128-GMAC,AES192-GMAC,AES256-GMAC");
+    setTokens("AES128-GMAC", "AES192-GMAC", "AES256-GMAC");
   }
 
 }

@@ -31,8 +31,8 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
 public class HMACSigAlgCompleter extends AbstractEnumCompleter {
 
   public HMACSigAlgCompleter() {
-    setTokens("HMACSHA1,HMACSHA224,HMACSHA256,HMACSHA384,HMACSHA512,HMACSHA3-224,"
-        + "HMACSHA3-256,HMACSHA3-384,HMACSHA3-512");
+    setTokens("HMACSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512",
+        "HMACSHA3-224", "HMACSHA3-256", "HMACSHA3-384", "HMACSHA3-512");
   }
 
 }

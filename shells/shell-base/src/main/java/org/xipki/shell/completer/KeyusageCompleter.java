@@ -17,8 +17,6 @@
 
 package org.xipki.shell.completer;
 
-import java.util.Arrays;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
@@ -31,9 +29,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class KeyusageCompleter extends AbstractEnumCompleter {
 
   public KeyusageCompleter() {
-    setTokens(Arrays.asList("digitalSignature", "contentCommitment", "keyEncipherment",
-        "dataEncipherment", "keyAgreement", "keyCertSign", "cRLSign", "encipherOnly",
-        "decipherOnly"));
+    setTokens("digitalSignature", "contentCommitment", "keyEncipherment", "dataEncipherment",
+        "keyAgreement", "keyCertSign", "cRLSign", "encipherOnly", "decipherOnly");
   }
 
 }

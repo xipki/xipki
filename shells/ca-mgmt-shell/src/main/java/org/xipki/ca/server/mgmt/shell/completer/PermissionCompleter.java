@@ -30,7 +30,7 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
 public class PermissionCompleter extends AbstractEnumCompleter {
 
   public PermissionCompleter() {
-    setTokens("enroll_cert,revoke_cert,unrevoke_cert,remove_cert,key_update,gen_crl,get_crl,"
-        + "enroll_cross,all");
+    setTokens("enroll_cert", "revoke_cert", "unrevoke_cert", "remove_cert",
+        "key_update", "gen_crl", "get_crl", "enroll_cross", "all");
   }
 }

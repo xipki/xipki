@@ -30,7 +30,7 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
 public class SecretKeyTypeCompleter extends AbstractEnumCompleter {
 
   public SecretKeyTypeCompleter() {
-    setTokens("DES3,AES,GENERIC");
+    setTokens("DES3", "AES", "GENERIC");
   }
 
 }

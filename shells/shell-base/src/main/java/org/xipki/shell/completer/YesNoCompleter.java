@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class YesNoCompleter extends AbstractEnumCompleter {
 
   public YesNoCompleter() {
-    setTokens("yes, no");
+    setTokens("yes", "no");
   }
 
 }

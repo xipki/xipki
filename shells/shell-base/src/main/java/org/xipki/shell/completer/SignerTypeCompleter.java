@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class SignerTypeCompleter extends AbstractEnumCompleter {
 
   public SignerTypeCompleter() {
-    setTokens("JKS, PKCS11, PKCS12");
+    setTokens("JKS", "PKCS11", "PKCS12");
   }
 
 }

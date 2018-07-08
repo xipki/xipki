@@ -30,7 +30,7 @@ import org.xipki.shell.completer.AbstractEnumCompleter;
 public class CaStatusCompleter extends AbstractEnumCompleter {
 
   public CaStatusCompleter() {
-    setTokens("active,inactive");
+    setTokens("active", "inactive");
   }
 
 }

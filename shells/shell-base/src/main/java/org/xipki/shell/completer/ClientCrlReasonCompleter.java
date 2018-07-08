@@ -17,8 +17,6 @@
 
 package org.xipki.shell.completer;
 
-import java.util.Arrays;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
@@ -31,8 +29,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class ClientCrlReasonCompleter extends AbstractEnumCompleter {
 
   public ClientCrlReasonCompleter() {
-    setTokens(Arrays.asList("unspecified", "keyCompromise", "affiliationChanged", "superseded",
-        "cessationOfOperation", "certificateHold", "privilegeWithdrawn"));
+    setTokens("unspecified", "keyCompromise", "affiliationChanged", "superseded",
+        "cessationOfOperation", "certificateHold", "privilegeWithdrawn");
   }
 
 }
