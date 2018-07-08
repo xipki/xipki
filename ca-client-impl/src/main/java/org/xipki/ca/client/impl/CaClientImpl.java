@@ -211,7 +211,7 @@ public final class CaClientImpl implements CaClient {
           ca.setCmpControl(caInfo.getCmpControl());
         }
         LOG.info("retrieved CAInfo for CA " + name);
-      } catch (CmpRequestorException | PkiErrorException | CertificateEncodingException
+      } catch (CaClientException | PkiErrorException | CertificateEncodingException
             | RuntimeException ex) {
         errorCaNames.add(name);
         caNamesWithError.add(name);
@@ -501,12 +501,8 @@ public final class CaClientImpl implements CaClient {
 
     final String id = "cert-1";
     CsrEnrollCertRequest request = new CsrEnrollCertRequest(id, profile, csr);
-    EnrollCertResultResp result;
-    try {
-      result = ca.getRequestor().requestCertificate(request, notBefore, notAfter, debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
+    EnrollCertResultResp result = ca.getRequestor().requestCertificate(
+        request, notBefore, notAfter, debug);
 
     return parseEnrollCertResult(result);
   } // method requestCert
@@ -546,13 +542,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("could not find CA named " + caName);
     }
 
-    EnrollCertResultResp result;
-    try {
-      result = ca.getRequestor().requestCertificate(request, debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
-
+    EnrollCertResultResp result = ca.getRequestor().requestCertificate(request, debug);
     return parseEnrollCertResult(result);
   } // method requestCerts
 
@@ -658,13 +648,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     X509CmpRequestor cmpRequestor = caConf.getRequestor();
-    RevokeCertResultType result;
-    try {
-      result = cmpRequestor.revokeCertificate(request, debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
-
+    RevokeCertResultType result = cmpRequestor.revokeCertificate(request, debug);
     return parseRevokeCertResult(result);
   }
 
@@ -709,13 +693,8 @@ public final class CaClientImpl implements CaClient {
     }
 
     X509CmpRequestor requestor = ca.getRequestor();
-    X509CRL result;
-    try {
-      result = (crlNumber == null) ? requestor.downloadCurrentCrl(debug)
+    X509CRL result = (crlNumber == null) ? requestor.downloadCurrentCrl(debug)
           : requestor.downloadCrl(crlNumber, debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
 
     return result;
   }
@@ -731,11 +710,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     X509CmpRequestor requestor = ca.getRequestor();
-    try {
-      return requestor.generateCrl(debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
+    return requestor.generateCrl(debug);
   }
 
   @Override
@@ -821,12 +796,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("could not find CA named " + caName);
     }
 
-    PKIMessage pkiMessage;
-    try {
-      pkiMessage = ca.getRequestor().envelope(certRequest, pop, profileName);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException("CmpRequestorException: " + ex.getMessage(), ex);
-    }
+    PKIMessage pkiMessage = ca.getRequestor().envelope(certRequest, pop, profileName);
 
     try {
       return pkiMessage.getEncoded();
@@ -885,7 +855,7 @@ public final class CaClientImpl implements CaClient {
     try {
       PKIMessage pkiMessage = cmpRequestor.envelopeRevocation(request);
       return pkiMessage.getEncoded();
-    } catch (CmpRequestorException | IOException ex) {
+    } catch (IOException ex) {
       throw new CaClientException(ex.getMessage(), ex);
     }
   }
@@ -950,13 +920,7 @@ public final class CaClientImpl implements CaClient {
 
     final String caName = getCaNameByIssuer(issuer);
     X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-    RevokeCertResultType result;
-    try {
-      result = cmpRequestor.unrevokeCertificate(request, debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
-
+    RevokeCertResultType result = cmpRequestor.unrevokeCertificate(request, debug);
     return parseRevokeCertResult(result);
   } // method unrevokeCerts
 
@@ -1013,13 +977,7 @@ public final class CaClientImpl implements CaClient {
 
     final String caName = getCaNameByIssuer(issuer);
     X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-    RevokeCertResultType result;
-    try {
-      result = cmpRequestor.removeCertificate(request, debug);
-    } catch (CmpRequestorException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
-
+    RevokeCertResultType result = cmpRequestor.removeCertificate(request, debug);
     return parseRevokeCertResult(result);
   }
 

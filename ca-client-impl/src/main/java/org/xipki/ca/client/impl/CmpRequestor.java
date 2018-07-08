@@ -83,6 +83,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.cmp.CmpUtf8Pairs;
 import org.xipki.cmp.CmpUtil;
@@ -168,21 +169,21 @@ abstract class CmpRequestor {
 
   protected abstract byte[] send(byte[] request) throws IOException;
 
-  protected PKIMessage sign(PKIMessage request) throws CmpRequestorException {
+  protected PKIMessage sign(PKIMessage request) throws CaClientException {
     ParamUtil.requireNonNull("request", request);
     if (requestor == null) {
-      throw new CmpRequestorException("no request signer is configured");
+      throw new CaClientException("no request signer is configured");
     }
 
     try {
       return CmpUtil.addProtection(request, requestor, sender, sendRequestorCert);
     } catch (CMPException | NoIdleSignerException ex) {
-      throw new CmpRequestorException("could not sign the request", ex);
+      throw new CaClientException("could not sign the request", ex);
     }
   }
 
   protected PkiResponse signAndSend(PKIMessage request, RequestResponseDebug debug)
-      throws CmpRequestorException {
+      throws CaClientException {
     ParamUtil.requireNonNull("request", request);
 
     PKIMessage tmpRequest = (signRequest) ? sign(request) : request;
@@ -192,7 +193,7 @@ abstract class CmpRequestor {
       encodedRequest = tmpRequest.getEncoded();
     } catch (IOException ex) {
       LOG.error("could not encode the PKI request {}", tmpRequest);
-      throw new CmpRequestorException(ex.getMessage(), ex);
+      throw new CaClientException(ex.getMessage(), ex);
     }
 
     RequestResponsePair reqResp = null;
@@ -209,7 +210,7 @@ abstract class CmpRequestor {
       encodedResponse = send(encodedRequest);
     } catch (IOException ex) {
       LOG.error("could not send the PKI request {} to server", tmpRequest);
-      throw new CmpRequestorException("TRANSPORT_ERROR", ex);
+      throw new CaClientException("TRANSPORT_ERROR", ex);
     }
 
     if (reqResp != null && debug.saveResponse()) {
@@ -221,7 +222,7 @@ abstract class CmpRequestor {
       response = new GeneralPKIMessage(encodedResponse);
     } catch (IOException ex) {
       LOG.error("could not decode the received PKI message: {}", Hex.encode(encodedResponse));
-      throw new CmpRequestorException(ex.getMessage(), ex);
+      throw new CaClientException(ex.getMessage(), ex);
     }
 
     PKIHeader reqHeader = request.getHeader();
@@ -231,7 +232,7 @@ abstract class CmpRequestor {
     ASN1OctetString respTid = respHeader.getTransactionID();
     if (!tid.equals(respTid)) {
       LOG.warn("Response contains different tid ({}) than requested {}", respTid, tid);
-      throw new CmpRequestorException("Response contains differnt tid than the request");
+      throw new CaClientException("Response contains differnt tid than the request");
     }
 
     ASN1OctetString senderNonce = reqHeader.getSenderNonce();
@@ -239,7 +240,7 @@ abstract class CmpRequestor {
     if (!senderNonce.equals(respRecipientNonce)) {
       LOG.warn("tid {}: response.recipientNonce ({}) != request.senderNonce ({})",
           tid, respRecipientNonce, senderNonce);
-      throw new CmpRequestorException("Response contains differnt tid than the request");
+      throw new CaClientException("Response contains differnt tid than the request");
     }
 
     GeneralName rec = respHeader.getRecipient();
@@ -254,13 +255,13 @@ abstract class CmpRequestor {
             Hex.encode(tid.getOctets()), response);
         ret.setProtectionVerificationResult(verifyProtection);
       } catch (InvalidKeyException | OperatorCreationException | CMPException ex) {
-        throw new CmpRequestorException(ex.getMessage(), ex);
+        throw new CaClientException(ex.getMessage(), ex);
       }
     } else if (signRequest) {
       PKIBody respBody = response.getBody();
       int bodyType = respBody.getType();
       if (bodyType != PKIBody.TYPE_ERROR) {
-        throw new CmpRequestorException("response is not signed");
+        throw new CaClientException("response is not signed");
       }
     }
 
@@ -268,14 +269,14 @@ abstract class CmpRequestor {
   } // method signAndSend
 
   protected ASN1Encodable extractGeneralRepContent(PkiResponse response, String expectedType)
-      throws CmpRequestorException, PkiErrorException {
+      throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("response", response);
     ParamUtil.requireNonNull("expectedType", expectedType);
     return extractGeneralRepContent(response, expectedType, true);
   }
 
   private ASN1Encodable extractGeneralRepContent(PkiResponse response, String expectedType,
-      boolean requireProtectionCheck) throws CmpRequestorException, PkiErrorException {
+      boolean requireProtectionCheck) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("response", response);
     ParamUtil.requireNonNull("expectedType", expectedType);
     if (requireProtectionCheck) {
@@ -287,10 +288,10 @@ abstract class CmpRequestor {
 
     if (PKIBody.TYPE_ERROR == bodyType) {
       ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
-      throw new CmpRequestorException(CmpFailureUtil.formatPkiStatusInfo(
+      throw new CaClientException(CmpFailureUtil.formatPkiStatusInfo(
           content.getPKIStatusInfo()));
     } else if (PKIBody.TYPE_GEN_REP != bodyType) {
-      throw new CmpRequestorException(String.format(
+      throw new CaClientException(String.format(
           "unknown PKI body type %s instead the expected [%s, %s]", bodyType,
           PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
     }
@@ -309,7 +310,7 @@ abstract class CmpRequestor {
     }
 
     if (itv == null) {
-      throw new CmpRequestorException("the response does not contain InfoTypeAndValue "
+      throw new CaClientException("the response does not contain InfoTypeAndValue "
           + expectedType);
     }
 
@@ -317,7 +318,7 @@ abstract class CmpRequestor {
   } // method extractGeneralRepContent
 
   protected ASN1Encodable extractXipkiActionRepContent(PkiResponse response, int action)
-      throws CmpRequestorException, PkiErrorException {
+      throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("response", response);
     ASN1Encodable itvValue = extractGeneralRepContent(response,
         ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
@@ -325,29 +326,29 @@ abstract class CmpRequestor {
   }
 
   protected ASN1Encodable extractXiActionContent(ASN1Encodable itvValue, int action)
-      throws CmpRequestorException {
+      throws CaClientException {
     ParamUtil.requireNonNull("itvValue", itvValue);
     ASN1Sequence seq;
     try {
       seq = ASN1Sequence.getInstance(itvValue);
     } catch (IllegalArgumentException ex) {
-      throw new CmpRequestorException("invalid syntax of the response");
+      throw new CaClientException("invalid syntax of the response");
     }
 
     int size = seq.size();
     if (size != 1 && size != 2) {
-      throw new CmpRequestorException("invalid syntax of the response");
+      throw new CaClientException("invalid syntax of the response");
     }
 
     int tmpAction;
     try {
       tmpAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
     } catch (IllegalArgumentException ex) {
-      throw new CmpRequestorException("invalid syntax of the response");
+      throw new CaClientException("invalid syntax of the response");
     }
 
     if (action != tmpAction) {
-      throw new CmpRequestorException("received XiPKI action '" + tmpAction
+      throw new CaClientException("received XiPKI action '" + tmpAction
           + "' instead the expected '" + action + "'");
     }
 
@@ -483,8 +484,7 @@ abstract class CmpRequestor {
     return new ProtectionVerificationResult(cert, protRes);
   } // method verifyProtection
 
-  protected PKIMessage buildMessageWithXipkAction(int action, ASN1Encodable value)
-      throws CmpRequestorException {
+  protected PKIMessage buildMessageWithXipkAction(int action, ASN1Encodable value) {
     PKIHeader header = buildPkiHeader(null);
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -501,7 +501,7 @@ abstract class CmpRequestor {
   }
 
   protected PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type,
-      ASN1Encodable value) throws CmpRequestorException {
+      ASN1Encodable value) {
     ParamUtil.requireNonNull("type", type);
 
     PKIHeader header = buildPkiHeader(null);
