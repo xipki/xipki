@@ -79,8 +79,7 @@ public class CmpRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public void assertPermitted(int permission)
-      throws InsuffientPermissionException {
+  public void assertPermitted(int permission) throws InsuffientPermissionException {
     if (!isPermitted(permission)) {
       throw new  InsuffientPermissionException("Permission "
           + PermissionConstants.getTextForCode(permission) + " is not permitted");

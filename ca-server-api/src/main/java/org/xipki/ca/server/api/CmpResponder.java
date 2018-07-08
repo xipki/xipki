@@ -30,7 +30,7 @@ import org.xipki.util.HealthCheckResult;
  * @since 3.0.1
  */
 
-public interface CaCmpResponder {
+public interface CmpResponder {
 
   boolean isOnService();
 

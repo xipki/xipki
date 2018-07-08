@@ -23,7 +23,7 @@ import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.api.CaCmpResponder;
+import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
@@ -83,7 +83,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
       }
 
       String caName = null;
-      CaCmpResponder responder = null;
+      CmpResponder responder = null;
 
       if (servletUri.getPath().length() > 1) {
         // skip the first char which is always '/'

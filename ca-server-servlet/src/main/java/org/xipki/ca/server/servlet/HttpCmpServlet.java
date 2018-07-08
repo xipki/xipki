@@ -39,7 +39,7 @@ import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CaCmpResponder;
+import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
@@ -97,7 +97,7 @@ public class HttpCmpServlet extends HttpServlet {
       }
 
       String caName = null;
-      CaCmpResponder responder = null;
+      CmpResponder responder = null;
       String path = StringUtil.getRelativeRequestUri(
           req.getServletPath(), req.getRequestURI());
       if (path.length() > 1) {

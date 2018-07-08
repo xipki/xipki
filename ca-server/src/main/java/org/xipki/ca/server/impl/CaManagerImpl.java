@@ -83,12 +83,12 @@ import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CaCmpResponder;
+import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.ca.server.impl.SelfSignedCertBuilder.GenerateSelfSignedResult;
-import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
+import org.xipki.ca.server.impl.cmp.CmpResponderImpl;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.rest.RestResponderImpl;
 import org.xipki.ca.server.impl.scep.ScepResponderImpl;
@@ -310,7 +310,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-  private final Map<String, CaCmpResponderImpl> cmpResponders = new ConcurrentHashMap<>();
+  private final Map<String, CmpResponderImpl> cmpResponders = new ConcurrentHashMap<>();
 
   private final Map<String, ScepResponderImpl> scepResponders = new ConcurrentHashMap<>();
 
@@ -772,11 +772,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     x509cas.put(caName, ca);
-    CaCmpResponderImpl caResponder;
+    CmpResponderImpl caResponder;
     try {
-      caResponder = new CaCmpResponderImpl(this, caName);
+      caResponder = new CmpResponderImpl(this, caName);
     } catch (NoSuchAlgorithmException ex) {
-      LogUtil.error(LOG, ex, concat("CaCmpResponderImpl.<init> (ca=", caName, ")"));
+      LogUtil.error(LOG, ex, concat("CmpResponderImpl.<init> (ca=", caName, ")"));
       return false;
     }
 
@@ -845,7 +845,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method shutdown
 
   @Override
-  public CaCmpResponder getX509CaResponder(String name) {
+  public CmpResponder getX509CaResponder(String name) {
     return cmpResponders.get(ParamUtil.requireNonBlankLower("name", name));
   }
 

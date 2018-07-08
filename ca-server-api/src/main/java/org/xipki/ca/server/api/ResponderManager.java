@@ -39,7 +39,7 @@ public interface ResponderManager {
    *          CA name. Must not be {@code null}.
    * @return the CMP responder for the given CA name.
    */
-  CaCmpResponder getX509CaResponder(String caName);
+  CmpResponder getX509CaResponder(String caName);
 
   ScepResponder getScepResponder(String name);
 

@@ -50,7 +50,7 @@ import org.xipki.ca.server.api.RestResponse;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.X509Ca;
-import org.xipki.ca.server.impl.cmp.CaCmpResponderImpl;
+import org.xipki.ca.server.impl.cmp.CmpResponderImpl;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
@@ -139,7 +139,7 @@ public class RestResponderImpl implements RestResponder {
         if (caName == null) {
           caName = caAlias.toLowerCase();
         }
-        ca = ((CaCmpResponderImpl) responderManager.getX509CaResponder(caName)).getCa();
+        ca = ((CmpResponderImpl) responderManager.getX509CaResponder(caName)).getCa();
       }
 
       if (caName == null || ca == null || !ca.getCaInfo().supportsRest()

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.api.CaCmpResponder;
+import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
@@ -64,7 +64,7 @@ public class HealthCheckServlet extends HttpServlet {
 
     try {
       String caName = null;
-      CaCmpResponder responder = null;
+      CmpResponder responder = null;
 
       String path = StringUtil.getRelativeRequestUri(
           req.getServletPath(), req.getRequestURI());

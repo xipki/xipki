@@ -50,7 +50,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CaCmpResponder;
+import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.cmp.CmpUtil;
@@ -70,9 +70,9 @@ import org.xipki.util.RandomUtil;
  * @since 2.0.0
  */
 
-abstract class CmpResponder implements CaCmpResponder {
+abstract class BaseCmpResponder implements CmpResponder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
   private static final int PVNO_CMP2000 = 2;
 
@@ -80,7 +80,7 @@ abstract class CmpResponder implements CaCmpResponder {
 
   private final SecureRandom random = new SecureRandom();
 
-  protected CmpResponder(SecurityFactory securityFactory) {
+  protected BaseCmpResponder(SecurityFactory securityFactory) {
     this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
   }
 

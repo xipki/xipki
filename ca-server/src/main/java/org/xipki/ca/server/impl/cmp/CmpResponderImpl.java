@@ -148,7 +148,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-public class CaCmpResponderImpl extends CmpResponder {
+public class CmpResponderImpl extends BaseCmpResponder {
 
   private class PendingPoolCleaner implements Runnable {
 
@@ -180,7 +180,7 @@ public class CaCmpResponderImpl extends CmpResponder {
 
   private static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaCmpResponderImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CmpResponderImpl.class);
 
   private final PendingCertificatePool pendingCertPool;
 
@@ -196,7 +196,7 @@ public class CaCmpResponderImpl extends CmpResponder {
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cacerts.getId());
   }
 
-  public CaCmpResponderImpl(CaManagerImpl caManager, String caName)
+  public CmpResponderImpl(CaManagerImpl caManager, String caName)
       throws NoSuchAlgorithmException {
     super(caManager.getSecurityFactory());
 
