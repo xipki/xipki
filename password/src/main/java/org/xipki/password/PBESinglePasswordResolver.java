@@ -90,7 +90,7 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
       pwdCallback = new PBEConsumerPasswordCallback();
     } else if ("OBF".equalsIgnoreCase(type)) {
       pwdCallback = new OBFPasswordCallback();
-      if (conf != null && !conf.startsWith("OBF:")) {
+      if (conf != null && !StringUtil.startsWithIgnoreCase(conf, "OBF:")) {
         conf = "OBF:" + conf;
       }
     } else {

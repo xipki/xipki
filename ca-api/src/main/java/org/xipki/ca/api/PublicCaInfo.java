@@ -28,7 +28,7 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -87,7 +87,7 @@ public class PublicCaInfo {
     } else {
       try {
         subjectAltName = GeneralNames.getInstance(
-            X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
+            JcaX509ExtensionUtils.parseExtensionValue(encodedSubjectAltName));
       } catch (IOException ex) {
         throw new OperationException(ErrorCode.INVALID_EXTENSION,
             "invalid SubjectAltName extension in CA certificate");
