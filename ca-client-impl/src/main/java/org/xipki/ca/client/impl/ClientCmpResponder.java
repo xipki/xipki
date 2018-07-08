@@ -17,22 +17,34 @@
 
 package org.xipki.ca.client.impl;
 
+import java.security.cert.X509Certificate;
+
+import org.xipki.security.AlgorithmValidator;
+import org.xipki.util.ParamUtil;
+
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.0
  */
 
-public class ClientErrorCode {
+class ClientCmpResponder {
 
-  /**
-   * Intern status to indicate that there are errors in the response.
-   */
-  public static final int PKISTATUS_RESPONSE_ERROR = -1;
+  private final X509Certificate cert;
 
-  public static final int PKISTATUS_NO_ANSWER = -2;
+  private final AlgorithmValidator sigAlgoValidator;
 
-  private ClientErrorCode() {
+  public ClientCmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
+    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
+  }
+
+  public X509Certificate getCert() {
+    return cert;
+  }
+
+  public AlgorithmValidator getSigAlgoValidator() {
+    return sigAlgoValidator;
   }
 
 }

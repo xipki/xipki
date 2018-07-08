@@ -37,7 +37,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-class CaConf {
+class ClientCaConf {
 
   private final String name;
 
@@ -47,9 +47,9 @@ class CaConf {
 
   private final String requestorName;
 
-  private final CmpResponder responder;
+  private final ClientCmpResponder responder;
 
-  private X509CmpRequestor requestor;
+  private X509ClientCmpRequestor requestor;
 
   private boolean certAutoconf;
 
@@ -67,7 +67,8 @@ class CaConf {
 
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-  CaConf(String name, String url, String healthUrl, String requestorName, CmpResponder responder) {
+  ClientCaConf(String name, String url, String healthUrl, String requestorName,
+      ClientCmpResponder responder) {
     this.name = ParamUtil.requireNonBlankLower("name", name);
     this.url = ParamUtil.requireNonBlank("url", url);
     this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
@@ -129,7 +130,7 @@ class CaConf {
     return cert != null;
   }
 
-  public CmpResponder getResponder() {
+  public ClientCmpResponder getResponder() {
     return responder;
   }
 
@@ -149,7 +150,7 @@ class CaConf {
     this.certprofilesAutoconf = autoconf;
   }
 
-  public void setRequestor(X509CmpRequestor requestor) {
+  public void setRequestor(X509ClientCmpRequestor requestor) {
     this.requestor = requestor;
   }
 
@@ -157,7 +158,7 @@ class CaConf {
     return requestorName;
   }
 
-  public X509CmpRequestor getRequestor() {
+  public X509ClientCmpRequestor getRequestor() {
     return requestor;
   }
 

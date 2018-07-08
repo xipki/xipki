@@ -165,7 +165,7 @@ public final class CaClientImpl implements CaClient {
 
   private static Unmarshaller jaxbUnmarshaller;
 
-  private final Map<String, CaConf> casMap = new HashMap<>();
+  private final Map<String, ClientCaConf> casMap = new HashMap<>();
 
   private final Set<String> autoConfCaNames = new HashSet<>();
 
@@ -197,10 +197,10 @@ public final class CaClientImpl implements CaClient {
 
     Set<String> errorCaNames = new HashSet<>();
     for (String name : caNames) {
-      CaConf ca = casMap.get(name);
+      ClientCaConf ca = casMap.get(name);
 
       try {
-        CaInfo caInfo = ca.getRequestor().retrieveCaInfo(name, null);
+        ClientCaInfo caInfo = ca.getRequestor().retrieveCaInfo(name, null);
         if (ca.isCertAutoconf()) {
           ca.setCert(caInfo.getCert());
         }
@@ -265,7 +265,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     // responders
-    Map<String, CmpResponder> responders = new HashMap<>();
+    Map<String, ClientCmpResponder> responders = new HashMap<>();
     for (ResponderType m : config.getResponders().getResponder()) {
       X509Certificate cert;
       try {
@@ -286,21 +286,21 @@ public final class CaClientImpl implements CaClient {
         throw new CaClientException(ex.getMessage());
       }
 
-      responders.put(m.getName(), new CmpResponder(cert, sigAlgoValidator));
+      responders.put(m.getName(), new ClientCmpResponder(cert, sigAlgoValidator));
     }
 
     // CA
-    Set<CaConf> cas = new HashSet<>();
+    Set<ClientCaConf> cas = new HashSet<>();
     for (CaType caType : config.getCas().getCa()) {
       String caName = caType.getName();
       try {
         // responder
-        CmpResponder responder = responders.get(caType.getResponder());
+        ClientCmpResponder responder = responders.get(caType.getResponder());
         if (responder == null) {
           throw new CaClientException("no responder named " + caType.getResponder()
               + " is configured");
         }
-        CaConf ca = new CaConf(caName, caType.getUrl(), caType.getHealthUrl(),
+        ClientCaConf ca = new ClientCaConf(caName, caType.getUrl(), caType.getHealthUrl(),
             caType.getRequestor(), responder);
 
         // CA cert
@@ -394,20 +394,20 @@ public final class CaClientImpl implements CaClient {
       }
     }
 
-    for (CaConf ca :cas) {
+    for (ClientCaConf ca :cas) {
       if (this.casMap.containsKey(ca.getName())) {
         throw new CaClientException("duplicate CAs with the same name " + ca.getName());
       }
 
       String requestorName = ca.getRequestorName();
 
-      X509CmpRequestor cmpRequestor;
+      X509ClientCmpRequestor cmpRequestor;
       if (requestorSigners.containsKey(requestorName)) {
-        cmpRequestor = new DfltHttpX509CmpRequestor(requestorSigners.get(requestorName),
+        cmpRequestor = new HttpX509ClientCmpRequestor(requestorSigners.get(requestorName),
             ca.getResponder(), ca.getUrl(), securityFactory);
         cmpRequestor.setSignRequest(requestorSignRequests.get(requestorName));
       } else if (requestorCerts.containsKey(requestorName)) {
-        cmpRequestor = new DfltHttpX509CmpRequestor(requestorCerts.get(requestorName),
+        cmpRequestor = new HttpX509ClientCmpRequestor(requestorCerts.get(requestorName),
             ca.getResponder(), ca.getUrl(), securityFactory);
       } else {
         throw new CaClientException("could not find requestor named " + requestorName
@@ -494,7 +494,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("certprofile " + profile + " is not supported by any CA");
     }
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new CaClientException("could not find CA named " + caName);
     }
@@ -537,7 +537,7 @@ public final class CaClientImpl implements CaClient {
       }
     }
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new CaClientException("could not find CA named " + caName);
     }
@@ -550,7 +550,7 @@ public final class CaClientImpl implements CaClient {
       throws CaClientException {
     if (caName != null) {
       caName = caName.toLowerCase();
-      CaConf ca = casMap.get(caName);
+      ClientCaConf ca = casMap.get(caName);
       if (ca == null) {
         throw new CaClientException("unknown ca: " + caName);
       }
@@ -562,7 +562,7 @@ public final class CaClientImpl implements CaClient {
       return;
     }
 
-    for (CaConf ca : casMap.values()) {
+    for (ClientCaConf ca : casMap.values()) {
       if (!ca.isCaInfoConfigured()) {
         continue;
       }
@@ -587,7 +587,7 @@ public final class CaClientImpl implements CaClient {
   public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
       Date invalidityDate, RequestResponseDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
-    CaConf ca = getCa(caName);
+    ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return revokeCert(ca, cert.getSerialNumber(), reason, invalidityDate, debug);
   }
@@ -595,12 +595,12 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityDate,
       RequestResponseDebug debug) throws CaClientException, PkiErrorException {
-    CaConf ca = getCa(caName);
+    ClientCaConf ca = getCa(caName);
     return revokeCert(ca, serial, reason, invalidityDate, debug);
   }
 
-  private CertIdOrError revokeCert(CaConf ca, BigInteger serial, int reason, Date invalidityDate,
-      RequestResponseDebug debug) throws CaClientException, PkiErrorException {
+  private CertIdOrError revokeCert(ClientCaConf ca, BigInteger serial, int reason,
+      Date invalidityDate, RequestResponseDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
 
@@ -636,7 +636,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     final String caName = getCaNameByIssuer(issuer);
-    CaConf caConf = casMap.get(caName);
+    ClientCaConf caConf = casMap.get(caName);
     if (caConf.getCmpControl().isRrAkiRequired()) {
       byte[] aki = caConf.getSubjectKeyIdentifier();
       List<RevokeCertRequestEntry> entries = request.getRequestEntries();
@@ -647,7 +647,7 @@ public final class CaClientImpl implements CaClient {
       }
     }
 
-    X509CmpRequestor cmpRequestor = caConf.getRequestor();
+    X509ClientCmpRequestor cmpRequestor = caConf.getRequestor();
     RevokeCertResultType result = cmpRequestor.revokeCertificate(request, debug);
     return parseRevokeCertResult(result);
   }
@@ -687,12 +687,12 @@ public final class CaClientImpl implements CaClient {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
     init0(false);
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new IllegalArgumentException("unknown CA " + caName);
     }
 
-    X509CmpRequestor requestor = ca.getRequestor();
+    X509ClientCmpRequestor requestor = ca.getRequestor();
     X509CRL result = (crlNumber == null) ? requestor.downloadCurrentCrl(debug)
           : requestor.downloadCrl(crlNumber, debug);
 
@@ -704,12 +704,12 @@ public final class CaClientImpl implements CaClient {
       throws CaClientException, PkiErrorException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new IllegalArgumentException("unknown CA " + caName);
     }
 
-    X509CmpRequestor requestor = ca.getRequestor();
+    X509ClientCmpRequestor requestor = ca.getRequestor();
     return requestor.generateCrl(debug);
   }
 
@@ -718,7 +718,7 @@ public final class CaClientImpl implements CaClient {
     ParamUtil.requireNonNull("issuer", issuer);
 
     for (String name : casMap.keySet()) {
-      final CaConf ca = casMap.get(name);
+      final ClientCaConf ca = casMap.get(name);
       if (!ca.isCaInfoConfigured()) {
         continue;
       }
@@ -733,7 +733,7 @@ public final class CaClientImpl implements CaClient {
 
   private String getCaNameForProfile(String certprofile) throws CaClientException {
     String caName = null;
-    for (CaConf ca : casMap.values()) {
+    for (ClientCaConf ca : casMap.values()) {
       if (!ca.isCaInfoConfigured()) {
         continue;
       }
@@ -791,7 +791,7 @@ public final class CaClientImpl implements CaClient {
       checkCertprofileSupportInCa(profileName, caName);
     }
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new CaClientException("could not find CA named " + caName);
     }
@@ -850,7 +850,7 @@ public final class CaClientImpl implements CaClient {
     request.addRequestEntry(entry);
 
     String caName = getCaNameByIssuer(issuer);
-    X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
+    X509ClientCmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
 
     try {
       PKIMessage pkiMessage = cmpRequestor.envelopeRevocation(request);
@@ -871,7 +871,7 @@ public final class CaClientImpl implements CaClient {
   public CertIdOrError unrevokeCert(String caName, X509Certificate cert,
       RequestResponseDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
-    CaConf ca = getCa(caName);
+    ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return unrevokeCert(ca, cert.getSerialNumber(), debug);
   }
@@ -879,11 +879,11 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError unrevokeCert(String caName, BigInteger serial, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
-    CaConf ca = getCa(caName);
+    ClientCaConf ca = getCa(caName);
     return unrevokeCert(ca, serial, debug);
   }
 
-  private CertIdOrError unrevokeCert(CaConf ca, BigInteger serial, RequestResponseDebug debug)
+  private CertIdOrError unrevokeCert(ClientCaConf ca, BigInteger serial, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
@@ -919,7 +919,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     final String caName = getCaNameByIssuer(issuer);
-    X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
+    X509ClientCmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
     RevokeCertResultType result = cmpRequestor.unrevokeCertificate(request, debug);
     return parseRevokeCertResult(result);
   } // method unrevokeCerts
@@ -928,7 +928,7 @@ public final class CaClientImpl implements CaClient {
   public CertIdOrError removeCert(String caName, X509Certificate cert, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
-    CaConf ca = getCa(caName);
+    ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return removeCert(ca, cert.getSerialNumber(), debug);
   }
@@ -936,11 +936,11 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError removeCert(String caName, BigInteger serial, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
-    CaConf ca = getCa(caName);
+    ClientCaConf ca = getCa(caName);
     return removeCert(ca, serial, debug);
   }
 
-  private CertIdOrError removeCert(CaConf ca, BigInteger serial, RequestResponseDebug debug)
+  private CertIdOrError removeCert(ClientCaConf ca, BigInteger serial, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
@@ -976,7 +976,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     final String caName = getCaNameByIssuer(issuer);
-    X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
+    X509ClientCmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
     RevokeCertResultType result = cmpRequestor.removeCertificate(request, debug);
     return parseRevokeCertResult(result);
   }
@@ -986,7 +986,7 @@ public final class CaClientImpl implements CaClient {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
 
     init0(false);
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       return Collections.emptySet();
     }
@@ -1018,7 +1018,7 @@ public final class CaClientImpl implements CaClient {
       return healthCheckResult;
     }
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new IllegalArgumentException("unknown CA " + caName);
     }
@@ -1216,7 +1216,7 @@ public final class CaClientImpl implements CaClient {
     return data;
   }
 
-  private CaConf getCa(String caName) throws CaClientException {
+  private ClientCaConf getCa(String caName) throws CaClientException {
     if (caName == null) {
       Iterator<String> names = casMap.keySet().iterator();
       if (!names.hasNext()) {
@@ -1227,14 +1227,14 @@ public final class CaClientImpl implements CaClient {
       caName = caName.toLowerCase();
     }
 
-    CaConf ca = casMap.get(caName);
+    ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       throw new CaClientException("could not find CA named " + caName);
     }
     return ca;
   }
 
-  private void assertIssuedByCa(X509Certificate cert, CaConf ca) throws CaClientException {
+  private void assertIssuedByCa(X509Certificate cert, ClientCaConf ca) throws CaClientException {
     boolean issued;
     try {
       issued = X509Util.issues(ca.getCert(), cert);
@@ -1249,7 +1249,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public java.security.cert.Certificate getCaCert(String caName) throws CaClientException {
-    CaConf ca = casMap.get(caName.toLowerCase());
+    ClientCaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getCert();
   }
 

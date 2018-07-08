@@ -36,7 +36,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.0.0
  */
 
-class DfltHttpX509CmpRequestor extends X509CmpRequestor {
+class HttpX509ClientCmpRequestor extends X509ClientCmpRequestor {
 
   private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
 
@@ -44,7 +44,7 @@ class DfltHttpX509CmpRequestor extends X509CmpRequestor {
 
   private final URL serverUrl;
 
-  DfltHttpX509CmpRequestor(X509Certificate requestorCert, CmpResponder responder,
+  HttpX509ClientCmpRequestor(X509Certificate requestorCert, ClientCmpResponder responder,
       String serverUrl, SecurityFactory securityFactory) {
     super(requestorCert, responder, securityFactory);
     ParamUtil.requireNonBlank("serverUrl", serverUrl);
@@ -56,7 +56,7 @@ class DfltHttpX509CmpRequestor extends X509CmpRequestor {
     }
   }
 
-  DfltHttpX509CmpRequestor(ConcurrentContentSigner requestor, CmpResponder responder,
+  HttpX509ClientCmpRequestor(ConcurrentContentSigner requestor, ClientCmpResponder responder,
       String serverUrl, SecurityFactory securityFactory) {
     super(requestor, responder, securityFactory);
     ParamUtil.requireNonBlank("serverUrl", serverUrl);

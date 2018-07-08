@@ -18,33 +18,42 @@
 package org.xipki.ca.client.impl;
 
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
-import org.xipki.security.AlgorithmValidator;
+import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.1.0
+ * @since 2.0.0
  */
 
-class CmpResponder {
+class ClientCaInfo {
 
   private final X509Certificate cert;
 
-  private final AlgorithmValidator sigAlgoValidator;
+  private final Set<CertprofileInfo> certprofiles;
 
-  public CmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
+  private final ClientCmpControl cmpControl;
+
+  ClientCaInfo(X509Certificate cert, ClientCmpControl cmpControl,
+      Set<CertprofileInfo> certprofiles) {
     this.cert = ParamUtil.requireNonNull("cert", cert);
-    this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
+    this.cmpControl = ParamUtil.requireNonNull("cmpControl", cmpControl);
+    this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
   }
 
-  public X509Certificate getCert() {
+  X509Certificate getCert() {
     return cert;
   }
 
-  public AlgorithmValidator getSigAlgoValidator() {
-    return sigAlgoValidator;
+  ClientCmpControl getCmpControl() {
+    return cmpControl;
+  }
+
+  Set<CertprofileInfo> getCertprofiles() {
+    return certprofiles;
   }
 
 }

@@ -130,26 +130,26 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-abstract class X509CmpRequestor extends CmpRequestor {
+abstract class X509ClientCmpRequestor extends ClientCmpRequestor {
 
   private static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER =
       new BcDigestCalculatorProvider();
 
   private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
 
-  private static final Logger LOG = LoggerFactory.getLogger(X509CmpRequestor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(X509ClientCmpRequestor.class);
 
   private final DocumentBuilder xmlDocBuilder;
 
   private boolean implicitConfirm = true;
 
-  X509CmpRequestor(X509Certificate requestorCert, CmpResponder responder,
+  X509ClientCmpRequestor(X509Certificate requestorCert, ClientCmpResponder responder,
       SecurityFactory securityFactory) {
     super(requestorCert, responder, securityFactory);
     xmlDocBuilder = newDocumentBuilder();
   }
 
-  X509CmpRequestor(ConcurrentContentSigner requestor, CmpResponder responder,
+  X509ClientCmpRequestor(ConcurrentContentSigner requestor, ClientCmpResponder responder,
       SecurityFactory securityFactory) {
     super(requestor, responder, securityFactory);
     xmlDocBuilder = newDocumentBuilder();
@@ -452,7 +452,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
           try {
             decryptedValue = decrypt(cvk.getPrivateKey());
           } catch (XiSecurityException ex) {
-            resultEntry = new ErrorResultEntry(thisId, ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
+            resultEntry = new ErrorResultEntry(thisId, PKISTATUS_RESPONSE_ERROR,
                 PKIFailureInfo.systemFailure, "could not decrypt PrivateKeyInfo");
             continue;
           }
@@ -467,7 +467,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
           try {
             certHolder = new X509CertificateHolder(cmpCert.getEncoded());
           } catch (IOException ex) {
-            resultEntry = new ErrorResultEntry(thisId, ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
+            resultEntry = new ErrorResultEntry(thisId, PKISTATUS_RESPONSE_ERROR,
                 PKIFailureInfo.systemFailure, "could not decode the certificate");
           }
 
@@ -488,8 +488,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     if (CollectionUtil.isNonEmpty(reqIdIdMap)) {
       for (BigInteger reqId : reqIdIdMap.keySet()) {
-        ErrorResultEntry ere =
-            new ErrorResultEntry(reqIdIdMap.get(reqId), ClientErrorCode.PKISTATUS_NO_ANSWER);
+        ErrorResultEntry ere = new ErrorResultEntry(reqIdIdMap.get(reqId), PKISTATUS_NO_ANSWER);
         result.addResultEntry(ere);
       }
     }
@@ -686,7 +685,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     return reqMessage;
   }
 
-  public CaInfo retrieveCaInfo(String caName, RequestResponseDebug debug)
+  public ClientCaInfo retrieveCaInfo(String caName, RequestResponseDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonBlank("caName", caName);
 
@@ -760,7 +759,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
       }
 
       LOG.info("CA {} supports profiles {}", caName, profileNames);
-      return new CaInfo(caCert, cmpControl, profiles);
+      return new ClientCaInfo(caCert, cmpControl, profiles);
     } else {
       throw new CaClientException("unknown CAInfo version " + version);
     }

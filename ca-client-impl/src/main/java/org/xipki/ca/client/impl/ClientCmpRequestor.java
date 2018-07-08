@@ -110,9 +110,16 @@ import org.xipki.util.RequestResponseDebug.RequestResponsePair;
  * @since 2.0.0
  */
 
-abstract class CmpRequestor {
+abstract class ClientCmpRequestor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CmpRequestor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientCmpRequestor.class);
+
+  /**
+   * Intern status to indicate that there are errors in the response.
+   */
+  protected static final int PKISTATUS_RESPONSE_ERROR = -1;
+
+  protected static final int PKISTATUS_NO_ANSWER = -2;
 
   protected final SecurityFactory securityFactory;
 
@@ -122,7 +129,7 @@ abstract class CmpRequestor {
 
   private final GeneralName sender;
 
-  private final CmpResponder responder;
+  private final ClientCmpResponder responder;
 
   private final GeneralName recipient;
 
@@ -132,7 +139,7 @@ abstract class CmpRequestor {
 
   private boolean sendRequestorCert;
 
-  public CmpRequestor(X509Certificate requestorCert, CmpResponder responder,
+  public ClientCmpRequestor(X509Certificate requestorCert, ClientCmpResponder responder,
       SecurityFactory securityFactory) {
     ParamUtil.requireNonNull("requestorCert", requestorCert);
     this.responder = ParamUtil.requireNonNull("responder", responder);
@@ -148,7 +155,7 @@ abstract class CmpRequestor {
     this.recipientName = subject;
   }
 
-  public CmpRequestor(ConcurrentContentSigner requestor, CmpResponder responder,
+  public ClientCmpRequestor(ConcurrentContentSigner requestor, ClientCmpResponder responder,
       SecurityFactory securityFactory) {
     this.requestor = ParamUtil.requireNonNull("requestor", requestor);
     if (requestor.getCertificate() == null) {
@@ -524,7 +531,7 @@ abstract class CmpRequestor {
 
     if (protectionVerificationResult == null
         || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID) {
-      throw new PkiErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
+      throw new PkiErrorException(PKISTATUS_RESPONSE_ERROR,
           PKIFailureInfo.badMessageCheck, "message check of the response failed");
     }
   }
