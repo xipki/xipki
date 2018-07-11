@@ -17,6 +17,7 @@
 
 package org.xipki.security.shell.pkcs12;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.security.Key;
 import java.security.KeyStore;
@@ -60,7 +61,7 @@ public class P12CertUpdateAction extends P12SecurityAction {
     KeyStore ks = getKeyStore();
 
     char[] pwd = getPassword();
-    X509Certificate newCert = X509Util.parseCert(certFile);
+    X509Certificate newCert = X509Util.parseCert(new File(certFile));
 
     assertMatch(newCert, new String(pwd));
 
@@ -82,7 +83,7 @@ public class P12CertUpdateAction extends P12SecurityAction {
     Set<X509Certificate> caCerts = new HashSet<>();
     if (isNotEmpty(caCertFiles)) {
       for (String caCertFile : caCertFiles) {
-        caCerts.add(X509Util.parseCert(caCertFile));
+        caCerts.add(X509Util.parseCert(new File(caCertFile)));
       }
     }
     X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);

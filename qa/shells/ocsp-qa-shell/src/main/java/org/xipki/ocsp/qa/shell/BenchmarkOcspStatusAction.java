@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.qa.shell;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
@@ -133,7 +134,7 @@ public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
         for (String certFile : certFiles) {
           X509Certificate cert;
           try {
-            cert = X509Util.parseCert(certFile);
+            cert = X509Util.parseCert(new File(certFile));
           } catch (Exception ex) {
             throw new IllegalCmdParamException("invalid certificate file  '" + certFile + "'", ex);
           }

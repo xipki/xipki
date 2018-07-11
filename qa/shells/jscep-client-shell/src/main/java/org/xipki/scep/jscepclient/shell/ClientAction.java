@@ -17,6 +17,7 @@
 
 package org.xipki.scep.jscepclient.shell;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -70,7 +71,7 @@ public abstract class ClientAction extends XiAction {
 
   protected Client getScepClient() throws CertificateException, IOException {
     if (scepClient == null) {
-      X509Certificate caCert = X509Util.parseCert(caCertFile);
+      X509Certificate caCert = X509Util.parseCert(new File(caCertFile));
       scepClient = new Client(new URL(url), new PreProvisionedCertificateVerifier(caCert));
     }
     return scepClient;

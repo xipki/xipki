@@ -146,12 +146,6 @@ public class X509Util {
     return new X500Name(newRdn);
   }
 
-  public static X509Certificate parseCert(String fileName)
-      throws IOException, CertificateException {
-    ParamUtil.requireNonNull("fileName", fileName);
-    return parseCert(new File(fileName));
-  }
-
   public static X509Certificate parseCert(File file) throws IOException, CertificateException {
     ParamUtil.requireNonNull("file", file);
     FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
@@ -182,12 +176,6 @@ public class X509Util {
     return cert;
   }
 
-  public static org.bouncycastle.asn1.x509.Certificate parseBcCert(String fileName)
-      throws IOException, CertificateException {
-    ParamUtil.requireNonNull("fileName", fileName);
-    return parseBcCert(new File(fileName));
-  }
-
   public static org.bouncycastle.asn1.x509.Certificate parseBcCert(File file)
       throws IOException, CertificateException {
     ParamUtil.requireNonNull("file", file);
@@ -214,12 +202,6 @@ public class X509Util {
     } catch (IllegalArgumentException ex) {
       throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
     }
-  }
-
-  public static CertificationRequest parseCsr(String fileName)
-      throws IOException, CertificateException {
-    ParamUtil.requireNonNull("fileName", fileName);
-    return parseCsr(new File(fileName));
   }
 
   public static CertificationRequest parseCsr(File file) throws IOException {
@@ -297,9 +279,9 @@ public class X509Util {
     return parseCrl(encodedCrl);
   }
 
-  public static X509CRL parseCrl(String file)
+  public static X509CRL parseCrl(File file)
       throws IOException, CertificateException, CRLException {
-    ParamUtil.requireNonBlank("file", file);
+    ParamUtil.requireNonNull("file", file);
     return parseCrl(new FileInputStream(IoUtil.expandFilepath(file)));
   }
 

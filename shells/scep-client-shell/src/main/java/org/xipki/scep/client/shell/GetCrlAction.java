@@ -52,7 +52,7 @@ public class GetCrlAction extends ClientAction {
 
   @Override
   protected Object execute0() throws Exception {
-    Certificate cert = X509Util.parseBcCert(certFile);
+    Certificate cert = X509Util.parseBcCert(new File(certFile));
     ScepClient client = getScepClient();
     X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
         cert.getIssuer(), cert.getSerialNumber().getPositiveValue());

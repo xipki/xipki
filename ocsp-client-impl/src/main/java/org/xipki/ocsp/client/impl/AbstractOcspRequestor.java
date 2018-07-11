@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.client.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -382,7 +383,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             X509Certificate cert = null;
             if (StringUtil.isNotBlank(signerCertFile)) {
               try {
-                cert = X509Util.parseCert(signerCertFile);
+                cert = X509Util.parseCert(new File(signerCertFile));
               } catch (CertificateException ex) {
                 throw new OcspRequestorException("could not parse certificate "
                     + signerCertFile + ": " + ex.getMessage());

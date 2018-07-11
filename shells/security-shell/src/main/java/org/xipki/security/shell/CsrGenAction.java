@@ -114,7 +114,7 @@ public abstract class CsrGenAction extends SecurityAction {
           + "(only applied to EC key with GM curves)")
   private Boolean gm = Boolean.FALSE;
 
-  @Option(name = "--out", aliases = "-o", required = true, description = "output file name")
+  @Option(name = "--out", aliases = "-o", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String outputFilename;
 

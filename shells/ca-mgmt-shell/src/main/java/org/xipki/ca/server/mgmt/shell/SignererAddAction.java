@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -65,7 +66,7 @@ public class SignererAddAction extends CaAction {
     String base64Cert = null;
     X509Certificate signerCert = null;
     if (certFile != null) {
-      signerCert = X509Util.parseCert(certFile);
+      signerCert = X509Util.parseCert(new File(certFile));
       base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
     }
 

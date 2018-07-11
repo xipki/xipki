@@ -17,6 +17,7 @@
 
 package org.xipki.ca.client.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -73,7 +74,7 @@ public class RevokeCertAction extends UnRevRemoveCertAction {
     ReqRespDebug debug = getReqRespDebug();
     try {
       if (certFile != null) {
-        X509Certificate cert = X509Util.parseCert(certFile);
+        X509Certificate cert = X509Util.parseCert(new File(certFile));
         certIdOrError = caClient.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
             debug);
       } else {

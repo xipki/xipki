@@ -199,11 +199,11 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
       linuxShellFile.setExecutable(true);
     }
 
-    X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+    X509Certificate issuerCert = X509Util.parseCert(new File(issuerCertFile));
 
     X509Certificate respIssuer = null;
     if (respIssuerFile != null) {
-      respIssuer = X509Util.parseCert(respIssuerFile);
+      respIssuer = X509Util.parseCert(new File(respIssuerFile));
       IoUtil.save(new File(outDir, "responder-issuer.pem"),
           X509Util.toPemCert(respIssuer).getBytes());
     }

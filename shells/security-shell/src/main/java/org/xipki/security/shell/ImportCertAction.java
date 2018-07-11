@@ -86,7 +86,7 @@ public class ImportCertAction extends SecurityAction {
     }
 
     for (String certFile : certFiles) {
-      X509Certificate cert = X509Util.parseCert(certFile);
+      X509Certificate cert = X509Util.parseCert(new File(certFile));
       String baseAlias = X509Util.getCommonName(cert.getSubjectX500Principal());
       String alias = baseAlias;
       int idx = 2;

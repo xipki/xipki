@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
@@ -66,7 +67,7 @@ public abstract class UnRevRmCertAction extends CaAction {
       serialNumber = toBigInt(serialNumberS);
     } else if (certFile != null) {
       X509Certificate caCert = ca.getCert();
-      X509Certificate cert = X509Util.parseCert(certFile);
+      X509Certificate cert = X509Util.parseCert(new File(certFile));
       if (!X509Util.issues(caCert, cert)) {
         throw new CmdFailure("certificate '" + certFile + "' is not issued by CA " + caName);
       }

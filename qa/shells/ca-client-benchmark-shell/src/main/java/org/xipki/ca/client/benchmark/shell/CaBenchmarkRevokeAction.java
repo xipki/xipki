@@ -17,6 +17,7 @@
 
 package org.xipki.ca.client.benchmark.shell;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -97,7 +98,7 @@ public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
         caDbConfFile, "\nserialNumberFile: ", serialNumberFile, "\nmaxCerts: ", maxCerts,
         "\n#certs/req: ", num, "\nunit: ", num, " certificate", (num > 1 ? "s" : ""), "\n");
 
-    Certificate caCert = X509Util.parseBcCert(issuerCertFile);
+    Certificate caCert = X509Util.parseBcCert(new File(issuerCertFile));
     Properties props = new Properties();
     props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
     props.setProperty("autoCommit", "false");

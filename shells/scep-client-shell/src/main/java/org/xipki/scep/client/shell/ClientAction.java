@@ -17,6 +17,7 @@
 
 package org.xipki.scep.client.shell;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -67,7 +68,7 @@ public abstract class ClientAction extends XiAction {
 
   protected ScepClient getScepClient() throws CertificateException, IOException {
     if (scepClient == null) {
-      X509Certificate caCert = X509Util.parseCert(caCertFile);
+      X509Certificate caCert = X509Util.parseCert(new File(caCertFile));
       CaIdentifier tmpCaId = new CaIdentifier(url, caId);
       CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(caCert);
       scepClient = new ScepClient(tmpCaId, caCertValidator);

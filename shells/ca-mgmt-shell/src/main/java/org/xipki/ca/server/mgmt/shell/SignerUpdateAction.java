@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -85,7 +87,7 @@ public class SignerUpdateAction extends CaAction {
     if (CaManager.NULL.equalsIgnoreCase(certFile)) {
       cert = CaManager.NULL;
     } else if (certFile != null) {
-      Certificate bcCert = X509Util.parseBcCert(certFile);
+      Certificate bcCert = X509Util.parseBcCert(new File(certFile));
       byte[] certBytes = bcCert.getEncoded();
       cert = Base64.encodeToString(certBytes);
     }

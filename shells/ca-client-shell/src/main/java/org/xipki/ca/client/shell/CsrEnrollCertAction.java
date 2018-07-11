@@ -74,7 +74,7 @@ public class CsrEnrollCertAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    CertificationRequest csr = X509Util.parseCsr(csrFile);
+    CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
     Date notBefore = StringUtil.isNotBlank(notBeforeS)
         ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;

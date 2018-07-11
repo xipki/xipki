@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.client.shell;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.CertificateEncodingException;
@@ -172,7 +173,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
       throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
     }
 
-    X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+    X509Certificate issuerCert = X509Util.parseCert(new File(issuerCertFile));
 
     Map<BigInteger, byte[]> encodedCerts = null;
     List<BigInteger> sns = new LinkedList<>();
@@ -209,7 +210,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
           ocspUrls = extractOcspUrls(cert);
           sn = cert.getSerialNumber();
         } else {
-          X509Certificate cert = X509Util.parseCert(certFile);
+          X509Certificate cert = X509Util.parseCert(new File(certFile));
           if (!X509Util.issues(issuerCert, cert)) {
             throw new IllegalCmdParamException(
                 "certificate " + certFile + " is not issued by the given issuer");
@@ -271,7 +272,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
 
     X509Certificate respIssuer = null;
     if (respIssuerFile != null) {
-      respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
+      respIssuer = X509Util.parseCert(new File(respIssuerFile));
     }
 
     URL serverUrlObj = new URL(serverUrl);

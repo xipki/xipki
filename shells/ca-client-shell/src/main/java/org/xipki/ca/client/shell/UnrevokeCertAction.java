@@ -17,6 +17,7 @@
 
 package org.xipki.ca.client.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -48,7 +49,7 @@ public class UnrevokeCertAction extends UnRevRemoveCertAction {
     CertIdOrError certIdOrError;
     try {
       if (certFile != null) {
-        X509Certificate cert = X509Util.parseCert(certFile);
+        X509Certificate cert = X509Util.parseCert(new File(certFile));
         certIdOrError = caClient.unrevokeCert(caName, cert, debug);
       } else {
         certIdOrError = caClient.unrevokeCert(caName, getSerialNumber(), debug);

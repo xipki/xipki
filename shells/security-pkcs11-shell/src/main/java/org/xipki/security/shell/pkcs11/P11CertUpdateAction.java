@@ -17,6 +17,7 @@
 
 package org.xipki.security.shell.pkcs11;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -56,7 +57,7 @@ public class P11CertUpdateAction extends P11SecurityAction {
   protected Object execute0() throws Exception {
     P11Slot slot = getSlot();
     P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
-    X509Certificate newCert = X509Util.parseCert(certFile);
+    X509Certificate newCert = X509Util.parseCert(new File(certFile));
     slot.updateCertificate(objIdentifier, newCert);
     println("updated certificate");
     return null;

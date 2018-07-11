@@ -54,7 +54,7 @@ public class CertPollAction extends ClientAction {
 
   @Override
   protected Object execute0() throws Exception {
-    CertificationRequest csr = X509Util.parseCsr(csrFile);
+    CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
     ScepClient client = getScepClient();
     X509Certificate caCert = client.getAuthorityCertStore().getCaCert();

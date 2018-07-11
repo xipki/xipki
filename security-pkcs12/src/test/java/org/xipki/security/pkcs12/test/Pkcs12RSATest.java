@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs12.test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.SecureRandom;
@@ -68,7 +69,7 @@ public abstract class Pkcs12RSATest {
     }
 
     String certFile = getCertificateFile();
-    X509Certificate cert = X509Util.parseCert(certFile);
+    X509Certificate cert = X509Util.parseCert(new File(certFile));
 
     InputStream ks = new FileInputStream(getPkcs12File());
     char[] password = getPassword().toCharArray();

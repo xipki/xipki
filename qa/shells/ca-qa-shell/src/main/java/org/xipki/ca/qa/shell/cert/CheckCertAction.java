@@ -17,6 +17,7 @@
 
 package org.xipki.ca.qa.shell.cert;
 
+import java.io.File;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -106,7 +107,7 @@ public class CheckCertAction extends XiAction {
           + profileName + "'");
     }
 
-    CertificationRequest csr = X509Util.parseCsr(csrFile);
+    CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
     Extensions extensions = null;
     CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
     ASN1Set attrs = reqInfo.getAttributes();

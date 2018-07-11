@@ -57,7 +57,7 @@ public class CertPollAction extends ClientAction {
   @Override
   protected Object execute0() throws Exception {
     PKCS10CertificationRequest csr = new PKCS10CertificationRequest(
-        X509Util.parseCsr(csrFile));
+        X509Util.parseCsr(new File(csrFile)));
 
     Client client = getScepClient();
 

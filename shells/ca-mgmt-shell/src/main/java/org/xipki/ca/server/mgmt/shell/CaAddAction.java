@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -47,7 +48,7 @@ public class CaAddAction extends CaAddOrGenAction {
   protected Object execute0() throws Exception {
     CaEntry caEntry = getCaEntry();
     if (certFile != null) {
-      X509Certificate caCert = X509Util.parseCert(certFile);
+      X509Certificate caCert = X509Util.parseCert(new File(certFile));
       caEntry.setCert(caCert);
     }
 

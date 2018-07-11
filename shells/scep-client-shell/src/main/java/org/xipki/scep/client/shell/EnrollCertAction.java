@@ -60,7 +60,7 @@ public class EnrollCertAction extends ClientAction {
   protected Object execute0() throws Exception {
     ScepClient client = getScepClient();
 
-    CertificationRequest csr = X509Util.parseCsr(csrFile);
+    CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
     EnrolmentResponse resp;
 
     PrivateKey key0 = getIdentityKey();

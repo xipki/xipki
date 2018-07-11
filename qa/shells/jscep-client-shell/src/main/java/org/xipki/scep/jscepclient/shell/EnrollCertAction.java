@@ -56,7 +56,7 @@ public class EnrollCertAction extends ClientAction {
     Client client = getScepClient();
 
     PKCS10CertificationRequest csr = new PKCS10CertificationRequest(
-        X509Util.parseCsr(csrFile));
+        X509Util.parseCsr(new File(csrFile)));
 
     EnrollmentResponse resp = client.enrol(getIdentityCert(), getIdentityKey(), csr);
     if (resp.isFailure()) {

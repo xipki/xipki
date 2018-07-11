@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -194,7 +195,7 @@ public class CaUpdateAction extends CaAction {
     }
 
     if (certFile != null) {
-      entry.setCert(X509Util.parseCert(certFile));
+      entry.setCert(X509Util.parseCert(new File(certFile)));
     }
 
     if (signerConf != null) {

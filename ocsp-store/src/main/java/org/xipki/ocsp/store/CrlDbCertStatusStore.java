@@ -127,7 +127,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private static X509Certificate parseCert(String certFile) throws OcspStoreException {
     try {
-      return X509Util.parseCert(certFile);
+      return X509Util.parseCert(new File(certFile));
     } catch (CertificateException | IOException ex) {
       throw new OcspStoreException("could not parse X.509 certificate from file "
           + certFile + ": " + ex.getMessage(), ex);
@@ -163,7 +163,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       LOG.info("UPDATE_CERTSTORE: a newer CRL is available");
       updateCrlSuccessful = false;
 
-      X509CRL crl = X509Util.parseCrl(crlFilename);
+      X509CRL crl = X509Util.parseCrl(new File(crlFilename));
 
       File revFile = new File(crlFilename + ".revocation");
       CertRevocationInfo caRevInfo = null;

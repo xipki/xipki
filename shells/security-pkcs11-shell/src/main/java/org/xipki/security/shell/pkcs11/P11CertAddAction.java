@@ -17,6 +17,7 @@
 
 package org.xipki.security.shell.pkcs11;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -53,7 +54,7 @@ public class P11CertAddAction extends P11SecurityAction {
   @Override
   protected Object execute0() throws Exception {
     byte[] id = (hexId == null) ? null : Hex.decode(hexId);
-    X509Certificate cert = X509Util.parseCert(certFile);
+    X509Certificate cert = X509Util.parseCert(new File(certFile));
     if (label == null) {
       label = X509Util.getCommonName(cert.getSubjectX500Principal());
     }

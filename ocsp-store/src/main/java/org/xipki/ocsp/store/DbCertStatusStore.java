@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.store;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
@@ -579,7 +580,7 @@ public class DbCertStatusStore extends OcspStore {
     Set<X509Certificate> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {
       try {
-        certs.add(X509Util.parseCert(certFile));
+        certs.add(X509Util.parseCert(new File(certFile)));
       } catch (CertificateException | IOException ex) {
         throw new OcspStoreException("could not parse X.509 certificate from file "
             + certFile + ": " + ex.getMessage(), ex);
