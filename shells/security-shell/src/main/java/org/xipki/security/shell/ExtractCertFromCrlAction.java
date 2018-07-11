@@ -50,7 +50,7 @@ import org.xipki.shell.IllegalCmdParamException;
 @Service
 public class ExtractCertFromCrlAction extends SecurityAction {
 
-  @Option(name = "--crl", required = true, description = "CRL file")
+  @Option(name = "--crl", required = true, description = "DER encoded CRL file")
   @Completion(FileCompleter.class)
   private String crlFile;
 

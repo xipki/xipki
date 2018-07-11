@@ -54,6 +54,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.DERUniversalString;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
@@ -97,7 +98,12 @@ import org.xipki.util.StringUtil;
 public class X509Util {
   private static final Logger LOG = LoggerFactory.getLogger(X509Util.class);
 
+  private static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----";
+
+  private static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
+
   private static CertificateFactory certFact;
+
   private static Object certFactLock = new Object();
 
   private X509Util() {
@@ -158,16 +164,82 @@ public class X509Util {
 
   public static X509Certificate parseCert(byte[] certBytes) throws CertificateException {
     ParamUtil.requireNonNull("certBytes", certBytes);
-    return parseCert(new ByteArrayInputStream(certBytes));
+    X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(
+        new ByteArrayInputStream(certBytes));
+    if (cert == null) {
+      throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
+    }
+    return cert;
   }
 
-  public static X509Certificate parseCert(InputStream certStream) throws CertificateException {
+  public static X509Certificate parseCert(InputStream certStream)
+      throws IOException, CertificateException {
     ParamUtil.requireNonNull("certStream", certStream);
     X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
     if (cert == null) {
       throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
     }
     return cert;
+  }
+
+  public static org.bouncycastle.asn1.x509.Certificate parseBcCert(String fileName)
+      throws IOException, CertificateException {
+    ParamUtil.requireNonNull("fileName", fileName);
+    return parseBcCert(new File(fileName));
+  }
+
+  public static org.bouncycastle.asn1.x509.Certificate parseBcCert(File file)
+      throws IOException, CertificateException {
+    ParamUtil.requireNonNull("file", file);
+    FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
+    try {
+      return parseBcCert(in);
+    } finally {
+      in.close();
+    }
+  }
+
+  public static org.bouncycastle.asn1.x509.Certificate parseBcCert(InputStream certStream)
+      throws IOException, CertificateException {
+    ParamUtil.requireNonNull("certStream", certStream);
+    return parseBcCert(IoUtil.read(certStream));
+  }
+
+  public static org.bouncycastle.asn1.x509.Certificate parseBcCert(byte[] certBytes)
+      throws CertificateException {
+    ParamUtil.requireNonNull("certBytes", certBytes);
+
+    try {
+      return org.bouncycastle.asn1.x509.Certificate.getInstance(certBytes);
+    } catch (IllegalArgumentException ex) {
+      throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
+    }
+  }
+
+  public static CertificationRequest parseCsr(String fileName)
+      throws IOException, CertificateException {
+    ParamUtil.requireNonNull("fileName", fileName);
+    return parseCsr(new File(fileName));
+  }
+
+  public static CertificationRequest parseCsr(File file) throws IOException {
+    ParamUtil.requireNonNull("file", file);
+    FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
+    try {
+      return parseCsr(in);
+    } finally {
+      in.close();
+    }
+  }
+
+  public static CertificationRequest parseCsr(InputStream csrStream) throws IOException {
+    ParamUtil.requireNonNull("csrStream", csrStream);
+    return parseCsr(IoUtil.read(csrStream));
+  }
+
+  public static CertificationRequest parseCsr(byte[] csrBytes) {
+    ParamUtil.requireNonNull("csrBytes", csrBytes);
+    return CertificationRequest.getInstance(csrBytes);
   }
 
   private static CertificateFactory getCertFactory() throws CertificateException {
@@ -192,16 +264,15 @@ public class X509Util {
   public static X509Certificate parsePemEncodedCert(String pemEncodedCert)
       throws CertificateException {
     ParamUtil.requireNonNull("pemEncodedCert", pemEncodedCert);
-    String b64 = pemEncodedCert.replace("-----BEGIN CERTIFICATE-----", "")
-        .replace("-----END CERTIFICATE-----", "");
+    String b64 = pemEncodedCert.replace(BEGIN_CERTIFICATE, "").replace(END_CERTIFICATE, "");
     return parseBase64EncodedCert(b64);
   }
 
   public static String toPemCert(X509Certificate cert) throws CertificateException {
     ParamUtil.requireNonNull("cert", cert);
     byte[] encoded = cert.getEncoded();
-    return StringUtil.concat("-----BEGIN CERTIFICATE-----\n",
-        Base64.encodeToString(encoded, true), "\n-----END CERTIFICATE-----");
+    return StringUtil.concat(BEGIN_CERTIFICATE, "\n",
+        Base64.encodeToString(encoded, true), "\n", END_CERTIFICATE);
   }
 
   public static X509Certificate toX509Cert(org.bouncycastle.asn1.x509.Certificate asn1Cert)

@@ -30,8 +30,8 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -43,18 +43,18 @@ import org.xipki.util.IoUtil;
 @Service
 public class CertPollAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "CSR file")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
   @Override
   protected Object execute0() throws Exception {
-    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+    CertificationRequest csr = X509Util.parseCsr(csrFile);
 
     ScepClient client = getScepClient();
     X509Certificate caCert = client.getAuthorityCertStore().getCaCert();

@@ -49,12 +49,12 @@ public class EnrollCertAction extends CaAction {
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--csr", required = true, description = "CSR file")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outFile;
 

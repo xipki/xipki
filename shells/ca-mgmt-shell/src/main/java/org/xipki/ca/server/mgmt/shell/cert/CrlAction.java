@@ -40,7 +40,7 @@ public abstract class CrlAction extends CaAction {
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
+  @Option(name = "--out", aliases = "-o", description = "where to save the DER encoded CRL")
   @Completion(FileCompleter.class)
   protected String outFile;
 

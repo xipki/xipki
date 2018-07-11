@@ -38,6 +38,7 @@ import org.xipki.ca.qa.shell.completer.CertprofileNameCompleter;
 import org.xipki.ca.qa.shell.completer.IssuerNameCompleter;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
@@ -53,7 +54,8 @@ import org.xipki.util.IoUtil;
 @Service
 public class CheckCertAction extends XiAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate file")
+  @Option(name = "--cert", aliases = "-c", required = true,
+      description = "DER encoded certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
@@ -62,7 +64,7 @@ public class CheckCertAction extends XiAction {
   @Completion(IssuerNameCompleter.class)
   private String issuerName;
 
-  @Option(name = "--csr", required = true, description = "CSR file")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -104,7 +106,7 @@ public class CheckCertAction extends XiAction {
           + profileName + "'");
     }
 
-    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+    CertificationRequest csr = X509Util.parseCsr(csrFile);
     Extensions extensions = null;
     CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
     ASN1Set attrs = reqInfo.getAttributes();

@@ -28,8 +28,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -42,12 +42,12 @@ import org.xipki.util.IoUtil;
 @Service
 public class EnrollCertAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "CSR file")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -55,7 +55,8 @@ public class EnrollCertAction extends ClientAction {
   protected Object execute0() throws Exception {
     Client client = getScepClient();
 
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
+    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(
+        X509Util.parseCsr(csrFile));
 
     EnrollmentResponse resp = client.enrol(getIdentityCert(), getIdentityKey(), csr);
     if (resp.isFailure()) {

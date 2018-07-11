@@ -40,11 +40,13 @@ import org.xipki.shell.CmdFailure;
 @Service
 public class GetCrlAction extends ClientAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate")
+  @Option(name = "--cert", aliases = "-c", required = true,
+      description = "DER encoded certificate")
   @Completion(FileCompleter.class)
   private String certFile;
 
-  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the DER encoded CRL")
   @Completion(FileCompleter.class)
   private String outputFile;
 

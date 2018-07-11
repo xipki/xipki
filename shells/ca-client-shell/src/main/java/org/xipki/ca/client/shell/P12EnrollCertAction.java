@@ -42,11 +42,11 @@ import org.xipki.util.ObjectCreationException;
 @Service
 public class P12EnrollCertAction extends EnrollCertAction {
 
-  @Option(name = "--p12", required = true, description = "PKCS#12 request file")
+  @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
   @Completion(FileCompleter.class)
   private String p12File;
 
-  @Option(name = "--password", description = "password of the PKCS#12 file")
+  @Option(name = "--password", description = "password of the PKCS#12 keystore file")
   private String password;
 
   private ConcurrentContentSigner signer;

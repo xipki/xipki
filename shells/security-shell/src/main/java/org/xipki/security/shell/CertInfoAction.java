@@ -40,7 +40,7 @@ import org.xipki.util.IoUtil;
 @Service
 public class CertInfoAction extends SecurityAction {
 
-  @Option(name = "--in", description = "certificate file")
+  @Option(name = "--in", description = "DER encoded certificate file")
   @Completion(FileCompleter.class)
   private String inFile;
 

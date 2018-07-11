@@ -54,7 +54,7 @@ public class P12CsrGenAction extends CsrGenAction {
   @Completion(FileCompleter.class)
   private String p12File;
 
-  @Option(name = "--password", description = "password of the PKCS#12 file")
+  @Option(name = "--password", description = "password of the PKCS#12 keystore file")
   private String password;
 
   private char[] getPassword() throws IOException {

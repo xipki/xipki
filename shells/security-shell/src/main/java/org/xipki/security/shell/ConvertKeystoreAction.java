@@ -45,22 +45,22 @@ import org.xipki.util.IoUtil;
 @Service
 public class ConvertKeystoreAction extends SecurityAction {
 
-  @Option(name = "--in", required = true, description = "Source keystore file")
+  @Option(name = "--in", required = true, description = "source keystore file")
   @Completion(FileCompleter.class)
   private String inFile;
 
-  @Option(name = "--intype", required = true, description = "Type of the source keystore")
+  @Option(name = "--intype", required = true, description = "type of the source keystore")
   @Completion(KeystoreTypeCompleter.class)
   private String inType;
 
   @Option(name = "--inpwd", description = "password of the source keystore")
   private String inPwd;
 
-  @Option(name = "--out", required = true, description = "Destination keystore file")
+  @Option(name = "--out", required = true, description = "destination keystore file")
   @Completion(FileCompleter.class)
   private String outFile;
 
-  @Option(name = "--outtype", required = true, description = "Type of the destination keystore")
+  @Option(name = "--outtype", required = true, description = "type of the destination keystore")
   @Completion(KeystoreTypeCompleter.class)
   private String outType;
 

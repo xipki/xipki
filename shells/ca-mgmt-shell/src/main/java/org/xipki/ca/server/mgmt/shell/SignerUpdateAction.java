@@ -17,14 +17,13 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.ByteArrayInputStream;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.server.mgmt.api.CaManager;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.SignerEntry;
@@ -35,7 +34,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Base64;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -58,7 +56,7 @@ public class SignerUpdateAction extends CaAction {
   @Completion(SignerTypeCompleter.class)
   protected String type;
 
-  @Option(name = "--cert", description = "certificate file or 'null'")
+  @Option(name = "--cert", description = "DER encoded certificate file or 'null'")
   @Completion(FileCompleter.class)
   protected String certFile;
 
@@ -87,8 +85,8 @@ public class SignerUpdateAction extends CaAction {
     if (CaManager.NULL.equalsIgnoreCase(certFile)) {
       cert = CaManager.NULL;
     } else if (certFile != null) {
-      byte[] certBytes = IoUtil.read(certFile);
-      X509Util.parseCert(new ByteArrayInputStream(certBytes));
+      Certificate bcCert = X509Util.parseBcCert(certFile);
+      byte[] certBytes = bcCert.getEncoded();
       cert = Base64.encodeToString(certBytes);
     }
 

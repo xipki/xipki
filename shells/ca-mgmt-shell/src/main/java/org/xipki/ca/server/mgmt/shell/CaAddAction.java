@@ -39,7 +39,7 @@ import org.xipki.shell.CmdFailure;
 @Service
 public class CaAddAction extends CaAddOrGenAction {
 
-  @Option(name = "--cert", description = "CA certificate file")
+  @Option(name = "--cert", description = "DER encded CA certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

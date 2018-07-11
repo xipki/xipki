@@ -45,7 +45,7 @@ public class GetCertAction extends ClientAction {
   private String serialNumber;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 

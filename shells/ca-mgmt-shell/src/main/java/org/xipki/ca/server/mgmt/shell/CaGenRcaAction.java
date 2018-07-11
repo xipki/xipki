@@ -39,7 +39,7 @@ import org.xipki.util.IoUtil;
 @Service
 public class CaGenRcaAction extends CaAddOrGenAction {
 
-  @Option(name = "--csr", required = true, description = "CSR of the Root CA")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR of the Root CA")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -50,7 +50,7 @@ public class CaGenRcaAction extends CaAddOrGenAction {
   private String serialS;
 
   @Option(name = "--out", aliases = "-o",
-      description = "where to save the generated CA certificate")
+      description = "where to save the generated DER encoded CA certificate")
   @Completion(FileCompleter.class)
   private String rootcaCertOutFile;
 

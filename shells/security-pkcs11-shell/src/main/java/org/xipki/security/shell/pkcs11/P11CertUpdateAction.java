@@ -48,7 +48,7 @@ public class P11CertUpdateAction extends P11SecurityAction {
           + "either keyId or keyLabel must be specified")
   protected String label;
 
-  @Option(name = "--cert", required = true, description = "certificate file")
+  @Option(name = "--cert", required = true, description = "DER encoded certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

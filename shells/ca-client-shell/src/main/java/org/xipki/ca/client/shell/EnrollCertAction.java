@@ -50,7 +50,7 @@ public abstract class EnrollCertAction extends EnrollAction {
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 

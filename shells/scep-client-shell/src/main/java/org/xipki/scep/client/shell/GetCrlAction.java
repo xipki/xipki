@@ -27,8 +27,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -40,17 +40,19 @@ import org.xipki.util.IoUtil;
 @Service
 public class GetCrlAction extends ClientAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate")
+  @Option(name = "--cert", aliases = "-c", required = true,
+      description = "DER encoded certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
-  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
+  @Option(name = "--out", aliases = "-o", required = true,
+      description = "where to save the DER encoded CRL")
   @Completion(FileCompleter.class)
   private String outputFile;
 
   @Override
   protected Object execute0() throws Exception {
-    Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
+    Certificate cert = X509Util.parseBcCert(certFile);
     ScepClient client = getScepClient();
     X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
         cert.getIssuer(), cert.getSerialNumber().getPositiveValue());

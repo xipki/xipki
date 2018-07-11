@@ -31,7 +31,6 @@ import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -46,7 +45,8 @@ public abstract class UnRevRmCertAction extends CaAction {
   protected String caName;
 
   @Option(name = "--cert", aliases = "-c",
-      description = "certificate file\n(either cert or serial must be specified)")
+      description = "DER encoded certificate file\n"
+          + "(either cert or serial must be specified)")
   @Completion(FileCompleter.class)
   protected String certFile;
 
@@ -66,7 +66,7 @@ public abstract class UnRevRmCertAction extends CaAction {
       serialNumber = toBigInt(serialNumberS);
     } else if (certFile != null) {
       X509Certificate caCert = ca.getCert();
-      X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
+      X509Certificate cert = X509Util.parseCert(certFile);
       if (!X509Util.issues(caCert, cert)) {
         throw new CmdFailure("certificate '" + certFile + "' is not issued by CA " + caName);
       }

@@ -39,7 +39,7 @@ import org.xipki.util.StringUtil;
 @Service
 public class CertStatusAction extends UnRevRmCertAction {
 
-  @Option(name = "--out", aliases = "-o", description = "where to save the certificate")
+  @Option(name = "--out", aliases = "-o", description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 

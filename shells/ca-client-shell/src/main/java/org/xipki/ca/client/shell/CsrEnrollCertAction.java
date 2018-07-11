@@ -29,9 +29,9 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.DateUtil;
-import org.xipki.util.IoUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
 
@@ -45,7 +45,7 @@ import org.xipki.util.StringUtil;
 @Service
 public class CsrEnrollCertAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "CSR file")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -59,7 +59,7 @@ public class CsrEnrollCertAction extends ClientAction {
   private String notAfterS;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -74,7 +74,7 @@ public class CsrEnrollCertAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+    CertificationRequest csr = X509Util.parseCsr(csrFile);
 
     Date notBefore = StringUtil.isNotBlank(notBeforeS)
         ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;

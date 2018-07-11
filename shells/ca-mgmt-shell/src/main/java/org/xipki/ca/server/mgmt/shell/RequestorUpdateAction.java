@@ -45,7 +45,8 @@ public class RequestorUpdateAction extends CaAction {
   @Completion(RequestorNameCompleter.class)
   protected String name;
 
-  @Option(name = "--cert", required = true, description = "requestor certificate file")
+  @Option(name = "--cert", required = true,
+      description = "DER encoded requestor certificate file")
   @Completion(FileCompleter.class)
   protected String certFile;
 

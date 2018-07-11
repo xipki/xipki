@@ -46,7 +46,7 @@ public abstract class UnRevRemoveCertAction extends ClientAction {
   protected String caName;
 
   @Option(name = "--cert", aliases = "-c",
-      description = "certificate file (either cert or serial must be specified)")
+      description = "DER encoded certificate file (either cert or serial must be specified)")
   @Completion(FileCompleter.class)
   protected String certFile;
 

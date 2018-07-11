@@ -31,7 +31,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "ca", name = "get-request", description = "get certificate request")
+@Command(scope = "ca", name = "get-request", description = "get the request to enroll certificate")
 @Service
 public class GetRequestAction extends UnRevRmCertAction {
 
@@ -44,11 +44,11 @@ public class GetRequestAction extends UnRevRmCertAction {
   protected Object execute0() throws Exception {
     byte[] request = caManager.getCertRequest(caName, getSerialNumber());
     if (request == null) {
-      System.out.println("certificate request unknown");
+      System.out.println("unknown request unknown");
       return null;
     }
 
-    saveVerbose("certificate request saved to file", new File(outputFile), request);
+    saveVerbose("request saved to file", new File(outputFile), request);
     return null;
   }
 

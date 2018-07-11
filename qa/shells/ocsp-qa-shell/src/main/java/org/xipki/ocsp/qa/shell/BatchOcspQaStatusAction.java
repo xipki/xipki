@@ -81,7 +81,8 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
   private static final String FILE_SEP = File.separator;
 
-  @Option(name = "--resp-issuer", description = "certificate file of the responder's issuer")
+  @Option(name = "--resp-issuer",
+      description = "DER encoded certificate file of the responder's issuer")
   @Completion(FileCompleter.class)
   private String respIssuerFile;
 
@@ -202,7 +203,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
     X509Certificate respIssuer = null;
     if (respIssuerFile != null) {
-      respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
+      respIssuer = X509Util.parseCert(respIssuerFile);
       IoUtil.save(new File(outDir, "responder-issuer.pem"),
           X509Util.toPemCert(respIssuer).getBytes());
     }

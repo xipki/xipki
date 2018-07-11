@@ -50,7 +50,7 @@ public abstract class ClientAction extends XiAction {
   @Option(name = "--ca-id", description = "CA identifier")
   protected String caId;
 
-  @Option(name = "--ca-cert", required = true, description = "CA certificate")
+  @Option(name = "--ca-cert", required = true, description = "DER encoded CA certificate")
   @Completion(FileCompleter.class)
   private String caCertFile;
 
@@ -58,7 +58,7 @@ public abstract class ClientAction extends XiAction {
   @Completion(FileCompleter.class)
   private String p12File;
 
-  @Option(name = "--password", description = "password of the PKCS#12 file")
+  @Option(name = "--password", description = "password of the PKCS#12 keystore file")
   private String password;
 
   private ScepClient scepClient;

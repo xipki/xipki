@@ -33,6 +33,7 @@ import org.xipki.common.qa.FileBigIntegerIterator;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -48,7 +49,8 @@ import org.xipki.util.StringUtil;
 @Service
 public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
 
-  @Option(name = "--issuer", required = true, description = "issuer certificate file")
+  @Option(name = "--issuer", required = true,
+      description = "DER encoded issuer certificate file")
   @Completion(FileCompleter.class)
   private String issuerCertFile;
 
@@ -95,7 +97,7 @@ public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
         caDbConfFile, "\nserialNumberFile: ", serialNumberFile, "\nmaxCerts: ", maxCerts,
         "\n#certs/req: ", num, "\nunit: ", num, " certificate", (num > 1 ? "s" : ""), "\n");
 
-    Certificate caCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
+    Certificate caCert = X509Util.parseBcCert(issuerCertFile);
     Properties props = new Properties();
     props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
     props.setProperty("autoCommit", "false");

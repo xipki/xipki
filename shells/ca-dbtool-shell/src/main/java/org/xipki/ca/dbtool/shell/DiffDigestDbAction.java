@@ -65,7 +65,7 @@ public class DiffDigestDbAction extends DbPortAction {
   private Integer numTargetThreads = 40;
 
   @Option(name = "--ca-cert", multiValued = true,
-      description = "Certificate of CAs to be considered")
+      description = "DER encoded Certificate of CAs to be considered")
   @Completion(FileCompleter.class)
   private List<String> caCertFiles;
 

@@ -44,7 +44,7 @@ public class GetCaCertAction extends ClientAction {
   protected String caName;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the CA certificate")
+      description = "where to save the DER encoded CA certificate")
   @Completion(FileCompleter.class)
   protected String outFile;
 

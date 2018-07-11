@@ -32,8 +32,8 @@ import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionId;
 import org.jscep.util.CertificationRequestUtils;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -45,18 +45,19 @@ import org.xipki.util.IoUtil;
 @Service
 public class CertPollAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "CSR file")
+  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the certificate")
+      description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
   @Override
   protected Object execute0() throws Exception {
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
+    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(
+        X509Util.parseCsr(csrFile));
 
     Client client = getScepClient();
 

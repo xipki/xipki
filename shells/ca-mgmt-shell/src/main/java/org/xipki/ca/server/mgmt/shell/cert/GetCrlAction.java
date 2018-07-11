@@ -47,7 +47,7 @@ public class GetCrlAction extends CrlAction {
   private Boolean withBaseCrl = Boolean.FALSE;
 
   @Option(name = "--basecrl-out",
-      description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
+      description = "where to save the DER encoded baseCRL\n(defaults to <out>-baseCRL)")
   @Completion(FileCompleter.class)
   private String baseCrlOut;
 
