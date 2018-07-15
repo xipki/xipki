@@ -71,6 +71,9 @@
     <bundle start-level="70">mvn:org.xipki/security-pkcs12/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-common/${p11proxy.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.p11proxy/p11proxy-client/${p11proxy.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" version="${project.version}" description="shall base">
     <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>

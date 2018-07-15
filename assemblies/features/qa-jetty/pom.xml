@@ -27,4 +27,7 @@
   <artifactId>qa-jetty</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: Assemblies :: Features :: ${project.artifactId}</name>
+  <properties>
+    <p11proxy.version>4.0.0-SNAPSHOT</p11proxy.version>
+  </properties>
 </project>
