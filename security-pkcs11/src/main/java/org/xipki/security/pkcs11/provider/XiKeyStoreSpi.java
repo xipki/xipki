@@ -154,7 +154,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
     for (P11SlotIdentifier slotId: slotIds) {
       P11Slot slot = module.getSlot(slotId);
-      Set<P11ObjectIdentifier> identityIds = slot.getIdentityIds();
+      Set<P11ObjectIdentifier> identityIds = slot.getIdentityKeyIds();
       for (P11ObjectIdentifier objId : identityIds) {
         P11Identity identity = slot.getIdentity(objId);
         X509Certificate[] chain = identity.certificateChain();

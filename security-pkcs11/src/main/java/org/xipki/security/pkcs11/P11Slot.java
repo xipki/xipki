@@ -286,13 +286,23 @@ public abstract class P11Slot {
    *          Identifier of the certificate. Must not be {@code null}.
    * @return certificate with the given identifier.
    */
-  protected X509Cert getCertForId(byte[] id) {
+  public X509Cert getCertForId(byte[] id) {
     for (P11ObjectIdentifier objId : certificates.keySet()) {
       if (objId.matchesId(id)) {
         return certificates.get(objId);
       }
     }
     return null;
+  }
+
+  /**
+   * Gets certificate with the given identifier {@code id}.
+   * @param objectId
+   *          Identifier of the certificate. Must not be {@code null}.
+   * @return certificate with the given identifier.
+   */
+  public X509Cert getCert(P11ObjectIdentifier objectId) {
+    return certificates.get(objectId);
   }
 
   private void updateCaCertsOfIdentities() {
@@ -453,7 +463,7 @@ public abstract class P11Slot {
     }
   }
 
-  public Set<P11ObjectIdentifier> getIdentityIds() {
+  public Set<P11ObjectIdentifier> getIdentityKeyIds() {
     return Collections.unmodifiableSet(identities.keySet());
   }
 
@@ -1064,7 +1074,8 @@ public abstract class P11Slot {
       for (int i = 0; i < size; i++) {
         P11ObjectIdentifier objectId = sortedKeyIds.get(i);
         sb.append("\tCert-").append(i + 1).append(". ").append(objectId.getLabel());
-        sb.append(" (").append("id: ").append(objectId.getLabel()).append(")\n");
+        sb.append(" (").append("id: ").append(objectId.getIdHex())
+          .append(", label: ").append(objectId.getLabel()).append(")\n");
         formatString(null, verbose, sb, certificates.get(objectId).getCert());
       }
     }

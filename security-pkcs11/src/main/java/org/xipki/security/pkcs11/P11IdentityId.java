@@ -42,6 +42,10 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    *          Slot identifier. Must not be {@code null}.
    * @param keyId
    *          Object identifier. Must not be {@code null}.
+   * @param publicKeyLabel
+   *          Label of the public key
+   * @param certLabel
+   *          Label of the certificate
    */
   public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
       String publicKeyLabel, String certLabel) {

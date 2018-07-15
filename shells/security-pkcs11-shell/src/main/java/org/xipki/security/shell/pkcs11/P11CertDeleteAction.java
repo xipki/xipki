@@ -30,7 +30,8 @@ import org.xipki.util.Hex;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "rm-cert-p11", description = "remove certificate from PKCS#11 device")
+@Command(scope = "xi", name = "delete-cert-p11",
+    description = "remove certificate from PKCS#11 device")
 @Service
 public class P11CertDeleteAction extends P11SecurityAction {
 

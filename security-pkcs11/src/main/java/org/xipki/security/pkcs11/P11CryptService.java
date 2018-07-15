@@ -17,10 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
@@ -72,8 +74,24 @@ public class P11CryptService {
   }
 
   public P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException {
-    ParamUtil.requireNonNull("identityId", identityId);
-    return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getKeyId());
+    return getIdentity(identityId.getSlotId(), identityId.getKeyId());
+  }
+
+  public P11Identity getIdentity(P11SlotIdentifier slotId, P11ObjectIdentifier keyId)
+      throws P11TokenException {
+    P11Slot slot = module.getSlot(slotId);
+    return (slot == null) ? null : slot.getIdentity(keyId);
+  }
+
+  public X509Certificate getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId)
+      throws P11TokenException {
+    P11Slot slot = module.getSlot(slotId);
+    if (slot == null) {
+      return null;
+    }
+
+    X509Cert cert = slot.getCert(certId);
+    return (cert == null) ? null : cert.getCert();
   }
 
   @Override
