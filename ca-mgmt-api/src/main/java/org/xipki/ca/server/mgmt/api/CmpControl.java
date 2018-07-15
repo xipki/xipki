@@ -236,7 +236,22 @@ public class CmpControl {
 
   @Override
   public String toString() {
-    return conf;
+    return toString(false);
+  }
+
+  public String toString(boolean verbose) {
+    return StringUtil.concatObjects(
+        "  confirm cert: ", confirmCert,
+        "\n  send CA cert: ", sendCaCert,
+        "\n  message time required: ", messageTimeRequired,
+        "\n  send responder cert: ", sendResponderCert,
+        "\n  message time bias: ", messageTimeBias,
+        "\n  confirm waiting time: ", confirmWaitTime, "s",
+        "\n  hroup enroll: ", groupEnroll,
+        "\n  AKI in revocation request required: ", rrAkiRequired,
+        "\n  signature algorithms: ", sigAlgoValidator.getAlgoNames(),
+        "\n  POPO algorithms: ", popoAlgoValidator.getAlgoNames(),
+        (verbose ? "\n  encoded: " : ""), (verbose ? conf : ""));
   }
 
   @Override

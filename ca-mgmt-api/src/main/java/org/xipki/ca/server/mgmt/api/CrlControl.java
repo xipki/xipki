@@ -350,7 +350,39 @@ public class CrlControl {
 
   @Override
   public String toString() {
-    return getConf();
+    return toString(false);
+  }
+
+  public String toString(boolean verbose) {
+    StringBuilder sb = new StringBuilder(xipkiCertsetIncluded ? "included" : "not included");
+
+    if (xipkiCertsetIncluded) {
+      sb.append("\t\tinclude cert: ").append(xipkiCertsetCertIncluded);
+      sb.append("\n\t\tinclude cert profile name: ").append(xipkiCertsetProfilenameIncluded);
+    }
+    String xipkiCertSetStr = sb.toString();
+
+    sb = new StringBuilder("generate CRL ");
+    if (intervalDayTime != null) {
+      sb.append("at ").append(intervalDayTime);
+    } else {
+      sb.append("every ").append(intervalMinutes).append(" minutes");
+    }
+    String intervalStr = sb.toString();
+
+    return StringUtil.concatObjects("  update mode: ", updateMode,
+        "\n  include expired certificates: ", includeExpiredCerts,
+        "\n  full CRL intervals: ", fullCrlIntervals,
+        "\n  delta CRL intervals: ", deltaCrlIntervals,
+        "\n  overlap: ", overlapMinutes, " minutes",
+        "\n  use extended nextUpdate: ", extendedNextUpdate,
+        "\n  only user certificates: ", onlyContainsUserCerts,
+        "\n  only CA certificates: ", onlyContainsCaCerts,
+        "\n  exclude reason: ", excludeReason,
+        "\n  invalidity date mode: ", invalidityDateMode,
+        "\n  interval: ", intervalStr,
+        "\n  XiPKI CertSet: ", xipkiCertSetStr,
+        (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   }
 
   public UpdateMode getUpdateMode() {

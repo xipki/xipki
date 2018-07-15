@@ -39,20 +39,20 @@ class InternUtil {
 
   static String formatCert(X509Certificate cert, boolean verbose) {
     if (cert == null) {
-      return "\tnull";
+      return "  null";
     }
 
     StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
-    sb.append("\tissuer: ")
+    sb.append("  issuer: ")
       .append(X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
-    sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
-    sb.append("\tsubject: ")
+    sb.append("  serialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
+    sb.append("  subject: ")
       .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
-    sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
-    sb.append("\tnotAfter: ").append(cert.getNotAfter());
+    sb.append("  notBefore: ").append(cert.getNotBefore()).append("\n");
+    sb.append("  notAfter: ").append(cert.getNotAfter());
 
     if (verbose) {
-      sb.append("\n\tencoded: ");
+      sb.append("\n  encoded: ");
       try {
         sb.append(Base64.encodeToString(cert.getEncoded()));
       } catch (CertificateEncodingException ex) {
@@ -63,7 +63,7 @@ class InternUtil {
     return sb.toString();
   }
 
-  public static String signerConfToString(String signerConf, boolean verbose,
+  static String signerConfToString(String signerConf, boolean verbose,
       boolean ignoreSensitiveInfo) {
     ParamUtil.requireNonBlank("signerConf", signerConf);
     if (ignoreSensitiveInfo) {

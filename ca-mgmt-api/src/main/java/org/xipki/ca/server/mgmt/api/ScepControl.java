@@ -105,7 +105,14 @@ public class ScepControl {
 
   @Override
   public String toString() {
-    return getConf();
+    return toString(false);
+  }
+
+  public String toString(boolean verbose) {
+    return StringUtil.concatObjects("  include CA cert: ", includeCaCert,
+        "\n  include signer cert: ", includeSignerCert,
+        "\n  operation GetCRL: ", (supportGetCrl ? "supported" : "not supported"),
+        (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   }
 
   @Override
