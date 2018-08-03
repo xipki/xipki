@@ -23,11 +23,9 @@ import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,7 +46,6 @@ import org.xipki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.ca.dbtool.jaxb.ca.CaconfType;
 import org.xipki.ca.dbtool.jaxb.ca.CertstoreType;
 import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
-import org.xipki.ca.dbtool.jaxb.ca.ProfileType;
 import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.ca.dbtool.port.DbPortFileNameIterator;
 import org.xipki.ca.dbtool.port.DbPorter;
@@ -190,16 +187,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         return;
       }
 
-      Map<Integer, String> profileMap = new HashMap<Integer, String>();
-      for (ProfileType ni : caconf.getProfiles().getProfile()) {
-        profileMap.put(ni.getId(), ni.getName());
-      }
-
       List<Integer> relatedCertStoreCaIds = resume
           ? getIssuerIds(relatedCas) : importIssuer(relatedCas);
 
       File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
-      importCert(certstore, profileMap, revokedOnly, relatedCertStoreCaIds, processLogFile);
+      importCert(certstore, revokedOnly, relatedCertStoreCaIds, processLogFile);
       recoverIndexes();
       processLogFile.delete();
     } catch (Exception ex) {
@@ -299,8 +291,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   } // method importIssuer0
 
-  private void importCert(CertstoreType certstore, Map<Integer, String> profileMap,
-      boolean revokedOnly, List<Integer> caIds, File processLogFile) throws Exception {
+  private void importCert(CertstoreType certstore, boolean revokedOnly, List<Integer> caIds,
+      File processLogFile) throws Exception {
     HashAlgo certhashAlgo = getCertHashAlgo(datasource);
 
     int numProcessedBefore = 0;
@@ -359,7 +351,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         }
 
         try {
-          long lastId = importCert0(certhashAlgo, psCert, certsFile, profileMap, revokedOnly, caIds,
+          long lastId = importCert0(certhashAlgo, psCert, certsFile, revokedOnly, caIds,
               minId, processLogFile, processLog, numProcessedBefore, importLog);
           minId = lastId + 1;
         } catch (Exception ex) {
@@ -380,10 +372,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         + importLog.numProcessed() + " certificates");
   } // method importCert
 
-  private long importCert0(HashAlgo certhashAlgo, PreparedStatement psCert,
-      String certsZipFile, Map<Integer, String> profileMap, boolean revokedOnly,
-      List<Integer> caIds, long minId, File processLogFile,ProcessLog processLog,
-      int numProcessedInLastProcess, ProcessLog importLog) throws Exception {
+  private long importCert0(HashAlgo certhashAlgo, PreparedStatement psCert, String certsZipFile,
+      boolean revokedOnly, List<Integer> caIds, long minId, File processLogFile,
+      ProcessLog processLog, int numProcessedInLastProcess, ProcessLog importLog) throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsXmlEntry = zipFile.getEntry("overview.xml");
 
@@ -459,9 +450,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
               setLong(psCert, idx++, cert.getRt());
               setLong(psCert, idx++, cert.getRit());
 
-              int certprofileId = cert.getPid();
-              String certprofileName = profileMap.get(certprofileId);
-              psCert.setString(idx++, certprofileName);
               psCert.setString(idx++, certhash);
               psCert.setString(idx++, subject);
 

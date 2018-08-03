@@ -317,7 +317,6 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           setInt(psCert, idx++, cert.getRr());
           setLong(psCert, idx++, cert.getRt());
           setLong(psCert, idx++, cert.getRit());
-          psCert.setString(idx++, cert.getProfile());
           psCert.setString(idx++, cert.getHash());
           psCert.setString(idx++, cert.getSubject());
           psCert.addBatch();

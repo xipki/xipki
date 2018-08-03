@@ -179,8 +179,6 @@ public class CrlControl {
 
   public static final String KEY_XIPKI_CERTSET_CERTS = "xipki.certset.certs";
 
-  public static final String KEY_XIPKI_CERTSET_PROFILENAME = "xipki.certset.profilename";
-
   public static final String KEY_FULLCRL_INTERVALS = "fullcrl.intervals";
 
   public static final String KEY_DELTACRL_INTERVALS = "deltacrl.intervals";
@@ -206,8 +204,6 @@ public class CrlControl {
   private boolean xipkiCertsetIncluded;
 
   private boolean xipkiCertsetCertIncluded = true;
-
-  private boolean xipkiCertsetProfilenameIncluded = true;
 
   private boolean includeExpiredCerts;
 
@@ -254,9 +250,6 @@ public class CrlControl {
     this.xipkiCertsetIncluded = getBoolean(props, KEY_XIPKI_CERTSET, false);
 
     this.xipkiCertsetCertIncluded = getBoolean(props, KEY_XIPKI_CERTSET_CERTS, true);
-
-    this.xipkiCertsetProfilenameIncluded = getBoolean(props,
-        KEY_XIPKI_CERTSET_PROFILENAME, true);
 
     str = props.value(KEY_EYTENSIONS);
     if (str == null) {
@@ -358,7 +351,6 @@ public class CrlControl {
 
     if (xipkiCertsetIncluded) {
       sb.append("\t\tinclude cert: ").append(xipkiCertsetCertIncluded);
-      sb.append("\n\t\tinclude cert profile name: ").append(xipkiCertsetProfilenameIncluded);
     }
     String xipkiCertSetStr = sb.toString();
 
@@ -395,10 +387,6 @@ public class CrlControl {
 
   public boolean isXipkiCertsetCertIncluded() {
     return xipkiCertsetCertIncluded;
-  }
-
-  public boolean isXipkiCertsetProfilenameIncluded() {
-    return xipkiCertsetProfilenameIncluded;
   }
 
   public boolean isIncludeExpiredCerts() {
@@ -491,7 +479,6 @@ public class CrlControl {
     if (deltaCrlIntervals != obj2.deltaCrlIntervals
         || xipkiCertsetIncluded != obj2.xipkiCertsetIncluded
         || xipkiCertsetCertIncluded != obj2.xipkiCertsetCertIncluded
-        || xipkiCertsetProfilenameIncluded != obj2.xipkiCertsetProfilenameIncluded
         || extendedNextUpdate != obj2.extendedNextUpdate
         || fullCrlIntervals != obj2.fullCrlIntervals
         || includeExpiredCerts != obj2.includeExpiredCerts

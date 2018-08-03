@@ -29,9 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.security.X509Cert;
 import org.xipki.util.LogUtil;

@@ -89,9 +89,6 @@ public class OcspCertsReader extends DbiXmlReader {
           case OcspCertType.TAG_NBEFORE:
             ret.setNbefore(parseLong(tagContent));
             break;
-          case OcspCertType.TAG_PROFILE:
-            ret.setProfile(tagContent);
-            break;
           case OcspCertType.TAG_REV:
             ret.setRev(parseBoolean(tagContent));
             break;

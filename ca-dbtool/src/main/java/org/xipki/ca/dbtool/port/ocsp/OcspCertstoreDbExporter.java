@@ -232,7 +232,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     System.out.println("exporting table CERT from ID " + minId);
 
-    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,NAFTER,NBEFORE,HASH,SUBJECT "
+    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,NAFTER,NBEFORE,HASH,SUBJECT "
         + "FROM CERT WHERE ID>=?";
     final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
 
@@ -318,8 +318,6 @@ class OcspCertstoreDbExporter extends DbPorter {
               cert.setRit(rit);
             }
           }
-
-          cert.setProfile(rs.getString("PN"));
 
           String hash = rs.getString("HASH");
           if (hash != null) {

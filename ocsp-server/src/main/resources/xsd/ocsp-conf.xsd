@@ -356,16 +356,6 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="file" type="xs:string"/>
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="includesType">
-    <xs:sequence>
-      <xs:element name="include" type="xs:string" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="excludesType">
-    <xs:sequence>
-      <xs:element name="exclude" type="xs:string" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
   <xs:simpleType name="embedCertsMode">
     <xs:restriction base="xs:string">
        <xs:enumeration value="NONE" />

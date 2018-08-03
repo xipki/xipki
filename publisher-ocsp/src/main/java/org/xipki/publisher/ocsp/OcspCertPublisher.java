@@ -29,9 +29,9 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -112,8 +112,7 @@ public class OcspCertPublisher extends CertPublisher {
     CertWithDbId cert = certInfo.getCert();
 
     try {
-      queryExecutor.addCert(caCert, cert, certInfo.getProfile().getName(),
-          certInfo.getRevocationInfo());
+      queryExecutor.addCert(caCert, cert, certInfo.getRevocationInfo());
       return true;
     } catch (Exception ex) {
       logAndAudit(caCert.getSubject(), cert, ex, "could not save certificate");
@@ -125,7 +124,7 @@ public class OcspCertPublisher extends CertPublisher {
   public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert,
       String certprofile, CertRevocationInfo revInfo) {
     try {
-      queryExecutor.revokeCert(caCert, cert, certprofile, revInfo);
+      queryExecutor.revokeCert(caCert, cert, revInfo);
       return true;
     } catch (Exception ex) {
       logAndAudit(caCert.getSubject(), cert, ex, "could not publish revoked certificate");

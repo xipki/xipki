@@ -15,13 +15,10 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.api.publisher;
+package org.xipki.ca.api;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.RequestType;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.ParamUtil;

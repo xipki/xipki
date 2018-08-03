@@ -55,12 +55,12 @@ import org.xipki.util.ParamUtil;
 class OcspStoreQueryExecutor {
 
   private static final String SQL_ADD_REVOKED_CERT =
-      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT,RT,RIT,RR)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_CERT =
-      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,HASH,SUBJECT) "
-      + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT) "
+      + "VALUES (?,?,?,?,?,?,?,?,?)";
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
@@ -149,17 +149,17 @@ class OcspStoreQueryExecutor {
     }
   } // method initIssuerStore
 
-  void addCert(X509Cert issuer, CertWithDbId certificate, String certprofile)
+  void addCert(X509Cert issuer, CertWithDbId certificate)
       throws DataAccessException, OperationException {
-    addCert(issuer, certificate, certprofile, null);
+    addCert(issuer, certificate, null);
   }
 
-  void addCert(X509Cert issuer, CertWithDbId certificate, String certprofile,
-      CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-    addOrUpdateCert(issuer, certificate, certprofile, revInfo);
+  void addCert(X509Cert issuer, CertWithDbId certificate, CertRevocationInfo revInfo)
+      throws DataAccessException, OperationException {
+    addOrUpdateCert(issuer, certificate, revInfo);
   }
 
-  private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate, String certprofile,
+  private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate,
       CertRevocationInfo revInfo) throws DataAccessException, OperationException {
     ParamUtil.requireNonNull("issuer", issuer);
 
@@ -201,7 +201,6 @@ class OcspStoreQueryExecutor {
       ps.setLong(idx++, notAfterSeconds);
       setBoolean(ps, idx++, revoked);
       ps.setInt(idx++, issuerId);
-      ps.setString(idx++, certprofile);
       ps.setString(idx++, certHash);
       ps.setString(idx++, cuttedSubject);
 
@@ -274,9 +273,9 @@ class OcspStoreQueryExecutor {
     }
   }
 
-  void revokeCert(X509Cert caCert, CertWithDbId cert, String certprofile,
-      CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-    addOrUpdateCert(caCert, cert, certprofile, revInfo);
+  void revokeCert(X509Cert caCert, CertWithDbId cert, CertRevocationInfo revInfo)
+      throws DataAccessException, OperationException {
+    addOrUpdateCert(caCert, cert, revInfo);
   }
 
   void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {

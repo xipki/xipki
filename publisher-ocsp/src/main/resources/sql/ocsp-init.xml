@@ -107,8 +107,6 @@
           remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="RIT" type="BIGINT"
           remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="PN" type="VARCHAR(45)"
-          remarks="certificate profile name"/>
       <!-- For maximal 512 bit hash value -->
       <column name="HASH" type="CHAR(86)"
           remarks="base64 enoded hash value of the DER encoded certificate. Algorithm is defined by CERTHASH_ALGO in table DBSchema">

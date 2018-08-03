@@ -76,7 +76,6 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -116,6 +115,7 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.PublicCaInfo;
@@ -126,7 +126,6 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
@@ -980,9 +979,8 @@ public class X509Ca {
    * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
    *
    * Xipki-CrlCert ::= SEQUENCE {
-   *         serial            INTEGER
+   *         serial          INTEGER
    *         cert        [0] EXPLICIT    Certificate OPTIONAL
-   *         profileName [1] EXPLICIT    UTF8String    OPTIONAL
    *         }
    * </pre>
    */
@@ -1010,8 +1008,6 @@ public class X509Ca {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(new ASN1Integer(sid.getSerial()));
 
-        Integer profileId = null;
-
         if (control.isXipkiCertsetCertIncluded()) {
           CertificateInfo certInfo;
           try {
@@ -1023,17 +1019,6 @@ public class X509Ca {
 
           Certificate cert = Certificate.getInstance(certInfo.getCert().getEncodedCert());
           vec.add(new DERTaggedObject(true, 0, cert));
-
-          if (control.isXipkiCertsetProfilenameIncluded()) {
-            profileId = certInfo.getProfile().getId();
-          }
-        } else if (control.isXipkiCertsetProfilenameIncluded()) {
-          profileId = certstore.getCertprofileForCertId(caIdent, sid.getId());
-        }
-
-        if (profileId != null) {
-          String profileName = caIdNameMap.getCertprofileName(profileId);
-          vec.add(new DERTaggedObject(true, 1, new DERUTF8String(profileName)));
         }
 
         vector.add(new DERSequence(vec));

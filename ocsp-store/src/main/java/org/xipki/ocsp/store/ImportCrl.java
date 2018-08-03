@@ -99,11 +99,11 @@ public class ImportCrl {
   private static final String SQL_DELETE_CERT = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
   private static final String SQL_UPDATE_CERT
-      = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,PN=?,HASH=? WHERE ID=?";
+      = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,HASH=? WHERE ID=?";
 
   private static final String SQL_INSERT_CERT
-      = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,PN,HASH) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+      = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,HASH) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String CORE_SQL_SELECT_ID_CERT = "ID FROM CERT WHERE IID=? AND SN=?";
 
@@ -661,12 +661,6 @@ public class ImportCrl {
       ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
       // not after NAFTER
       ps.setLong(offset++, tbsCert.getEndDate().getDate().getTime() / 1000);
-      // profile name PN
-      if (StringUtil.isBlank(profileName)) {
-        ps.setNull(offset++, Types.VARCHAR);
-      } else {
-        ps.setString(offset++, profileName);
-      }
       ps.setString(offset++, b64CertHash);
 
       if (sql == SQL_UPDATE_CERT) {

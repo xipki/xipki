@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.CertificateInfo;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;

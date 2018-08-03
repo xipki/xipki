@@ -57,11 +57,6 @@ public class OcspCertType extends IdentifidDbObjectType {
   public static final String TAG_NBEFORE = "nbefore";
 
   /**
-   * certificate profile name.
-   */
-  public static final String TAG_PROFILE = "profile";
-
-  /**
    * whether revoked.
    */
   public static final String TAG_REV = "rev";
@@ -103,8 +98,6 @@ public class OcspCertType extends IdentifidDbObjectType {
   private Long nafter;
 
   private Long nbefore;
-
-  private String profile;
 
   private Boolean rev;
 
@@ -150,14 +143,6 @@ public class OcspCertType extends IdentifidDbObjectType {
 
   public void setNbefore(Long nbefore) {
     this.nbefore = nbefore;
-  }
-
-  public String getProfile() {
-    return profile;
-  }
-
-  public void setProfile(String profile) {
-    this.profile = profile;
   }
 
   public Boolean getRev() {
@@ -246,7 +231,6 @@ public class OcspCertType extends IdentifidDbObjectType {
     writeIfNotNull(writer, TAG_RR, rr);
     writeIfNotNull(writer, TAG_RT, rt);
     writeIfNotNull(writer, TAG_RIT, rit);
-    writeIfNotNull(writer, TAG_PROFILE, profile);
 
     writeIfNotNull(writer, TAG_NBEFORE, nbefore);
     writeIfNotNull(writer, TAG_NAFTER, nafter);

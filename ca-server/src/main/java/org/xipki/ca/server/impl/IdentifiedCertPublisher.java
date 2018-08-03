@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;

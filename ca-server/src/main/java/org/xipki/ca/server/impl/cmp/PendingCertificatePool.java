@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.CertificateInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
