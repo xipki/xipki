@@ -62,6 +62,7 @@ import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,12 +94,16 @@ import org.xipki.ca.client.impl.jaxb.CmpcontrolType;
 import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
+import org.xipki.ca.client.impl.jaxb.RequestorType.PbmMac;
+import org.xipki.ca.client.impl.jaxb.RequestorType.Signature;
 import org.xipki.ca.client.impl.jaxb.ResponderType;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
@@ -200,7 +205,7 @@ public final class CaClientImpl implements CaClient {
       ClientCaConf ca = casMap.get(name);
 
       try {
-        ClientCaInfo caInfo = ca.getRequestor().retrieveCaInfo(name, null);
+        ClientCaInfo caInfo = ca.getAgent().retrieveCaInfo(name, null);
         if (ca.isCertAutoconf()) {
           ca.setCert(caInfo.getCert());
         }
@@ -275,18 +280,28 @@ public final class CaClientImpl implements CaClient {
         throw new CaClientException(ex.getMessage(), ex);
       }
 
-      Set<String> algoNames = new HashSet<>();
-      for (String algo : m.getSignatureAlgos().getSignatureAlgo()) {
-        algoNames.add(algo);
-      }
-      AlgorithmValidator sigAlgoValidator;
-      try {
-        sigAlgoValidator = new CollectionAlgorithmValidator(algoNames);
-      } catch (NoSuchAlgorithmException ex) {
-        throw new CaClientException(ex.getMessage());
+      ClientCmpResponder responder;
+      if (m.getSignature() != null) {
+        Set<String> algoNames = new HashSet<>();
+        for (String algo : m.getSignature().getSignatureAlgos().getAlgo()) {
+          algoNames.add(algo);
+        }
+        AlgorithmValidator sigAlgoValidator;
+        try {
+          sigAlgoValidator = new CollectionAlgorithmValidator(algoNames);
+        } catch (NoSuchAlgorithmException ex) {
+          throw new CaClientException(ex.getMessage());
+        }
+
+        responder = new SignatureClientCmpResponder(cert, sigAlgoValidator);
+      } else { // if (m.getPbmMac() != null)
+        ResponderType.PbmMac mac = m.getPbmMac();
+        X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+        responder = new PbmMacClientCmpResponder(subject, mac.getOwfAlgos().getAlgo(),
+            mac.getMacAlgos().getAlgo());
       }
 
-      responders.put(m.getName(), new ClientCmpResponder(cert, sigAlgoValidator));
+      responders.put(m.getName(), responder);
     }
 
     // CA
@@ -357,41 +372,62 @@ public final class CaClientImpl implements CaClient {
     }
 
     // requestors
-    Map<String, X509Certificate> requestorCerts = new HashMap<>();
-    Map<String, ConcurrentContentSigner> requestorSigners = new HashMap<>();
-    Map<String, Boolean> requestorSignRequests = new HashMap<>();
+    Map<String, ClientCmpRequestor> requestors = new HashMap<>();
 
     for (RequestorType requestorConf : config.getRequestors().getRequestor()) {
+      boolean signRequest = requestorConf.isSignRequest();
       String name = requestorConf.getName();
-      requestorSignRequests.put(name, requestorConf.isSignRequest());
+      ClientCmpRequestor requestor;
 
-      X509Certificate requestorCert = null;
-      if (requestorConf.getCert() != null) {
-        try {
-          requestorCert = X509Util.parseCert(readData(requestorConf.getCert()));
-          requestorCerts.put(name, requestorCert);
-        } catch (Exception ex) {
-          throw new CaClientException(ex.getMessage(), ex);
+      if (requestorConf.getSignature() != null) {
+        Signature cf = requestorConf.getSignature();
+        //requestorSignRequests.put(name, cf.isSignRequest());
+
+        X509Certificate requestorCert = null;
+        if (cf.getCert() != null) {
+          try {
+            requestorCert = X509Util.parseCert(readData(cf.getCert()));
+          } catch (Exception ex) {
+            throw new CaClientException(ex.getMessage(), ex);
+          }
         }
-      }
 
-      if (requestorConf.getSignerType() != null) {
-        try {
-          SignerConf signerConf = new SignerConf(requestorConf.getSignerConf());
-          ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-              requestorConf.getSignerType(), signerConf, requestorCert);
-          requestorSigners.put(name, requestorSigner);
-        } catch (ObjectCreationException ex) {
-          throw new CaClientException(ex.getMessage(), ex);
+        if (cf.getSignerType() != null) {
+          try {
+            SignerConf signerConf = new SignerConf(cf.getSignerConf());
+            ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
+                cf.getSignerType(), signerConf, requestorCert);
+            requestor = new SignatureClientCmpRequestor(
+                signRequest, requestorSigner, securityFactory);
+          } catch (ObjectCreationException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
+          }
+        } else {
+          if (signRequest) {
+            throw new CaClientException("signer of requestor must be configured");
+          } else if (requestorCert == null) {
+            throw new CaClientException(
+                "at least one of certificate and signer of requestor must be configured");
+          } else {
+            requestor = new SignatureClientCmpRequestor(requestorCert);
+          }
         }
       } else {
-        if (requestorConf.isSignRequest()) {
-          throw new CaClientException("signer of requestor must be configured");
-        } else if (requestorCert == null) {
-          throw new CaClientException(
-              "at least one of certificate and signer of requestor must be configured");
+        PbmMac cf = requestorConf.getPbmMac();
+        X500Name x500name = new X500Name(cf.getSender());
+        AlgorithmIdentifier owf = HashAlgo.getNonNullInstance(cf.getOwf()).getAlgorithmIdentifier();
+        AlgorithmIdentifier mac;
+        try {
+          mac = AlgorithmUtil.getMacAlgId(cf.getMac());
+        } catch (NoSuchAlgorithmException ex) {
+          throw new CaClientException("Unknown MAC algorithm " + cf.getMac());
         }
+
+        requestor = new PbmMacClientCmpRequestor(signRequest, x500name,
+            cf.getPassword().toCharArray(), cf.getKid(), owf, cf.getIterationCount(), mac);
       }
+
+      requestors.put(name, requestor);
     }
 
     for (ClientCaConf ca :cas) {
@@ -401,20 +437,15 @@ public final class CaClientImpl implements CaClient {
 
       String requestorName = ca.getRequestorName();
 
-      X509ClientCmpRequestor cmpRequestor;
-      if (requestorSigners.containsKey(requestorName)) {
-        cmpRequestor = new HttpX509ClientCmpRequestor(requestorSigners.get(requestorName),
+      if (requestors.containsKey(requestorName)) {
+        ClientCmpAgent agent = new HttpClientCmpAgent(requestors.get(requestorName),
             ca.getResponder(), ca.getUrl(), securityFactory);
-        cmpRequestor.setSignRequest(requestorSignRequests.get(requestorName));
-      } else if (requestorCerts.containsKey(requestorName)) {
-        cmpRequestor = new HttpX509ClientCmpRequestor(requestorCerts.get(requestorName),
-            ca.getResponder(), ca.getUrl(), securityFactory);
+        ca.setAgent(agent);
       } else {
         throw new CaClientException("could not find requestor named " + requestorName
                 + " for CA " + ca.getName());
       }
 
-      ca.setRequestor(cmpRequestor);
       this.casMap.put(ca.getName(), ca);
     }
 
@@ -501,7 +532,7 @@ public final class CaClientImpl implements CaClient {
 
     final String id = "cert-1";
     CsrEnrollCertRequest request = new CsrEnrollCertRequest(id, profile, csr);
-    EnrollCertResultResp result = ca.getRequestor().requestCertificate(
+    EnrollCertResultResp result = ca.getAgent().requestCertificate(
         request, notBefore, notAfter, debug);
 
     return parseEnrollCertResult(result);
@@ -542,7 +573,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("could not find CA named " + caName);
     }
 
-    EnrollCertResultResp result = ca.getRequestor().requestCertificate(request, debug);
+    EnrollCertResultResp result = ca.getAgent().requestCertificate(request, debug);
     return parseEnrollCertResult(result);
   } // method requestCerts
 
@@ -647,8 +678,7 @@ public final class CaClientImpl implements CaClient {
       }
     }
 
-    X509ClientCmpRequestor cmpRequestor = caConf.getRequestor();
-    RevokeCertResultType result = cmpRequestor.revokeCertificate(request, debug);
+    RevokeCertResultType result = caConf.getAgent().revokeCertificate(request, debug);
     return parseRevokeCertResult(result);
   }
 
@@ -692,9 +722,9 @@ public final class CaClientImpl implements CaClient {
       throw new IllegalArgumentException("unknown CA " + caName);
     }
 
-    X509ClientCmpRequestor requestor = ca.getRequestor();
-    X509CRL result = (crlNumber == null) ? requestor.downloadCurrentCrl(debug)
-          : requestor.downloadCrl(crlNumber, debug);
+    ClientCmpAgent agent = ca.getAgent();
+    X509CRL result = (crlNumber == null) ? agent.downloadCurrentCrl(debug)
+          : agent.downloadCrl(crlNumber, debug);
 
     return result;
   }
@@ -709,8 +739,7 @@ public final class CaClientImpl implements CaClient {
       throw new IllegalArgumentException("unknown CA " + caName);
     }
 
-    X509ClientCmpRequestor requestor = ca.getRequestor();
-    return requestor.generateCrl(debug);
+    return ca.getAgent().generateCrl(debug);
   }
 
   @Override
@@ -796,7 +825,7 @@ public final class CaClientImpl implements CaClient {
       throw new CaClientException("could not find CA named " + caName);
     }
 
-    PKIMessage pkiMessage = ca.getRequestor().envelope(certRequest, pop, profileName);
+    PKIMessage pkiMessage = ca.getAgent().envelope(certRequest, pop, profileName);
 
     try {
       return pkiMessage.getEncoded();
@@ -850,10 +879,10 @@ public final class CaClientImpl implements CaClient {
     request.addRequestEntry(entry);
 
     String caName = getCaNameByIssuer(issuer);
-    X509ClientCmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
+    ClientCmpAgent agent = casMap.get(caName).getAgent();
 
     try {
-      PKIMessage pkiMessage = cmpRequestor.envelopeRevocation(request);
+      PKIMessage pkiMessage = agent.envelopeRevocation(request);
       return pkiMessage.getEncoded();
     } catch (IOException ex) {
       throw new CaClientException(ex.getMessage(), ex);
@@ -919,8 +948,8 @@ public final class CaClientImpl implements CaClient {
     }
 
     final String caName = getCaNameByIssuer(issuer);
-    X509ClientCmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-    RevokeCertResultType result = cmpRequestor.unrevokeCertificate(request, debug);
+    ClientCmpAgent agent = casMap.get(caName).getAgent();
+    RevokeCertResultType result = agent.unrevokeCertificate(request, debug);
     return parseRevokeCertResult(result);
   } // method unrevokeCerts
 
@@ -976,8 +1005,8 @@ public final class CaClientImpl implements CaClient {
     }
 
     final String caName = getCaNameByIssuer(issuer);
-    X509ClientCmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-    RevokeCertResultType result = cmpRequestor.removeCertificate(request, debug);
+    ClientCmpAgent agent = casMap.get(caName).getAgent();
+    RevokeCertResultType result = agent.removeCertificate(request, debug);
     return parseRevokeCertResult(result);
   }
 

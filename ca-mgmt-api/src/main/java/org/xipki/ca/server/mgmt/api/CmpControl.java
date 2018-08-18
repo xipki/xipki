@@ -18,10 +18,18 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
@@ -52,6 +60,12 @@ public class CmpControl {
 
   public static final String KEY_PROTECTION_SIGALGO = "protection.sigalgo";
 
+  public static final String KEY_PROTECTION_PBM_OWF = "protection.pbm.owf";
+
+  public static final String KEY_PROTECTION_PBM_MAC = "protection.pbm.mac";
+
+  public static final String KEY_PROTECTION_PBM_IC = "protection.pbm.ic";
+
   public static final String KEY_POPO_SIGALGO = "popo.sigalgo";
 
   public static final String KEY_GROUP_ENROLL = "group.enroll";
@@ -61,6 +75,8 @@ public class CmpControl {
   private static final int DFLT_MESSAGE_TIME_BIAS = 300; // 300 seconds
 
   private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
+
+  private static final int DFLT_PBM_ITERATIONCOUNT = 1000;
 
   private final String conf;
 
@@ -81,6 +97,16 @@ public class CmpControl {
   private final boolean groupEnroll;
 
   private final boolean rrAkiRequired;
+
+  private AlgorithmIdentifier responsePbmOwf;
+
+  private List<ASN1ObjectIdentifier> requestPbmOwfs;
+
+  private AlgorithmIdentifier responsePbmMac;
+
+  private List<ASN1ObjectIdentifier> requestPbmMacs;
+
+  private int responsePbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
@@ -104,26 +130,51 @@ public class CmpControl {
     this.confirmWaitTimeMs = this.confirmWaitTime * 1000L;
 
     // protection algorithms
-    String str = pairs.value(KEY_PROTECTION_SIGALGO);
-    Set<String> algos = (str == null) ? null : splitAlgos(str);
+    String key = KEY_PROTECTION_SIGALGO;
+    String str = pairs.value(key);
+    if (str == null) {
+      throw new InvalidConfException(key + " is not set");
+    }
+    Set<String> algos = splitAlgos(str);
     try {
       this.sigAlgoValidator = new CollectionAlgorithmValidator(algos);
     } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidConfException("invalid " + KEY_PROTECTION_SIGALGO + ": " + str, ex);
+      throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
     algos = this.sigAlgoValidator.getAlgoNames();
-    pairs.putPair(KEY_PROTECTION_SIGALGO, algosAsString(algos));
+    pairs.putPair(key, algosAsString(algos));
 
     // popo algorithms
-    str = pairs.value(KEY_POPO_SIGALGO);
-    algos = (str == null) ? null : splitAlgos(str);
+    key = KEY_POPO_SIGALGO;
+    str = pairs.value(key);
+    if (str == null) {
+      throw new InvalidConfException(key + " is not set");
+    }
+    algos = splitAlgos(str);
     try {
       this.popoAlgoValidator = new CollectionAlgorithmValidator(algos);
     } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidConfException("invalid " + KEY_POPO_SIGALGO + ": " + str, ex);
+      throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
     algos = this.popoAlgoValidator.getAlgoNames();
-    pairs.putPair(KEY_POPO_SIGALGO, algosAsString(algos));
+    pairs.putPair(key, algosAsString(algos));
+
+    // PasswordBasedMac
+    str = pairs.value(KEY_PROTECTION_PBM_OWF);
+    // CHECKSTYLE:SKIP
+    List<String> listOwfAlgos = StringUtil.isBlank(str) ? null
+        : StringUtil.split(str, ALGO_DELIMITER);
+
+    // PasswordBasedMac.mac
+    key = KEY_PROTECTION_PBM_MAC;
+    str = pairs.value(KEY_PROTECTION_PBM_MAC);
+    List<String> listMacAlgos = StringUtil.isBlank(str) ? null
+        : StringUtil.split(str, ALGO_DELIMITER);
+
+    str = pairs.value(KEY_PROTECTION_PBM_IC);
+    Integer pbmIterationCount = (str == null) ? null : Integer.parseInt(str);
+
+    initPbm(pairs, listOwfAlgos, listMacAlgos, pbmIterationCount);
 
     this.conf = pairs.getEncoded();
   } // constructor
@@ -131,7 +182,9 @@ public class CmpControl {
   public CmpControl(Boolean confirmCert, Boolean sendCaCert,
       Boolean messageTimeRequired, Boolean sendResponderCert, Boolean rrAkiRequired,
       Integer messageTimeBias, Integer confirmWaitTime, Boolean groupEnroll,
-      Set<String> sigAlgos, Set<String> popoAlgos) throws InvalidConfException {
+      List<String> sigAlgos, List<String> popoAlgos,
+      List<String> pbmOwfs, List<String> pbmMacs, Integer pbmIterationCount)
+      throws InvalidConfException {
     if (confirmWaitTime != null) {
       ParamUtil.requireMin("confirmWaitTime", confirmWaitTime, 0);
     }
@@ -183,8 +236,82 @@ public class CmpControl {
       pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popoAlgoValidator.getAlgoNames()));
     }
 
+    // PasswordBasedMac
+    initPbm(pairs, pbmOwfs, pbmMacs, pbmIterationCount);
+
+    if (CollectionUtil.isNonEmpty(pbmOwfs)) {
+      pairs.putPair(KEY_PROTECTION_PBM_OWF, algosAsString(pbmOwfs));
+    }
+
+    if (CollectionUtil.isNonEmpty(pbmMacs)) {
+      pairs.putPair(KEY_PROTECTION_PBM_MAC, algosAsString(pbmMacs));
+    }
+
+    pairs.putPair(KEY_PROTECTION_PBM_IC, Integer.toString(this.responsePbmIterationCount));
+
     this.conf = pairs.getEncoded();
   } // constructor
+
+  private void initPbm(ConfPairs pairs, List<String> pbmOwfs, List<String> pbmMacs,
+      Integer pbmIterationCount) throws InvalidConfException {
+    if (pbmIterationCount == null) {
+      pbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
+    }
+
+    if (CollectionUtil.isEmpty(pbmOwfs)) {
+      pbmOwfs = Arrays.asList("SHA256");
+    }
+
+    if (CollectionUtil.isEmpty(pbmMacs)) {
+      pbmMacs = Arrays.asList("HMACSHA256");
+    }
+
+    if (pbmIterationCount <= 0) {
+      throw new InvalidConfException("invalid pbmIterationCount " + pbmIterationCount);
+    }
+    this.responsePbmIterationCount = pbmIterationCount;
+    pairs.putPair(KEY_PROTECTION_PBM_IC, Integer.toString(pbmIterationCount));
+
+    this.requestPbmOwfs = new ArrayList<>(pbmOwfs.size());
+    List<String> canonicalizedAlgos = new ArrayList<>(pbmOwfs.size());
+    for (int i = 0; i < pbmOwfs.size(); i++) {
+      String algo = pbmOwfs.get(i);
+      HashAlgo ha;
+      try {
+        ha = HashAlgo.getNonNullInstance(algo);
+      } catch (Exception ex) {
+        throw new InvalidConfException("invalid pbmPwf " + algo, ex);
+      }
+      canonicalizedAlgos.add(ha.getName());
+      requestPbmOwfs.add(ha.getOid());
+
+      if (i == 0) {
+        responsePbmOwf = ha.getAlgorithmIdentifier();
+      }
+    }
+    pairs.putPair(KEY_PROTECTION_PBM_OWF, algosAsString(canonicalizedAlgos));
+
+    // PasswordBasedMac.mac
+    canonicalizedAlgos.clear();
+    this.requestPbmMacs = new ArrayList<>(pbmMacs.size());
+    for (int i = 0; i < pbmMacs.size(); i++) {
+      String algo = pbmMacs.get(i);
+      AlgorithmIdentifier algId;
+      try {
+        algId = AlgorithmUtil.getMacAlgId(algo);
+        canonicalizedAlgos.add(AlgorithmUtil.getSigOrMacAlgoName(algId));
+      } catch (NoSuchAlgorithmException ex) {
+        throw new InvalidConfException("invalid pbmMac " + algo, ex);
+      }
+      requestPbmMacs.add(algId.getAlgorithm());
+
+      if (i == 0) {
+        responsePbmMac = algId;
+      }
+    }
+    pairs.putPair(KEY_PROTECTION_PBM_MAC, algosAsString(canonicalizedAlgos));
+
+  }
 
   public boolean isMessageTimeRequired() {
     return messageTimeRequired;
@@ -228,6 +355,38 @@ public class CmpControl {
 
   public AlgorithmValidator getPopoAlgoValidator() {
     return popoAlgoValidator;
+  }
+
+  public AlgorithmIdentifier getResponsePbmOwf() {
+    return responsePbmOwf;
+  }
+
+  public AlgorithmIdentifier getResponsePbmMac() {
+    return responsePbmMac;
+  }
+
+  public int getResponsePbmIterationCount() {
+    return responsePbmIterationCount;
+  }
+
+  public boolean isRequestPbmOwfPermitted(AlgorithmIdentifier pbmOwf) {
+    ASN1ObjectIdentifier owfOid = pbmOwf.getAlgorithm();
+    for (ASN1ObjectIdentifier oid : requestPbmOwfs) {
+      if (oid.equals(owfOid)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean isRequestPbmMacPermitted(AlgorithmIdentifier pbmMac) {
+    ASN1ObjectIdentifier macOid = pbmMac.getAlgorithm();
+    for (ASN1ObjectIdentifier oid : requestPbmMacs) {
+      if (oid.equals(macOid)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public String getConf() {
@@ -277,7 +436,7 @@ public class CmpControl {
     return ret;
   }
 
-  private static String algosAsString(Set<String> algos) {
+  private static String algosAsString(Collection<String> algos) {
     return StringUtil.collectionAsString(algos, ALGO_DELIMITER);
   }
 

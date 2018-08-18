@@ -37,9 +37,22 @@ public class CmpRequestorInfo implements RequestorInfo {
 
   private final CertWithDbId cert;
 
+  private final char[] password;
+
+  private final byte[] keyId;
+
   public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, CertWithDbId cert) {
     this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
     this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.password = null;
+    this.keyId = null;
+  }
+
+  public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, char[] password, byte[] keyId) {
+    this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
+    this.cert = null;
+    this.password = ParamUtil.requireNonNull("password", password);
+    this.keyId = ParamUtil.requireNonNull("keyId", keyId);
   }
 
   public CaHasRequestorEntry getCaHasRequestor() {
@@ -48,6 +61,14 @@ public class CmpRequestorInfo implements RequestorInfo {
 
   public CertWithDbId getCert() {
     return cert;
+  }
+
+  public char[] getPassword() {
+    return password;
+  }
+
+  public byte[] getKeyId() {
+    return keyId;
   }
 
   @Override

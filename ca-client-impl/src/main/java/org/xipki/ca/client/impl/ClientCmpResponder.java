@@ -17,10 +17,7 @@
 
 package org.xipki.ca.client.impl;
 
-import java.security.cert.X509Certificate;
-
-import org.xipki.security.AlgorithmValidator;
-import org.xipki.util.ParamUtil;
+import org.bouncycastle.asn1.x509.GeneralName;
 
 /**
  * TODO.
@@ -28,23 +25,8 @@ import org.xipki.util.ParamUtil;
  * @since 2.1.0
  */
 
-class ClientCmpResponder {
+public interface ClientCmpResponder {
 
-  private final X509Certificate cert;
-
-  private final AlgorithmValidator sigAlgoValidator;
-
-  public ClientCmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
-    this.cert = ParamUtil.requireNonNull("cert", cert);
-    this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
-  }
-
-  public X509Certificate getCert() {
-    return cert;
-  }
-
-  public AlgorithmValidator getSigAlgoValidator() {
-    return sigAlgoValidator;
-  }
+  GeneralName getName();
 
 }

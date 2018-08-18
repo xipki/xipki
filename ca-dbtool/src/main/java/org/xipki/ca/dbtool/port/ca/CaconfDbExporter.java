@@ -137,7 +137,7 @@ class CaconfDbExporter extends DbPorter {
   private void exportRequestor(CaconfType caconf) throws DataAccessException, IOException {
     System.out.println("exporting table REQUESTOR");
     Requestors requestors = new Requestors();
-    final String sql = "SELECT ID,NAME,CERT FROM REQUESTOR";
+    final String sql = "SELECT ID,NAME,TYPE,CONF FROM REQUESTOR";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -151,8 +151,9 @@ class CaconfDbExporter extends DbPorter {
         RequestorType requestor = new RequestorType();
         requestor.setId(rs.getInt("ID"));
         requestor.setName(name);
-        requestor.setCert(buildFileOrBase64Binary(
-            rs.getString("CERT"), "ca-conf/cert-requestor-" + name + ".der"));
+        requestor.setType(rs.getString("TYPE"));
+        requestor.setConf(buildFileOrValue(
+            rs.getString("CONF"), "ca-conf/cert-requestor-" + name + ".conf"));
         requestors.getRequestor().add(requestor);
       }
     } catch (SQLException ex) {

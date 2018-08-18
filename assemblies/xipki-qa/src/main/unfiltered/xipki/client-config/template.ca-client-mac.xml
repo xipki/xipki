@@ -18,16 +18,16 @@
   <requestors>
     <requestor>
       <name>requestor1</name>
-      <signRequest>false</signRequest>
-      <signature>
-        <!-- Can be commented if the certificate can be retrieved from the signerType and signerConf -->
-        <!--cert>
-          <file>xipki/security/tlskeys/tls-client.der</file>
-        </cert-->
-        <!-- Required if signRequest is true and/or you wish the CA to generate private key -->
-        <signerType>PKCS12</signerType>
-        <signerConf>password=1234,algo=SHA256WITHRSA,keystore=file:xipki/security/tlskeys/tls-client.p12</signerConf>
-      </signature>
+      <signRequest>true</signRequest>
+      <pbmMac>
+        <!-- SHA1("requestor-mac1") -->
+        <kid>466827c7757a70af71ca0338c01361aab2019dcf</kid>
+        <sender>CN=PBMMAC</sender>
+        <password>123456</password>
+        <owf>SHA256</owf>
+        <iterationCount>10</iterationCount>
+        <mac>HMAC-SHA256</mac>
+      </pbmMac>
     </requestor>
   </requestors>
   <responders>
@@ -36,11 +36,14 @@
       <cert>
         <file>xipki/security/tlskeys/tls-server.der</file>
       </cert>
-      <signature>
-        <signatureAlgos>
-          <algo>SHA256WITHRSA</algo>
-        </signatureAlgos>
-      </signature>
+      <pbmMac>
+        <owfAlgos>
+          <algo>SHA256</algo>
+        </owfAlgos>
+        <macAlgos>
+          <algo>HMAC-SHA256</algo>
+        </macAlgos>
+      </pbmMac>
     </responder>
   </responders>
   <cas>
@@ -49,8 +52,38 @@
       disables the interval update -->
     <cainfoUpdateInterval>10</cainfoUpdateInterval>
     <ca>
-      <name>MYCA</name>
-      <url>https://localhost:8443/cmp/myca</url>
+      <name>rootca1</name>
+      <url>https://localhost:8443/cmp/rootca</url>
+      <requestor>requestor1</requestor>
+      <responder>responder1</responder>
+      <cmpcontrol>
+        <autoconf/>
+      </cmpcontrol>
+      <caCert>
+        <autoconf/>
+      </caCert>
+      <certprofiles>
+        <autoconf/>
+      </certprofiles>
+    </ca>
+    <ca>
+      <name>subca1</name>
+      <url>https://localhost:8443/cmp/subca</url>
+      <requestor>requestor1</requestor>
+      <responder>responder1</responder>
+      <cmpcontrol>
+        <autoconf/>
+      </cmpcontrol>
+      <caCert>
+        <autoconf/>
+      </caCert>
+      <certprofiles>
+        <autoconf/>
+      </certprofiles>
+    </ca>
+    <ca>
+      <name>subcawithcrl1</name>
+      <url>https://localhost:8443/cmp/subcawithcrl</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>

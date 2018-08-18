@@ -19,6 +19,7 @@ package org.xipki.ca.server.impl.cmp;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -39,6 +40,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -51,7 +56,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
@@ -77,6 +81,7 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.cmp.RevDetails;
 import org.bouncycastle.asn1.cmp.RevRepContentBuilder;
 import org.bouncycastle.asn1.cmp.RevReqContent;
+import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
@@ -88,6 +93,11 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.EncryptionScheme;
+import org.bouncycastle.asn1.pkcs.KeyDerivationFunc;
+import org.bouncycastle.asn1.pkcs.PBES2Parameters;
+import org.bouncycastle.asn1.pkcs.PBKDF2Params;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -101,6 +111,7 @@ import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
+import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,6 +152,8 @@ import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.concurrent.ConcurrentBag;
+import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
  * TODO.
@@ -182,6 +195,17 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpResponderImpl.class);
 
+  private static final AlgorithmIdentifier prf_hmacWithSHA256 =
+      new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256, DERNull.INSTANCE);
+
+  private static final ConcurrentBag<ConcurrentBagEntry<Cipher>> aesGcm_ciphers;
+
+  private static final ConcurrentBag<ConcurrentBagEntry<SecretKeyFactory>> pbkdf2_kdfs;
+
+  private static boolean aesGcm_ciphers_initialized;
+
+  private static boolean pbkdf2_kdfs_initialized;
+
   private final PendingCertificatePool pendingCertPool;
 
   private final KeyGenerator aesKeyGen;
@@ -194,6 +218,47 @@ public class CmpResponderImpl extends BaseCmpResponder {
     KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cacerts.getId());
+
+    String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
+    aesGcm_ciphers = new ConcurrentBag<>();
+    for (int i = 0; i < 64; i++) {
+      Cipher cipher;
+      try {
+        cipher = Cipher.getInstance(oid);
+      } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
+        LogUtil.error(LOG, ex, "could not get Cipher of " + oid);
+        break;
+      }
+      aesGcm_ciphers.add(new ConcurrentBagEntry<Cipher>(cipher));
+    }
+    int size = aesGcm_ciphers.size();
+    aesGcm_ciphers_initialized = size > 0;
+    if (size > 0) {
+      LOG.info("initialized {} AES GCM Cipher instances", size);
+    } else {
+      LOG.error("could not initialize any AES GCM Cipher instance");
+    }
+
+    oid = PKCSObjectIdentifiers.id_PBKDF2.getId();
+    pbkdf2_kdfs = new ConcurrentBag<>();
+    for (int i = 0; i < 64; i++) {
+      SecretKeyFactory keyFact;
+      try {
+        keyFact = SecretKeyFactory.getInstance(oid);
+      } catch (NoSuchAlgorithmException ex) {
+        LogUtil.error(LOG, ex, "could not get SecretKeyFactory of " + oid);
+        break;
+      }
+      pbkdf2_kdfs.add(new ConcurrentBagEntry<SecretKeyFactory>(keyFact));
+    }
+
+    size = pbkdf2_kdfs.size();
+    pbkdf2_kdfs_initialized = size > 0;
+    if (size > 0) {
+      LOG.info("initialized {} PBKDF2 SecretKeyFactory instances", size);
+    } else {
+      LOG.error("could not initialize any PBKDF2 SecretKeyFactory instance");
+    }
   }
 
   public CmpResponderImpl(CaManagerImpl caManager, String caName)
@@ -778,58 +843,162 @@ public class CmpResponderImpl extends BaseCmpResponder {
     CertOrEncCert cec = new CertOrEncCert(
         CMPCertificate.getInstance(certInfo.getCert().getEncodedCert()));
     if (certInfo.getPrivateKey() == null) {
+      // no private key will be returned.
       return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec), null);
     }
 
+    final int aesGcmTagByteLen = 16;
+    final int aesGcmNonceLen = 12;
+
+    PrivateKeyInfo privKey = certInfo.getPrivateKey();
+    AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
+    EncryptedValue encKey;
+
     // Due to the bug mentioned in https://github.com/bcgit/bc-java/issues/359
     // we cannot use BoucyCastle's EncryptedValueBuilder to build the EncryptedValue.
-    PublicKey reqPub = requestor.getCert().getCert().getPublicKey();
-
     try {
-      CrmfKeyWrapper wrapper = null;
-      if (reqPub instanceof RSAPublicKey) {
-        wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
-      } else if (reqPub instanceof ECPublicKey) {
-        wrapper = new CrmfKeyWrapper.ECIESAsymmetricKeyWrapper(reqPub);
+      if (requestor.getCert() != null) {
+        // use public key of the requestor to encrypt the private key
+        PublicKey reqPub = requestor.getCert().getCert().getPublicKey();
+        CrmfKeyWrapper wrapper = null;
+        if (reqPub instanceof RSAPublicKey) {
+          wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
+        } else if (reqPub instanceof ECPublicKey) {
+          wrapper = new CrmfKeyWrapper.ECIESAsymmetricKeyWrapper(reqPub);
+        } else {
+          String msg = "Requestors's public key can not be used for encryption";
+          LOG.error(msg);
+          return new CertResponse(certReqId,
+              new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
+        }
+
+        byte[] symmKeyBytes = new byte[16];
+        synchronized (aesKeyGen) {
+          symmKeyBytes = aesKeyGen.generateKey().getEncoded();
+        }
+
+        // encrypt the symmKey
+        byte[] encSymmKey = wrapper.generateWrappedKey(symmKeyBytes);
+        // algorithmIdentifier after the encryption process.
+        AlgorithmIdentifier keyAlg = wrapper.getAlgorithmIdentifier();
+
+        // encrypt the data
+        ASN1ObjectIdentifier symmAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
+        byte[] nonce = randomBytes(aesGcmNonceLen);
+
+        ConcurrentBagEntry<Cipher> cipher0 = null;
+        if (aesGcm_ciphers_initialized) {
+          try {
+            cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
+          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+          }
+        }
+
+        Cipher dataCipher = (cipher0 != null)
+            ? cipher0.value() : Cipher.getInstance(symmAlgOid.getId());
+
+        byte[] encValue;
+
+        try {
+          try {
+            dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"),
+                new GCMParameterSpec(aesGcmTagByteLen << 3, nonce));
+          } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
+            throw new IllegalStateException(ex);
+          }
+
+          encValue = dataCipher.doFinal(privKey.getEncoded());
+        } finally {
+          if (cipher0 != null) {
+            aesGcm_ciphers.requite(cipher0);
+          }
+        }
+
+        GCMParameters params = new GCMParameters(nonce, aesGcmTagByteLen);
+        AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(symmAlgOid, params);
+
+        encKey = new EncryptedValue(intendedAlg, symmAlg,
+            new DERBitString(encSymmKey), keyAlg, null, new DERBitString(encValue));
       } else {
-        String msg = "Requestors's public key cannot be used for encryption";
-        LOG.error(msg);
-        return new CertResponse(certReqId,
-            new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
+        final ASN1ObjectIdentifier encAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
+        final int keysizeBits = 128; // one of 128, 192 and 256. Must match the encAlgOid
+        final int iterationCount = 10240; // >= 1000
+        final int nonceLen = 12; // fixed value
+        final int tagByteLen = 16; // fixed value
+
+        byte[] nonce = randomBytes(nonceLen);
+
+        // use password of the requestor to encrypt the private key
+        byte[] pbkdfSalt = randomBytes(keysizeBits / 8);
+
+        ConcurrentBagEntry<SecretKeyFactory> keyFact0 = null;
+        if (pbkdf2_kdfs_initialized) {
+          try {
+            keyFact0 = pbkdf2_kdfs.borrow(5, TimeUnit.SECONDS);
+          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+          }
+        }
+
+        SecretKeyFactory keyFact = (keyFact0 != null) ? keyFact0.value()
+            : SecretKeyFactory.getInstance(PKCSObjectIdentifiers.id_PBKDF2.getId());
+
+        SecretKey key;
+
+        try {
+          key = keyFact.generateSecret(
+              new PBKDF2KeySpec(requestor.getPassword(), pbkdfSalt, iterationCount,
+                  keysizeBits, prf_hmacWithSHA256));
+          byte[] encoded = key.getEncoded();
+          key = new SecretKeySpec(encoded, "AES");
+        } finally {
+          if (keyFact0 != null) {
+            pbkdf2_kdfs.requite(keyFact0);
+          }
+        }
+
+        GCMParameterSpec gcmParamSpec = new GCMParameterSpec(tagByteLen * 8, nonce);
+
+        ConcurrentBagEntry<Cipher> cipher0 = null;
+        if (aesGcm_ciphers_initialized) {
+          try {
+            cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
+          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+          }
+        }
+
+        byte[] encValue;
+
+        Cipher dataCipher = (cipher0 != null)
+            ? cipher0.value() : Cipher.getInstance(encAlgOid.getId());
+
+        try {
+          dataCipher.init(Cipher.ENCRYPT_MODE, key, gcmParamSpec);
+          encValue = dataCipher.doFinal(privKey.getEncoded());
+        } finally {
+          if (cipher0 != null) {
+            aesGcm_ciphers.requite(cipher0);
+          }
+        }
+
+        AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2,
+            new PBES2Parameters(
+                new KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2,
+                    new PBKDF2Params(pbkdfSalt, iterationCount, keysizeBits / 8,
+                        prf_hmacWithSHA256)),
+                new EncryptionScheme(encAlgOid, new GCMParameters(nonce, tagByteLen))));
+
+        encKey = new EncryptedValue(intendedAlg, symmAlg,
+            null, null, null, new DERBitString(encValue));
       }
-
-      PrivateKeyInfo privKey = certInfo.getPrivateKey();
-      AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
-      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-
-      byte[] symmKeyBytes = new byte[16];
-      synchronized (aesKeyGen) {
-        symmKeyBytes = aesKeyGen.generateKey().getEncoded();
-      }
-
-      // encrypt the symmKey
-      byte[] encSymmKey = wrapper.generateWrappedKey(symmKeyBytes);
-      // get the algorithmIdentifier after the encryption process.
-      AlgorithmIdentifier keyAlg = wrapper.getAlgorithmIdentifier();
-
-      // encrypt the data
-      dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"));
-      byte[] encValue = dataCipher.doFinal(privKey.getEncoded());
-      // get the algorithmIdentifier after the encryption process.
-      byte[] iv = dataCipher.getIV();
-      AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(NISTObjectIdentifiers.id_aes128_CBC,
-          new DEROctetString(iv));
-
-      EncryptedValue encKey = new EncryptedValue(intendedAlg, symmAlg,
-          new DERBitString(encSymmKey), keyAlg, null, new DERBitString(encValue));
-
-      return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec, encKey, null), null);
     } catch (Exception ex) {
       String msg = "error while encrypting the private key";
       LOG.error(msg);
       return new CertResponse(certReqId,
           new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
     }
+
+    return new CertResponse(certReqId, statusInfo,
+        new CertifiedKeyPair(cec, encKey, null), null);
   }
 
   private PKIBody unRevokeRemoveCertificates(PKIMessage request, RevReqContent rr,
@@ -1384,6 +1553,12 @@ public class CmpResponderImpl extends BaseCmpResponder {
   @Override
   public CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
     return getCa().getRequestor(requestorCert);
+  }
+
+  @Override
+  // CHECKSTYLE:SKIP
+  public CmpRequestorInfo getMacRequestor(X500Name requestorSender, byte[] senderKID) {
+    return getCa().getMacRequestor(requestorSender, senderKID);
   }
 
   private PKIBody cmpEnrollCert(String dfltCertprofileName, String dfltKeyGenType,

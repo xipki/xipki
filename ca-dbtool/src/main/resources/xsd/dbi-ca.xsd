@@ -107,7 +107,7 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="conf" type="fileOrValueType"/>
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
@@ -116,7 +116,8 @@
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="cert" type="fileOrBinaryType" minOccurs="0"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="conf" type="fileOrValueType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="publisher" type="publisherType"/>
@@ -125,7 +126,7 @@
       <xs:element name="id" type="xs:int"/>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="conf" type="fileOrValueType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="profile" type="profileType"/>

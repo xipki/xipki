@@ -23,9 +23,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.cert.X509Certificate;
 
-import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
@@ -36,7 +34,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.0.0
  */
 
-class HttpX509ClientCmpRequestor extends X509ClientCmpRequestor {
+class HttpClientCmpAgent extends ClientCmpAgent {
 
   private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
 
@@ -44,19 +42,7 @@ class HttpX509ClientCmpRequestor extends X509ClientCmpRequestor {
 
   private final URL serverUrl;
 
-  HttpX509ClientCmpRequestor(X509Certificate requestorCert, ClientCmpResponder responder,
-      String serverUrl, SecurityFactory securityFactory) {
-    super(requestorCert, responder, securityFactory);
-    ParamUtil.requireNonBlank("serverUrl", serverUrl);
-
-    try {
-      this.serverUrl = new URL(serverUrl);
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException("invalid URL: " + serverUrl);
-    }
-  }
-
-  HttpX509ClientCmpRequestor(ConcurrentContentSigner requestor, ClientCmpResponder responder,
+  HttpClientCmpAgent(ClientCmpRequestor requestor, ClientCmpResponder responder,
       String serverUrl, SecurityFactory securityFactory) {
     super(requestor, responder, securityFactory);
     ParamUtil.requireNonBlank("serverUrl", serverUrl);

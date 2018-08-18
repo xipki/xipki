@@ -80,6 +80,16 @@
             <profile>all</profile>
           </profiles>
         </requestor>
+        <requestor>
+          <requestorName>requestor-mac1</requestorName>
+          <ra>true</ra>
+          <permissions>
+            <permission>all</permission>
+          </permissions>
+          <profiles>
+            <profile>all</profile>
+          </profiles>
+        </requestor>
       </requestors>
       <users>
         <user>

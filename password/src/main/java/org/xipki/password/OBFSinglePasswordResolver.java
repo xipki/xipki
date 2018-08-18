@@ -38,4 +38,9 @@ public class OBFSinglePasswordResolver implements SinglePasswordResolver {
     return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
   }
 
+  @Override
+  public String protectPassword(char[] password) throws PasswordResolverException {
+    return OBFPasswordService.obfuscate(new String(password));
+  }
+
 }

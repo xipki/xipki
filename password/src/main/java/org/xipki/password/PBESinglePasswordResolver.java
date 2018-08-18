@@ -120,6 +120,13 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
     return PBEPasswordService.decryptPassword(getMasterPassword(passwordHint), passwordHint);
   }
 
+  @Override
+  public String protectPassword(char[] password) throws PasswordResolverException {
+    final int iterationCount = 2000;
+    return PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256, iterationCount,
+        getMasterPassword(null), password);
+  }
+
   public void setMasterPasswordCallback(String masterPasswordCallback) {
     ParamUtil.requireNonBlank("masterPasswordCallback", masterPasswordCallback);
     this.masterPasswordCallback = masterPasswordCallback.trim();

@@ -25,6 +25,7 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
+import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIMessage;
@@ -35,6 +36,9 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
+import org.bouncycastle.cert.crmf.CRMFException;
+import org.bouncycastle.cert.crmf.PKMACBuilder;
+import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
@@ -67,9 +71,48 @@ public class CmpUtil {
           signer.getCertificate().getSubjectX500Principal().getEncoded());
       tmpSignerName = new GeneralName(x500Name);
     }
+
+    ProtectedPKIMessageBuilder builder =
+        newProtectedPKIMessageBuilder(pkiMessage, tmpSignerName, null);
+    if (addSignerCert) {
+      X509CertificateHolder signerCert = signer.getBcCertificate();
+      builder.addCMPCertificate(signerCert);
+    }
+
+    ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
+    ProtectedPKIMessage signedMessage;
+    try {
+      signedMessage = builder.build(signer0.value());
+    } finally {
+      signer.requiteSigner(signer0);
+    }
+    return signedMessage.toASN1Structure();
+  }
+
+  public static PKIMessage addProtection(PKIMessage pkiMessage, char[] password,
+      PBMParameter pbmParameter, GeneralName signerName, byte[] senderKid)
+      throws CMPException {
+    ProtectedPKIMessageBuilder builder =
+        newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
+    ProtectedPKIMessage signedMessage;
+    try {
+      // TODO: more efficient way to get the instance of builder
+      PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
+      pkMacBuilder.setParameters(pbmParameter);
+      signedMessage = builder.build(pkMacBuilder.build(password));
+    } catch (CRMFException ex) {
+      throw new CMPException(ex.getMessage(), ex);
+    }
+    return signedMessage.toASN1Structure();
+
+  }
+
+  // CHECKSTYLE:SKIP
+  private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
+      GeneralName sender, byte[] senderKid) throws CMPException {
     PKIHeader header = pkiMessage.getHeader();
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
-        tmpSignerName, header.getRecipient());
+        sender, header.getRecipient());
     PKIFreeText freeText = header.getFreeText();
     if (freeText != null) {
       builder.setFreeText(freeText);
@@ -92,9 +135,8 @@ public class CmpUtil {
       builder.setRecipNonce(octet.getOctets());
     }
 
-    octet = header.getSenderKID();
-    if (octet != null) {
-      builder.setSenderKID(octet.getOctets());
+    if (senderKid != null) {
+      builder.setSenderKID(senderKid);
     }
 
     octet = header.getSenderNonce();
@@ -112,20 +154,8 @@ public class CmpUtil {
     }
     builder.setBody(pkiMessage.getBody());
 
-    if (addSignerCert) {
-      X509CertificateHolder signerCert = signer.getBcCertificate();
-      builder.addCMPCertificate(signerCert);
-    }
-
-    ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
-    ProtectedPKIMessage signedMessage;
-    try {
-      signedMessage = builder.build(signer0.value());
-    } finally {
-      signer.requiteSigner(signer0);
-    }
-    return signedMessage.toASN1Structure();
-  } // method addProtection
+    return builder;
+  }
 
   public static boolean isImplictConfirm(PKIHeader header) {
     ParamUtil.requireNonNull("header", header);

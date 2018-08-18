@@ -18,6 +18,7 @@
 package org.xipki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
+import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -25,6 +26,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -45,10 +47,13 @@ public class RequestorUpdateAction extends CaAction {
   @Completion(RequestorNameCompleter.class)
   protected String name;
 
-  @Option(name = "--cert", required = true,
-      description = "DER encoded requestor certificate file")
+  @Option(name = "--cert", description = "DER encoded requestor certificate file\n"
+      + "(exactly one of cert and password must be specified).")
   @Completion(FileCompleter.class)
   protected String certFile;
+
+  @Option(name = "--password", description = "Passord for PBM (Password based MAC)")
+  protected String password;
 
   @Override
   protected Object execute0() throws Exception {
@@ -56,8 +61,20 @@ public class RequestorUpdateAction extends CaAction {
     byte[] certBytes = IoUtil.read(certFile);
     X509Util.parseCert(new ByteArrayInputStream(certBytes));
     String msg = "CMP requestor " + name;
+
+    String type;
+    String conf;
+    if (certFile != null) {
+      type = RequestorEntry.TYPE_CERT;
+      X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
+      conf = Base64.encodeToString(cert.getEncoded());
+    } else {
+      type = RequestorEntry.TYPE_PBM;
+      conf = password;
+    }
+
     try {
-      caManager.changeRequestor(name, Base64.encodeToString(certBytes));
+      caManager.changeRequestor(name, type, conf);
       println("updated " + msg);
       return null;
     } catch (CaMgmtException ex) {

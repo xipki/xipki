@@ -49,7 +49,7 @@ class ClientCaConf {
 
   private final ClientCmpResponder responder;
 
-  private X509ClientCmpRequestor requestor;
+  private ClientCmpAgent agent;
 
   private boolean certAutoconf;
 
@@ -150,16 +150,16 @@ class ClientCaConf {
     this.certprofilesAutoconf = autoconf;
   }
 
-  public void setRequestor(X509ClientCmpRequestor requestor) {
-    this.requestor = requestor;
+  public void setAgent(ClientCmpAgent agent) {
+    this.agent = agent;
   }
 
   public String getRequestorName() {
     return requestorName;
   }
 
-  public X509ClientCmpRequestor getRequestor() {
-    return requestor;
+  public ClientCmpAgent getAgent() {
+    return agent;
   }
 
   public void setCmpControlAutoconf(boolean autoconf) {

@@ -262,8 +262,14 @@ public class CaConf {
     // Requestors
     if (jaxb.getRequestors() != null) {
       for (RequestorType m : jaxb.getRequestors().getRequestor()) {
-        RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()),
-            getBase64Binary(m.getCert(), zipFile));
+        String conf;
+        if (m.getConf() != null) {
+          conf = getValue(m.getConf(), zipFile);
+        } else {
+          conf = getBase64Binary(m.getBinaryConf(), zipFile);
+        }
+
+        RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()), m.getType(), conf);
         addRequestor(en);
       }
     }

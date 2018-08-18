@@ -96,6 +96,10 @@ ca:requestor-add \
   --name requestor1 \
   --cert xipki/security/tlskeys/tls-client.der
 
+ca:requestor-add \
+  --name requestor-mac1 \
+  --password 123456
+
 echo "Sleeping 1 second"
 sleep 1
 
@@ -193,6 +197,13 @@ ca:capub-add \
 # Add requestor to CA
 ca:careq-add \
   --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca rootca1
+
+ca:careq-add \
+  --requestor requestor-mac1 \
   --permission all \
   --ra yes \
   --profile all \
@@ -383,6 +394,13 @@ ca:careq-add \
   --profile all \
   --ca subca1
 
+ca:careq-add \
+  --requestor requestor-mac1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca subca1
+
 ## Restart the CA
 #ca:restart
 
@@ -436,6 +454,13 @@ ca:caprofile-add \
 ## Add CMP requestor to CA
 ca:careq-add \
   --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca subcawithcrl1
+
+ca:careq-add \
+  --requestor requestor-mac1 \
   --permission all \
   --ra yes \
   --profile all \

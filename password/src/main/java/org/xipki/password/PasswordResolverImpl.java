@@ -108,6 +108,21 @@ public class PasswordResolverImpl implements PasswordResolver {
         + "of protocol '" + protocol + "'");
   }
 
+  @Override
+  public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
+    Objects.requireNonNull(protocol, "protocol must not be null");
+    Objects.requireNonNull(password, "password must not be null");
+
+    for (SinglePasswordResolver resolver : resolvers) {
+      if (resolver.canResolveProtocol(protocol)) {
+        return resolver.protectPassword(password);
+      }
+    }
+
+    throw new PasswordResolverException("could not find password resolver to protect password "
+        + "of protocol '" + protocol + "'");
+  }
+
   public void setMasterPasswordCallback(String masterPasswordCallback) {
     this.masterPasswordCallback = masterPasswordCallback;
   }

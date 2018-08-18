@@ -57,20 +57,16 @@ abstract class CrmfKeyWrapper {
 
   abstract byte[] generateWrappedKey(byte[] encryptionKey) throws OperatorException;
 
-  protected PublicKey publicKey;
-
-  CrmfKeyWrapper(PublicKey publicKey) {
-    this.publicKey = publicKey;
-  }
-
   // CHECKSTYLE:SKIP
   static class RSAOAEPAsymmetricKeyWrapper extends CrmfKeyWrapper {
 
     private static final AlgorithmIdentifier OAEP_DFLT = new AlgorithmIdentifier(
         PKCSObjectIdentifiers.id_RSAES_OAEP, new RSAESOAEPparams());
 
+    private PublicKey publicKey;
+
     public RSAOAEPAsymmetricKeyWrapper(PublicKey publicKey) {
-      super(publicKey);
+      this.publicKey = publicKey;
     }
 
     @Override
@@ -102,8 +98,10 @@ abstract class CrmfKeyWrapper {
 
     private final int aesKeySize = 128;
 
+    private PublicKey publicKey;
+
     public ECIESAsymmetricKeyWrapper(PublicKey publicKey) {
-      super(publicKey);
+      this.publicKey = publicKey;
       this.algorithmIdentifier = new AlgorithmIdentifier(
           ObjectIdentifiers.id_ecies_specifiedParameters, buildECIESParameters());
     }

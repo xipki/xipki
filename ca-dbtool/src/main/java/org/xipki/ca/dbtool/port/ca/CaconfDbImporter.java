@@ -154,18 +154,17 @@ class CaconfDbImporter extends DbPorter {
 
   private void importRequestor(Requestors requestors) throws DataAccessException, IOException {
     System.out.println("importing table REQUESTOR");
-    final String sql = "INSERT INTO REQUESTOR (ID,NAME,CERT) VALUES (?,?,?)";
+    final String sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
 
       for (RequestorType requestor : requestors.getRequestor()) {
-        byte[] certBytes = binary(requestor.getCert());
-        String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
         try {
           ps.setInt(1, requestor.getId());
           ps.setString(2, requestor.getName());
-          ps.setString(3, b64Cert);
+          ps.setString(3, requestor.getType());
+          ps.setString(4, value(requestor.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {

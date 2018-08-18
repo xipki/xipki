@@ -47,13 +47,32 @@ public class RequestorCheckAction extends RequestorUpdateAction {
       throw new CmdFailure("requestor named '" + name + "' is not configured");
     }
 
-    byte[] ex = IoUtil.read(certFile);
-    if (cr.getBase64Cert() == null) {
-      throw new CmdFailure("Cert: is not configured explicitly as expected");
-    }
+    if (certFile != null) {
+      byte[] ex = IoUtil.read(certFile);
+      String expType = RequestorEntry.TYPE_CERT;
+      if (!cr.getType().equals(expType)) {
+        throw new CmdFailure("Requestor type is not " + expType);
+      }
 
-    if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
-      throw new CmdFailure("Cert: the expected one and the actual one differ");
+      String conf = cr.getConf();
+      if (conf == null) {
+        throw new CmdFailure("Cert: is not configured explicitly as expected");
+      }
+
+      if (!Arrays.equals(ex, Base64.decode(conf))) {
+        throw new CmdFailure("Cert: the expected one and the actual one differ");
+      }
+    } else {
+      String expType = RequestorEntry.TYPE_PBM;
+      if (!cr.getType().equals(expType)) {
+        throw new CmdFailure("Requestor type is not " + expType);
+      }
+
+      char[] ex = password.toCharArray();
+      char[] is = securityFactory.getPasswordResolver().resolvePassword(cr.getConf());
+      if (Arrays.equals(ex, is)) {
+        throw new CmdFailure("PBM: the expected one and the actual one differ");
+      }
     }
 
     println(" checked requestor " + name);

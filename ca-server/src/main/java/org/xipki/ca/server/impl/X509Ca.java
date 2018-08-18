@@ -128,7 +128,6 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
-import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.CaUtil;
@@ -142,6 +141,7 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.CrlControl.HourMinute;
 import org.xipki.ca.server.mgmt.api.CrlControl.UpdateMode;
+import org.xipki.ca.server.mgmt.api.RequestorEntry;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.security.CertRevocationInfo;
@@ -2303,10 +2303,6 @@ public class X509Ca {
   }
 
   public CmpRequestorInfo getRequestor(X500Name requestorSender) {
-    if (requestorSender == null) {
-      return null;
-    }
-
     Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
@@ -2315,6 +2311,10 @@ public class X509Ca {
     for (CaHasRequestorEntry m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
+      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
+        continue;
+      }
+
       if (entry.getCert().getSubjectAsX500Name().equals(requestorSender)) {
         return new CmpRequestorInfo(m, entry.getCert());
       }
@@ -2324,10 +2324,6 @@ public class X509Ca {
   } // method getRequestor
 
   public CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
-    if (requestorCert == null) {
-      return null;
-    }
-
     Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
@@ -2336,8 +2332,34 @@ public class X509Ca {
     for (CaHasRequestorEntry m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
+      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
+        continue;
+      }
+
       if (entry.getCert().getCert().equals(requestorCert)) {
         return new CmpRequestorInfo(m, entry.getCert());
+      }
+    }
+
+    return null;
+  }
+
+  // CHECKSTYLE:SKIP
+  public CmpRequestorInfo getMacRequestor(X500Name sender, byte[] senderKID) {
+    Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
+    if (CollectionUtil.isEmpty(requestorEntries)) {
+      return null;
+    }
+
+    for (CaHasRequestorEntry m : requestorEntries) {
+      RequestorEntryWrapper entry =
+          caManager.getRequestorWrapper(m.getRequestorIdent().getName());
+      if (!RequestorEntry.TYPE_PBM.equals(entry.getDbEntry().getType())) {
+        continue;
+      }
+
+      if (entry.matchKeyId(senderKID)) {
+        return new CmpRequestorInfo(m, entry.getPassword(), senderKID);
       }
     }
 

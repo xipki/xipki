@@ -260,16 +260,17 @@ public interface CaManager {
   void removeRequestor(String requestorName) throws CaMgmtException;
 
   /**
-   * Chagnes the requestor {@code name}.
+   * Changes the requestor {@code name} of type CERTIFCATE.
    * @param name
-   *          Requestor name. Must not be {@code null}.
-   * @param base64Cert
-   *          Base64 encoded certificate of the requestor's certificate.
-   *          Must not be {@code null}.
+   *          name of the certificate profile to be changed. Must not be {@code null}.
+   * @param type
+   *          Type to be changed. {@code null} indicates no change.
+   * @param conf
+   *          Configuration to be changed. {@code null} indicates no change.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeRequestor(String name, String base64Cert) throws CaMgmtException;
+  void changeRequestor(String name, String type, String conf) throws CaMgmtException;
 
   /**
    * Removes the requestor {@code requestorName} from the CA {@code caName}.

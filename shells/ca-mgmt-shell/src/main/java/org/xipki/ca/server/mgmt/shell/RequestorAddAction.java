@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.security.cert.X509Certificate;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -25,7 +27,10 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.RequestorEntry;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 
 /**
@@ -41,20 +46,32 @@ public class RequestorAddAction extends CaAction {
   @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
   private String name;
 
-  @Option(name = "--cert", required = true,
-      description = "DER encoded requestor certificate file")
+  @Option(name = "--cert", description = "DER encoded requestor certificate file\n"
+      + "(exactly one of cert and password must be specified).")
   @Completion(FileCompleter.class)
   private String certFile;
 
+  @Option(name = "--password", description = "Passord for PBM (Password based MAC)")
+  private String password;
+
   @Override
   protected Object execute0() throws Exception {
-    String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-    RequestorEntry entry = new RequestorEntry(new NameId(null, name), base64Cert);
+    if (!(certFile == null ^ password == null)) {
+      throw new CmdFailure("exactly one of cert and password must be specified");
+    }
+
+    RequestorEntry entry;
+    if (certFile != null) {
+      X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
+      entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_CERT,
+          Base64.encodeToString(cert.getEncoded()));
+    } else {
+      entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_PBM, password);
+      String keyId = HashAlgo.SHA1.hexHash(entry.getIdent().getName().getBytes("UTF-8"));
+      println("The key ID is " + keyId);
+    }
 
     String msg = "CMP requestor " + name;
-    if (entry.getCert() == null) {
-      throw new CmdFailure("could not add " + msg + ", error: could not get requestor certificate");
-    }
 
     try {
       caManager.addRequestor(entry);

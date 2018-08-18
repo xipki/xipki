@@ -41,7 +41,6 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.SqlColumn.ColumnType;
-import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.store.CertStore;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
@@ -66,6 +65,8 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -114,7 +115,7 @@ class CaManagerQueryExecutor {
     this.sqlSelectPublisherId = buildSelectFirstSql("ID FROM PUBLISHER WHERE NAME=?");
     this.sqlSelectPublisher = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
     this.sqlSelectRequestorId = buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?");
-    this.sqlSelectRequestor = buildSelectFirstSql("ID,CERT FROM REQUESTOR WHERE NAME=?");
+    this.sqlSelectRequestor = buildSelectFirstSql("ID,TYPE,CONF FROM REQUESTOR WHERE NAME=?");
     this.sqlSelectSigner = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectCa = buildSelectFirstSql("ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,"
@@ -380,7 +381,8 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown Requestor " + name);
       }
 
-      return new RequestorEntry(new NameId(rs.getInt("ID"), name), rs.getString("CERT"));
+      return new RequestorEntry(new NameId(rs.getInt("ID"), name),
+          rs.getString("TYPE"), rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
     } finally {
@@ -790,13 +792,14 @@ class CaManagerQueryExecutor {
       throw new CaMgmtException(ex);
     }
 
-    final String sql = "INSERT INTO REQUESTOR (ID,NAME,CERT) VALUES (?,?,?)";
+    final String sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
       ps.setInt(1, dbEntry.getIdent().getId());
       ps.setString(2, dbEntry.getIdent().getName());
-      ps.setString(3, Base64.encodeToString(dbEntry.getCert().getEncoded()));
+      ps.setString(3, dbEntry.getType());
+      ps.setString(4, dbEntry.getConf());
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add requestor " + dbEntry.getIdent());
       }
@@ -806,8 +809,6 @@ class CaManagerQueryExecutor {
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource, sql, ex);
-    } catch (CertificateEncodingException ex) {
-      throw new CaMgmtException(ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
@@ -830,10 +831,14 @@ class CaManagerQueryExecutor {
 
       int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
 
-      sql = "INSERT INTO REQUESTOR (ID,NAME) VALUES (?,?)";
+      sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
       stmt = prepareStatement(sql);
       stmt.setInt(1, id + 1);
       stmt.setString(2, requestorName);
+      // ANY VALUE
+      stmt.setString(3, "EMBEDDED");
+      // ANY VALUE
+      stmt.setString(4, "DEFAULT");
       stmt.executeUpdate();
       LOG.info("added requestor '{}'", requestorName);
     } catch (SQLException ex) {
@@ -1271,12 +1276,29 @@ class CaManagerQueryExecutor {
     }
   }
 
-  RequestorEntryWrapper changeRequestor(NameId nameId, String base64Cert) throws CaMgmtException {
+  RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf,
+      PasswordResolver passwordResolver) throws CaMgmtException {
     ParamUtil.requireNonNull("nameId", nameId);
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-    requestor.setDbEntry(new RequestorEntry(nameId, base64Cert));
 
-    changeIfNotNull("REQUESTOR", col(INT, "ID", nameId.getId()), col(STRING, "CERT", base64Cert));
+    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(type)) {
+      if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
+        try {
+          conf = passwordResolver.protectPassword("PBE", conf.toCharArray());
+        } catch (PasswordResolverException ex) {
+          throw new CaMgmtException("could not encrypt requestor " + nameId.getName(), ex);
+        }
+      }
+    }
+
+    requestor.setDbEntry(new RequestorEntry(nameId, type, conf), passwordResolver);
+
+    if (requestor.getDbEntry().isFaulty()) {
+      throw new CaMgmtException("invalid requestor configuration");
+    }
+
+    changeIfNotNull("REQUESTOR", col(INT, "ID", nameId.getId()),
+        col(STRING, "TYPE", type), col(STRING, "CONF", conf));
     return requestor;
   } // method changeRequestor
 

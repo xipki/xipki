@@ -89,7 +89,6 @@ import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.ca.server.impl.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.cmp.CmpResponderImpl;
-import org.xipki.ca.server.impl.cmp.RequestorEntryWrapper;
 import org.xipki.ca.server.impl.rest.RestResponderImpl;
 import org.xipki.ca.server.impl.scep.ScepResponderImpl;
 import org.xipki.ca.server.impl.store.CertStore;
@@ -141,6 +140,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.UserType;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
@@ -940,7 +940,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
         idNameMap.addRequestor(requestorDbEntry.getIdent());
         requestorDbEntries.put(name, requestorDbEntry);
         RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-        requestor.setDbEntry(requestorDbEntry);
+        requestor.setDbEntry(requestorDbEntry, securityFactory.getPasswordResolver());
         requestors.put(name, requestor);
       }
 
@@ -1368,8 +1368,23 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
     }
 
+    // encrypt the password
+    PasswordResolver pwdResolver = securityFactory.getPasswordResolver();
+    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(dbEntry.getType())) {
+      String conf = dbEntry.getConf();
+      if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
+        String encryptedPassword;
+        try {
+          encryptedPassword = pwdResolver.protectPassword("PBE", conf.toCharArray());
+        } catch (PasswordResolverException ex) {
+          throw new CaMgmtException("could not encrypt requestor " + name, ex);
+        }
+        dbEntry = new RequestorEntry(dbEntry.getIdent(), dbEntry.getType(), encryptedPassword);
+      }
+    }
+
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-    requestor.setDbEntry(dbEntry);
+    requestor.setDbEntry(dbEntry, pwdResolver);
 
     queryExecutor.addRequestor(dbEntry);
     idNameMap.addRequestor(dbEntry.getIdent());
@@ -1407,9 +1422,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method removeRequestor
 
   @Override
-  public void changeRequestor(String name, String base64Cert) throws CaMgmtException {
-    ParamUtil.requireNonNull("base64Cert", base64Cert);
+  public void changeRequestor(String name, String type, String conf) throws CaMgmtException {
     name = ParamUtil.requireNonBlankLower("name", name);
+    ParamUtil.requireNonBlank("type", type);
+    ParamUtil.requireNonBlank("conf", conf);
+
     asssertMasterMode();
 
     NameId ident = idNameMap.getRequestor(name);
@@ -1417,7 +1434,8 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw logAndCreateException(concat("unknown requestor ", name));
     }
 
-    RequestorEntryWrapper requestor = queryExecutor.changeRequestor(ident, base64Cert);
+    RequestorEntryWrapper requestor = queryExecutor.changeRequestor(ident, type, conf,
+        securityFactory.getPasswordResolver());
 
     requestorDbEntries.remove(name);
     requestors.remove(name);
@@ -3075,8 +3093,17 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           RequestorEntry entry = requestorDbEntries.get(name);
           RequestorType jaxb = new RequestorType();
           jaxb.setName(name);
-          jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
-              concat("files/requestor-", name, ".der")));
+          jaxb.setType(entry.getType());
+
+          if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
+            FileOrBinaryType fob = createFileOrBinary(zipStream,
+                Base64.decode(entry.getConf()), concat("files/requestor-", name, ".der"));
+            jaxb.setBinaryConf(fob);
+          } else {
+            FileOrValueType fov = createFileOrValue(zipStream,
+                entry.getConf(), concat("files/requestor-", name, ".conf"));
+            jaxb.setConf(fov);
+          }
 
           list.add(jaxb);
         }

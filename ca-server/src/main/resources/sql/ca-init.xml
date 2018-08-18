@@ -78,7 +78,10 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
-      <column name="CERT" type="VARCHAR(4000)"/>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
     </createTable>
     <addUniqueConstraint tableName="REQUESTOR" columnNames="NAME" constraintName="CONST_REQUESTOR_NAME"/>
     <!-- table PUBLISHER -->

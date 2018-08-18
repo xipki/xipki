@@ -18,6 +18,7 @@
 package org.xipki.security;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +43,8 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
    *            all algorithms
    * @throws NoSuchAlgorithmException if any algoName is unknown.
    */
-  public CollectionAlgorithmValidator(Set<String> algoNames) throws NoSuchAlgorithmException {
+  public CollectionAlgorithmValidator(Collection<String> algoNames)
+      throws NoSuchAlgorithmException {
     Set<String> canonicalizedNames = new HashSet<>();
     if (algoNames != null) {
       for (String m : algoNames) {

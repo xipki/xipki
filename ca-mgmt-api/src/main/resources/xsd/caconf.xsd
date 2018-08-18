@@ -107,9 +107,13 @@
     </xs:simpleContent>
   </xs:complexType>
   <xs:complexType name="requestorType">
-    <xs:all>
-      <xs:element name="cert" type="fileOrBinaryType"/>
-    </xs:all>
+    <xs:sequence>
+      <xs:element name="type" type="xs:string"/>
+      <xs:choice>
+        <xs:element name="conf" type="fileOrValueType"/>
+        <xs:element name="binaryConf" type="fileOrBinaryType"/>
+      </xs:choice>
+    </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="userType">

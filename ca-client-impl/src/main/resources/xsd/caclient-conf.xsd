@@ -56,27 +56,64 @@
     </xs:all>
   </xs:complexType>
   <xs:complexType name="requestorType">
-    <xs:all>
+    <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="signRequest" type="xs:boolean"/>
-      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="signerType" type="xs:string" minOccurs="0"/>
-      <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
-    </xs:all>
+      <xs:choice>
+        <xs:element name="pbmMac">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="kid" type="xs:hexBinary"/>
+              <xs:element name="sender" type="xs:string"/>
+              <xs:element name="password" type="xs:string"/>
+              <xs:element name="owf" type="xs:string"/>
+              <xs:element name="iterationCount" type="xs:int"/>
+              <xs:element name="mac" type="xs:string"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="signature">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+              <xs:element name="signerType" type="xs:string" minOccurs="0"/>
+              <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
   </xs:complexType>
   <xs:complexType name="responderType">
-    <xs:all>
+    <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="signatureAlgos">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="signatureAlgo" type="xs:string" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:all>
+      <xs:choice>
+        <xs:element name="pbmMac">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="owfAlgos" type="algosType"/>
+              <xs:element name="macAlgos" type="algosType"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="signature">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="signatureAlgos" type="algosType"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
   </xs:complexType>
+
+  <xs:complexType name="algosType">
+    <xs:sequence>
+       <xs:element name="algo" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="cmpcontrolType">
     <xs:choice>
       <xs:element name="autoconf" type="xs:anyType"/>
@@ -102,7 +139,8 @@
     <xs:choice>
       <xs:element name="autoconf" type="xs:anyType"/>
       <xs:sequence>
-        <xs:element name="certprofile" type="certprofileType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="certprofile" type="certprofileType" minOccurs="0"
+           maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:choice>
   </xs:complexType>

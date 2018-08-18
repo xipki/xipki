@@ -29,4 +29,6 @@ public interface SinglePasswordResolver {
 
   char[] resolvePassword(String passwordHint) throws PasswordResolverException;
 
+  String protectPassword(char[] password) throws PasswordResolverException;
+
 }

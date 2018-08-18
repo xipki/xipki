@@ -28,6 +28,7 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
+import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.cmp.PKIBody;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
@@ -42,8 +43,11 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
+import org.bouncycastle.cert.crmf.PKMACBuilder;
+import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -105,18 +109,21 @@ abstract class BaseCmpResponder implements CmpResponder {
    */
   protected abstract CmpControl getCmpControl();
 
+  // CHECKSTYLE:SKIP
+  public abstract CmpRequestorInfo getMacRequestor(X500Name requestorSender, byte[] senderKID);
+
   public abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
 
   public abstract CmpRequestorInfo getRequestor(X509Certificate requestorCert);
 
-  private CmpRequestorInfo getRequestor(PKIHeader reqHeader) {
+  private static X500Name getX500Sender(PKIHeader reqHeader) {
     GeneralName requestSender = reqHeader.getSender();
     if (requestSender.getTagNo() != GeneralName.directoryName) {
       return null;
     }
 
-    return getRequestor((X500Name) requestSender.getName());
-  } // method getRequestor
+    return (X500Name) requestSender.getName();
+  }
 
   /**
    * Processes the request and returns the response.
@@ -238,21 +245,24 @@ abstract class BaseCmpResponder implements CmpResponder {
             message, cmpControl);
         ProtectionResult pr = verificationResult.getProtectionResult();
         switch (pr) {
-          case VALID:
+          case SIGNATURE_VALID:
+          case MAC_VALID:
             errorStatus = null;
             break;
-          case INVALID:
+          case SIGNATURE_INVALID:
             errorStatus = "request is protected by signature but invalid";
             break;
-          case NOT_SIGNATURE_BASED:
-            errorStatus = "request is not protected by signature";
+          case MAC_INVALID:
+            errorStatus = "request is protected by MAC but invalid";
             break;
           case SENDER_NOT_AUTHORIZED:
-            errorStatus = "request is protected by signature but the requestor is not authorized";
+            errorStatus = "request is protected but the requestor is not authorized";
             break;
-          case SIGALGO_FORBIDDEN:
-            errorStatus = "request is protected by signature but the protection algorithm"
-              + " is forbidden";
+          case SIGNATURE_ALGO_FORBIDDEN:
+            errorStatus = "request is protected by signature but the algorithm is forbidden";
+            break;
+          case MAC_ALGO_FORBIDDEN:
+            errorStatus = "request is protected by MAC but the algorithm is forbidden";
             break;
           default:
             throw new RuntimeException("should not reach here, unknown ProtectionResult " + pr);
@@ -266,7 +276,9 @@ abstract class BaseCmpResponder implements CmpResponder {
     } else if (tlsClientCert != null) {
       boolean authorized = false;
 
-      requestor = getRequestor(reqHeader);
+      X500Name x500Sender = getX500Sender(reqHeader);
+      requestor = (x500Sender == null) ? null : getRequestor(x500Sender);
+
       if (requestor != null) {
         if (tlsClientCert.equals(requestor.getCert().getCert())) {
           authorized = true;
@@ -298,7 +310,7 @@ abstract class BaseCmpResponder implements CmpResponder {
         event);
 
     if (isProtected) {
-      resp = addProtection(resp, event);
+      resp = addProtection(resp, event, requestor);
     } else {
       // protected by TLS connection
     }
@@ -307,7 +319,15 @@ abstract class BaseCmpResponder implements CmpResponder {
   } // method processPkiMessage
 
   protected byte[] randomTransactionId() {
-    byte[] bytes = new byte[10];
+    return randomBytes(10);
+  }
+
+  protected byte[] randomSalt() {
+    return randomBytes(64);
+  }
+
+  protected byte[] randomBytes(int len) {
+    byte[] bytes = new byte[len];
     random.nextBytes(bytes);
     return bytes;
   }
@@ -316,43 +336,87 @@ abstract class BaseCmpResponder implements CmpResponder {
       CmpControl cmpControl) throws CMPException, InvalidKeyException, OperatorCreationException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
-    if (protectedMsg.hasPasswordBasedMacProtection()) {
-      LOG.warn("NOT_SIGNAUTRE_BASED: {}",
-          pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
-      return new ProtectionVerificationResult(null, ProtectionResult.NOT_SIGNATURE_BASED);
-    }
-
     PKIHeader header = protectedMsg.getHeader();
-    AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
-    if (!cmpControl.getSigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
-      LOG.warn("SIG_ALGO_FORBIDDEN: {}",
-          pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
-      return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);
-    }
-
-    CmpRequestorInfo requestor = getRequestor(header);
-    if (requestor == null) {
-      LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
+    X500Name sender = getX500Sender(header);
+    if (sender == null) {
+      LOG.warn("tid={}: not authorized requestor 'null'", tid);
       return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
     }
 
-    ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
-        requestor.getCert().getCert());
-    if (verifierProvider == null) {
-      LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
-      return new ProtectionVerificationResult(requestor,
-          ProtectionResult.SENDER_NOT_AUTHORIZED);
-    }
+    AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
 
-    boolean signatureValid = protectedMsg.verify(verifierProvider);
-    return new ProtectionVerificationResult(requestor,
-        signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
+    if (protectedMsg.hasPasswordBasedMacProtection()) {
+      PBMParameter parameter =
+          PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
+      AlgorithmIdentifier algId = parameter.getOwf();
+      if (!cmpControl.isRequestPbmOwfPermitted(algId)) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", algId.getAlgorithm().getId());
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
+      algId = parameter.getMac();
+      if (!cmpControl.isRequestPbmMacPermitted(algId)) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})", algId.getAlgorithm().getId());
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
+      ASN1OctetString asn1 = header.getSenderKID();
+      // CHECKSTYLE:SKIP
+      byte[] senderKID = (asn1 == null) ? null : asn1.getOctets();
+      PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
+
+      CmpRequestorInfo requestor = getMacRequestor(sender, senderKID);
+
+      if (requestor == null) {
+        LOG.warn("tid={}: not authorized requestor '{}' with senderKID '{}", tid, sender,
+            (senderKID == null) ? "null" : Hex.toHexString(senderKID));
+        return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
+      }
+
+      boolean macValid = protectedMsg.verify(pkMacBuilder, requestor.getPassword());
+      return new ProtectionVerificationResult(requestor,
+          macValid ? ProtectionResult.MAC_VALID : ProtectionResult.MAC_INVALID);
+    } else {
+      if (!cmpControl.getSigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
+        LOG.warn("SIG_ALGO_FORBIDDEN: {}",
+            pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+        return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_ALGO_FORBIDDEN);
+      }
+
+      X500Name x500Sender = getX500Sender(header);
+      CmpRequestorInfo requestor = (x500Sender == null) ? null : getRequestor(x500Sender);
+      if (requestor == null) {
+        LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
+        return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
+      }
+
+      ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
+          requestor.getCert().getCert());
+      if (verifierProvider == null) {
+        LOG.warn("tid={}: not authorized requestor '{}'", tid, sender);
+        return new ProtectionVerificationResult(requestor,
+            ProtectionResult.SENDER_NOT_AUTHORIZED);
+      }
+
+      boolean signatureValid = protectedMsg.verify(verifierProvider);
+      return new ProtectionVerificationResult(requestor,
+          signatureValid ? ProtectionResult.SIGNATURE_VALID : ProtectionResult.SIGNATURE_INVALID);
+    }
   } // method verifyProtection
 
-  private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent event) {
+  private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent event,
+      CmpRequestorInfo requestor) {
+    CmpControl control = getCmpControl();
     try {
-      return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
-          getCmpControl().isSendResponderCert());
+      if (requestor.getCert() != null) {
+        return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
+            control.isSendResponderCert());
+      } else {
+        PBMParameter parameter = new PBMParameter(randomSalt(), control.getResponsePbmOwf(),
+            control.getResponsePbmIterationCount(), control.getResponsePbmMac());
+        return CmpUtil.addProtection(pkiMessage, requestor.getPassword(), parameter,
+            getSender(), requestor.getKeyId());
+      }
     } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not add protection to the PKI message");
       PKIStatusInfo status = generateRejectionStatus(

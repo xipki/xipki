@@ -33,9 +33,16 @@
   </signers>
   <requestors>
     <requestor name="requestor1">
-      <cert>
+      <type>cert</type>
+      <binaryConf>
         <file>${security.dir}/tlskeys/tls-client.der</file>
-      </cert>
+      </binaryConf>
+    </requestor>
+    <requestor name="requestor-mac1">
+      <type>pbm</type>
+      <conf>
+        <value>123456</value>
+      </conf>
     </requestor>
   </requestors>
   <users>
@@ -203,6 +210,16 @@
       <requestors>
         <requestor>
           <requestorName>requestor1</requestorName>
+          <ra>true</ra>
+          <permissions>
+            <permission>all</permission>
+          </permissions>
+          <profiles>
+            <profile>all</profile>
+          </profiles>
+        </requestor>
+        <requestor>
+          <requestorName>requestor-mac1</requestorName>
           <ra>true</ra>
           <permissions>
             <permission>all</permission>

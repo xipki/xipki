@@ -17,15 +17,13 @@
 
 package org.xipki.ca.server.mgmt.api;
 
-import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
+
 import org.xipki.util.ParamUtil;
 
 /**
@@ -36,15 +34,25 @@ import org.xipki.util.ParamUtil;
 
 public class RequestorEntry {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RequestorEntry.class);
+  /**
+   * Certificate.
+   */
+  public static final String TYPE_CERT = "cert";
+
+  /**
+   * Password based MAC.
+   */
+  public static final String TYPE_PBM = "pbm";
 
   private final NameId ident;
 
-  private final String base64Cert;
+  private final String type;
 
-  private X509Certificate cert;
+  private final String conf;
 
-  public RequestorEntry(NameId ident, String base64Cert) {
+  private boolean faulty;
+
+  public RequestorEntry(NameId ident, String type, String conf) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
     String name = ident.getName();
     if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
@@ -52,24 +60,28 @@ public class RequestorEntry {
       throw new IllegalArgumentException("Requestor name could not be " + name);
     }
 
-    this.base64Cert = ParamUtil.requireNonBlank("base64Cert", base64Cert);
-    try {
-      this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-    } catch (Throwable th) {
-      LogUtil.error(LOG, th, "could not parse the certificate for requestor '" + ident + "'");
-    }
+    this.type = ParamUtil.requireNonBlank("type", type);
+    this.conf = ParamUtil.requireNonBlank("conf", conf);
   }
 
   public NameId getIdent() {
     return ident;
   }
 
-  public String getBase64Cert() {
-    return base64Cert;
+  public String getType() {
+    return type;
   }
 
-  public X509Certificate getCert() {
-    return cert;
+  public String getConf() {
+    return conf;
+  }
+
+  public void setFaulty(boolean faulty) {
+    this.faulty = faulty;
+  }
+
+  public boolean isFaulty() {
+    return faulty;
   }
 
   @Override
@@ -79,28 +91,30 @@ public class RequestorEntry {
 
   public String toString(boolean verbose) {
     StringBuilder sb = new StringBuilder(500);
-    sb.append("id: ").append(ident.getId()).append('\n');
-    sb.append("name: ").append(ident.getName()).append('\n');
-    sb.append("faulty: ").append(cert == null).append('\n');
+    sb.append("id: ").append(ident.getId());
+    sb.append("\nname: ").append(ident.getName());
+    sb.append("\ntype: ").append(type);
 
-    if (cert != null) {
-      sb.append("cert: ").append("\n");
-      sb.append("\tissuer: ")
-        .append(X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append("\n");
-      sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append("\n");
-      sb.append("\tsubject: ")
-        .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
-
-      if (verbose) {
-        sb.append("\tencoded: ");
-        try {
-          sb.append(Base64.encodeToString(cert.getEncoded()));
-        } catch (CertificateEncodingException ex) {
-          sb.append("ERROR");
-        }
-      }
+    sb.append("\nconf: ");
+    if (verbose || conf.length() < 101) {
+      sb.append(conf);
     } else {
-      sb.append("cert: null");
+      sb.append(conf.substring(0, 97)).append("...");
+    }
+
+    sb.append("\nfaulty: ").append(faulty).append('\n');
+
+    if (!faulty && TYPE_CERT.equalsIgnoreCase(type)) {
+      try {
+        X509Certificate cert = X509Util.parseBase64EncodedCert(conf);
+        sb.append("cert:");
+        sb.append("\n\tissuer: ").append(X509Util.getRfc4519Name(cert.getIssuerX500Principal()));
+        sb.append("\n\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
+        sb.append("\n\tsubject: ")
+          .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
+      } catch (CertificateException ex) {
+        sb.append("cert: ERROR(").append(ex.getMessage()).append(")\n");
+      }
     }
 
     return sb.toString();
@@ -118,7 +132,8 @@ public class RequestorEntry {
   public boolean equals(RequestorEntry obj, boolean ignoreId) {
     return (obj != null)
         && ident.equals(obj.ident, ignoreId)
-        && base64Cert.equals(obj.base64Cert);
+        && type.equals(obj.type)
+        && conf.equals(obj.conf);
   }
 
   @Override

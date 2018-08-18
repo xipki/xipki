@@ -529,7 +529,7 @@ public class AlgorithmUtil {
 
     ASN1ObjectIdentifier oid = macAlgNameToOidMap.get(algoS);
     if (oid == null) {
-      throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
+      throw new NoSuchAlgorithmException("unsupported MAC algorithm " + algoS);
     }
     return new AlgorithmIdentifier(oid, DERNull.INSTANCE);
   } // method getMacAlgId
