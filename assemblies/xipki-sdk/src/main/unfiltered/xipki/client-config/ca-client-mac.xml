@@ -52,38 +52,8 @@
       disables the interval update -->
     <cainfoUpdateInterval>10</cainfoUpdateInterval>
     <ca>
-      <name>rootca1</name>
-      <url>https://localhost:8443/cmp/rootca</url>
-      <requestor>requestor1</requestor>
-      <responder>responder1</responder>
-      <cmpcontrol>
-        <autoconf/>
-      </cmpcontrol>
-      <caCert>
-        <autoconf/>
-      </caCert>
-      <certprofiles>
-        <autoconf/>
-      </certprofiles>
-    </ca>
-    <ca>
-      <name>subca1</name>
-      <url>https://localhost:8443/cmp/subca</url>
-      <requestor>requestor1</requestor>
-      <responder>responder1</responder>
-      <cmpcontrol>
-        <autoconf/>
-      </cmpcontrol>
-      <caCert>
-        <autoconf/>
-      </caCert>
-      <certprofiles>
-        <autoconf/>
-      </certprofiles>
-    </ca>
-    <ca>
-      <name>subcawithcrl1</name>
-      <url>https://localhost:8443/cmp/subcawithcrl</url>
+      <name>MYCA</name>
+      <url>https://localhost:8443/cmp/myca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>

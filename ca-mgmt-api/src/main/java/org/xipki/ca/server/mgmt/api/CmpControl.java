@@ -76,7 +76,7 @@ public class CmpControl {
 
   private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
 
-  private static final int DFLT_PBM_ITERATIONCOUNT = 1000;
+  private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
 
   private final String conf;
 

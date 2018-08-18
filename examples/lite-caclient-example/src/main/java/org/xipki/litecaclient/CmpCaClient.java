@@ -46,7 +46,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -77,6 +77,7 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.cmp.RevDetails;
 import org.bouncycastle.asn1.cmp.RevRepContent;
 import org.bouncycastle.asn1.cmp.RevReqContent;
+import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
@@ -106,7 +107,6 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -924,24 +924,15 @@ public class CmpCaClient {
       }
 
       AlgorithmIdentifier symmAlg = ev.getSymmAlg();
-      if (!(symmAlg.getAlgorithm().equals(CMSAlgorithm.AES128_CBC)
-          || symmAlg.getAlgorithm().equals(CMSAlgorithm.AES192_CBC)
-          || symmAlg.getAlgorithm().equals(CMSAlgorithm.AES256_CBC))) {
-        // currently we only support AES128-CBC
+      if (!symmAlg.getAlgorithm().equals(NISTObjectIdentifiers.id_aes128_GCM)) {
+        // currently we only support AES128-GCM
         throw new Exception("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
       }
 
-      Cipher dataCipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-      /*
-       * As defined in §4.1 in RFC 3565:
-       * The AlgorithmIdentifier parameters field MUST be present, and the
-       * parameters field MUST contain a AES-IV:
-       *
-       *     AES-IV ::= OCTET STRING (SIZE(16))
-       */
-      byte[] iv = DEROctetString.getInstance(symmAlg.getParameters()).getOctets();
-      AlgorithmParameterSpec algParams = new IvParameterSpec(iv);
-      dataCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symmKey, "AES"), algParams);
+      Cipher dataCipher = Cipher.getInstance(NISTObjectIdentifiers.id_aes128_GCM.getId());
+      GCMParameters gcmParams = GCMParameters.getInstance(symmAlg.getParameters());
+      GCMParameterSpec spec = new GCMParameterSpec(gcmParams.getIcvLen() * 8, gcmParams.getNonce());
+      dataCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symmKey, "AES"), spec);
 
       byte[] encValue = ev.getEncValue().getOctets();
       return dataCipher.doFinal(encValue);

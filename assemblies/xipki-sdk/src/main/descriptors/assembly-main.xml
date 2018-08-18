@@ -22,6 +22,14 @@
   <formats>
     <format>tar.gz</format>
   </formats>
+  <files>
+    <file>
+      <source>${output.directory}/xipki/client-config/ca-client-signature.xml</source>
+      <outputDirectory>xipki/client-config</outputDirectory>
+      <destName>ca-client.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
   <componentDescriptors>
     <componentDescriptor>../shared/src/main/descriptors/component-common.xml</componentDescriptor>
   </componentDescriptors>
