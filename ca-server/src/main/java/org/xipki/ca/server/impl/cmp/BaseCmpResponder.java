@@ -360,6 +360,12 @@ abstract class BaseCmpResponder implements CmpResponder {
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
+      int iterationCount = parameter.getIterationCount().getValue().intValue();
+      if (iterationCount < 1000) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} < 1000)", iterationCount);
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
       ASN1OctetString asn1 = header.getSenderKID();
       // CHECKSTYLE:SKIP
       byte[] senderKID = (asn1 == null) ? null : asn1.getOctets();

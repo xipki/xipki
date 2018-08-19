@@ -104,7 +104,6 @@ public class CmpUtil {
       throw new CMPException(ex.getMessage(), ex);
     }
     return signedMessage.toASN1Structure();
-
   }
 
   // CHECKSTYLE:SKIP
