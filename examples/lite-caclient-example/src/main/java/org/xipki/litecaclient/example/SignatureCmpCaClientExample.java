@@ -34,13 +34,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.litecaclient.CmpCaClient;
 import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.SdkUtil;
+import org.xipki.litecaclient.SignatureCmpCaClient;
 
 /**
  * TODO.
  * @author Lijun Liao
  */
 
-public class CmpCaClientExample extends CaClientExample {
+public class SignatureCmpCaClientExample extends CaClientExample {
 
   //private static final String CA_URL = "http://localhost:8080/cmp/myca";
 
@@ -100,14 +101,8 @@ public class CmpCaClientExample extends CaClientExample {
       X509Certificate caCert = SdkUtil.parseCert(new File(expandPath(CA_CERT_FILE)));
 
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
-      CmpCaClient client = new CmpCaClient(CA_URL, caCert, requestorKey, requestorCert,
+      CmpCaClient client = new SignatureCmpCaClient(CA_URL, caCert, requestorKey, requestorCert,
           responderCert, HASH_ALGO);
-
-      // Since xipki-2.2.1 the specification of CA certificate is not required, it can
-      // be retrieved via the CMP protocol
-      //
-      // CmpCaClient client = new CmpCaClient(CA_URL, requestorKey, requestorCert,
-      //        responderCert, HASH_ALGO);
 
       client.init();
 
