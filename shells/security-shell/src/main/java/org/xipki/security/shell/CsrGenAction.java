@@ -126,7 +126,7 @@ public abstract class CsrGenAction extends SecurityAction {
   private List<String> keyusages;
 
   @Option(name = "--ext-keyusage", multiValued = true,
-      description = "extended keyusage (name or OID")
+      description = "extended keyusage (name or OID)")
   @Completion(ExtKeyusageCompleter.class)
   private List<String> extkeyusages;
 
