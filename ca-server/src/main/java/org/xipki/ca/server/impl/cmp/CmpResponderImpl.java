@@ -511,17 +511,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
       CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
 
       String genkeyType = null;
-      if (allowKeyGen) {
-        if (keyvalues != null) {
-          genkeyType = keyvalues.value(CmpUtf8Pairs.KEY_GENERATEKEY);
-        }
-
-        if (genkeyType == null) {
-          genkeyType = dfltKeyGenType;
-        }
-      }
-
-      if (StringUtil.isBlank(genkeyType)) {
+      if (req.getCertTemplate().getPublicKey() != null) {
         if (!req.hasProofOfPossession()) {
           certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "no POP"));
           continue;
@@ -534,7 +524,23 @@ public class CmpResponderImpl extends BaseCmpResponder {
           continue;
         }
       } else {
-        checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
+        if (allowKeyGen) {
+          if (keyvalues != null) {
+            genkeyType = keyvalues.value(CmpUtf8Pairs.KEY_GENERATEKEY);
+          }
+
+          if (genkeyType == null) {
+            genkeyType = dfltKeyGenType;
+          }
+
+          checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
+        } else {
+          LOG.warn("no public key is specified and key generation is not allowed {}",
+              certReqId.getValue());
+          certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
+              "no public key"));
+          continue;
+        }
       }
 
       CertTemplate certTemp = req.getCertTemplate();
