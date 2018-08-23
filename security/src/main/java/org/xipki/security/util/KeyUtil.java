@@ -137,6 +137,12 @@ public class KeyUtil {
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
         dsaParams.getG());
+    return generateDSAKeypair(dsaParamSpec, random);
+  }
+
+  // CHECKSTYLE:SKIP
+  public static KeyPair generateDSAKeypair(DSAParameterSpec dsaParamSpec, SecureRandom random)
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
     synchronized (kpGen) {
       kpGen.initialize(dsaParamSpec, random);

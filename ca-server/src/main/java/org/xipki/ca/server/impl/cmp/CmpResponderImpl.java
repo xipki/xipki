@@ -450,8 +450,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
   private PKIBody processKur(String dfltCertprofileName, String dfltKeyGenType, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages kur,
-      CmpControl cmpControl,
-      String msgId, AuditEvent event) throws InsuffientPermissionException {
+      CmpControl cmpControl, String msgId, AuditEvent event) throws InsuffientPermissionException {
     CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltKeyGenType, request,
         requestor, tid, reqHeader, kur, true, true, cmpControl, msgId, event);
     return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
@@ -510,7 +509,6 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
       CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
 
-      String genkeyType = null;
       if (req.getCertTemplate().getPublicKey() != null) {
         if (!req.hasProofOfPossession()) {
           certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "no POP"));
@@ -525,14 +523,6 @@ public class CmpResponderImpl extends BaseCmpResponder {
         }
       } else {
         if (allowKeyGen) {
-          if (keyvalues != null) {
-            genkeyType = keyvalues.value(CmpUtf8Pairs.KEY_GENERATEKEY);
-          }
-
-          if (genkeyType == null) {
-            genkeyType = dfltKeyGenType;
-          }
-
           checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
         } else {
           LOG.warn("no public key is specified and key generation is not allowed {}",
@@ -559,7 +549,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
         }
       }
 
-      CertTemplateData certTempData = new CertTemplateData(certTemp.getSubject(), genkeyType,
+      CertTemplateData certTempData = new CertTemplateData(certTemp.getSubject(),
           certTemp.getPublicKey(), notBefore, notAfter,  certTemp.getExtensions(), certprofileName,
           certReqId);
       certTemplateDatas.add(certTempData);
@@ -693,7 +683,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
           String msg = "certprofile " + certprofileName + " is not allowed";
           certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
         } else {
-          CertTemplateData certTemplateData = new CertTemplateData(subject, null, publicKeyInfo,
+          CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
               notBefore, notAfter, extensions, certprofileName, certReqId);
 
           certResp = generateCertificates(Arrays.asList(certTemplateData),

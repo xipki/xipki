@@ -127,6 +127,10 @@ public abstract class Certprofile {
 
   public abstract CertLevel getCertLevel();
 
+  public KeypairGenControl getKeypairGenControl() {
+    return KeypairGenControl.ForbiddenKeypairGenControl.INSTANCE;
+  }
+
   public abstract Set<KeyUsageControl> getKeyUsage();
 
   public abstract Integer getPathLenBasicConstraint();

@@ -40,7 +40,7 @@ public class CmpUtf8Pairs {
 
   public static final String KEY_NOTAFTER = "notafter";
 
-  public static final String KEY_GENERATEKEY = "generatekey";
+  // public static final String KEY_GENERATEKEY = "generatekey";
 
   private static final char NAME_TERM = '?';
 

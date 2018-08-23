@@ -51,13 +51,6 @@ import org.xipki.util.StringUtil;
 @Service
 public class EnrollCertCaGenKeyAction extends EnrollAction {
 
-  @Option(name = "--key-type", required = true,
-      description = "key type to be generated. Valid values are\n"
-          + "  rsa:<key size>[:<public exponent>], e.g. rsa:2048, rsa:2048:0x10001\n"
-          + "  ec:<curve name>, e.g. rsa:secp256r1\n"
-          + "  dsa:<plen>[:<qlen>], e.g. dsa:2048, dsa:2048:256")
-  private String keytype;
-
   @Option(name = "--cert-out", description = "where to save the DER encoded certificate")
   @Completion(FileCompleter.class)
   private String certOutputFile;
@@ -77,7 +70,7 @@ public class EnrollCertCaGenKeyAction extends EnrollAction {
   @Override
   protected EnrollCertRequestEntry buildEnrollCertRequestEntry(String id, String profile,
       CertRequest certRequest) throws Exception {
-    return new EnrollCertRequestEntry("id-1", profile, certRequest, keytype);
+    return new EnrollCertRequestEntry("id-1", profile, certRequest, null);
   }
 
   @Override

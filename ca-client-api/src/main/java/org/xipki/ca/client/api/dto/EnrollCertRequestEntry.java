@@ -35,26 +35,13 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
 
   private final ProofOfPossession popo;
 
-  private final String genKeyType;
-
   public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
       ProofOfPossession popo) {
     super(id);
 
     this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
     this.certReq = ParamUtil.requireNonNull("certReq", certReq);
-    this.popo = ParamUtil.requireNonNull("popo", popo);
-    this.genKeyType = null;
-  }
-
-  public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
-      String genKeyType) {
-    super(id);
-
-    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-    this.certReq = ParamUtil.requireNonNull("certReq", certReq);
-    this.popo = null;
-    this.genKeyType = ParamUtil.requireNonBlank("genKeyType", genKeyType);
+    this.popo = popo;
   }
 
   public String getCertprofile() {
@@ -67,10 +54,6 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
 
   public ProofOfPossession getPopo() {
     return popo;
-  }
-
-  public String getGenKeyType() {
-    return genKeyType;
   }
 
 }

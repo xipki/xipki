@@ -87,6 +87,14 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="serialNumberInReq" type="xs:boolean"/>
+      <xs:element name="keypairGeneration" type="keypairGenerationType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Control how CA will generate the keypair for the certificate.
+            Defaults to forbidden.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="keyAlgorithms" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -125,6 +133,38 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="value" type="xs:string"/>
     </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="keypairGenerationType">
+    <xs:choice>
+      <xs:element name="inheritCA"/>
+      <xs:element name="forbidden"/>
+      <xs:element name="rsa">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="keysize" type="xs:int"/>
+            <xs:element name="publicExponent" type="xs:string" minOccurs="0"/>
+            <xs:element name="algorithm" type="oidWithDescType"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ec">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="curve" type="oidWithDescType"/>
+            <xs:element name="algorithm" type="oidWithDescType"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="dsa">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="pLength" type="xs:int"/>
+            <xs:element name="qLength" type="xs:int" minOccurs="0"/>
+            <xs:element name="algorithm" type="oidWithDescType"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
   </xs:complexType>
   <xs:complexType name="algorithmType">
     <xs:sequence>

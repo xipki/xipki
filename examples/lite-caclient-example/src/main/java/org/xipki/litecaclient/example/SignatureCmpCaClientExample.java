@@ -109,24 +109,13 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       // retrieve CA certificate
       printCert("===== CA Certificate =====", client.getCaCert());
 
-      // Enroll certificate via CRMF - RSA (CA generate keypair)
-      KeyAndCert keyAndCert = client.requestCertViaCrmf(CERT_PROFILE,"rsa:2048", getSubject(),
-          profileAndKeyTypeInUri);
-      printKeyAndCert("===== RSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
-
-      // Enroll certificate via CRMF - EC (CA generate keypair)
+      // Enroll certificate via CRMF - (CA generate keypair)
       KeyAndCert[] keyAndCerts =
-          client.requestCertViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
-          new String[] {"ec:secp256r1", "ec:secp256r1"},
+          client.requestCertViaCrmfCaGenKeypair(new String[] {CERT_PROFILE, CERT_PROFILE},
           new String[]{getSubject(), getSubject()}, profileAndKeyTypeInUri);
       for (int i = 0; i < keyAndCerts.length; i++) {
-        printKeyAndCert("===== EC via CRMF (CMP, CA generate keypair) =====", keyAndCerts[i]);
+        printKeyAndCert("===== via CRMF (CMP, CA generate keypair) =====", keyAndCerts[i]);
       }
-
-      // Enroll certificate via CRMF - DSA (CA generate keypair)
-      keyAndCert = client.requestCertViaCrmf(CERT_PROFILE, "dsa:2048", getSubject(),
-          profileAndKeyTypeInUri);
-      printKeyAndCert("===== DSA via CRMF (CMP, CA generate keypair) =====", keyAndCert);
 
       // Enroll certificate via CSR - RSA
       MyKeypair kp = generateRsaKeypair();

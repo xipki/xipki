@@ -87,6 +87,7 @@ import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.GeneralNameTag;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyUsageControl;
+import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.RdnControl;
 import org.xipki.ca.api.profile.StringType;
@@ -109,6 +110,10 @@ import org.xipki.ca.certprofile.xml.jaxb.ExtensionsType;
 import org.xipki.ca.certprofile.xml.jaxb.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xml.jaxb.IntWithDescType;
 import org.xipki.ca.certprofile.xml.jaxb.KeyUsage;
+import org.xipki.ca.certprofile.xml.jaxb.KeypairGenerationType;
+import org.xipki.ca.certprofile.xml.jaxb.KeypairGenerationType.Dsa;
+import org.xipki.ca.certprofile.xml.jaxb.KeypairGenerationType.Ec;
+import org.xipki.ca.certprofile.xml.jaxb.KeypairGenerationType.Rsa;
 import org.xipki.ca.certprofile.xml.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.xml.jaxb.PdsLocationType;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
@@ -170,6 +175,8 @@ public class XmlCertprofile extends BaseCertprofile {
   private BiometricInfoOption biometricInfo;
 
   private CertLevel certLevel;
+
+  private KeypairGenControl keypairGenControl;
 
   private ExtensionValue certificatePolicies;
 
@@ -239,6 +246,7 @@ public class XmlCertprofile extends BaseCertprofile {
     authorizationTemplate = null;
     biometricInfo = null;
     certLevel = null;
+    keypairGenControl = null;
     certificatePolicies = null;
     constantExtensions = null;
     extendedKeyusages = null;
@@ -347,6 +355,44 @@ public class XmlCertprofile extends BaseCertprofile {
       this.certLevel = CertLevel.EndEntity;
     } else {
       throw new CertprofileException("invalid CertLevel '" + str + "'");
+    }
+
+    // KeypairGenControl
+    KeypairGenerationType kg = conf.getKeypairGeneration();
+    if (kg == null || kg.getForbidden() != null) {
+      this.keypairGenControl = KeypairGenControl.ForbiddenKeypairGenControl.INSTANCE;
+    } else if (kg.getInheritCA() != null) {
+      this.keypairGenControl = KeypairGenControl.InheritCAKeypairGenControl.INSTANCE;
+    } else if (kg.getRsa() != null) {
+      Rsa rsaKg = kg.getRsa();
+      BigInteger publicExponent = null;
+      if (rsaKg.getPublicExponent() != null) {
+        String tmp = rsaKg.getPublicExponent();
+        publicExponent = StringUtil.startsWithIgnoreCase(tmp, "0x")
+            ? new BigInteger(tmp.substring(2), 16) : new BigInteger(tmp);
+      }
+
+      ASN1ObjectIdentifier keyAlgorithmOid = (rsaKg.getAlgorithm() == null) ? null
+          : new ASN1ObjectIdentifier(rsaKg.getAlgorithm().getValue());
+
+      this.keypairGenControl = new KeypairGenControl.RSAKeypairGenControl(rsaKg.getKeysize(),
+          publicExponent, keyAlgorithmOid);
+    } else if (kg.getEc() != null) {
+      Ec ecKg = kg.getEc();
+      ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(ecKg.getCurve().getValue());
+      ASN1ObjectIdentifier keyAlgorithmOid = (ecKg.getAlgorithm() == null) ? null
+          : new ASN1ObjectIdentifier(ecKg.getAlgorithm().getValue());
+      this.keypairGenControl = new KeypairGenControl.ECKeypairGenControl(curveOid, keyAlgorithmOid);
+    } else if (kg.getDsa() != null) {
+      Dsa dsaKg = kg.getDsa();
+      int plen = dsaKg.getPLength();
+      int qlen = (dsaKg.getQLength() == null) ? 0 : dsaKg.getQLength().intValue();
+      ASN1ObjectIdentifier keyAlgorithmOid = (dsaKg.getAlgorithm() == null) ? null
+          : new ASN1ObjectIdentifier(dsaKg.getAlgorithm().getValue());
+      this.keypairGenControl =
+          new KeypairGenControl.DSAKeypairGenControl(plen, qlen, keyAlgorithmOid);
+    } else {
+      throw new CertprofileException("unknown KeypairGeneration type " + kg);
     }
 
     str = conf.getNotBeforeTime().toLowerCase().trim();
@@ -1759,6 +1805,11 @@ public class XmlCertprofile extends BaseCertprofile {
   @Override
   public CertLevel getCertLevel() {
     return certLevel;
+  }
+
+  @Override
+  public KeypairGenControl getKeypairGenControl() {
+    return keypairGenControl;
   }
 
   @Override

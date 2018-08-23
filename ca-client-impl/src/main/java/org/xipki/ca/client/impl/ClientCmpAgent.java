@@ -1343,10 +1343,6 @@ abstract class ClientCmpAgent {
       EnrollCertRequestEntry reqEntry = reqEntries.get(i);
       CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE,
           reqEntry.getCertprofile());
-      String genKeyType = reqEntry.getGenKeyType();
-      if (genKeyType != null) {
-        utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_GENERATEKEY, genKeyType);
-      }
 
       AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 

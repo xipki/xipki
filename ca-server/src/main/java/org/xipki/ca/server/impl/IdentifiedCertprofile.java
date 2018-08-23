@@ -66,6 +66,7 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyUsageControl;
+import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
@@ -491,6 +492,10 @@ class IdentifiedCertprofile {
 
   public CertLevel getCertLevel() {
     return certprofile.getCertLevel();
+  }
+
+  public KeypairGenControl getKeypairGenControl() {
+    return certprofile.getKeypairGenControl();
   }
 
   public boolean isOnlyForRa() {

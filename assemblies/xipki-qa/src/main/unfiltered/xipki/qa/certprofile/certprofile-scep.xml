@@ -65,6 +65,9 @@
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
   <serialNumberInReq>false</serialNumberInReq>
+  <keypairGeneration>
+    <inheritCA/>
+  </keypairGeneration>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
