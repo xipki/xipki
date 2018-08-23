@@ -18,10 +18,7 @@
 package org.xipki.litecaclient;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -591,39 +588,8 @@ public abstract class CmpCaClient {
   }
 
   public byte[] send(byte[] request, String uri) throws IOException {
-    SdkUtil.requireNonNull("request", request);
-
-    URL url = (uri == null) ? caUrl : new URL(uri);
-    HttpURLConnection httpUrlConnection = SdkUtil.openHttpConn(url);
-    httpUrlConnection.setDoOutput(true);
-    httpUrlConnection.setUseCaches(false);
-
-    httpUrlConnection.setRequestMethod("POST");
-    httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
-    httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(request.length));
-    OutputStream outputstream = httpUrlConnection.getOutputStream();
-    outputstream.write(request);
-    outputstream.flush();
-
-    InputStream inputStream = httpUrlConnection.getInputStream();
-    if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-      inputStream.close();
-      throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
-          + httpUrlConnection.getResponseMessage());
-    }
-    String responseContentType = httpUrlConnection.getContentType();
-    boolean isValidContentType = false;
-    if (responseContentType != null) {
-      if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
-        isValidContentType = true;
-      }
-    }
-    if (!isValidContentType) {
-      inputStream.close();
-      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
-    }
-
-    return SdkUtil.read(inputStream);
+    URL url = ((uri == null) ? caUrl : new URL(uri));
+    return SdkUtil.send(url, "POST", request, CMP_REQUEST_MIMETYPE, CMP_RESPONSE_MIMETYPE);
   } // method send
 
   protected abstract byte[] decrypt(EncryptedValue ev) throws Exception;

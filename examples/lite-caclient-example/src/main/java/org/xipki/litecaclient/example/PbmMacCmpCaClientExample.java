@@ -19,6 +19,7 @@ package org.xipki.litecaclient.example;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -40,6 +41,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.PbmMacCmpCaClient;
 import org.xipki.litecaclient.SdkUtil;
+import org.xipki.litecaclient.TlsInit;
 
 /**
  * TODO.
@@ -48,12 +50,13 @@ import org.xipki.litecaclient.SdkUtil;
 
 public class PbmMacCmpCaClientExample extends CaClientExample {
 
-  //private static final String CA_URL = "http://localhost:8080/cmp/myca";
+  //private static final String URL_PREFIX = "http://localhost:8080";
 
-  private static final String CA_URL = "https://localhost:8443/cmp/myca";
+  private static final String URL_PREFIX = "https://localhost:8443";
 
-  private static final String CA_CERT_FILE = "~/source/xipki/assemblies/xipki-pki/target/"
-      + "xipki-pki-4.0.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
+  private static final String CMP_URL = URL_PREFIX + "/cmp/myca";
+
+  private static final String CACERT_URL = URL_PREFIX + "/cacert/myca";
 
   private static final String KEYCERT_DIR =  "target/tlskeys";
 
@@ -78,7 +81,12 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
     Security.addProvider(new BouncyCastleProvider());
 
     try {
-      X509Certificate caCert = SdkUtil.parseCert(new File(expandPath(CA_CERT_FILE)));
+      TlsInit.init();
+      byte[] encodedCaCert =
+          SdkUtil.send(new URL(CACERT_URL), "GET", null, null, "application/pkix-cert");
+      TlsInit.shutdown();
+
+      X509Certificate caCert = SdkUtil.parseCert(encodedCaCert);
 
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
 
@@ -86,7 +94,7 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       X500Name responderSubject = X500Name.getInstance(
           responderCert.getSubjectX500Principal().getEncoded());
 
-      PbmMacCmpCaClient client = new PbmMacCmpCaClient(CA_URL, caCert, requestorSubject,
+      PbmMacCmpCaClient client = new PbmMacCmpCaClient(CMP_URL, caCert, requestorSubject,
           responderSubject, HASH_ALGO);
 
       // SHA1("requestor-mac1".getBytes())

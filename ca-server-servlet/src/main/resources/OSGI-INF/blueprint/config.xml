@@ -58,4 +58,13 @@
       <entry key="urlPatterns" value="/health/*"/>
     </service-properties>
   </service>
+
+  <!-- CaCert servlet -->
+  <bean id="caCertServlet" class="org.xipki.ca.server.servlet.HttpCaCertServlet"/>
+  <service ref="caCertServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="urlPatterns" value="/cacert/*"/>
+    </service-properties>
+  </service>
+
 </blueprint>

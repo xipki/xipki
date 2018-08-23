@@ -20,6 +20,7 @@ package org.xipki.litecaclient.example;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -35,6 +36,7 @@ import org.xipki.litecaclient.CmpCaClient;
 import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.SdkUtil;
 import org.xipki.litecaclient.SignatureCmpCaClient;
+import org.xipki.litecaclient.TlsInit;
 
 /**
  * TODO.
@@ -43,12 +45,13 @@ import org.xipki.litecaclient.SignatureCmpCaClient;
 
 public class SignatureCmpCaClientExample extends CaClientExample {
 
-  //private static final String CA_URL = "http://localhost:8080/cmp/myca";
+  //private static final String URL_PREFIX = "http://localhost:8080";
 
-  private static final String CA_URL = "https://localhost:8443/cmp/myca";
+  private static final String URL_PREFIX = "https://localhost:8443";
 
-  private static final String CA_CERT_FILE = "~/source/xipki/assemblies/xipki-pki/target/"
-      + "xipki-pki-4.0.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
+  private static final String CMP_URL = URL_PREFIX + "/cmp/myca";
+
+  private static final String CACERT_URL = URL_PREFIX + "/cacert/myca";
 
   private static final String KEYCERT_DIR =  "target/tlskeys";
 
@@ -98,10 +101,15 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       PrivateKey requestorKey = (PrivateKey) ks.getKey(alias, password);
       X509Certificate requestorCert = (X509Certificate) ks.getCertificate(alias);
 
-      X509Certificate caCert = SdkUtil.parseCert(new File(expandPath(CA_CERT_FILE)));
+      TlsInit.init();
+      byte[] encodedCaCert =
+          SdkUtil.send(new URL(CACERT_URL), "GET", null, null, "application/pkix-cert");
+      TlsInit.shutdown();
+
+      X509Certificate caCert = SdkUtil.parseCert(encodedCaCert);
 
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
-      CmpCaClient client = new SignatureCmpCaClient(CA_URL, caCert, requestorKey, requestorCert,
+      CmpCaClient client = new SignatureCmpCaClient(CMP_URL, caCert, requestorKey, requestorCert,
           responderCert, HASH_ALGO);
 
       client.init();

@@ -147,6 +147,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -1875,6 +1876,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   @Override
   public Set<String> getCaAliasNames() {
     return caAliases.keySet();
+  }
+
+  @Override
+  public X509Cert getCaCert(String caName) {
+    caName = ParamUtil.requireNonBlankLower("caName", caName);
+    X509Ca ca = x509cas.get(caName);
+    return (ca == null) ? null : ca.getCaInfo().getCert();
   }
 
   @Override

@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -149,5 +150,46 @@ public class SdkUtil {
     }
     return obj;
   }
+
+  public static byte[] send(URL url, String httpMethod, byte[] request, String requestContentType,
+      String expectedResponseContentType) throws IOException {
+    HttpURLConnection httpUrlConnection = SdkUtil.openHttpConn(url);
+    httpUrlConnection.setDoOutput(true);
+    httpUrlConnection.setUseCaches(false);
+
+    httpUrlConnection.setRequestMethod(httpMethod);
+    if (requestContentType != null) {
+      httpUrlConnection.setRequestProperty("Content-Type", requestContentType);
+    }
+
+    if (request != null) {
+      httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(request.length));
+
+      OutputStream outputstream = httpUrlConnection.getOutputStream();
+      outputstream.write(request);
+      outputstream.flush();
+    }
+
+    InputStream inputStream = httpUrlConnection.getInputStream();
+    if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+      inputStream.close();
+      throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
+          + httpUrlConnection.getResponseMessage());
+    }
+    String responseContentType = httpUrlConnection.getContentType();
+    boolean isValidContentType = false;
+    if (responseContentType != null) {
+      if (responseContentType.equalsIgnoreCase(expectedResponseContentType)) {
+        isValidContentType = true;
+      }
+    }
+
+    if (!isValidContentType) {
+      inputStream.close();
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
+    }
+
+    return SdkUtil.read(inputStream);
+  } // method send
 
 }

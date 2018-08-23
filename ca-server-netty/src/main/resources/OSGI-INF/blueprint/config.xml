@@ -64,4 +64,15 @@
       <entry key="alias" value="/health"/>
     </service-properties>
   </service>
+
+  <!-- CaCert servlet -->
+  <bean id="caCertServlet" class="org.xipki.ca.server.netty.HttpCaCertServlet">
+    <property name="responderManager" ref="responderManager"/>
+  </bean>
+  <service ref="caCertServlet" interface="org.xipki.http.servlet.HttpServlet">
+    <service-properties>
+      <entry key="alias" value="/cacert"/>
+    </service-properties>
+  </service>
+
 </blueprint>

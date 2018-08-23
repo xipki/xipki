@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.api;
 
+import org.xipki.security.X509Cert;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -32,6 +34,8 @@ public interface ResponderManager {
    * @return CA name for the given alias.
    */
   String getCaNameForAlias(String caAlias);
+
+  X509Cert getCaCert(String caName);
 
   /**
    * Returns the CMP responder for the CA {@code caName}.
