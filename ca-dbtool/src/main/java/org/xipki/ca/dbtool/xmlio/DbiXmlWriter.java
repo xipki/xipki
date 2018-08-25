@@ -49,7 +49,7 @@ public class DbiXmlWriter {
     stream = new ByteArrayOutputStream();
 
     synchronized (FACTORY) {
-      writer = FACTORY.createXMLStreamWriter(stream);
+      writer = FACTORY.createXMLStreamWriter(stream, "UTF-8");
     }
     writer.writeStartDocument("UTF-8", "1.0");
     writeNewline();
