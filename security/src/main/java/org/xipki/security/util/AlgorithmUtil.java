@@ -109,7 +109,9 @@ public class AlgorithmUtil {
 
         nameList.add(name);
         nameOidMap.put(name, oid);
-        oidNameMap.put(oid, name);
+        if (!oidNameMap.containsKey(oid)) {
+          oidNameMap.put(oid, name);
+        }
       }
 
       Collections.sort(nameList);
