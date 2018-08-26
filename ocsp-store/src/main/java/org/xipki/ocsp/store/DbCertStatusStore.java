@@ -208,11 +208,9 @@ public class DbCertStatusStore extends OcspStore {
             continue;
           }
 
-          int id = rs.getInt("ID");
-          String b64Cert = rs.getString("CERT");
-          X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
+          X509Certificate cert = X509Util.parseCert(rs.getString("CERT").getBytes());
 
-          IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
+          IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
           String crlInfoStr = rs.getString("CRL_INFO");
           if (StringUtil.isNotBlank(crlInfoStr)) {
             CrlInfo crlInfo = new CrlInfo(crlInfoStr);

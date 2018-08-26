@@ -59,7 +59,7 @@ public class SignerEntry {
     }
 
     try {
-      this.certificate = X509Util.parseBase64EncodedCert(base64Cert);
+      this.certificate = X509Util.parseCert(base64Cert.getBytes());
     } catch (Throwable th) {
       this.certFaulty = true;
     }

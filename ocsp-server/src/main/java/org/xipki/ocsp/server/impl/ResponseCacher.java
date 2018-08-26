@@ -457,8 +457,7 @@ class ResponseCacher {
           ps.setInt(1, id);
           rs = ps.executeQuery();
           rs.next();
-          String b64Cert = rs.getString("CERT");
-          X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
+          X509Certificate cert = X509Util.parseCert(rs.getString("CERT").getBytes());
           IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
           issuerStore.addIssuer(caInfoEntry);
           LOG.info("added issuer {}", id);
@@ -501,8 +500,7 @@ class ResponseCacher {
 
       while (rs.next()) {
         int id = rs.getInt("ID");
-        String b64Cert = rs.getString("CERT");
-        X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
+        X509Certificate cert = X509Util.parseCert(rs.getString("CERT").getBytes());
         IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
         RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
             caInfoEntry.getEncodedHash(HashAlgo.SHA1));

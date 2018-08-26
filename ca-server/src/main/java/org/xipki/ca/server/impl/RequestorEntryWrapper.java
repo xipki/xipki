@@ -61,7 +61,7 @@ public class RequestorEntryWrapper {
     dbEntry.setFaulty(true);
     if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
-        X509Certificate x509Cert = X509Util.parseBase64EncodedCert(conf);
+        X509Certificate x509Cert = X509Util.parseCert(conf.getBytes());
         dbEntry.setFaulty(false);
         this.cert = new CertWithDbId(x509Cert);
       } catch (CertificateException ex) {

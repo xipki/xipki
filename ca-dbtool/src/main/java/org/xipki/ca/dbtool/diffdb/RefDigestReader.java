@@ -273,7 +273,7 @@ class RefDigestReader {
         throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
       }
 
-      caCert = X509Util.parseBase64EncodedCert(rs.getString("CERT"));
+      caCert = X509Util.parseCert(rs.getString("CERT").getBytes());
       rs.close();
 
       sql = "SELECT COUNT(*) FROM CERT WHERE " + colCaId + "=" + caId;

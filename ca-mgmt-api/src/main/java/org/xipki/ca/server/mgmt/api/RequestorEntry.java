@@ -106,7 +106,7 @@ public class RequestorEntry {
 
     if (!faulty && TYPE_CERT.equalsIgnoreCase(type)) {
       try {
-        X509Certificate cert = X509Util.parseBase64EncodedCert(conf);
+        X509Certificate cert = X509Util.parseCert(conf.getBytes());
         sb.append("cert:");
         sb.append("\n\tissuer: ").append(X509Util.getRfc4519Name(cert.getIssuerX500Principal()));
         sb.append("\n\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()));

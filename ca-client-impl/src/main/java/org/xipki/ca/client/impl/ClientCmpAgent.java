@@ -1434,7 +1434,7 @@ abstract class ClientCmpAgent {
       X509Certificate caCert;
       String b64CaCert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
       try {
-        caCert = X509Util.parseBase64EncodedCert(b64CaCert);
+        caCert = X509Util.parseCert(b64CaCert.getBytes());
       } catch (CertificateException ex) {
         throw new CaClientException("could no parse the CA certificate", ex);
       }

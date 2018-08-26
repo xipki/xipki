@@ -83,8 +83,12 @@ import java.util.Arrays;
 
 // CHECKSTYLE:OFF
 public class Base64 {
-  private static final char[] CA =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
+  private static final String CA_TEXT =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  private static final char[] CA = CA_TEXT.toCharArray();
+
+  private static final byte[] CA_BYTES = CA_TEXT.getBytes();
+
   private static final int[] IA = new int[256];
 
   static {
@@ -93,6 +97,28 @@ public class Base64 {
       IA[CA[i]] = i;
     }
     IA['='] = 0;
+  }
+
+  public static final boolean containsOnlyBase64Chars(byte[] bytes, int offset, int len) {
+    final int maxIndex = Math.min(bytes.length, offset + len);
+
+    for (int i = offset; i < maxIndex; i ++) {
+      byte bt = bytes[i];
+
+      boolean contained = true;
+      for (byte cb : CA_BYTES) {
+        if (bt != cb) {
+          contained = false;
+          break;
+        }
+      }
+
+      if (!contained) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   // ****************************************************************************************
@@ -451,7 +477,7 @@ public class Base64 {
   }
 
   /**
-   * Decodes a BASE64 encoded byte array that is known to be resonably well formatted. The method
+   * Decodes a BASE64 encoded byte array that is known to be reasonably well formatted. The method
    * is about twice as fast as {@link #decode(byte[])}. The preconditions are:<br>
    * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
    * + Line separator must be "\r\n", as specified in RFC 2045
