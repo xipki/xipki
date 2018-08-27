@@ -87,7 +87,7 @@ public class Base64 {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   private static final char[] CA = CA_TEXT.toCharArray();
 
-  private static final byte[] CA_BYTES = CA_TEXT.getBytes();
+  private static final byte[] BASE64_BYTES = (CA_TEXT + "=\r\n").getBytes();
 
   private static final int[] IA = new int[256];
 
@@ -105,10 +105,10 @@ public class Base64 {
     for (int i = offset; i < maxIndex; i ++) {
       byte bt = bytes[i];
 
-      boolean contained = true;
-      for (byte cb : CA_BYTES) {
-        if (bt != cb) {
-          contained = false;
+      boolean contained = false;
+      for (byte cb : BASE64_BYTES) {
+        if (bt == cb) {
+          contained = true;
           break;
         }
       }
