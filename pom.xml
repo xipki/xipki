@@ -51,8 +51,8 @@
     <xipki.tools.version>1.0.2</xipki.tools.version>
     <xipki.scep.version>3.1.0</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.2.1-SNAPSHOT</karaf.version>
-    <karaf.plugin.version>4.2.0</karaf.plugin.version>
+    <karaf.version>4.2.1</karaf.version>
+    <karaf.plugin.version>4.2.1</karaf.plugin.version>
     <netty.version>4.1.18.Final</netty.version>
     <netty-tcnative.version>2.0.7.Final</netty-tcnative.version>
     <bc.version>1.60</bc.version>
