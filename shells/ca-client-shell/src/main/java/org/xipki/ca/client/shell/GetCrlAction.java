@@ -101,7 +101,7 @@ public class GetCrlAction extends CrlAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outForm));
 
     if (!withBaseCrl.booleanValue()) {
       return null;
@@ -132,7 +132,8 @@ public class GetCrlAction extends CrlAction {
       throw new CmdFailure("received no baseCRL from server");
     }
 
-    saveVerbose("saved baseCRL to file", new File(baseCrlOut), crl.getEncoded());
+    saveVerbose("saved baseCRL to file", new File(baseCrlOut),
+        derPemEncodeCrl(crl.getEncoded(), outForm));
     return null;
   } // method execute0
 

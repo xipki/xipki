@@ -31,7 +31,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -46,10 +45,6 @@ public class GetCrlAction extends CrlAction {
   @Option(name = "--with-basecrl",
       description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
   private Boolean withBaseCrl = Boolean.FALSE;
-
-  @Option(name = "--basecrl-out-form", description = "format to save the baseCRL")
-  @Completion(DerPemCompleter.class)
-  protected String baseCrlOutForm = "DER";
 
   @Option(name = "--basecrl-out",
       description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
@@ -79,7 +74,7 @@ public class GetCrlAction extends CrlAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outForm));
 
     if (withBaseCrl.booleanValue()) {
       byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
