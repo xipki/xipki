@@ -28,6 +28,7 @@ import org.xipki.ca.client.api.CaClientException;
 import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -41,8 +42,11 @@ public abstract class CrlAction extends ClientAction {
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded CRL")
+  @Option(name = "--out-form", description = "format to save the CRL")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
+  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
   @Completion(FileCompleter.class)
   protected String outFile;
 
@@ -84,7 +88,7 @@ public abstract class CrlAction extends ClientAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outForm));
     return null;
   } // method execute0
 

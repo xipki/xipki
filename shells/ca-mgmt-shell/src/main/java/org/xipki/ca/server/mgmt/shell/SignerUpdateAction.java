@@ -58,7 +58,7 @@ public class SignerUpdateAction extends CaAction {
   @Completion(SignerTypeCompleter.class)
   protected String type;
 
-  @Option(name = "--cert", description = "DER encoded certificate file or 'null'")
+  @Option(name = "--cert", description = "certificate file or 'null'")
   @Completion(FileCompleter.class)
   protected String certFile;
 

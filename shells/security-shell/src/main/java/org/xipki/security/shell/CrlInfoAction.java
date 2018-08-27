@@ -41,7 +41,7 @@ import org.xipki.util.IoUtil;
 @Service
 public class CrlInfoAction extends SecurityAction {
 
-  @Option(name = "--in", description = "DER encoded CRL file")
+  @Option(name = "--in", description = "CRL file")
   @Completion(FileCompleter.class)
   private String inFile;
 

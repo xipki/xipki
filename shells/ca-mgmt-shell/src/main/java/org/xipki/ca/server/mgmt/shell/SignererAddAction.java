@@ -54,7 +54,7 @@ public class SignererAddAction extends CaAction {
   @Option(name = "--conf", required = true, description = "conf of the signer")
   private String conf;
 
-  @Option(name = "--cert", description = "DER encoded signer certificate file")
+  @Option(name = "--cert", description = "signer certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

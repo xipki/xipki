@@ -51,7 +51,7 @@ public abstract class ClientAction extends XiAction {
   @Option(name = "--ca-id", description = "CA identifier")
   protected String caId;
 
-  @Option(name = "--ca-cert", required = true, description = "DER encoded CA certificate")
+  @Option(name = "--ca-cert", required = true, description = "CA certificate")
   @Completion(FileCompleter.class)
   private String caCertFile;
 

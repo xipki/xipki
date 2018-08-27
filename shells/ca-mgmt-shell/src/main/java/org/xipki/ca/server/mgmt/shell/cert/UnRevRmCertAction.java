@@ -46,7 +46,7 @@ public abstract class UnRevRmCertAction extends CaAction {
   protected String caName;
 
   @Option(name = "--cert", aliases = "-c",
-      description = "DER encoded certificate file\n"
+      description = "certificate file\n"
           + "(either cert or serial must be specified)")
   @Completion(FileCompleter.class)
   protected String certFile;

@@ -29,6 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.jscep.client.Client;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -40,13 +41,16 @@ import org.xipki.shell.CmdFailure;
 @Service
 public class GetCrlAction extends ClientAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true,
-      description = "DER encoded certificate")
+  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate")
   @Completion(FileCompleter.class)
   private String certFile;
 
+  @Option(name = "--out-form", description = "format to save the CRL")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded CRL")
+      description = "where to save the CRL")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -60,7 +64,8 @@ public class GetCrlAction extends ClientAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
+    saveVerbose("saved CRL to file", new File(outputFile),
+        derPemEncodeCrl(crl.getEncoded(), outForm));
     return null;
   }
 

@@ -38,6 +38,7 @@ import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.StringUtil;
 
 /**
@@ -51,7 +52,11 @@ import org.xipki.util.StringUtil;
 @Service
 public class EnrollCertCaGenKeyAction extends EnrollAction {
 
-  @Option(name = "--cert-out", description = "where to save the DER encoded certificate")
+  @Option(name = "--cert-out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  private String certOutForm = "DER";
+
+  @Option(name = "--cert-out", description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String certOutputFile;
 
@@ -96,7 +101,8 @@ public class EnrollCertCaGenKeyAction extends EnrollAction {
 
     if (StringUtil.isNotBlank(certOutputFile)) {
       File certFile = new File(certOutputFile);
-      saveVerbose("saved certificate to file", certFile, cert.getEncoded());
+      saveVerbose("saved certificate to file", certFile,
+          derPemEncodeCert(cert.getEncoded(), certOutForm));
     }
 
     PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);

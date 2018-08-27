@@ -31,6 +31,7 @@ import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -49,12 +50,16 @@ public class EnrollCertAction extends CaAction {
   @Completion(CaNameCompleter.class)
   private String caName;
 
-  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outFile;
 
@@ -85,7 +90,8 @@ public class EnrollCertAction extends CaAction {
 
     X509Certificate cert = caManager.generateCertificate(caName, profileName, encodedCsr,
         notBefore, notAfter);
-    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+    saveVerbose("saved certificate to file", new File(outFile),
+        derPemEncodeCert(cert.getEncoded(), outForm));
 
     return null;
   }

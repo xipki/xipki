@@ -17,6 +17,7 @@
 
 package org.xipki.ca.dbtool.shell;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,8 +29,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.dbtool.diffdb.DigestDiffWorker;
 import org.xipki.ca.dbtool.port.DbPortWorker;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.completer.DirCompleter;
-import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -65,7 +66,7 @@ public class DiffDigestDbAction extends DbPortAction {
   private Integer numTargetThreads = 40;
 
   @Option(name = "--ca-cert", multiValued = true,
-      description = "DER encoded Certificate of CAs to be considered")
+      description = "Certificate of CAs to be considered")
   @Completion(FileCompleter.class)
   private List<String> caCertFiles;
 
@@ -74,7 +75,8 @@ public class DiffDigestDbAction extends DbPortAction {
     if (caCertFiles != null && !caCertFiles.isEmpty()) {
       caCerts = new HashSet<>(caCertFiles.size());
       for (String fileName : caCertFiles) {
-        caCerts.add(IoUtil.read(fileName));
+        byte[] derEncodedCert = X509Util.parseBcCert(new File(fileName)).getEncoded();
+        caCerts.add(derEncodedCert);
       }
     }
 

@@ -82,7 +82,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
   private static final String FILE_SEP = File.separator;
 
   @Option(name = "--resp-issuer",
-      description = "DER encoded certificate file of the responder's issuer")
+      description = "certificate file of the responder's issuer")
   @Completion(FileCompleter.class)
   private String respIssuerFile;
 

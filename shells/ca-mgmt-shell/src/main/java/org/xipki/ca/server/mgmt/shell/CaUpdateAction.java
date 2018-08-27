@@ -127,7 +127,7 @@ public class CaUpdateAction extends CaAction {
   @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
   private Integer numCrls;
 
-  @Option(name = "--cert", description = "DER encoded CA certificate file")
+  @Option(name = "--cert", description = "CA certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

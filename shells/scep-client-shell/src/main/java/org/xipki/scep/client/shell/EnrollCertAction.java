@@ -32,6 +32,7 @@ import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.StringUtil;
 
 /**
@@ -43,12 +44,16 @@ import org.xipki.util.StringUtil;
 @Service
 public class EnrollCertAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -86,7 +91,8 @@ public class EnrollCertAction extends ClientAction {
     }
 
     X509Certificate cert = resp.getCertificates().get(0);
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("saved enrolled certificate to file", new File(outputFile),
+        derPemEncodeCert(cert.getEncoded(), outForm));
     return null;
   }
 

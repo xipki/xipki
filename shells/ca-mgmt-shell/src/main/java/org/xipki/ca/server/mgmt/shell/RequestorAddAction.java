@@ -46,7 +46,7 @@ public class RequestorAddAction extends CaAction {
   @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
   private String name;
 
-  @Option(name = "--cert", description = "DER encoded requestor certificate file\n"
+  @Option(name = "--cert", description = "requestor certificate file\n"
       + "(exactly one of cert and password must be specified).")
   @Completion(FileCompleter.class)
   private String certFile;

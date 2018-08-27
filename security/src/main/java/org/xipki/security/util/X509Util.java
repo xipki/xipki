@@ -239,11 +239,19 @@ public class X509Util {
           }
         }
 
+        if (bytes[base64Start] == '\n') {
+          base64Start++;
+        }
+
         for (int i = len - END_PEM.length - 6; i > 0; i--) {
           if (CompareUtil.areEqual(bytes, i, END_PEM, 0, END_PEM.length)) {
             base64End = i - 1;
             break;
           }
+        }
+
+        if (bytes[base64End - 1] == '\r') {
+          base64End--;
         }
 
         byte[] base64Bytes = new byte[base64End - base64Start + 1];
@@ -310,7 +318,7 @@ public class X509Util {
 
   public static X509CRL parseCrl(byte[] encodedCrl) throws CertificateException, CRLException {
     ParamUtil.requireNonNull("encodedCrl", encodedCrl);
-    return parseCrl(new ByteArrayInputStream(encodedCrl));
+    return parseCrl(new ByteArrayInputStream(toDerEncoded(encodedCrl)));
   }
 
   public static X509CRL parseCrl(InputStream crlStream) throws CertificateException, CRLException {

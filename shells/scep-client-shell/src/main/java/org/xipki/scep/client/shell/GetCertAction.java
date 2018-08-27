@@ -30,6 +30,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -44,8 +45,12 @@ public class GetCertAction extends ClientAction {
   @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumber;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -61,7 +66,8 @@ public class GetCertAction extends ClientAction {
       throw new CmdFailure("received no certficate from server");
     }
 
-    saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+    saveVerbose("saved certificate to file", new File(outputFile),
+        derPemEncodeCert(certs.get(0).getEncoded(), outForm));
     return null;
   }
 

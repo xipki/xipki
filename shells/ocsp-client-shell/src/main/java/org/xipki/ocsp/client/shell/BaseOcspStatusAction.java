@@ -95,8 +95,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
   @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
   protected Boolean verbose = Boolean.FALSE;
 
-  @Option(name = "--resp-issuer",
-      description = "DER encoded certificate file of the responder's issuer")
+  @Option(name = "--resp-issuer", description = "certificate file of the responder's issuer")
   @Completion(FileCompleter.class)
   private String respIssuerFile;
 
@@ -120,7 +119,7 @@ public abstract class BaseOcspStatusAction extends CommonOcspStatusAction {
   private String serialNumberList;
 
   @Option(name = "--cert", aliases = "-c", multiValued = true,
-      description = "DER encoded certificate files")
+      description = "certificate files")
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 

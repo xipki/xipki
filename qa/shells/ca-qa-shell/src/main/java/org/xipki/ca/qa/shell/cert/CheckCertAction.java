@@ -55,8 +55,7 @@ import org.xipki.util.IoUtil;
 @Service
 public class CheckCertAction extends XiAction {
 
-  @Option(name = "--cert", aliases = "-c", required = true,
-      description = "DER encoded certificate file")
+  @Option(name = "--cert", aliases = "-c", required = true, description = "certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
@@ -65,7 +64,7 @@ public class CheckCertAction extends XiAction {
   @Completion(IssuerNameCompleter.class)
   private String issuerName;
 
-  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 

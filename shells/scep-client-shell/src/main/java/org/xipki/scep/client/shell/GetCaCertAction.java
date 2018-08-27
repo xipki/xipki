@@ -30,6 +30,7 @@ import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.XiAction;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -47,8 +48,12 @@ public class GetCaCertAction extends XiAction {
   @Option(name = "--ca-id", description = "CA identifier")
   private String caId;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded CA certificate")
+      description = "where to save the CA certificate")
   @Completion(FileCompleter.class)
   protected String outFile;
 
@@ -69,7 +74,8 @@ public class GetCaCertAction extends XiAction {
       throw new CmdFailure("received no CA certficate from server");
     }
 
-    saveVerbose("saved certificate to file", new File(outFile), caCert.getEncoded());
+    saveVerbose("saved certificate to file", new File(outFile),
+        derPemEncodeCert(caCert.getEncoded(), outForm));
     return null;
   }
 

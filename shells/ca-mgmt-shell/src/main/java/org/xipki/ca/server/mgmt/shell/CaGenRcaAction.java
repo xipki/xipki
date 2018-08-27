@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaEntry;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.IoUtil;
 
 /**
@@ -39,7 +40,7 @@ import org.xipki.util.IoUtil;
 @Service
 public class CaGenRcaAction extends CaAddOrGenAction {
 
-  @Option(name = "--csr", required = true, description = "DER encoded CSR of the Root CA")
+  @Option(name = "--csr", required = true, description = "CSR of the Root CA")
   @Completion(FileCompleter.class)
   private String csrFile;
 
@@ -49,8 +50,12 @@ public class CaGenRcaAction extends CaAddOrGenAction {
   @Option(name = "--serial", description = "profile of the Root CA")
   private String serialS;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o",
-      description = "where to save the generated DER encoded CA certificate")
+      description = "where to save the generated CA certificate")
   @Completion(FileCompleter.class)
   private String rootcaCertOutFile;
 
@@ -67,7 +72,7 @@ public class CaGenRcaAction extends CaAddOrGenAction {
         serialNumber);
     if (rootcaCertOutFile != null) {
       saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
-          rootcaCert.getEncoded());
+          derPemEncodeCert(rootcaCert.getEncoded(), outForm));
     }
     println("generated root CA " + caEntry.getIdent().getName());
     return null;

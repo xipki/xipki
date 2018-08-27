@@ -47,7 +47,7 @@ public class P11CertAddAction extends P11SecurityAction {
   @Option(name = "--label", description = "label of the PKCS#11 objects.")
   protected String label;
 
-  @Option(name = "--cert", required = true, description = "DER encoded certificate file")
+  @Option(name = "--cert", required = true, description = "certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 

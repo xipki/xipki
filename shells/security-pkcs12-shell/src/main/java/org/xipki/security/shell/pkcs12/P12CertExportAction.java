@@ -28,6 +28,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -40,8 +41,12 @@ import org.xipki.shell.CmdFailure;
 @Service
 public class P12CertExportAction extends P12SecurityAction {
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outFile;
 
@@ -64,7 +69,8 @@ public class P12CertExportAction extends P12SecurityAction {
     }
 
     X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+    saveVerbose("saved certificate to file", new File(outFile),
+        derPemEncodeCert(cert.getEncoded(), outForm));
 
     return null;
   }

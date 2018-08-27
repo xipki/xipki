@@ -32,6 +32,7 @@ import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -43,12 +44,16 @@ import org.xipki.shell.CmdFailure;
 @Service
 public class CertPollAction extends ClientAction {
 
-  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -73,7 +78,8 @@ public class CertPollAction extends ClientAction {
       throw new CmdFailure("received no certficate from server");
     }
 
-    saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+    saveVerbose("saved certificate to file", new File(outputFile),
+        derPemEncodeCert(certs.get(0).getEncoded(), outForm));
     return null;
   }
 

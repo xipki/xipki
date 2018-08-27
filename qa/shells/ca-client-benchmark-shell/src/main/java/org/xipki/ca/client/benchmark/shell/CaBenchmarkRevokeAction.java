@@ -50,8 +50,7 @@ import org.xipki.util.StringUtil;
 @Service
 public class CaBenchmarkRevokeAction extends CaBenchmarkAction {
 
-  @Option(name = "--issuer", required = true,
-      description = "DER encoded issuer certificate file")
+  @Option(name = "--issuer", required = true, description = "issuer certificate file")
   @Completion(FileCompleter.class)
   private String issuerCertFile;
 

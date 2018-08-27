@@ -28,6 +28,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -41,12 +42,16 @@ public class GetCaCertAction extends ClientAction {
 
   @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
   @Completion(CaNameCompleter.class)
-  protected String caName;
+  private String caName;
+
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  private String outForm = "DER";
 
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded CA certificate")
+      description = "where to save the CA certificate")
   @Completion(FileCompleter.class)
-  protected String outFile;
+  private String outFile;
 
   @Override
   protected Object execute0() throws Exception {
@@ -84,7 +89,8 @@ public class GetCaCertAction extends ClientAction {
       throw new CmdFailure("received no CA certificate");
     }
 
-    saveVerbose("saved CA certificate to file", new File(outFile), caCert.getEncoded());
+    saveVerbose("saved CA certificate to file", new File(outFile),
+        derPemEncodeCert(caCert.getEncoded(), outForm));
     return null;
   } // method execute0
 

@@ -26,6 +26,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.StringUtil;
 
 /**
@@ -39,7 +40,11 @@ import org.xipki.util.StringUtil;
 @Service
 public class CertStatusAction extends UnRevRmCertAction {
 
-  @Option(name = "--out", aliases = "-o", description = "where to save the DER encoded certificate")
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
+  @Option(name = "--out", aliases = "-o", description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -58,7 +63,8 @@ public class CertStatusAction extends UnRevRmCertAction {
             ? "good" : "revoked with " + certInfo.getRevocationInfo()));
     println(msg);
     if (outputFile != null) {
-      saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
+      saveVerbose("saved certificate to file", new File(outputFile),
+          derPemEncodeCert(cert.getEncoded(), outForm));
     }
     return null;
   }

@@ -64,8 +64,7 @@ public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
   @Completion(FileCompleter.class)
   private String serialNumberFile;
 
-  @Option(name = "--cert", multiValued = true,
-      description = "DER encoded certificate files")
+  @Option(name = "--cert", multiValued = true, description = "certificate files")
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 

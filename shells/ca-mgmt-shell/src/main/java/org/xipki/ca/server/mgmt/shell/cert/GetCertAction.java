@@ -28,6 +28,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -46,8 +47,12 @@ public class GetCertAction extends CaAction {
   @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumberS;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -61,7 +66,8 @@ public class GetCertAction extends CaAction {
       return null;
     }
 
-    saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("certificate saved to file", new File(outputFile),
+        derPemEncodeCert(cert.getEncoded(), outForm));
     return null;
   }
 

@@ -36,7 +36,7 @@ import org.xipki.util.IoUtil;
 @Service
 public class CsrValidateAction extends SecurityAction {
 
-  @Option(name = "--csr", required = true, description = "DER encoded CSR file")
+  @Option(name = "--csr", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String csrFile;
 

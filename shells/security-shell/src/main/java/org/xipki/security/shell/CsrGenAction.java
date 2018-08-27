@@ -70,6 +70,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.shell.completer.ExtKeyusageCompleter;
 import org.xipki.shell.completer.ExtensionNameCompleter;
 import org.xipki.shell.completer.HashAlgCompleter;
@@ -114,7 +115,11 @@ public abstract class CsrGenAction extends SecurityAction {
           + "(only applied to EC key with GM curves)")
   private Boolean gm = Boolean.FALSE;
 
-  @Option(name = "--out", aliases = "-o", required = true, description = "DER encoded CSR file")
+  @Option(name = "--out-form", description = "format to save the CSR")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
+  @Option(name = "--out", aliases = "-o", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
   private String outputFilename;
 
@@ -352,7 +357,7 @@ public abstract class CsrGenAction extends SecurityAction {
         attributes);
 
     File file = new File(outputFilename);
-    saveVerbose("saved CSR to file", file, csr.getEncoded());
+    saveVerbose("saved CSR to file", file, derPemEncodeCsr(csr.getEncoded(), outForm));
     return null;
   } // method execute0
 

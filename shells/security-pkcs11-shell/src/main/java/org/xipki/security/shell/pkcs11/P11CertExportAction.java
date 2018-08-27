@@ -28,6 +28,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -50,8 +51,12 @@ public class P11CertExportAction extends P11SecurityAction {
           + "either keyId or keyLabel must be specified")
   protected String label;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outFile;
 
@@ -63,7 +68,8 @@ public class P11CertExportAction extends P11SecurityAction {
     if (cert == null) {
       throw new CmdFailure("could not export certificate " + objIdentifier);
     }
-    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+    saveVerbose("saved certificate to file", new File(outFile),
+        derPemEncodeCert(cert.getEncoded(), outForm));
     return null;
   }
 

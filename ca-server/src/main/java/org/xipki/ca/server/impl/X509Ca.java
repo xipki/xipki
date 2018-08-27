@@ -2309,6 +2309,11 @@ public class X509Ca {
     for (CaHasRequestorEntry m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
+
+      if (entry.getDbEntry().isFaulty()) {
+        continue;
+      }
+
       if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
         continue;
       }

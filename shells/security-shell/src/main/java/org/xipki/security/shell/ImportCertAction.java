@@ -58,7 +58,7 @@ public class ImportCertAction extends SecurityAction {
   private String ksPwd;
 
   @Option(name = "--cert", aliases = "-c", required = true, multiValued = true,
-      description = "DER encoded certificate files")
+      description = "certificate files")
   @Completion(FileCompleter.class)
   private List<String> certFiles;
 

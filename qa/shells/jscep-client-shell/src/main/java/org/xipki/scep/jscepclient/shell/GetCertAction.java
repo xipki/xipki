@@ -29,6 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.jscep.client.Client;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -43,8 +44,12 @@ public class GetCertAction extends ClientAction {
   @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumber;
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -59,7 +64,8 @@ public class GetCertAction extends ClientAction {
       throw new CmdFailure("received no certificate from server");
     }
 
-    saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("saved returned certificate to file", new File(outputFile),
+        derPemEncodeCert(cert.getEncoded(), outForm));
     return null;
   }
 

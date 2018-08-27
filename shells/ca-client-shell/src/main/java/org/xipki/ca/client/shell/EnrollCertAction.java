@@ -36,6 +36,7 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -49,8 +50,12 @@ public abstract class EnrollCertAction extends EnrollAction {
   @Option(name = "--hash", description = "hash algorithm name for the POPO computation")
   protected String hashAlgo = "SHA256";
 
+  @Option(name = "--out-form", description = "format to save the certificate")
+  @Completion(DerPemCompleter.class)
+  private String outForm = "DER";
+
   @Option(name = "--out", aliases = "-o", required = true,
-      description = "where to save the DER encoded certificate")
+      description = "where to save the certificate")
   @Completion(FileCompleter.class)
   private String outputFile;
 
@@ -122,7 +127,8 @@ public abstract class EnrollCertAction extends EnrollAction {
     }
 
     File certFile = new File(outputFile);
-    saveVerbose("saved certificate to file", certFile, cert.getEncoded());
+    saveVerbose("saved certificate to file", certFile,
+        derPemEncodeCert(cert.getEncoded(), outForm));
 
     return null;
   } // method execute0

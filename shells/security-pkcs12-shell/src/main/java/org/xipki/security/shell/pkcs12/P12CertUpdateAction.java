@@ -48,11 +48,11 @@ import org.xipki.util.ObjectCreationException;
 @Service
 public class P12CertUpdateAction extends P12SecurityAction {
 
-  @Option(name = "--cert", required = true, description = "DER encoded certificate file")
+  @Option(name = "--cert", required = true, description = "certificate file")
   @Completion(FileCompleter.class)
   private String certFile;
 
-  @Option(name = "--ca-cert", multiValued = true, description = "DER encoded CA Certificate file")
+  @Option(name = "--ca-cert", multiValued = true, description = "CA Certificate file")
   @Completion(FileCompleter.class)
   private Set<String> caCertFiles;
 

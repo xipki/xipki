@@ -27,6 +27,7 @@ import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -40,7 +41,11 @@ public abstract class CrlAction extends CaAction {
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--out", aliases = "-o", description = "where to save the DER encoded CRL")
+  @Option(name = "--out-form", description = "format to save the CRL")
+  @Completion(DerPemCompleter.class)
+  protected String outForm = "DER";
+
+  @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
   @Completion(FileCompleter.class)
   protected String outFile;
 
@@ -65,7 +70,8 @@ public abstract class CrlAction extends CaAction {
     }
 
     if (outFile != null) {
-      saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+      saveVerbose("saved CRL to file", new File(outFile),
+          derPemEncodeCrl(crl.getEncoded(), outForm));
     }
     return null;
   }

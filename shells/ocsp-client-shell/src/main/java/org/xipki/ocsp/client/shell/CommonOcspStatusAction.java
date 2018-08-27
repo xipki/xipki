@@ -38,7 +38,7 @@ import org.xipki.shell.completer.SigAlgCompleter;
 public abstract class CommonOcspStatusAction extends XiAction {
 
   @Option(name = "--issuer", aliases = "-i", required = true,
-      description = "DER encoded issuer certificate file")
+      description = "issuer certificate file")
   @Completion(FileCompleter.class)
   protected String issuerCertFile;
 

@@ -35,6 +35,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.PemEncoder;
+import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.StringUtil;
 
 /**
@@ -281,6 +283,22 @@ public abstract class XiAction implements Action {
       }
     }
     return new BigInteger(tmpStr, defaultHex ? 16 : 10);
+  }
+
+  protected byte[] derPemEncodeCert(byte[] data, String encodeForm) {
+    return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE);
+  }
+
+  protected byte[] derPemEncodeCrl(byte[] data, String encodeForm) {
+    return derPemEncode(data, encodeForm, PemLabel.X509_CRL);
+  }
+
+  protected byte[] derPemEncodeCsr(byte[] data, String encodeForm) {
+    return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE_REQUEST);
+  }
+
+  protected byte[] derPemEncode(byte[] data, String encodeForm, PemLabel pemLabel) {
+    return "PEM".equalsIgnoreCase(encodeForm) ? PemEncoder.encode(data, pemLabel) : data;
   }
 
   protected boolean confirm(String prompt, int maxTries) throws IOException {
