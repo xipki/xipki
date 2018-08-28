@@ -51,9 +51,9 @@ public class P11CertExportAction extends P11SecurityAction {
           + "either keyId or keyLabel must be specified")
   protected String label;
 
-  @Option(name = "--out-form", description = "format to save the certificate")
+  @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")

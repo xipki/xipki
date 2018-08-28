@@ -59,9 +59,9 @@ public class CsrEnrollCertAction extends ClientAction {
   @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
   private String notAfterS;
 
-  @Option(name = "--out-form", description = "format to save the certificate")
+  @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  private String outForm = "DER";
+  private String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")

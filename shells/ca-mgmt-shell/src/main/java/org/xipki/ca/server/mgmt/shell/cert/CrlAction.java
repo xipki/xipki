@@ -41,9 +41,9 @@ public abstract class CrlAction extends CaAction {
   @Completion(CaNameCompleter.class)
   protected String caName;
 
-  @Option(name = "--out-form", description = "format to save the CRL")
+  @Option(name = "--outform", description = "output format of the CRL")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
   @Completion(FileCompleter.class)

@@ -40,9 +40,9 @@ import org.xipki.util.StringUtil;
 @Service
 public class CertStatusAction extends UnRevRmCertAction {
 
-  @Option(name = "--out-form", description = "format to save the certificate")
+  @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", description = "where to save the certificate")
   @Completion(FileCompleter.class)

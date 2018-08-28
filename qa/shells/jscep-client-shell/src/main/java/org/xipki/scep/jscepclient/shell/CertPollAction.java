@@ -50,9 +50,9 @@ public class CertPollAction extends ClientAction {
   @Completion(FileCompleter.class)
   private String csrFile;
 
-  @Option(name = "--out-form", description = "format to save the certificate")
+  @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")

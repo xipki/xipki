@@ -45,9 +45,9 @@ public class GetCrlAction extends ClientAction {
   @Completion(FileCompleter.class)
   private String certFile;
 
-  @Option(name = "--out-form", description = "format to save the CRL")
+  @Option(name = "--outform", description = "output format of the CRL")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the CRL")

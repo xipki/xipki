@@ -44,9 +44,9 @@ public class GetCertAction extends ClientAction {
   @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumber;
 
-  @Option(name = "--out-form", description = "format to save the certificate")
+  @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")

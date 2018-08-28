@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class DerPemCompleter extends AbstractEnumCompleter {
 
   public DerPemCompleter() {
-    setTokens("PEM", "DER");
+    setTokens("pem", "der");
   }
 
 }

@@ -298,7 +298,7 @@ public abstract class XiAction implements Action {
   }
 
   protected byte[] derPemEncode(byte[] data, String encodeForm, PemLabel pemLabel) {
-    return "PEM".equalsIgnoreCase(encodeForm) ? PemEncoder.encode(data, pemLabel) : data;
+    return "pem".equalsIgnoreCase(encodeForm) ? PemEncoder.encode(data, pemLabel) : data;
   }
 
   protected boolean confirm(String prompt, int maxTries) throws IOException {

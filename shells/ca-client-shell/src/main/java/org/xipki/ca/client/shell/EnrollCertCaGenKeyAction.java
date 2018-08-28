@@ -52,9 +52,9 @@ import org.xipki.util.StringUtil;
 @Service
 public class EnrollCertCaGenKeyAction extends EnrollAction {
 
-  @Option(name = "--cert-out-form", description = "format to save the certificate")
+  @Option(name = "--cert-out-form", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  private String certOutForm = "DER";
+  private String certoutForm = "der";
 
   @Option(name = "--cert-out", description = "where to save the certificate")
   @Completion(FileCompleter.class)

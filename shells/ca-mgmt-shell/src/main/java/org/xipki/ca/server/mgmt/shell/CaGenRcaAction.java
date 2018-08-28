@@ -50,9 +50,9 @@ public class CaGenRcaAction extends CaAddOrGenAction {
   @Option(name = "--serial", description = "profile of the Root CA")
   private String serialS;
 
-  @Option(name = "--out-form", description = "format to save the certificate")
+  @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "DER";
+  protected String outForm = "der";
 
   @Option(name = "--out", aliases = "-o",
       description = "where to save the generated CA certificate")
