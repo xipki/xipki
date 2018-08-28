@@ -149,9 +149,7 @@ public class IoUtil {
 
   public static String expandFilepath(String path) {
     ParamUtil.requireNonBlank("path", path);
-
-    return path.startsWith("~" + File.separator)
-        ? System.getProperty("user.home") + path.substring(1) : path;
+    return path.startsWith("~") ? System.getProperty("user.home") + path.substring(1) : path;
   }
 
   public static File expandFilepath(File file) {
