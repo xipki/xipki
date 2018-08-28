@@ -91,35 +91,43 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   xipki/qa/qa.d/rootca.xml
 
+xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
+  xipki/qa/qa.d/rootca.xml
+
 ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } then {
-  xi:update-cert-p11 --slot $SLOT --label rootca1 --cert output/rootca1.der
+  xi:update-cert-p11 --slot $SLOT --label rootca1 --cert output/rootca1.crt
 } else {
-  xi:update-cert-p12 --p12 output/rootca1.p12 --password 1234 --cert output/rootca1.der
+  xi:update-cert-p12 --p12 output/rootca1.p12 --password 1234 --cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subca1
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-    --slot $SLOT --label subca1 --out output/subca1.csr \
+    --slot $SLOT --label subca1 \
+    --outform $OUTFORM \
+    --out output/subca1.csr \
     --subject "CN=subca1,O=xipki,C=DE"
 } else {
   xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/subca1.p12 --password 1234 \
-    --out output/subca1.csr --subject "CN=subca1,O=xipki,C=DE"
+    --outform $OUTFORM \
+    --out output/subca1.csr \
+    --subject "CN=subca1,O=xipki,C=DE"
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
-  --out output/subca1.der --profile subca
+  --outform $OUTFORM \
+  --out output/subca1.crt --profile subca
 
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:update-cert-p11 --slot $SLOT --label subca1 \
-    --cert output/subca1.der \
+    --cert output/subca1.crt \
 } else {
   xi:update-cert-p12 --p12 output/subca1.p12 --password 1234 \
-    --cert output/subca1.der --ca-cert output/rootca1.der
+    --cert output/subca1.crt --ca-cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subcawithcrl
@@ -127,6 +135,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT --label subcawithcrl1 \
+    --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
@@ -142,6 +151,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/subcawithcrl1.p12 --password 1234 \
+    --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
@@ -156,35 +166,43 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subcawithcrl1.csr \
-  --out output/subcawithcrl1.der --profile subca-Complex
+  --outform $OUTFORM \
+  --out output/subcawithcrl1.crt \
+  --profile subca-Complex
 
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:update-cert-p11 --slot $SLOT --label subcawithcrl1 \
-    --cert output/subcawithcrl1.der \
+    --cert output/subcawithcrl1.crt \
 } else {
   xi:update-cert-p12 --p12 output/subcawithcrl1.p12 --password 1234 \
-    --cert output/subcawithcrl1.der --ca-cert output/rootca1.der
+    --cert output/subcawithcrl1.crt --ca-cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-    --slot $SLOT --label ocsp99 --out output/ocsp99.csr \
+    --slot $SLOT --label ocsp99 \
+    --outform $OUTFORM \
+    --out output/ocsp99.csr \
     --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 } else {
   xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-    --p12 output/ocsp99.p12 --password 1234 --out output/ocsp99.csr \
+    --p12 output/ocsp99.p12 --password 1234 \
+    --outform $OUTFORM \
+    --out output/ocsp99.csr \
     --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 }
 
-ca:enroll-cert --ca rootca1 --csr output/ocsp99.csr --out output/ocsp99.der \
+ca:enroll-cert --ca rootca1 --csr output/ocsp99.csr \
+  --outform $OUTFORM \
+  --out output/ocsp99.crt \
   --profile ocsp
 
 if { $TOKEN_TYPE equals "PKCS11" } then {
-  xi:update-cert-p11 --slot $SLOT --label ocsp99 --cert output/ocsp99.der \
+  xi:update-cert-p11 --slot $SLOT --label ocsp99 --cert output/ocsp99.crt \
 } else {
   xi:update-cert-p12 --p12 output/ocsp99.p12 --password 1234 \
-    --cert output/ocsp99.der --ca-cert output/rootca1.der
+    --cert output/ocsp99.crt --ca-cert output/rootca1.crt
 }
 
 ca:caprofile-rm -f --ca rootca1 --profile ocsp

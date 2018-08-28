@@ -99,7 +99,7 @@ public class IssuerInfo {
     }
 
     this.cert = X509Util.parseCert(certBytes);
-    this.bcCert = Certificate.getInstance(certBytes);
+    this.bcCert = X509Util.parseBcCert(certBytes);
     this.ski = X509Util.extractSki(cert);
     this.caNotBefore = this.cert.getNotBefore();
     this.caNotAfter = this.cert.getNotAfter();

@@ -28,15 +28,17 @@ if { "$1" equals "" } then {
   argsValid = "true"
 } else {
   if { "$1" equals "-l" } then {
+    OUTFORM = $2
+    HASH = $3
+    TOKEN_TYPE = $4
+    SIG_TYPE = $5
+    KEYSPEC =$6
+  } else {
+    OUTFORM = $1
     HASH = $2
     TOKEN_TYPE = $3
     SIG_TYPE = $4
     KEYSPEC =$5
-  } else {
-    HASH = $1
-    TOKEN_TYPE = $2
-    SIG_TYPE = $3
-    KEYSPEC =$4
   }
 
   if { "$HASH" equals "SM3" } then {
@@ -119,7 +121,8 @@ if { $argsValid equals "false" } then {
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/qa/camgmt-qa.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "source file:./xipki/qa/camgmt-qa.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "    outform:         Output format of the certificates, CRLs and CSRs"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
   echo "                     SM3 (only for signature type SM2)"
@@ -309,7 +312,7 @@ if { $printUsage equals "true" } then {
     --max-validity 10y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
-    --cert output/rootca1.der \
+    --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
@@ -336,7 +339,7 @@ if { $printUsage equals "true" } then {
     --max-validity 8y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
-    --cert output/rootca1.der \
+    --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/rootca1-2.der \
     --cmp-control $CMP_CONTROL \
@@ -362,7 +365,8 @@ if { $printUsage equals "true" } then {
     --name rootca1 \
     --csr output/rootca1.csr \
     --profile rootca \
-    --out output/rootca1-2.der \
+    --outform $OUTFORM \
+    --out output/rootca1-2.crt \
     --permission all \
     --sn-bitlen 63  \
     --next-crl-no 2 \
@@ -389,7 +393,7 @@ if { $printUsage equals "true" } then {
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/subca1.der \
+    --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
@@ -408,7 +412,7 @@ if { $printUsage equals "true" } then {
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/rootca1.der \
+    --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-responder responder1 \
@@ -426,7 +430,7 @@ if { $printUsage equals "true" } then {
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/rootca1.der \
+    --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --crl-signer crlsigner2 \
@@ -446,7 +450,7 @@ if { $printUsage equals "true" } then {
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/rootca1.der \
+    --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
@@ -641,21 +645,21 @@ if { $printUsage equals "true" } then {
 
   ##### cert #####
 
-  ca:revoke-cert --ca rootca1 --reason certificateHold --cert output/subcawithcrl1.der
+  ca:revoke-cert --ca rootca1 --reason certificateHold --cert output/subcawithcrl1.crt
 
-  ca:unrevoke-cert --ca rootca1 --cert output/subcawithcrl1.der
+  ca:unrevoke-cert --ca rootca1 --cert output/subcawithcrl1.crt
 
-  ca:revoke-cert --ca rootca1 --reason certificateHold --cert output/subcawithcrl1.der
+  ca:revoke-cert --ca rootca1 --reason certificateHold --cert output/subcawithcrl1.crt
 
-  ca:unrevoke-cert --ca rootca1 --cert output/subcawithcrl1.der
+  ca:unrevoke-cert --ca rootca1 --cert output/subcawithcrl1.crt
 
-  ca:revoke-cert --ca rootca1 --reason keyCompromise --cert output/subcawithcrl1.der
+  ca:revoke-cert --ca rootca1 --reason keyCompromise --cert output/subcawithcrl1.crt
 
-  ca:revoke-cert --ca rootca1 --reason keyCompromise --cert output/subca1.der
+  ca:revoke-cert --ca rootca1 --reason keyCompromise --cert output/subca1.crt
 
-  ca:rm-cert -f --ca rootca1 --cert output/subcawithcrl1.der
+  ca:rm-cert -f --ca rootca1 --cert output/subcawithcrl1.crt
 
-  ca:rm-cert -f --ca rootca1 --cert output/subca1.der
+  ca:rm-cert -f --ca rootca1 --cert output/subca1.crt
 
   ##### CA #####
 

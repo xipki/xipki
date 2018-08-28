@@ -339,7 +339,7 @@ public class CaConf {
             }
 
             genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
-                csr, serialNumber, certFilename);
+                csr, serialNumber, certFilename, ci.getGenSelfIssued().getCertOutform());
           }
 
           CaUris caUris;

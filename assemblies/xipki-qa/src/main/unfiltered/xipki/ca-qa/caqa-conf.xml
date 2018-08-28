@@ -18,7 +18,7 @@
   <issuers>
     <issuer name="rootca">
       <cert>
-        <file>output/rootca1.der</file>
+        <file>output/rootca1.crt</file>
       </cert>
       <validityMode>cutoff</validityMode>
       <caIssuerUrl>http://example.org/rootca1.der</caIssuerUrl>
@@ -26,7 +26,7 @@
     </issuer>
     <issuer name="subca">
       <cert>
-        <file>output/subca1.der</file>
+        <file>output/subca1.crt</file>
       </cert>
       <validityMode>cutoff</validityMode>
       <caIssuerUrl>http://example.org/subca1.der</caIssuerUrl>
@@ -34,7 +34,7 @@
     </issuer>
     <issuer name="subcawithcrl">
       <cert>
-        <file>output/subcawithcrl1.der</file>
+        <file>output/subcawithcrl1.crt</file>
       </cert>
       <validityMode>lax</validityMode>
       <caIssuerUrl>http://example.org/subcawithcrl1.der</caIssuerUrl>

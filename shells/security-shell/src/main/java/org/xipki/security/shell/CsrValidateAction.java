@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
 
 /**
@@ -42,7 +43,7 @@ public class CsrValidateAction extends SecurityAction {
 
   @Override
   protected Object execute0() throws Exception {
-    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+    CertificationRequest csr = X509Util.parseCsr(IoUtil.read(csrFile));
     String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
     boolean bo = securityFactory.verifyPopo(csr, null);
     String txt = bo ? "valid" : "invalid";

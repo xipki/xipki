@@ -28,15 +28,17 @@ if { "$1" equals "" } then {
   argsValid = "true"
 } else {
   if { "$1" equals "-l" } then {
+    OUTFORM = $2
+    HASH = $3
+    TOKEN_TYPE = $4
+    SIG_TYPE = $5
+    KEYSPEC = $6
+  } else {
+    OUTFORM = $2
     HASH = $2
     TOKEN_TYPE = $3
     SIG_TYPE = $4
-    KEYSPEC =$5
-  } else {
-    HASH = $1
-    TOKEN_TYPE = $2
-    SIG_TYPE = $3
-    KEYSPEC =$4
+    KEYSPEC = $5
   }
 
   if { "$HASH" equals "SM3" } then {
@@ -119,7 +121,8 @@ if { $argsValid equals "false" } then {
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/qa/lifecycle.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "source file:./xipki/qa/lifecycle.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "    outform:         Output format of the certificates, CRLs and CSRs"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
   echo "                     SM3 (only for signature type SM2)"
@@ -235,7 +238,7 @@ if { $printUsage equals "true" } then {
   ca:list-cert --ca rootca1 --subject "CN=*ca*,O=xipki" --order subject -n 100
 
   # get the serial number
-  SERIAL = $(xi:cert-info --serial --hex --in output/subca1.der)
+  SERIAL = $(xi:cert-info --serial --hex --in output/subca1.crt)
 
   # save the certificate request
   ca:get-request --ca rootca1 --serial $SERIAL --out output/subca1.request

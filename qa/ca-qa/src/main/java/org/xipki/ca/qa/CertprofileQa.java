@@ -137,6 +137,8 @@ public class CertprofileQa {
     issue = new ValidationIssue("X509.SIZE", "certificate size");
     resultIssues.add(issue);
 
+    certBytes = X509Util.toDerEncoded(certBytes);
+
     Integer maxSize = certprofile.getMaxSize();
     if (maxSize != 0) {
       int size = certBytes.length;

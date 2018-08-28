@@ -28,6 +28,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 
@@ -62,7 +63,8 @@ public class CrlInfoAction extends SecurityAction {
 
   @Override
   protected Object execute0() throws Exception {
-    CertificateList crl = CertificateList.getInstance(IoUtil.read(inFile));
+    CertificateList crl = CertificateList.getInstance(
+        X509Util.toDerEncoded(IoUtil.read(inFile)));
 
     if (crlNumber != null && crlNumber) {
       ASN1Encodable asn1 = crl.getTBSCertList().getExtensions().getExtensionParsedValue(

@@ -22,7 +22,7 @@ echo "#################################################################"
 echo "#             Manage certificate via REST interface             #"
 echo "#################################################################"
 
-CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/subcawithcrl1.der)
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/subcawithcrl1.crt)
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/rest-tls1.p12 --password 1234 \

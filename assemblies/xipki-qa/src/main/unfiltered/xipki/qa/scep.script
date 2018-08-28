@@ -28,49 +28,54 @@ feature:install xipki-scepclient-shell
 xi:csr-p12 --hash $STDHASH --p12 output/scep-ocsp1.p12 --password 1234 \
   --challenge-password user1:password1 \
   --subject "CN=scep-ocsp1,O=xipki,C=DE" \
+  --outform $OUTFORM \
   --out output/scep-ocsp1.csr
 
 ## Enroll certificate via PKCSReq
 xi:scep-enroll --method pkcs --url $SCEP_URL \
-  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/subcawithcrl1.crt \
   --p12 output/scep-ocsp1.p12 --password 1234 \
   --csr output/scep-ocsp1.csr \
-  --out output/scep-ocsp1.der
+  --outform $OUTFORM \
+  --out output/scep-ocsp1.crt
 
 ## Poll Cert
 xi:scep-certpoll --url $SCEP_URL \
-  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/subcawithcrl1.crt \
   --p12 output/scep-ocsp1.p12 --password 1234 \
   --csr output/scep-ocsp1.csr \
-  --out output/scep-ocsp1-certpoll.der
+  --outform $OUTFORM \
+  --out output/scep-ocsp1-certpoll.crt
 
 ## Get Cert
 
-SERIAL = $(xi:cert-info --serial --hex --in output/scep-ocsp1-certpoll.der)
+SERIAL = $(xi:cert-info --serial --hex --in output/scep-ocsp1-certpoll.crt)
 
 xi:scep-getcert \
   --url $SCEP_URL \
-  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/subcawithcrl1.crt \
   --p12 output/scep-ocsp1.p12 \
   --password 1234 \
-  --out output/scep-ocsp1-getcert.der \
+  --outform $OUTFORM \
+  --out output/scep-ocsp1-getcert.crt \
   --serial $SERIAL
 
 ## Update the certificate in PKCS#12 file
 xi:update-cert-p12 \
   --p12 output/scep-ocsp1.p12 \
   --password 1234 \
-  --cert output/scep-ocsp1.der \
-  --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rootca1.der
+  --cert output/scep-ocsp1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
 
 ## Get CRL
 xi:scep-getcrl \
   --url $SCEP_URL \
-  --ca-cert output/subcawithcrl1.der \
-  --cert output/scep-ocsp1.der \
+  --ca-cert output/subcawithcrl1.crt \
+  --cert output/scep-ocsp1.crt \
   --p12 output/scep-ocsp1.p12 \
   --password 1234 \
+  --outform $OUTFORM \
   --out output/subcawithcrl1-scep.crl
 
 ## Renewal
@@ -80,43 +85,48 @@ xi:csr-p12 \
   --p12 output/scep-ocsp1-2.p12 \
   --password 1234 \
   --subject "CN=scep-ocsp1-2,O=xipki,C=DE" \
+  --outform $OUTFORM \
   --out output/scep-ocsp1-2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key scep-ocsp1.p12
 xi:scep-enroll --method renewal \
   --url $SCEP_URL \
-  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/subcawithcrl1.crt \
   --p12 output/scep-ocsp1.p12 \
   --password 1234 \
   --csr output/scep-ocsp1-2.csr \
-  --out output/scep-ocsp1-2.der
+  --outform $OUTFORM \
+  --out output/scep-ocsp1-2.crt
 
 ## Update the certificate in PKCS#12 file
 xi:update-cert-p12 \
   --p12 output/scep-ocsp1-2.p12 --password 1234 \
-  --cert output/scep-ocsp1-2.der \
-  --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rootca1.der
+  --cert output/scep-ocsp1-2.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
 
 ## Renewal with different CommonName
 
 xi:csr-p12 --hash $STDHASH \
   --p12 output/scep-ocsp2.p12 --password 1234 \
   --subject "CN=scep-ocsp2,O=xipki,C=DE" \
+  --outform $OUTFORM \
   --out output/scep-ocsp2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key scep-ocsp1.p12
 xi:scep-enroll --method renewal \
   --url $SCEP_URL \
-  --ca-cert output/subcawithcrl1.der \
+  --ca-cert output/subcawithcrl1.crt \
   --p12 output/scep-ocsp1.p12 --password 1234 \
-  --csr output/scep-ocsp2.csr --out output/scep-ocsp2.der
+  --csr output/scep-ocsp2.csr \
+  --outform $OUTFORM \
+  --out output/scep-ocsp2.crt
 
 ## Update the certificate in PKCS#12 file
 xi:update-cert-p12 \
   --p12 output/scep-ocsp2.p12 --password 1234 \
-  --cert output/scep-ocsp2.der \
-  --ca-cert output/subcawithcrl1.der \
-  --ca-cert output/rootca1.der
+  --cert output/scep-ocsp2.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
 
 feature:uninstall xipki-scepclient-shell

@@ -31,71 +31,71 @@ echo "#################################################################"
 ## rootca
 
 caqa:check-cert --issuer rootca --profile rootca \
-  --csr output/rootca1.csr --cert output/rootca1.der
+  --csr output/rootca1.csr --cert output/rootca1.crt
 
 caqa:check-cert --issuer rootca --profile cross \
-  --csr output/cross1.csr --cert output/cross1.der
+  --csr output/cross1.csr --cert output/cross1.crt
 
 caqa:check-cert --issuer rootca --profile subca \
-  --csr output/subca1.csr --cert output/subca1.der
+  --csr output/subca1.csr --cert output/subca1.crt
 
 caqa:check-cert --issuer rootca --profile subca-complex \
-  --csr output/subcawithcrl1.csr --cert output/subcawithcrl1.der
+  --csr output/subcawithcrl1.csr --cert output/subcawithcrl1.crt
 
 ## subcawithcrl
 
 caqa:check-cert --issuer subcawithcrl --profile ocsp \
-  --csr output/ocsp1.csr --cert output/ocsp1.der
+  --csr output/ocsp1.csr --cert output/ocsp1.crt
 
 caqa:check-cert --issuer subcawithcrl --profile ocsp \
-  --csr output/ocsp2.csr --cert output/ocsp2.der
+  --csr output/ocsp2.csr --cert output/ocsp2.crt
 
 caqa:check-cert --issuer subcawithcrl --profile multiple-ous \
-  --csr output/multiple-ous1.csr --cert output/multiple-ous1.der
+  --csr output/multiple-ous1.csr --cert output/multiple-ous1.crt
 
 caqa:check-cert --issuer subcawithcrl --profile multiple-ous \
-  --csr output/multiple-ous2.csr --cert output/multiple-ous2.der
+  --csr output/multiple-ous2.csr --cert output/multiple-ous2.crt
 
 caqa:check-cert --issuer subcawithcrl --profile multi-valued-rdn \
-  --csr output/multi-valued-rdn1.csr --cert output/multi-valued-rdn1.der
+  --csr output/multi-valued-rdn1.csr --cert output/multi-valued-rdn1.crt
 
 caqa:check-cert --issuer subcawithcrl --profile max-time \
-  --csr output/max-time1.csr --cert output/max-time1.der
+  --csr output/max-time1.csr --cert output/max-time1.crt
 
 ## subca
 
 caqa:check-cert --issuer subca --profile tls \
-  --csr output/tls1.csr --cert output/tls1.der
+  --csr output/tls1.csr --cert output/tls1.crt
 
 caqa:check-cert --issuer subca --profile tls-inc-sn \
-  --csr output/tls-inc-sn1.csr --cert output/tls-inc-sn1.der
+  --csr output/tls-inc-sn1.csr --cert output/tls-inc-sn1.crt
 
 caqa:check-cert --issuer subca --profile tls-inc-sn \
-  --csr output/tls-inc-sn1-1.csr --cert output/tls-inc-sn1-1.der
+  --csr output/tls-inc-sn1-1.csr --cert output/tls-inc-sn1-1.crt
 
 caqa:check-cert --issuer subca --profile tls-inc-sn \
-  --csr output/tls-inc-sn1-2.csr --cert output/tls-inc-sn1-2.der
+  --csr output/tls-inc-sn1-2.csr --cert output/tls-inc-sn1-2.crt
 
 caqa:check-cert --issuer subca --profile tls \
-  --csr output/tls2.csr --cert output/tls2.der
+  --csr output/tls2.csr --cert output/tls2.crt
 
 caqa:check-cert --issuer subca --profile tls-c \
-  --csr output/tls-c1.csr --cert output/tls-c1.der
+  --csr output/tls-c1.csr --cert output/tls-c1.crt
 
 caqa:check-cert --issuer subca --profile tls-c \
-  --csr output/tls-c2.csr --cert output/tls-c2.der
+  --csr output/tls-c2.csr --cert output/tls-c2.crt
 
 caqa:check-cert --issuer subca --profile qc \
-  --csr output/qc1.csr --cert output/qc1.der
+  --csr output/qc1.csr --cert output/qc1.crt
 
 caqa:check-cert --issuer subca --profile ee-complex \
-  --csr output/ee-complex1.csr --cert output/ee-complex1.der
+  --csr output/ee-complex1.csr --cert output/ee-complex1.crt
 
 caqa:check-cert --issuer subca --profile ee-complex \
-  --csr output/ee-complex2.csr --cert output/ee-complex2.der
+  --csr output/ee-complex2.csr --cert output/ee-complex2.crt
 
 caqa:check-cert --issuer subca --profile extended \
-  --csr output/extended1.csr --cert output/extended1.der
+  --csr output/extended1.csr --cert output/extended1.crt
 
 feature:uninstall xipki-caqa-shell
 

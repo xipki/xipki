@@ -26,6 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
@@ -71,7 +72,7 @@ public class CertInfoAction extends SecurityAction {
 
   @Override
   protected Object execute0() throws Exception {
-    Certificate cert = Certificate.getInstance(IoUtil.read(inFile));
+    Certificate cert = X509Util.parseBcCert(IoUtil.read(inFile));
 
     if (serial != null && serial) {
       return getNumber(cert.getSerialNumber().getPositiveValue());

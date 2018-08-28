@@ -524,7 +524,7 @@ public interface CaManager {
    * @param profileName
    *          Name of the certificate profile. Must not be {@code null}.
    * @param encodedCsr
-   *          DER-encoded CSR. Must not be {@code null}.
+   *          CSR. Must not be {@code null}.
    * @param notBefore
    *          NotBefore. Could be {@code null}.
    * @param notAfter
@@ -543,7 +543,7 @@ public interface CaManager {
    * @param certprofileName
    *          Profile name of the root CA certificate. Must not be {@code null}.
    * @param encodedCsr
-   *          DER-encoded CSR. Must not be {@code null}.
+   *          CSR. Must not be {@code null}.
    * @param serialNumber
    *          Serial number. Could be {@code null}.
    * @return the generated certificate

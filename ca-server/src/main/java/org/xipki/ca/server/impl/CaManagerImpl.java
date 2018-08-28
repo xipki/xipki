@@ -149,6 +149,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
@@ -158,7 +159,9 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
+import org.xipki.util.PemEncoder;
 import org.xipki.util.StringUtil;
+import org.xipki.util.PemEncoder.PemLabel;
 import org.xml.sax.SAXException;
 
 /**
@@ -2128,7 +2131,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     X509Ca ca = getX509Ca(caName);
     CertificationRequest csr;
     try {
-      csr = CertificationRequest.getInstance(encodedCsr);
+      csr = X509Util.parseCsr(encodedCsr);
     } catch (Exception ex) {
       throw new CaMgmtException(concat("invalid CSR request. ERROR: ", ex.getMessage()));
     }
@@ -2237,7 +2240,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     CertificationRequest csr;
     try {
-      csr = CertificationRequest.getInstance(encodedCsr);
+      csr = X509Util.parseCsr(encodedCsr);
     } catch (Exception ex) {
       System.err.println("invalid encodedCsr");
       return null;
@@ -2717,7 +2720,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
             String fn = genSelfIssued.getCertFilename();
             if (fn != null) {
               try {
-                IoUtil.save(fn, cert.getEncoded());
+                byte[] encodedCert = cert.getEncoded();
+                if ("pem".equalsIgnoreCase(genSelfIssued.getCertOutputFormat())) {
+                  encodedCert = PemEncoder.encode(encodedCert, PemLabel.CERTIFICATE);
+                }
+                IoUtil.save(fn, encodedCert);
                 LOG.info("saved generated certificate of root CA {} to {}",
                     caName, fn);
               } catch (CertificateEncodingException ex) {

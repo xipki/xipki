@@ -21,10 +21,13 @@
 xi:csr-p12 --hash $STDHASH --p12 output/scep1.p12 --password 1234 \
   --subject "CN=scep responder1,O=xipki,C=DE" --out output/scep1.csr
 
-ca:enroll-cert --ca subcawithcrl1 --csr output/scep1.csr --out output/scep1.der \
+ca:enroll-cert --ca subcawithcrl1 --csr output/scep1.csr \
+  --outform $OUTFORM \
+  --out output/scep1.crt \
   --profile scep
 
-xi:update-cert-p12 --p12 output/scep1.p12 --password 1234 --cert output/scep1.der
+xi:update-cert-p12 --p12 output/scep1.p12 --password 1234 \
+  --cert output/scep1.crt
 
 ca:signer-add --name scep-responder1 --type PKCS12 \
   --conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/scep1.p12,algo=SHA256withRSA

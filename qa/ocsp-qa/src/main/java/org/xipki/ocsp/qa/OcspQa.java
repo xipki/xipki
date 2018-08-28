@@ -454,6 +454,8 @@ public class OcspQa {
 
       byte[] hashValue = certHash.getCertificateHash();
       if (encodedCert != null) {
+        encodedCert = X509Util.toDerEncoded(encodedCert);
+
         issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.VALIDITY",
             "certhash validity");
         issues.add(issue);

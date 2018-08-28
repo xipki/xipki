@@ -87,11 +87,11 @@
         <conf>
 # Comma-separated files of CA certificates to be considered
 # optional. Default is all.
-#cacerts.includes=cacert1.der,cacert2.der
+#cacerts.includes=cacert1.crt,cacert2.crt
 
 # Comma-separated files of CA certificates to be not considered
 # optional. Default is none
-#cacerts.excludes=cacert2.der,cacert3.der
+#cacerts.excludes=cacert2.crt,cacert3.crt
         </conf>
       </source>
       <ignoreExpiredCert>true</ignoreExpiredCert>
@@ -125,7 +125,7 @@ crl.url = http://example.org/crl
 useUpdateDatesFromCrl = false
 
 # CA cert file
-caCert.file = output/subcawithcrl1.der
+caCert.file = output/subcawithcrl1.crt
 
 # certificate used to verify the CRL signature.
 # Required for indirect CRL, otherwise optional
