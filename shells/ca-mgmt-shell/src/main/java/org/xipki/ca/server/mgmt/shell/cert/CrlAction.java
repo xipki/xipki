@@ -43,7 +43,7 @@ public abstract class CrlAction extends CaAction {
 
   @Option(name = "--outform", description = "output format of the CRL")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
   @Completion(FileCompleter.class)
@@ -71,7 +71,7 @@ public abstract class CrlAction extends CaAction {
 
     if (outFile != null) {
       saveVerbose("saved CRL to file", new File(outFile),
-          derPemEncodeCrl(crl.getEncoded(), outForm));
+          derPemEncodeCrl(crl.getEncoded(), outform));
     }
     return null;
   }

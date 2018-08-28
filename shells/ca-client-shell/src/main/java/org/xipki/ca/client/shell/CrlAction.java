@@ -44,7 +44,7 @@ public abstract class CrlAction extends ClientAction {
 
   @Option(name = "--outform", description = "output format of the CRL")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
   @Completion(FileCompleter.class)
@@ -88,7 +88,7 @@ public abstract class CrlAction extends ClientAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outForm));
+    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outform));
     return null;
   } // method execute0
 

@@ -53,7 +53,7 @@ public class P11CertExportAction extends P11SecurityAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")
@@ -69,7 +69,7 @@ public class P11CertExportAction extends P11SecurityAction {
       throw new CmdFailure("could not export certificate " + objIdentifier);
     }
     saveVerbose("saved certificate to file", new File(outFile),
-        derPemEncodeCert(cert.getEncoded(), outForm));
+        derPemEncodeCert(cert.getEncoded(), outform));
     return null;
   }
 

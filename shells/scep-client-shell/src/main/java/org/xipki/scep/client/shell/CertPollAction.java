@@ -50,7 +50,7 @@ public class CertPollAction extends ClientAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")
@@ -79,7 +79,7 @@ public class CertPollAction extends ClientAction {
     }
 
     saveVerbose("saved certificate to file", new File(outputFile),
-        derPemEncodeCert(certs.get(0).getEncoded(), outForm));
+        derPemEncodeCert(certs.get(0).getEncoded(), outform));
     return null;
   }
 

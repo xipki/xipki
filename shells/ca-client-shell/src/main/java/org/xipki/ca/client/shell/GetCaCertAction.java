@@ -46,7 +46,7 @@ public class GetCaCertAction extends ClientAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  private String outForm = "der";
+  private String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the CA certificate")
@@ -90,7 +90,7 @@ public class GetCaCertAction extends ClientAction {
     }
 
     saveVerbose("saved CA certificate to file", new File(outFile),
-        derPemEncodeCert(caCert.getEncoded(), outForm));
+        derPemEncodeCert(caCert.getEncoded(), outform));
     return null;
   } // method execute0
 

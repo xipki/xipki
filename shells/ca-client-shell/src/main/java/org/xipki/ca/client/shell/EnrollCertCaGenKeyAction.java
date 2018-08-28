@@ -52,9 +52,9 @@ import org.xipki.util.StringUtil;
 @Service
 public class EnrollCertCaGenKeyAction extends EnrollAction {
 
-  @Option(name = "--cert-out-form", description = "output format of the certificate")
+  @Option(name = "--cert-outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  private String certoutForm = "der";
+  private String certOutform = "der";
 
   @Option(name = "--cert-out", description = "where to save the certificate")
   @Completion(FileCompleter.class)
@@ -102,7 +102,7 @@ public class EnrollCertCaGenKeyAction extends EnrollAction {
     if (StringUtil.isNotBlank(certOutputFile)) {
       File certFile = new File(certOutputFile);
       saveVerbose("saved certificate to file", certFile,
-          derPemEncodeCert(cert.getEncoded(), certOutForm));
+          derPemEncodeCert(cert.getEncoded(), certOutform));
     }
 
     PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);

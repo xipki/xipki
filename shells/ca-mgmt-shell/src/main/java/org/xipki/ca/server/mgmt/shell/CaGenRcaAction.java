@@ -52,7 +52,7 @@ public class CaGenRcaAction extends CaAddOrGenAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o",
       description = "where to save the generated CA certificate")
@@ -72,7 +72,7 @@ public class CaGenRcaAction extends CaAddOrGenAction {
         serialNumber);
     if (rootcaCertOutFile != null) {
       saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
-          derPemEncodeCert(rootcaCert.getEncoded(), outForm));
+          derPemEncodeCert(rootcaCert.getEncoded(), outform));
     }
     println("generated root CA " + caEntry.getIdent().getName());
     return null;

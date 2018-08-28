@@ -74,7 +74,7 @@ public class GetCrlAction extends CrlAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outForm));
+    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outform));
 
     if (withBaseCrl.booleanValue()) {
       byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
@@ -96,7 +96,7 @@ public class GetCrlAction extends CrlAction {
           throw new CmdFailure("received no baseCRL from server");
         } else {
           saveVerbose("saved baseCRL to file", new File(baseCrlOut),
-              derPemEncodeCrl(crl.getEncoded(), outForm));
+              derPemEncodeCrl(crl.getEncoded(), outform));
         }
       }
     }

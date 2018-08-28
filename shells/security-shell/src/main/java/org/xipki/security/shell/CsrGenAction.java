@@ -117,7 +117,7 @@ public abstract class CsrGenAction extends SecurityAction {
 
   @Option(name = "--outform", description = "output format of the CSR")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true, description = "CSR file")
   @Completion(FileCompleter.class)
@@ -357,7 +357,7 @@ public abstract class CsrGenAction extends SecurityAction {
         attributes);
 
     File file = new File(outputFilename);
-    saveVerbose("saved CSR to file", file, derPemEncodeCsr(csr.getEncoded(), outForm));
+    saveVerbose("saved CSR to file", file, derPemEncodeCsr(csr.getEncoded(), outform));
     return null;
   } // method execute0
 

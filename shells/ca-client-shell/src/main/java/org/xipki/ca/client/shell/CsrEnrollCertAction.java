@@ -61,7 +61,7 @@ public class CsrEnrollCertAction extends ClientAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  private String outForm = "der";
+  private String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the certificate")
@@ -106,7 +106,7 @@ public class CsrEnrollCertAction extends ClientAction {
 
     File certFile = new File(outputFile);
     saveVerbose("certificate saved to file", certFile,
-        derPemEncodeCert(cert.getEncoded(), outForm));
+        derPemEncodeCert(cert.getEncoded(), outform));
     return null;
   }
 

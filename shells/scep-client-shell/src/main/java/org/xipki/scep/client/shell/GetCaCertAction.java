@@ -50,7 +50,7 @@ public class GetCaCertAction extends XiAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
       description = "where to save the CA certificate")
@@ -75,7 +75,7 @@ public class GetCaCertAction extends XiAction {
     }
 
     saveVerbose("saved certificate to file", new File(outFile),
-        derPemEncodeCert(caCert.getEncoded(), outForm));
+        derPemEncodeCert(caCert.getEncoded(), outform));
     return null;
   }
 

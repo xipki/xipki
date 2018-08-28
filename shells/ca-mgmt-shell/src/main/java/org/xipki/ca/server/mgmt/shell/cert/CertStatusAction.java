@@ -42,7 +42,7 @@ public class CertStatusAction extends UnRevRmCertAction {
 
   @Option(name = "--outform", description = "output format of the certificate")
   @Completion(DerPemCompleter.class)
-  protected String outForm = "der";
+  protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", description = "where to save the certificate")
   @Completion(FileCompleter.class)
@@ -64,7 +64,7 @@ public class CertStatusAction extends UnRevRmCertAction {
     println(msg);
     if (outputFile != null) {
       saveVerbose("saved certificate to file", new File(outputFile),
-          derPemEncodeCert(cert.getEncoded(), outForm));
+          derPemEncodeCert(cert.getEncoded(), outform));
     }
     return null;
   }
