@@ -16,113 +16,113 @@
 #
 ################################################################################
 
-echo '+++++source xipki/qa/camgmt-qa.script    pem SHA256 PKCS11 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    pem SHA256 PKCS11 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    pem sha256 pkcs11 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    pem sha256 pkcs11 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SHA256 PKCS11 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    der SHA256 PKCS11 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    der sha256 pkcs11 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    der sha256 pkcs11 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    pem SHA256 PKCS12 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    pem SHA256 PKCS12 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    pem sha256 pkcs12 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    pem sha256 pkcs12 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SHA256 PKCS12 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    der SHA256 PKCS12 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    der sha256 pkcs12 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    der sha256 pkcs12 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    pem SHA256 PKCS11 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    pem SHA256 PKCS11 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    pem sha256 pkcs11 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    pem sha256 pkcs11 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SHA256 PKCS11 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    der SHA256 PKCS11 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    der sha256 pkcs11 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    der sha256 pkcs11 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    pem SHA256 PKCS12 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    pem SHA256 PKCS12 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    pem sha256 pkcs12 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    pem sha256 pkcs12 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SHA256 PKCS12 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script    der SHA256 PKCS12 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script    der sha256 pkcs12 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script    der sha256 pkcs12 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    pem SHA256 PKCS11 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script    pem SHA256 PKCS11 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script    pem sha256 pkcs11 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    pem sha256 pkcs11 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SHA256 PKCS11 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script    der SHA256 PKCS11 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script    der sha256 pkcs11 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    der sha256 pkcs11 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    pem SHA256 PKCS12 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script    pem SHA256 PKCS12 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script    pem sha256 pkcs12 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    pem sha256 pkcs12 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SHA256 PKCS12 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script    der SHA256 PKCS12 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script    der sha256 pkcs12 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    der sha256 pkcs12 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    pem SM3 PKCS12 SM2 secp256r1+++++'
-           source xipki/qa/camgmt-qa.script    pem SM3 PKCS12 SM2 secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script    pem sm3 pkcs12 sm2 secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    pem sm3 pkcs12 sm2 secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script    der SM3 PKCS12 SM2 secp256r1+++++'
-           source xipki/qa/camgmt-qa.script    der SM3 PKCS12 SM2 secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script    der sm3 pkcs12 sm2 secp256r1+++++'
+           source xipki/qa/camgmt-qa.script    der sm3 pkcs12 sm2 secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS11 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS11 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sha256 pkcs11 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l pem sha256 pkcs11 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SHA256 PKCS11 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l der SHA256 PKCS11 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l der sha256 pkcs11 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l der sha256 pkcs11 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS12 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS12 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sha256 pkcs12 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l pem sha256 pkcs12 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SHA256 PKCS12 RSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l der SHA256 PKCS12 RSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l der sha256 pkcs12 rsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l der sha256 pkcs12 rsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS11 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS11 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sha256 pkcs11 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l pem sha256 pkcs11 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SHA256 PKCS11 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l der SHA256 PKCS11 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l der sha256 pkcs11 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l der sha256 pkcs11 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS12 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS12 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sha256 pkcs12 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l pem sha256 pkcs12 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SHA256 PKCS12 DSA 2048+++++'
-           source xipki/qa/camgmt-qa.script -l der SHA256 PKCS12 DSA 2048
+echo '+++++source xipki/qa/camgmt-qa.script -l der sha256 pkcs12 dsa 2048+++++'
+           source xipki/qa/camgmt-qa.script -l der sha256 pkcs12 dsa 2048
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS11 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS11 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sha256 pkcs11 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script -l pem sha256 pkcs11 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SHA256 PKCS11 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script -l der SHA256 PKCS11 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script -l der sha256 pkcs11 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script -l der sha256 pkcs11 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS12 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script -l pem SHA256 PKCS12 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sha256 pkcs12 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script -l pem sha256 pkcs12 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SHA256 PKCS12 EC secp256r1+++++'
-           source xipki/qa/camgmt-qa.script -l der SHA256 PKCS12 EC secp256r1
+echo '+++++source xipki/qa/camgmt-qa.script -l der sha256 pkcs12 ec secp256r1+++++'
+           source xipki/qa/camgmt-qa.script -l der sha256 pkcs12 ec secp256r1
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l pem SM3 PKCS12 SM2+++++'
-           source xipki/qa/camgmt-qa.script -l pem SM3 PKCS12 SM2
+echo '+++++source xipki/qa/camgmt-qa.script -l pem sm3 pkcs12 sm2+++++'
+           source xipki/qa/camgmt-qa.script -l pem sm3 pkcs12 sm2
 
 sleep 2
-echo '+++++source xipki/qa/camgmt-qa.script -l der SM3 PKCS12 SM2+++++'
-           source xipki/qa/camgmt-qa.script -l der SM3 PKCS12 SM2
+echo '+++++source xipki/qa/camgmt-qa.script -l der sm3 pkcs12 sm2+++++'
+           source xipki/qa/camgmt-qa.script -l der sm3 pkcs12 sm2

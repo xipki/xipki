@@ -41,13 +41,13 @@ if { "$1" equals "" } then {
     KEYSPEC = $5
   }
 
-  if { "$HASH" equals "SM3" } then {
-    STDHASH = SHA256
+  if { "$HASH" equals "sm3" } then {
+    STDHASH = sha256
   } else {
     STDHASH = "$HASH"
   }
 
-  list = [PKCS11 PKCS12]; each ($list) {
+  list = [pkcs11 pkcs12]; each ($list) {
     if { "$TOKEN_TYPE" equals $it } then {
       argsValid = "true"
       break
@@ -59,7 +59,7 @@ if { "$1" equals "" } then {
   } else {
     argsValid = "false"
 
-    list = [RSA RSAPSS EC PLAINEC DSA SM2]; each ($list) {
+    list = [rsa rsapss ec plainec dsa sm2]; each ($list) {
       if { "$SIG_TYPE" equals $it } then {
         argsValid = "true"
         break
@@ -72,8 +72,8 @@ if { "$1" equals "" } then {
   } else {
     argsValid = "false"
 
-    if { "$SIG_TYPE" equals "PLAINEC" } then {
-      list = [SHA1 SHA256 SHA384 SHA512]; each ($list) {
+    if { "$SIG_TYPE" equals "plainec" } then {
+      list = [sha1 sha256 sha384 sha512]; each ($list) {
         if { "$HASH" equals $it } then {
           argsValid = "true"
           break
@@ -83,8 +83,8 @@ if { "$1" equals "" } then {
       if { "$argsValid" equals "false" } then {
         errMsg = "invalid combination $HASH and $SIG_TYPE"
       }
-    } elif { "$SIG_TYPE" equals "SM2" } then {
-      list = [SM3]; each ($list) {
+    } elif { "$SIG_TYPE" equals "sm2" } then {
+      list = [sm3]; each ($list) {
         if { "$HASH" equals $it } then {
           argsValid = "true"
           break
@@ -95,7 +95,7 @@ if { "$1" equals "" } then {
         errMsg = "invalid combination $HASH and $SIG_TYPE"
       }
     } else {
-      list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
+      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512]; each ($list) {
         if { "$HASH" equals $it } then {
           argsValid = "true"
           break
@@ -123,14 +123,14 @@ if { $printUsage equals "true" } then {
   echo ""
   echo "source file:./xipki/qa/lifecycle.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    outform:         Output format of the certificates, CRLs and CSRs"
-  echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
-  echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
-  echo "                     SM3 (only for signature type SM2)"
-  echo "                     The SHA3 algorithms are not for PLAINEC."
-  echo "    token type:      PKCS11, PKCS12"
-  echo "    signature type:  RSA, RSAPSS, EC, PLAINEC, DSA, SM2"
-  echo "    keyspec:         keysize for signature types RSA, RSAPSS and DSA,"
-  echo "                     curve name for signature types EC and PLAINEC"
+  echo "    hash algo:       sha1, sha224, sha256, sha384, sha512"
+  echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
+  echo "                     sm3 (only for signature type sm2)"
+  echo "                     The sha3 algorithms are not for plainec."
+  echo "    token type:      pkcs11, pkcs12"
+  echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
+  echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
+  echo "                     curve name for signature types ec and plainec"
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } else {
@@ -174,7 +174,7 @@ if { $printUsage equals "true" } then {
 
   dsaPlain = ""
 
-  if { "$SIG_TYPE" equals "PLAINEC" } then {
+  if { "$SIG_TYPE" equals "plainec" } then {
     dsaPlain = "--dsa-plain"
   }
 
@@ -190,7 +190,7 @@ if { $printUsage equals "true" } then {
     xipki/qa/qa.d/ra.script
 
   rsaMgf1 = ""
-  if { "$SIG_TYPE" equals "RSAPSS" } then {
+  if { "$SIG_TYPE" equals "rsapss" } then {
     rsaMgf1 = "--rsa-mgf1"
   }
 
@@ -208,7 +208,7 @@ if { $printUsage equals "true" } then {
 
   gm = ""
 
-  if { "$SIG_TYPE" equals "SM2" } then {
+  if { "$SIG_TYPE" equals "sm2" } then {
     gm = "--gm"
   }
 

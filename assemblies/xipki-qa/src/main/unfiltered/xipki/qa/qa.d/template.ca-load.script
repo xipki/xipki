@@ -50,7 +50,7 @@ sleep 1
 ca:restart
 
 ## Create the CSR for the command caqa:check-cert in QA
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT --label rootca1 --out output/rootca1.csr \
@@ -68,9 +68,9 @@ echo "#################################################################"
 echo "#                         Load rootca.xml                       #"
 echo "#################################################################"
 
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
-} elif { $TOKEN_TYPE equals "PKCS12" } then {
+} else {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
@@ -97,14 +97,14 @@ xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
 ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:update-cert-p11 --slot $SLOT --label rootca1 --cert output/rootca1.crt
 } else {
   xi:update-cert-p12 --p12 output/rootca1.p12 --password 1234 --cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subca1
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT --label subca1 \
     --outform $OUTFORM \
@@ -122,7 +122,7 @@ ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
   --outform $OUTFORM \
   --out output/subca1.crt --profile subca
 
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:update-cert-p11 --slot $SLOT --label subca1 \
     --cert output/subca1.crt \
 } else {
@@ -131,7 +131,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
 }
 
 ## Generate keys and CSR for subcawithcrl
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT --label subcawithcrl1 \
@@ -170,7 +170,7 @@ ca:enroll-cert --ca rootca1 --csr output/subcawithcrl1.csr \
   --out output/subcawithcrl1.crt \
   --profile subca-Complex
 
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:update-cert-p11 --slot $SLOT --label subcawithcrl1 \
     --cert output/subcawithcrl1.crt \
 } else {
@@ -179,7 +179,7 @@ if { $TOKEN_TYPE equals "PKCS11" } then {
 }
 
 ## Generate keys and CSR for OCSPResponder
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT --label ocsp99 \
     --outform $OUTFORM \
@@ -198,7 +198,7 @@ ca:enroll-cert --ca rootca1 --csr output/ocsp99.csr \
   --out output/ocsp99.crt \
   --profile ocsp
 
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:update-cert-p11 --slot $SLOT --label ocsp99 --cert output/ocsp99.crt \
 } else {
   xi:update-cert-p12 --p12 output/ocsp99.p12 --password 1234 \
@@ -212,7 +212,7 @@ echo "#                        Add subca with OCSP                    #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
 } else {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subca1.p12,algo=$SIGALGO"
@@ -249,7 +249,7 @@ echo "#                       Add subca with CRL                      #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "PKCS11" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
 } else {
   CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
