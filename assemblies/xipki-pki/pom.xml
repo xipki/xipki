@@ -32,8 +32,8 @@
     <jdbc.h2.version>1.4.197</jdbc.h2.version>
     <patchkaraf.main.repos>mvn:org.xipki.features/pki/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.main.repos>
     <patchkaraf.jetty.repos>mvn:org.xipki.features/pki-jetty/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.jetty.repos>
-    <patchkaraf.main.features>(aries-blueprint/${karaf.version},wrap/${karaf.version},netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.main.features>
-    <patchkaraf.jetty.features>(aries-blueprint/${karaf.version},wrap/${karaf.version},http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.jetty.features>
+    <patchkaraf.main.features>(aries-blueprint/${karaf.version},wrap,netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.main.features>
+    <patchkaraf.jetty.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.jetty.features>
   </properties>
   <dependencies>
     <dependency>
