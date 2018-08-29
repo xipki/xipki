@@ -75,7 +75,7 @@ public class EnrollCertCaGenKeyAction extends EnrollAction {
   @Override
   protected EnrollCertRequestEntry buildEnrollCertRequestEntry(String id, String profile,
       CertRequest certRequest) throws Exception {
-    return new EnrollCertRequestEntry("id-1", profile, certRequest, null);
+    return new EnrollCertRequestEntry("id-1", profile, certRequest, null, true);
   }
 
   @Override

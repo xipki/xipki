@@ -486,7 +486,7 @@ public abstract class CmpCaClient {
         }
       }
 
-      uri = caUri + "?certprofile=" + certprofiles[0];
+      uri = caUri + "?certprofile=" + certprofiles[0] + "&ca-generate-keypair=true";
     }
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
@@ -502,8 +502,9 @@ public abstract class CmpCaClient {
 
       AttributeTypeAndValue[] atvs = null;
       if (uri == null) {
-        String utf8pairs =
-            "certprofile?" + certprofiles[i] + "%";
+        String utf8pairs = "certprofile?" + certprofiles[i] + "%"
+            + "ca-generate-keypair?true%";
+
         AttributeTypeAndValue certprofileInfo =
             new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8pairs));

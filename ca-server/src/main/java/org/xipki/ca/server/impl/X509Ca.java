@@ -2071,7 +2071,7 @@ public class X509Ca {
           throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
         }
       }
-    } else {
+    } else if (certTemplate.isCaGenerateKeypair()) {
       KeypairGenControl kg = certprofile.getKeypairGenControl();
 
       try {
@@ -2169,6 +2169,9 @@ public class X509Ca {
           | NoSuchProviderException | IOException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
       }
+    } else {
+      // show not reach here
+      throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified  genkey");
     }
 
     // public key

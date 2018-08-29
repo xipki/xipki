@@ -1343,6 +1343,9 @@ abstract class ClientCmpAgent {
       EnrollCertRequestEntry reqEntry = reqEntries.get(i);
       CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE,
           reqEntry.getCertprofile());
+      if (reqEntry.isCaGenerateKeypair()) {
+        utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR, "true");
+      }
 
       AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 

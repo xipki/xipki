@@ -35,12 +35,28 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
 
   private final ProofOfPossession popo;
 
+  private final boolean caGenerateKeypair;
+
   public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
       ProofOfPossession popo) {
     super(id);
 
     this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
     this.certReq = ParamUtil.requireNonNull("certReq", certReq);
+    this.caGenerateKeypair = false;
+    this.popo = ParamUtil.requireNonNull("popo", popo);
+  }
+
+  public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
+      ProofOfPossession popo, boolean caGenerateKeypair) {
+    super(id);
+
+    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+    this.certReq = ParamUtil.requireNonNull("certReq", certReq);
+    this.caGenerateKeypair = caGenerateKeypair;
+    if (!caGenerateKeypair) {
+      ParamUtil.requireNonNull("popo", popo);
+    }
     this.popo = popo;
   }
 
@@ -54,6 +70,10 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
 
   public ProofOfPossession getPopo() {
     return popo;
+  }
+
+  public boolean isCaGenerateKeypair() {
+    return caGenerateKeypair;
   }
 
 }

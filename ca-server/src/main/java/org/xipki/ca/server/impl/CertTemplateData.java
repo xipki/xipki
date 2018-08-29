@@ -43,18 +43,20 @@ public class CertTemplateData {
 
   private final String certprofileName;
 
+  private final boolean caGenerateKeypair;
+
   private final Extensions extensions;
 
   private final ASN1Integer certReqId;
 
   public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
       Date notAfter, Extensions extensions, String certprofileName) {
-    this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null);
+    this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
   }
 
   public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo,
       Date notBefore, Date notAfter, Extensions extensions, String certprofileName,
-      ASN1Integer certReqId) {
+      ASN1Integer certReqId, boolean caGenerateKeypair) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = ParamUtil.requireNonNull("subject", subject);
     this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
@@ -63,6 +65,7 @@ public class CertTemplateData {
     this.notBefore = notBefore;
     this.notAfter = notAfter;
     this.certReqId = certReqId;
+    this.caGenerateKeypair = caGenerateKeypair;
   }
 
   public X500Name getSubject() {
@@ -71,6 +74,10 @@ public class CertTemplateData {
 
   public SubjectPublicKeyInfo getPublicKeyInfo() {
     return publicKeyInfo;
+  }
+
+  public boolean isCaGenerateKeypair() {
+    return caGenerateKeypair;
   }
 
   public Date getNotBefore() {
