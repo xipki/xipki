@@ -102,7 +102,7 @@ public class Base64 {
   public static final boolean containsOnlyBase64Chars(byte[] bytes, int offset, int len) {
     final int maxIndex = Math.min(bytes.length, offset + len);
 
-    for (int i = offset; i < maxIndex; i ++) {
+    for (int i = offset; i < maxIndex; i++) {
       byte bt = bytes[i];
 
       boolean contained = false;
