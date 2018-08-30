@@ -226,7 +226,7 @@ if { $printUsage equals "true" } then {
   echo "#                            Signer                             #"
   echo "#################################################################"
   caqa:signer-check --name responder1 --type pkcs12 \
-    --conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=sha256withRSA
+    --conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA256WITHRSA
 
   ca:signer-add --name qa-responder1 --type pkcs12 \
     --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA1withRSA
@@ -244,13 +244,13 @@ if { $printUsage equals "true" } then {
     --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=INVALIDALGO
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA1WITHRSA
 
   ca:signer-up --name qa-responder1 \
     --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA256withRSA
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA256withRSA
+    --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=SHA256WITHRSA
 
   ca:signer-rm -f qa-responder1
 

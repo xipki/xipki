@@ -149,6 +149,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -2475,6 +2476,17 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     ConfPairs pairs = new ConfPairs(signerConf);
+
+    String algo = pairs.value("algo");
+    if (algo != null) {
+      try {
+        algo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new CaMgmtException("Unknown signature algo: " + ex.getMessage(), ex);
+      }
+      pairs.putPair("algo", algo);
+    }
+
     String keystoreConf = pairs.value("keystore");
     String passwordHint = pairs.value("password");
     String keyLabel = pairs.value("key-label");
