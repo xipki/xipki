@@ -323,7 +323,7 @@ public abstract class CmpCaClient {
     return keycerts;
   } // method parseEnrollCertResult
 
-  public X509Certificate requestCertViaCsr(String certprofile, CertificationRequest csr,
+  public X509Certificate enrollCertViaCsr(String certprofile, CertificationRequest csr,
       boolean profileInUri) throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
@@ -388,17 +388,17 @@ public abstract class CmpCaClient {
         && serialNumber.equals(revCert.getSerialNumber().getValue());
   }
 
-  public X509Certificate requestCertViaCrmf(String certprofile, PrivateKey privateKey,
+  public X509Certificate enrollCertViaCrmf(String certprofile, PrivateKey privateKey,
       SubjectPublicKeyInfo publicKeyInfo, String subject, boolean profileInUri)
           throws Exception {
-    return requestCertViaCrmf(new String[]{certprofile},
+    return enrollCertViaCrmf(new String[]{certprofile},
         new PrivateKey[]{privateKey},
         new SubjectPublicKeyInfo[] {publicKeyInfo},
         new String[] {subject},
         profileInUri)[0];
   }
 
-  public X509Certificate[] requestCertViaCrmf(String[] certprofiles, PrivateKey[] privateKey,
+  public X509Certificate[] enrollCertViaCrmf(String[] certprofiles, PrivateKey[] privateKey,
       SubjectPublicKeyInfo[] publicKeyInfo, String[] subject, boolean profileInUri)
           throws Exception {
     final int n = certprofiles.length;
@@ -466,13 +466,13 @@ public abstract class CmpCaClient {
     return ret;
   } // method requestCerts
 
-  public KeyAndCert requestCertViaCrmfCaGenKeypair(String certprofile,
+  public KeyAndCert enrollCertViaCrmfCaGenKeypair(String certprofile,
       String subject, boolean profileAndKeyTypeInUri) throws Exception {
-    return requestCertViaCrmfCaGenKeypair(new String[]{certprofile},
+    return enrollCertViaCrmfCaGenKeypair(new String[]{certprofile},
         new String[] {subject}, profileAndKeyTypeInUri)[0];
   }
 
-  public KeyAndCert[] requestCertViaCrmfCaGenKeypair(String[] certprofiles,
+  public KeyAndCert[] enrollCertViaCrmfCaGenKeypair(String[] certprofiles,
       String[] subject, boolean profileAndKeyTypeInUri) throws Exception {
     final int n = certprofiles.length;
 
