@@ -91,10 +91,8 @@ import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
-import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.EncryptedValue;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PBES2Parameters;
 import org.bouncycastle.asn1.pkcs.PBKDF2Params;
@@ -1061,14 +1059,20 @@ abstract class ClientCmpAgent {
 
     int exptectedBodyType;
     switch (req.getType()) {
+      case INIT_REQ:
+        exptectedBodyType = PKIBody.TYPE_INIT_REQ;
+        break;
       case CERT_REQ:
         exptectedBodyType = PKIBody.TYPE_CERT_REP;
         break;
       case KEY_UPDATE:
         exptectedBodyType = PKIBody.TYPE_KEY_UPDATE_REP;
         break;
-      default:
+      case CROSS_CERT_REQ:
         exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
+        break;
+      default:
+        throw new RuntimeException("unknown EnrollCertRequest.Type " + req.getType());
     }
 
     return requestCertificate0(request, reqIdIdMap, exptectedBodyType, debug);
@@ -1341,63 +1345,46 @@ abstract class ClientCmpAgent {
 
     for (int i = 0; i < reqEntries.size(); i++) {
       EnrollCertRequestEntry reqEntry = reqEntries.get(i);
-      CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE,
-          reqEntry.getCertprofile());
+
+      AttributeTypeAndValue[] reginfo = null;
+
+      CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs();
+      if (reqEntry.getCertprofile() != null) {
+        utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_CERTPROFILE, reqEntry.getCertprofile());
+      }
+
       if (reqEntry.isCaGenerateKeypair()) {
         utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR, "true");
       }
 
-      AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
-
-      AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{atv};
-      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), atvs);
+      if (!utf8Pairs.names().isEmpty()) {
+        AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
+        reginfo = new AttributeTypeAndValue[]{atv};
+      }
+      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), reginfo);
     }
 
     int bodyType;
     switch (req.getType()) {
+      case INIT_REQ:
+        bodyType = PKIBody.TYPE_INIT_REQ;
+        break;
       case CERT_REQ:
         bodyType = PKIBody.TYPE_CERT_REQ;
         break;
       case KEY_UPDATE:
         bodyType = PKIBody.TYPE_KEY_UPDATE_REQ;
         break;
-      default:
+      case CROSS_CERT_REQ:
         bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
+        break;
+      default:
+        throw new RuntimeException("Unknown EnrollCertRequest.Type " + req.getType());
     }
 
     PKIBody body = new PKIBody(bodyType, new CertReqMessages(certReqMsgs));
     return new PKIMessage(header, body);
   } // method buildPkiMessage
-
-  private PKIMessage buildPkiMessage(CertRequest req, ProofOfPossession pop, String profileName) {
-    PKIHeader header = buildPkiHeader(implicitConfirm, null);
-
-    CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE, profileName);
-    AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
-    CertReqMsg[] certReqMsgs = new CertReqMsg[1];
-    certReqMsgs[0] = new CertReqMsg(req, pop, new AttributeTypeAndValue[]{certprofileInfo});
-
-    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
-    return new PKIMessage(header, body);
-  }
-
-  public PKIMessage envelope(CertRequest req, ProofOfPossession pop, String profileName)
-      throws CaClientException {
-    ParamUtil.requireNonNull("req", req);
-    ParamUtil.requireNonNull("pop", pop);
-    ParamUtil.requireNonNull("profileName", profileName);
-
-    PKIMessage request = buildPkiMessage(req, pop, profileName);
-    return sign(request);
-  }
-
-  public PKIMessage envelopeRevocation(RevokeCertRequest request) throws CaClientException {
-    ParamUtil.requireNonNull("request", request);
-
-    PKIMessage reqMessage = buildRevokeCertRequest(request);
-    reqMessage = sign(reqMessage);
-    return reqMessage;
-  }
 
   public ClientCaInfo retrieveCaInfo(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {

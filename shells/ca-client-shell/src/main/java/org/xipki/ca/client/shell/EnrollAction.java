@@ -333,7 +333,7 @@ public abstract class EnrollAction extends ClientAction {
     return result;
   } // method enroll
 
-  private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts)
+  static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts)
       throws InvalidOidOrNameException {
     if (oidTexts == null) {
       return null;
@@ -353,7 +353,7 @@ public abstract class EnrollAction extends ClientAction {
     return ret;
   }
 
-  private List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
+  static List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
     List<String> list = new ArrayList<>(types.size());
     for (String m : types) {
       String id = ExtensionNameCompleter.getIdForExtensionName(m);

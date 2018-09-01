@@ -48,10 +48,15 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
   }
 
   public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
-      ProofOfPossession popo, boolean caGenerateKeypair) {
+      ProofOfPossession popo, boolean caGenerateKeypair, boolean kup) {
     super(id);
 
-    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+    if (kup) {
+      this.certprofile = certprofile;
+    } else {
+      this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+    }
+
     this.certReq = ParamUtil.requireNonNull("certReq", certReq);
     this.caGenerateKeypair = caGenerateKeypair;
     if (!caGenerateKeypair) {

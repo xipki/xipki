@@ -35,6 +35,7 @@ public class EnrollCertRequest {
   public enum Type {
 
     CERT_REQ,
+    INIT_REQ,
     KEY_UPDATE,
     CROSS_CERT_REQ;
 

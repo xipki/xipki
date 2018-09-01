@@ -338,4 +338,14 @@ public interface CaClient {
    */
   Certificate getCaCert(String caName) throws CaClientException;
 
+  /**
+   * Returns the subject of CA certificate.
+   * @param caName
+   *          the CA name
+   * @return the subject of CA certificate
+   * @throws CaClientException
+   *          if client error occurs.
+   */
+  X500Name getCaCertSubject(String caName) throws CaClientException;
+
 }

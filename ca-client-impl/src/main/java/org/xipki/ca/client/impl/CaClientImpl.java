@@ -561,7 +561,9 @@ public final class CaClientImpl implements CaClient {
       // make sure that all requests are targeted on the same CA
       for (EnrollCertRequestEntry entry : request.getRequestEntries()) {
         String profile = entry.getCertprofile();
-        checkCertprofileSupportInCa(profile, caName);
+        if (profile != null) {
+          checkCertprofileSupportInCa(profile, caName);
+        }
       }
     }
 
@@ -1215,6 +1217,12 @@ public final class CaClientImpl implements CaClient {
   public java.security.cert.Certificate getCaCert(String caName) throws CaClientException {
     ClientCaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getCert();
+  }
+
+  @Override
+  public X500Name getCaCertSubject(String caName) throws CaClientException {
+    ClientCaConf ca = casMap.get(caName.toLowerCase());
+    return ca == null ? null : ca.getSubject();
   }
 
 }
