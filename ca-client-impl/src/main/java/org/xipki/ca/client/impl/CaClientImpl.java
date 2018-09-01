@@ -56,10 +56,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
-import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cmp.PKIStatus;
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -801,39 +798,6 @@ public final class CaClientImpl implements CaClient {
     return casMap.keySet();
   }
 
-  @Override
-  public byte[] envelope(CertRequest certRequest, ProofOfPossession pop,
-      String profileName, String caName) throws CaClientException {
-    ParamUtil.requireNonNull("certRequest", certRequest);
-    ParamUtil.requireNonNull("pop", pop);
-    profileName = ParamUtil.requireNonBlankLower("profileName", profileName);
-
-    init0(false);
-    if (caName == null) {
-      // detect the CA name
-      caName = getCaNameForProfile(profileName);
-      if (caName == null) {
-        throw new CaClientException("certprofile " + profileName + " is not supported by any CA");
-      }
-    } else {
-      caName = caName.toLowerCase();
-      checkCertprofileSupportInCa(profileName, caName);
-    }
-
-    ClientCaConf ca = casMap.get(caName);
-    if (ca == null) {
-      throw new CaClientException("could not find CA named " + caName);
-    }
-
-    PKIMessage pkiMessage = ca.getAgent().envelope(certRequest, pop, profileName);
-
-    try {
-      return pkiMessage.getEncoded();
-    } catch (IOException ex) {
-      throw new CaClientException("IOException: " + ex.getMessage(), ex);
-    }
-  } // method envelope
-
   private boolean verify(java.security.cert.Certificate caCert,
       java.security.cert.Certificate cert) {
     if (!(caCert instanceof X509Certificate)) {
@@ -866,35 +830,6 @@ public final class CaClientImpl implements CaClient {
       return false;
     }
   } // method verify
-
-  @Override
-  public byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
-      throws CaClientException {
-    ParamUtil.requireNonNull("issuer", issuer);
-
-    init0(false);
-    final String id = "cert-1";
-    RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, issuer, serial, reason, null);
-    RevokeCertRequest request = new RevokeCertRequest();
-    request.addRequestEntry(entry);
-
-    String caName = getCaNameByIssuer(issuer);
-    ClientCmpAgent agent = casMap.get(caName).getAgent();
-
-    try {
-      PKIMessage pkiMessage = agent.envelopeRevocation(request);
-      return pkiMessage.getEncoded();
-    } catch (IOException ex) {
-      throw new CaClientException(ex.getMessage(), ex);
-    }
-  }
-
-  @Override
-  public byte[] envelopeRevocation(X509Certificate cert, int reason) throws CaClientException {
-    ParamUtil.requireNonNull("cert", cert);
-    X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-    return envelopeRevocation(issuer, cert.getSerialNumber(), reason);
-  }
 
   @Override
   public CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)

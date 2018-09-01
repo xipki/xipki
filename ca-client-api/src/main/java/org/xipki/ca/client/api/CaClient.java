@@ -25,8 +25,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
@@ -218,53 +216,6 @@ public interface CaClient {
    *          if client error occurs.
    */
   String getCaNameByIssuer(X500Name issuer) throws CaClientException;
-
-  /**
-   * Creates the PKIMessage sent to CA and returns its encoded form.
-   *
-   * @param certRequest
-   *          Core request to enroll certificate. Must not be {@code null}.
-   * @param popo
-   *          ProofOfPossession. Must not be {@code null}.
-   * @param profileName
-   *          Certificate profile name. Must not be {@code null}.
-   * @param caName
-   *          CA name. Could be {@code null}.
-   * @return encoded PKIMessage
-   * @throws CaClientException
-   *          if client error occurs.
-   */
-  byte[] envelope(CertRequest certRequest, ProofOfPossession popo, String profileName,
-      String caName) throws CaClientException;
-
-  /**
-   * Creates the PKIMessage sent to CA and returns its encoded form.
-   *
-   * @param issuer
-   *          Issuer of the certificate. Must not be {@code null}.
-   * @param serial
-   *          Serial number of the certificate. Must not be {@code null}.
-   * @param reason
-   *          Revocation reason.
-   * @return encoded PKIMessage
-   * @throws CaClientException
-   *          if client error occurs.
-   */
-  byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
-      throws CaClientException;
-
-  /**
-   * Creates the PKIMessage sent to CA and returns its encoded form.
-   *
-   * @param cert
-   *          Certificate. Must not be {@code null}.
-   * @param reason
-   *          Revocation reason.
-   * @return encoded PKIMessage
-   * @throws CaClientException
-   *          if client error occurs.
-   */
-  byte[] envelopeRevocation(X509Certificate cert, int reason) throws CaClientException;
 
   /**
    * Unrevokes a certificate.
