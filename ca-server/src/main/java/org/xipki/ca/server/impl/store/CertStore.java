@@ -70,6 +70,7 @@ import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.ca.server.mgmt.api.CertWithRevocationInfo;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -547,7 +548,8 @@ public class CertStore {
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     ParamUtil.requireNonNull("revInfo", revInfo);
 
-    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(ca, serialNumber, idNameMap);
+    CertWithRevocationInfo certWithRevInfo =
+        getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
           ca.getName(), LogUtil.formatCsn(serialNumber));
@@ -617,7 +619,7 @@ public class CertStore {
     ParamUtil.requireNonNull("reason", reason);
 
     CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(ca, serialNumber, idNameMap);
+        getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
           ca.getName(), LogUtil.formatCsn(serialNumber));
@@ -669,7 +671,8 @@ public class CertStore {
     ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(ca, serialNumber, idNamMap);
+    CertWithRevocationInfo certWithRevInfo =
+        getCertWithRevocationInfo(ca.getId(), serialNumber, idNamMap);
     if (certWithRevInfo == null) {
       if (LOG.isWarnEnabled()) {
         LOG.warn("certificate with CA={} and serialNumber={} does not exist",
@@ -1074,9 +1077,8 @@ public class CertStore {
     return certInfo;
   } // method getCertForId
 
-  public CertWithRevocationInfo getCertWithRevocationInfo(NameId ca, BigInteger serial,
+  public CertWithRevocationInfo getCertWithRevocationInfo(int caId, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException {
-    ParamUtil.requireNonNull("ca", ca);
     ParamUtil.requireNonNull("serial", serial);
     ParamUtil.requireNonNull("idNameMap", idNameMap);
 
@@ -1095,7 +1097,7 @@ public class CertStore {
 
     try {
       int idx = 1;
-      ps.setInt(idx++, ca.getId());
+      ps.setInt(idx++, caId);
       ps.setString(idx++, serial.toString(16));
       rs = ps.executeQuery();
       if (!rs.next()) {

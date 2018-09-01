@@ -92,7 +92,6 @@ import org.xipki.ca.server.impl.cmp.CmpResponderImpl;
 import org.xipki.ca.server.impl.rest.RestResponderImpl;
 import org.xipki.ca.server.impl.scep.ScepResponderImpl;
 import org.xipki.ca.server.impl.store.CertStore;
-import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.PasswordHash;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CaEntry;
@@ -104,7 +103,7 @@ import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CaSystemStatus;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
-import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
+import org.xipki.ca.server.mgmt.api.CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.server.mgmt.api.ChangeUserEntry;
@@ -161,8 +160,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.PemEncoder;
-import org.xipki.util.StringUtil;
 import org.xipki.util.PemEncoder.PemLabel;
+import org.xipki.util.StringUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -2519,17 +2518,42 @@ public class CaManagerImpl implements CaManager, ResponderManager {
   } // method canonicalizeSignerConf
 
   @Override
-  public CertWithStatusInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);;
     ParamUtil.requireNonNull("serialNumber", serialNumber);
     X509Ca ca = getX509Ca(caName);
-    CertWithRevocationInfo certInfo;
     try {
-      certInfo = ca.getCertWithRevocationInfo(serialNumber);
+      return ca.getCertWithRevocationInfo(serialNumber);
     } catch (CertificateException | OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
-    return (certInfo != null) ? certInfo.toCertWithStatusInfo() : new CertWithStatusInfo();
+  }
+
+  @Override
+  public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
+      throws CaMgmtException {
+    ParamUtil.requireNonNull("issuer", issuer);;
+    ParamUtil.requireNonNull("serialNumber", serialNumber);
+
+    NameId caId = null;
+    for (String name : caInfos.keySet()) {
+      CaInfo ca = caInfos.get(name);
+      if (issuer.equals(caInfos.get(name).getCert().getSubjectAsX500Name())) {
+        caId = ca.getIdent();
+        break;
+      }
+    }
+
+    if (caId == null) {
+      return null;
+    }
+
+    try {
+      return certstore.getCertWithRevocationInfo(caId.getId(), serialNumber, idNameMap);
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex.getMessage(), ex);
+    }
   }
 
   @Override

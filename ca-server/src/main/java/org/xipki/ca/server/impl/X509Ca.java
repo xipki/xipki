@@ -128,7 +128,6 @@ import org.xipki.ca.api.profile.X509CertVersion;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.ca.server.impl.store.CertStore;
-import org.xipki.ca.server.impl.store.CertWithRevocationInfo;
 import org.xipki.ca.server.impl.util.CaUtil;
 import org.xipki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CaHasUserEntry;
@@ -136,6 +135,7 @@ import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.CaStatus;
 import org.xipki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.ca.server.mgmt.api.CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CrlControl;
 import org.xipki.ca.server.mgmt.api.CrlControl.HourMinute;
@@ -587,7 +587,7 @@ public class X509Ca {
 
   public CertWithRevocationInfo getCertWithRevocationInfo(BigInteger serialNumber)
       throws CertificateException, OperationException {
-    return certstore.getCertWithRevocationInfo(caIdent, serialNumber, caIdNameMap);
+    return certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
   }
 
   public byte[] getCertRequest(BigInteger serialNumber) throws OperationException {
@@ -1375,7 +1375,7 @@ public class X509Ca {
       throws OperationException {
     event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
     CertWithRevocationInfo certWithRevInfo =
-        certstore.getCertWithRevocationInfo(caIdent, serialNumber, caIdNameMap);
+        certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
     if (certWithRevInfo == null) {
       return null;
     }
@@ -1682,7 +1682,7 @@ public class X509Ca {
   }
 
   private List<CertificateInfo> generateCerts(List<CertTemplateData> certTemplates,
-      RequestorInfo requestor, boolean keyUpdate, RequestType reqType, byte[] transactionId,
+      RequestorInfo requestor, boolean update, RequestType reqType, byte[] transactionId,
       String msgId) throws OperationExceptionWithIndex {
     ParamUtil.requireNonEmpty("certTemplates", certTemplates);
     final int n = certTemplates.size();
@@ -1691,7 +1691,7 @@ public class X509Ca {
     for (int i = 0; i < n; i++) {
       CertTemplateData certTemplate = certTemplates.get(i);
       try {
-        GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestor, keyUpdate);
+        GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestor, update);
         gcts.add(gct);
       } catch (OperationException ex) {
         throw new OperationExceptionWithIndex(i, ex);
@@ -1713,8 +1713,7 @@ public class X509Ca {
 
       boolean successful = false;
       try {
-        CertificateInfo certInfo = generateCert(gct, requestor, false, reqType,
-            transactionId, msgId);
+        CertificateInfo certInfo = generateCert(gct, requestor, reqType, transactionId, msgId);
         successful = true;
         certInfos.add(certInfo);
 
@@ -1765,14 +1764,13 @@ public class X509Ca {
         reqType, transactionId, msgId).get(0);
   }
 
-  private CertificateInfo generateCert(GrantedCertTemplate gct,
-      RequestorInfo requestor, boolean keyUpdate, RequestType reqType, byte[] transactionId,
-      String msgId) throws OperationException {
+  private CertificateInfo generateCert(GrantedCertTemplate gct, RequestorInfo requestor,
+      RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_cert, msgId);
 
     boolean successful = false;
     try {
-      CertificateInfo ret = generateCert0(gct, requestor, keyUpdate, reqType, transactionId, event);
+      CertificateInfo ret = generateCert0(gct, requestor, reqType, transactionId, event);
       successful = (ret != null);
       return ret;
     } finally {
@@ -1780,9 +1778,8 @@ public class X509Ca {
     }
   }
 
-  private CertificateInfo generateCert0(GrantedCertTemplate gct,
-      RequestorInfo requestor, boolean keyUpdate, RequestType reqType, byte[] transactionId,
-      AuditEvent event) throws OperationException {
+  private CertificateInfo generateCert0(GrantedCertTemplate gct, RequestorInfo requestor,
+      RequestType reqType, byte[] transactionId, AuditEvent event) throws OperationException {
     ParamUtil.requireNonNull("gct", gct);
 
     event.addEventData(CaAuditConstants.NAME_req_subject,
@@ -1977,7 +1974,7 @@ public class X509Ca {
   }
 
   private GrantedCertTemplate createGrantedCertTemplate(CertTemplateData certTemplate,
-      RequestorInfo requestor, boolean keyUpdate) throws OperationException {
+      RequestorInfo requestor, boolean update) throws OperationException {
     ParamUtil.requireNonNull("certTemplate", certTemplate);
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
@@ -2214,7 +2211,7 @@ public class X509Ca {
     byte[] subjectPublicKeyData = grantedPublicKeyInfo.getPublicKeyData().getBytes();
     long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
 
-    if (keyUpdate) {
+    if (update) {
       CertStatus certStatus = certstore.getCertStatusForSubject(caIdent, grantedSubject);
       if (certStatus == CertStatus.REVOKED) {
         throw new OperationException(CERT_REVOKED);
@@ -2229,7 +2226,7 @@ public class X509Ca {
         }
       }
       // duplicateSubject check will be processed later
-    } // end if(keyUpdate)
+    } // end if(update)
 
     StringBuilder msgBuilder = new StringBuilder();
 

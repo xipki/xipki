@@ -633,7 +633,20 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  CertWithStatusInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException;
+  CertWithRevocationInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException;
+
+  /**
+   * Returns certificate with revocation information for the {@code issuer}
+   * and with serial number {@code serialNumber}.
+   * @param issuer
+   *          Issuer of the certificate. Must not be {@code null}.
+   * @param serialNumber
+   *          Serial number. Must not be {@code null}.
+   * @return the certificate with status information.
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Loads the CA system configuration.

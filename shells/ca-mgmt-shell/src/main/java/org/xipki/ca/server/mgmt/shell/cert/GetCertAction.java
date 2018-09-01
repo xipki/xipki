@@ -18,14 +18,13 @@
 package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
-import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
+import org.xipki.ca.server.mgmt.api.CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.completer.DerPemCompleter;
@@ -58,16 +57,15 @@ public class GetCertAction extends CaAction {
 
   @Override
   protected Object execute0() throws Exception {
-    CertWithStatusInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
-    X509Certificate cert = (X509Certificate) certInfo.getCert();
+    CertWithRevocationInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
 
-    if (cert == null) {
+    if (certInfo == null) {
       System.out.println("certificate unknown");
       return null;
     }
 
     saveVerbose("certificate saved to file", new File(outputFile),
-        derPemEncodeCert(cert.getEncoded(), outform));
+        derPemEncodeCert(certInfo.getCert().getEncodedCert(), outform));
     return null;
   }
 

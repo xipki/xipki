@@ -18,14 +18,13 @@
 package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
-import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
+import org.xipki.ca.server.mgmt.api.CertWithRevocationInfo;
 import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.StringUtil;
 
@@ -50,21 +49,20 @@ public class CertStatusAction extends UnRevRmCertAction {
 
   @Override
   protected Object execute0() throws Exception {
-    CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
-    X509Certificate cert = (X509Certificate) certInfo.getCert();
+    CertWithRevocationInfo certInfo = caManager.getCert(caName, getSerialNumber());
 
-    if (cert == null) {
+    if (certInfo == null) {
       System.out.println("certificate unknown");
       return null;
     }
 
     String msg = StringUtil.concat("certificate profile: ", certInfo.getCertprofile(), "\nstatus: ",
-        (certInfo.getRevocationInfo() == null
-            ? "good" : "revoked with " + certInfo.getRevocationInfo()));
+        (certInfo.getRevInfo() == null
+            ? "good" : "revoked with " + certInfo.getRevInfo()));
     println(msg);
     if (outputFile != null) {
       saveVerbose("saved certificate to file", new File(outputFile),
-          derPemEncodeCert(cert.getEncoded(), outform));
+          derPemEncodeCert(certInfo.getCert().getEncodedCert(), outform));
     }
     return null;
   }

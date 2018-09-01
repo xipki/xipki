@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.store;
+package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.server.mgmt.api.CertWithStatusInfo;
 import org.xipki.security.CertRevocationInfo;
 
 /**
