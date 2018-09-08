@@ -1060,7 +1060,7 @@ abstract class ClientCmpAgent {
     int exptectedBodyType;
     switch (req.getType()) {
       case INIT_REQ:
-        exptectedBodyType = PKIBody.TYPE_INIT_REQ;
+        exptectedBodyType = PKIBody.TYPE_INIT_REP;
         break;
       case CERT_REQ:
         exptectedBodyType = PKIBody.TYPE_CERT_REP;

@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
@@ -31,11 +32,14 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
+import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
+import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.ObjectCreationException;
 
@@ -46,6 +50,12 @@ import org.xipki.util.ObjectCreationException;
  */
 
 public abstract class EnrollCertAction extends EnrollAction {
+
+  @Option(name = "--cmpreq-type",
+      description = "CMP request type (ir for Initialization Request,\n"
+          + "cr for Certification Request, and ccr for Cross-Certification Request)")
+  @Completion(value = StringsCompleter.class, values = {"ir", "cr", "ccr"})
+  private String cmpreqType = "cr";
 
   @Option(name = "--hash", description = "hash algorithm name for the POPO computation")
   protected String hashAlgo = "SHA256";
@@ -132,5 +142,18 @@ public abstract class EnrollCertAction extends EnrollAction {
 
     return null;
   } // method execute0
+
+  @Override
+  protected Type getCmpReqType() throws Exception {
+    if ("cr".equalsIgnoreCase(cmpreqType)) {
+      return EnrollCertRequest.Type.CERT_REQ;
+    } else if ("ir".equalsIgnoreCase(cmpreqType)) {
+      return EnrollCertRequest.Type.INIT_REQ;
+    } else if ("ccr".equalsIgnoreCase(cmpreqType)) {
+      return EnrollCertRequest.Type.CROSS_CERT_REQ;
+    } else {
+      throw new IllegalCmdParamException("invalid cmpreq-type " + cmpreqType);
+    }
+  }
 
 }

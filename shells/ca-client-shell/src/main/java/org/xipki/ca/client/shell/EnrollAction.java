@@ -148,7 +148,12 @@ public abstract class EnrollAction extends ClientAction {
   protected abstract EnrollCertRequestEntry buildEnrollCertRequestEntry(
       String id, String profile, CertRequest certRequest) throws Exception;
 
+  protected abstract EnrollCertRequest.Type getCmpReqType() throws Exception;
+
   protected EnrollCertResult enroll() throws Exception {
+    // CHECKSTYLE:SKIP
+    EnrollCertRequest.Type type = getCmpReqType();
+
     if (caName != null) {
       caName = caName.toLowerCase();
     }
@@ -319,7 +324,7 @@ public abstract class EnrollAction extends ClientAction {
     CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
     EnrollCertRequestEntry reqEntry = buildEnrollCertRequestEntry("id-1", profile, certReq);
-    EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.Type.CERT_REQ);
+    EnrollCertRequest request = new EnrollCertRequest(type);
     request.addRequestEntry(reqEntry);
 
     ReqRespDebug debug = getReqRespDebug();
