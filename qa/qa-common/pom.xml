@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.qa</groupId>
     <artifactId>qa</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
   </parent>
   <packaging>bundle</packaging>
   <artifactId>qa-common</artifactId>

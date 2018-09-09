@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.examples</groupId>
     <artifactId>examples</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
   </parent>
   <artifactId>lite-caclient-example</artifactId>
   <packaging>bundle</packaging>
