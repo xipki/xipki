@@ -390,7 +390,7 @@
   </dependencyManagement>
   <profiles>
     <profile>
-      <id>dist</id>
+      <id>assemblies</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
