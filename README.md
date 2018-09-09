@@ -206,11 +206,11 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 3.1. In case XiPKI is started as a normal application 
 
  * In case of using new keys and certificates, in OSGi console:  
-   `source file:./xipki/setup/cacert-none/setup-*.script`
+   `source xipki/setup/cacert-none/setup-*.script`
    where * is place holder.
 
  * In case of using existing keys and certificates, in OSGi console:  
-    `source file:./xipki/setup/cacert-present/setup-*.script`
+    `source xipki/setup/cacert-present/setup-*.script`
    where * is place holder.
 
  * Verify the installation, execute the OSGi command  
@@ -219,10 +219,10 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 3.2. In case XiPKI is started as a daemon 
 
  * In case of using new keys and certificates, in shell console:
-   `bin/client "sourcefile:./xipki/setup/cacert-none/setup-*.script"`
+   `bin/client "source xipki/setup/cacert-none/setup-*.script"`
 
  * In case of using existing keys and certificates, in shell console:  
-   `bin/client "sourcefile:./xipki/setup/cacert-present/setup*.script"`
+   `bin/client "source xipki/setup/cacert-present/setup*.script"`
 
 4. Enroll/Revoke Certificate and Get CRL via Shell (optional)
 
@@ -242,9 +242,9 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 
   The binary `xipki-sdk-<version>`.tar.gz contains several example scripts in the folder xipki/client-script.
   They can be executed in the karaf shell as follows:  
-  - `source file:./xipki/client-script/cmp-client.script` 
-  - `source file:./xipki/client-script/rest-client.script`
-  - `source file:./xipki/client-script/scep-client.script`
+  - `source xipki/client-script/cmp-client.script` 
+  - `source xipki/client-script/rest-client.script`
+  - `source xipki/client-script/scep-client.script`
 
 * REST API  
   The shell script `xipki/client-script/rest.sh` of the `xipki-pki` demonstrates
