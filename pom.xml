@@ -104,7 +104,6 @@
     <module>shells</module>
     <module>examples</module>
     <module>qa</module>
-    <module>xipki-bom</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
