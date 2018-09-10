@@ -46,7 +46,7 @@ public class InitDbAction extends LiquibaseAction {
 
     LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile);
     try {
-      liquibase.init(logLevel, logFile);
+      liquibase.init();
       liquibase.releaseLocks();
       liquibase.dropAll();
       liquibase.update();

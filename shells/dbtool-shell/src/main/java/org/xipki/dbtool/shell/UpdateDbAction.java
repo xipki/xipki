@@ -47,7 +47,7 @@ public class UpdateDbAction extends LiquibaseAction {
 
     LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile);
     try {
-      liquibase.init(logLevel, logFile);
+      liquibase.init();
       liquibase.update();
     } finally {
       liquibase.shutdown();

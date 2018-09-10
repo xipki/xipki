@@ -28,7 +28,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
@@ -51,16 +50,6 @@ public abstract class LiquibaseAction extends XiAction {
 
   @Option(name = "--force", aliases = "-f", description = "never prompt for confirmation")
   protected Boolean force = Boolean.FALSE;
-
-  @Option(name = "--log-level",
-      description = "log level, valid values are debug, info, warning, severe, off")
-  @Completion(value = StringsCompleter.class,
-      values = {"debug", "info", "warning", "severe", "off"})
-  protected String logLevel = "warning";
-
-  @Option(name = "--log-file", description = "log file")
-  @Completion(FileCompleter.class)
-  protected String logFile;
 
   @Option(name = "--db-schema", required = true, description = "DB schema file")
   @Completion(FileCompleter.class)

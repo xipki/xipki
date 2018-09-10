@@ -60,8 +60,8 @@
     <jscep.version>2.4.0</jscep.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.2</pkcs11-wrapper.version>
-    <liquibase.version>3.5.4</liquibase.version>
-    <snakeyaml.version>1.17</snakeyaml.version>
+    <liquibase.version>3.6.2</liquibase.version>
+    <snakeyaml.version>1.18</snakeyaml.version>
     <hikaricp.version>3.0.0</hikaricp.version>
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
@@ -379,6 +379,12 @@
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
         <version>${liquibase.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

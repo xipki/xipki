@@ -17,6 +17,12 @@
 
 package org.xipki.dbtool;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.util.ParamUtil;
 
 import liquibase.CatalogAndSchema;
@@ -24,15 +30,13 @@ import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.diff.compare.CompareControl;
 import liquibase.diff.output.DiffOutputControl;
-import liquibase.exception.CommandLineParsingException;
 import liquibase.exception.DatabaseException;
 import liquibase.integration.commandline.CommandLineResourceAccessor;
 import liquibase.integration.commandline.CommandLineUtils;
 import liquibase.lockservice.LockService;
 import liquibase.lockservice.LockServiceFactory;
-import liquibase.logging.LogFactory;
-import liquibase.logging.Logger;
 import liquibase.resource.CompositeResourceAccessor;
+import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 
 /**
@@ -43,6 +47,8 @@ import liquibase.resource.ResourceAccessor;
  */
 
 public class LiquibaseMain {
+
+  private static Logger LOG = LoggerFactory.getLogger(LiquibaseMain.class);
 
   private final LiquibaseDatabaseConf dbConf;
 
@@ -57,26 +63,25 @@ public class LiquibaseMain {
     this.changeLogFile = ParamUtil.requireNonBlank("changeLogFile", changeLogFile);
   }
 
-  public void changeLogLevel(String logLevel, String logFile) throws CommandLineParsingException {
-    ParamUtil.requireNonNull("logLevel", logLevel);
-    try {
-      LogFactory.setInstance(new MyLoggerFactory());
+  public void init() throws Exception {
 
-      Logger log = LogFactory.getInstance().getLog();
-      if (logFile != null && logFile.length() > 0) {
-        log.setLogLevel(logLevel, logFile);
-      } else {
-        log.setLogLevel(logLevel);
+    ResourceAccessor fsOpener = new FileSystemResourceAccessor() {
+      @Override
+      protected void addRootPath(URL path) {
+        try {
+          new File(path.toURI());
+        } catch (URISyntaxException e) {
+          //add like normal
+        } catch (IllegalArgumentException e) {
+          // this line is added to avoid the IllegalArgumentException: URI is not
+          // hierarchical in java 10+.
+          return;
+        }
+
+        super.addRootPath(path);
       }
-    } catch (IllegalArgumentException ex) {
-      throw new CommandLineParsingException(ex.getMessage(), ex);
-    }
-  }
+    };
 
-  public void init(String logLevel, String logFile) throws Exception {
-    changeLogLevel(logLevel, logFile);
-
-    ResourceAccessor fsOpener = new MyFileSystemResourceAccessor();
     ClassLoader classLoader = getClass().getClassLoader();
     ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
 
@@ -119,7 +124,7 @@ public class LiquibaseMain {
         database.rollback();
         database.close();
       } catch (Exception ex2) {
-        LogFactory.getInstance().getLog().warning("problem closing connection", ex2);
+        LOG.warn("problem closing connection", ex2);
       }
       throw ex;
     }
@@ -148,7 +153,7 @@ public class LiquibaseMain {
         database.close();
       }
     } catch (DatabaseException ex) {
-      LogFactory.getInstance().getLog().warning("problem closing connection", ex);
+      LOG.warn("problem closing connection", ex);
     } finally {
       database = null;
       liquibase = null;
