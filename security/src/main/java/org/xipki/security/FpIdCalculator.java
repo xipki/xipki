@@ -18,7 +18,6 @@
 package org.xipki.security;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
@@ -102,11 +101,18 @@ public class FpIdCalculator {
     }
   }
 
-  private static long bytesToLong(byte[] bytes) {
-    ByteBuffer buffer = ByteBuffer.allocate(8);
-    buffer.put(bytes, 0, 8);
-    buffer.flip(); //need flip
-    return buffer.getLong();
+  private static long bytesToLong(byte[] bs) {
+    int hi = bs[0] << 24
+        | (bs[1] & 0xff) << 16
+        | (bs[2] & 0xff) << 8
+        | (bs[3] & 0xff);
+
+    int lo = bs[4] << 24
+        | (bs[5] & 0xff) << 16
+        | (bs[6] & 0xff) << 8
+        | (bs[7] & 0xff);
+
+    return ((long)(hi & 0xffffffffL) << 32) | (long)(lo & 0xffffffffL);
   }
 
 }
