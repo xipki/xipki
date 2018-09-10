@@ -75,6 +75,9 @@
         <includes>
           <include>**/*</include>
         </includes>
+        <excludes>
+          <exclude>etc/org.xipki.security.pkcs11.cfg</exclude>
+        </excludes>
       </resource>
       <resource>
         <directory>../xipki-pki/src/main/filtered</directory>
@@ -95,7 +98,8 @@
         </includes>
         <excludes>
           <exclude>xipki/ocsp-config/ocsp-responder.xml*</exclude>
-          <exclude>src/main/unfiltered/etc/system.properties</exclude>
+          <exclude>etc/custom.system.properties</exclude>
+          <exclude>xipki/setup/**</exclude>
         </excludes>
       </resource>
     </resources>

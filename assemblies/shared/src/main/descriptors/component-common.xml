@@ -90,6 +90,7 @@
         <exclude>NOTICE</exclude>
         <exclude>RELEASE-NOTES</exclude>
         <exclude>karaf-manual*</exclude>
+        <exclude>*.md</exclude>
         <!-- We use only the OSGi core apache felix instead of eclipse.osgi. -->
         <exclude>**/org.eclipse.osgi/**</exclude>
       </excludes>
