@@ -55,6 +55,7 @@
     <karaf.plugin.version>4.2.1</karaf.plugin.version>
     <netty.version>4.1.29.Final</netty.version>
     <netty-tcnative.version>2.0.15.Final</netty-tcnative.version>
+    <jaxb-api.version>2.2.11</jaxb-api.version>
     <bc.version>1.60</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <jscep.version>2.4.0</jscep.version>
@@ -165,6 +166,7 @@
           <instructions>
             <Bundle-Vendor>Lijun Liao (xipki.org)</Bundle-Vendor>
             <Bundle-Build-Id>${buildNumber}</Bundle-Build-Id>
+            <Bundle-Description>${project.name}</Bundle-Description>
             <Bundle-Build-Timestamp>${timestamp}</Bundle-Build-Timestamp>
           </instructions>
         </configuration>
@@ -258,7 +260,7 @@
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
           <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.13.3</version>
+          <version>0.14.0</version>
           <executions>
             <execution>
               <goals>
@@ -385,6 +387,11 @@
             <artifactId>logback-classic</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>${jaxb-api.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
