@@ -17,7 +17,7 @@ Just create [issues](https://github.com/xipki/xipki/issues).
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
-* JRE / JDK 8 (build 162 or higher)
+* JRE / JDK 8 (build 162+), 9, 10, 11
 * Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
 
 ## Tested PKCS#11 Devices
