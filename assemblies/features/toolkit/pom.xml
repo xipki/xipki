@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.assemblies.features</groupId>
     <artifactId>features</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.features</groupId>
   <artifactId>toolkit</artifactId>
