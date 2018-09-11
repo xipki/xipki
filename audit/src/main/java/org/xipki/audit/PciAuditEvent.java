@@ -44,7 +44,7 @@ public class PciAuditEvent {
 
   private static final char DEFAULT_DELIMITER = ' ';
 
-  private static final String DEFAULT_REPLACE_DELIMITER = "_";
+  private static final char DEFAULT_REPLACE_DELIMITER = '_';
 
   private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
@@ -165,19 +165,18 @@ public class PciAuditEvent {
     CharArrayWriter buffer = new CharArrayWriter(100);
 
     final char de = DEFAULT_DELIMITER;
-    final String newDe = DEFAULT_REPLACE_DELIMITER;
 
     if (prefix != null && !prefix.isEmpty()) {
       buffer.append(prefix);
     }
 
-    buffer.append(replaceDelimiter(getUserId(), de, newDe)).append(de);
-    buffer.append(replaceDelimiter(getEventType(), de, newDe)).append(de);
-    buffer.append(replaceDelimiter(getDate(), de, newDe)).append(de);
-    buffer.append(replaceDelimiter(getTime(), de, newDe)).append(de);
-    buffer.append(replaceDelimiter(getStatus(), de, newDe)).append(de);
-    buffer.append(replaceDelimiter(getOrigination(), de, newDe)).append(de);
-    buffer.append(replaceDelimiter(getAffectedResource(), de, newDe));
+    buffer.append(replaceDelimiter(getUserId())).append(de);
+    buffer.append(replaceDelimiter(getEventType())).append(de);
+    buffer.append(replaceDelimiter(getDate())).append(de);
+    buffer.append(replaceDelimiter(getTime())).append(de);
+    buffer.append(replaceDelimiter(getStatus())).append(de);
+    buffer.append(replaceDelimiter(getOrigination())).append(de);
+    buffer.append(replaceDelimiter(getAffectedResource()));
 
     return buffer;
   }
@@ -200,14 +199,12 @@ public class PciAuditEvent {
     return true;
   }
 
-  private static String replaceDelimiter(String fieldValue, char delimiter,
-      String replaceDelimiter) {
-    if (replaceDelimiter == null || replaceDelimiter.length() < 1
-        || fieldValue == null || fieldValue.length() < 1) {
+  private static String replaceDelimiter(String fieldValue) {
+    if (fieldValue == null || fieldValue.isEmpty()) {
       return fieldValue;
     }
 
-    return fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
+    return fieldValue.replace(DEFAULT_DELIMITER, DEFAULT_REPLACE_DELIMITER);
   }
 
   private static String getHostAddress() {
