@@ -30,39 +30,8 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
-  <files>
-    <file>
-      <source>${output.directory}/xipki/ca-config/example/h2.ca-db.properties</source>
-      <outputDirectory>xipki/ca-config</outputDirectory>
-      <destName>ca-db.properties</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${output.directory}/xipki/ca-config/example/h2.ocsp-db.properties</source>
-      <outputDirectory>xipki/ca-config</outputDirectory>
-      <destName>ocsp-db.properties</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${output.directory}/xipki/ocsp-config/example/h2.ocsp-cache-db.properties</source>
-      <outputDirectory>xipki/ocsp-config</outputDirectory>
-      <destName>ocsp-cache-db.properties</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${output.directory}/xipki/ocsp-config/example/h2.ocsp-crl-db.properties</source>
-      <outputDirectory>xipki/ocsp-config</outputDirectory>
-      <destName>ocsp-crl-db.properties</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${output.directory}/xipki/client-config/template.ca-client-signature.xml</source>
-      <outputDirectory>xipki/client-config</outputDirectory>
-      <destName>template.ca-client.xml</destName>
-      <fileMode>0644</fileMode>
-    </file>
-  </files>
   <componentDescriptors>
+    <componentDescriptor>src/main/descriptors/component.xml</componentDescriptor>
     <componentDescriptor>../shared/src/main/descriptors/component-common.xml</componentDescriptor>
   </componentDescriptors>
 </assembly>
