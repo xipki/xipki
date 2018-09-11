@@ -32,6 +32,8 @@ import java.util.Set;
 
 public class ConfPairs {
 
+  private static final char BACKSLASH = '\\';
+
   private static class Unmodifiable extends ConfPairs {
 
     private ConfPairs underlying;
@@ -132,7 +134,7 @@ public class ConfPairs {
         continue;
       }
 
-      if ('\\' == ch) {
+      if (BACKSLASH == ch) {
         if (i == len - 1) {
           throw new IllegalArgumentException("invalid ConfPairs '" + confPairs + "'");
         }
@@ -160,7 +162,7 @@ public class ConfPairs {
           break;
         }
 
-        if ('\\' == ch) {
+        if (BACKSLASH == ch) {
           if (i == len - 1) {
             throw new IllegalArgumentException("invalid ConfPairs '" + confPairs + "'");
           }
@@ -178,7 +180,7 @@ public class ConfPairs {
       tokenBuilder = new StringBuilder();
       for (int i = 0; i < termPosition;) {
         char ch = token.charAt(i);
-        if ('\\' == ch) {
+        if (BACKSLASH == ch) {
           if (i == termPosition - 1) {
             throw new IllegalArgumentException("invalid ConfPair '" + confPairs + "'");
           }
@@ -195,7 +197,7 @@ public class ConfPairs {
       tokenBuilder = new StringBuilder();
       for (int i = termPosition + 1; i < len;) {
         char ch = token.charAt(i);
-        if ('\\' == ch) {
+        if (BACKSLASH == ch) {
           if (i == len - 1) {
             throw new IllegalArgumentException("invalid ConfPair '" + confPairs + "'");
           }
@@ -313,7 +315,7 @@ public class ConfPairs {
     for (int i = 0; i < n; i++) {
       char ch = str.charAt(i);
       if (ch == NAME_TERM || ch == TOKEN_TERM) {
-        sb.append('\\');
+        sb.append(BACKSLASH);
       }
       sb.append(ch);
     }
