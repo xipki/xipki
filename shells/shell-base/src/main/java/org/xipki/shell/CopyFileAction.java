@@ -52,20 +52,17 @@ public class CopyFileAction extends XiAction {
   protected Object execute0() throws Exception {
     File sourceFile = new File(expandFilepath(source));
     if (!sourceFile.exists()) {
-      System.err.println(source + " does not exist");
-      return null;
+      throw new IllegalCmdParamException(source + " does not exist");
     }
 
     if (!sourceFile.isFile()) {
-      System.err.println(source + " is not a file");
-      return null;
+      throw new IllegalCmdParamException(source + " is not a file");
     }
 
     File destFile = new File(dest);
     if (destFile.exists()) {
       if (!destFile.isFile()) {
-        System.err.println("cannot override an existing directory by a file");
-        return null;
+        throw new IllegalCmdParamException("cannot override an existing directory by a file");
       } else {
         if (!force.booleanValue() && !confirm("Do you want to override the file " + dest, 3)) {
           return null;

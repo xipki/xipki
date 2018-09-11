@@ -50,20 +50,17 @@ public class CopyDirAction extends XiAction {
   protected Object execute0() throws Exception {
     File sourceDir = new File(expandFilepath(source));
     if (!sourceDir.exists()) {
-      System.err.println(source + " does not exist");
-      return null;
+      throw new IllegalCmdParamException(source + " does not exist");
     }
 
     if (!sourceDir.isDirectory()) {
-      System.err.println(source + " is not a directory");
-      return null;
+      throw new IllegalCmdParamException(source + " is not a directory");
     }
 
     File destDir = new File(dest);
     if (destDir.exists()) {
       if (destDir.isFile()) {
-        System.err.println(dest + " is not a directory");
-        return null;
+        throw new IllegalCmdParamException(dest + " is not a directory");
       }
     } else {
       destDir.mkdirs();
