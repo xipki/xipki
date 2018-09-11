@@ -30,16 +30,16 @@ import org.xipki.security.pkcs11.P11Slot;
 public class P11ECSignSpeed extends P11SignSpeed {
 
   public P11ECSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-      String signatureAlgorithm, String curveNameOrOid) throws Exception {
-    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, curveNameOrOid);
+      String signatureAlgorithm, int threads, String curveNameOrOid) throws Exception {
+    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, curveNameOrOid);
   }
 
   public P11ECSignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-      byte[] keyId, String keyLabel, String signatureAlgorithm, String curveNameOrOid)
+      byte[] keyId, String keyLabel, String signatureAlgorithm, int threads, String curveNameOrOid)
           throws Exception {
     super(securityFactory, slot, signatureAlgorithm, !keyPresent,
         generateKey(keyPresent, slot, keyId, keyLabel, curveNameOrOid),
-        "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid);
+        "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid, threads);
   }
 
   private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,

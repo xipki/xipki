@@ -43,7 +43,7 @@ public class SpeedP12HMACSignAction extends SpeedP12SignAction {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P12HMACSignSpeed(securityFactory, sigAlgo);
+    return new P12HMACSignSpeed(securityFactory, sigAlgo, getNumThreads());
   }
 
 }

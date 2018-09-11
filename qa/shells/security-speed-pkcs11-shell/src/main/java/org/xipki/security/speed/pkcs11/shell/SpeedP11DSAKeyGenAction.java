@@ -50,8 +50,8 @@ public class SpeedP11DSAKeyGenAction extends SpeedP11Action {
   }
 
   @Override
-  protected int getNumThreads(int numThreads) {
-    return (getKeyId() == null) ? numThreads : 1;
+  protected int getNumThreads() {
+    return (getKeyId() == null) ? super.getNumThreads() : 1;
   }
 
 }

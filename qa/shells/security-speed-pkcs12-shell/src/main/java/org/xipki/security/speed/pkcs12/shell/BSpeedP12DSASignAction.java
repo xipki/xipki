@@ -57,7 +57,8 @@ public class BSpeedP12DSASignAction extends BSpeedP12SignAction {
       sigAlgo = "SHA1withDSA";
     }
 
-    return new P12DSASignSpeed(securityFactory, sigAlgo, control.plen(), control.qlen());
+    return new P12DSASignSpeed(securityFactory, sigAlgo, getNumThreads(),
+        control.plen(), control.qlen());
   }
 
 }

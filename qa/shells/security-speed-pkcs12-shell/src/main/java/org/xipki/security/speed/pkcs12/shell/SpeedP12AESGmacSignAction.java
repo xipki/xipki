@@ -41,9 +41,12 @@ public class SpeedP12AESGmacSignAction extends SpeedP12SignAction {
   @Completion(GMACSigAlgCompleter.class)
   private String sigAlgo;
 
+  public SpeedP12AESGmacSignAction() {
+  }
+
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P12AESGmacSignSpeed(securityFactory, sigAlgo);
+    return new P12AESGmacSignSpeed(securityFactory, sigAlgo, getNumThreads());
   }
 
 }

@@ -50,7 +50,7 @@ public class BSpeedP12ECSignAction extends BSpeedP12SignAction {
   protected BenchmarkExecutor nextTester() throws Exception {
     ECControl control = queue.poll();
     return (control == null) ? null
-        : new P12ECSignSpeed(securityFactory, sigAlgo, control.curveName());
+        : new P12ECSignSpeed(securityFactory, sigAlgo, getNumThreads(), control.curveName());
   }
 
 }

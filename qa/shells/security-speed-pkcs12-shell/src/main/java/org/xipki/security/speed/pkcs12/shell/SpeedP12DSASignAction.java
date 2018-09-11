@@ -52,7 +52,7 @@ public class SpeedP12DSASignAction extends SpeedP12SignAction {
     if (qlen == null) {
       qlen = (plen >= 2048) ? 256 : 160;
     }
-    return new P12DSASignSpeed(securityFactory, sigAlgo, plen, qlen);
+    return new P12DSASignSpeed(securityFactory, sigAlgo, getNumThreads(), plen, qlen);
   }
 
 }

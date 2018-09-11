@@ -48,7 +48,7 @@ public class SpeedP12ECSignAction extends SpeedP12SignAction {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P12ECSignSpeed(securityFactory, sigAlgo, curveName);
+    return new P12ECSignSpeed(securityFactory, sigAlgo, getNumThreads(), curveName);
   }
 
 }

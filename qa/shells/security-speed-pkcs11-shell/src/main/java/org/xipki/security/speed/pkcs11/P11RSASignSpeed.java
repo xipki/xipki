@@ -32,17 +32,19 @@ import org.xipki.security.pkcs11.P11Slot;
 public class P11RSASignSpeed extends P11SignSpeed {
 
   public P11RSASignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-      String signatureAlgorithm, int keysize, BigInteger publicExponent) throws Exception {
-    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, keysize, publicExponent);
+      String signatureAlgorithm, int threads, int keysize, BigInteger publicExponent)
+          throws Exception {
+    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads,
+        keysize, publicExponent);
   }
 
   public P11RSASignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-      byte[] keyId, String keyLabel, String signatureAlgorithm, int keysize,
+      byte[] keyId, String keyLabel, String signatureAlgorithm, int threads, int keysize,
       BigInteger publicExponent) throws Exception {
     super(securityFactory, slot, signatureAlgorithm, !keyPresent,
         generateKey(keyPresent, slot, keyId, keysize, publicExponent, keyLabel),
         "PKCS#11 RSA signature creation\n" + "keysize: " + keysize + "\n"
-            + "public exponent: " + publicExponent);
+            + "public exponent: " + publicExponent, threads);
   }
 
   private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,

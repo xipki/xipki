@@ -47,10 +47,14 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 
-    private final byte[] data = new byte[1024];
+    private static final int batch = 16;
+
+    private final byte[][] data = new byte[batch][16];
 
     public Testor() {
-      new SecureRandom().nextBytes(data);
+      for (int i = 0; i < data.length; i++) {
+        new SecureRandom().nextBytes(data[i]);
+      }
     }
 
     @Override
@@ -58,10 +62,10 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       while (!stop() && getErrorAccout() < 1) {
         try {
           signer.sign(data);
-          account(1, 0);
+          account(batch, 0);
         } catch (Exception ex) {
           LOG.error("P12SignSpeed.Testor.run()", ex);
-          account(1, 1);
+          account(batch, batch);
         }
       }
     }
@@ -75,12 +79,13 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   private final ConcurrentContentSigner signer;
 
   public P12SignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
-      byte[] keystore, String description) throws Exception {
-    this("PKCS12", securityFactory, signatureAlgorithm, keystore, description);
+      byte[] keystore, String description, int threads) throws Exception {
+    this("PKCS12", securityFactory, signatureAlgorithm, keystore, description, threads);
   }
 
   public P12SignSpeed(String tokenType, SecurityFactory securityFactory,
-      String signatureAlgorithm, byte[] keystore, String description) throws Exception {
+      String signatureAlgorithm, byte[] keystore, String description, int threads)
+          throws Exception {
     super(description);
 
     ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -88,7 +93,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     ParamUtil.requireNonNull("keystore", keystore);
 
     SignerConf signerConf = getKeystoreSignerConf(new ByteArrayInputStream(keystore), PASSWORD,
-        signatureAlgorithm, 20);
+        signatureAlgorithm, threads + Math.max(2, threads * 5 / 4));
     this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Certificate) null);
   }
 

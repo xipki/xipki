@@ -36,7 +36,7 @@ public class SpeedP12SM2SignAction extends SpeedP12SignAction {
 
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
-    return new P12SM2SignSpeed(securityFactory);
+    return new P12SM2SignSpeed(securityFactory, getNumThreads());
   }
 
 }

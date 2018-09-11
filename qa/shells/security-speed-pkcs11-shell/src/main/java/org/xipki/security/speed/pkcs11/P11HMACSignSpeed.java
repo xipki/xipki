@@ -34,15 +34,15 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 public class P11HMACSignSpeed extends P11SignSpeed {
 
   public P11HMACSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-      String signatureAlgorithm) throws Exception {
-    this(!false, securityFactory, slot, keyId, null, signatureAlgorithm);
+      String signatureAlgorithm, int threads) throws Exception {
+    this(!false, securityFactory, slot, keyId, null, signatureAlgorithm, threads);
   }
 
   public P11HMACSignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-      byte[] keyId, String keyLabel, String signatureAlgorithm) throws Exception {
+      byte[] keyId, String keyLabel, String signatureAlgorithm, int threads) throws Exception {
     super(securityFactory, slot, signatureAlgorithm, !keyPresent,
         generateKey(keyPresent, slot, keyId, keyLabel, signatureAlgorithm),
-        "PKCS#11 HMAC signature creation");
+        "PKCS#11 HMAC signature creation", threads);
   }
 
   private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot,

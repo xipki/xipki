@@ -56,7 +56,6 @@ public class BSpeedP11ECKeyGenAction extends BSpeedP11Action {
     return new P11ECKeyGenSpeed(getSlot(), getKeyId(), control.curveName());
   }
 
-  @Override
   protected int getNumThreads(int numThreads) {
     return (getKeyId() == null) ? numThreads : 1;
   }

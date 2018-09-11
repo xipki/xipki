@@ -58,8 +58,8 @@ public class BSpeedP11DSAKeyGenAction extends BSpeedP11Action {
   }
 
   @Override
-  protected int getNumThreads(int numThreads) {
-    return (getKeyId() == null) ? numThreads : 1;
+  protected int getNumThreads() {
+    return (getKeyId() == null) ? super.getNumThreads() : 1;
   }
 
 }

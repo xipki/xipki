@@ -50,7 +50,7 @@ public class SpeedP11RSASignAction extends SpeedP11SignAction {
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
     return new P11RSASignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-        sigAlgo, keysize, toBigInt(publicExponent));
+        sigAlgo, getNumThreads(), keysize, toBigInt(publicExponent));
   }
 
 }

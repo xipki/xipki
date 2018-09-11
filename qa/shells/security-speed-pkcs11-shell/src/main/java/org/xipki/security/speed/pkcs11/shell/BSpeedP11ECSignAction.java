@@ -60,7 +60,8 @@ public class BSpeedP11ECSignAction extends BSpeedP11Action {
       return null;
     }
 
-    return new P11ECSignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, control.curveName());
+    return new P11ECSignSpeed(securityFactory, getSlot(), getKeyId(), sigAlgo, getNumThreads(),
+        control.curveName());
   }
 
 }

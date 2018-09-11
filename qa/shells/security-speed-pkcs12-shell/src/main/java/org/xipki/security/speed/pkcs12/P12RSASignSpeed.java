@@ -33,11 +33,11 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12RSASignSpeed extends P12SignSpeed {
 
-  public P12RSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
+  public P12RSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
       int keysize, BigInteger publicExponent) throws Exception {
     super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
         "PKCS#12 RSA signature creation\nkeysize: " + keysize
-            + "\npublic exponent: " + publicExponent);
+            + "\npublic exponent: " + publicExponent, threads);
   }
 
   private static byte[] generateKeystore(int keysize, BigInteger publicExponent)

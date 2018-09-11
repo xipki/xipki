@@ -32,9 +32,9 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12SM2SignSpeed extends P12SignSpeed {
 
-  public P12SM2SignSpeed(SecurityFactory securityFactory) throws Exception {
+  public P12SM2SignSpeed(SecurityFactory securityFactory, int threads) throws Exception {
     super(securityFactory, "SM3WITHSM2", generateKeystore("sm2p256v1"),
-        "PKCS#12 SM2 signature creation");
+        "PKCS#12 SM2 signature creation", threads);
   }
 
   private static byte[] generateKeystore(String curveNameOrOid) throws Exception {

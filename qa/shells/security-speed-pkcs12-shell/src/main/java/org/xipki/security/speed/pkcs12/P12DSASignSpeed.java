@@ -32,11 +32,11 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12DSASignSpeed extends P12SignSpeed {
 
-  public P12DSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
+  public P12DSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
       int plength, int qlength) throws Exception {
     super(securityFactory, signatureAlgorithm,
         generateKeystore(plength, qlength), "PKCS#12 DSA signature creation\nplength: " + plength
-            + "\nqlength: " + qlength);
+            + "\nqlength: " + qlength, threads);
   }
 
   private static byte[] generateKeystore(int plength, int qlength) throws Exception {

@@ -49,10 +49,14 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 
-    final byte[] data = new byte[1024];
+    private static final int batch = 16;
+
+    private final byte[][] data = new byte[batch][16];
 
     public Testor() {
-      new SecureRandom().nextBytes(data);
+      for (int i = 0; i < data.length; i++) {
+        new SecureRandom().nextBytes(data[i]);
+      }
     }
 
     @Override
@@ -60,10 +64,10 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
       while (!stop() && getErrorAccout() < 1) {
         try {
           signer.sign(data);
-          account(1, 0);
+          account(batch, 0);
         } catch (Exception ex) {
           Log.error("P11SignSpeed.Testor.run()", ex);
-          account(1, 1);
+          account(batch, batch);
         }
       }
     }
@@ -81,7 +85,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   private final boolean deleteKeyAfterTest;
 
   public P11SignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
-      boolean deleteKeyAfterTest, P11ObjectIdentifier objectId, String description)
+      boolean deleteKeyAfterTest, P11ObjectIdentifier objectId, String description, int threads)
           throws ObjectCreationException {
     super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
@@ -96,7 +100,8 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     P11SlotIdentifier slotId = slot.getSlotId();
     SignerConf signerConf = getPkcs11SignerConf(slot.getModuleName(),
-        slotId.getId(), objectId.getId(), signatureAlgorithm, 20);
+        slotId.getId(), objectId.getId(), signatureAlgorithm,
+        threads + Math.max(2, threads * 5 / 4));
     try {
       this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
     } catch (ObjectCreationException ex) {

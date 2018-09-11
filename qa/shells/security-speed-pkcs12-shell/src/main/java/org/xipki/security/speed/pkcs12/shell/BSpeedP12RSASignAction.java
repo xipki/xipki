@@ -51,6 +51,7 @@ public class BSpeedP12RSASignAction extends BSpeedP12SignAction {
   protected BenchmarkExecutor nextTester() throws Exception {
     RSAControl control = queue.poll();
     return (control == null) ? null
-      : new P12RSASignSpeed(securityFactory, sigAlgo, control.modulusLen(), toBigInt("0x10001"));
+      : new P12RSASignSpeed(securityFactory, sigAlgo, getNumThreads(),
+          control.modulusLen(), toBigInt("0x10001"));
   }
 }

@@ -44,7 +44,7 @@ public class SpeedP11HMACSignAction extends SpeedP11SignAction {
   @Override
   protected BenchmarkExecutor getTester() throws Exception {
     return new P11HMACSignSpeed(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-        sigAlgo);
+        sigAlgo, getNumThreads());
   }
 
 }

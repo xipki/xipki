@@ -30,16 +30,16 @@ import org.xipki.security.pkcs11.P11Slot;
 public class P11DSASignSpeed extends P11SignSpeed {
 
   public P11DSASignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-      String signatureAlgorithm, int plength, int qlength) throws Exception {
-    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, plength, qlength);
+      String signatureAlgorithm, int threads, int plength, int qlength) throws Exception {
+    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, plength, qlength);
   }
 
   public P11DSASignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-      byte[] keyId, String keyLabel, String signatureAlgorithm, int plength, int qlength)
-          throws Exception {
+      byte[] keyId, String keyLabel, String signatureAlgorithm, int threads,
+      int plength, int qlength) throws Exception {
     super(securityFactory, slot, signatureAlgorithm, !keyPresent,
         generateKey(keyPresent, slot, keyId, keyLabel, plength, qlength),
-        "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength);
+        "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength, threads);
   }
 
   private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,

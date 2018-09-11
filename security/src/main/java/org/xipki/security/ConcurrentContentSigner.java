@@ -103,6 +103,18 @@ public interface ConcurrentContentSigner {
   byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
 
   /**
+   * Sign the data.
+   * @param data
+   *          Data to be signed. Must not be {@code null}.
+   * @return the signature
+   * @throws NoIdleSignerException
+   *         If no idle signer is available
+   * @throws SignatureException
+   *         if could not sign the data.
+   */
+  byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException;
+
+  /**
    * Borrows a signer with implementation-dependent default timeout.
    * @return the signer
    * @throws NoIdleSignerException

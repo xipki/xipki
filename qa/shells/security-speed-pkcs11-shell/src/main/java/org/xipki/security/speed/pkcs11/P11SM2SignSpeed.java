@@ -29,15 +29,15 @@ import org.xipki.security.pkcs11.P11Slot;
 // CHECKSTYLE:SKIP
 public class P11SM2SignSpeed extends P11SignSpeed {
 
-  public P11SM2SignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId)
+  public P11SM2SignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId, int threads)
       throws Exception {
-    this(!false, securityFactory, slot, keyId, null);
+    this(!false, securityFactory, slot, keyId, null, threads);
   }
 
   public P11SM2SignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-      byte[] keyId, String keyLabel) throws Exception {
+      byte[] keyId, String keyLabel, int threads) throws Exception {
     super(securityFactory, slot, "SM3WITHSM2", !keyPresent,
-        generateKey(keyPresent, slot, keyId, keyLabel), "PKCS#11 SM2 signature creation");
+        generateKey(keyPresent, slot, keyId, keyLabel), "PKCS#11 SM2 signature creation", threads);
   }
 
   private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot,

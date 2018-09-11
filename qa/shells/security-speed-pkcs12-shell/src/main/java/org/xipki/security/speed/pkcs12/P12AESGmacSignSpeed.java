@@ -30,10 +30,10 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12AESGmacSignSpeed extends P12SignSpeed {
 
-  public P12AESGmacSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm)
-      throws Exception {
+  public P12AESGmacSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
+      int threads) throws Exception {
     super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
-        "JCEKS AES-GMAC signature creation");
+        "JCEKS AES-GMAC signature creation", threads);
   }
 
   private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {

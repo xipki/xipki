@@ -284,4 +284,29 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
   }
 
+  @Override
+  public byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException {
+    ConcurrentBagEntrySigner signer = borrowSigner();
+    byte[][] signatures = new byte[data.length][];
+
+    try {
+      XiContentSigner xiSigner = signer.value();
+
+      for (int i = 0; i < data.length; i++) {
+        OutputStream signatureStream = xiSigner.getOutputStream();
+        try {
+          signatureStream.write(data[i]);
+        } catch (IOException ex) {
+          throw new SignatureException(
+              "could not write data to SignatureStream: " + ex.getMessage(), ex);
+        }
+        signatures[i] = xiSigner.getSignature();
+      }
+    } finally {
+      requiteSigner(signer);
+    }
+
+    return signatures;
+  }
+
 }

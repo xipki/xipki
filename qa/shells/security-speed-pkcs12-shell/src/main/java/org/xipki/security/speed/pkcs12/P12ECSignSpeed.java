@@ -32,10 +32,10 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
 // CHECKSTYLE:SKIP
 public class P12ECSignSpeed extends P12SignSpeed {
 
-  public P12ECSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
+  public P12ECSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
       String curveNameOrOid) throws Exception {
     super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
-        "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid);
+        "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid, threads);
   }
 
   private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
