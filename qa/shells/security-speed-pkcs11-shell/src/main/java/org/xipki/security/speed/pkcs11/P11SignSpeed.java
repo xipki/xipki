@@ -49,7 +49,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 
-    private static final int batch = 16;
+    private static final int batch = 10;
 
     private final byte[][] data = new byte[batch][16];
 
@@ -114,6 +114,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   protected void shutdown() {
     if (deleteKeyAfterTest) {
       try {
+        LOG.info("delete key {}", objectId);
         slot.removeIdentityByKeyId(objectId);
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);

@@ -177,7 +177,9 @@ public abstract class BenchmarkExecutor {
 
   public void account(int all, int failed) {
     processLog.addNumProcessed(all);
-    errorAccount.addAndGet(failed);
+    if (failed != 0) {
+      errorAccount.addAndGet(failed);
+    }
   }
 
   protected void resetStartTime() {

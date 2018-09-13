@@ -286,8 +286,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   @Override
   public byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException {
-    ConcurrentBagEntrySigner signer = borrowSigner();
     byte[][] signatures = new byte[data.length][];
+    ConcurrentBagEntrySigner signer = borrowSigner();
 
     try {
       XiContentSigner xiSigner = signer.value();

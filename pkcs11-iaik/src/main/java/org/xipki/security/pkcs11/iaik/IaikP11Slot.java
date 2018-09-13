@@ -232,11 +232,12 @@ class IaikP11Slot extends P11Slot {
       }
     }
 
-    ConcurrentBagEntry<Session> session = borrowSession();
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
 
     try {
+      Session session = bagEntry.value();
       // secret keys
-      List<SecretKey> secretKeys = getAllSecretKeyObjects(session.value());
+      List<SecretKey> secretKeys = getAllSecretKeyObjects(session);
       for (SecretKey secKey : secretKeys) {
         byte[] keyId = secKey.getId().getByteArrayValue();
         if (keyId == null || keyId.length == 0) {
@@ -247,7 +248,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       // first get the list of all CA certificates
-      List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects(session.value());
+      List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects(session);
       for (X509PublicKeyCertificate p11Cert : p11Certs) {
         byte[] id = p11Cert.getId().getByteArrayValue();
         char[] label = p11Cert.getLabel().getCharArrayValue();
@@ -257,13 +258,13 @@ class IaikP11Slot extends P11Slot {
         }
       }
 
-      List<PrivateKey> privKeys = getAllPrivateObjects(session.value());
+      List<PrivateKey> privKeys = getAllPrivateObjects(session);
 
       for (PrivateKey privKey : privKeys) {
         byte[] keyId = privKey.getId().getByteArrayValue();
 
         try {
-          analyseSingleKey(session.value(), privKey, ret);
+          analyseSingleKey(session, privKey, ret);
         } catch (XiSecurityException ex) {
           LogUtil.error(LOG, ex, "XiSecurityException while initializing private key "
               + "with id " + hex(keyId));
@@ -281,7 +282,7 @@ class IaikP11Slot extends P11Slot {
 
       return ret;
     } finally {
-      sessions.requite(session);
+      sessions.requite(bagEntry);
     }
   } // method refresh
 
@@ -460,23 +461,20 @@ class IaikP11Slot extends P11Slot {
       try {
         return sign0(session, expectedSignatureLen, mechanismObj, content, signingKey);
       } catch (PKCS11Exception ex) {
-        if (ex.getErrorCode() != PKCS11Constants.CKR_USER_NOT_LOGGED_IN) {
-          throw new P11TokenException(ex.getMessage(), ex);
-        }
-
-        LOG.info("sign ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
-        // force the login
-        forceLogin(session);
-        try {
+        long errorCode = ex.getErrorCode();
+        if (errorCode == PKCS11Constants.CKR_USER_NOT_LOGGED_IN) {
+          LOG.info("sign ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
+          // force the login
+          forceLogin(session);
           return sign0(session, expectedSignatureLen, mechanismObj, content, signingKey);
-        } catch (TokenException ex2) {
-          throw new P11TokenException(ex2.getMessage(), ex2);
+        } else {
+          throw ex;
         }
-      } catch (TokenException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
+      } finally {
+        sessions.requite(session0);
       }
-    } finally {
-      sessions.requite(session0);
+    } catch (TokenException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     }
   }
 
@@ -488,11 +486,10 @@ class IaikP11Slot extends P11Slot {
       return singleSign(session, mechanism, content, signingKey);
     }
 
-    if (LOG.isTraceEnabled()) {
-      LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
-    }
+    LOG.debug("sign (init, update, then finish)");
 
     session.signInit(mechanism, signingKey);
+
     for (int i = 0; i < len; i += maxMessageSize) {
       int blockLen = Math.min(maxMessageSize, len - i);
       session.signUpdate(content, i, blockLen);
@@ -503,16 +500,9 @@ class IaikP11Slot extends P11Slot {
 
   private byte[] singleSign(Session session, Mechanism mechanism, byte[] content,
       Key signingKey) throws TokenException {
-    if (LOG.isTraceEnabled()) {
-      LOG.debug("sign with signing key:\n{}", signingKey);
-    }
-
+    LOG.debug("single sign");
     session.signInit(mechanism, signingKey);
     byte[] signature = session.sign(content);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("signature:\n{}", hex(signature));
-    }
     return signature;
   }
 
@@ -1687,7 +1677,7 @@ class IaikP11Slot extends P11Slot {
   }
 
   private static void logPkcs11ObjectAttributes(String prefix, PKCS11Object p11Object) {
-    if (!LOG.isErrorEnabled()) {
+    if (!LOG.isDebugEnabled()) {
       return;
     }
 
