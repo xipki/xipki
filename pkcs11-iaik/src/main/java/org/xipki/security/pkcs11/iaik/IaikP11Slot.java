@@ -555,8 +555,7 @@ class IaikP11Slot extends P11Slot {
 
       if (session == null) {
         // create new session
-        session = new ConcurrentBagEntry<>(openSession());
-        sessions.add(session);
+        sessions.add(new ConcurrentBagEntry<>(openSession()));
       }
     }
 
@@ -570,6 +569,7 @@ class IaikP11Slot extends P11Slot {
     if (session == null) {
       throw new P11TokenException("no idle session");
     }
+
     login(session.value());
     return session;
   }
