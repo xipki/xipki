@@ -275,31 +275,37 @@ public class SoftTokenContentSignerBuilder {
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
-    if (!AlgorithmUtil.isECSigAlg(signatureAlgId)) {
-      // Provider SunEC is much slower (5x) than BC
-      final String provName = "SunJCE";
-      if (Security.getProvider(provName) != null) {
-        String algoName;
-        try {
-          algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
-        } catch (NoSuchAlgorithmException ex) {
-          throw new XiSecurityException(ex.getMessage());
-        }
+    String provName = null;
+    if (AlgorithmUtil.isRSASigAlgId(signatureAlgId)) {
+      provName = "SunRsaSign";
+    } else if (AlgorithmUtil.isECSigAlg(signatureAlgId)) {
+      // Currently, the provider SunEC is much slower (5x) than BC
+      provName = null;
+    } else if (AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
+      provName = "SUN";
+    }
 
-        try {
-          for (int i = 0; i < parallelism; i++) {
-            Signature signature = Signature.getInstance(algoName, provName);
-            signature.initSign(key);
-            if (i == 0) {
-              signature.update(new byte[]{1, 2, 3, 4});
-              signature.sign();
-            }
-            XiContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
-            signers.add(signer);
+    if (provName != null && Security.getProvider(provName) != null) {
+      String algoName;
+      try {
+        algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new XiSecurityException(ex.getMessage());
+      }
+
+      try {
+        for (int i = 0; i < parallelism; i++) {
+          Signature signature = Signature.getInstance(algoName, provName);
+          signature.initSign(key);
+          if (i == 0) {
+            signature.update(new byte[]{1, 2, 3, 4});
+            signature.sign();
           }
-        } catch (Exception ex) {
-          signers.clear();
+          XiContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
+          signers.add(signer);
         }
+      } catch (Exception ex) {
+        signers.clear();
       }
     }
 
