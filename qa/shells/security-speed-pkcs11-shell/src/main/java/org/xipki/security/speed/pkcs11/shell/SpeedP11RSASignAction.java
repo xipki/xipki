@@ -21,9 +21,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.speed.pkcs11.P11RSASignSpeed;
 import org.xipki.security.speed.shell.completer.RSASigAlgCompleter;
+import org.xipki.util.BenchmarkExecutor;
 
 /**
  * TODO.

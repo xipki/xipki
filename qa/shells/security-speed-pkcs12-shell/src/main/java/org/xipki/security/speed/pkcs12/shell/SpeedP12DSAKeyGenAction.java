@@ -20,9 +20,9 @@ package org.xipki.security.speed.pkcs12.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.speed.pkcs12.P12DSAKeyGenSpeed;
 import org.xipki.security.speed.shell.SingleSpeedAction;
+import org.xipki.util.BenchmarkExecutor;
 
 /**
  * TODO.

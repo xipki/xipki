@@ -20,9 +20,9 @@ package org.xipki.security.speed.pkcs11;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jline.utils.Log;
-import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ParamUtil;
 
 /**

@@ -55,7 +55,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.ca.client.benchmark.shell.jaxb.EnrollCertType;
 import org.xipki.ca.client.benchmark.shell.jaxb.EnrollTemplateType;
-import org.xipki.common.qa.BenchmarkExecutor;
+import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.XmlUtil;

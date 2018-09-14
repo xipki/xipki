@@ -22,9 +22,9 @@ import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.qa.BenchmarkExecutor;
 import org.xipki.security.speed.pkcs11.P11ECKeyGenSpeed;
 import org.xipki.security.speed.shell.ECControl;
+import org.xipki.util.BenchmarkExecutor;
 
 /**
  * TODO.
