@@ -36,7 +36,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
   private ConcurrentLinkedDeque<AuditService> services = new ConcurrentLinkedDeque<AuditService>();
 
-  private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
+  private AuditService defaultAuditService = new Slf4jAuditService();
 
   @Override
   public AuditService getAuditService() {

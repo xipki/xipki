@@ -39,8 +39,7 @@
       <cm:property name="messageFormat" value="rfc_5424"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="syslogAuditServiceImpl"
-      class="org.xipki.audit.syslog.SyslogAuditService"
+  <bean id="syslogAuditService" class="org.xipki.audit.syslog.SyslogAuditService"
       init-method="init" destroy-method="destroy">
     <property name="facility" value="${facility}"/>
     <property name="host" value="${host}"/>
@@ -53,5 +52,5 @@
     <property name="ssl" value="${ssl}"/>
     <property name="messageFormat" value="${messageFormat}"/>
   </bean>
-  <service ref="syslogAuditServiceImpl" interface="org.xipki.audit.AuditService"/>
+  <service ref="syslogAuditService" interface="org.xipki.audit.AuditService"/>
 </blueprint>

@@ -18,12 +18,16 @@
 package org.xipki.audit.internal;
 
 import java.io.CharArrayWriter;
+import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditEventData;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
+import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
 
 /**
@@ -32,15 +36,15 @@ import org.xipki.audit.PciAuditEvent;
  * @since 2.0.0
  */
 
-public class Slf4jAuditServiceImpl extends AuditService {
+public class Slf4jAuditService implements AuditService {
 
   private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
 
-  public Slf4jAuditServiceImpl() {
+  public Slf4jAuditService() {
   }
 
   @Override
-  protected void logEvent0(AuditEvent event) {
+  public void logEvent(AuditEvent event) {
     switch (event.getLevel()) {
       case DEBUG:
         if (LOG.isDebugEnabled()) {
@@ -56,7 +60,7 @@ public class Slf4jAuditServiceImpl extends AuditService {
   }
 
   @Override
-  protected void logEvent0(PciAuditEvent event) {
+  public void logEvent(PciAuditEvent event) {
     CharArrayWriter msg = event.toCharArrayWriter("");
     AuditLevel al = event.getLevel();
     switch (al) {
@@ -71,6 +75,48 @@ public class Slf4jAuditServiceImpl extends AuditService {
         }
         break;
     } // end switch
+  }
+
+  protected static String createMessage(AuditEvent event) {
+    Objects.requireNonNull(event, "event must not be null");
+    String applicationName = event.getApplicationName();
+    if (applicationName == null) {
+      applicationName = "undefined";
+    }
+
+    String name = event.getName();
+    if (name == null) {
+      name = "undefined";
+    }
+
+    StringBuilder sb = new StringBuilder(150);
+
+    sb.append(event.getLevel().getAlignedText()).append(" | ");
+    sb.append(applicationName).append(" - ").append(name);
+
+    AuditStatus status = event.getStatus();
+    if (status == null) {
+      status = AuditStatus.UNDEFINED;
+    }
+    sb.append(":\tstatus: ").append(status.name());
+    List<AuditEventData> eventDataArray = event.getEventDatas();
+
+    long duration = event.getDuration();
+    if (duration >= 0) {
+      sb.append("\tduration: ").append(duration);
+    }
+
+    if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
+      for (AuditEventData m : eventDataArray) {
+        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+          continue;
+        }
+
+        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+      }
+    }
+
+    return sb.toString();
   }
 
 }

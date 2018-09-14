@@ -17,115 +17,26 @@
 
 package org.xipki.audit;
 
-import java.util.List;
-import java.util.Objects;
-
 /**
  * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class AuditService {
-
-  protected abstract void logEvent0(AuditEvent event);
-
-  protected abstract void logEvent0(PciAuditEvent event);
+public interface AuditService {
 
   /**
    * TODO.
    * @param event
    *          Audit event. Must not be {@code null}-
    */
-  public void logEvent(AuditEvent event) {
-    Objects.requireNonNull(event, "event must not be null");
-
-    /*
-    switch (event.getLevel()) {
-    case DEBUG:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("AuditEvent {}", createMessage(event));
-      }
-      break;
-    default:
-      if (LOG.isInfoEnabled()) {
-        LOG.info("AuditEvent {}", createMessage(event));
-      }
-      break;
-    } // end switch
-    */
-
-    logEvent0(event);
-  }
+  void logEvent(AuditEvent event);
 
   /**
    * TODO.
    * @param event
    *          Audit event. Must not be {@code null}-
    */
-  public void logEvent(PciAuditEvent event) {
-    Objects.requireNonNull(event, "event must not be null");
-
-    /*
-    CharArrayWriter msg = event.toCharArrayWriter("");
-    AuditLevel al = event.getLevel();
-    switch (al) {
-    case DEBUG:
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("PciAuditEvent {} | {}", al.getAlignedText(), msg);
-      }
-      break;
-    default:
-      if (LOG.isInfoEnabled()) {
-        LOG.info("PciAuditEvent {} | {}", al.getAlignedText(), msg);
-      }
-      break;
-    } // end switch
-    */
-
-    logEvent0(event);
-  }
-
-  protected static String createMessage(AuditEvent event) {
-    Objects.requireNonNull(event, "event must not be null");
-    String applicationName = event.getApplicationName();
-    if (applicationName == null) {
-      applicationName = "undefined";
-    }
-
-    String name = event.getName();
-    if (name == null) {
-      name = "undefined";
-    }
-
-    StringBuilder sb = new StringBuilder(150);
-
-    sb.append(event.getLevel().getAlignedText()).append(" | ");
-    sb.append(applicationName).append(" - ").append(name);
-
-    AuditStatus status = event.getStatus();
-    if (status == null) {
-      status = AuditStatus.UNDEFINED;
-    }
-    sb.append(":\tstatus: ").append(status.name());
-    List<AuditEventData> eventDataArray = event.getEventDatas();
-
-    long duration = event.getDuration();
-    if (duration >= 0) {
-      sb.append("\tduration: ").append(duration);
-    }
-
-    if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
-      for (AuditEventData m : eventDataArray) {
-        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
-          continue;
-        }
-
-        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
-      }
-    }
-
-    return sb.toString();
-  }
+  void logEvent(PciAuditEvent event);
 
 }
