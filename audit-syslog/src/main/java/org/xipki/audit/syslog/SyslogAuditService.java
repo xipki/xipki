@@ -18,7 +18,6 @@
 package org.xipki.audit.syslog;
 
 import java.io.CharArrayWriter;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -162,9 +161,9 @@ public class SyslogAuditService implements AuditService {
 
     try {
       syslog.sendMessage(sm);
-    } catch (IOException ex) {
-      LOG.error("could not send syslog message: {}", ex.getMessage());
-      LOG.debug("could not send syslog message", ex);
+    } catch (Throwable th) {
+      LOG.error("could not send syslog message: {}", th.getMessage());
+      LOG.debug("could not send syslog message", th);
     }
   } // method logEvent(AuditEvent)
 
@@ -194,9 +193,9 @@ public class SyslogAuditService implements AuditService {
 
     try {
       syslog.sendMessage(sm);
-    } catch (IOException ex) {
-      LOG.error("could not send syslog message: {}", ex.getMessage());
-      LOG.debug("could not send syslog message", ex);
+    } catch (Throwable th) {
+      LOG.error("could not send syslog message: {}", th.getMessage());
+      LOG.debug("could not send syslog message", th);
     }
   } // method logEvent(PCIAuditEvent)
 
@@ -219,26 +218,27 @@ public class SyslogAuditService implements AuditService {
       msgFormat = MessageFormat.RFC_5424;
     }
 
-    if ("udp".equalsIgnoreCase(protocol)) {
-      UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
-      syslog = lcSyslog;
-      lcSyslog.setSyslogServerPort(port);
-    } else if ("tcp".equalsIgnoreCase(protocol)) {
+    if ("tcp".equalsIgnoreCase(protocol)) {
       TcpSyslogMessageSender lcSyslog = new TcpSyslogMessageSender();
       syslog = lcSyslog;
+      lcSyslog.setSyslogServerHostname(host);
       lcSyslog.setSyslogServerPort(port);
       lcSyslog.setSsl(ssl);
       if (writeRetries > 0) {
         lcSyslog.setMaxRetryCount(writeRetries);
       }
     } else {
-      LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
+      if (!"udp".equalsIgnoreCase(protocol)) {
+        LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
+      }
+
       UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
       syslog = lcSyslog;
       lcSyslog.setSyslogServerPort(port);
+      lcSyslog.setSyslogServerHostname(host);
     }
 
-    syslog.setDefaultMessageHostname(host);
+    // syslog.setDefaultMessageHostname(host);
     syslog.setMessageFormat(msgFormat);
 
     Facility sysFacility = null;
