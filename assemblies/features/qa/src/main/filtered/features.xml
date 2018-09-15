@@ -113,7 +113,6 @@
     <bundle start-level="80">mvn:org.xipki.shells/security-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-pkcs11-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-pkcs12-shell/${project.version}</bundle>
