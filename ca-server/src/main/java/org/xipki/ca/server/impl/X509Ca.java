@@ -1203,6 +1203,8 @@ public class X509Ca {
         throw new CaMgmtException(
             "could not clear publish queue of CA " + caIdent + ": " + ex.getMessage(), ex);
       }
+
+      return;
     }
 
     for (String publisherName : publisherNames) {

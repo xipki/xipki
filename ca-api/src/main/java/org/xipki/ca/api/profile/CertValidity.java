@@ -84,7 +84,7 @@ public class CertValidity implements Comparable<CertValidity> {
     } else if (suffix == 'h' || suffix == 'H') {
       unit = Unit.HOUR;
       numValdityS = validityS.substring(0, len - 1);
-    } else if (suffix == 'm' || suffix == 'm') {
+    } else if (suffix == 'm' || suffix == 'M') {
       unit = Unit.MINUTE;
       numValdityS = validityS.substring(0, len - 1);
     } else if (suffix >= '0' && suffix <= '9') {

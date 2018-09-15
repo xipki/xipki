@@ -394,6 +394,11 @@ public class CmpControl {
   }
 
   @Override
+  public int hashCode() {
+    return conf.hashCode();
+  }
+
+  @Override
   public String toString() {
     return toString(false);
   }

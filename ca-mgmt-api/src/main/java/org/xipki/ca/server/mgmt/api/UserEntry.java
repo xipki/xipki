@@ -54,6 +54,11 @@ public class UserEntry {
   }
 
   @Override
+  public int hashCode() {
+    return ident.hashCode() + 31 + hashedPassword.hashCode();
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if  (!(obj instanceof UserEntry)) {
       return false;

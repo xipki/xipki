@@ -1146,7 +1146,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
         encKey = new EncryptedValue(intendedAlg, symmAlg,
             null, null, null, new DERBitString(encValue));
       }
-    } catch (Exception ex) {
+    } catch (Throwable th) {
       String msg = "error while encrypting the private key";
       LOG.error(msg);
       return new CertResponse(certReqId,

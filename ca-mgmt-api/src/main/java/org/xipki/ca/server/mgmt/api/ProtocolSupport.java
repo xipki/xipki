@@ -91,7 +91,7 @@ public class ProtocolSupport {
   }
 
   public boolean equals(Object obj) {
-    if (! (obj instanceof CaUris)) {
+    if (! (obj instanceof ProtocolSupport)) {
       return false;
     }
 
