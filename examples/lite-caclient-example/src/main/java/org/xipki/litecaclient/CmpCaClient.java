@@ -195,8 +195,8 @@ public abstract class CmpCaClient {
     return caCerts;
   }
 
-  private ASN1Encodable extractGeneralRepContent(PKIMessage response,
-      String expectedType) throws Exception {
+  private ASN1Encodable extractGeneralRepContent(PKIMessage response, String expectedType)
+      throws Exception {
     PKIBody respBody = response.getBody();
     int bodyType = respBody.getType();
 
@@ -268,8 +268,7 @@ public abstract class CmpCaClient {
   }
 
   private Map<BigInteger, KeyAndCert> parseEnrollCertResult(PKIMessage response,
-      int resonseBodyType, int numCerts)
-      throws Exception {
+      int resonseBodyType, int numCerts) throws Exception {
     PKIBody respBody = response.getBody();
     final int bodyType = respBody.getType();
 
@@ -533,8 +532,7 @@ public abstract class CmpCaClient {
 
     KeyAndCert[] ret = new KeyAndCert[n];
     for (int i = 0; i < n; i++) {
-      BigInteger certReqId = certReqIds[i];
-      ret[i] = keyCerts.get(certReqId);
+      ret[i] = keyCerts.get(certReqIds[i]);
     }
 
     return ret;
@@ -728,14 +726,22 @@ public abstract class CmpCaClient {
   private static String buildText(PKIStatusInfo pkiStatusInfo) {
     final int status = pkiStatusInfo.getStatus().intValue();
     switch (status) {
-      case 0: return "accepted (0)";
-      case 1: return "grantedWithMods (1)";
-      case 2: return "rejection (2)";
-      case 3: return "waiting (3)";
-      case 4: return "revocationWarning (4)";
-      case 5: return "revocationNotification (5)";
-      case 6: return "keyUpdateWarning (6)";
-      default: return Integer.toString(status);
+      case 0:
+        return "accepted (0)";
+      case 1:
+        return "grantedWithMods (1)";
+      case 2:
+        return "rejection (2)";
+      case 3:
+        return "waiting (3)";
+      case 4:
+        return "revocationWarning (4)";
+      case 5:
+        return "revocationNotification (5)";
+      case 6:
+        return "keyUpdateWarning (6)";
+      default:
+        return Integer.toString(status);
     }
   }
 

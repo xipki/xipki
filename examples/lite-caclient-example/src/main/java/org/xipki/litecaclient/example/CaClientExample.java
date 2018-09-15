@@ -162,8 +162,7 @@ public class CaClientExample {
   }
 
   protected static CertificationRequest genCsr(MyKeypair keypair, String subject,
-      String challengePassword)
-      throws GeneralSecurityException, OperatorCreationException {
+      String challengePassword) throws GeneralSecurityException, OperatorCreationException {
     X500Name subjectDn = new X500Name(subject);
 
     PKCS10CertificationRequestBuilder csrBuilder = new PKCS10CertificationRequestBuilder(
