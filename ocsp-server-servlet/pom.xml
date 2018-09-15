@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
   </parent>
   <artifactId>ocsp-server-servlet</artifactId>
   <packaging>bundle</packaging>
