@@ -91,7 +91,9 @@ public class ProtocolSupport {
   }
 
   public boolean equals(Object obj) {
-    if (! (obj instanceof ProtocolSupport)) {
+    if (this == obj) {
+      return true;
+    } else if (! (obj instanceof ProtocolSupport)) {
       return false;
     }
 

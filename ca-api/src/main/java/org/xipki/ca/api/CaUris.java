@@ -73,7 +73,9 @@ public class CaUris {
   }
 
   public boolean equals(Object obj) {
-    if (! (obj instanceof CaUris)) {
+    if (this == obj) {
+      return true;
+    } else if (! (obj instanceof CaUris)) {
       return false;
     }
 

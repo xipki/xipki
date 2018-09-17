@@ -165,7 +165,9 @@ public class CmpUtf8Pairs {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CmpUtf8Pairs)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CmpUtf8Pairs)) {
       return false;
     }
 

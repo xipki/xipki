@@ -62,7 +62,9 @@ class PendingCertificatePool {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof MyEntry)) {
+      if (this == obj) {
+        return true;
+      } else if (!(obj instanceof MyEntry)) {
         return false;
       }
 

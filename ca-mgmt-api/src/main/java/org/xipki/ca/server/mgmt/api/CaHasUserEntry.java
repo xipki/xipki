@@ -71,7 +71,9 @@ public class CaHasUserEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CaHasUserEntry)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CaHasUserEntry)) {
       return false;
     }
 

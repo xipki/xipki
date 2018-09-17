@@ -151,7 +151,9 @@ public class SignerEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof SignerEntry)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof SignerEntry)) {
       return false;
     }
 

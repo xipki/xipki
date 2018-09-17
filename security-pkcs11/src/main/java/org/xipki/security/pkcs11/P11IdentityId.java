@@ -93,7 +93,9 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof P11IdentityId)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof P11IdentityId)) {
       return false;
     }
 

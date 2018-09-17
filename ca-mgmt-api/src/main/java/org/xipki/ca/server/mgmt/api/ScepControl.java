@@ -122,7 +122,9 @@ public class ScepControl {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ScepControl)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof ScepControl)) {
       return false;
     }
 

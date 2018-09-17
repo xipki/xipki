@@ -49,9 +49,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    }
-
-    if (!(obj instanceof P11SlotIdentifier)) {
+    } else if (!(obj instanceof P11SlotIdentifier)) {
       return false;
     }
 

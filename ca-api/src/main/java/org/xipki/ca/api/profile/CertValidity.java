@@ -183,7 +183,9 @@ public class CertValidity implements Comparable<CertValidity> {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CertValidity)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CertValidity)) {
       return false;
     }
 

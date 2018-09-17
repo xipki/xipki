@@ -159,7 +159,9 @@ public class CrlControl {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof HourMinute)) {
+      if (this == obj) {
+        return true;
+      } else if (!(obj instanceof HourMinute)) {
         return false;
       }
 
@@ -471,7 +473,9 @@ public class CrlControl {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CrlControl)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CrlControl)) {
       return false;
     }
 

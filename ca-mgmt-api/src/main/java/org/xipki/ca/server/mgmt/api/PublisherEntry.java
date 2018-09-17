@@ -72,7 +72,9 @@ public class PublisherEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof PublisherEntry)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof PublisherEntry)) {
       return false;
     }
 

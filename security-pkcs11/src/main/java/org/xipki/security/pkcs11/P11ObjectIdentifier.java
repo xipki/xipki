@@ -86,9 +86,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    }
-
-    if (!(obj instanceof P11ObjectIdentifier)) {
+    } else if (!(obj instanceof P11ObjectIdentifier)) {
       return false;
     }
 

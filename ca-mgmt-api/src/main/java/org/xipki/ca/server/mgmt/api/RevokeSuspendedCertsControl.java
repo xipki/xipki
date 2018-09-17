@@ -87,7 +87,9 @@ public class RevokeSuspendedCertsControl {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof RevokeSuspendedCertsControl)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof RevokeSuspendedCertsControl)) {
       return false;
     }
 

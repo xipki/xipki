@@ -60,7 +60,9 @@ public class UserEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if  (!(obj instanceof UserEntry)) {
+    if (this == obj) {
+      return true;
+    } else if  (!(obj instanceof UserEntry)) {
       return false;
     }
 

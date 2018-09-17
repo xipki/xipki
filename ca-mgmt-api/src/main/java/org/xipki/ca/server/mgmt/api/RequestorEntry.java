@@ -122,7 +122,9 @@ public class RequestorEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof RequestorEntry)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof RequestorEntry)) {
       return false;
     }
 

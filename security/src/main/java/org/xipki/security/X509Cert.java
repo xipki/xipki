@@ -128,9 +128,7 @@ public class X509Cert {
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
-    }
-
-    if (!(obj instanceof X509Cert)) {
+    } else if (!(obj instanceof X509Cert)) {
       return false;
     }
 

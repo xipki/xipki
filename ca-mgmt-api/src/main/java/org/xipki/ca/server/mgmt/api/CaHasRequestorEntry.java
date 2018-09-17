@@ -99,7 +99,9 @@ public class CaHasRequestorEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CaHasRequestorEntry)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CaHasRequestorEntry)) {
       return false;
     }
 

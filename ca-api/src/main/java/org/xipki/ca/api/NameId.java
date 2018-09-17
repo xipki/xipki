@@ -54,9 +54,7 @@ public class NameId {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    }
-
-    if (!(obj instanceof NameId)) {
+    } else if (!(obj instanceof NameId)) {
       return false;
     }
 

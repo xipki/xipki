@@ -81,7 +81,9 @@ public class CertprofileEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if  (!(obj instanceof CertprofileEntry)) {
+    if (this == obj) {
+      return true;
+    } else if  (!(obj instanceof CertprofileEntry)) {
       return false;
     }
 

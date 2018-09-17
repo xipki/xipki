@@ -420,7 +420,9 @@ public class CmpControl {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CmpControl)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CmpControl)) {
       return false;
     }
 

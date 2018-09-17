@@ -71,9 +71,7 @@ public class ConfPairs {
     public boolean equals(Object obj) {
       if (this == obj) {
         return true;
-      }
-
-      if (obj instanceof Unmodifiable) {
+      } else if (obj instanceof Unmodifiable) {
         return underlying.equals(((Unmodifiable) obj).underlying);
       } else if (obj instanceof ConfPairs) {
         return underlying.equals((ConfPairs) obj);
@@ -285,7 +283,9 @@ public class ConfPairs {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ConfPairs)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof ConfPairs)) {
       return false;
     }
 

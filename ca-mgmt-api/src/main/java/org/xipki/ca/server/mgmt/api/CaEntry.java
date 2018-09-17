@@ -368,7 +368,9 @@ public class CaEntry {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CaEntry)) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof CaEntry)) {
       return false;
     }
 
