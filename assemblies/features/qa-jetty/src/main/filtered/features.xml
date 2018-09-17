@@ -99,7 +99,7 @@
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" description="Syslog audit">
     <feature>xipki-audit</feature>
-    <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
+    <bundle start-level="70">mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/audit-syslog/${project.version}</bundle>
   </feature>
   <feature name="xipki-custom-certprofiles" version="${project.version}" description="CA Custom Certificate Profiles">
