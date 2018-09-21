@@ -43,7 +43,7 @@ public class Range {
     return max;
   }
 
-  public void setRange(Integer min, Integer max) {
+  public final void setRange(Integer min, Integer max) {
     if (min == null && max == null) {
       throw new IllegalArgumentException("min and max must not be both null");
     }

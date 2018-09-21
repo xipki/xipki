@@ -168,7 +168,7 @@ public class SqlStateCodes {
       case UNKNOWN:
         return new SqlStateCodes();
       default:
-        throw new RuntimeException("should not reach here, unknown database type " + dbType);
+        throw new IllegalStateException("should not reach here, unknown database type " + dbType);
     }
   }
 

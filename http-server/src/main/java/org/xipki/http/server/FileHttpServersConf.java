@@ -23,11 +23,13 @@ import java.net.URL;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
 import org.xipki.httpserver.v1.jaxb.Httpservers;
 import org.xipki.httpserver.v1.jaxb.ObjectFactory;
+import org.xml.sax.SAXException;
 
 /**
  * TODO.
@@ -54,7 +56,7 @@ public class FileHttpServersConf implements HttpServersConf {
       jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 
       root = jaxbUnmarshaller.unmarshal(new File(confFile));
-    } catch (Exception ex) {
+    } catch (JAXBException | SAXException | RuntimeException ex) {
       throw new Exception("parsing config file failed, message: " + ex.getMessage(), ex);
     }
 

@@ -77,7 +77,7 @@ public class XmlUtil {
 
   public static Element createElement(String namespace, String localPart, String value) {
     if (document == null) {
-      throw new RuntimeException("XMLDocumentBuilder must not be initialized");
+      throw new IllegalStateException("XMLDocumentBuilder must not be initialized");
     }
     ParamUtil.requireNonBlank("localPart", localPart);
     Element element = document.createElementNS(namespace, "ns:" + localPart);

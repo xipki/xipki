@@ -19,9 +19,10 @@ package org.xipki.ocsp.server.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -190,7 +191,7 @@ public class RequestOption {
         certpathValidationModel = CertpathValidationModel.PKIX;
         break;
       default:
-        throw new RuntimeException("should not reach here, unknown ValidationModel "
+        throw new IllegalStateException("should not reach here, unknown ValidationModel "
             + certpathConf.getValidationModel());
     } // end switch
 
@@ -281,7 +282,7 @@ public class RequestOption {
 
       String fileName = ksConf.getKeystore().getFile();
       InputStream is = (fileName != null)
-          ? new FileInputStream(IoUtil.expandFilepath(fileName))
+          ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName)))
           : new ByteArrayInputStream(ksConf.getKeystore().getValue());
 
       char[] password = (ksConf.getPassword() == null)  ? null
@@ -306,7 +307,7 @@ public class RequestOption {
         }
       }
     } else {
-      throw new RuntimeException("should not happen, neither keystore nor dir is defined");
+      throw new IllegalStateException("should not happen, neither keystore nor dir is defined");
     }
 
     return tmpCerts;

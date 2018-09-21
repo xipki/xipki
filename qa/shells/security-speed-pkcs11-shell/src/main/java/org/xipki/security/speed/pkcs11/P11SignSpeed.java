@@ -111,7 +111,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   }
 
   @Override
-  protected void shutdown() {
+  protected final void shutdown() {
     if (deleteKeyAfterTest) {
       try {
         LOG.info("delete key {}", objectId);

@@ -248,7 +248,7 @@ class TargetDigestRetriever {
     }
   } // constructor
 
-  public void close() {
+  public final void close() {
     if (executor != null) {
       executor.shutdownNow();
     }

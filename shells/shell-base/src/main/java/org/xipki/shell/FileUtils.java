@@ -17,14 +17,12 @@
 
 package org.xipki.shell;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.security.auth.login.Configuration;
@@ -36,11 +34,6 @@ import javax.security.auth.login.Configuration;
  */
 
 class FileUtils {
-
-  /**
-   * The file copy buffer size (30 MB).
-   */
-  private static final long FILE_COPY_BUFFER_SIZE = 1024L * 1024 * 30;
 
   private FileUtils() {
   }
@@ -198,38 +191,7 @@ class FileUtils {
       throw new IOException("Destination '" + destFile + "' exists but is a directory");
     }
 
-    FileInputStream fis = null;
-    FileOutputStream fos = null;
-    FileChannel input = null;
-    FileChannel output = null;
-    try {
-      fis = new FileInputStream(srcFile);
-      fos = new FileOutputStream(destFile);
-      input = fis.getChannel();
-      output = fos.getChannel();
-      final long size = input.size(); // See IO-386
-      long pos = 0;
-      long count = 0;
-      while (pos < size) {
-        final long remain = size - pos;
-        count = (remain > FILE_COPY_BUFFER_SIZE) ? FILE_COPY_BUFFER_SIZE : remain;
-        final long bytesCopied = output.transferFrom(input, pos, count);
-        if (bytesCopied == 0) {
-          // IO-385 - can happen if file is truncated after caching the size
-          break; // ensure we don't loop forever
-        }
-        pos += bytesCopied;
-      }
-    } finally {
-      closeQuietly(output, fos, input, fis);
-    }
-
-    final long srcLen = srcFile.length(); // See IO-386
-    final long dstLen = destFile.length(); // See IO-386
-    if (srcLen != dstLen) {
-      throw new IOException("Failed to copy full contents from '" + srcFile + "' to '"
-          + destFile + "' Expected length: " + srcLen + " Actual: " + dstLen);
-    }
+    Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     if (preserveFileDate) {
       destFile.setLastModified(srcFile.lastModified());
     }
@@ -289,26 +251,6 @@ class FileUtils {
     // Do this last, as the above has probably affected directory metadata
     if (preserveFileDate) {
       destDir.setLastModified(srcDir.lastModified());
-    }
-  }
-
-  private static void closeQuietly(Closeable... closeables) {
-    if (closeables == null) {
-      return;
-    }
-    for (final Closeable closeable : closeables) {
-      closeQuietly0(closeable);
-    }
-  }
-
-  private static void closeQuietly0(Closeable closable) {
-    if (closable == null) {
-      return;
-    }
-
-    try {
-      closable.close();
-    } catch (Throwable th) { // CHECKSTYLE:SKIP
     }
   }
 

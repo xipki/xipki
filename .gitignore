@@ -1,5 +1,7 @@
 .gitignore
 
+.pmd
+
 # log files
 *.log
 

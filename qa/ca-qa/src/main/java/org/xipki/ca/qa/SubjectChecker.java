@@ -372,7 +372,7 @@ public class SubjectChecker {
         correctStringType = (atvValue instanceof DERIA5String);
         break;
       default:
-        throw new RuntimeException("should not reach here, unknown StringType " + stringType);
+        throw new IllegalStateException("should not reach here, unknown StringType " + stringType);
     } // end switch
     return correctStringType;
   }

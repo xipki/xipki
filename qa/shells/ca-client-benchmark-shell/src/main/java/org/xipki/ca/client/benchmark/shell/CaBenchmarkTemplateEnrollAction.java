@@ -17,7 +17,8 @@
 
 package org.xipki.ca.client.benchmark.shell;
 
-import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -60,7 +61,7 @@ public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
     }
 
     EnrollTemplateType template = CaBenchmarkTemplateEnroll.parse(
-        new FileInputStream(templateFile));
+        Files.newInputStream(Paths.get(templateFile)));
     int size = template.getEnrollCert().size();
 
     String description = StringUtil.concatObjectsCap(200, "template: ", templateFile,

@@ -51,6 +51,10 @@ public class GetCrlAction extends CrlAction {
   @Completion(FileCompleter.class)
   private String baseCrlOut;
 
+  @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
+  @Completion(FileCompleter.class)
+  protected String outFile;
+
   @Override
   protected X509CRL retrieveCrl() throws Exception {
     return caManager.getCurrentCrl(caName);
@@ -103,5 +107,10 @@ public class GetCrlAction extends CrlAction {
 
     return null;
   } // method execute0
+
+  @Override
+  protected String getOutFile() {
+    return outFile;
+  }
 
 }

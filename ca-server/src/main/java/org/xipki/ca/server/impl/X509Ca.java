@@ -298,7 +298,7 @@ public class X509Ca {
         }
         interval = (int) (minSinceCrlBaseTime % MINUTE_PER_DAY);
       } else {
-        throw new RuntimeException("should not reach here, neither interval minutes"
+        throw new IllegalStateException("should not reach here, neither interval minutes"
             + " nor dateTime is specified");
       }
 
@@ -867,7 +867,8 @@ public class X509Ca {
             }
             break;
           default:
-            throw new RuntimeException("unknown TripleState " + crlControl.getInvalidityDateMode());
+            throw new IllegalStateException(
+                "unknown TripleState " + crlControl.getInvalidityDateMode());
         }
 
         BigInteger serial = revInfo.getSerial();
@@ -909,7 +910,7 @@ public class X509Ca {
       boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
       boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
       if (onlyUserCerts && onlyCaCerts) {
-        throw new RuntimeException(
+        throw new IllegalStateException(
             "should not reach here, onlyUserCerts and onlyCACerts are both true");
       }
 
@@ -1323,7 +1324,7 @@ public class X509Ca {
       case PRIVILEGE_WITHDRAWN:
         break;
       default:
-        throw new RuntimeException("unknown CRL reason " + reason);
+        throw new IllegalStateException("unknown CRL reason " + reason);
     } // switch (reason)
 
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_cert, msgId);
@@ -2269,7 +2270,7 @@ public class X509Ca {
       } else if (mode == ValidityMode.LAX) {
         // permitted
       } else {
-        throw new RuntimeException(
+        throw new IllegalStateException(
             "should not reach here, unknown CA ValidityMode " + mode);
       } // end if (mode)
     } // end if (notAfter)
@@ -2504,7 +2505,8 @@ public class X509Ca {
         ms = val.getValidity() * 365 * DAY_IN_MS;
         break;
       default:
-        throw new RuntimeException("should not reach here, unknown Validity Unit " + val.getUnit());
+        throw new IllegalStateException(
+            "should not reach here, unknown Validity Unit " + val.getUnit());
     }
     final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds
     final CrlReason reason = caInfo.revokeSuspendedCertsControl().getTargetReason();

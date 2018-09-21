@@ -18,9 +18,11 @@
 package org.xipki.litecaclient.example;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -84,7 +86,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       KeyStore ks = KeyStore.getInstance("PKCS12");
 
       char[] password = REQUESTOR_KEYSTORE_PASSWORD.toCharArray();
-      FileInputStream ksStream = new FileInputStream(expandPath(REQUESTOR_KEYSTORE_FILE));
+      InputStream ksStream = Files.newInputStream(Paths.get(expandPath(REQUESTOR_KEYSTORE_FILE)));
       ks.load(ksStream, password);
       ksStream.close();
 

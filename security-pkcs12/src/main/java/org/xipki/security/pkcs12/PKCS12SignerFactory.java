@@ -18,9 +18,10 @@
 package org.xipki.security.pkcs12;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -126,8 +127,8 @@ public class PKCS12SignerFactory implements SignerFactory {
     } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
       String fn = str.substring("file:".length());
       try {
-        keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
-      } catch (FileNotFoundException ex) {
+        keystoreStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(fn)));
+      } catch (IOException ex) {
         throw new ObjectCreationException("file not found: " + fn);
       }
     } else {

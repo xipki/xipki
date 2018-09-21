@@ -36,6 +36,9 @@ import org.xipki.security.X509Cert;
 
 public abstract class CertPublisher {
 
+  protected CertPublisher() {
+  }
+
   /**
    * Initializes me.
    *

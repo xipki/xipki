@@ -19,7 +19,8 @@ package org.xipki.security.shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -70,7 +71,7 @@ public class ImportCertAction extends SecurityAction {
 
     Set<String> aliases = new HashSet<>(10);
     if (realKsFile.exists()) {
-      FileInputStream inStream = new FileInputStream(realKsFile);
+      InputStream inStream = Files.newInputStream(realKsFile.toPath());
       try {
         ks.load(inStream, password);
       } finally {

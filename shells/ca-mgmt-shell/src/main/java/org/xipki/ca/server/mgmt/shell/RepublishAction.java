@@ -53,7 +53,7 @@ public class RepublishAction extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     if (publisherNames == null) {
-      throw new RuntimeException("should not reach here");
+      throw new IllegalStateException("should not reach here");
     }
     boolean allPublishers = false;
     for (String publisherName : publisherNames) {

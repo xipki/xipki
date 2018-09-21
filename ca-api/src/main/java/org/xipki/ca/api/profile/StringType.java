@@ -53,7 +53,7 @@ public enum StringType {
     } else if (ia5String == this) {
       return new DERIA5String(text, true);
     } else {
-      throw new RuntimeException("should not reach here, unknown StringType " + this.name());
+      throw new IllegalStateException("should not reach here, unknown StringType " + this.name());
     }
   }
 

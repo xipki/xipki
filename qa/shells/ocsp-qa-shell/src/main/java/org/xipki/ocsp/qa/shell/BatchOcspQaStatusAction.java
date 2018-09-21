@@ -19,12 +19,12 @@ package org.xipki.ocsp.qa.shell;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -214,8 +214,8 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
         HashAlgo.getNonNullInstance(requestOptions.getHashAlgorithmId()),
         Certificate.getInstance(issuerCert.getEncoded()));
 
-    OutputStream resultOut = new FileOutputStream(new File(outDir, "overview.txt"));
-    BufferedReader snReader = new BufferedReader(new FileReader(snFile));
+    OutputStream resultOut = Files.newOutputStream(Paths.get(outDir.getPath(), "overview.txt"));
+    BufferedReader snReader = Files.newBufferedReader(Paths.get(snFile));
 
     int numSucc = 0;
     int numFail = 0;

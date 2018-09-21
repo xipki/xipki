@@ -125,7 +125,7 @@ class P11RSAContentSigner implements XiContentSigner {
     } else {
       Long mech = hashAlgMecMap.get(hashAlgo);
       if (mech == null) {
-        throw new RuntimeException("should not reach here, unknown HashAlgo " + hashAlgo);
+        throw new IllegalStateException("should not reach here, unknown HashAlgo " + hashAlgo);
       }
       this.mechanism = mech.longValue();
       if (!slot.supportsMechanism(this.mechanism)) {

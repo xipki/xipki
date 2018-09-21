@@ -18,8 +18,11 @@
 package org.xipki.ca.dbtool.port.ocsp;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -195,11 +198,12 @@ class OcspCertstoreDbExporter extends DbPorter {
   private Exception exportCert(CertstoreType certstore, File processLogFile) {
     new File(baseDir, OcspDbEntryType.CERT.getDirName()).mkdirs();
 
-    FileOutputStream certsFileOs = null;
+    OutputStream certsFileOs = null;
 
     try {
-      certsFileOs = new FileOutputStream(
-          new File(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"), true);
+      certsFileOs = Files.newOutputStream(
+          Paths.get(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"),
+          StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       exportCert0(certstore, processLogFile, certsFileOs);
       return null;
     } catch (Exception ex) {
@@ -214,8 +218,8 @@ class OcspCertstoreDbExporter extends DbPorter {
     }
   } // method exportCert
 
-  private void exportCert0(CertstoreType certstore, File processLogFile,
-      FileOutputStream certsFileOs) throws Exception {
+  private void exportCert0(CertstoreType certstore, File processLogFile, OutputStream certsFileOs)
+      throws Exception {
     File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
     Long minId = null;
     if (processLogFile.exists()) {

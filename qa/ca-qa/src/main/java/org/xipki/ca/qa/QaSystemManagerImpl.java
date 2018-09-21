@@ -17,10 +17,11 @@
 
 package org.xipki.ca.qa;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     QaconfType qaConf;
     try {
-      FileInputStream issuerConfStream = new FileInputStream(confFile);
+      InputStream issuerConfStream = Files.newInputStream(Paths.get(confFile));
       qaConf = parseQaConf(issuerConfStream);
     } catch (IOException | JAXBException | SAXException ex) {
       final String message = "could not parse the QA configuration";

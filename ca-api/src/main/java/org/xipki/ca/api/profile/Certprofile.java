@@ -42,6 +42,9 @@ public abstract class Certprofile {
     return false;
   }
 
+  protected Certprofile() {
+  }
+
   public void shutdown() {
   }
 

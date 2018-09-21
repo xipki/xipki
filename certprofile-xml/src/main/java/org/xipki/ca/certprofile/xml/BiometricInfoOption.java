@@ -63,7 +63,7 @@ public class BiometricInfoOption {
       } else if (m.getOid() != null) {
         idTypes.add(new ASN1ObjectIdentifier(m.getOid().getValue()));
       } else {
-        throw new RuntimeException("should not reach here, invalid biometricType");
+        throw new IllegalStateException("should not reach here, invalid biometricType");
       }
     }
   }

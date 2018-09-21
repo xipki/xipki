@@ -98,7 +98,7 @@ public class CmpUtf8Pairs {
     }
   } // constructor
 
-  public void putUtf8Pair(String name, String value) {
+  public final void putUtf8Pair(String name, String value) {
     ParamUtil.requireNonNull("name", name);
     ParamUtil.requireNonNull("value", value);
 

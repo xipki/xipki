@@ -19,10 +19,11 @@ package org.xipki.ca.dbtool.diffdb;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -73,16 +74,18 @@ class DigestDiffReporter {
     dir.mkdirs();
     IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
-    this.missingWriter = new BufferedWriter(new FileWriter(new File(dir, "missing")));
-    this.unexpectedWriter = new BufferedWriter(new FileWriter(new File(dir, "unexpected")));
-    this.diffWriter = new BufferedWriter(new FileWriter(new File(dir, "diff")));
-    this.goodWriter = new BufferedWriter(new FileWriter(new File(dir, "good")));
-    this.errorWriter = new BufferedWriter(new FileWriter(new File(dir, "error")));
+    String dirPath = dir.getPath();
+
+    this.missingWriter = Files.newBufferedWriter(Paths.get(dirPath, "missing"));
+    this.unexpectedWriter = Files.newBufferedWriter(Paths.get(dirPath, "unexpected"));
+    this.diffWriter = Files.newBufferedWriter(Paths.get(dirPath, "diff"));
+    this.goodWriter = Files.newBufferedWriter(Paths.get(dirPath, "good"));
+    this.errorWriter = Files.newBufferedWriter(Paths.get(dirPath, "error"));
 
     start();
   }
 
-  public void start() {
+  public final void start() {
     startTime = new Date();
   }
 

@@ -304,16 +304,12 @@ public abstract class BaseCertprofile extends Certprofile {
         return publicKey;
       }
     } else {
-      throw new RuntimeException(String.format(
+      throw new IllegalStateException(String.format(
           "should not reach here, unknown KeyParametersOption %s", keyParamsOption));
     }
 
     throw new BadCertTemplateException("the given publicKey is not permitted");
   } // method checkPublicKey
-
-  @Override
-  public void initialize(String data) throws CertprofileException {
-  }
 
   protected void verifySubjectDnOccurence(X500Name requestedSubject)
       throws BadCertTemplateException {

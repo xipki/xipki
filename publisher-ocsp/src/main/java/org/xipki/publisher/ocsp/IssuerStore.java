@@ -41,7 +41,7 @@ class IssuerStore {
     }
   }
 
-  void addIdentityEntry(IssuerEntry entry) {
+  final void addIdentityEntry(IssuerEntry entry) {
     ParamUtil.requireNonNull("entry", entry);
     for (IssuerEntry existingEntry : entries) {
       if (existingEntry.getId() == entry.getId()) {

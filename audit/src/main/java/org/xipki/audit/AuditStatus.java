@@ -31,9 +31,12 @@ public enum AuditStatus {
   FAILED,
   UNDEFINED;
 
-  public static AuditStatus forName(String name) {
+  private AuditStatus() {
+  }
+
+  public static AuditStatus forName(final String name) {
     Objects.requireNonNull(name, "name must not be null");
-    for (AuditStatus v : values()) {
+    for (final AuditStatus v : values()) {
       if (v.name().equals(name)) {
         return v;
       }

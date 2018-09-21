@@ -186,7 +186,7 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
       } else if (entry.getDsaKey() != null) {
         keyEntry = new KeyEntry.DSAKeyEntry(entry.getDsaKey().getPLength());
       } else {
-        throw new RuntimeException("should not reach here, unknown child of KeyEntry");
+        throw new IllegalStateException("should not reach here, unknown child of KeyEntry");
       }
 
       String randomDnStr = entry.getRandomDn();

@@ -136,7 +136,7 @@ public class PKCS11SignerFactory implements SignerFactory {
       } else if (slotIndex != null) {
         p11SlotId = module.getSlotIdForIndex(slotIndex);
       } else {
-        throw new RuntimeException("should not reach here");
+        throw new IllegalStateException("should not reach here");
       }
       slot = module.getSlot(p11SlotId);
     } catch (P11TokenException | XiSecurityException ex) {

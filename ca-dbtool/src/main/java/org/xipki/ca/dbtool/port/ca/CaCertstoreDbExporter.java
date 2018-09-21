@@ -18,9 +18,12 @@
 package org.xipki.ca.dbtool.port.ca;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
 import java.sql.PreparedStatement;
@@ -200,9 +203,10 @@ class CaCertstoreDbExporter extends DbPorter {
     File dir = new File(baseDir, type.getDirName());
     dir.mkdirs();
 
-    FileOutputStream entriesFileOs = null;
+    OutputStream entriesFileOs = null;
     try {
-      entriesFileOs = new FileOutputStream(new File(baseDir, type.getDirName() + ".mf"), true);
+      entriesFileOs = Files.newOutputStream(Paths.get(baseDir, type.getDirName() + ".mf"),
+          StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       exportEntries(type, certstore, processLogFile, entriesFileOs, idProcessedInLastProcess);
       return null;
     } catch (Exception ex) {
@@ -221,7 +225,7 @@ class CaCertstoreDbExporter extends DbPorter {
   }
 
   private void exportEntries(CaDbEntryType type, CertstoreType certstore, File processLogFile,
-      FileOutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
+      OutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
     // CHECKSTYLE:SKIP
     int numEntriesPerSelect = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
     int numEntriesPerZip = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
@@ -250,7 +254,7 @@ class CaCertstoreDbExporter extends DbPorter {
         coreSql = "ID,RID,CID FROM REQCERT WHERE ID>=?";
         break;
       default:
-        throw new RuntimeException("unknown CaDbEntryType " + type);
+        throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
 
     Long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1
@@ -376,6 +380,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
             ((CertsWriter) entriesInCurrentFile).add(cert);
           } else if (CaDbEntryType.CRL == type) {
+            System.out.println(rs.getString("CRL"));
             byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
 
             X509CRL x509Crl = null;
@@ -440,7 +445,7 @@ class CaCertstoreDbExporter extends DbPorter {
             entry.setRid(rs.getLong("RID"));
             ((RequestCertsWriter) entriesInCurrentFile).add(entry);
           } else {
-            throw new RuntimeException("unknown CaDbEntryType " + type);
+            throw new IllegalStateException("unknown CaDbEntryType " + type);
           }
 
           numEntriesInCurrentFile++;
@@ -608,7 +613,7 @@ class CaCertstoreDbExporter extends DbPorter {
       case REQCERT:
         return new RequestCertsWriter();
       default:
-        throw new RuntimeException("unknown CaDbEntryType " + type);
+        throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
   }
 
@@ -627,7 +632,7 @@ class CaCertstoreDbExporter extends DbPorter {
         certstore.setCountReqCerts(num);
         break;
       default:
-        throw new RuntimeException("unknown CaDbEntryType " + type);
+        throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
   }
 }

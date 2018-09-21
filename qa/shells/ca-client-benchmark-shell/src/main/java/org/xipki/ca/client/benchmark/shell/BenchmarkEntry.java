@@ -91,7 +91,7 @@ public class BenchmarkEntry {
           this.subjectRdnForIncrement = ObjectIdentifiers.DN_CN;
           break;
         default:
-          throw new RuntimeException("should not reach here, unknown randomDn " + randomDn);
+          throw new IllegalStateException("should not reach here, unknown randomDn " + randomDn);
       }
 
       if (this.subjectRdnForIncrement != null

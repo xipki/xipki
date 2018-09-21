@@ -75,7 +75,7 @@ public class DbiXmlWriter {
     writer.writeEndElement();
   }
 
-  public void writeNewline() throws XMLStreamException {
+  public final void writeNewline() throws XMLStreamException {
     writer.writeCharacters("\n");
   }
 

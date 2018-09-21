@@ -62,7 +62,7 @@ public class X509Cert {
     try {
       this.subjectKeyIdentifer = X509Util.extractSki(cert);
     } catch (CertificateEncodingException ex) {
-      throw new RuntimeException(
+      throw new IllegalStateException(
           String.format("CertificateEncodingException: %s", ex.getMessage()));
     }
 
@@ -72,7 +72,7 @@ public class X509Cert {
       try {
         this.encodedCert = cert.getEncoded();
       } catch (CertificateEncodingException ex) {
-        throw new RuntimeException(
+        throw new IllegalStateException(
             String.format("CertificateEncodingException: %s", ex.getMessage()));
       }
     }
@@ -107,7 +107,7 @@ public class X509Cert {
       try {
         certHolder = new X509CertificateHolder(encodedCert);
       } catch (IOException ex) {
-        throw new RuntimeException("should not happen, could not decode certificate: "
+        throw new IllegalStateException("should not happen, could not decode certificate: "
             + ex.getMessage());
       }
       return certHolder;

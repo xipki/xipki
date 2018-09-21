@@ -34,30 +34,37 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<AuditService> services = new ConcurrentLinkedDeque<AuditService>();
+  private final transient ConcurrentLinkedDeque<AuditService> services =
+      new ConcurrentLinkedDeque<AuditService>();
 
-  private AuditService defaultAuditService = new Slf4jAuditService();
+  private final transient AuditService dfltAuditService = new Slf4jAuditService();
+
+  /**
+   * Constructor.
+   */
+  public AuditServiceRegisterImpl() {
+  }
 
   @Override
   public AuditService getAuditService() {
-    return services.isEmpty() ? defaultAuditService : services.getLast();
+    return services.isEmpty() ? dfltAuditService : services.getLast();
   }
 
-  public void bindService(AuditService service) {
+  public void bindService(final AuditService service) {
     //might be null if dependency is optional
     if (service == null) {
       LOG.info("bindService invoked with null.");
       return;
     }
 
-    boolean replaced = services.remove(service);
+    final boolean replaced = services.remove(service);
     services.add(service);
 
-    String action = replaced ? "replaced" : "added";
+    final String action = replaced ? "replaced" : "added";
     LOG.info("{} AuditService binding for {}", action, service);
   }
 
-  public void unbindService(AuditService service) {
+  public void unbindService(final AuditService service) {
     //might be null if dependency is optional
     if (service == null) {
       LOG.debug("unbindService invoked with null.");

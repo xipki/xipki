@@ -1757,7 +1757,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
             CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
         break;
       default:
-        throw new RuntimeException("should not reach here");
+        throw new IllegalStateException("should not reach here");
     } // switch type
 
     InfoTypeAndValue tv = null;

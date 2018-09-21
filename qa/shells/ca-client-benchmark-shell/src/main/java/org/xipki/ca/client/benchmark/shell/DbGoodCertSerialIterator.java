@@ -41,7 +41,7 @@ import org.xipki.util.ParamUtil;
 
 class DbGoodCertSerialIterator implements Iterator<BigInteger> {
 
-  private static final int numSqlEntries = 1000;
+  private static final int NUM_SQL_ENTRIES = 1000;
 
   private final String sqlNextSerials;
 
@@ -67,7 +67,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
     this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);
     this.caSerial = caCert.getSerialNumber().getPositiveValue();
 
-    this.sqlNextSerials = caDataSource.buildSelectFirstSql(numSqlEntries, "ID",
+    this.sqlNextSerials = caDataSource.buildSelectFirstSql(NUM_SQL_ENTRIES, "ID",
             "ID,SN FROM CERT WHERE REV=0 AND CA_ID=? AND ID>=?");
 
     byte[] encodedCaCert = caCert.getEncoded();
@@ -158,7 +158,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
       caDataSource.releaseResources(stmt, rs);
     }
 
-    if (idx < numSqlEntries) {
+    if (idx < NUM_SQL_ENTRIES) {
       noUnrevokedCerts = true;
     }
 

@@ -1398,7 +1398,7 @@ public class CertStore {
           sortByStr = "SUBJECT DESC";
           break;
         default:
-          throw new RuntimeException("unknown CertListOrderBy " + orderBy);
+          throw new IllegalStateException("unknown CertListOrderBy " + orderBy);
       }
     }
 

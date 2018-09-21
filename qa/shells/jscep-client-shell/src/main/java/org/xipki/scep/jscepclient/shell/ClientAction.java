@@ -18,9 +18,10 @@
 package org.xipki.scep.jscepclient.shell;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.CertStore;
@@ -96,7 +97,7 @@ public abstract class ClientAction extends XiAction {
     char[] pwd = readPasswordIfNotSet(password);
 
     KeyStore ks = KeyUtil.getKeyStore("PKCS12");
-    ks.load(new FileInputStream(p12File), pwd);
+    ks.load(Files.newInputStream(Paths.get(p12File)), pwd);
 
     String keyname = null;
     Enumeration<String> aliases = ks.aliases();

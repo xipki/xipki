@@ -439,7 +439,7 @@ public class CrlControl {
     return invalidityDateMode;
   }
 
-  public void validate() throws InvalidConfException {
+  public final void validate() throws InvalidConfException {
     if (onlyContainsCaCerts && onlyContainsUserCerts) {
       throw new InvalidConfException(
           "onlyContainsCACerts and onlyContainsUserCerts can not be both true");

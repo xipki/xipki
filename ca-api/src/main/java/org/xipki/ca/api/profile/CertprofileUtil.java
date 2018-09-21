@@ -126,7 +126,7 @@ public class CertprofileUtil {
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
         return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
       default:
-        throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
+        throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch (tag)
   } // method createGeneralName
 

@@ -23,7 +23,6 @@ import java.security.cert.X509Certificate;
 import org.xipki.ca.api.NameId;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
-
 import org.xipki.util.ParamUtil;
 
 /**

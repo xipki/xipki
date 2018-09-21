@@ -660,7 +660,8 @@ public class XmlCertprofile extends BaseCertprofile {
       } else if (target.getRegisteredID() != null) {
         nameTag = GeneralNameTag.registeredID;
       } else {
-        throw new RuntimeException("should not reach here, unknown SubjectToSubjectAltName target");
+        throw new IllegalStateException(
+            "should not reach here, unknown SubjectToSubjectAltName target");
       }
 
       subjectToSubjectAltNameModes.put(new ASN1ObjectIdentifier(m.getSource().getValue()),
@@ -1023,7 +1024,7 @@ public class XmlCertprofile extends BaseCertprofile {
           vec2.add(new DERIA5String(pl.getUrl()));
           String lang = pl.getLanguage();
           if (lang.length() != 2) {
-            throw new RuntimeException("invalid language '" + lang + "'");
+            throw new CertprofileException("invalid language '" + lang + "'");
           }
           vec2.add(new DERPrintableString(lang));
           DERSequence seq = new DERSequence(vec2);
@@ -1032,7 +1033,7 @@ public class XmlCertprofile extends BaseCertprofile {
         QCStatement qcStatement = new QCStatement(qcStatementId, new DERSequence(vec));
         qcStatementOption = new QcStatementOption(qcStatement);
       } else {
-        throw new RuntimeException("unknown value of qcStatment");
+        throw new CertprofileException("unknown value of qcStatment");
       }
 
       this.qcStatementsOption.add(qcStatementOption);
@@ -1045,7 +1046,7 @@ public class XmlCertprofile extends BaseCertprofile {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (QcStatementOption m : qcStatementsOption) {
       if (m.getStatement() == null) {
-        throw new RuntimeException("should not reach here");
+        throw new IllegalStateException("should not reach here");
       }
       vec.add(m.getStatement());
     }
@@ -1596,7 +1597,7 @@ public class XmlCertprofile extends BaseCertprofile {
         values.addExtension(type, extValue);
         occurences.remove(type);
       } else {
-        throw new RuntimeException("should not reach here");
+        throw new IllegalStateException("should not reach here");
       }
     }
 
@@ -1772,7 +1773,7 @@ public class XmlCertprofile extends BaseCertprofile {
               grantedNames.add(new GeneralName(tag.getTag(), rdnValue));
               break;
             default:
-              throw new RuntimeException(
+              throw new IllegalStateException(
                   "should not reach here, unknown GeneralName tag " + tag);
           } // end switch (tag)
         }
@@ -2020,7 +2021,7 @@ public class XmlCertprofile extends BaseCertprofile {
       }
     }
 
-    throw new RuntimeException("should not reach here: undefined extension "
+    throw new IllegalStateException("should not reach here: undefined extension "
         + ObjectIdentifiers.oidToDisplayName(type));
   } // method getExtensionValue
 

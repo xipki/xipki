@@ -18,8 +18,9 @@
 package org.xipki.ca.dbtool.port;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
   public DbPortFileNameIterator(String filename) throws IOException {
     ParamUtil.requireNonNull("filename", filename);
 
-    this.reader = new BufferedReader(new FileReader(filename));
+    this.reader = Files.newBufferedReader(Paths.get(filename));
     this.nextFilename = readNextFilenameLine();
   }
 
@@ -61,7 +62,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
     try {
       nextFilename = readNextFilenameLine();
     } catch (IOException ex) {
-      throw new RuntimeException("could not read next file name");
+      throw new IllegalStateException("could not read next file name");
     }
     return str;
   }

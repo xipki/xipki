@@ -20,11 +20,11 @@ package org.xipki.security.pkcs11.emulator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -472,7 +472,7 @@ class EmulatorP11Slot extends P11Slot {
 
   private Properties loadProperties(File file) throws P11TokenException {
     try {
-      try (InputStream stream = new FileInputStream(file)) {
+      try (InputStream stream = Files.newInputStream(file.toPath())) {
         Properties props = new Properties();
         props.load(stream);
         return props;

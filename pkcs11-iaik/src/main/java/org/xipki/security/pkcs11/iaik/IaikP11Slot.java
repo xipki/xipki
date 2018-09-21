@@ -287,7 +287,7 @@ class IaikP11Slot extends P11Slot {
   } // method refresh
 
   @Override
-  public void close() {
+  public final void close() {
     if (slot != null) {
       try {
         LOG.info("close all sessions on token: {}", slot.getSlotID());

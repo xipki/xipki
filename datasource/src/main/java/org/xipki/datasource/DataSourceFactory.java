@@ -17,9 +17,10 @@
 
 package org.xipki.datasource;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -44,7 +45,7 @@ public class DataSourceFactory {
   public DataSourceWrapper createDataSourceForFile(String name, String confFile,
       PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
     ParamUtil.requireNonNull("confFile", confFile);
-    FileInputStream fileIn = new FileInputStream(IoUtil.expandFilepath(confFile));
+    InputStream fileIn = Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile)));
     return createDataSource(name, fileIn, passwordResolver);
   }
 

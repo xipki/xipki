@@ -157,7 +157,7 @@ public abstract class BenchmarkExecutor {
         this.duration = num * 1440; // 1440 = 60 * 24
         break;
       default:
-        throw new RuntimeException("invalid duration unit " + unit);
+        throw new IllegalStateException("invalid duration unit " + unit);
     }
   }
 

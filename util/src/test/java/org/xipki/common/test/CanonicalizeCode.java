@@ -20,11 +20,11 @@ package org.xipki.common.test;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -59,7 +59,7 @@ public class CanonicalizeCode {
 
   static {
     try {
-      BufferedReader reader = new BufferedReader(new FileReader("src/test/resources/HEADER.txt"));
+      BufferedReader reader = Files.newBufferedReader(Paths.get("src/test/resources/HEADER.txt"));
       String line;
       while ((line = reader.readLine()) != null) {
         headerLines.add(line.getBytes("utf-8"));
@@ -135,7 +135,7 @@ public class CanonicalizeCode {
   private void canonicalizeFile(File file) throws Exception {
     byte[] newLine = detectNewline(file);
 
-    BufferedReader reader = new BufferedReader(new FileReader(file));
+    BufferedReader reader = Files.newBufferedReader(file.toPath());
 
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
 
@@ -201,7 +201,7 @@ public class CanonicalizeCode {
 
   private void canonicalizeTextFile(File file) throws Exception {
     byte[] newLine = new byte[]{'\n'};
-    BufferedReader reader = new BufferedReader(new FileReader(file));
+    BufferedReader reader = Files.newBufferedReader(file.toPath());
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
 
     try {
@@ -268,7 +268,7 @@ public class CanonicalizeCode {
       return;
     }
 
-    BufferedReader reader = new BufferedReader(new FileReader(file));
+    BufferedReader reader = Files.newBufferedReader(file.toPath());
 
     boolean authorsLineAvailable = false;
     boolean thirdparty = false;
@@ -365,7 +365,7 @@ public class CanonicalizeCode {
   } // method removeTrailingSpaces
 
   private static byte[] detectNewline(File file) throws IOException {
-    InputStream is = new FileInputStream(file);
+    InputStream is = Files.newInputStream(file.toPath());
     byte[] bytes = new byte[200];
     int size;
     try {

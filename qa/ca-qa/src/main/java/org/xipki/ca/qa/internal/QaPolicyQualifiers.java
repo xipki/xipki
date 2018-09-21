@@ -52,7 +52,7 @@ public class QaPolicyQualifiers {
       } else if ("userNotice".equals(localPart)) {
         info = new QaUserNoticePolicyQualifierInfo(value);
       } else {
-        throw new RuntimeException(
+        throw new IllegalStateException(
             "should not reach here, unknown child of PolicyQualifiers " + localPart);
       }
       list.add(info);

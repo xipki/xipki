@@ -17,8 +17,9 @@
 
 package org.xipki.ca.dbtool.port.ocsp;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class OcspDbImportWorker extends DbPortWorker {
     ParamUtil.requireNonNull("dbConfFile", dbConfFile);
 
     Properties props = DbPorter.getDbConfProperties(
-        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+        Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
         passwordResolver);
     this.resume = resume;

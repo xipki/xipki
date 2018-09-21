@@ -18,9 +18,10 @@
 package org.xipki.common.qa;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -52,7 +53,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger> {
     this.fileName = ParamUtil.requireNonBlank("fileName", fileName);
     this.hex = hex;
     this.loop = loop;
-    this.reader = new BufferedReader(new FileReader(fileName));
+    this.reader = Files.newBufferedReader(Paths.get(fileName));
     this.currentNumber = readNextNumber();
   }
 
@@ -83,7 +84,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger> {
       line = reader.readLine();
       if (loop && line == null) {
         reader.close();
-        reader = new BufferedReader(new FileReader(fileName));
+        reader = Files.newBufferedReader(Paths.get(fileName));
         line = reader.readLine();
       }
 

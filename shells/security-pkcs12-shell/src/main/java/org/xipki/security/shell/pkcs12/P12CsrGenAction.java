@@ -17,8 +17,10 @@
 
 package org.xipki.security.shell.pkcs12;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -68,7 +70,7 @@ public class P12CsrGenAction extends CsrGenAction {
   public KeyStore getKeyStore()
       throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
     KeyStore ks;
-    try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
+    try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
       ks = KeyUtil.getKeyStore("PKCS12");
       ks.load(in, getPassword());
     }

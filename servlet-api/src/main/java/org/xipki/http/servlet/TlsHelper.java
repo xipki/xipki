@@ -52,7 +52,7 @@ public class TlsHelper {
     try {
       cf = CertificateFactory.getInstance("X509");
     } catch (Exception ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalStateException(ex);
     }
   }
 
@@ -78,7 +78,7 @@ public class TlsHelper {
         return (X509Certificate) cert;
       }
     } else if (mode != SslReverseProxyMode.APACHE) {
-      throw new RuntimeException("Should not reach here, unknown SslReverseProxyMode " + mode);
+      throw new IllegalStateException("Should not reach here, unknown SslReverseProxyMode " + mode);
     }
 
     // check whether this application is behind a reverse proxy and the TLS client certificate

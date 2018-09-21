@@ -20,12 +20,11 @@ package org.xipki.ca.server.impl;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -1808,7 +1807,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
     Properties caConfProps = new Properties();
     try {
-      caConfProps.load(new FileInputStream(IoUtil.expandFilepath(caConfFile)));
+      caConfProps.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(caConfFile))));
     } catch (IOException ex) {
       throw new IllegalArgumentException("could not parse CA configuration file " + caConfFile, ex);
     }
@@ -3311,11 +3310,11 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return ret;
   }
 
-  private static ZipOutputStream getZipOutputStream(File zipFile) throws FileNotFoundException {
+  private static ZipOutputStream getZipOutputStream(File zipFile) throws IOException {
     ParamUtil.requireNonNull("zipFile", zipFile);
 
     BufferedOutputStream out = new BufferedOutputStream(
-        new FileOutputStream(zipFile), 1048576); // 1M
+        Files.newOutputStream(zipFile.toPath()), 1048576); // 1M
     ZipOutputStream zipOutStream = new ZipOutputStream(out);
     zipOutStream.setLevel(Deflater.BEST_SPEED);
     return zipOutStream;

@@ -62,7 +62,7 @@ public class XiWrappedContentSigner implements XiContentSigner {
     try {
       return signer.getAlgorithmIdentifier().getEncoded();
     } catch (IOException ex) {
-      throw new RuntimeException("error encoding AlgorithmIdentifier", ex);
+      throw new IllegalStateException("error encoding AlgorithmIdentifier", ex);
     }
   }
 

@@ -56,7 +56,7 @@ public class AuditEvent {
   /**
    * Duration in milliseconds.
    */
-  private long duration = -1;
+  private long duration;
 
   /**
    * The data array belonging to the event.
@@ -66,6 +66,7 @@ public class AuditEvent {
   public AuditEvent(Date timestamp) {
     this.timestamp = (timestamp == null) ? new Date() : timestamp;
     this.level = AuditLevel.INFO;
+    this.duration = -1;
   }
 
   public AuditLevel getLevel() {
@@ -114,37 +115,33 @@ public class AuditEvent {
 
     int idx = -1;
     for (int i = 0; i < eventDatas.size(); i++) {
-      AuditEventData ed = eventDatas.get(i);
+      final AuditEventData ed = eventDatas.get(i);
       if (ed.getName().equals(eventData.getName())) {
         idx = i;
         break;
       }
     }
 
-    if (idx != -1) {
-      AuditEventData existing = eventDatas.get(idx);
-      existing.addValue(eventData.getValue());
-      return existing;
-    } else {
+    if (idx == -1) {
       eventDatas.add(eventData);
       return eventData;
+    } else {
+      final AuditEventData existing = eventDatas.get(idx);
+      existing.addValue(eventData.getValue());
+      return existing;
     }
   }
 
   public boolean removeEventData(String eventDataName) {
     Objects.requireNonNull(eventDataName, "eventDataName must not be null");
 
-    AuditEventData tbr = null;
-    for (AuditEventData ed : eventDatas) {
-      if (ed.getName().equals(eventDataName)) {
-        tbr = ed;
-      }
-    }
-
     boolean removed = false;
-    if (tbr != null) {
-      eventDatas.remove(tbr);
-      removed = true;
+    for (final AuditEventData ed : eventDatas) {
+      if (ed.getName().equals(eventDataName)) {
+        eventDatas.remove(ed);
+        removed = true;
+        break;
+      }
     }
 
     return removed;

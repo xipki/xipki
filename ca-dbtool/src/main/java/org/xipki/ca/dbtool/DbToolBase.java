@@ -19,11 +19,10 @@ package org.xipki.ca.dbtool;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -289,9 +288,9 @@ public class DbToolBase {
     return sb.toString();
   } // method buildFilename
 
-  public static ZipOutputStream getZipOutputStream(File zipFile) throws FileNotFoundException {
+  public static ZipOutputStream getZipOutputStream(File zipFile) throws IOException {
     BufferedOutputStream out = new BufferedOutputStream(
-        new FileOutputStream(zipFile), STREAM_BUFFER_SIZE);
+        Files.newOutputStream(zipFile.toPath()), STREAM_BUFFER_SIZE);
     ZipOutputStream zipOutStream = new ZipOutputStream(out);
     zipOutStream.setLevel(Deflater.BEST_SPEED);
     return zipOutStream;

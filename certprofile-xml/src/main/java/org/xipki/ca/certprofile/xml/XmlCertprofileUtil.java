@@ -268,7 +268,8 @@ public class XmlCertprofileUtil {
     } else if (type.getUri() != null) {
       base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
     } else {
-      throw new RuntimeException("should not reach here, unknown child of GeneralSubtreeBaseType");
+      throw new IllegalStateException(
+          "should not reach here, unknown child of GeneralSubtreeBaseType");
     }
 
     Integer min = type.getMinimum();
@@ -474,7 +475,7 @@ public class XmlCertprofileUtil {
           controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
           break;
         default:
-          throw new RuntimeException(
+          throw new IllegalStateException(
             "should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
       }
     }
@@ -715,7 +716,7 @@ public class XmlCertprofileUtil {
       case UTF_8_STRING:
         return DirectoryStringType.utf8String;
       default:
-        throw new RuntimeException(
+        throw new IllegalStateException(
             "should not reach here, undefined DirectoryStringType " + jaxbType);
     }
   }
@@ -738,7 +739,7 @@ public class XmlCertprofileUtil {
       case IA_5_STRING:
         return StringType.ia5String;
       default:
-        throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
+        throw new IllegalStateException("should not reach here, undefined StringType " + jaxbType);
     }
   }
 

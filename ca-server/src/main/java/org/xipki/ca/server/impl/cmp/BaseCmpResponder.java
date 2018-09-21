@@ -265,7 +265,8 @@ abstract class BaseCmpResponder implements CmpResponder {
             errorStatus = "request is protected by MAC but the algorithm is forbidden";
             break;
           default:
-            throw new RuntimeException("should not reach here, unknown ProtectionResult " + pr);
+            throw new IllegalStateException(
+                "should not reach here, unknown ProtectionResult " + pr);
         } // end switch
         requestor = (CmpRequestorInfo) verificationResult.getRequestor();
       } catch (Exception ex) {

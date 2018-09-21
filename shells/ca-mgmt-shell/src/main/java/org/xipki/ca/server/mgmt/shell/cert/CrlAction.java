@@ -22,7 +22,6 @@ import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaEntry;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -45,10 +44,6 @@ public abstract class CrlAction extends CaAction {
   @Completion(DerPemCompleter.class)
   protected String outform = "der";
 
-  @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
-  @Completion(FileCompleter.class)
-  protected String outFile;
-
   protected abstract X509CRL retrieveCrl() throws Exception;
 
   @Override
@@ -69,11 +64,14 @@ public abstract class CrlAction extends CaAction {
       throw new CmdFailure("received no CRL from server");
     }
 
+    String outFile = getOutFile();
     if (outFile != null) {
       saveVerbose("saved CRL to file", new File(outFile),
           derPemEncodeCrl(crl.getEncoded(), outform));
     }
     return null;
   }
+
+  protected abstract String getOutFile();
 
 }

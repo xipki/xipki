@@ -360,7 +360,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
           engineParams = AlgorithmParameters.getInstance("PSS", "BC");
           engineParams.init(paramSpec);
         } catch (Exception ex) {
-          throw new RuntimeException(ex.getMessage(), ex);
+          throw new IllegalStateException(ex.getMessage(), ex);
         }
       }
     }

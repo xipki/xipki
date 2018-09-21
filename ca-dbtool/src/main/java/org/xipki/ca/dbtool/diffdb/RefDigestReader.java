@@ -328,7 +328,7 @@ class RefDigestReader {
       endReached.set(true);
       return null;
     } else if (!(next instanceof DigestEntrySet)) {
-      throw new RuntimeException("unknown QueueEntry type: " + next.getClass().getName());
+      throw new IllegalStateException("unknown QueueEntry type: " + next.getClass().getName());
     }
 
     certSet = (DigestEntrySet) next;

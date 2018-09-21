@@ -18,9 +18,10 @@
 package org.xipki.http.server;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -236,7 +237,8 @@ public final class HttpServers {
         availableCiphersuits = new ArrayList<>(OpenSsl.availableJavaCipherSuites());
         break;
       default:
-        throw new RuntimeException("should not reach here, unknown SssProvider " + sslProvider);
+        throw new IllegalStateException(
+            "should not reach here, unknown SssProvider " + sslProvider);
     }
 
     LOG.debug("available SSL protocols {}", availableProtocols);
@@ -388,7 +390,7 @@ public final class HttpServers {
     if (store.getValue() != null) {
       stream = new ByteArrayInputStream(store.getValue());
     } else {
-      stream = new FileInputStream(store.getFile());
+      stream = Files.newInputStream(Paths.get(store.getFile()));
     }
 
     KeyStore keystore = KeyStore.getInstance(storeType);

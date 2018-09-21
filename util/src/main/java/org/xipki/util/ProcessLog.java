@@ -145,7 +145,7 @@ public class ProcessLog {
     return total;
   }
 
-  public void reset() {
+  public final void reset() {
     startTimeMs = System.currentTimeMillis();
     numProcessed = new AtomicLong(0);
     lastPrintTimeMs = new AtomicLong(0);

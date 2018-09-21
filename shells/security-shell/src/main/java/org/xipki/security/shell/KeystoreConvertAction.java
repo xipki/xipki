@@ -19,7 +19,8 @@ package org.xipki.security.shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -102,7 +103,7 @@ public class KeystoreConvertAction extends SecurityAction {
       inPwd = readPassword("Enter the password of the source keystore");
     }
 
-    srcKs.load(new FileInputStream(inFile), inPwd);
+    srcKs.load(Files.newInputStream(Paths.get(inFile)), inPwd);
     Enumeration<String> aliases = srcKs.aliases();
     boolean containsKeyEntry = false;
     while (aliases.hasMoreElements()) {

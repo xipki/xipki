@@ -17,8 +17,9 @@
 
 package org.xipki.dbtool.shell;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -71,13 +72,13 @@ public abstract class LiquibaseAction extends XiAction {
 
   protected LiquibaseDatabaseConf getDatabaseConf() throws IOException, PasswordResolverException {
     Properties props = new Properties();
-    props.load(new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
     return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
   }
 
   protected static Properties getPropertiesFromFile(String propFile) throws IOException {
     Properties props = new Properties();
-    props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
+    props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(propFile))));
     return props;
   }
 

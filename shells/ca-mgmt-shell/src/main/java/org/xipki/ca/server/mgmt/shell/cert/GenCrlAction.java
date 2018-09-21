@@ -20,7 +20,10 @@ package org.xipki.ca.server.mgmt.shell.cert;
 import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 
 /**
  * TODO.
@@ -32,9 +35,18 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class GenCrlAction extends CrlAction {
 
+  @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
+  @Completion(FileCompleter.class)
+  protected String outFile;
+
   @Override
   protected X509CRL retrieveCrl() throws Exception {
     return caManager.generateCrlOnDemand(caName);
+  }
+
+  @Override
+  protected String getOutFile() {
+    return outFile;
   }
 
 }

@@ -19,7 +19,6 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.util.StringTokenizer;
 
-import org.xipki.ca.api.CaUris;
 import org.xipki.util.StringUtil;
 
 /**

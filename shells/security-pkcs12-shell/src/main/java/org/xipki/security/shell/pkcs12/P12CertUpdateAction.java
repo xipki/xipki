@@ -18,7 +18,9 @@
 package org.xipki.security.shell.pkcs12;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
@@ -89,7 +91,7 @@ public class P12CertUpdateAction extends P12SecurityAction {
     X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
     ks.setKeyEntry(keyname, key, pwd, certChain);
 
-    try (FileOutputStream out = new FileOutputStream(p12File)) {
+    try (OutputStream out = Files.newOutputStream(Paths.get(p12File))) {
       ks.store(out, pwd);
       println("updated certificate");
       return null;

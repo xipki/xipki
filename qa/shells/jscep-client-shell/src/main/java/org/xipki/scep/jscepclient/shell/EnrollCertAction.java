@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.CommandException;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
@@ -75,7 +76,7 @@ public class EnrollCertAction extends ClientAction {
     X509Certificate cert = extractEeCerts(resp.getCertStore());
 
     if (cert == null) {
-      throw new Exception("received no certificate");
+      throw new CommandException("received no certificate");
     }
 
     saveVerbose("saved enrolled certificate to file", new File(outputFile),

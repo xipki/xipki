@@ -18,8 +18,9 @@
 package org.xipki.ca.dbtool.diffdb;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.Set;
 
@@ -88,12 +89,12 @@ public class DigestDiffWorker extends DbPortWorker {
     }
 
     Properties props = DbPorter.getDbConfProperties(
-        new FileInputStream(IoUtil.expandFilepath(targetDbConfFile)));
+        Files.newInputStream(Paths.get(IoUtil.expandFilepath(targetDbConfFile))));
     this.targetDatasource = datasourceFactory.createDataSource(
         "ds-" + targetDbConfFile, props, passwordResolver);
 
     Properties refProps = DbPorter.getDbConfProperties(
-        new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
+        Files.newInputStream(Paths.get(IoUtil.expandFilepath(refDbConfFile))));
     this.refDatasource = datasourceFactory.createDataSource(
         "ds-" + refDbConfFile, refProps, passwordResolver);
   } // constructor

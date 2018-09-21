@@ -190,7 +190,8 @@ class CaCertstoreDbImporter extends DbPorter {
             entriesFinished = true;
             break;
           default:
-            throw new RuntimeException("unsupported CaDbEntryType " + typeProcessedInLastProcess);
+            throw new IllegalStateException(
+                "unsupported CaDbEntryType " + typeProcessedInLastProcess);
         }
       }
 
@@ -318,7 +319,7 @@ class CaCertstoreDbImporter extends DbPorter {
           sql = SQL_ADD_REQCERT;
           break;
         default:
-          throw new RuntimeException("unsupported DbEntryType " + type);
+          throw new IllegalStateException("unsupported DbEntryType " + type);
       }
 
       final long remainingTotal = total - numProcessedBefore;
@@ -609,7 +610,7 @@ class CaCertstoreDbImporter extends DbPorter {
             throw ex;
           }
         } else {
-          throw new RuntimeException("Unknown CaDbEntryType " + type);
+          throw new IllegalStateException("Unknown CaDbEntryType " + type);
         }
 
         boolean isLastBlock = !entries.hasNext();
@@ -659,7 +660,7 @@ class CaCertstoreDbImporter extends DbPorter {
       case REQCERT:
         return new RequestCertsReader(is);
       default:
-        throw new RuntimeException("unknown CaDbEntryType " + type);
+        throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
   }
 

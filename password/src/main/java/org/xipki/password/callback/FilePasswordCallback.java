@@ -18,8 +18,9 @@
 package org.xipki.password.callback;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class FilePasswordCallback implements PasswordCallback {
     String passwordHint = null;
     BufferedReader reader = null;
     try {
-      reader = new BufferedReader(new FileReader(IoUtil.expandFilepath(passwordFile)));
+      reader = Files.newBufferedReader(Paths.get(IoUtil.expandFilepath(passwordFile)));
       String line;
       while ((line = reader.readLine()) != null) {
         line = line.trim();

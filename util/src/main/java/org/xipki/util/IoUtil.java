@@ -17,10 +17,9 @@
 
 package org.xipki.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +31,8 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class IoUtil {
   }
 
   public static byte[] read(File file) throws IOException {
-    return read(new FileInputStream(expandFilepath(file)));
+    return read(Files.newInputStream(expandFilepath(file).toPath()));
   }
 
   public static byte[] read(InputStream in) throws IOException {
@@ -101,12 +102,8 @@ public class IoUtil {
       parent.mkdirs();
     }
 
-    FileOutputStream out = new FileOutputStream(tmpFile);
-    try {
-      out.write(content);
-    } finally {
-      out.close();
-    }
+    Files.copy(new ByteArrayInputStream(content), tmpFile.toPath(),
+        StandardCopyOption.REPLACE_EXISTING);
   }
 
   public static String getHostAddress() throws SocketException {
@@ -174,15 +171,6 @@ public class IoUtil {
       }
     }
     return sb.toString();
-  }
-
-  public static void writeShort(short value, byte[] dest, int destOffset) {
-    dest[destOffset++] = (byte) (value >> 8);
-    dest[destOffset] = (byte) (0xFF & value);
-  }
-
-  public static short parseShort(byte[] bytes, int offset) {
-    return (short) ((0xFF & bytes[offset++]) << 8 | 0xFF & bytes[offset]);
   }
 
   public static void writeInt(int value, byte[] dest, int destOffset) {

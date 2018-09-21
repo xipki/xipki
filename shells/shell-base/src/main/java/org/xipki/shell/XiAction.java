@@ -17,10 +17,12 @@
 
 package org.xipki.shell;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
@@ -152,12 +154,8 @@ public abstract class XiAction implements Action {
       }
     }
 
-    FileOutputStream out = new FileOutputStream(tmpFile);
-    try {
-      out.write(encoded);
-    } finally {
-      out.close();
-    }
+    Files.copy(
+        new ByteArrayInputStream(encoded), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   private static String randomHex(int numOfBytes) {

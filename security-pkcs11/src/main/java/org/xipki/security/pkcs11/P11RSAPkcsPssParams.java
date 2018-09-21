@@ -101,7 +101,7 @@ public class P11RSAPkcsPssParams implements P11Params {
         this.hashAlgorithm = PKCS11Constants.CKM_SHA3_512;
         break;
       default:
-        throw new RuntimeException("should not reach here");
+        throw new IllegalStateException("should not reach here");
     }
 
     switch (mgfHashAlgo) {
@@ -133,7 +133,7 @@ public class P11RSAPkcsPssParams implements P11Params {
         this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_512;
         break;
       default:
-        throw new RuntimeException("should not reach here");
+        throw new IllegalStateException("should not reach here");
     }
   }
 

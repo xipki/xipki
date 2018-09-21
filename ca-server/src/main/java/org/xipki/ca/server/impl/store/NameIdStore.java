@@ -47,7 +47,7 @@ class NameIdStore {
     }
   }
 
-  void addEntry(String name, Integer id) {
+  final void addEntry(String name, Integer id) {
     ParamUtil.requireNonBlank("name", name);
     ParamUtil.requireNonNull("id", id);
 

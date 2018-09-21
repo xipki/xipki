@@ -101,7 +101,7 @@ class DigestDiff {
     } else if (refDbControl == DbControl.XIPKI_CA_v4) {
       this.certhashAlgo = HashAlgo.SHA1;
     } else {
-      throw new RuntimeException("should not reach here, unknown dbContro " + refDbControl);
+      throw new IllegalStateException("should not reach here, unknown dbContro " + refDbControl);
     }
 
     // number of threads
@@ -132,7 +132,7 @@ class DigestDiff {
     } else if (refDbControl == DbControl.XIPKI_CA_v4) {
       refSql = "SELECT ID FROM CA";
     } else {
-      throw new RuntimeException("invalid refDbControl " + refDbControl);
+      throw new IllegalStateException("invalid refDbControl " + refDbControl);
     }
 
     Statement refStmt = null;

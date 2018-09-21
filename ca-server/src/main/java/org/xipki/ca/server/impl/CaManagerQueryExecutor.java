@@ -1268,7 +1268,7 @@ class CaManagerQueryExecutor {
         valText = Integer.toString(val);
       }
     } else {
-      throw new RuntimeException("should not reach here, unknown type " + column.getType());
+      throw new IllegalStateException("should not reach here, unknown type " + column.getType());
     }
 
     if (changedColumns != null) {

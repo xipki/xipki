@@ -163,7 +163,7 @@ public class ScepResponderImpl implements ScepResponder {
     setResponder(responder);
   }
 
-  public void setResponder(SignerEntryWrapper responder) throws CaMgmtException {
+  public final void setResponder(SignerEntryWrapper responder) throws CaMgmtException {
     if (responder == null) {
       this.responderKey = null;
       this.responderCert = null;

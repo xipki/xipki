@@ -137,7 +137,7 @@ public class CertValidity implements Comparable<CertValidity> {
       case MINUTE:
         return new Date(referenceDate.getTime() + MINUTE - SECOND);
       default:
-        throw new RuntimeException(String.format(
+        throw new IllegalStateException(String.format(
             "should not reach here, unknown CertValidity.Unit %s", unit));
     }
   } // method add
@@ -151,7 +151,7 @@ public class CertValidity implements Comparable<CertValidity> {
       case YEAR:
         return (365 * 24 * validity + 6 * validity) * 60;
       default:
-        throw new RuntimeException(String.format(
+        throw new IllegalStateException(String.format(
             "should not reach here, unknown CertValidity.Unit %s", unit));
     }
   }
@@ -203,7 +203,7 @@ public class CertValidity implements Comparable<CertValidity> {
       case YEAR:
         return validity + "y";
       default:
-        throw new RuntimeException(String.format(
+        throw new IllegalStateException(String.format(
             "should not reach here, unknown CertValidity.Unit %s", unit));
     }
   }

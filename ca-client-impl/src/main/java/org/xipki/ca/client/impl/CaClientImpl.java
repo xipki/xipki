@@ -18,14 +18,13 @@
 package org.xipki.ca.client.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -257,8 +256,8 @@ public final class CaClientImpl implements CaClient {
 
     CaclientType config;
     try {
-      config = parse(new FileInputStream(configFile));
-    } catch (FileNotFoundException ex) {
+      config = parse(Files.newInputStream(configFile.toPath()));
+    } catch (IOException ex) {
       throw new CaClientException("could not read file " + confFile);
     }
 

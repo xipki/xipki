@@ -18,10 +18,11 @@
 package org.xipki.ca.certprofile.test;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -251,7 +252,7 @@ public class ProfileConfCreatorDemo {
     File file = new File("tmp", filename);
     file.getParentFile().mkdirs();
     JAXBElement<X509ProfileType> root = new ObjectFactory().createX509Profile(profile);
-    FileOutputStream out = new FileOutputStream(file);
+    OutputStream out = Files.newOutputStream(file.toPath());
     try {
       marshaller.marshal(root, out);
     } catch (JAXBException ex) {
@@ -1238,7 +1239,7 @@ public class ProfileConfCreatorDemo {
     try {
       element = XmlUtil.getDocumentElment(xmlBlock.getBytes());
     } catch (IOException | SAXException ex) {
-      throw new RuntimeException(ex.getMessage(), ex);
+      throw new IllegalStateException(ex.getMessage(), ex);
     }
     ExtensionValueType extnValue = new ExtensionValueType();
     extnValue.setAny(element);
@@ -1471,7 +1472,7 @@ public class ProfileConfCreatorDemo {
     try {
       value.setValue(DERNull.INSTANCE.getEncoded());
     } catch (IOException ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalStateException(ex);
     }
     value.setDescription("DER NULL");
     statementValue.setConstant(value);
@@ -1800,7 +1801,7 @@ public class ProfileConfCreatorDemo {
     try {
       element = XmlUtil.getDocumentElment(str.getBytes());
     } catch (IOException | SAXException ex) {
-      throw new RuntimeException(ex.getMessage(), ex);
+      throw new IllegalStateException(ex.getMessage(), ex);
     }
     return new ExampleDescription(element);
   }
@@ -1858,7 +1859,7 @@ public class ProfileConfCreatorDemo {
       binary.setValue(new ASN1Integer(64).getEncoded());
       binary.setDescription("INTEGER 64");
     } catch (IOException ex) {
-      throw new RuntimeException(ex.getMessage());
+      throw new IllegalStateException(ex.getMessage());
     }
     cap.getParameters().setBase64Binary(binary);
 

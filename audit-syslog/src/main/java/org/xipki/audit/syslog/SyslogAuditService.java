@@ -20,6 +20,7 @@ package org.xipki.audit.syslog;
 import java.io.CharArrayWriter;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -111,7 +112,7 @@ public class SyslogAuditService implements AuditService {
       return;
     }
 
-    CharArrayWriter sb = new CharArrayWriter(150);
+    final CharArrayWriter sb = new CharArrayWriter(150);
     if (notEmpty(prefix)) {
       sb.append(prefix);
     }
@@ -128,12 +129,11 @@ public class SyslogAuditService implements AuditService {
       sb.append("\tduration: ").append(Long.toString(duration));
     }
 
-    List<AuditEventData> eventDataArray = event.getEventDatas();
-    for (AuditEventData m : eventDataArray) {
-      if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
-        continue;
+    final List<AuditEventData> eventDataArray = event.getEventDatas();
+    for (final AuditEventData m : eventDataArray) {
+      if (!(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))) {
+        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
       }
-      sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
     }
 
     final int n = sb.size();
@@ -143,7 +143,7 @@ public class SyslogAuditService implements AuditService {
       return;
     }
 
-    SyslogMessage sm = new SyslogMessage();
+    final SyslogMessage sm = new SyslogMessage();
     sm.setFacility(syslog.getDefaultFacility());
     if (notEmpty(localname)) {
       sm.setHostname(localname);
@@ -232,7 +232,7 @@ public class SyslogAuditService implements AuditService {
         LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
       }
 
-      UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
+      final UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
       syslog = lcSyslog;
       lcSyslog.setSyslogServerPort(port);
       lcSyslog.setSyslogServerHostname(host);
@@ -241,18 +241,16 @@ public class SyslogAuditService implements AuditService {
     // syslog.setDefaultMessageHostname(host);
     syslog.setMessageFormat(msgFormat);
 
-    Facility sysFacility = null;
-    if (notEmpty(facility)) {
-      sysFacility = Facility.fromLabel(facility.toUpperCase());
-    }
+    Facility sysFacility = notEmpty(facility)
+        ? Facility.fromLabel(facility.toUpperCase(Locale.ENGLISH)) : null;
 
     if (sysFacility == null) {
       LOG.warn("unknown facility, use the default one '{}'", DFLT_SYSLOG_FACILITY);
-      sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase());
+      sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase(Locale.ENGLISH));
     }
 
     if (sysFacility == null) {
-      throw new RuntimeException("should not reach here, sysFacility is null");
+      throw new IllegalStateException("should not reach here, sysFacility is null");
     }
 
     syslog.setDefaultFacility(sysFacility);
@@ -322,18 +320,24 @@ public class SyslogAuditService implements AuditService {
       return Severity.INFORMATIONAL;
     }
 
+    Severity res;
     switch (auditLevel) {
       case DEBUG:
-        return Severity.DEBUG;
+        res = Severity.DEBUG;
+        break;
       case INFO:
-        return Severity.INFORMATIONAL;
+        res = Severity.INFORMATIONAL;
+        break;
       case WARN:
-        return Severity.WARNING;
+        res = Severity.WARNING;
+        break;
       case ERROR:
-        return Severity.ERROR;
+        res = Severity.ERROR;
+        break;
       default:
-        throw new RuntimeException(String.format("unknown auditLevel '%s'", auditLevel));
+        throw new IllegalArgumentException(String.format("unknown auditLevel '%s'", auditLevel));
     }
+    return res;
   }
 
 }

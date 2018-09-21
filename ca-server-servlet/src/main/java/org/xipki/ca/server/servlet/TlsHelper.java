@@ -106,7 +106,7 @@ public class TlsHelper {
       clientCerts.put(pemClientCert, clientCert);
       return clientCert;
     } else {
-      throw new RuntimeException("unknown reverseProxyMode " + reverseProxyMode);
+      throw new IllegalStateException("unknown reverseProxyMode " + reverseProxyMode);
     }
 
   }

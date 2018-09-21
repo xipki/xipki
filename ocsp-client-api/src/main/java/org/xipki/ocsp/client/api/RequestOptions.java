@@ -162,7 +162,7 @@ public class RequestOptions {
         || "SHA384WITHRSAANDMGF1".equals(algoName) || "SHA512WITHRSAANDMGF1".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
     } else {
-      throw new RuntimeException("Unsupported algorithm " + algoName); // should not happen
+      throw new IllegalStateException("Unsupported algorithm " + algoName); // should not happen
     }
 
     ASN1Encodable params;
@@ -199,7 +199,7 @@ public class RequestOptions {
     } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOid)) {
       saltSize = 64;
     } else {
-      throw new RuntimeException("unknown digest algorithm " + digestAlgOid);
+      throw new IllegalStateException("unknown digest algorithm " + digestAlgOid);
     }
 
     AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);

@@ -1072,7 +1072,7 @@ abstract class ClientCmpAgent {
         exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
         break;
       default:
-        throw new RuntimeException("unknown EnrollCertRequest.Type " + req.getType());
+        throw new IllegalStateException("unknown EnrollCertRequest.Type " + req.getType());
     }
 
     return requestCertificate0(request, reqIdIdMap, exptectedBodyType, debug);
@@ -1379,7 +1379,7 @@ abstract class ClientCmpAgent {
         bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
         break;
       default:
-        throw new RuntimeException("Unknown EnrollCertRequest.Type " + req.getType());
+        throw new IllegalStateException("Unknown EnrollCertRequest.Type " + req.getType());
     }
 
     PKIBody body = new PKIBody(bodyType, new CertReqMessages(certReqMsgs));
@@ -1472,7 +1472,7 @@ abstract class ClientCmpAgent {
     try {
       return dbf.newDocumentBuilder();
     } catch (ParserConfigurationException ex) {
-      throw new RuntimeException("could not create XML document builder", ex);
+      throw new IllegalStateException("could not create XML document builder", ex);
     }
   }
 

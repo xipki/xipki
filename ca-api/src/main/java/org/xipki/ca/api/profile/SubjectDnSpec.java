@@ -18,11 +18,11 @@
 package org.xipki.ca.api.profile;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -100,9 +100,9 @@ public class SubjectDnSpec {
   private static final Map<ASN1ObjectIdentifier, Set<StringType>> STRING_TYPE_SET =
       new HashMap<>();
 
-  private static final List<ASN1ObjectIdentifier> forwardDNs;
+  private static final List<ASN1ObjectIdentifier> FORWARD_DNS;
 
-  private static final Set<String> countryAreaCodes = new HashSet<>();
+  private static final Set<String> COUNTRY_AREA_CODES = new HashSet<>();
 
   static {
     // ----- RDN order -----
@@ -130,11 +130,11 @@ public class SubjectDnSpec {
       }
     }
 
-    forwardDNs = Collections.unmodifiableList(tmpForwardDNs);
+    FORWARD_DNS = Collections.unmodifiableList(tmpForwardDNs);
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder(500);
       sb.append("forward RDNs: ");
-      for (ASN1ObjectIdentifier oid : forwardDNs) {
+      for (ASN1ObjectIdentifier oid : FORWARD_DNS) {
         String desc = ObjectIdentifiers.getName(oid);
         if (desc == null) {
           sb.append(oid.getId());
@@ -142,7 +142,7 @@ public class SubjectDnSpec {
           sb.append(desc).append(" (").append(oid.getId()).append("), ");
         }
       }
-      if (!forwardDNs.isEmpty()) {
+      if (!FORWARD_DNS.isEmpty()) {
         sb.delete(sb.length() - 2, sb.length());
       }
       LOG.info(sb.toString());
@@ -177,11 +177,11 @@ public class SubjectDnSpec {
         // skip the name
         st.nextToken();
         String areaCode = st.nextToken().trim();
-        countryAreaCodes.add(areaCode.toUpperCase());
+        COUNTRY_AREA_CODES.add(areaCode.toUpperCase());
       }
 
       if (LOG.isInfoEnabled()) {
-        List<String> list = new ArrayList<>(countryAreaCodes);
+        List<String> list = new ArrayList<>(COUNTRY_AREA_CODES);
         Collections.sort(list);
         LOG.info("area/country codes: {}", list);
       }
@@ -535,12 +535,12 @@ public class SubjectDnSpec {
   } // method fixRdnControl
 
   public static List<ASN1ObjectIdentifier> getForwardDNs() {
-    return forwardDNs;
+    return FORWARD_DNS;
   }
 
   public static boolean isValidCountryAreaCode(String code) {
     ParamUtil.requireNonBlank("code", code);
-    return countryAreaCodes.isEmpty() ? true : countryAreaCodes.contains(code.toUpperCase());
+    return COUNTRY_AREA_CODES.isEmpty() ? true : COUNTRY_AREA_CODES.contains(code.toUpperCase());
   }
 
   private static BufferedReader getReader(String propKey, String fallbackResource) {
@@ -548,14 +548,15 @@ public class SubjectDnSpec {
     if (StringUtil.isNotBlank(confFile)) {
       LOG.info("read from file " + confFile);
       try {
-        return new BufferedReader(new FileReader(confFile));
-      } catch (FileNotFoundException ex) {
-        throw new RuntimeException("could not access non-existing file " + confFile);
+        return Files.newBufferedReader(Paths.get(confFile));
+      } catch (IOException ex) {
+        throw new IllegalStateException("could not access non-existing file " + confFile);
       }
     } else {
       InputStream confStream = SubjectDnSpec.class.getResourceAsStream(fallbackResource);
       if (confStream == null) {
-        throw new RuntimeException("could not access non-existing resource " + fallbackResource);
+        throw new IllegalStateException(
+            "could not access non-existing resource " + fallbackResource);
       }
       LOG.info("read from resource " + fallbackResource);
       return new BufferedReader(new InputStreamReader(confStream));

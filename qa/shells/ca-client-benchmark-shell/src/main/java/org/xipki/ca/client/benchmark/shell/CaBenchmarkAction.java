@@ -32,4 +32,7 @@ public abstract class CaBenchmarkAction extends XiAction {
   @Reference
   protected CaClient caClient;
 
+  protected CaBenchmarkAction() {
+  }
+
 }

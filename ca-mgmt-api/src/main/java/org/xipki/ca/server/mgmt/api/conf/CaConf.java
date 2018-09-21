@@ -18,12 +18,13 @@
 package org.xipki.ca.server.mgmt.api.conf;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -162,7 +163,7 @@ public class CaConf {
     }
   }
 
-  private void init(File confFile, SecurityFactory securityFactory)
+  private final void init(File confFile, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
     confFile = IoUtil.expandFilepath(confFile);
 
@@ -179,7 +180,7 @@ public class CaConf {
     try {
       if ("xml".equalsIgnoreCase(fileExt)) {
         LOG.info("read the configuration file {} as an XML file", confFilename);
-        caConfStream = new FileInputStream(confFile);
+        caConfStream = Files.newInputStream(confFile.toPath());
       } else if ("zip".equalsIgnoreCase(fileExt)) {
         LOG.info("read the configuration file {} as a ZIP file", confFilename);
         zipFile = new ZipFile(confFile);
@@ -192,7 +193,7 @@ public class CaConf {
         } catch (ZipException ex) {
           LOG.info("the configuration file {} is not a ZIP file, try as an XML file", confFilename);
           zipFile = null;
-          caConfStream = new FileInputStream(confFile);
+          caConfStream = Files.newInputStream(confFile.toPath());
         }
       }
 
@@ -238,7 +239,7 @@ public class CaConf {
     }
   }
 
-  private void init(CaconfType jaxb, ZipFile zipFile, SecurityFactory securityFactory)
+  private final void init(CaconfType jaxb, ZipFile zipFile, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     if (jaxb.getProperties() != null) {
       for (NameValueType m : jaxb.getProperties().getProperty()) {
@@ -586,7 +587,7 @@ public class CaConf {
         throw new IOException("could not find ZIP entry " + fileName);
       }
     } else {
-      is = new FileInputStream(resolveFilePath(fileName));
+      is = Files.newInputStream(Paths.get(resolveFilePath(fileName)));
     }
     byte[] binary = IoUtil.read(is);
 
@@ -617,7 +618,7 @@ public class CaConf {
         throw new IOException("could not find ZIP entry " + fileName);
       }
     } else {
-      is = new FileInputStream(resolveFilePath(fileName));
+      is = Files.newInputStream(Paths.get(resolveFilePath(fileName)));
     }
 
     return IoUtil.read(is);

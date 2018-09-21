@@ -20,14 +20,14 @@ package org.xipki.litecaclient;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -52,7 +52,7 @@ public class SdkUtil {
 
   public static X509Certificate parseCert(File file) throws IOException, CertificateException {
     requireNonNull("file", file);
-    FileInputStream in = new FileInputStream(file);
+    InputStream in = Files.newInputStream(file.toPath());
     try {
       return parseCert(in);
     } finally {
@@ -94,7 +94,7 @@ public class SdkUtil {
   }
 
   public static byte[] read(File file) throws IOException {
-    return read(new FileInputStream(file));
+    return read(Files.newInputStream(file.toPath()));
   }
 
   public static byte[] read(InputStream in) throws IOException {
@@ -122,12 +122,8 @@ public class SdkUtil {
       parent.mkdirs();
     }
 
-    FileOutputStream out = new FileOutputStream(file);
-    try {
-      out.write(content);
-    } finally {
-      out.close();
-    }
+    Files.copy(
+        new ByteArrayInputStream(content), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   public static HttpURLConnection openHttpConn(URL url) throws IOException {

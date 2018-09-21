@@ -18,8 +18,9 @@
 package org.xipki.ocsp.store;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -169,7 +170,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       CertRevocationInfo caRevInfo = null;
       if (revFile.exists()) {
         Properties props = new Properties();
-        FileInputStream is = new FileInputStream(revFile);
+        InputStream is = Files.newInputStream(revFile.toPath());
         try {
           props.load(is);
         } finally {

@@ -17,9 +17,10 @@
 
 package org.xipki.security.shell.pkcs11;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
 import java.util.Enumeration;
@@ -79,7 +80,7 @@ public class P11SecretKeyImportAction extends P11KeyGenAction {
     }
 
     KeyStore ks = KeyStore.getInstance("JCEKS");
-    InputStream ksStream = new FileInputStream(IoUtil.expandFilepath(keyOutFile));
+    InputStream ksStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(keyOutFile)));
     char[] pwd = getPassword();
     try {
       ks.load(ksStream, pwd);

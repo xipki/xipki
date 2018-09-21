@@ -197,7 +197,7 @@ public enum HashAlgo {
       case SM3:
         return new SM3Digest();
       default:
-        throw new RuntimeException("should not reach here, unknown HashAlgo " + name());
+        throw new IllegalStateException("should not reach here, unknown HashAlgo " + name());
     }
   }
 

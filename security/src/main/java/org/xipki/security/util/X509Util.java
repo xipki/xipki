@@ -19,10 +19,10 @@ package org.xipki.security.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.Certificate;
@@ -151,7 +151,7 @@ public class X509Util {
 
   public static X509Certificate parseCert(File file) throws IOException, CertificateException {
     ParamUtil.requireNonNull("file", file);
-    FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
+    InputStream in = Files.newInputStream(IoUtil.expandFilepath(file).toPath());
     try {
       return parseCert(in);
     } finally {
@@ -178,7 +178,7 @@ public class X509Util {
   public static org.bouncycastle.asn1.x509.Certificate parseBcCert(File file)
       throws IOException, CertificateException {
     ParamUtil.requireNonNull("file", file);
-    FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
+    InputStream in = Files.newInputStream(IoUtil.expandFilepath(file).toPath());
     try {
       return parseBcCert(in);
     } finally {
@@ -205,7 +205,7 @@ public class X509Util {
 
   public static CertificationRequest parseCsr(File file) throws IOException {
     ParamUtil.requireNonNull("file", file);
-    FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
+    InputStream in = Files.newInputStream(IoUtil.expandFilepath(file).toPath());
     try {
       return parseCsr(in);
     } finally {
@@ -313,7 +313,7 @@ public class X509Util {
   public static X509CRL parseCrl(File file)
       throws IOException, CertificateException, CRLException {
     ParamUtil.requireNonNull("file", file);
-    return parseCrl(new FileInputStream(IoUtil.expandFilepath(file)));
+    return parseCrl(Files.newInputStream(IoUtil.expandFilepath(file).toPath()));
   }
 
   public static X509CRL parseCrl(byte[] encodedCrl) throws CertificateException, CRLException {
@@ -785,7 +785,7 @@ public class X509Util {
     try {
       return new Extension(Extension.subjectAlternativeName, critical, names.getEncoded());
     } catch (IOException ex) {
-      throw new RuntimeException(ex.getMessage(), ex);
+      throw new IllegalStateException(ex.getMessage(), ex);
     }
   }
 
@@ -803,7 +803,7 @@ public class X509Util {
     try {
       return new Extension(Extension.subjectInfoAccess, critical, seq.getEncoded());
     } catch (IOException ex) {
-      throw new RuntimeException(ex.getMessage(), ex);
+      throw new IllegalStateException(ex.getMessage(), ex);
     }
   }
 
@@ -923,7 +923,7 @@ public class X509Util {
       case GeneralName.registeredID:
         return new GeneralName(tag, value);
       default:
-        throw new RuntimeException("unsupported tag " + tag);
+        throw new IllegalStateException("unsupported tag " + tag);
     } // end switch (tag)
   } // method createGeneralName
 

@@ -19,11 +19,12 @@ package org.xipki.ocsp.server.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.cert.Certificate;
@@ -280,7 +281,7 @@ public class OcspServerImpl implements OcspServer {
       throw (RuntimeException) ex;
     } catch (Throwable th) {
       LOG.error("could not start OCSP responder", th);
-      throw new RuntimeException(th);
+      throw new IllegalStateException(th);
     }
   }
 
@@ -849,7 +850,8 @@ public class OcspServerImpl implements OcspServer {
         }
         break;
       default:
-        throw new RuntimeException("unknown CertificateStatus:" + certStatusInfo.getCertStatus());
+        throw new IllegalStateException(
+            "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
     } // end switch
 
     if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
@@ -1127,7 +1129,7 @@ public class OcspServerImpl implements OcspServer {
     } else if (model == CertpathValidationModel.CHAIN) {
       // do nothing
     } else {
-      throw new RuntimeException("invalid CertpathValidationModel " + model.name());
+      throw new IllegalStateException("invalid CertpathValidationModel " + model.name());
     }
 
     for (int i = certpath.length - 1; i >= 0; i--) {
@@ -1148,13 +1150,13 @@ public class OcspServerImpl implements OcspServer {
 
   private static InputStream getInputStream(FileOrValueType conf) throws IOException {
     return (conf.getFile() != null)
-        ? new FileInputStream(IoUtil.expandFilepath(conf.getFile()))
+        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
         : new ByteArrayInputStream(conf.getValue());
   }
 
   private static InputStream getInputStream(FileOrPlainValueType conf) throws IOException {
     return (conf.getFile() != null)
-        ? new FileInputStream(IoUtil.expandFilepath(conf.getFile()))
+        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
         : new ByteArrayInputStream(conf.getValue().getBytes());
   }
 

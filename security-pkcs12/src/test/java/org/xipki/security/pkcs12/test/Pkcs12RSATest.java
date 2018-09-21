@@ -18,8 +18,9 @@
 package org.xipki.security.pkcs12.test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
@@ -71,7 +72,7 @@ public abstract class Pkcs12RSATest {
     String certFile = getCertificateFile();
     X509Certificate cert = X509Util.parseCert(new File(certFile));
 
-    InputStream ks = new FileInputStream(getPkcs12File());
+    InputStream ks = Files.newInputStream(Paths.get(getPkcs12File()));
     char[] password = getPassword().toCharArray();
     SoftTokenContentSignerBuilder builder = new SoftTokenContentSignerBuilder("PKCS12", ks,
         password, null, password, new X509Certificate[]{cert});

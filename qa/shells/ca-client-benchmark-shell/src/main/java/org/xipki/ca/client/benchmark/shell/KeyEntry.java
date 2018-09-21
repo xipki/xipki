@@ -92,7 +92,7 @@ public abstract class KeyEntry {
         + "HArzIk6vrsRyMjm5U9bKVimYaalQCmq1Uq49EYazIa31e5uDDMnbfcmMoPyi9Z"
         + "5jQAVfm+tWuvM+S118s3d/mCpoX62O3gLaHNpPpD8CHoOagGcqthk+9/wWarhR";
 
-    private static final BigInteger publicExponent = BigInteger.valueOf(65535);
+    private static final BigInteger PUBLIC_EXPONENT = BigInteger.valueOf(65535);
 
     private final SubjectPublicKeyInfo spki;
 
@@ -117,7 +117,7 @@ public abstract class KeyEntry {
         }
         BigInteger modulus = base64ToInt(modulusStr);
         this.spki = new SubjectPublicKeyInfo(keyAlgId,
-            new org.bouncycastle.asn1.pkcs.RSAPublicKey(modulus, publicExponent));
+            new org.bouncycastle.asn1.pkcs.RSAPublicKey(modulus, PUBLIC_EXPONENT));
       } else {
         KeyPairGenerator kp = KeyPairGenerator.getInstance("RSA");
         kp.initialize(keysize);

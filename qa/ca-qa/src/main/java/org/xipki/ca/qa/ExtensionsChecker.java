@@ -942,7 +942,7 @@ public class ExtensionsChecker {
       } else if (expSubtree.getUri() != null) {
         expBase = new GeneralName(GeneralName.uniformResourceIdentifier, expSubtree.getUri());
       } else {
-        throw new RuntimeException("should not reach here, unknown child of GeneralName");
+        throw new IllegalStateException("should not reach here, unknown child of GeneralName");
       }
 
       if (!isBase.equals(expBase)) {
@@ -1213,7 +1213,7 @@ public class ExtensionsChecker {
             failureMsg.append("userNotice '").append(value).append("' is absent but is required; ");
           }
         } else {
-          throw new RuntimeException("should not reach here");
+          throw new IllegalStateException("should not reach here");
         }
       }
     }
@@ -1600,7 +1600,8 @@ public class ExtensionsChecker {
               grantedNames.add(new GeneralName(tag.getTag(), rdnValue));
               break;
             default:
-              throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
+              throw new IllegalStateException(
+                  "should not reach here, unknown GeneralName tag " + tag);
           } // end switch (tag)
         }
       }
@@ -1931,7 +1932,7 @@ public class ExtensionsChecker {
         correctStringType = (asn1 instanceof DERUTF8String);
         break;
       default:
-        throw new RuntimeException("should not reach here, unknown DirectoryStringType "
+        throw new IllegalStateException("should not reach here, unknown DirectoryStringType "
             + conf.getType());
     } // end switch
 
@@ -2158,7 +2159,7 @@ public class ExtensionsChecker {
                 isExponent, expExponent);
           }
         } else {
-          throw new RuntimeException("statementInfo[" + i + "]should not reach here");
+          throw new IllegalStateException("statementInfo[" + i + "]should not reach here");
         }
       } catch (IOException ex) {
         failureMsg.append("statementInfo[").append(i).append("] has incorrect syntax; ");
@@ -2350,7 +2351,7 @@ public class ExtensionsChecker {
       }
     }
 
-    throw new RuntimeException("should not reach here: undefined extension "
+    throw new IllegalStateException("should not reach here: undefined extension "
         + ObjectIdentifiers.oidToDisplayName(type));
   } // method getExtensionValue
 
@@ -2503,7 +2504,7 @@ public class ExtensionsChecker {
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
         return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
       default:
-        throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
+        throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch
   } // method createGeneralName
 

@@ -45,7 +45,7 @@ class CertBasedIdentityStore {
     }
   }
 
-  void addIdentityEntry(CertBasedIdentityEntry entry) {
+  final void addIdentityEntry(CertBasedIdentityEntry entry) {
     ParamUtil.requireNonNull("entry", entry);
 
     for (CertBasedIdentityEntry existingEntry : entries) {

@@ -180,7 +180,7 @@ class SqlErrorCodes {
       case UNKNOWN:
         return new SqlErrorCodes();
       default:
-        throw new RuntimeException("should not reach here, unknown database type " + dbType);
+        throw new IllegalStateException("should not reach here, unknown database type " + dbType);
     }
   }
 

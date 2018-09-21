@@ -24,4 +24,8 @@ package org.xipki.ca.qa.internal;
  */
 
 public abstract class QaExtension {
+
+  protected QaExtension() {
+  }
+
 }

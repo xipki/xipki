@@ -195,7 +195,7 @@ public class PublicKeyChecker {
       }
     } else {
       String txt = (keyParamsOption == null) ? "null" : keyParamsOption.getClass().getName();
-      throw new RuntimeException("should not reach here, unknown keyParamsOption " + txt);
+      throw new IllegalStateException("should not reach here, unknown keyParamsOption " + txt);
     }
 
     throw new BadCertTemplateException("the given publicKey is not permitted");

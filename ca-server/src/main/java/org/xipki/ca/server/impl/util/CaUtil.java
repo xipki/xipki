@@ -89,7 +89,7 @@ public class CaUtil {
     } else if (level == CertLevel.EndEntity) {
       basicConstraints = new BasicConstraints(false);
     } else {
-      throw new RuntimeException("unknown CertLevel " + level);
+      throw new IllegalStateException("unknown CertLevel " + level);
     }
     return basicConstraints;
   }

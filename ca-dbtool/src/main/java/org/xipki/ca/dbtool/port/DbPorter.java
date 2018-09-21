@@ -18,9 +18,10 @@
 package org.xipki.ca.dbtool.port;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBException;
@@ -244,9 +245,9 @@ public class DbPorter extends DbToolBase {
     ParamUtil.requireNonNull("content", content);
     ParamUtil.requireNonNull("file", file);
 
-    FileOutputStream out = null;
+    OutputStream out = null;
     try {
-      out = new FileOutputStream(file);
+      out = Files.newOutputStream(file.toPath());
       out.write(content.getBytes());
     } finally {
       if (out != null) {

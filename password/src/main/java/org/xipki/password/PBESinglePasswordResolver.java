@@ -94,7 +94,7 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
         conf = "OBF:" + conf;
       }
     } else {
-      throw new RuntimeException("unknown PasswordCallback type '" + type + "'");
+      throw new IllegalStateException("unknown PasswordCallback type '" + type + "'");
     }
 
     try {

@@ -17,8 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       return;
     }
 
-    this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), passwordResolver);
+    this.p11Conf = new P11Conf(Files.newInputStream(Paths.get(pkcs11ConfFile)), passwordResolver);
   }
 
   public void setP11ModuleFactoryRegister(P11ModuleFactoryRegister p11ModuleFactoryRegister) {
