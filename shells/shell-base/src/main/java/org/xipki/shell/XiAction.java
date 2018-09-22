@@ -65,6 +65,10 @@ public abstract class XiAction implements Action {
     return bo != null && bo.booleanValue();
   }
 
+  protected void saveVerbose(String promptPrefix, String file, byte[] encoded) throws IOException {
+    saveVerbose(promptPrefix, new File(file), encoded);
+  }
+
   protected void saveVerbose(String promptPrefix, File file, byte[] encoded) throws IOException {
     File saveTo = expandFilepath(file);
 
@@ -140,6 +144,10 @@ public abstract class XiAction implements Action {
 
     println(tmpPromptPrefix + " " + saveTo.getPath());
   } // method saveVerbose
+
+  protected void save(String file, byte[] encoded) throws IOException {
+    save(new File(file), encoded);
+  }
 
   protected void save(File file, byte[] encoded) throws IOException {
     File tmpFile = expandFilepath(file);
@@ -283,15 +291,15 @@ public abstract class XiAction implements Action {
     return new BigInteger(tmpStr, defaultHex ? 16 : 10);
   }
 
-  protected byte[] derPemEncodeCert(byte[] data, String encodeForm) {
+  protected byte[] encodeCert(byte[] data, String encodeForm) {
     return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE);
   }
 
-  protected byte[] derPemEncodeCrl(byte[] data, String encodeForm) {
+  protected byte[] encodeCrl(byte[] data, String encodeForm) {
     return derPemEncode(data, encodeForm, PemLabel.X509_CRL);
   }
 
-  protected byte[] derPemEncodeCsr(byte[] data, String encodeForm) {
+  protected byte[] encodeCsr(byte[] data, String encodeForm) {
     return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE_REQUEST);
   }
 

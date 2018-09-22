@@ -85,7 +85,7 @@ public class CertPollAction extends ClientAction {
       throw new CommandException("received no certificate");
     }
 
-    saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
+    saveVerbose("saved polled certificate to file", outputFile, cert.getEncoded());
     return null;
   }
 

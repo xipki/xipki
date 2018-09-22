@@ -130,6 +130,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
@@ -250,7 +251,7 @@ public class ProfileConfCreatorDemo {
   private static void marshall(Marshaller marshaller, X509ProfileType profile, String filename)
       throws Exception {
     File file = new File("tmp", filename);
-    file.getParentFile().mkdirs();
+    IoUtil.mkdirsParent(file.toPath());
     JAXBElement<X509ProfileType> root = new ObjectFactory().createX509Profile(profile);
     OutputStream out = Files.newOutputStream(file.toPath());
     try {

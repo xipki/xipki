@@ -104,9 +104,7 @@ public class CsrEnrollCertAction extends ClientAction {
       throw new CmdFailure("no certificate received from the server");
     }
 
-    File certFile = new File(outputFile);
-    saveVerbose("certificate saved to file", certFile,
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("certificate saved to file", outputFile, encodeCert(cert.getEncoded(), outform));
     return null;
   }
 

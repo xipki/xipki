@@ -18,7 +18,6 @@
 package org.xipki.security.shell;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
@@ -175,7 +174,7 @@ public class KeystoreConvertAction extends SecurityAction {
 
     destKs.store(bout, outPwd);
 
-    saveVerbose("converted keystore to", new File(outFile), bout.toByteArray());
+    saveVerbose("converted keystore to", outFile, bout.toByteArray());
     return null;
   }
 

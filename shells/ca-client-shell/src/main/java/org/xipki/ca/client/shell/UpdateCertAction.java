@@ -17,7 +17,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Completion;
@@ -136,9 +135,7 @@ public abstract class UpdateCertAction extends UpdateAction {
       throw new CmdFailure("no certificate received from the server");
     }
 
-    File certFile = new File(outputFile);
-    saveVerbose("saved certificate to file", certFile,
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved certificate to file", outputFile, encodeCert(cert.getEncoded(), outform));
 
     return null;
   } // method execute0

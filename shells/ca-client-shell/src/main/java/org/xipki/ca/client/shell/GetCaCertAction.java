@@ -17,7 +17,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.io.File;
 import java.security.cert.Certificate;
 import java.util.Set;
 
@@ -89,8 +88,7 @@ public class GetCaCertAction extends ClientAction {
       throw new CmdFailure("received no CA certificate");
     }
 
-    saveVerbose("saved CA certificate to file", new File(outFile),
-        derPemEncodeCert(caCert.getEncoded(), outform));
+    saveVerbose("saved CA certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
     return null;
   } // method execute0
 

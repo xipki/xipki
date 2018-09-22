@@ -118,6 +118,7 @@ public class SdkUtil {
 
   public static void save(File file, byte[] content) throws IOException {
     File parent = file.getParentFile();
+
     if (parent != null && !parent.exists()) {
       parent.mkdirs();
     }

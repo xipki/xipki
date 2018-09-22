@@ -17,8 +17,6 @@
 
 package org.xipki.security.shell;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -100,8 +98,7 @@ public class PBEEncryptAction extends SecurityAction {
     String passwordHint = PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256,
         iterationCount, masterPassword, password);
     if (outFile != null) {
-      saveVerbose("saved the encrypted password to file", new File(outFile),
-          passwordHint.getBytes());
+      saveVerbose("saved the encrypted password to file", outFile, passwordHint.getBytes());
     } else {
       println("the encrypted password is: '" + passwordHint + "'");
     }

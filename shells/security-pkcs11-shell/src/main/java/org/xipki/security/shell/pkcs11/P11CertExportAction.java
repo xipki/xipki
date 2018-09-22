@@ -17,7 +17,6 @@
 
 package org.xipki.security.shell.pkcs11;
 
-import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -68,8 +67,7 @@ public class P11CertExportAction extends P11SecurityAction {
     if (cert == null) {
       throw new CmdFailure("could not export certificate " + objIdentifier);
     }
-    saveVerbose("saved certificate to file", new File(outFile),
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
     return null;
   }
 

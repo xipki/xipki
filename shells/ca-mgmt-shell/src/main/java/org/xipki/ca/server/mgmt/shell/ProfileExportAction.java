@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -59,7 +57,7 @@ public class ProfileExportAction extends CaAction {
     if (StringUtil.isBlank(entry.getConf())) {
       println("cert profile does not have conf");
     } else {
-      saveVerbose("saved cert profile configuration to", new File(confFile),
+      saveVerbose("saved cert profile configuration to", confFile,
           entry.getConf().getBytes("UTF-8"));
     }
     return null;

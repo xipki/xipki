@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
@@ -71,8 +70,8 @@ public class CaGenRcaAction extends CaAddOrGenAction {
     X509Certificate rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr,
         serialNumber);
     if (rootcaCertOutFile != null) {
-      saveVerbose("saved root certificate to file", new File(rootcaCertOutFile),
-          derPemEncodeCert(rootcaCert.getEncoded(), outform));
+      saveVerbose("saved root certificate to file", rootcaCertOutFile,
+          encodeCert(rootcaCert.getEncoded(), outform));
     }
     println("generated root CA " + caEntry.getIdent().getName());
     return null;

@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -64,8 +62,8 @@ public class GetCertAction extends CaAction {
       return null;
     }
 
-    saveVerbose("certificate saved to file", new File(outputFile),
-        derPemEncodeCert(certInfo.getCert().getEncodedCert(), outform));
+    saveVerbose("certificate saved to file", outputFile,
+        encodeCert(certInfo.getCert().getEncodedCert(), outform));
     return null;
   }
 

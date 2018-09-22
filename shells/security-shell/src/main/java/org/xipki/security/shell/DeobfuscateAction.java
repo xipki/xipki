@@ -17,8 +17,6 @@
 
 package org.xipki.security.shell;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -70,8 +68,7 @@ public class DeobfuscateAction extends SecurityAction {
 
     String password = OBFPasswordService.deobfuscate(passwordHint);
     if (outFile != null) {
-      saveVerbose("saved the password to file", new File(outFile),
-          new String(password).getBytes());
+      saveVerbose("saved the password to file", outFile, new String(password).getBytes());
     } else {
       println("the password is: '" + new String(password) + "'");
     }

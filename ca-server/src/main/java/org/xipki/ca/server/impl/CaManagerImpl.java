@@ -2939,10 +2939,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
       throw new IOException(concat("File ", zipFilename, " exists."));
     }
 
-    File parentFile = zipFile.getParentFile();
-    if (parentFile != null && !parentFile.exists()) {
-      parentFile.mkdirs();
-    }
+    IoUtil.mkdirsParent(zipFile.toPath());
 
     CaconfType root = new CaconfType();
 

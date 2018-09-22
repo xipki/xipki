@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -61,8 +59,8 @@ public class CertStatusAction extends UnRevRmCertAction {
             ? "good" : "revoked with " + certInfo.getRevInfo()));
     println(msg);
     if (outputFile != null) {
-      saveVerbose("saved certificate to file", new File(outputFile),
-          derPemEncodeCert(certInfo.getCert().getEncodedCert(), outform));
+      saveVerbose("saved certificate to file", outputFile,
+          encodeCert(certInfo.getCert().getEncodedCert(), outform));
     }
     return null;
   }

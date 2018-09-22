@@ -17,7 +17,6 @@
 
 package org.xipki.scep.client.shell;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -66,8 +65,8 @@ public class GetCertAction extends ClientAction {
       throw new CmdFailure("received no certficate from server");
     }
 
-    saveVerbose("saved certificate to file", new File(outputFile),
-        derPemEncodeCert(certs.get(0).getEncoded(), outform));
+    saveVerbose("saved certificate to file", outputFile,
+        encodeCert(certs.get(0).getEncoded(), outform));
     return null;
   }
 

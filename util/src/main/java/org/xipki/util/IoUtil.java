@@ -32,6 +32,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -96,14 +97,17 @@ public class IoUtil {
 
   public static void save(File file, byte[] content) throws IOException {
     File tmpFile = expandFilepath(file);
-
-    File parent = tmpFile.getParentFile();
-    if (parent != null && !parent.exists()) {
-      parent.mkdirs();
-    }
+    mkdirsParent(tmpFile.toPath());
 
     Files.copy(new ByteArrayInputStream(content), tmpFile.toPath(),
         StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  public static void mkdirsParent(Path path) throws IOException {
+    Path parent = path.getParent();
+    if (parent != null) {
+      Files.createDirectories(parent);
+    }
   }
 
   public static String getHostAddress() throws SocketException {

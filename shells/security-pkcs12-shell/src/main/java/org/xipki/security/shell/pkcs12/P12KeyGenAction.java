@@ -17,7 +17,6 @@
 
 package org.xipki.security.shell.pkcs12;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 
@@ -46,8 +45,7 @@ public abstract class P12KeyGenAction extends KeyGenAction {
 
   protected void saveKey(P12KeyGenerationResult keyGenerationResult) throws IOException {
     ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
-    File p12File = new File(keyOutFile);
-    saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.keystore());
+    saveVerbose("saved PKCS#12 keystore to file", keyOutFile, keyGenerationResult.keystore());
   }
 
   protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {

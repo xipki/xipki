@@ -17,7 +17,6 @@
 
 package org.xipki.security.shell;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -356,8 +355,7 @@ public abstract class CsrGenAction extends SecurityAction {
     PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
         attributes);
 
-    File file = new File(outputFilename);
-    saveVerbose("saved CSR to file", file, derPemEncodeCsr(csr.getEncoded(), outform));
+    saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
     return null;
   } // method execute0
 

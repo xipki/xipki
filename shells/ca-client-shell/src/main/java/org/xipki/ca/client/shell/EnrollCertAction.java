@@ -17,7 +17,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Completion;
@@ -33,8 +32,8 @@ import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
-import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
+import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SignatureAlgoControl;
@@ -136,9 +135,7 @@ public abstract class EnrollCertAction extends EnrollAction {
       throw new CmdFailure("no certificate received from the server");
     }
 
-    File certFile = new File(outputFile);
-    saveVerbose("saved certificate to file", certFile,
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved certificate to file", outputFile, encodeCert(cert.getEncoded(), outform));
 
     return null;
   } // method execute0

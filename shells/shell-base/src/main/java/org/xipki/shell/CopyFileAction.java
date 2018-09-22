@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -69,10 +70,7 @@ public class CopyFileAction extends XiAction {
         }
       }
     } else {
-      File parent = destFile.getParentFile();
-      if (parent != null) {
-        parent.mkdirs();
-      }
+      IoUtil.mkdirsParent(destFile.toPath());
     }
 
     FileUtils.copyFile(sourceFile, destFile, true);

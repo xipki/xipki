@@ -91,8 +91,8 @@ public class EnrollCertAction extends ClientAction {
     }
 
     X509Certificate cert = resp.getCertificates().get(0);
-    saveVerbose("saved enrolled certificate to file", new File(outputFile),
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved enrolled certificate to file", outputFile,
+        encodeCert(cert.getEncoded(), outform));
     return null;
   }
 

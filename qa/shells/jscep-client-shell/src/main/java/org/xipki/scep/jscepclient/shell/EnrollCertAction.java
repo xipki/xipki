@@ -79,8 +79,8 @@ public class EnrollCertAction extends ClientAction {
       throw new CommandException("received no certificate");
     }
 
-    saveVerbose("saved enrolled certificate to file", new File(outputFile),
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved enrolled certificate to file", outputFile,
+        encodeCert(cert.getEncoded(), outform));
     return null;
   }
 

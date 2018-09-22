@@ -17,7 +17,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.io.File;
 import java.security.cert.X509CRL;
 import java.util.Set;
 
@@ -88,7 +87,7 @@ public abstract class CrlAction extends ClientAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outform));
+    saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
     return null;
   } // method execute0
 

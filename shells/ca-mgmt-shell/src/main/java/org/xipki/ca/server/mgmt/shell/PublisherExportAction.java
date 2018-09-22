@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -58,8 +56,7 @@ public class PublisherExportAction extends CaAction {
     if (StringUtil.isBlank(entry.getConf())) {
       println("publisher does not have conf");
     } else {
-      saveVerbose("saved publisher configuration to", new File(confFile),
-          entry.getConf().getBytes("UTF-8"));
+      saveVerbose("saved publisher configuration to", confFile, entry.getConf().getBytes("UTF-8"));
     }
     return null;
   }

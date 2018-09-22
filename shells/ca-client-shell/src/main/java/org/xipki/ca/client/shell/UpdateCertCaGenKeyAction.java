@@ -18,7 +18,6 @@
 package org.xipki.ca.client.shell;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -102,9 +101,8 @@ public class UpdateCertCaGenKeyAction extends UpdateAction {
     }
 
     if (StringUtil.isNotBlank(certOutputFile)) {
-      File certFile = new File(certOutputFile);
-      saveVerbose("saved certificate to file", certFile,
-          derPemEncodeCert(cert.getEncoded(), certOutform));
+      saveVerbose("saved certificate to file", certOutputFile,
+          encodeCert(cert.getEncoded(), certOutform));
     }
 
     PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
@@ -115,7 +113,7 @@ public class UpdateCertCaGenKeyAction extends UpdateAction {
     ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     ks.store(bout, pwd);
-    saveVerbose("saved key to file", new File(p12OutputFile), bout.toByteArray());
+    saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
 
     return null;
   } // method execute0

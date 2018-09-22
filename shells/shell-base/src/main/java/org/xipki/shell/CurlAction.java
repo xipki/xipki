@@ -17,7 +17,6 @@
 
 package org.xipki.shell;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -196,7 +195,7 @@ public class CurlAction extends XiAction {
 
       if (outFile != null) {
         String fn = (errorStream != null) ? "error-" + outFile : outFile;
-        saveVerbose("saved response to file", new File(fn), respContentBytes);
+        saveVerbose("saved response to file", fn, respContentBytes);
       } else {
         String ct = httpConn.getHeaderField("Content-Type");
         String charset = getCharset(ct);

@@ -103,7 +103,7 @@ public class ExtractCertFromCrlAction extends SecurityAction {
     zip.flush();
     zip.close();
 
-    saveVerbose("extracted " + n + " certificates to", new File(outFile), out.toByteArray());
+    saveVerbose("extracted " + n + " certificates to", outFile, out.toByteArray());
     return null;
   } // method execute0
 

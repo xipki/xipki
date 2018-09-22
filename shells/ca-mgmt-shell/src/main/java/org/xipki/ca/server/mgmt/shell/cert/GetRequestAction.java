@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -48,7 +46,7 @@ public class GetRequestAction extends UnRevRmCertAction {
       return null;
     }
 
-    saveVerbose("request saved to file", new File(outputFile), request);
+    saveVerbose("request saved to file", outputFile, request);
     return null;
   }
 

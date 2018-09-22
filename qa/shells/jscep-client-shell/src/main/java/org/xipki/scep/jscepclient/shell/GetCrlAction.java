@@ -64,8 +64,7 @@ public class GetCrlAction extends ClientAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outputFile),
-        derPemEncodeCrl(crl.getEncoded(), outform));
+    saveVerbose("saved CRL to file", outputFile, encodeCrl(crl.getEncoded(), outform));
     return null;
   }
 

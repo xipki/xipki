@@ -157,11 +157,7 @@ public class DbPorter extends DbToolBase {
     }
 
     File file = new File(baseDir, fileName);
-    File parent = file.getParentFile();
-    if (parent != null && !parent.exists()) {
-      parent.mkdirs();
-    }
-
+    IoUtil.mkdirsParent(file.toPath());
     IoUtil.save(file, content.getBytes("UTF-8"));
 
     ret.setFile(fileName);
@@ -203,11 +199,7 @@ public class DbPorter extends DbToolBase {
     }
 
     File file = new File(baseDir, fileName);
-    File parent = file.getParentFile();
-    if (parent != null && !parent.exists()) {
-      parent.mkdirs();
-    }
-
+    IoUtil.mkdirsParent(file.toPath());
     IoUtil.save(file, content);
 
     ret.setFile(fileName);

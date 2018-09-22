@@ -18,7 +18,6 @@
 package org.xipki.ca.client.shell;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -37,8 +36,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.ca.client.api.CertifiedKeyPairOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
+import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
@@ -112,9 +111,8 @@ public class EnrollCertCaGenKeyAction extends EnrollAction {
     }
 
     if (StringUtil.isNotBlank(certOutputFile)) {
-      File certFile = new File(certOutputFile);
-      saveVerbose("saved certificate to file", certFile,
-          derPemEncodeCert(cert.getEncoded(), certOutform));
+      saveVerbose("saved certificate to file", certOutputFile,
+          encodeCert(cert.getEncoded(), certOutform));
     }
 
     PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
@@ -125,7 +123,7 @@ public class EnrollCertCaGenKeyAction extends EnrollAction {
     ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     ks.store(bout, pwd);
-    saveVerbose("saved key to file", new File(p12OutputFile), bout.toByteArray());
+    saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
 
     return null;
   } // method execute0

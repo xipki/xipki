@@ -17,7 +17,6 @@
 
 package org.xipki.security.shell.pkcs12;
 
-import java.io.File;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -69,8 +68,7 @@ public class P12CertExportAction extends P12SecurityAction {
     }
 
     X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-    saveVerbose("saved certificate to file", new File(outFile),
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
 
     return null;
   }

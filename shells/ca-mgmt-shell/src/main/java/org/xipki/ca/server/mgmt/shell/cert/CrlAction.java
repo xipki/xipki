@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.io.File;
 import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Completion;
@@ -66,8 +65,7 @@ public abstract class CrlAction extends CaAction {
 
     String outFile = getOutFile();
     if (outFile != null) {
-      saveVerbose("saved CRL to file", new File(outFile),
-          derPemEncodeCrl(crl.getEncoded(), outform));
+      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
     }
     return null;
   }

@@ -17,7 +17,6 @@
 
 package org.xipki.scep.client.shell;
 
-import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -74,8 +73,7 @@ public class GetCaCertAction extends XiAction {
       throw new CmdFailure("received no CA certficate from server");
     }
 
-    saveVerbose("saved certificate to file", new File(outFile),
-        derPemEncodeCert(caCert.getEncoded(), outform));
+    saveVerbose("saved certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
     return null;
   }
 

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.security.cert.X509CRL;
 
@@ -78,7 +77,7 @@ public class GetCrlAction extends CrlAction {
       throw new CmdFailure("received no CRL from server");
     }
 
-    saveVerbose("saved CRL to file", new File(outFile), derPemEncodeCrl(crl.getEncoded(), outform));
+    saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
 
     if (withBaseCrl.booleanValue()) {
       byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
@@ -99,8 +98,7 @@ public class GetCrlAction extends CrlAction {
         if (crl == null) {
           throw new CmdFailure("received no baseCRL from server");
         } else {
-          saveVerbose("saved baseCRL to file", new File(baseCrlOut),
-              derPemEncodeCrl(crl.getEncoded(), outform));
+          saveVerbose("saved baseCRL to file", baseCrlOut, encodeCrl(crl.getEncoded(), outform));
         }
       }
     }

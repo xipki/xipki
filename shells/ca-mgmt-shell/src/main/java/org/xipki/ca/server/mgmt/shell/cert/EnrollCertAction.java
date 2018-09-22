@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -90,8 +89,7 @@ public class EnrollCertAction extends CaAction {
 
     X509Certificate cert = caManager.generateCertificate(caName, profileName, encodedCsr,
         notBefore, notAfter);
-    saveVerbose("saved certificate to file", new File(outFile),
-        derPemEncodeCert(cert.getEncoded(), outform));
+    saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
 
     return null;
   }
