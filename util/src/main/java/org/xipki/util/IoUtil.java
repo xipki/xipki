@@ -33,6 +33,7 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -48,7 +49,10 @@ import org.slf4j.LoggerFactory;
  */
 
 public class IoUtil {
+
   private static final Logger LOG = LoggerFactory.getLogger(IoUtil.class);
+
+  private static final String USER_HOME = System.getProperty("user.home");
 
   private IoUtil() {
   }
@@ -65,11 +69,15 @@ public class IoUtil {
   }
 
   public static byte[] read(String fileName) throws IOException {
-    return read(new File(expandFilepath(fileName)));
+    return Files.readAllBytes(
+        Paths.get(
+            expandFilepath(fileName)));
   }
 
   public static byte[] read(File file) throws IOException {
-    return read(Files.newInputStream(expandFilepath(file).toPath()));
+    return Files.readAllBytes(
+        Paths.get(
+            expandFilepath(file.getPath())));
   }
 
   public static byte[] read(InputStream in) throws IOException {
@@ -150,17 +158,13 @@ public class IoUtil {
 
   public static String expandFilepath(String path) {
     ParamUtil.requireNonBlank("path", path);
-    return path.startsWith("~") ? System.getProperty("user.home") + path.substring(1) : path;
+    return path.startsWith("~") ? USER_HOME + path.substring(1) : path;
   }
 
   public static File expandFilepath(File file) {
     String path = file.getPath();
     String expandedPath = expandFilepath(path);
-    if (path.equals(expandedPath)) {
-      return file;
-    } else {
-      return new File(expandedPath);
-    }
+    return path.equals(expandedPath) ? file : new File(expandedPath);
   }
 
   public static String convertSequenceName(String sequenceName) {
