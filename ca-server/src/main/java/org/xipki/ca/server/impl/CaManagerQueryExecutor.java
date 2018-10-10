@@ -20,7 +20,6 @@ package org.xipki.ca.server.impl;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -148,30 +147,16 @@ class CaManagerQueryExecutor {
   } // method generateCert
 
   private Statement createStatement() throws CaMgmtException {
-    Connection dsConnection;
     try {
-      dsConnection = datasource.getConnection();
+      return datasource.createStatement();
     } catch (DataAccessException ex) {
-      throw new CaMgmtException("could not get connection", ex);
-    }
-
-    try {
-      return datasource.createStatement(dsConnection);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException("could not create statement", ex);
+      throw new CaMgmtException(ex);
     }
   } // method createStatement
 
   private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
-    Connection dsConnection;
     try {
-      dsConnection = datasource.getConnection();
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
-
-    try {
-      return datasource.prepareStatement(dsConnection, sql);
+      return datasource.prepareStatement(sql);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }

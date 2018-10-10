@@ -72,7 +72,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
 
     byte[] encodedCaCert = caCert.getEncoded();
     String sql = "SELECT ID,CERT FROM CA";
-    Statement stmt = caDataSource.getConnection().createStatement();
+    Statement stmt = caDataSource.createStatement();
     try {
       ResultSet rs = stmt.executeQuery(sql);
       int tmpCaId = -1;
@@ -132,7 +132,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
 
     int idx = 0;
     try {
-      stmt = caDataSource.getConnection().prepareStatement(sql);
+      stmt = caDataSource.prepareStatement(sql);
       stmt.setInt(1, caId);
       stmt.setLong(2, nextStartId);
       rs = stmt.executeQuery();

@@ -297,27 +297,7 @@ public class DbToolBase {
   }
 
   public void releaseResources(Statement ps, ResultSet rs) {
-    releaseResources(datasource, ps, rs);
-  }
-
-  public static void releaseResources(DataSourceWrapper datasource, Statement ps, ResultSet rs) {
-    if (ps != null) {
-      try {
-        ps.close();
-      } catch (SQLException ex) {
-        DataAccessException dex = datasource.translate(null, ex);
-        LogUtil.warn(LOG, dex, "could not close Statement");
-      }
-    }
-
-    if (rs != null) {
-      try {
-        rs.close();
-      } catch (SQLException ex) {
-        DataAccessException dex = datasource.translate(null, ex);
-        LogUtil.warn(LOG, dex, "could not close ResultSet");
-      }
-    }
+    datasource.releaseResources(ps, rs);
   }
 
 }

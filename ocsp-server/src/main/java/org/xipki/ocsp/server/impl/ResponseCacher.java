@@ -228,7 +228,7 @@ class ResponseCacher {
       final String sql = SQL_ADD_ISSUER;
       PreparedStatement ps = null;
       try {
-        ps = prepareStatement(sql);
+        ps = datasource.prepareStatement(sql);
         int idx = 1;
         ps.setInt(idx++, id);
         ps.setString(idx++, sha1FpCert);
@@ -257,7 +257,7 @@ class ResponseCacher {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlg);
     long id = deriveId(issuerId, identBytes);
-    PreparedStatement ps = prepareStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
     ResultSet rs = null;
 
     try {
@@ -379,7 +379,7 @@ class ResponseCacher {
     final String sql = SQL_DELETE_EXPIRED_RESP;
     PreparedStatement ps = null;
     try {
-      ps = prepareStatement(sql);
+      ps = datasource.prepareStatement(sql);
       ps.setLong(1, maxThisUpdate);
       return ps.executeUpdate();
     } catch (SQLException ex) {
@@ -415,7 +415,7 @@ class ResponseCacher {
 
       Set<Integer> ids = new HashSet<>();
       try {
-        ps = prepareStatement(SQL_SELECT_ISSUER_ID);
+        ps = datasource.prepareStatement(SQL_SELECT_ISSUER_ID);
         rs = ps.executeQuery();
 
         if (master) {
@@ -451,7 +451,7 @@ class ResponseCacher {
 
         try {
           if (ps == null) {
-            ps = prepareStatement(sqlSelectIssuerCert);
+            ps = datasource.prepareStatement(sqlSelectIssuerCert);
           }
 
           ps.setInt(1, id);
@@ -492,7 +492,7 @@ class ResponseCacher {
     ResultSet rs = null;
 
     try {
-      ps = prepareStatement(SQL_SELECT_ISSUER);
+      ps = datasource.prepareStatement(SQL_SELECT_ISSUER);
       rs = ps.executeQuery();
       List<IssuerEntry> caInfos = new LinkedList<>();
 
@@ -516,7 +516,7 @@ class ResponseCacher {
         String subject = cert.getSubjectX500Principal().getName();
         if (duplicated) {
           if (deleteIssuerStmt == null) {
-            deleteIssuerStmt = prepareStatement(SQL_DELETE_ISSUER);
+            deleteIssuerStmt = datasource.prepareStatement(SQL_DELETE_ISSUER);
           }
 
           deleteIssuerStmt.setInt(1, id);
@@ -538,16 +538,6 @@ class ResponseCacher {
     }
 
     return true;
-  }
-
-  private PreparedStatement prepareStatement(String sqlQuery) throws DataAccessException {
-    Connection conn = datasource.getConnection();
-    try {
-      return datasource.prepareStatement(conn, sqlQuery);
-    } catch (DataAccessException ex) {
-      datasource.returnConnection(conn);
-      throw ex;
-    }
   }
 
   private static byte[] buildIdent(BigInteger serialNumber, AlgorithmCode sigAlg) {

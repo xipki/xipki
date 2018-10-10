@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.dbtool.DbToolBase;
 import org.xipki.ca.dbtool.diffdb.QueueEntry.DigestEntrySet;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -242,8 +241,6 @@ class RefDigestReader {
       throws Exception {
     ParamUtil.requireNonNull("datasource", datasource);
 
-    Connection conn = datasource.getConnection();
-
     Statement stmt = null;
     ResultSet rs = null;
     String sql = null;
@@ -253,7 +250,7 @@ class RefDigestReader {
     long minId;
 
     try {
-      stmt = datasource.createStatement(conn);
+      stmt = datasource.createStatement();
 
       String tblCa;
       String colCaId;
@@ -293,7 +290,7 @@ class RefDigestReader {
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
     } finally {
-      DbToolBase.releaseResources(datasource, stmt, rs);
+      datasource.releaseResources(stmt, rs);
     }
   } // method getInstance
 
@@ -351,10 +348,14 @@ class RefDigestReader {
     if (executor != null) {
       executor.shutdownNow();
     }
+
+    if (conn != null) {
+      datasource.returnConnection(conn);
+    }
   }
 
   protected void releaseResources(Statement ps, ResultSet rs) {
-    DbToolBase.releaseResources(datasource, ps, rs);
+    datasource.releaseResources(ps, rs);
   }
 
 }

@@ -308,7 +308,7 @@ public class DbCertStatusStore extends OcspStore {
       long revTime = 0;
       long invalTime = 0;
 
-      PreparedStatement ps = datasource.prepareStatement(datasource.getConnection(), sql);
+      PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
         ps.setInt(1, issuer.getId());
@@ -443,7 +443,7 @@ public class DbCertStatusStore extends OcspStore {
    *     PreparedStatement can be created within 5 seconds.
    */
   private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
-    return datasource.prepareStatement(datasource.getConnection(), sqlQuery);
+    return datasource.prepareStatement(sqlQuery);
   }
 
   @Override

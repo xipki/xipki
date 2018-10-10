@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.impl;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -42,16 +41,12 @@ public class DbSchemaInfo {
   public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
     ParamUtil.requireNonNull("datasource", datasource);
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-    Connection conn = datasource.getConnection();
-    if (conn == null) {
-      throw new DataAccessException("could not get connection");
-    }
 
     Statement stmt = null;
     ResultSet rs = null;
 
     try {
-      stmt = datasource.createStatement(conn);
+      stmt = datasource.createStatement();
       if (stmt == null) {
         throw new DataAccessException("could not create statement");
       }

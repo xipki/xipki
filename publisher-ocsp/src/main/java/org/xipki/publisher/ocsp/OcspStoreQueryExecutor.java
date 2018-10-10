@@ -20,7 +20,6 @@ package org.xipki.publisher.ocsp;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -87,17 +86,13 @@ class OcspStoreQueryExecutor {
 
     this.sqlCertRegistered = datasource.buildSelectFirstSql(1, "ID FROM CERT WHERE SN=? AND IID=?");
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-    Connection conn = datasource.getConnection();
-    if (conn == null) {
-      throw new DataAccessException("could not get connection");
-    }
 
     Map<String, String> variables = new HashMap<>();
     Statement stmt = null;
     ResultSet rs = null;
 
     try {
-      stmt = datasource.createStatement(conn);
+      stmt = datasource.createStatement();
       if (stmt == null) {
         throw new DataAccessException("could not create statement");
       }
@@ -125,7 +120,7 @@ class OcspStoreQueryExecutor {
 
   private IssuerStore initIssuerStore() throws DataAccessException {
     final String sql = "SELECT ID,SUBJECT,S1C,CERT FROM ISSUER";
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
     ResultSet rs = null;
 
     try {
@@ -189,7 +184,7 @@ class OcspStoreQueryExecutor {
     long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
     String cuttedSubject = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
 
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       // CERT
@@ -244,7 +239,7 @@ class OcspStoreQueryExecutor {
 
     final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       int idx = 1;
@@ -296,7 +291,7 @@ class OcspStoreQueryExecutor {
 
     if (publishGoodCerts) {
       final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-      PreparedStatement ps = borrowPreparedStatement(sql);
+      PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
         int idx = 1;
@@ -314,7 +309,7 @@ class OcspStoreQueryExecutor {
       }
     } else {
       final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
-      PreparedStatement ps = borrowPreparedStatement(sql);
+      PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
         ps.setInt(1, issuerId);
@@ -339,7 +334,7 @@ class OcspStoreQueryExecutor {
     }
 
     final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       ps.setInt(1, issuerId);
@@ -358,7 +353,7 @@ class OcspStoreQueryExecutor {
 
     int issuerId = getIssuerId(caCert);
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       ps.setString(1, revInfo.getEncoded());
@@ -374,7 +369,7 @@ class OcspStoreQueryExecutor {
   void unrevokeCa(X509Cert caCert) throws DataAccessException {
     int issuerId = getIssuerId(caCert);
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       ps.setNull(1, Types.VARCHAR);
@@ -413,7 +408,7 @@ class OcspStoreQueryExecutor {
     final String sql =
         "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
 
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       String b64Cert = Base64.encodeToString(encodedCert);
@@ -438,31 +433,13 @@ class OcspStoreQueryExecutor {
   } // method addIssuer
 
   /**
-   * TODO.
-   * @param sqlQuery the SQL query
-   * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
-   *      can be created within 5 seconds.
-   */
-  private PreparedStatement borrowPreparedStatement(String sqlQuery) throws DataAccessException {
-    PreparedStatement ps = null;
-    Connection col = datasource.getConnection();
-    if (col != null) {
-      ps = datasource.prepareStatement(col, sqlQuery);
-    }
-    if (ps == null) {
-      throw new DataAccessException("could not create prepared statement for " + sqlQuery);
-    }
-    return ps;
-  }
-
-  /**
    * Returns the database Id for the given issuer and serialNumber.
    * @return the database table id if registered, <code>null</code> otherwise.
    */
   private Long getCertId(int issuerId, BigInteger serialNumber) throws DataAccessException {
     final String sql = sqlCertRegistered;
     ResultSet rs = null;
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
       ps.setString(1, serialNumber.toString(16));
@@ -482,7 +459,7 @@ class OcspStoreQueryExecutor {
 
     try {
       ResultSet rs = null;
-      PreparedStatement ps = borrowPreparedStatement(sql);
+      PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
         rs = ps.executeQuery();

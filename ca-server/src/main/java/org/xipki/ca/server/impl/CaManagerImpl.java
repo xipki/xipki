@@ -482,6 +482,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
           DataSourceWrapper datasource = datasourceFactory.createDataSourceForFile(
               datasourceName, datasourceFile, securityFactory.getPasswordResolver());
 
+          // test the datasource
           Connection conn = datasource.getConnection();
           datasource.returnConnection(conn);
 

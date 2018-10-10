@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
 
 import liquibase.CatalogAndSchema;
@@ -60,7 +61,8 @@ public class LiquibaseMain {
 
   public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile) {
     this.dbConf = ParamUtil.requireNonNull("dbConf", dbConf);
-    this.changeLogFile = ParamUtil.requireNonBlank("changeLogFile", changeLogFile);
+    this.changeLogFile = IoUtil.expandFilepath(
+        ParamUtil.requireNonBlank("changeLogFile", changeLogFile));
   }
 
   public void init() throws Exception {

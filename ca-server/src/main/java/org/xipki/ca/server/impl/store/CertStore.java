@@ -30,11 +30,9 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -325,7 +323,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw datasource.translate(null, ex);
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   } // method addCert
 
@@ -343,7 +341,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 
@@ -357,7 +355,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 
@@ -376,7 +374,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 
@@ -390,7 +388,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 
@@ -425,7 +423,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 
@@ -446,7 +444,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -466,7 +464,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -484,7 +482,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -537,7 +535,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   } // method addCrl
 
@@ -600,7 +598,7 @@ public class CertStore {
       throw new OperationException(DATABASE_FAILURE,
           datasource.translate(SQL_REVOKE_CERT, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
 
     if (publishToDeltaCrlCache) {
@@ -655,7 +653,7 @@ public class CertStore {
       throw new OperationException(DATABASE_FAILURE,
           datasource.translate(SQL_REVOKE_CERT, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
 
     if (publishToDeltaCrlCache) {
@@ -717,7 +715,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
 
     if (publishToDeltaCrlCache) {
@@ -743,7 +741,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 
@@ -768,7 +766,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   } // method removeCert
 
@@ -793,7 +791,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getPublishQueueEntries
 
@@ -812,7 +810,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -840,7 +838,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getSerialNumbers
 
@@ -880,7 +878,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getSerialNumbers
 
@@ -907,7 +905,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getExpiredSerialNumbers
 
@@ -934,7 +932,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getSuspendedCertIds
 
@@ -965,7 +963,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     return (b64Crl == null) ? null : Base64.decodeFast(b64Crl);
@@ -991,7 +989,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     int size = crlNumbers.size();
@@ -1014,7 +1012,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
 
     return numCrlsToDelete;
@@ -1056,7 +1054,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     byte[] encodedCert = Base64.decodeFast(b64Cert);
@@ -1116,7 +1114,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
 
     byte[] certBytes = Base64.decodeFast(b64Cert);
@@ -1184,7 +1182,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     try {
@@ -1233,7 +1231,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getCertprofileForId
 
@@ -1279,7 +1277,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     return certs;
@@ -1305,7 +1303,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     if (reqId == null) {
@@ -1324,7 +1322,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     return (b64Req == null) ? null : Base64.decodeFast(b64Req);
@@ -1435,7 +1433,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method listCerts
 
@@ -1461,7 +1459,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     if (StringUtil.isBlank(expPasswordText)) {
@@ -1490,7 +1488,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method authenticateUser
 
@@ -1518,7 +1516,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -1543,7 +1541,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method knowsCertForSerial
 
@@ -1586,7 +1584,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getRevokedCertificates
 
@@ -1611,7 +1609,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     sql = sqlRevForId;
@@ -1655,7 +1653,7 @@ public class CertStore {
       } catch (SQLException ex) {
         throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
       } finally {
-        releaseDbResources(null, rs);
+        datasource.releaseResources(null, rs);
       }
     } // end for
 
@@ -1686,7 +1684,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   } // method getCertStatusForSubjectFp
 
@@ -1704,7 +1702,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -1722,7 +1720,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
   }
 
@@ -1730,30 +1728,14 @@ public class CertStore {
     return HashAlgo.SHA1.base64Hash(data);
   }
 
-  private PreparedStatement borrowPreparedStatement(String sqlQuery)
-      throws OperationException {
-    PreparedStatement ps = null;
+  private PreparedStatement borrowPreparedStatement(String sqlQuery) throws OperationException {
     try {
-      Connection conn = datasource.getConnection();
-      if (conn != null) {
-        ps = datasource.prepareStatement(conn, sqlQuery);
-      }
+      return datasource.prepareStatement(sqlQuery);
     } catch (DataAccessException ex) {
       LOG.debug("DataAccessException", ex);
       throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     }
-
-    if (ps != null) {
-      return ps;
-    }
-
-    throw new OperationException(DATABASE_FAILURE,
-        "could not create prepared statement for " + sqlQuery);
   } // method borrowPreparedStatement
-
-  private void releaseDbResources(Statement ps, ResultSet rs) {
-    datasource.releaseResources(ps, rs);
-  }
 
   public boolean isHealthy() {
     final String sql = "SELECT ID FROM CA";
@@ -1765,7 +1747,7 @@ public class CertStore {
       try {
         rs = ps.executeQuery();
       } finally {
-        releaseDbResources(ps, rs);
+        datasource.releaseResources(ps, rs);
       }
       return true;
     } catch (Exception ex) {
@@ -1803,7 +1785,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     } finally {
-      releaseDbResources(ps, rs);
+      datasource.releaseResources(ps, rs);
     }
 
     X500Name lastName = new X500Name(subjectStr);
@@ -1844,7 +1826,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
 
     return id;
@@ -1862,7 +1844,7 @@ public class CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      releaseDbResources(ps, null);
+      datasource.releaseResources(ps, null);
     }
   }
 

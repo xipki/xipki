@@ -137,7 +137,7 @@ class DigestDiff {
 
     Statement refStmt = null;
     try {
-      refStmt = refDatasource.createStatement(refDatasource.getConnection());
+      refStmt = refDatasource.createStatement();
       ResultSet refRs = null;
       try {
         refRs = refStmt.executeQuery(refSql);
@@ -245,8 +245,7 @@ class DigestDiff {
       throw new IllegalArgumentException("unknown dbControl " + dbControl);
     }
 
-    Connection conn = datasource.getConnection();
-    Statement stmt = datasource.createStatement(conn);
+    Statement stmt = datasource.createStatement();
     Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
     ResultSet rs = null;
     try {

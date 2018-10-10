@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.xipki.ca.dbtool.DbToolBase;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
@@ -356,7 +355,7 @@ class TargetDigestRetriever {
   }
 
   private void releaseResources(Statement ps, ResultSet rs) {
-    DbToolBase.releaseResources(datasource, ps, rs);
+    datasource.releaseResources(ps, rs);
   }
 
   public void awaitTerminiation() throws Exception {
