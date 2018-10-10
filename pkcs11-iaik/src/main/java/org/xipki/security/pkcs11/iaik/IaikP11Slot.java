@@ -165,7 +165,7 @@ class IaikP11Slot extends P11Slot {
     try {
       Session session;
       try {
-        // SO (Security Officer cannot be logged in READ-ONLY session
+        // SO (Security Officer) cannot login in READ-ONLY session
         session = openSession();
       } catch (P11TokenException ex) {
         LogUtil.error(LOG, ex, "openSession");
@@ -547,15 +547,17 @@ class IaikP11Slot extends P11Slot {
 
   private ConcurrentBagEntry<Session> borrowSession() throws P11TokenException {
     ConcurrentBagEntry<Session> session = null;
-    if (countSessions.get() < maxSessionCount) {
-      try {
-        session = sessions.borrow(1, TimeUnit.NANOSECONDS);
-      } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-      }
+    synchronized (sessions) {
+      if (countSessions.get() < maxSessionCount) {
+        try {
+          session = sessions.borrow(1, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+        }
 
-      if (session == null) {
-        // create new session
-        sessions.add(new ConcurrentBagEntry<>(openSession()));
+        if (session == null) {
+          // create new session
+          sessions.add(new ConcurrentBagEntry<>(openSession()));
+        }
       }
     }
 
