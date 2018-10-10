@@ -87,15 +87,12 @@ public abstract class DataSourceWrapper {
       final String sqlSelect = "SELECT @cur_value";
       String sql = null;
 
-      boolean newConn = (conn == null);
-      Connection tmpConn = (conn != null) ? conn : getConnection();
-
       Statement stmt = null;
       ResultSet rs = null;
 
       long ret;
       try {
-        stmt = tmpConn.createStatement();
+        stmt = conn == null ? createStatement() : createStatement(conn);
         sql = sqlUpdate;
         stmt.executeUpdate(sql);
 
@@ -109,11 +106,7 @@ public abstract class DataSourceWrapper {
       } catch (SQLException ex) {
         throw translate(sqlUpdate, ex);
       } finally {
-        if (newConn) {
-          releaseResources(stmt, rs);
-        } else {
-          super.releaseStatementAndResultSet(stmt, rs);
-        }
+        releaseResources(stmt, rs, conn == null);
       }
 
       LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
@@ -469,6 +462,22 @@ public abstract class DataSourceWrapper {
     }
   }
 
+  public Statement createStatement() throws DataAccessException {
+    Connection conn = getConnection();
+    boolean succ = false;
+    try {
+      Statement stmt = conn.createStatement();
+      succ = true;
+      return stmt;
+    } catch (SQLException ex) {
+      throw translate(null, ex);
+    } finally {
+      if (!succ) {
+        returnConnection(conn);
+      }
+    }
+  }
+
   public PreparedStatement prepareStatement(Connection conn, String sqlQuery)
       throws DataAccessException {
     ParamUtil.requireNonNull("conn", conn);
@@ -476,6 +485,23 @@ public abstract class DataSourceWrapper {
       return conn.prepareStatement(sqlQuery);
     } catch (SQLException ex) {
       throw translate(sqlQuery, ex);
+    }
+  }
+
+  public PreparedStatement prepareStatement(String sqlQuery) throws DataAccessException {
+    Connection conn = getConnection();
+
+    boolean succ = false;
+    try {
+      PreparedStatement ps = conn.prepareStatement(sqlQuery);
+      succ = true;
+      return ps;
+    } catch (SQLException ex) {
+      throw translate(sqlQuery, ex);
+    } finally {
+      if (!succ) {
+        returnConnection(conn);
+      }
     }
   }
 
@@ -492,7 +518,9 @@ public abstract class DataSourceWrapper {
       }
     }
 
-    if (ps != null) {
+    if (ps == null) {
+      return;
+    } else if (returnConnection) {
       Connection conn = null;
       try {
         conn = ps.getConnection();
@@ -505,23 +533,11 @@ public abstract class DataSourceWrapper {
       } catch (Throwable th) {
         LOG.warn("could not close statement", th);
       } finally {
-        if (returnConnection && conn != null) {
+        if (conn != null) {
           returnConnection(conn);
         }
       }
-    }
-  }
-
-  private void releaseStatementAndResultSet(Statement ps, ResultSet rs) {
-    if (rs != null) {
-      try {
-        rs.close();
-      } catch (Throwable th) {
-        LOG.warn("could not close ResultSet", th);
-      }
-    }
-
-    if (ps != null) {
+    } else {
       try {
         ps.close();
       } catch (Throwable th) {
@@ -542,7 +558,7 @@ public abstract class DataSourceWrapper {
     Statement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
       rs = stmt.executeQuery(sql);
       if (rs.next()) {
         return rs.getObject(column, type);
@@ -552,11 +568,7 @@ public abstract class DataSourceWrapper {
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, rs);
-      } else {
-        releaseStatementAndResultSet(stmt, rs);
-      }
+      releaseResources(stmt, rs, conn == null);
     }
   }
 
@@ -575,18 +587,14 @@ public abstract class DataSourceWrapper {
     Statement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
       rs = stmt.executeQuery(sql);
       rs.next();
       return rs.getLong(1);
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, rs);
-      } else {
-        releaseStatementAndResultSet(stmt, rs);
-      }
+      releaseResources(stmt, rs, conn == null);
     }
   }
 
@@ -598,18 +606,14 @@ public abstract class DataSourceWrapper {
     Statement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
       rs = stmt.executeQuery(sql);
       rs.next();
       return rs.getInt(1);
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, rs);
-      } else {
-        releaseStatementAndResultSet(stmt, rs);
-      }
+      releaseResources(stmt, rs, conn == null);
     }
   }
 
@@ -628,18 +632,14 @@ public abstract class DataSourceWrapper {
     Statement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
       rs = stmt.executeQuery(sql);
       rs.next();
       return rs.getLong(1);
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, rs);
-      } else {
-        releaseStatementAndResultSet(stmt, rs);
-      }
+      releaseResources(stmt, rs, conn == null);
     }
   }
 
@@ -649,23 +649,9 @@ public abstract class DataSourceWrapper {
     final String sql = StringUtil.concat("DELETE FROM ", table, " WHERE ", idColumn,
         "=", Long.toString(id));
 
-    Connection tmpConn;
-    if (conn != null) {
-      tmpConn = conn;
-    } else {
-      try {
-        tmpConn = getConnection();
-      } catch (Throwable th) {
-        if (LOG.isWarnEnabled()) {
-          LOG.warn("datasource {} could not get connection: {}", name, th.getMessage());
-        }
-        return false;
-      }
-    }
-
     Statement stmt = null;
     try {
-      stmt = tmpConn.createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
       stmt.execute(sql);
     } catch (Throwable th) {
       if (LOG.isWarnEnabled()) {
@@ -673,11 +659,7 @@ public abstract class DataSourceWrapper {
       }
       return false;
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, null);
-      } else {
-        releaseStatementAndResultSet(stmt, null);
-      }
+      releaseResources(stmt, null, conn == null);
     }
 
     return true;
@@ -695,7 +677,7 @@ public abstract class DataSourceWrapper {
     PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = (conn != null) ? conn.prepareStatement(sql) : getConnection().prepareStatement(sql);
+      stmt = conn == null ? prepareStatement(sql) : prepareStatement(conn, sql);
       if (value instanceof Integer) {
         stmt.setInt(1, (Integer) value);
       } else if (value instanceof Long) {
@@ -710,11 +692,7 @@ public abstract class DataSourceWrapper {
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, rs);
-      } else {
-        releaseStatementAndResultSet(stmt, rs);
-      }
+      releaseResources(stmt, rs, conn == null);
     }
   } // method columnExists
 
@@ -723,53 +701,34 @@ public abstract class DataSourceWrapper {
     ParamUtil.requireNonBlank("table", table);
     ParamUtil.requireNonBlank("column", column);
 
-    Statement stmt;
-    try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-    } catch (SQLException ex) {
-      throw translate(null, ex);
-    }
-
     String coreSql = StringUtil.concat(column, " FROM ", table);
     final String sql = buildSelectFirstSql(1, coreSql);
 
+    Statement stmt = null;
     try {
+      stmt = conn == null ? createStatement() : createStatement(conn);
       stmt.execute(sql);
       return true;
     } catch (SQLException ex) {
       return false;
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, null);
-      } else {
-        releaseStatementAndResultSet(stmt, null);
-      }
+      releaseResources(stmt, null, conn == null);
     }
   }
 
   public boolean tableExists(Connection conn, String table) throws DataAccessException {
     ParamUtil.requireNonBlank("table", table);
 
-    Statement stmt;
-    try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-    } catch (SQLException ex) {
-      throw translate(null, ex);
-    }
-
     final String sql = buildSelectFirstSql(1, StringUtil.concat("1 FROM ", table));
-
+    Statement stmt = null;
     try {
+      stmt = conn == null ? createStatement() : createStatement(conn);
       stmt.execute(sql);
       return true;
     } catch (SQLException ex) {
       return false;
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, null);
-      } else {
-        releaseStatementAndResultSet(stmt, null);
-      }
+      releaseResources(stmt, null, conn == null);
     }
   }
 
@@ -806,10 +765,9 @@ public abstract class DataSourceWrapper {
   public void createSequence(String sequenceName, long startValue) throws DataAccessException {
     ParamUtil.requireNonBlank("sequenceName", sequenceName);
     final String sql = buildCreateSequenceSql(sequenceName, startValue);
-    Connection conn = getConnection();
     Statement stmt = null;
     try {
-      stmt = conn.createStatement();
+      stmt = createStatement();
       stmt.execute(sql);
       LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
     } catch (SQLException ex) {
@@ -822,10 +780,9 @@ public abstract class DataSourceWrapper {
   public void dropSequence(String sequenceName) throws DataAccessException {
     ParamUtil.requireNonBlank("sequenceName", sequenceName);
     final String sql = buildDropSequenceSql(sequenceName);
-    Connection conn = getConnection();
     Statement stmt = null;
     try {
-      stmt = conn.createStatement();
+      stmt = createStatement();
       stmt.execute(sql);
       LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
     } catch (SQLException ex) {
@@ -843,13 +800,11 @@ public abstract class DataSourceWrapper {
   public long nextSeqValue(Connection conn, String sequenceName) throws DataAccessException {
     ParamUtil.requireNonBlank("sequenceName", sequenceName);
     final String sql = buildAndCacheNextSeqValueSql(sequenceName);
-    boolean newConn = (conn == null);
-    Connection tmpConn = (conn != null) ? conn : getConnection();
     Statement stmt = null;
 
     long next;
     try {
-      stmt = tmpConn.createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
 
       while (true) {
         ResultSet rs = stmt.executeQuery(sql);
@@ -867,17 +822,13 @@ public abstract class DataSourceWrapper {
             throw new DataAccessException("could not increment the sequence " + sequenceName);
           }
         } finally {
-          releaseStatementAndResultSet(null, rs);
+          releaseResources(null, rs, false);
         }
       }
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (newConn) {
-        releaseResources(stmt, null);
-      } else {
-        releaseStatementAndResultSet(stmt, null);
-      }
+      releaseResources(stmt, null, conn == null);
     }
 
     LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, next);
@@ -1157,16 +1108,12 @@ public abstract class DataSourceWrapper {
   private void executeUpdate(Connection conn, String sql) throws DataAccessException {
     Statement stmt = null;
     try {
-      stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+      stmt = conn == null ? createStatement() : createStatement(conn);
       stmt.executeUpdate(sql);
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
-      if (conn == null) {
-        releaseResources(stmt, null);
-      } else {
-        releaseStatementAndResultSet(stmt, null);
-      }
+      releaseResources(stmt, null, conn == null);
     }
   }
 
