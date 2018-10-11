@@ -71,7 +71,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
 xi:copy-file -f xipki/qa/qa.d/template.rootca.xml xipki/qa/qa.d/rootca.xml
@@ -215,7 +215,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 
 xi:copy-file -f xipki/qa/qa.d/template.subca.xml xipki/qa/qa.d/subca.xml
@@ -252,7 +252,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
 } else {
-  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
 }
 
 xi:copy-file -f xipki/qa/qa.d/template.subcawithcrl.xml \

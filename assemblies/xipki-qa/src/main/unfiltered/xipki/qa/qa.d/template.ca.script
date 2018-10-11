@@ -85,11 +85,10 @@ ca:publisher-add \
   --conf datasource=ocsp,publish.goodcerts=true
 
 # Signer
-# with encrypted password 1234
 ca:signer-add \
   --name responder1 \
   --type pkcs12 \
-  --conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
+  --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
 
 # CMP Requestors
 ca:requestor-add \
@@ -136,7 +135,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg=="
+  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=1234"
 }
 
 ca:gen-rootca \
@@ -356,7 +355,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 
 ca:ca-add \
@@ -422,8 +421,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
 } else {
-  CA_SIGNER_CONF = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,\
-keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
 }
 
 ca:ca-add \
