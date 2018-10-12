@@ -43,6 +43,20 @@
       <xs:element name="tls" type="tlsType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="enabled" type="xs:boolean" default="true"/>
+    <xs:attribute name="maxRequestSize" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          maximal size of the content of a request
+        </xs:documentation>
+      </xs:annotation>
+   </xs:attribute>
+    <xs:attribute name="maxUriSize" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          maximal size of the path part of a URI.
+        </xs:documentation>
+      </xs:annotation>
+   </xs:attribute>
   </xs:complexType>
   <xs:complexType name="tlsType">
     <xs:all>

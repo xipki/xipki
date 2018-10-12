@@ -33,6 +33,18 @@ public interface HttpServlet {
   boolean needsTlsSessionInfo();
 
   /**
+   * Retrieves the length limit of a URI.
+   * @return the maximal allowed number of letters in the path part of the URL.
+   */
+  int getMaxUriSize();
+
+  /**
+   * Retrieves the length limit of the request content.
+   * @return the maximal allowed number of bytes of the request content.
+   */
+  int getMaxRequestSize();
+
+  /**
    * TODO.
    * @param request
    *          The request. Must not be {@code null}.

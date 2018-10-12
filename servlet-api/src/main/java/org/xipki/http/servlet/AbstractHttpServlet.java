@@ -44,6 +44,16 @@ public abstract class AbstractHttpServlet implements HttpServlet {
     return false;
   }
 
+  @Override
+  public int getMaxUriSize() {
+    return 1024;
+  }
+
+  @Override
+  public int getMaxRequestSize() {
+    return Integer.MAX_VALUE;
+  }
+
   protected static byte[] readContent(FullHttpRequest request) {
     ByteBuf buf = request.content();
     if (buf == null) {

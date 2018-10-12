@@ -124,4 +124,15 @@ public class HealthCheckServlet extends AbstractHttpServlet {
     }
   } // method service0
 
+  @Override
+  public int getMaxUriSize() {
+    return 200;
+  }
+
+  @Override
+  public int getMaxRequestSize() {
+    // empty content is expected
+    return 0;
+  }
+
 }

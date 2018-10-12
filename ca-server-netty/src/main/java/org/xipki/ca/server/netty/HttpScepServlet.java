@@ -313,4 +313,14 @@ public class HttpScepServlet extends AbstractHttpServlet {
     auditService.logEvent(event);
   } // method audit
 
+  @Override
+  public int getMaxUriSize() {
+    return 200;
+  }
+
+  @Override
+  public int getMaxRequestSize() {
+    return 4096;
+  }
+
 }

@@ -169,7 +169,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
       // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
       // POST, we support GET for longer requests anyway.
       if (b64OcspReq.length() > responder.getMaxRequestSize()) {
-        return createErrorResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
+        return createErrorResponse(version, HttpResponseStatus.REQUEST_URI_TOO_LONG);
       }
 
       OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder,
@@ -231,5 +231,15 @@ public class HttpOcspServlet extends AbstractHttpServlet {
       return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
     } // end external try
   } // method serviceGet
+
+  @Override
+  public int getMaxUriSize() {
+    return 1024;
+  }
+
+  @Override
+  public int getMaxRequestSize() {
+    return 4096;
+  }
 
 }

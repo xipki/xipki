@@ -123,6 +123,15 @@ public final class HttpServers {
       }
 
       HttpServer server = new HttpServer(buildSslContext(conf), port, numThreads);
+
+      if (conf.getMaxRequestSize() != null) {
+        server.setMaxRequestBodySize(conf.getMaxRequestSize().intValue());
+      }
+
+      if (conf.getMaxUriSize() != null) {
+        server.setMaxUriPathSize(conf.getMaxUriSize().intValue());
+      }
+
       server.setServletListener(servletListener);
       server.setSslReverseProxyMode(mode);
       servers.add(server);

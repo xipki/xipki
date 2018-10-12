@@ -111,4 +111,14 @@ public class HttpRestServlet extends AbstractHttpServlet {
     this.auditServiceRegister = auditServiceRegister;
   }
 
+  @Override
+  public int getMaxUriSize() {
+    return 200;
+  }
+
+  @Override
+  public int getMaxRequestSize() {
+    return 4096;
+  }
+
 }

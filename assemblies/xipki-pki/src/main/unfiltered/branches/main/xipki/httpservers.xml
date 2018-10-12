@@ -15,13 +15,13 @@
   limitations under the License.
 -->
 <httpservers xmlns="http://xipki.org/httpserver/v1">
-  <httpserver enabled="true">
+  <httpserver enabled="true" maxRequestSize="65536" maxUriSize="1024">
     <description>HTTP server</description>
     <port>8080</port>
     <threads>0</threads>
     <reverseProxy>NONE</reverseProxy>
   </httpserver>
-  <httpserver enabled="true">
+  <httpserver enabled="true" maxRequestSize="65536" maxUriSize="1024">
     <description>HTTPS server</description>
     <port>8443</port>
     <threads>0</threads>

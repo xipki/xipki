@@ -101,4 +101,15 @@ public class HttpCaCertServlet extends AbstractHttpServlet {
     this.responderManager = responderManager;
   }
 
+  @Override
+  public int getMaxUriSize() {
+    return 200;
+  }
+
+  @Override
+  public int getMaxRequestSize() {
+    // empty content is expected
+    return 0;
+  }
+
 }

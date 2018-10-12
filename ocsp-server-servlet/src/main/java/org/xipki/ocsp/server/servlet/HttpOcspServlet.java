@@ -161,7 +161,7 @@ public class HttpOcspServlet extends HttpServlet {
       // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
       // POST, we support GET for longer requests anyway.
       if (b64OcspReq.length() > responder.getMaxRequestSize()) {
-        sendError(resp, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        sendError(resp, HttpServletResponse.SC_REQUEST_URI_TOO_LONG);
         return;
       }
 

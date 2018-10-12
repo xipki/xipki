@@ -28,6 +28,7 @@ import org.xipki.http.servlet.HttpServlet;
 import org.xipki.http.servlet.ServletURI;
 import org.xipki.http.servlet.SslReverseProxyMode;
 import org.xipki.util.LogUtil;
+import org.xipki.util.ParamUtil;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -97,7 +98,13 @@ public final class HttpServer {
         return;
       }
 
-      Object[] objs = servletListener.getServlet(request.uri());
+      String rawPath = request.uri();
+      if (rawPath.length() > maxUriPathSize) {
+        sendError(ctx, HttpResponseStatus.REQUEST_URI_TOO_LONG);
+        return;
+      }
+
+      Object[] objs = servletListener.getServlet(rawPath);
       if (objs == null) {
         sendError(ctx, HttpResponseStatus.NOT_FOUND);
         return;
@@ -105,6 +112,17 @@ public final class HttpServer {
 
       ServletURI servletUri = (ServletURI) objs[0];
       HttpServlet servlet = (HttpServlet) objs[1];
+
+      if (rawPath.length() > servlet.getMaxUriSize()) {
+        sendError(ctx, HttpResponseStatus.REQUEST_URI_TOO_LONG);
+        return;
+      }
+
+      if (request.content().readableBytes()
+          > Math.min(maxRequestBodySize, servlet.getMaxRequestSize())) {
+        sendError(ctx, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
+        return;
+      }
 
       SSLSession sslSession = null;
 
@@ -173,6 +191,10 @@ public final class HttpServer {
 
   private final int numThreads;
 
+  private int maxRequestBodySize = Integer.MAX_VALUE;
+
+  private int maxUriPathSize = Integer.MAX_VALUE;
+
   private ServletListener servletListener;
 
   private EventLoopGroup bossGroup;
@@ -189,6 +211,14 @@ public final class HttpServer {
     this.sslContext = sslContext;
     this.port = port;
     this.numThreads = (numThreads > 0) ? numThreads : Runtime.getRuntime().availableProcessors();
+  }
+
+  public void setMaxUriPathSize(int maxUriPathSize) {
+    this.maxUriPathSize = ParamUtil.requireMin("maxUriPathSize", maxUriPathSize, 0);
+  }
+
+  public void setMaxRequestBodySize(int maxRequestBodySize) {
+    this.maxRequestBodySize = ParamUtil.requireMin("maxRequestBodySize", maxRequestBodySize, 0);
   }
 
   public void setServletListener(ServletListener servletListener) {
