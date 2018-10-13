@@ -66,6 +66,7 @@
   <modules>
     <!-- Base components -->
     <module>util</module>
+    <module>http-client</module>
     <module>cmp</module>
     <module>audit</module>
     <module>audit-syslog</module>
