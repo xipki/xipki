@@ -23,8 +23,8 @@
   <reference-list id="certprofileFactories"
        interface="org.xipki.ca.api.profile.CertprofileFactory"
        availability="optional">
-    <reference-listener ref="certprofileFactoryRegister" bind-method="bindService"
-         unbind-method="unbindService"/>
+    <reference-listener ref="certprofileFactoryRegister" bind-method="registFactory"
+         unbind-method="unregistFactory"/>
   </reference-list>
 
   <bean id="publisherFactoryRegister"
@@ -34,8 +34,8 @@
   <reference-list id="publisherFactories"
        interface="org.xipki.ca.api.publisher.CertPublisherFactory"
        availability="optional">
-    <reference-listener ref="publisherFactoryRegister" bind-method="bindService"
-         unbind-method="unbindService"/>
+    <reference-listener ref="publisherFactoryRegister" bind-method="registFactory"
+         unbind-method="unregistFactory"/>
   </reference-list>
 
 </blueprint>

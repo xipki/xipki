@@ -50,10 +50,15 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
     return services.isEmpty() ? dfltAuditService : services.getLast();
   }
 
+  @Deprecated
   public void bindService(final AuditService service) {
+    registService(service);
+  }
+
+  public void registService(final AuditService service) {
     //might be null if dependency is optional
     if (service == null) {
-      LOG.info("bindService invoked with null.");
+      LOG.info("registService invoked with null.");
       return;
     }
 
@@ -64,10 +69,15 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
     LOG.info("{} AuditService binding for {}", action, service);
   }
 
+  @Deprecated
   public void unbindService(final AuditService service) {
+    unregistService(service);
+  }
+
+  public void unregistService(final AuditService service) {
     //might be null if dependency is optional
     if (service == null) {
-      LOG.debug("unbindService invoked with null.");
+      LOG.debug("unregistService invoked with null.");
       return;
     }
 

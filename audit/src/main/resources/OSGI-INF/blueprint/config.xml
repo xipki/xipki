@@ -17,7 +17,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
   <bean id="register" class="org.xipki.audit.internal.AuditServiceRegisterImpl"/>
   <reference-list id="auditServices" interface="org.xipki.audit.AuditService" availability="optional">
-    <reference-listener ref="register" bind-method="bindService" unbind-method="unbindService"/>
+    <reference-listener ref="register" bind-method="registService" unbind-method="unregistService"/>
   </reference-list>
   <service ref="register" interface="org.xipki.audit.AuditServiceRegister"/>
 </blueprint>

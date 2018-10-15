@@ -17,6 +17,7 @@
 
 package org.xipki.util;
 
+import java.io.Closeable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,7 +62,12 @@ public abstract class BenchmarkExecutor {
 
   protected abstract Runnable getTestor() throws Exception;
 
+  @Deprecated
   protected void shutdown() {
+    close();
+  }
+
+  public void close() {
   }
 
   public void execute() {
@@ -115,7 +121,7 @@ public abstract class BenchmarkExecutor {
     printStatus();
     printSummary();
 
-    shutdown();
+    close();
     System.getProperties().remove(PROPKEY_BENCHMARK);
   } // method test
 

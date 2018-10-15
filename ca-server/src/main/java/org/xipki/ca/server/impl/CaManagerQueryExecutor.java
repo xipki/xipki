@@ -1146,7 +1146,7 @@ class CaManagerQueryExecutor {
       return profile;
     } finally {
       if (failed) {
-        profile.shutdown();
+        profile.close();
       }
     }
   } // method changeCertprofile

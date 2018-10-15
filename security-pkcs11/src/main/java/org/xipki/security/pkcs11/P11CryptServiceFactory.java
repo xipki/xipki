@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import java.io.Closeable;
 import java.util.Set;
 
 import org.xipki.security.exception.XiSecurityException;
@@ -28,7 +29,7 @@ import org.xipki.security.pkcs11.exception.P11TokenException;
  * @since 2.0.0
  */
 
-public interface P11CryptServiceFactory {
+public interface P11CryptServiceFactory extends Closeable {
 
   String DEFAULT_P11MODULE_NAME = "default";
 
@@ -47,6 +48,7 @@ public interface P11CryptServiceFactory {
 
   Set<String> getModuleNames();
 
+  @Deprecated
   void shutdown();
 
 }

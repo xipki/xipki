@@ -17,6 +17,7 @@
 
 package org.xipki.dbtool;
 
+import java.io.Closeable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -47,7 +48,7 @@ import liquibase.resource.ResourceAccessor;
  * @since 2.0.0
  */
 
-public class LiquibaseMain {
+public class LiquibaseMain implements Closeable {
 
   private static Logger LOG = LoggerFactory.getLogger(LiquibaseMain.class);
 
@@ -148,7 +149,13 @@ public class LiquibaseMain {
     System.out.println("successfully  updated the database");
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     try {
       if (database != null) {
         database.rollback();

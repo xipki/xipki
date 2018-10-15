@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import java.io.Closeable;
 import java.util.List;
 
 import org.xipki.security.pkcs11.exception.P11TokenException;
@@ -28,7 +29,7 @@ import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
  * @since 2.0.0
  */
 
-public interface P11Module {
+public interface P11Module extends Closeable {
 
   String getName();
 
@@ -55,6 +56,7 @@ public interface P11Module {
 
   P11SlotIdentifier getSlotIdForId(long id) throws P11UnknownEntityException;
 
+  @Override
   void close();
 
 }

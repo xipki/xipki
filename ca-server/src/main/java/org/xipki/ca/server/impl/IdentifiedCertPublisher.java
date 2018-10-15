@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.impl;
 
+import java.io.Closeable;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.0.0
  */
 
-class IdentifiedCertPublisher {
+class IdentifiedCertPublisher implements Closeable {
 
   private final PublisherEntry entry;
 
@@ -108,8 +109,9 @@ class IdentifiedCertPublisher {
     return certPublisher.isAsyn();
   }
 
-  public void shutdown() {
-    certPublisher.shutdown();
+  @Override
+  public void close() {
+    certPublisher.close();
   }
 
   public boolean publishsGoodCert() {

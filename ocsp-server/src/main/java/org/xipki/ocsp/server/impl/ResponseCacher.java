@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.server.impl;
 
+import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -60,7 +61,7 @@ import org.xipki.util.concurrent.ConcurrentBagEntry;
  * @since 2.2.0
  */
 
-class ResponseCacher {
+class ResponseCacher implements Closeable {
   private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
 
   private static final String SQL_ADD_ISSUER = "INSERT INTO ISSUER (ID,S1C,CERT) VALUES (?,?,?)";
@@ -173,7 +174,8 @@ class ResponseCacher {
         new IssuerUpdater(), 448, 600, TimeUnit.SECONDS);
   }
 
-  void shutdown() {
+  @Override
+  public void close() {
     if (datasource != null) {
       datasource.close();
       datasource = null;

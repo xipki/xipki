@@ -50,7 +50,7 @@ public class UpdateDbAction extends LiquibaseAction {
       liquibase.init();
       liquibase.update();
     } finally {
-      liquibase.shutdown();
+      liquibase.close();
     }
 
     return null;

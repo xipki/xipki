@@ -18,6 +18,7 @@
 package org.xipki.ca.dbtool.diffdb;
 
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -40,7 +41,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-class DigestDiffReporter {
+class DigestDiffReporter implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(DigestDiffReporter.class);
 
@@ -140,6 +141,7 @@ class DigestDiffReporter {
     }
   }
 
+  @Override
   public void close() {
     closeWriter(missingWriter);
     closeWriter(unexpectedWriter);

@@ -17,6 +17,7 @@
 
 package org.xipki.litecaclient;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -89,7 +90,7 @@ import org.slf4j.LoggerFactory;
  * @author Lijun Liao
  */
 
-public abstract class CmpCaClient {
+public abstract class CmpCaClient implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpCaClient.class);
 
@@ -149,8 +150,9 @@ public abstract class CmpCaClient {
     this.caSubjectKeyIdentifier = SdkUtil.extractSki(this.caCert);
   }
 
-  public void shutdown() {
-    TlsInit.shutdown();
+  @Override
+  public void close() {
+    TlsInit.close();
   }
 
   public X509Certificate getCaCert() {

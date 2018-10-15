@@ -87,14 +87,14 @@ public class CaDbImportWorker extends DbPortWorker {
         // CAConfiguration
         CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource, srcFolder, stopMe);
         caConfImporter.importToDb();
-        caConfImporter.shutdown();
+        caConfImporter.close();
       }
 
       // CertStore
       CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(datasource,
           srcFolder, batchEntriesPerCommit, resume, stopMe);
       certStoreImporter.importToDb();
-      certStoreImporter.shutdown();
+      certStoreImporter.close();
     } finally {
       try {
         datasource.close();

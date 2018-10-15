@@ -29,6 +29,7 @@ import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_UNAVAILABLE;
 import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT;
 import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT_PROFILE;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -170,7 +171,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-public class X509Ca {
+public class X509Ca implements Closeable {
 
   private static class GrantedCertTemplate {
     private final ConcurrentContentSigner signer;
@@ -952,6 +953,7 @@ public class X509Ca {
 
       addXipkiCertset(crlBuilder, deltaCrl, control, notExpireAt, onlyCaCerts, onlyUserCerts);
 
+      @SuppressWarnings("resource")
       ConcurrentContentSigner concurrentSigner = (crlSigner == null)
           ? caInfo.getSigner(null) : crlSigner.getSigner();
 
@@ -2641,7 +2643,8 @@ public class X509Ca {
     return caInfo.getCaEntry().getHexSha1OfCert();
   }
 
-  void shutdown() {
+  @Override
+  public void close() {
     if (crlGenerationService != null) {
       crlGenerationService.cancel(false);
       crlGenerationService = null;

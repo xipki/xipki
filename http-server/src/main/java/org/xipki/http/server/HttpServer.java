@@ -17,6 +17,7 @@
 
 package org.xipki.http.server;
 
+import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -64,7 +65,7 @@ import io.netty.util.CharsetUtil;
  * @since 2.2.0
  */
 
-public final class HttpServer {
+public final class HttpServer implements Closeable {
 
   private class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -322,7 +323,13 @@ public final class HttpServer {
     LOG.info("HTTP server is listening on port {}", port);
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     bossGroup.shutdownGracefully();
     bossGroup = null;
     workerGroup.shutdownGracefully();

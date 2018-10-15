@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -61,7 +62,7 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
  * @since 2.0.0
  */
 
-public abstract class P11Slot {
+public abstract class P11Slot implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Slot.class);
 
@@ -266,6 +267,7 @@ public abstract class P11Slot {
 
   protected abstract void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException;
 
+  @Override
   public abstract void close();
 
   /**

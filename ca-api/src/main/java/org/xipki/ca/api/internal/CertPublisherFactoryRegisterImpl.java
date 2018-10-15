@@ -40,11 +40,11 @@ public class CertPublisherFactoryRegisterImpl implements CertPublisherFactoryReg
 
   private static final Logger LOG = LoggerFactory.getLogger(CertPublisherFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<CertPublisherFactory> services = new ConcurrentLinkedDeque<>();
+  private ConcurrentLinkedDeque<CertPublisherFactory> factories = new ConcurrentLinkedDeque<>();
 
   @Override
   public boolean canCreatePublisher(String type) {
-    for (CertPublisherFactory service : services) {
+    for (CertPublisherFactory service : factories) {
       if (service.canCreatePublisher(type)) {
         return true;
       }
@@ -56,7 +56,7 @@ public class CertPublisherFactoryRegisterImpl implements CertPublisherFactoryReg
   public CertPublisher newPublisher(String type) throws ObjectCreationException {
     ParamUtil.requireNonBlank("type", type);
 
-    for (CertPublisherFactory service : services) {
+    for (CertPublisherFactory service : factories) {
       if (service.canCreatePublisher(type)) {
         return service.newPublisher(type);
       }
@@ -68,37 +68,45 @@ public class CertPublisherFactoryRegisterImpl implements CertPublisherFactoryReg
   @Override
   public Set<String> getSupportedTypes() {
     Set<String> types = new HashSet<>();
-    for (CertPublisherFactory service : services) {
+    for (CertPublisherFactory service : factories) {
       types.addAll(service.getSupportedTypes());
     }
     return Collections.unmodifiableSet(types);
   }
 
   public void bindService(CertPublisherFactory service) {
+    registFactory(service);
+  }
+
+  public void registFactory(CertPublisherFactory factory) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("bindService invoked with null.");
+    if (factory == null) {
+      LOG.info("registFactory invoked with null.");
       return;
     }
 
-    boolean replaced = services.remove(service);
-    services.add(service);
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
 
     String action = replaced ? "replaced" : "added";
-    LOG.info("{} CertPublisherFactory binding for {}", action, service);
+    LOG.info("{} CertPublisherFactory binding for {}", action, factory);
   }
 
   public void unbindService(CertPublisherFactory service) {
+    unregistFactory(service);
+  }
+
+  public void unregistFactory(CertPublisherFactory factory) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("unbindService invoked with null.");
+    if (factory == null) {
+      LOG.info("unregistFactory invoked with null.");
       return;
     }
 
-    if (services.remove(service)) {
-      LOG.info("removed CertPublisherFactory binding for {}", service);
+    if (factories.remove(factory)) {
+      LOG.info("removed CertPublisherFactory binding for {}", factory);
     } else {
-      LOG.info("no CertPublisherFactory binding found to remove for {}", service);
+      LOG.info("no CertPublisherFactory binding found to remove for {}", factory);
     }
   }
 

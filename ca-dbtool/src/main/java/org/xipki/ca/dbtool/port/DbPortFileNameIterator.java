@@ -18,6 +18,7 @@
 package org.xipki.ca.dbtool.port;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -35,7 +36,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-public class DbPortFileNameIterator implements Iterator<String> {
+public class DbPortFileNameIterator implements Iterator<String>, Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);
 
@@ -72,6 +73,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
     throw new UnsupportedOperationException("remove is not supported");
   }
 
+  @Override
   public void close() {
     try {
       reader.close();

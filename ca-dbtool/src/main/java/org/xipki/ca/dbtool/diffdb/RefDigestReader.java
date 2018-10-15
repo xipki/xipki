@@ -17,6 +17,7 @@
 
 package org.xipki.ca.dbtool.diffdb;
 
+import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
@@ -52,7 +53,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-class RefDigestReader {
+class RefDigestReader implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(RefDigestReader.class);
 
@@ -344,6 +345,7 @@ class RefDigestReader {
     return new CertsBundle(certsMap, serialNumbers);
   } // method nextCerts
 
+  @Override
   public void close() {
     if (executor != null) {
       executor.shutdownNow();

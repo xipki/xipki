@@ -542,8 +542,14 @@ public class DbCertStatusStore extends OcspStore {
     }
   }
 
+  @Deprecated
   @Override
   public void shutdown() throws OcspStoreException {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (scheduledThreadPoolExecutor != null) {
       scheduledThreadPoolExecutor.shutdown();
       scheduledThreadPoolExecutor = null;

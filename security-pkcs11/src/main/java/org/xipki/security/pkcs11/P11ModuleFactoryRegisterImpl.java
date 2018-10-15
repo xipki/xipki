@@ -38,34 +38,44 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
 
   private static final Map<String, P11Module> modules = new HashMap<>();
 
-  private ConcurrentLinkedDeque<P11ModuleFactory> services =
+  private ConcurrentLinkedDeque<P11ModuleFactory> factories =
       new ConcurrentLinkedDeque<P11ModuleFactory>();
 
+  @Deprecated
   public void bindService(P11ModuleFactory service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("bindService invoked with null.");
-      return;
-    }
-
-    boolean replaced = services.remove(service);
-    services.add(service);
-
-    String action = replaced ? "replaced" : "added";
-    LOG.info("{} P11ModuleFactory binding for {}", action, service);
+    registFactory(service);
   }
 
-  public void unbindService(P11ModuleFactory service) {
+  public void registFactory(P11ModuleFactory factory) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("unbindService invoked with null.");
+    if (factory == null) {
+      LOG.info("registFactory invoked with null.");
       return;
     }
 
-    if (services.remove(service)) {
-      LOG.info("removed P11ModuleFactory binding for {}", service);
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
+
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} P11ModuleFactory binding for {}", action, factory);
+  }
+
+  @Deprecated
+  public void unbindService(P11ModuleFactory service) {
+    unregistFactory(service);
+  }
+
+  public void unregistFactory(P11ModuleFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.info("unregistFactory invoked with null.");
+      return;
+    }
+
+    if (factories.remove(factory)) {
+      LOG.info("removed P11ModuleFactory binding for {}", factory);
     } else {
-      LOG.info("no P11ModuleFactory binding found to remove for '{}'", service);
+      LOG.info("no P11ModuleFactory binding found to remove for '{}'", factory);
     }
   }
 
@@ -79,7 +89,7 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
     P11Module p11Module = modules.get(key);
 
     if (p11Module == null) {
-      for (P11ModuleFactory service : services) {
+      for (P11ModuleFactory service : factories) {
         if (service.canCreateModule(type)) {
           p11Module = service.newModule(conf);
           break;
@@ -96,7 +106,13 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
     return p11Module;
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     for (String pk11Lib : modules.keySet()) {
       try {
         modules.get(pk11Lib).close();
@@ -106,7 +122,7 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
     }
     modules.clear();
 
-    services.clear();
+    factories.clear();
   }
 
 }

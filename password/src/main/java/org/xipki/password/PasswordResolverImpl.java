@@ -57,31 +57,41 @@ public class PasswordResolverImpl implements PasswordResolver {
     initialized = true;
   }
 
+  @Deprecated
   public void bindService(SinglePasswordResolver service) {
+    registResolver(service);
+  }
+
+  public void registResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("bindService invoked with null.");
+    if (resolver == null) {
+      LOG.debug("registResolver invoked with null.");
       return;
     }
 
-    boolean replaced = resolvers.remove(service);
-    resolvers.add(service);
+    boolean replaced = resolvers.remove(resolver);
+    resolvers.add(resolver);
     String txt = replaced ? "replaced" : "added";
-    LOG.debug("{} SinglePasswordResolver binding for {}", txt, service);
+    LOG.debug("{} SinglePasswordResolver binding for {}", txt, resolver);
   }
 
+  @Deprecated
   public void unbindService(SinglePasswordResolver service) {
+    unregistResolver(service);
+  }
+
+  public void unregistResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("unbindService invoked with null.");
+    if (resolver == null) {
+      LOG.debug("unregistResolver invoked with null.");
       return;
     }
 
     try {
-      if (resolvers.remove(service)) {
-        LOG.debug("removed SinglePasswordResolver binding for {}", service);
+      if (resolvers.remove(resolver)) {
+        LOG.debug("removed SinglePasswordResolver binding for {}", resolver);
       } else {
-        LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
+        LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", resolver);
       }
     } catch (Exception ex) {
       LOG.debug("caught Exception({}). service is probably destroyed.", ex.getMessage());

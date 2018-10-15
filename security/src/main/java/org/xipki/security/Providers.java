@@ -17,6 +17,7 @@
 
 package org.xipki.security;
 
+import java.io.Closeable;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @since 2.0.0
  */
 
-public class Providers {
+public class Providers implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Providers.class);
 
@@ -37,7 +38,13 @@ public class Providers {
     addBcProvider();
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
   }
 
   private void addBcProvider() {

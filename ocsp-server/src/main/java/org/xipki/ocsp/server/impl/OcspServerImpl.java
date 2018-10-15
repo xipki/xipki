@@ -304,6 +304,11 @@ public class OcspServerImpl implements OcspServer {
     // Duplication name check: responder
     for (ResponderType m : conf.getResponders().getResponder()) {
       String name = m.getName();
+
+      if ("health".equals(name)) {
+        throw new InvalidConfException("responder name 'health' is not permitted");
+      }
+
       if (set.contains(name)) {
         throw new InvalidConfException("duplicated definition of responder named '" + name + "'");
       }
@@ -392,7 +397,7 @@ public class OcspServerImpl implements OcspServer {
       } catch (IOException ex) {
         throw new InvalidConfException(ex.getMessage(), ex);
       } finally {
-        close(dsStream);
+        closeStream(dsStream);
       }
       responseCacher = new ResponseCacher(datasource, master, cacheType.getValidity());
       responseCacher.init();
@@ -431,7 +436,7 @@ public class OcspServerImpl implements OcspServer {
         } catch (IOException ex) {
           throw new InvalidConfException(ex.getMessage(), ex);
         } finally {
-          close(dsStream);
+          closeStream(dsStream);
         }
         datasources.put(name, datasource);
       } // end for
@@ -525,15 +530,21 @@ public class OcspServerImpl implements OcspServer {
     this.servletPaths = list2;
   } // method init0
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     LOG.info("stopped OCSP Responder");
     if (responseCacher != null) {
-      responseCacher.shutdown();
+      responseCacher.close();
     }
 
     for (OcspStore store : stores.values()) {
       try {
-        store.shutdown();
+        store.close();
       } catch (Exception ex) {
         LogUtil.warn(LOG, ex, "shutdown store " + store.getName());
       }
@@ -1160,7 +1171,7 @@ public class OcspServerImpl implements OcspServer {
         : new ByteArrayInputStream(conf.getValue().getBytes());
   }
 
-  private static void close(InputStream stream) {
+  private static void closeStream(InputStream stream) {
     if (stream == null) {
       return;
     }
@@ -1184,7 +1195,7 @@ public class OcspServerImpl implements OcspServer {
       }
       throw new InvalidConfException(msg);
     } finally {
-      close(is);
+      closeStream(is);
     }
   }
 

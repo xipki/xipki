@@ -17,6 +17,7 @@
 
 package org.xipki.security;
 
+import java.io.Closeable;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.SignatureException;
@@ -33,7 +34,7 @@ import org.xipki.security.exception.XiSecurityException;
  * @since 2.0.0
  */
 
-public interface ConcurrentContentSigner {
+public interface ConcurrentContentSigner extends Closeable {
 
   String getName();
 
@@ -135,6 +136,6 @@ public interface ConcurrentContentSigner {
 
   boolean isHealthy();
 
+  @Deprecated
   void shutdown();
-
 }

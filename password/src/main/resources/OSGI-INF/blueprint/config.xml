@@ -30,8 +30,8 @@
   </bean>
   <reference-list id="singlePasswordResolvers"
       interface="org.xipki.password.SinglePasswordResolver" availability="optional">
-    <reference-listener ref="passwordResolver" bind-method="bindService"
-        unbind-method="unbindService"/>
+    <reference-listener ref="passwordResolver" bind-method="registResolver"
+        unbind-method="unregistResolver"/>
   </reference-list>
   <service ref="passwordResolver" interface="org.xipki.password.PasswordResolver"/>
 

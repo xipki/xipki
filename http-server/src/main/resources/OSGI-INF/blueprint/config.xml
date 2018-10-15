@@ -29,7 +29,7 @@
   <reference id="passwordResolver" interface="org.xipki.password.PasswordResolver"/>
 
   <bean id="httpservers" class="org.xipki.http.server.HttpServers"
-      init-method="start" destroy-method="shutdown">
+      init-method="start" destroy-method="close">
     <property name="conf" ref="httpserversConf"/>
     <property name="servletListener" ref="servletListener"/>
     <property name="passwordResolver" ref="passwordResolver"/>

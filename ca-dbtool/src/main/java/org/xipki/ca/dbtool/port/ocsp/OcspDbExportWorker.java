@@ -99,7 +99,7 @@ public class OcspDbExportWorker extends DbPortWorker {
       OcspCertstoreDbExporter certStoreExporter = new OcspCertstoreDbExporter(datasource,
           destFolder, numCertsInBundle, numCertsPerSelect, resume, stopMe);
       certStoreExporter.export();
-      certStoreExporter.shutdown();
+      certStoreExporter.close();
     } finally {
       try {
         datasource.close();

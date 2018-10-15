@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.impl;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -28,6 +29,8 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
@@ -51,6 +54,7 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
 
 /**
@@ -60,6 +64,8 @@ import org.xipki.util.ParamUtil;
  */
 
 public class CaInfo {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CaInfo.class);
 
   private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
@@ -378,7 +384,11 @@ public class CaInfo {
         tmpSigners.put(algo, signer);
       } catch (Throwable th) {
         for (ConcurrentContentSigner ccs : tmpSigners.values()) {
-          ccs.shutdown();
+          try {
+            ccs.close();
+          } catch (IOException ex) {
+            LogUtil.error(LOG, ex, "could not close ConcurrentContentSigner " + ccs.getName());
+          }
         }
         tmpSigners.clear();
         throw new XiSecurityException("could not initialize the CA signer");

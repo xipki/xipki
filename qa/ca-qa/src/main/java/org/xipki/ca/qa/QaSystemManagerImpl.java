@@ -170,7 +170,13 @@ public class QaSystemManagerImpl implements QaSystemManager {
     LOG.info("initialized");
   } // method init
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
   }
 
   @Override

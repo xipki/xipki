@@ -34,7 +34,7 @@
       interface="org.xipki.ca.api.publisher.CertPublisherFactoryRegister"/>
 
   <bean id="caManager" class="org.xipki.ca.server.impl.CaManagerImpl"
-      init-method="startCaSystem" destroy-method="shutdown">
+      init-method="startCaSystem" destroy-method="close">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>

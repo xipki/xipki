@@ -107,7 +107,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       TlsInit.init();
       byte[] encodedCaCert =
           SdkUtil.send(new URL(CACERT_URL), "GET", null, null, "application/pkix-cert");
-      TlsInit.shutdown();
+      TlsInit.close();
 
       X509Certificate caCert = SdkUtil.parseCert(encodedCaCert);
       // CHECKSTYLE:SKIP
@@ -216,7 +216,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
         System.err.println("(CMP) revoking certificate failed");
       }
 
-      client.shutdown();
+      client.close();
     } catch (Exception ex) {
       ex.printStackTrace();
       System.exit(-1);

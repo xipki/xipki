@@ -95,7 +95,7 @@ public class RestCaClientExample extends CaClientExample {
         System.err.println("(REST) revoking certificate failed");
       }
 
-      client.shutdown();
+      client.close();
     } catch (Exception ex) {
       ex.printStackTrace();
       System.exit(-1);

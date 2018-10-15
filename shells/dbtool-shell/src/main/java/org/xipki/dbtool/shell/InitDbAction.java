@@ -51,7 +51,7 @@ public class InitDbAction extends LiquibaseAction {
       liquibase.dropAll();
       liquibase.update();
     } finally {
-      liquibase.shutdown();
+      liquibase.close();
     }
 
     return null;

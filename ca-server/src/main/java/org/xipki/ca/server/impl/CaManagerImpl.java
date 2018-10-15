@@ -19,6 +19,7 @@ package org.xipki.ca.server.impl;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -170,7 +171,7 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-public class CaManagerImpl implements CaManager, ResponderManager {
+public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
   private class CertsInQueuePublisher implements Runnable {
 
@@ -357,7 +358,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
 
   private boolean initializing;
 
-  public CaManagerImpl() throws InvalidConfException {
+  public CaManagerImpl() {
     this.datasourceFactory = new DataSourceFactory();
     String calockId = null;
     File caLockFile = new File("calock");
@@ -797,7 +798,13 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     return true;
   } // method startCa
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     LOG.info("stopping CA system");
     shutdownScheduledThreadPoolExecutor();
 
@@ -816,7 +823,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     for (String caName : x509cas.keySet()) {
       X509Ca ca = x509cas.get(caName);
       try {
-        ca.shutdown();
+        ca.close();
       } catch (Throwable th) {
         LogUtil.error(LOG, th, concat("could not call ca.shutdown() for CA ", caName));
       }
@@ -1101,7 +1108,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     cmpResponders.remove(name);
     scepResponders.remove(name);
     if (oldCa != null) {
-      oldCa.shutdown();
+      oldCa.close();
     }
 
     CaInfo ca = queryExecutor.createCaInfo(name, masterMode, certstore);
@@ -1906,7 +1913,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     cmpResponders.remove(name);
     scepResponders.remove(name);
     if (ca != null) {
-      ca.shutdown();
+      ca.close();
     }
   } // method removeCa
 
@@ -2314,7 +2321,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     try {
-      profile.shutdown();
+      profile.close();
     } catch (Exception ex) {
       LogUtil.warn(LOG, ex, "could not shutdown Certprofile " + profile.getIdent());
     }
@@ -2326,7 +2333,7 @@ public class CaManagerImpl implements CaManager, ResponderManager {
     }
 
     try {
-      publisher.shutdown();
+      publisher.close();
     } catch (Exception ex) {
       LogUtil.warn(LOG, ex, "could not shutdown CertPublisher " + publisher.getIdent());
     }

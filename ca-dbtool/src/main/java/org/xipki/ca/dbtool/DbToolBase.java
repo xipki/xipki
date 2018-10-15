@@ -18,6 +18,7 @@
 package org.xipki.ca.dbtool;
 
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +51,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-public class DbToolBase {
+public class DbToolBase implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbToolBase.class);
 
@@ -120,7 +121,13 @@ public class DbToolBase {
     return true;
   } // method deleteFromTableWithLargerId
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     datasource.returnConnection(connection);
     connection = null;
   }

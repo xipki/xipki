@@ -22,7 +22,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <bean id="qaSystemManager" class="org.xipki.ca.qa.QaSystemManagerImpl"
-      init-method="init" destroy-method="shutdown">
+      init-method="init" destroy-method="close">
     <property name="confFile" value="${confFile}"/>
   </bean>
   <service ref="qaSystemManager" interface="org.xipki.ca.qa.QaSystemManager"/>

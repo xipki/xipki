@@ -108,7 +108,13 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     this.passwordResolver = passwordResolver;
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     services.clear();
   }
 

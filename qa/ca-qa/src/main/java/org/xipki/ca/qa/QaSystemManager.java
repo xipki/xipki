@@ -17,6 +17,7 @@
 
 package org.xipki.ca.qa;
 
+import java.io.Closeable;
 import java.util.Set;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Set;
  * @since 2.0.0
  */
 
-public interface QaSystemManager {
+public interface QaSystemManager extends Closeable {
 
   Set<String> getIssuerNames();
 

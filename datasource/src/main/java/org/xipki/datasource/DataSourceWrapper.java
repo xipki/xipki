@@ -17,6 +17,7 @@
 
 package org.xipki.datasource;
 
+import java.io.Closeable;
 import java.io.PrintWriter;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
@@ -44,7 +45,7 @@ import com.zaxxer.hikari.HikariDataSource;
  * @since 2.0.0
  */
 
-public abstract class DataSourceWrapper {
+public abstract class DataSourceWrapper implements Closeable {
 
   // CHECKSTYLE:SKIP
   private static class MySQL extends DataSourceWrapper {
@@ -440,10 +441,11 @@ public abstract class DataSourceWrapper {
     }
   }
 
+  @Override
   public void close() {
     try {
       service.close();
-    } catch (Exception ex) {
+    } catch (RuntimeException ex) {
       LOG.warn("could not close datasource: {}", ex.getMessage());
       LOG.debug("could not close datasource", ex);
     }

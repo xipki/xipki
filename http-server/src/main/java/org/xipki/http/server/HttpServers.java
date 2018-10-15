@@ -18,6 +18,7 @@
 package org.xipki.http.server;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -62,7 +63,7 @@ import io.netty.handler.ssl.SslProvider;
  * @since 2.2.0
  */
 
-public final class HttpServers {
+public final class HttpServers implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpServers.class);
 
@@ -142,15 +143,21 @@ public final class HttpServers {
     }
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (servers.isEmpty()) {
       LOG.info("found no HTTP server to shutdown");
       return;
     }
 
     for (HttpServer server : servers) {
-      server.shutdown();
-      LOG.info("shutdown HTTP server {}", server);
+      server.close();
+      LOG.info("close HTTP server {}", server);
     }
 
     servers.clear();

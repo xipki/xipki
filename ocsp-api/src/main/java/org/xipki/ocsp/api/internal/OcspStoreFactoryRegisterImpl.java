@@ -38,14 +38,14 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
   private static final Logger LOG = LoggerFactory.getLogger(
       OcspStoreFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<OcspStoreFactory> services =
+  private ConcurrentLinkedDeque<OcspStoreFactory> factories =
       new ConcurrentLinkedDeque<OcspStoreFactory>();
 
   @Override
   public OcspStore newOcspStore(String type) throws ObjectCreationException {
     ParamUtil.requireNonBlank("type", type);
 
-    for (OcspStoreFactory service : services) {
+    for (OcspStoreFactory service : factories) {
       if (service.canCreateOcspStore(type)) {
         LOG.info("found factory to create OcspStore of type '" + type + "'");
         return service.newOcspStore(type);
@@ -56,31 +56,41 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
         "could not find factory to create OcspStore of type '" + type + "'");
   }
 
+  @Deprecated
   public void bindService(OcspStoreFactory service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("bindService invoked with null.");
-      return;
-    }
-
-    boolean replaced = services.remove(service);
-    services.add(service);
-
-    String action = replaced ? "replaced" : "added";
-    LOG.info("{} CertStatusStoreFactory binding for {}", action, service);
+    registFactory(service);
   }
 
-  public void unbindService(OcspStoreFactory service) {
+  public void registFactory(OcspStoreFactory factory) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("unbindService invoked with null.");
+    if (factory == null) {
+      LOG.info("registFactory invoked with null.");
       return;
     }
 
-    if (services.remove(service)) {
-      LOG.info("removed CertStatusStoreFactory binding for {}", service);
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
+
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} CertStatusStoreFactory binding for {}", action, factory);
+  }
+
+  @Deprecated
+  public void unbindService(OcspStoreFactory service) {
+    unregistFactory(service);
+  }
+
+  public void unregistFactory(OcspStoreFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.info("unregistFactory invoked with null.");
+      return;
+    }
+
+    if (factories.remove(factory)) {
+      LOG.info("removed CertStatusStoreFactory binding for {}", factory);
     } else {
-      LOG.info("no CertStatusStoreFactory binding found to remove for '{}'", service);
+      LOG.info("no CertStatusStoreFactory binding found to remove for '{}'", factory);
     }
   }
 

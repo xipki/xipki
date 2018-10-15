@@ -17,6 +17,7 @@
 
 package org.xipki.ca.client.api;
 
+import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.Certificate;
 import java.security.cert.X509CRL;
@@ -39,7 +40,7 @@ import org.xipki.util.ReqRespDebug;
  * @since 2.0.0
  */
 
-public interface CaClient {
+public interface CaClient extends Closeable {
 
   Set<String> getCaNames();
 

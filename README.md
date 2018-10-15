@@ -96,11 +96,9 @@ follows.
 
   This step is only required if the CA is behind a reverse proxy apache httpd.
 
-  * In file etc/org.xipki.ca.server.cfg, change the sslCertInHttpHeader as
-    follows:
-
+  * Add the java property org.xipki.reverseproxy.mode
     ```sh
-    sslCertInHttpHeader = true
+    -Dorg.xipki.reverseproxy.mode=APACHE
     ```
 
   * configure the proxy to forward the headers via mod_proxy with the following

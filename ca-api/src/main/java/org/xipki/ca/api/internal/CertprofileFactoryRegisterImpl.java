@@ -40,12 +40,12 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
 
   private static final Logger LOG = LoggerFactory.getLogger(CertprofileFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<CertprofileFactory> services = new ConcurrentLinkedDeque<>();
+  private ConcurrentLinkedDeque<CertprofileFactory> factories = new ConcurrentLinkedDeque<>();
 
   @Override
   public Set<String> getSupportedTypes() {
     Set<String> types = new HashSet<>();
-    for (CertprofileFactory service : services) {
+    for (CertprofileFactory service : factories) {
       types.addAll(service.getSupportedTypes());
     }
     return Collections.unmodifiableSet(types);
@@ -53,7 +53,7 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
 
   @Override
   public boolean canCreateProfile(String type) {
-    for (CertprofileFactory service : services) {
+    for (CertprofileFactory service : factories) {
       if (service.canCreateProfile(type)) {
         return true;
       }
@@ -65,7 +65,7 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
   public Certprofile newCertprofile(String type) throws ObjectCreationException {
     ParamUtil.requireNonBlank("type", type);
 
-    for (CertprofileFactory service : services) {
+    for (CertprofileFactory service : factories) {
       if (service.canCreateProfile(type)) {
         return service.newCertprofile(type);
       }
@@ -75,31 +75,41 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
         "could not find factory to create Certprofile of type '" + type + "'");
   }
 
+  @Deprecated
   public void bindService(CertprofileFactory service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("bindService invoked with null.");
-      return;
-    }
-
-    boolean replaced = services.remove(service);
-    services.add(service);
-
-    String action = replaced ? "replaced" : "added";
-    LOG.info("{} CertprofileFactory binding for {}", action, service);
+    registFactory(service);
   }
 
-  public void unbindService(CertprofileFactory service) {
+  public void registFactory(CertprofileFactory factory) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("unbindService invoked with null.");
+    if (factory == null) {
+      LOG.info("registFactroy invoked with null.");
       return;
     }
 
-    if (services.remove(service)) {
-      LOG.info("removed CertprofileFactory binding for {}", service);
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
+
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} CertprofileFactory binding for {}", action, factory);
+  }
+
+  @Deprecated
+  public void unbindService(CertprofileFactory service) {
+    unregistFactory(service);
+  }
+
+  public void unregistFactory(CertprofileFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.debug("unregistFactory invoked with null.");
+      return;
+    }
+
+    if (factories.remove(factory)) {
+      LOG.info("removed CertprofileFactory binding for {}", factory);
     } else {
-      LOG.info("no CertprofileFactory binding found to remove for '{}'", service);
+      LOG.info("no CertprofileFactory binding found to remove for '{}'", factory);
     }
   }
 

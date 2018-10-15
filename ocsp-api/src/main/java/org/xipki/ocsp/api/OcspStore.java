@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.api;
 
+import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -30,7 +31,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.0.0
  */
 
-public abstract class OcspStore {
+public abstract class OcspStore implements Closeable {
 
   protected static final long DAY = 24L * 60 * 60 * 1000;
 
@@ -97,6 +98,7 @@ public abstract class OcspStore {
   public abstract void init(String conf, DataSourceWrapper datasource)
       throws OcspStoreException;
 
+  @Deprecated
   public abstract void shutdown() throws OcspStoreException;
 
   public abstract boolean isHealthy();

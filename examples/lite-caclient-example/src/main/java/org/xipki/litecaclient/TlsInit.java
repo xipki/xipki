@@ -97,7 +97,7 @@ public class TlsInit {
     HttpsURLConnection.setDefaultHostnameVerifier(SdkHostnameVerifier.INSTANCE);
   }
 
-  public static void shutdown() {
+  public static void close() {
     if (HttpsURLConnection.getDefaultHostnameVerifier() == SdkHostnameVerifier.INSTANCE) {
       LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
           oldHostnameVerifier);

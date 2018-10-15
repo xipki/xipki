@@ -17,6 +17,7 @@
 
 package org.xipki.litecaclient;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Lijun Liao
  */
 
-public class RestCaClient {
+public class RestCaClient implements Closeable {
 
   public static final String CT_pkix_cert = "application/pkix-cert";
 
@@ -73,8 +74,9 @@ public class RestCaClient {
     return caCert;
   }
 
-  public void shutdown() {
-    TlsInit.shutdown();
+  @Override
+  public void close() {
+    TlsInit.close();
   }
 
   private X509Certificate httpgetCaCert() throws Exception {

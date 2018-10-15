@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.qa.benchmark;
 
+import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -54,7 +55,7 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
  * @since 2.2.0
  */
 
-final class HttpClient {
+final class HttpClient implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
 
@@ -242,7 +243,13 @@ final class HttpClient {
     future.awaitUninterruptibly();
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (channel != null) {
       channel = null;
     }

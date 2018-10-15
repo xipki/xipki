@@ -38,42 +38,52 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<SignerFactory> services = new ConcurrentLinkedDeque<>();
+  private ConcurrentLinkedDeque<SignerFactory> factories = new ConcurrentLinkedDeque<>();
 
   @Override
   public Set<String> getSupportedSignerTypes() {
     Set<String> types = new HashSet<>();
-    for (SignerFactory service : services) {
+    for (SignerFactory service : factories) {
       types.addAll(service.getSupportedSignerTypes());
     }
     return Collections.unmodifiableSet(types);
   }
 
+  @Deprecated
   public void bindService(SignerFactory service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("bindService invoked with null.");
-      return;
-    }
-
-    boolean replaced = services.remove(service);
-    services.add(service);
-
-    String action = replaced ? "replaced" : "added";
-    LOG.info("{} SignerFactory binding for {}", action, service);
+    registFactory(service);
   }
 
-  public void unbindService(SignerFactory service) {
+  public void registFactory(SignerFactory factory) {
     //might be null if dependency is optional
-    if (service == null) {
-      LOG.info("unbindService invoked with null.");
+    if (factory == null) {
+      LOG.info("registFactory invoked with null.");
       return;
     }
 
-    if (services.remove(service)) {
-      LOG.info("removed SignerFactory binding for {}", service);
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
+
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} SignerFactory binding for {}", action, factory);
+  }
+
+  @Deprecated
+  public void unbindService(SignerFactory service) {
+    unbindService(service);
+  }
+
+  public void unregistFactory(SignerFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.info("unregistFactory invoked with null.");
+      return;
+    }
+
+    if (factories.remove(factory)) {
+      LOG.info("removed SignerFactory binding for {}", factory);
     } else {
-      LOG.info("no SignerFactory binding found to remove for '{}'", service);
+      LOG.info("no SignerFactory binding found to remove for '{}'", factory);
     }
   }
 
@@ -82,7 +92,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
       SignerConf conf, X509Certificate[] certificateChain) throws ObjectCreationException {
     ParamUtil.requireNonBlank("type", type);
 
-    for (SignerFactory service : services) {
+    for (SignerFactory service : factories) {
       if (service.canCreateSigner(type)) {
         return service.newSigner(type, conf, certificateChain);
       }

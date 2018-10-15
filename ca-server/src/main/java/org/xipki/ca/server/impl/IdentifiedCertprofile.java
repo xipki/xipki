@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.impl;
 
+import java.io.Closeable;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
@@ -86,7 +87,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.0.0
  */
 
-class IdentifiedCertprofile {
+class IdentifiedCertprofile implements Closeable {
 
   private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSION_TYPES;
 
@@ -512,9 +513,15 @@ class IdentifiedCertprofile {
     return certprofile.incSerialNumberIfSubjectExists();
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (certprofile != null) {
-      certprofile.shutdown();
+      certprofile.close();
     }
   }
 

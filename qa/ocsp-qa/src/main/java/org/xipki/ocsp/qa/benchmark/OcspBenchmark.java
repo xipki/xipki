@@ -66,7 +66,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
       }
 
       try {
-        requestor.shutdown();
+        requestor.close();
       } catch (Exception ex) {
         LOG.warn("got IOException in requestor.stop()");
       }

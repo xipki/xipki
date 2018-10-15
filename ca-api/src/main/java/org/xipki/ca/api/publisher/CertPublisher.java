@@ -17,6 +17,7 @@
 
 package org.xipki.ca.api.publisher;
 
+import java.io.Closeable;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ import org.xipki.security.X509Cert;
  * @since 2.0.0
  */
 
-public abstract class CertPublisher {
+public abstract class CertPublisher implements Closeable {
 
   protected CertPublisher() {
   }
@@ -54,7 +55,13 @@ public abstract class CertPublisher {
   public abstract void initialize(String conf, PasswordResolver passwordResolver,
       Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
   }
 
   public abstract boolean publishsGoodCert();

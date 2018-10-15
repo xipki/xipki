@@ -17,6 +17,7 @@
 
 package org.xipki.ca.api.profile;
 
+import java.io.Closeable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ import org.xipki.ca.api.PublicCaInfo;
  * @since 2.0.0
  */
 
-public abstract class Certprofile {
+public abstract class Certprofile implements Closeable {
 
   public boolean isOnlyForRa() {
     return false;
@@ -45,7 +46,13 @@ public abstract class Certprofile {
   protected Certprofile() {
   }
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
   }
 
   public X509CertVersion getVersion() {

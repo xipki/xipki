@@ -491,7 +491,13 @@ public final class CaClientImpl implements CaClient {
     LOG.info("initialized");
   } // method init
 
+  @Deprecated
   public void shutdown() {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (scheduledThreadPoolExecutor != null) {
       scheduledThreadPoolExecutor.shutdown();
       while (!scheduledThreadPoolExecutor.isTerminated()) {

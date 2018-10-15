@@ -23,8 +23,8 @@
   <reference-list id="factories"
        interface="org.xipki.ocsp.api.OcspStoreFactory"
        availability="optional">
-    <reference-listener ref="factoryRegister" bind-method="bindService"
-         unbind-method="unbindService"/>
+    <reference-listener ref="factoryRegister" bind-method="registFactory"
+         unbind-method="unregistFactory"/>
   </reference-list>
 
 </blueprint>

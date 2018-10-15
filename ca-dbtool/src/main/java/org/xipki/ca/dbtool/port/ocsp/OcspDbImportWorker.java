@@ -75,7 +75,7 @@ public class OcspDbImportWorker extends DbPortWorker {
       OcspCertstoreDbImporter certStoreImporter = new OcspCertstoreDbImporter(datasource,
           srcFolder, batchEntriesPerCommit, resume, stopMe);
       certStoreImporter.importToDb();
-      certStoreImporter.shutdown();
+      certStoreImporter.close();
     } finally {
       try {
         datasource.close();

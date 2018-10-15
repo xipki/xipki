@@ -18,6 +18,7 @@
 package org.xipki.common.qa;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -35,7 +36,7 @@ import org.xipki.util.ParamUtil;
  * @since 2.1.0
  */
 
-public class FileBigIntegerIterator implements Iterator<BigInteger> {
+public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
 
   private final boolean hex;
 
@@ -108,6 +109,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger> {
     return nextNumbers.poll();
   }
 
+  @Override
   public void close() {
     try {
       reader.close();

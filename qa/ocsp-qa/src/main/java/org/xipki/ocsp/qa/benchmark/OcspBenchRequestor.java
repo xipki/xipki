@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.qa.benchmark;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -63,7 +64,7 @@ import io.netty.handler.codec.http.HttpVersion;
  * @since 2.2.0
  */
 
-class OcspBenchRequestor {
+class OcspBenchRequestor implements Closeable {
 
   public static final int MAX_LEN_GET = 190;
 
@@ -139,8 +140,14 @@ class OcspBenchRequestor {
     this.httpClient.start();
   }
 
+  @Deprecated
   public void shutdown() throws Exception {
-    httpClient.shutdown();
+    close();
+  }
+
+  @Override
+  public void close() {
+    httpClient.close();
   }
 
   public void ask(BigInteger[] serialNumbers) throws OcspRequestorException {

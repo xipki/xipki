@@ -105,13 +105,18 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     try {
       this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
     } catch (ObjectCreationException ex) {
-      shutdown();
+      close();
       throw ex;
     }
   }
 
-  @Override
+  @Deprecated
   protected final void shutdown() {
+    close();
+  }
+
+  @Override
+  public final void close() {
     if (deleteKeyAfterTest) {
       try {
         LOG.info("delete key {}", objectId);

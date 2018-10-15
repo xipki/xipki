@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.api;
 
+import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 
 import org.xipki.util.HealthCheckResult;
@@ -27,7 +28,7 @@ import org.xipki.util.HealthCheckResult;
  * @since 2.0.0
  */
 
-public interface OcspServer {
+public interface OcspServer extends Closeable {
 
   ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException;
 

@@ -17,6 +17,7 @@
 
 package org.xipki.ca.dbtool.diffdb;
 
+import java.io.Closeable;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,7 +49,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-class TargetDigestRetriever {
+class TargetDigestRetriever implements Closeable {
 
   private class Retriever implements Runnable {
 
@@ -247,6 +248,7 @@ class TargetDigestRetriever {
     }
   } // constructor
 
+  @Override
   public final void close() {
     if (executor != null) {
       executor.shutdownNow();

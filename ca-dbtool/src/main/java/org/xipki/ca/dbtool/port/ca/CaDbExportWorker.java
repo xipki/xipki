@@ -108,14 +108,14 @@ public class CaDbExportWorker extends DbPortWorker {
         // CAConfiguration
         CaconfDbExporter caConfExporter = new CaconfDbExporter(datasource, destFolder, stopMe);
         caConfExporter.export();
-        caConfExporter.shutdown();
+        caConfExporter.close();
       }
 
       // CertStore
       CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(datasource, destFolder,
           numCertsInBundle, numCertsPerSelect, resume, stopMe);
       certStoreExporter.export();
-      certStoreExporter.shutdown();
+      certStoreExporter.close();
     } finally {
       try {
         datasource.close();
