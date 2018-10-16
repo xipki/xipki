@@ -36,7 +36,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -45,6 +44,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -66,8 +66,8 @@ final class HttpClient implements Closeable {
 
     @Override
     public void initChannel(SocketChannel ch) {
-      ChannelPipeline pipeline = ch.pipeline();
-      pipeline.addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
+      ch.pipeline()
+        .addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
         .addLast(new WriteTimeoutHandler(60, TimeUnit.SECONDS))
         .addLast(new HttpClientCodec())
         .addLast(new HttpObjectAggregator(65536))
@@ -82,8 +82,8 @@ final class HttpClient implements Closeable {
       try {
         decrementPendingRequests();
         responseHandler.onComplete(resp);
-      } catch (Throwable th) {
-        LOG.error("unexpected error", th);
+      } catch (RuntimeException ex) {
+        LOG.error("unexpected error", ex);
       }
     }
 
@@ -104,7 +104,9 @@ final class HttpClient implements Closeable {
 
   private int queueSize = 1000;
 
-  private String uri;
+  private URI uri;
+
+  private String host;
 
   private OcspBenchmark responseHandler;
 
@@ -147,8 +149,9 @@ final class HttpClient implements Closeable {
     }
   }
 
-  public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize) {
+  public HttpClient(URI uri, OcspBenchmark responseHandler, int queueSize) {
     this.uri = ParamUtil.requireNonNull("uri", uri);
+    this.host = uri.getHost();
     if (queueSize > 0) {
       this.queueSize = queueSize;
     }
@@ -158,7 +161,6 @@ final class HttpClient implements Closeable {
 
   @SuppressWarnings("unchecked")
   public void start() throws Exception {
-    URI uri = new URI(this.uri);
     String scheme = (uri.getScheme() == null) ? "http" : uri.getScheme();
 
     if (!"http".equalsIgnoreCase(scheme)) {
@@ -232,6 +234,8 @@ final class HttpClient implements Closeable {
     if (!channel.isActive()) {
       throw new OcspRequestorException("channel is not active");
     }
+
+    request.headers().add(HttpHeaderNames.HOST, host);
 
     try {
       latch.await(5, TimeUnit.SECONDS);

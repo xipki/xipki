@@ -136,7 +136,7 @@ class OcspBenchRequestor implements Closeable {
     } else {
       this.responderRawPathGet = this.responderRawPathPost + "/";
     }
-    this.httpClient = new HttpClient(responderUrl, responseHandler, queueSize);
+    this.httpClient = new HttpClient(uri, responseHandler, queueSize);
     this.httpClient.start();
   }
 
