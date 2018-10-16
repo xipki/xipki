@@ -17,7 +17,6 @@
 
 package org.xipki.util;
 
-import java.io.Closeable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
@@ -182,6 +181,10 @@ public abstract class BenchmarkExecutor {
     if (failed != 0) {
       errorAccount.addAndGet(failed);
     }
+  }
+
+  public int getThreads() {
+    return threads;
   }
 
   protected void resetStartTime() {

@@ -18,8 +18,10 @@
 
 package org.xipki.util;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class LruCache<K, V> {
 
@@ -351,6 +353,14 @@ public class LruCache<K, V> {
    */
   public final synchronized Map<K, V> snapshot() {
     return new LinkedHashMap<>(map);
+  }
+
+  /**
+   * TODO.
+   * @return a copy of the keys of the current contents of the cache.
+   */
+  public final synchronized Set<K> keySnapshot() {
+    return new HashSet<>(map.keySet());
   }
 
   @Override
