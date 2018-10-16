@@ -338,7 +338,6 @@ public final class HttpServer implements Closeable {
 
   private static Class<?> clazz(String clazzName, boolean initialize, ClassLoader clazzLoader)
       throws ClassNotFoundException {
-    return Class.forName("io.netty.channel.epoll.EpollServerSocketChannel",
-        initialize, clazzLoader);
+    return Class.forName(clazzName, initialize, clazzLoader);
   }
 }
