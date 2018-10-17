@@ -17,6 +17,7 @@
 
 package org.xipki.http.server;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -142,6 +143,10 @@ public class ServletListener {
   }
 
   public Object[] getServlet(String rawPath) throws URISyntaxException {
+    if (rawPath.startsWith("http://") || rawPath.startsWith("https://")) {
+      rawPath = new URI(rawPath).getPath();
+    }
+
     String alias = null;
     String uriText = null;
 
