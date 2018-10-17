@@ -18,6 +18,7 @@
 package org.xipki.ocsp.qa.benchmark;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -70,7 +71,7 @@ final class HttpClient implements Closeable {
         .addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
         .addLast(new WriteTimeoutHandler(60, TimeUnit.SECONDS))
         .addLast(new HttpClientCodec())
-        .addLast(new HttpObjectAggregator(65536))
+        .addLast(new HttpObjectAggregator(4096))
         .addLast(new HttpClientHandler());
     }
   }
@@ -121,7 +122,7 @@ final class HttpClient implements Closeable {
     ClassLoader loader = HttpClient.class.getClassLoader();
     if (os.contains("linux")) {
       try {
-        Class<?> checkClazz = Class.forName("io.netty.channel.epoll.Epoll", false, loader);
+        Class<?> checkClazz = clazz("io.netty.channel.epoll.Epoll", false, loader);
         Method mt = checkClazz.getMethod("isAvailable");
         Object obj = mt.invoke(null);
 
@@ -137,7 +138,7 @@ final class HttpClient implements Closeable {
       }
     } else if (os.contains("mac os") || os.contains("os x")) {
       try {
-        Class<?> checkClazz = Class.forName("io.netty.channel.epoll.kqueue.KQueue", false, loader);
+        Class<?> checkClazz = clazz("io.netty.channel.epoll.kqueue.KQueue", false, loader);
         Method mt = checkClazz.getMethod("isAvailable");
         Object obj = mt.invoke(null);
         if (obj instanceof Boolean) {
@@ -181,9 +182,9 @@ final class HttpClient implements Closeable {
     if (epollAvailable != null && epollAvailable.booleanValue()) {
       try {
         channelClass = (Class<? extends SocketChannel>)
-            Class.forName("io.netty.channel.epoll.EpollSocketChannel", false, loader);
+            clazz("io.netty.channel.epoll.EpollSocketChannel", false, loader);
 
-        Class<?> clazz = Class.forName("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
+        Class<?> clazz = clazz("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
         Constructor<?> constructor = clazz.getConstructor(int.class);
         this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
         LOG.info("use Epoll Transport");
@@ -199,10 +200,9 @@ final class HttpClient implements Closeable {
     } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
       try {
         channelClass = (Class<? extends SocketChannel>)
-                Class.forName("io.netty.channel.kqueue.KQueueSocketChannel", false, loader);
+                clazz("io.netty.channel.kqueue.KQueueSocketChannel", false, loader);
 
-        Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
-                    true, loader);
+        Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup", true, loader);
         Constructor<?> constructor = clazz.getConstructor(int.class);
         this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
         LOG.info("Use KQueue Transport");
@@ -226,8 +226,19 @@ final class HttpClient implements Closeable {
       .handler(new HttpClientInitializer());
 
     String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
+
     // Make the connection attempt.
     this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
+
+    long start = System.currentTimeMillis();
+    while (!this.channel.isActive() && System.currentTimeMillis() - start < 1000) {
+      LOG.info("channel is not active, waiting for 100 ms");
+      Thread.sleep(100);
+    }
+
+    if (!this.channel.isActive()) {
+      throw new IOException("coult not open and activate channel");
+    }
   }
 
   public void send(FullHttpRequest request) throws OcspRequestorException {
@@ -286,4 +297,10 @@ final class HttpClient implements Closeable {
       }
     }
   }
+
+  private static Class<?> clazz(String clazzName, boolean initialize, ClassLoader clazzLoader)
+      throws ClassNotFoundException {
+    return Class.forName(clazzName, initialize, clazzLoader);
+  }
+
 }
