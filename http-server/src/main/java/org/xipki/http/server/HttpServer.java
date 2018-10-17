@@ -78,10 +78,19 @@ public final class HttpServer implements Closeable {
       if (sslContext != null) {
         pipeline.addLast("ssl", sslContext.newHandler(ch.alloc()));
       }
-      pipeline.addLast(new HttpServerCodec())
-        .addLast(new HttpObjectAggregator(65536))
+
+      final int maxContentLength;
+      if (maxRequestBodySize == Integer.MAX_VALUE) {
+        maxContentLength = 1024 * 1024; // 1M
+      } else {
+        maxContentLength = 1024 + maxRequestBodySize;
+      }
+
+      pipeline
+        .addLast("code", new HttpServerCodec())
+        .addLast("aggregator", new HttpObjectAggregator(maxContentLength))
         .addLast(new ChunkedWriteHandler())
-        .addLast(new NettyHttpServerHandler());
+        .addLast("serverHandler", new NettyHttpServerHandler());
     }
   }
 
