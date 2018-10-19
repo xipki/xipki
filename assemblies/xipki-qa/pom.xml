@@ -31,10 +31,8 @@
     <output.directory>${project.build.directory}/classes</output.directory>
     <jdbc.h2.version>1.4.197</jdbc.h2.version>
     <jdbc.mysql.version>5.1.46</jdbc.mysql.version>
-    <patchkaraf.main.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.main.repos>
-    <patchkaraf.jetty.repos>mvn:org.xipki.features/qa-jetty/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.jetty.repos>
-    <patchkaraf.main.features>(aries-blueprint/${karaf.version},wrap,netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.main.features>
-    <patchkaraf.jetty.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.jetty.features>
+    <patchkaraf.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -326,15 +324,15 @@
             </configuration>
           </execution>
           <execution>
-            <id>add-features-to-repo-jetty</id>
+            <id>add-features-to-repo</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${output.directory}/branches/jetty/system</repository>
+              <repository>${output.directory}/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.features/qa-jetty/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/qa/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -367,27 +365,13 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
-                <mkdir dir="${project.build.directory}/classes/branches/main/etc"/>
-                <mkdir dir="${project.build.directory}/classes/branches/jetty/etc"/>
-                <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
-                      todir="${project.build.directory}/classes/branches/main/etc"/>
-                <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
-                      todir="${project.build.directory}/classes/branches/jetty/etc"/>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
-                  <arg file="${project.build.directory}/classes/branches/main/etc/org.apache.karaf.features.cfg"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
                   <arg value="--repos"/>
-                  <arg value="${patchkaraf.main.repos}"/>
+                  <arg value="${patchkaraf.repos}"/>
                   <arg value="--features"/>
-                  <arg value="${patchkaraf.main.features}"/>
-                </java>
-                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
-                  <arg value="--file"/>
-                  <arg file="${project.build.directory}/classes/branches/jetty/etc/org.apache.karaf.features.cfg"/>
-                  <arg value="--repos"/>
-                  <arg value="${patchkaraf.jetty.repos}"/>
-                  <arg value="--features"/>
-                  <arg value="${patchkaraf.jetty.features}"/>
+                  <arg value="${patchkaraf.features}"/>
                 </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
                   <arg value="--file"/>
@@ -428,22 +412,6 @@
                 <descriptor>src/main/descriptors/assembly-main.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
-              <tarLongFileMode>posix</tarLongFileMode>
-              <!-- Don't install/publish the result -->
-              <attach>false</attach>
-            </configuration>
-          </execution>
-          <execution>
-            <id>bin-jetty</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/descriptors/assembly-jetty.xml</descriptor>
-              </descriptors>
-              <appendAssemblyId>true</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
               <!-- Don't install/publish the result -->
               <attach>false</attach>

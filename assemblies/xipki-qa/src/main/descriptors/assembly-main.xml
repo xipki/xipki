@@ -22,14 +22,6 @@
   <formats>
     <format>tar.gz</format>
   </formats>
-  <fileSets>
-    <fileSet>
-      <directory>${output.directory}/branches/main</directory>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-  </fileSets>
   <componentDescriptors>
     <componentDescriptor>src/main/descriptors/component.xml</componentDescriptor>
     <componentDescriptor>../shared/src/main/descriptors/component-common.xml</componentDescriptor>

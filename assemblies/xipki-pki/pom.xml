@@ -30,10 +30,8 @@
     <app.name>PKI</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
     <jdbc.h2.version>1.4.197</jdbc.h2.version>
-    <patchkaraf.main.repos>mvn:org.xipki.features/pki/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.main.repos>
-    <patchkaraf.jetty.repos>mvn:org.xipki.features/pki-jetty/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.jetty.repos>
-    <patchkaraf.main.features>(aries-blueprint/${karaf.version},wrap,netty),xipki-httpserver,xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.main.features>
-    <patchkaraf.jetty.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.jetty.features>
+    <patchkaraf.repos>mvn:org.xipki.features/pki/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-caserver,xipki-ocspserver,xipki-security-shell,xipki-camgmt-shell</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -272,44 +270,15 @@
         <extensions>true</extensions>
         <executions>
           <execution>
-            <id>add-features-to-repo-main</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>features-add-to-repository</goal>
-            </goals>
-            <configuration>
-              <repository>${output.directory}/branches/main/system</repository>
-              <descriptors>
-                <descriptor>mvn:org.xipki.features/pki/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
-              </descriptors>
-              <features>
-                <feature>aries-blueprint</feature>
-                <feature>wrap</feature>
-                <!-- project-core features -->
-                <feature>netty-linux-x86_64</feature>
-                <feature>netty-osx-x86_64</feature>
-                <feature>netty</feature>
-                <feature>xipki-httpserver</feature>
-                <feature>xipki-caserver</feature>
-                <feature>xipki-camgmt-shell</feature>
-                <feature>xipki-security-shell</feature>
-                <feature>xipki-ocspserver</feature>
-                <feature>xipki-dbtool</feature>
-                <feature>xipki-audit-syslog</feature>
-              </features>
-            </configuration>
-          </execution>
-          <execution>
             <id>add-features-to-repo-jetty</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${output.directory}/branches/jetty/system</repository>
+              <repository>${output.directory}/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.features/pki-jetty/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/pki/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -335,27 +304,13 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
-                <mkdir dir="${project.build.directory}/classes/branches/main/etc"/>
-                <mkdir dir="${project.build.directory}/classes/branches/jetty/etc"/>
-                <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
-                      todir="${project.build.directory}/classes/branches/main/etc"/>
-                <copy file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
-                      todir="${project.build.directory}/classes/branches/jetty/etc"/>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
-                  <arg file="${project.build.directory}/classes/branches/main/etc/org.apache.karaf.features.cfg"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
                   <arg value="--repos"/>
-                  <arg value="${patchkaraf.main.repos}"/>
+                  <arg value="${patchkaraf.repos}"/>
                   <arg value="--features"/>
-                  <arg value="${patchkaraf.main.features}"/>
-                </java>
-                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
-                  <arg value="--file"/>
-                  <arg file="${project.build.directory}/classes/branches/jetty/etc/org.apache.karaf.features.cfg"/>
-                  <arg value="--repos"/>
-                  <arg value="${patchkaraf.jetty.repos}"/>
-                  <arg value="--features"/>
-                  <arg value="${patchkaraf.jetty.features}"/>
+                  <arg value="${patchkaraf.features}"/>
                 </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
                   <arg value="--file"/>

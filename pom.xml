@@ -50,8 +50,6 @@
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.1</karaf.version>
     <karaf.plugin.version>4.2.1</karaf.plugin.version>
-    <netty.version>4.1.30.Final</netty.version>
-    <netty-tcnative.version>2.0.18.Final</netty-tcnative.version>
     <jaxb-api.version>2.2.11</jaxb-api.version>
     <bc.version>1.60</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
@@ -77,8 +75,6 @@
     <module>security-pkcs12</module>
     <module>pkcs11-emulator</module>
     <module>pkcs11-iaik</module>
-    <module>servlet-api</module>
-    <module>http-server</module>
     <!-- PKI Client -->
     <module>ca-client-api</module>
     <module>ca-client-impl</module>

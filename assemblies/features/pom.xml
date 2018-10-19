@@ -29,9 +29,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>pki</module>
-    <module>pki-jetty</module>
     <module>qa</module>
-    <module>qa-jetty</module>
     <module>sdk</module>
     <module>toolkit</module>
   </modules>
