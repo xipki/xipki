@@ -18,6 +18,7 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
@@ -41,7 +41,7 @@ public interface CaManager {
 
   String NULL = "null";
 
-  CaSystemStatus getCaSystemStatus();
+  CaSystemStatus getCaSystemStatus() throws CaMgmtException;
 
   void unlockCa() throws CaMgmtException;
 
@@ -115,8 +115,10 @@ public interface CaManager {
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return the aliases of the given CA.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  Set<String> getAliasesForCa(String caName);
+  Set<String> getAliasesForCa(String caName) throws CaMgmtException;
 
   /**
    * Gets the CA name for the alias {@code aliasName}.
@@ -124,26 +126,28 @@ public interface CaManager {
    * @param aliasName
    *          CA alias name. Must not be {@code null}.
    * @return the aliases of the given CA.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  String getCaNameForAlias(String aliasName);
+  String getCaNameForAlias(String aliasName) throws CaMgmtException;
 
-  Set<String> getCaAliasNames();
+  Set<String> getCaAliasNames() throws CaMgmtException;
 
-  Set<String> getCertprofileNames();
+  Set<String> getCertprofileNames() throws CaMgmtException;
 
-  Set<String> getPublisherNames();
+  Set<String> getPublisherNames() throws CaMgmtException;
 
-  Set<String> getRequestorNames();
+  Set<String> getRequestorNames() throws CaMgmtException;
 
-  Set<String> getSignerNames();
+  Set<String> getSignerNames() throws CaMgmtException;
 
-  Set<String> getCaNames();
+  Set<String> getCaNames() throws CaMgmtException;
 
-  Set<String> getSuccessfulCaNames();
+  Set<String> getSuccessfulCaNames() throws CaMgmtException;
 
-  Set<String> getFailedCaNames();
+  Set<String> getFailedCaNames() throws CaMgmtException;
 
-  Set<String> getInactiveCaNames();
+  Set<String> getInactiveCaNames() throws CaMgmtException;
 
   /**
    * Adds a CA.
@@ -159,8 +163,10 @@ public interface CaManager {
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return the CaEntry
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  CaEntry getCa(String caName);
+  CaEntry getCa(String caName) throws CaMgmtException;
 
   /**
    * Changes a CA.
@@ -222,33 +228,39 @@ public interface CaManager {
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return the Certprofile names.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  Set<String> getCertprofilesForCa(String caName);
+  Set<String> getCertprofilesForCa(String caName) throws CaMgmtException;
 
   /**
    * Returns the Requests supported by the CA {@code caName}.
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return the requestors.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  Set<CaHasRequestorEntry> getRequestorsForCa(String caName);
+  Set<CaHasRequestorEntry> getRequestorsForCa(String caName) throws CaMgmtException;
 
   /**
    * Returns the requestor named {@code name}.
    * @param name
    *          Requestor name. Must not be {@code null}.
    * @return the requestor.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  RequestorEntry getRequestor(String name);
+  RequestorEntry getRequestor(String name) throws CaMgmtException;
 
   /**
    * Adds requstor.
-   * @param dbEntry
+   * @param requestorEntry
    *          Requestor entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestor(RequestorEntry dbEntry) throws CaMgmtException;
+  void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException;
 
   /**
    * Removes requestor named {@code requestorName}.
@@ -330,8 +342,10 @@ public interface CaManager {
    * @param profileName
    *          certificate profile name. Must not be {@code null}.
    * @return the profile
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  CertprofileEntry getCertprofile(String profileName);
+  CertprofileEntry getCertprofile(String profileName) throws CaMgmtException;
 
   /**
    * Removes the certificate profile {@code profileName}.
@@ -357,21 +371,21 @@ public interface CaManager {
 
   /**
    * Adds a certificate profile.
-   * @param dbEntry
+   * @param certprofileEntry
    *          Certificate profile entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException;
+  void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException;
 
   /**
    * Adds a signer.
-   * @param dbEntry
+   * @param signerEntry
    *          Signer entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addSigner(SignerEntry dbEntry) throws CaMgmtException;
+  void addSigner(SignerEntry signerEntry) throws CaMgmtException;
 
   /**
    * Removes the signer named {@code name}.
@@ -387,8 +401,10 @@ public interface CaManager {
    * @param name
    *          Signer name. Must not be {@code null}.
    * @return the signer.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  SignerEntry getSigner(String name);
+  SignerEntry getSigner(String name) throws CaMgmtException;
 
   /**
    * Changes the signer {@code name}.
@@ -398,8 +414,8 @@ public interface CaManager {
    *          Type to be changed. {@code null} indicates no change.
    * @param conf
    *          Configuration to be changed. {@code null} indicates no change.
-   * @param base64Cert
-   *          Base64 encoded certificate of the signer. {@code null} indicates no change.
+   * @param encodedCert
+   *          Encoded certificate of the signer. {@code null} indicates no change.
    * @throws CaMgmtException
    *          if error occurs.
    */
@@ -408,28 +424,32 @@ public interface CaManager {
 
   /**
    * Adds a publisher.
-   * @param dbEntry
+   * @param entry
    *          Publisher entry.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addPublisher(PublisherEntry dbEntry) throws CaMgmtException;
+  void addPublisher(PublisherEntry entry) throws CaMgmtException;
 
   /**
    * Returns publishers for the CA {@code caName}.
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return publishers for the given CA.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  List<PublisherEntry> getPublishersForCa(String caName);
+  List<PublisherEntry> getPublishersForCa(String caName) throws CaMgmtException;
 
   /**
    * Returns the publisher.
    * @param publisherName
    *          Publisher name. Must not be {@code null}.
    * @return the publisher.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  PublisherEntry getPublisher(String publisherName);
+  PublisherEntry getPublisher(String publisherName) throws CaMgmtException;
 
   /**
    * Removes the publisher {@code publisherName}.
@@ -555,21 +575,21 @@ public interface CaManager {
 
   /**
    * Adds a user.
-   * @param userEntry
+   * @param addUserEntry
    *          AddUser entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addUser(AddUserEntry userEntry) throws CaMgmtException;
+  void addUser(AddUserEntry addUserEntry) throws CaMgmtException;
 
   /**
    * Change the user.
-   * @param userEntry
+   * @param changeUserEntry
    *          User change entry. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeUser(ChangeUserEntry userEntry) throws CaMgmtException;
+  void changeUser(ChangeUserEntry changeUserEntry) throws CaMgmtException;
 
   /**
    * Remove the name {@code username}.
@@ -650,25 +670,26 @@ public interface CaManager {
 
   /**
    * Loads the CA system configuration.
-   * @param conf
-   *          Configuration of the CA system. Must not be {@code null}.
+   * @param zippedConfStream
+   *          Inputstream of the zipped Configuration the CA system. Must not be {@code null}.
+   * @return map of generated root certificates, if newly generated. The key is the CA name.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void loadConf(CaConf conf) throws CaMgmtException;
+  Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
+      throws CaMgmtException, IOException;
 
   /**
-   * Exports the CA system configuration.
-   * @param zipFilename
-   *          Where to save the exported ZIP file. Must be {@code null}.
+   * Exports the CA system configuration to a zip-stream.
    * @param caNames
    *          List of the names of CAs to be exported. {@code null} to export all CAs.
+   * @return ZIP stream of the CA system configuration.
    * @throws IOException
    *          If read the ZIP file fails.
    * @throws CaMgmtException
    *          if non-IO error occurs.
    */
-  void exportConf(String zipFilename, List<String> caNames) throws CaMgmtException, IOException;
+  InputStream exportConf(List<String> caNames) throws CaMgmtException, IOException;
 
   /**
    * Returns a sorted list of certificate meta information.
@@ -706,19 +727,25 @@ public interface CaManager {
   /**
    * Retrieves the types of supported signers.
    * @return lower-case types of supported signers, never {@code null}.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  Set<String> getSupportedSignerTypes();
+  Set<String> getSupportedSignerTypes() throws CaMgmtException;
 
   /**
    * Retrieves the types of supported certificate profiles.
    * @return types of supported certificate profiles, never {@code null}.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  Set<String> getSupportedCertprofileTypes();
+  Set<String> getSupportedCertprofileTypes() throws CaMgmtException;
 
   /**
    * Retrieves the types of supported publishers.
    * @return lower-case types of supported publishers, never {@code null}.
+   * @throws CaMgmtException
+   *          if error occurs.
    */
-  Set<String> getSupportedPublisherTypes();
+  Set<String> getSupportedPublisherTypes() throws CaMgmtException;
 
 }

@@ -30,13 +30,18 @@ import org.xipki.util.StringUtil;
 
 public class PublisherEntry {
 
-  private final NameId ident;
+  private NameId ident;
 
-  private final String type;
+  private String type;
 
-  private final String conf;
+  private String conf;
 
   private boolean faulty;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private PublisherEntry() {
+  }
 
   public PublisherEntry(NameId ident, String type, String conf) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
@@ -44,12 +49,24 @@ public class PublisherEntry {
     this.conf = conf;
   }
 
+  public void setIdent(NameId ident) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
+
   public NameId getIdent() {
     return ident;
   }
 
+  public void setType(String type) {
+    this.type = ParamUtil.requireNonBlankLower("type", type);
+  }
+
   public String getType() {
     return type;
+  }
+
+  public void setConf(String conf) {
+    this.conf = conf;
   }
 
   public String getConf() {

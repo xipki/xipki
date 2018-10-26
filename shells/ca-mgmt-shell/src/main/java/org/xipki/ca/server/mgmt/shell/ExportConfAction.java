@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -27,6 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -52,7 +55,8 @@ public class ExportConfAction extends CaAction {
   protected Object execute0() throws Exception {
     String msg = "configuration to file " + confFile;
     try {
-      caManager.exportConf(confFile, caNames);
+      InputStream is = caManager.exportConf(caNames);
+      save(new File(confFile), IoUtil.read(is));
       println("exported " + msg);
       return null;
     } catch (CaMgmtException ex) {

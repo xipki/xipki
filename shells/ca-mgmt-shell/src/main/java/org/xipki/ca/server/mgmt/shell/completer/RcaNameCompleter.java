@@ -18,11 +18,13 @@
 package org.xipki.ca.server.mgmt.shell.completer;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaEntry;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 
 /**
  * TODO.
@@ -35,9 +37,22 @@ public class RcaNameCompleter extends MgmtNameCompleter {
 
   @Override
   protected Set<String> getEnums() {
+    Set<String> caNames;
+    try {
+      caNames = caManager.getCaNames();
+    } catch (CaMgmtException ex) {
+      return Collections.emptySet();
+    }
+
     Set<String> ret = new HashSet<>();
-    for (String name : caManager.getCaNames()) {
-      CaEntry caEntry = caManager.getCa(name);
+
+    for (String name : caNames) {
+      CaEntry caEntry;
+      try {
+        caEntry = caManager.getCa(name);
+      } catch (CaMgmtException ex) {
+        continue;
+      }
 
       X509Certificate cert = caEntry.getCert();
       if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {

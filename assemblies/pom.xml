@@ -29,9 +29,9 @@
   <packaging>pom</packaging>
   <modules>
     <module>features</module>
-    <module>xipki-toolkit</module>
-    <module>xipki-pki</module>
-    <module>xipki-sdk</module>
+    <module>xipki-console</module>
+    <module>ocsp-war</module>
+    <module>ca-war</module>
     <!-- DO NOT INCLUDE xipki-qa -->
   </modules>
 </project>

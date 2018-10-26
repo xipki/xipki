@@ -41,11 +41,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>datasource</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xipki.shells</groupId>
       <artifactId>shell-base</artifactId>
       <version>${project.version}</version>

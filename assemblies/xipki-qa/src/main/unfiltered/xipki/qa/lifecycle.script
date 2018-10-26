@@ -138,17 +138,17 @@ if { $printUsage equals "true" } then {
 
   ## Prepare OCSP responder configuration
   xi:copy-file -f \
-    xipki/ocsp-config/template.ocsp-responder.xml \
-    xipki/ocsp-config/ocsp-responder.xml
+    xipki/etc/ocsp/template.ocsp-responder.xml \
+    xipki/etc/ocsp/ocsp-responder.xml
 
   xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
-    xipki/ocsp-config/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.xml
 
   xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
-    xipki/ocsp-config/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.xml
 
   xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-    xipki/ocsp-config/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.xml
 
   ## CA client configuration
   xi:copy-file -f xipki/client-config/template.ca-client.xml \
@@ -250,7 +250,7 @@ if { $printUsage equals "true" } then {
   source file:./xipki/qa/rest.script
 
   # Force the OCSP responder to import the CRL to database
-  xi:copy-file -f xipki/ocsp-config/example/foo.crl.UPDATEME \
+  xi:copy-file -f xipki/etc/ocsp/foo.crl.UPDATEME \
     output/subcawithcrl1.crl.UPDATEME
 
   feature:install xipki-ocspserver

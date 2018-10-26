@@ -31,7 +31,7 @@ if { "$1" equals "" } then {
     printUsage = "true"
     argsValid = "true"
   } else {
-    list = [enroll ocsp revoke]; each ($list) {
+    list = [enroll ocsp]; each ($list) {
       if { "$action" equals $it } then {
         argsValid = "true"
         break
@@ -50,7 +50,7 @@ if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/qa/benchmark.script <test type> [<durataion> [<threads>]]"
-  echo "test type:       enroll, ocsp, revoke"
+  echo "test type:       enroll, ocsp"
   echo "duration:        duration in seconds, default is 15"
   echo "threads:         number of threads, default is 5"
 } else {
@@ -84,18 +84,6 @@ if { $printUsage equals "true" } then {
     xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \
       --key-type RSA --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
       --profile TLS -n 3 --random-dn O
-
-    feature:uninstall xipki-caclient-shell
-  } elif { "$action" equals "revoke" } then {
-    feature:install xipki-caclient-shell
-
-    echo "Sleeping 1 second"
-    sleep 1
-
-    echo "Revoke benchmark"
-    xiqa:cmp-benchmark-revoke --duration $duration --thread $threads \
-      --issuer output/subca1.crt \
-      --ca-db xipki/ca-config/ca-db.properties
 
     feature:uninstall xipki-caclient-shell
   } elif { "$action" equals "ocsp" } then {

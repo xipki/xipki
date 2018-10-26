@@ -50,7 +50,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
 
   //private static final String URL_PREFIX = "http://localhost:8080";
 
-  private static final String URL_PREFIX = "https://localhost:8443";
+  private static final String URL_PREFIX = "https://localhost:8443/ca";
 
   private static final String CMP_URL = URL_PREFIX + "/cmp/myca";
 

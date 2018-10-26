@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaEntry;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.shell.CaAction;
 import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.security.util.X509Util;
@@ -56,7 +57,8 @@ public abstract class UnRevRmCertAction extends CaAction {
   private String serialNumberS;
 
   protected BigInteger getSerialNumber()
-      throws CmdFailure, IllegalCmdParamException, CertificateException, IOException {
+      throws CmdFailure, IllegalCmdParamException, CertificateException, IOException,
+        CaMgmtException  {
     CaEntry ca = caManager.getCa(caName);
     if (ca == null) {
       throw new CmdFailure("CA " + caName + " not available");

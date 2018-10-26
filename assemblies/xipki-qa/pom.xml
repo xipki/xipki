@@ -29,7 +29,6 @@
   <properties>
     <app.name>PKI QA</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
-    <jdbc.h2.version>1.4.197</jdbc.h2.version>
     <jdbc.mysql.version>5.1.46</jdbc.mysql.version>
     <patchkaraf.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
     <patchkaraf.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.features>
@@ -59,46 +58,6 @@
         <includes>
           <include>**/*</include>
         </includes>
-      </resource>
-      <resource>
-        <directory>../shared/src/main/filtered</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>../shared/src/main/unfiltered</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-        <excludes>
-          <exclude>etc/org.xipki.security.pkcs11.cfg</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>../xipki-pki/src/main/filtered</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-        <excludes>
-          <exclude>**/org.apache.karaf.features.cfg</exclude>
-          <exclude>lib/jdbc/**</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>../xipki-pki/src/main/unfiltered</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-        <excludes>
-          <exclude>xipki/ocsp-config/ocsp-responder.xml*</exclude>
-          <exclude>etc/custom.system.properties</exclude>
-          <exclude>xipki/setup/**</exclude>
-        </excludes>
       </resource>
     </resources>
     <plugins>
@@ -140,6 +99,18 @@
                   <groupId>mysql</groupId>
                   <artifactId>mysql-connector-java</artifactId>
                   <version>${jdbc.mysql.version}</version>
+                  <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                  <version>${jdbc.mariadb.version}</version>
+                  <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${jdbc.postgresql.version}</version>
                   <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
                 </artifactItem>
               </artifactItems>
@@ -268,7 +239,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>${output.directory}/xipki/security/tlskeys</outputDirectory>
+              <outputDirectory>${output.directory}/xipki/keycerts/tlskeys</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>
@@ -287,42 +258,6 @@
         <artifactId>karaf-maven-plugin</artifactId>
         <extensions>true</extensions>
         <executions>
-          <execution>
-            <id>add-features-to-repo-main</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>features-add-to-repository</goal>
-            </goals>
-            <configuration>
-              <repository>${output.directory}/branches/main/system</repository>
-              <descriptors>
-                <descriptor>mvn:org.xipki.features/qa/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
-              </descriptors>
-              <features>
-                <feature>aries-blueprint</feature>
-                <feature>wrap</feature>
-                <!-- project-core features -->
-                <feature>netty-linux-x86_64</feature>
-                <feature>netty-osx-x86_64</feature>
-                <feature>netty</feature>
-                <feature>xipki-httpserver</feature>
-                <feature>xipki-caserver</feature>
-                <feature>xipki-camgmt-shell</feature>
-                <feature>xipki-caclient-shell</feature>
-                <feature>xipki-security-shell</feature>
-                <feature>xipki-ocspserver</feature>
-                <feature>xipki-ocspclient-shell</feature>
-                <feature>xipki-dbtool</feature>
-                <feature>xipki-audit-syslog</feature>
-                <feature>xipki-scepclient-shell</feature>
-                <feature>xipki-jscepclient-shell</feature>
-                <feature>xipki-caqa-shell</feature>
-                <feature>xipki-ocspqa-shell</feature>
-                <feature>xipki-custom-certprofiles</feature>
-              </features>
-            </configuration>
-          </execution>
           <execution>
             <id>add-features-to-repo</id>
             <phase>generate-resources</phase>
@@ -387,7 +322,7 @@
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
                   <arg value="--value-file"/>
-                  <arg file="../xipki-pki/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
+                  <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
               </target>
             </configuration>

@@ -211,7 +211,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     } finally {
-      IoUtil.closeStream(certsFileOs);
+      IoUtil.closeQuietly(certsFileOs);
     }
   } // method exportCert
 

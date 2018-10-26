@@ -43,10 +43,15 @@ public class CaUris {
 
   private static final String NAME_DELTACRL_URIS = "deltacrl.uris";
 
-  private final List<String> cacertUris;
-  private final List<String> ocspUris;
-  private final List<String> crlUris;
-  private final List<String> deltaCrlUris;
+  private List<String> cacertUris;
+  private List<String> ocspUris;
+  private List<String> crlUris;
+  private List<String> deltaCrlUris;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CaUris() {
+  }
 
   public CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
       List<String> deltaCrlUris) {
@@ -56,16 +61,32 @@ public class CaUris {
     this.deltaCrlUris = (deltaCrlUris == null) ? null : Collections.unmodifiableList(deltaCrlUris);
   }
 
+  public void setCacertUris(List<String> uris) {
+    this.cacertUris = (cacertUris == null) ? null : Collections.unmodifiableList(uris);
+  }
+
   public List<String> getCacertUris() {
     return cacertUris;
+  }
+
+  public void setOcspUris(List<String> uris) {
+    this.ocspUris = (ocspUris == null) ? null : Collections.unmodifiableList(uris);
   }
 
   public List<String> getOcspUris() {
     return ocspUris;
   }
 
+  public void setCrlUris(List<String> uris) {
+    this.crlUris = (crlUris == null) ? null : Collections.unmodifiableList(uris);
+  }
+
   public List<String> getCrlUris() {
     return crlUris;
+  }
+
+  public void setDeltaCrlUris(List<String> uris) {
+    this.deltaCrlUris = (deltaCrlUris == null) ? null : Collections.unmodifiableList(uris);
   }
 
   public List<String> getDeltaCrlUris() {

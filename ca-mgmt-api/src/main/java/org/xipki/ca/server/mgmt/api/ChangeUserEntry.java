@@ -28,13 +28,17 @@ import org.xipki.util.ParamUtil;
 
 public class ChangeUserEntry {
 
-  private final NameId ident;
+  private NameId ident;
 
   private Boolean active;
 
   private String password;
 
   public ChangeUserEntry(NameId ident) throws CaMgmtException {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
+
+  public void setIdent(NameId ident) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
   }
 

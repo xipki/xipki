@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,12 +44,12 @@ import org.xipki.ca.server.mgmt.shell.completer.SignerNamePlusNullCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.YesNoCompleter;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
 
 /**
@@ -195,7 +194,7 @@ public class CaUpdateAction extends CaAction {
     }
 
     if (certFile != null) {
-      entry.setCert(X509Util.parseCert(new File(certFile)));
+      entry.setEncodedCert(IoUtil.read(certFile));
     }
 
     if (signerConf != null) {

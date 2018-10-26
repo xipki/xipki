@@ -152,7 +152,7 @@ final class HttpClient implements Closeable {
 
   public HttpClient(URI uri, OcspBenchmark responseHandler, int queueSize) {
     this.uri = ParamUtil.requireNonNull("uri", uri);
-    this.host = uri.getHost();
+    this.host = uri.getHost() + ":" + uri.getPort();
     if (queueSize > 0) {
       this.queueSize = queueSize;
     }

@@ -17,9 +17,11 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 
 /**
  * TODO.
@@ -32,7 +34,11 @@ public class CaAliasCompleter extends MgmtNameCompleter {
 
   @Override
   protected Set<String> getEnums() {
-    return caManager.getCaAliasNames();
+    try {
+      return caManager.getCaAliasNames();
+    } catch (CaMgmtException ex) {
+      return Collections.emptySet();
+    }
   }
 
 }

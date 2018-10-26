@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
 
@@ -116,7 +117,15 @@ public class LiquibaseDatabaseConf {
 
     if (datasourceClassName.contains("org.h2.")) {
       driverClassName = "org.h2.Driver";
-      urlBuilder.append(dbProps.getProperty("dataSource.url"));
+      String dataSourceUrl = dbProps.getProperty("dataSource.url");
+      String prefix = "jdbc:h2:";
+      if (dataSourceUrl.startsWith(prefix + "~")) {
+        urlBuilder.append(prefix)
+          .append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
+      } else {
+        urlBuilder.append(dataSourceUrl);
+      }
+
       if (schema != null) {
         urlBuilder.append(";INIT=CREATE SCHEMA IF NOT EXISTS ").append(schema);
       }
@@ -128,7 +137,7 @@ public class LiquibaseDatabaseConf {
         .append(dbProps.getProperty("dataSource.databaseName"));
     } else if (datasourceClassName.contains("mariadb.")) {
       driverClassName = "org.mariadb.jdbc.Driver";
-      String str = dbProps.getProperty("dataSource.URL");
+      String str = dbProps.getProperty("dataSource.url");
       if (StringUtil.isNotBlank(str)) {
         urlBuilder.append(str);
       } else {
@@ -175,7 +184,14 @@ public class LiquibaseDatabaseConf {
         .append(serverName).append(":").append(portNumber).append("/").append(databaseName);
     } else if (datasourceClassName.contains("hsqldb.")) {
       driverClassName = "org.hsqldb.jdbc.JDBCDriver";
-      urlBuilder.append(dbProps.getProperty("dataSource.url"));
+      String dataSourceUrl = dbProps.getProperty("dataSource.url");
+      String prefix = "jdbc:hsqldb:file:";
+      if (dataSourceUrl.startsWith(prefix + "~")) {
+        urlBuilder.append(prefix)
+          .append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
+      } else {
+        urlBuilder.append(dataSourceUrl);
+      }
     } else {
       throw new IllegalArgumentException("unsupported database type " + datasourceClassName);
     }

@@ -33,17 +33,14 @@ public class GenSelfIssued {
 
   private final byte[] csr;
 
-  private final String certFilename;
-
   private final BigInteger serialNumber;
 
   private final String certOutputFormat;
 
-  public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber, String certFilename,
+  public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber,
       String certOutputFormat) {
     this.profile = ParamUtil.requireNonBlank("profile", profile);
     this.csr = ParamUtil.requireNonNull("csr", csr);
-    this.certFilename = certFilename;
     this.serialNumber = serialNumber;
     this.certOutputFormat = certOutputFormat;
   }
@@ -54,10 +51,6 @@ public class GenSelfIssued {
 
   public byte[] getCsr() {
     return csr;
-  }
-
-  public String getCertFilename() {
-    return certFilename;
   }
 
   public BigInteger getSerialNumber() {

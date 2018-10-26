@@ -22,11 +22,11 @@
       <signature>
         <!-- Can be commented if the certificate can be retrieved from the signerType and signerConf -->
         <!--cert>
-          <file>xipki/security/tlskeys/tls-client.der</file>
+          <file>xipki/keycerts/tlskeys/tls-client.der</file>
         </cert-->
         <!-- Required if signRequest is true and/or you wish the CA to generate private key -->
         <signerType>PKCS12</signerType>
-        <signerConf>password=1234,algo=REPLACEME-CMP_SIGALGO,keystore=file:xipki/security/tlskeys/tls-client.p12</signerConf>
+        <signerConf>password=1234,algo=REPLACEME-CMP_SIGALGO,keystore=file:xipki/keycerts/tlskeys/tls-client.p12</signerConf>
       </signature>
     </requestor>
   </requestors>
@@ -34,7 +34,7 @@
     <responder>
       <name>responder1</name>
       <cert>
-        <file>xipki/security/tlskeys/tls-server.der</file>
+        <file>xipki/keycerts/tlskeys/tls-server.der</file>
       </cert>
       <signature>
         <signatureAlgos>

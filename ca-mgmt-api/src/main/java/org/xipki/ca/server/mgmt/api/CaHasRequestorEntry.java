@@ -34,13 +34,18 @@ import org.xipki.util.StringUtil;
 
 public class CaHasRequestorEntry {
 
-  private final NameId requestorIdent;
+  private NameId requestorIdent;
 
   private boolean ra;
 
   private int permission;
 
   private Set<String> profiles;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CaHasRequestorEntry() {
+  }
 
   public CaHasRequestorEntry(NameId requestorIdent) {
     this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
@@ -64,6 +69,10 @@ public class CaHasRequestorEntry {
 
   public NameId getRequestorIdent() {
     return requestorIdent;
+  }
+
+  public void setRequestorIdent(NameId requestorIdent) {
+    this.requestorIdent = requestorIdent;
   }
 
   public void setProfiles(Set<String> profiles) {

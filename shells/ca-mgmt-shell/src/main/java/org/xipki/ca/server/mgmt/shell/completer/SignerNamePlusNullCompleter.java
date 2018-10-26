@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 
 /**
  * TODO.
@@ -35,7 +36,11 @@ public class SignerNamePlusNullCompleter extends MgmtNameCompleter {
   @Override
   protected Set<String> getEnums() {
     Set<String> ret = new HashSet<>();
-    ret.addAll(caManager.getSignerNames());
+    try {
+      ret.addAll(caManager.getSignerNames());
+    } catch (CaMgmtException ex) {
+      // CHECKSTYLE:SKIP
+    }
     ret.add(CaManager.NULL);
     return ret;
   }

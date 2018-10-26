@@ -53,13 +53,23 @@
     <jaxb-api.version>2.2.11</jaxb-api.version>
     <bc.version>1.60</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
-    <jscep.version>2.4.0</jscep.version>
-    <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.2</pkcs11-wrapper.version>
     <liquibase.version>3.6.2</liquibase.version>
     <snakeyaml.version>1.18</snakeyaml.version>
     <hikaricp.version>3.2.0</hikaricp.version>
     <syslog-java-client.version>1.1.5</syslog-java-client.version>
+    <fastjson.version>1.2.49</fastjson.version>
+    <netty.version>4.1.30.Final</netty.version>
+    <!-- only for runtime -->
+    <logback.version>1.2.3</logback.version>
+    <netty-tcnative.version>2.0.18.Final</netty-tcnative.version>
+    <jdbc.h2.version>1.4.197</jdbc.h2.version>
+    <jdbc.hsqldb.version>2.4.1</jdbc.hsqldb.version>
+    <jdbc.mariadb.version>2.3.0</jdbc.mariadb.version>
+    <jdbc.postgresql.version>42.2.5</jdbc.postgresql.version>
+    <!-- Only for test purpose -->
+    <jscep.version>2.4.0</jscep.version>
+    <junit.version>4.8.2</junit.version>
   </properties>
   <modules>
     <!-- Base components -->
@@ -85,19 +95,21 @@
     <module>ca-mgmt-api</module>
     <module>ca-server-api</module>
     <module>ca-server</module>
-    <module>ca-server-netty</module>
-    <module>ca-server-servlet</module>
+    <module>ca-servlet</module>
     <module>ca-dbtool</module>
+    <module>ca-mgmt-msg</module>
+    <module>ca-mgmt-client</module>
     <module>certprofile-xml</module>
     <module>publisher-ocsp</module>
     <module>ocsp-api</module>
     <module>ocsp-server</module>
     <module>ocsp-store</module>
-    <module>ocsp-server-servlet</module>
-    <module>ocsp-server-netty</module>
+    <module>ocsp-servlet</module>
     <module>shells</module>
     <module>examples</module>
     <module>qa</module>
+    <module>audits</module>
+    <module>securities</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>

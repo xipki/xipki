@@ -40,7 +40,7 @@ public class CertValidity implements Comparable<CertValidity> {
 
     private String suffix;
 
-    Unit(String suffix) {
+    private Unit(String suffix) {
       this.suffix = suffix;
     }
 
@@ -60,8 +60,13 @@ public class CertValidity implements Comparable<CertValidity> {
 
   private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
-  private final int validity;
-  private final Unit unit;
+  private int validity;
+  private Unit unit;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CertValidity() {
+  }
 
   public CertValidity(int validity, Unit unit) {
     this.validity = ParamUtil.requireMin("validity", validity, 1);
@@ -103,8 +108,16 @@ public class CertValidity implements Comparable<CertValidity> {
     return new CertValidity(validity, unit);
   } // method getInstance
 
+  public void setValidity(int validity) {
+    this.validity = ParamUtil.requireMin("validity", validity, 1);
+  }
+
   public int getValidity() {
     return validity;
+  }
+
+  public void setUnit(Unit unit) {
+    this.unit = ParamUtil.requireNonNull("unit", unit);
   }
 
   public Unit getUnit() {

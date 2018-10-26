@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 
 /**
  * TODO.
@@ -33,7 +34,12 @@ public class ProfileNameAndAllCompleter extends MgmtNameCompleter {
 
   @Override
   protected Set<String> getEnums() {
-    Set<String> ret = new HashSet<>(caManager.getCertprofileNames());
+    Set<String> ret;
+    try {
+      ret = new HashSet<>(caManager.getCertprofileNames());
+    } catch (CaMgmtException ex) {
+      ret = new HashSet<>();
+    }
     ret.add("all");
     return ret;
   }

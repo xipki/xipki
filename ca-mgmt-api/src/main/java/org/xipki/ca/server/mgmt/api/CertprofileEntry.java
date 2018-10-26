@@ -30,13 +30,18 @@ import org.xipki.util.StringUtil;
 
 public class CertprofileEntry {
 
-  private final NameId ident;
+  private NameId ident;
 
-  private final String type;
+  private String type;
 
-  private final String conf;
+  private String conf;
 
   private boolean faulty;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CertprofileEntry() {
+  }
 
   public CertprofileEntry(NameId ident, String type, String conf) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
@@ -45,6 +50,21 @@ public class CertprofileEntry {
     if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
       throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
     }
+  }
+
+  public void setIdent(NameId ident) {
+    if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
+      throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
+    }
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
+
+  public void setType(String type) {
+    this.type = ParamUtil.requireNonBlankLower("type", type);
+  }
+
+  public void setConf(String conf) {
+    this.conf = conf;
   }
 
   public NameId getIdent() {

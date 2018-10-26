@@ -17,14 +17,23 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.cert.X509Certificate;
+import java.util.Map;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.server.mgmt.api.CaMgmtException;
-import org.xipki.ca.server.mgmt.api.conf.CaConf;
+import org.xipki.ca.server.mgmt.api.conf.CaConfs;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.
@@ -40,13 +49,37 @@ public class LoadConfAction extends CaAction {
   @Completion(FileCompleter.class)
   private String confFile;
 
+  @Option(name = "--outform", description = "output format of the root certificates")
+  @Completion(DerPemCompleter.class)
+  protected String outform = "der";
+
+  @Option(name = "--out-dir",
+      description = "directory to save the root certificates")
+  @Completion(FileCompleter.class)
+  private String outDir = ".";
+
   @Override
   protected Object execute0() throws Exception {
-    CaConf caConf = new CaConf(confFile, securityFactory);
     String msg = "configuration " + confFile;
     try {
-      caManager.loadConf(caConf);
-      println("loaded " + msg);
+      InputStream confStream;
+      if (confFile.endsWith(".xml")) {
+        confStream = CaConfs.convertFileConfToZip(confFile);
+      } else {
+        confStream = Files.newInputStream(Paths.get(confFile));
+      }
+
+      Map<String, X509Certificate> rootCerts = caManager.loadConf(confStream);
+      if (CollectionUtil.isEmpty(rootCerts)) {
+        println("loaded " + msg);
+      } else {
+        for (String caname : rootCerts.keySet()) {
+          String filename = "ca-" + caname + "." + outform.toLowerCase();
+          saveVerbose("save certificate of root CA " + caname,
+              new File(outDir, filename),
+              encodeCrl(rootCerts.get(caname).getEncoded(), outform));
+        }
+      }
       return null;
     } catch (CaMgmtException ex) {
       throw new CmdFailure("could not load " + msg + ", error: " + ex.getMessage(), ex);

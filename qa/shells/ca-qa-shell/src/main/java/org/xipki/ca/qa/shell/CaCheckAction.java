@@ -17,6 +17,8 @@
 
 package org.xipki.ca.qa.shell;
 
+import java.util.Arrays;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.CaUris;
@@ -55,8 +57,8 @@ public class CaCheckAction extends CaUpdateAction {
     }
 
     // CA certificate
-    if (ey.getCert() != null) {
-      if (!ey.getCert().equals(ca.getCert())) {
+    if (ey.getEncodedCert() != null) {
+      if (!Arrays.equals(ey.getEncodedCert(), ca.getCert().getEncoded())) {
         throw new CmdFailure("CA cert is not as expected");
       }
     }

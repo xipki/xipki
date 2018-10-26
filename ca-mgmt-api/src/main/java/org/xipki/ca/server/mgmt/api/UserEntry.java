@@ -29,11 +29,16 @@ import org.xipki.util.StringUtil;
 
 public class UserEntry {
 
-  private final NameId ident;
+  private NameId ident;
 
-  private final boolean active;
+  private boolean active;
 
-  private final String hashedPassword;
+  private String hashedPassword;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private UserEntry() {
+  }
 
   public UserEntry(NameId ident, boolean active, String hashedPassword) throws CaMgmtException {
     this.ident = ParamUtil.requireNonNull("ident", ident);
@@ -41,12 +46,24 @@ public class UserEntry {
     this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
   }
 
+  public void setIdent(NameId ident) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
+
   public NameId getIdent() {
     return ident;
   }
 
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
   public boolean isActive() {
     return active;
+  }
+
+  public void setHashedPassword(String hashedPassword) {
+    this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
   }
 
   public String getHashedPassword() {

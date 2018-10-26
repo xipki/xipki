@@ -223,10 +223,6 @@ public final class CaClientImpl implements CaClient {
     return caNamesWithError;
   } // method autoConfCas
 
-  public void init() throws CaClientException {
-    init0(true);
-  }
-
   private synchronized void init0(boolean force) throws CaClientException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");

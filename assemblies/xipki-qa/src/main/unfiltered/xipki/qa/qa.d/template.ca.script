@@ -25,22 +25,20 @@ sleep 1
 
 xi:initdb \
   --force \
-  --db-conf xipki/ca-config/ca-db.properties \
+  --db-conf xipki/etc/ca/example/h2.ca-db.properties \
   --db-schema xipki/sql/ca-init.xml
 
 xi:initdb \
   --force \
-  --db-conf xipki/ca-config/ocsp-db.properties \
+  --db-conf xipki/etc/ocsp/example/h2.ocsp-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
 
-xi:initdb \
-  --force \
-  --db-conf  xipki/ocsp-config/ocsp-cache-db.properties \
+xi:initdb --force \
+  --db-conf  xipki/etc/ocsp/example/h2.ocsp-cache-db.properties \
   --db-schema xipki/sql/ocsp-cache-init.xml
 
-xi:initdb \
-  --force \
-  --db-conf  xipki/ocsp-config/ocsp-crl-db.properties \
+xi:initdb --force \
+  --db-conf  xipki/etc/ocsp/example/h2.ocsp-crl-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
 
 feature:install xipki-custom-certprofiles
@@ -88,12 +86,12 @@ ca:publisher-add \
 ca:signer-add \
   --name responder1 \
   --type pkcs12 \
-  --conf password=1234,keystore=file:xipki/security/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
+  --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
 
 # CMP Requestors
 ca:requestor-add \
   --name requestor1 \
-  --cert xipki/security/tlskeys/tls-client.der
+  --cert xipki/keycerts/tlskeys/tls-client.der
 
 ca:requestor-add \
   --name requestor-mac1 \

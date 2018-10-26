@@ -17,7 +17,7 @@
 <caconf xmlns="http://xipki.org/ca/conf/v2" basedir="APP_DIR">
   <properties>
     <property name="profiles.dir">xipki/qa/certprofile</property>
-    <property name="security.dir">xipki/security</property>
+    <property name="keycerts.dir">xipki/keycerts</property>
     <property name="output.dir">output</property>
     <property name="token.type">REPLACEME-TOKEN_TYPE</property>
     <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
@@ -26,7 +26,7 @@
     <signer name="responder1">
       <type>pkcs12</type>
       <conf>
-        <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO</value>
+        <value>password=1234,keystore=file:${keycerts.dir}/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO</value>
       </conf>
     </signer>
   </signers>
@@ -34,7 +34,7 @@
     <requestor name="requestor1">
       <type>cert</type>
       <binaryConf>
-        <file>${security.dir}/tlskeys/tls-client.der</file>
+        <file>${keycerts.dir}/tlskeys/tls-client.der</file>
       </binaryConf>
     </requestor>
     <requestor name="requestor-mac1">

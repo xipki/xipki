@@ -19,10 +19,10 @@ package org.xipki.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -57,14 +57,14 @@ public class IoUtil {
   private IoUtil() {
   }
 
-  public static void closeStream(OutputStream stream) {
-    if (stream == null) {
+  public static void closeQuietly(Closeable closable) {
+    if (closable == null) {
       return;
     }
     try {
-      stream.close();
+      closable.close();
     } catch (Throwable th) {
-      LOG.error("could not close stream: {}", th.getMessage());
+      LOG.error("could not close closable: {}", th.getMessage());
     }
   }
 

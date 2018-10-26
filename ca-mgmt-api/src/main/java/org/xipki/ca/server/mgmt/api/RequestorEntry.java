@@ -43,13 +43,18 @@ public class RequestorEntry {
    */
   public static final String TYPE_PBM = "pbm";
 
-  private final NameId ident;
+  private NameId ident;
 
-  private final String type;
+  private String type;
 
-  private final String conf;
+  private String conf;
 
   private boolean faulty;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private RequestorEntry() {
+  }
 
   public RequestorEntry(NameId ident, String type, String conf) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
@@ -60,6 +65,23 @@ public class RequestorEntry {
     }
 
     this.type = ParamUtil.requireNonBlank("type", type);
+    this.conf = ParamUtil.requireNonBlank("conf", conf);
+  }
+
+  public void setIdent(NameId ident) {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+    String name = ident.getName();
+    if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
+        || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
+      throw new IllegalArgumentException("Requestor name could not be " + name);
+    }
+  }
+
+  public void setType(String type) {
+    this.type = ParamUtil.requireNonBlank("type", type);
+  }
+
+  public void setConf(String conf) {
     this.conf = ParamUtil.requireNonBlank("conf", conf);
   }
 

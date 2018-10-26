@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server.mgmt.api;
 
-import java.security.cert.X509Certificate;
-
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
@@ -33,7 +31,7 @@ import org.xipki.util.ParamUtil;
 
 public class ChangeCaEntry {
 
-  private final NameId ident;
+  private NameId ident;
 
   private CaStatus status;
 
@@ -79,13 +77,22 @@ public class ChangeCaEntry {
 
   private CaUris caUris;
 
-  private X509Certificate cert;
+  private byte[] encodedCert;
 
   private Integer numCrls;
 
   private Integer serialNoBitLen;
 
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private ChangeCaEntry() {
+  }
+
   public ChangeCaEntry(NameId ident) throws CaMgmtException {
+    this.ident = ParamUtil.requireNonNull("ident", ident);
+  }
+
+  public void setIdent(NameId ident) {
     this.ident = ParamUtil.requireNonNull("ident", ident);
   }
 
@@ -280,12 +287,12 @@ public class ChangeCaEntry {
     this.caUris = caUris;
   }
 
-  public X509Certificate getCert() {
-    return cert;
+  public byte[] getEncodedCert() {
+    return encodedCert;
   }
 
-  public void setCert(X509Certificate cert) {
-    this.cert = cert;
+  public void setEncodedCert(byte[] encodedCert) {
+    this.encodedCert = encodedCert;
   }
 
   public Integer getNumCrls() {

@@ -196,7 +196,7 @@ xi:csr-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
-  --biometric-file xipki/README.md \
+  --biometric-file etc/jre.properties \
   --biometric-uri https://example.org/?id=123
 
 xi:cmp-csr-enroll --csr output/ee-complex1.csr \
@@ -219,7 +219,7 @@ xi:csr-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
-  --biometric-file xipki/README.md \
+  --biometric-file etc/jre.properties \
   --biometric-uri https://example.org/?id=123 \
   --complex-subject
 

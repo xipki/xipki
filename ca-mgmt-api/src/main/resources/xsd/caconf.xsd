@@ -183,8 +183,7 @@
       <!-- general CA configuration -->
       <xs:element name="cert" type="fileOrBinaryType" minOccurs="0">
         <xs:annotation>
-          <xs:documentation>If genSelfIssued is preset, only choice file is allowed and
-          it specifies the location to save the new self-issued CA certificate. Otherwise it
+          <xs:documentation>If genSelfIssued is preset, it must be absent. Otherwise it
           specifies the CA certificate</xs:documentation>
         </xs:annotation>
       </xs:element>

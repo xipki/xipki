@@ -28,6 +28,8 @@
   <name>XiPKI :: QA</name>
   <packaging>pom</packaging>
   <modules>
+    <module>ca-server-servlet</module>
+    <module>ocsp-server-servlet</module>
     <module>qa-common</module>
     <module>ocsp-qa</module>
     <module>ca-qa</module>

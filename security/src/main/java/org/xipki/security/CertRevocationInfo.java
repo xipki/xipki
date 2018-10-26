@@ -37,6 +37,11 @@ public class CertRevocationInfo {
 
   private Date invalidityTime;
 
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CertRevocationInfo() {
+  }
+
   public CertRevocationInfo(CrlReason reason) {
     this(reason, new Date(), null);
   }

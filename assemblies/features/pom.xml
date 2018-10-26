@@ -28,10 +28,8 @@
   <name>XiPKI :: Assemblies :: Features</name>
   <packaging>pom</packaging>
   <modules>
-    <module>pki</module>
     <module>qa</module>
-    <module>sdk</module>
-    <module>toolkit</module>
+    <module>console</module>
   </modules>
   <profiles>
     <profile>

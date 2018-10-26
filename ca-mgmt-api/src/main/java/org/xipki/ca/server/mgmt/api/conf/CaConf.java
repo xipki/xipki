@@ -17,14 +17,13 @@
 
 package org.xipki.ca.server.mgmt.api.conf;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -36,13 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
@@ -96,7 +93,6 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
@@ -108,8 +104,6 @@ import org.xml.sax.SAXException;
 
 public class CaConf {
   private static final Logger LOG = LoggerFactory.getLogger(CaConf.class);
-
-  private static final String APP_DIR = "APP_DIR";
 
   private final Map<String, String> properties = new HashMap<>();
 
@@ -125,76 +119,34 @@ public class CaConf {
 
   private final Map<String, SingleCaConf> cas = new HashMap<>();
 
-  private String baseDir;
-
-  public CaConf(String confFilename, SecurityFactory securityFactory)
-      throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
-    ParamUtil.requireNonNull("confFilename", confFilename);
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
-    init(new File(confFilename), securityFactory);
-  }
-
   public CaConf(File confFile, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
     ParamUtil.requireNonNull("confFile", confFile);
     ParamUtil.requireNonNull("securityFactory", securityFactory);
-    init(confFile, securityFactory);
-  }
-
-  public static void marshal(CaconfType jaxb, OutputStream out)
-      throws JAXBException, SAXException {
-    ParamUtil.requireNonNull("jaxb", jaxb);
-    ParamUtil.requireNonNull("out", out);
-
-    try {
-      JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-
-      SchemaFactory schemaFact = SchemaFactory.newInstance(
-          javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      URL url = CaConf.class.getResource("/xsd/caconf.xsd");
-      Marshaller jaxbMarshaller = context.createMarshaller();
-      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      jaxbMarshaller.setProperty("com.sun.xml.internal.bind.indentString", "  ");
-      jaxbMarshaller.setSchema(schemaFact.newSchema(url));
-
-      jaxbMarshaller.marshal(new ObjectFactory().createCaconf(jaxb), out);
-    } catch (JAXBException ex) {
-      throw XmlUtil.convert(ex);
-    }
-  }
-
-  private final void init(File confFile, SecurityFactory securityFactory)
-      throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
     confFile = IoUtil.expandFilepath(confFile);
 
-    String confFilename = confFile.getName();
-    int fileExtIndex = confFilename.lastIndexOf('.');
-    String fileExt = null;
-    if (fileExtIndex != -1) {
-      fileExt = confFilename.substring(fileExtIndex + 1);
-    }
+    init(Files.newInputStream(confFile.toPath()), securityFactory);
+  }
 
-    ZipFile zipFile = null;
-    InputStream caConfStream = null;
+  public CaConf(InputStream confFileZipStream, SecurityFactory securityFactory)
+      throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
+    ParamUtil.requireNonNull("confFileZipStream", confFileZipStream);
+    ParamUtil.requireNonNull("securityFactory", securityFactory);
+
+    init(confFileZipStream, securityFactory);
+  }
+
+  private final void init(InputStream zipFileStream, SecurityFactory securityFactory)
+      throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
+    ZipInputStream zipStream = new ZipInputStream(zipFileStream);
 
     try {
-      if ("xml".equalsIgnoreCase(fileExt)) {
-        LOG.info("read the configuration file {} as an XML file", confFilename);
-        caConfStream = Files.newInputStream(confFile.toPath());
-      } else if ("zip".equalsIgnoreCase(fileExt)) {
-        LOG.info("read the configuration file {} as a ZIP file", confFilename);
-        zipFile = new ZipFile(confFile);
-        caConfStream = zipFile.getInputStream(zipFile.getEntry("caconf.xml"));
-      } else {
-        try {
-          LOG.info("try to read the configuration file {} as a ZIP file", confFilename);
-          zipFile = new ZipFile(confFile);
-          caConfStream = zipFile.getInputStream(zipFile.getEntry("caconf.xml"));
-        } catch (ZipException ex) {
-          LOG.info("the configuration file {} is not a ZIP file, try as an XML file", confFilename);
-          zipFile = null;
-          caConfStream = Files.newInputStream(confFile.toPath());
-        }
+      Map<String, byte[]> zipEntries = new HashMap<>();
+
+      ZipEntry zipEntry;
+      while ((zipEntry = zipStream.getNextEntry()) != null) {
+        byte[] zipEntryBytes = IoUtil.read(zipStream);
+        zipEntries.put(zipEntry.getName(), zipEntryBytes);
       }
 
       JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
@@ -206,40 +158,29 @@ public class CaConf {
       jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 
       CaconfType root = (CaconfType) ((JAXBElement<?>)
-          jaxbUnmarshaller.unmarshal(caConfStream)).getValue();
+          jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(zipEntries.get("caconf.xml"))))
+          .getValue();
 
-      if (zipFile == null) {
-        baseDir = root.getBasedir();
-        if (StringUtil.isBlank(baseDir)) {
-          File confFileParent = confFile.getParentFile();
-          baseDir = (confFileParent == null) ? "." : confFileParent.getPath();
-        } else if (APP_DIR.equalsIgnoreCase(baseDir)) {
-          baseDir = ".";
-        }
-      }
-      init(root, zipFile, securityFactory);
+      init0(root, zipEntries, securityFactory);
     } catch (JAXBException ex) {
       throw XmlUtil.convert(ex);
     } finally {
-      if (caConfStream != null) {
-        try {
-          caConfStream.close();
-        } catch (IOException ex) {
-          LOG.info("could not clonse caConfStream", ex.getMessage());
-        }
+      try {
+        zipFileStream.close();
+      } catch (IOException ex) {
+        LOG.info("could not clonse zipFileStream", ex.getMessage());
       }
 
-      if (zipFile != null) {
-        try {
-          zipFile.close();
-        } catch (IOException ex) {
-          LOG.info("could not clonse zipFile", ex.getMessage());
-        }
+      try {
+        zipStream.close();
+      } catch (IOException ex) {
+        LOG.info("could not clonse zipStream", ex.getMessage());
       }
     }
   }
 
-  private final void init(CaconfType jaxb, ZipFile zipFile, SecurityFactory securityFactory)
+  private final void init0(CaconfType jaxb, Map<String, byte[]> zipEntries,
+      SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     if (jaxb.getProperties() != null) {
       for (NameValueType m : jaxb.getProperties().getProperty()) {
@@ -255,7 +196,7 @@ public class CaConf {
     if (jaxb.getSigners() != null) {
       for (SignerType m : jaxb.getSigners().getSigner()) {
         SignerEntry en = new SignerEntry(m.getName(), expandConf(m.getType()),
-            getValue(m.getConf(), zipFile), getBase64Binary(m.getCert(), zipFile));
+            getValue(m.getConf(), zipEntries), getBase64Binary(m.getCert(), zipEntries));
         addSigner(en);
       }
     }
@@ -265,9 +206,9 @@ public class CaConf {
       for (RequestorType m : jaxb.getRequestors().getRequestor()) {
         String conf;
         if (m.getConf() != null) {
-          conf = getValue(m.getConf(), zipFile);
+          conf = getValue(m.getConf(), zipEntries);
         } else {
-          conf = getBase64Binary(m.getBinaryConf(), zipFile);
+          conf = getBase64Binary(m.getBinaryConf(), zipEntries);
         }
 
         RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()), m.getType(), conf);
@@ -295,7 +236,7 @@ public class CaConf {
     if (jaxb.getPublishers() != null) {
       for (PublisherType m : jaxb.getPublishers().getPublisher()) {
         PublisherEntry en = new PublisherEntry(new NameId(null, m.getName()),
-            expandConf(m.getType()), getValue(m.getConf(), zipFile));
+            expandConf(m.getType()), getValue(m.getConf(), zipEntries));
         addPublisher(en);
       }
     }
@@ -304,7 +245,7 @@ public class CaConf {
     if (jaxb.getProfiles() != null) {
       for (ProfileType m : jaxb.getProfiles().getProfile()) {
         CertprofileEntry en = new CertprofileEntry(new NameId(null, m.getName()),
-            expandConf(m.getType()), getValue(m.getConf(), zipFile));
+            expandConf(m.getType()), getValue(m.getConf(), zipEntries));
         addProfile(en);
       }
     }
@@ -319,16 +260,10 @@ public class CaConf {
         if (m.getCaInfo() != null) {
           CaInfoType ci = m.getCaInfo();
           if (ci.getGenSelfIssued() != null) {
-            String certFilename = null;
             if (ci.getCert() != null) {
-              if (ci.getCert().getFile() != null) {
-                certFilename = expandConf(ci.getCert().getFile());
-                certFilename = resolveFilePath(certFilename);
-              } else {
-                throw new InvalidConfException("cert.file of CA " + name + " must not be null");
-              }
+              throw new InvalidConfException("cert.file of CA " + name + " must not be set");
             }
-            byte[] csr = getBinary(ci.getGenSelfIssued().getCsr(), zipFile);
+            byte[] csr = getBinary(ci.getGenSelfIssued().getCsr(), zipEntries);
             BigInteger serialNumber = null;
             String str = ci.getGenSelfIssued().getSerialNumber();
             if (str != null) {
@@ -340,7 +275,7 @@ public class CaConf {
             }
 
             genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
-                csr, serialNumber, certFilename, ci.getGenSelfIssued().getCertOutform());
+                csr, serialNumber, ci.getGenSelfIssued().getCertOutform());
           }
 
           CaUris caUris;
@@ -358,7 +293,7 @@ public class CaConf {
           int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
 
           caEntry = new CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
-              expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile), caUris,
+              expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipEntries), caUris,
               numCrls, exprirationPeriod);
 
           if (ci.getCmpControl() != null) {
@@ -380,7 +315,7 @@ public class CaConf {
           caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
           caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
           if (ci.getExtraControl() != null) {
-            String value = getValue(ci.getExtraControl(), zipFile);
+            String value = getValue(ci.getExtraControl(), zipEntries);
             if (value != null) {
               caEntry.setExtraControl(new ConfPairs(value).unmodifiable());
             }
@@ -408,7 +343,7 @@ public class CaConf {
             X509Certificate caCert;
 
             if (ci.getCert() != null) {
-              byte[] bytes = getBinary(ci.getCert(), zipFile);
+              byte[] bytes = getBinary(ci.getCert(), zipEntries);
               try {
                 caCert = X509Util.parseCert(bytes);
               } catch (CertificateException ex) {
@@ -419,7 +354,7 @@ public class CaConf {
               ConcurrentContentSigner signer;
               try {
                 List<String[]> signerConfs = CaEntry.splitCaSignerConfs(
-                    getValue(ci.getSignerConf(), zipFile));
+                    getValue(ci.getSignerConf(), zipEntries));
                 SignerConf signerConf = new SignerConf(signerConfs.get(0)[1]);
 
                 signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf,
@@ -569,7 +504,8 @@ public class CaConf {
     return cas.get(ParamUtil.requireNonNull("name", name));
   }
 
-  private String getValue(FileOrValueType fileOrValue, ZipFile zipFile) throws IOException {
+  private String getValue(FileOrValueType fileOrValue, Map<String, byte[]> zipEntries)
+      throws IOException {
     if (fileOrValue == null) {
       return null;
     }
@@ -578,29 +514,23 @@ public class CaConf {
       return expandConf(fileOrValue.getValue());
     }
 
-    String fileName = expandConf(fileOrValue.getFile());
-
-    InputStream is;
-    if (zipFile != null) {
-      is = zipFile.getInputStream(new ZipEntry(fileName));
-      if (is == null) {
-        throw new IOException("could not find ZIP entry " + fileName);
-      }
-    } else {
-      is = Files.newInputStream(Paths.get(resolveFilePath(fileName)));
+    String fileName = fileOrValue.getFile();
+    byte[] binary = zipEntries.get(fileName);
+    if (binary == null) {
+      throw new IOException("could not find ZIP entry " + fileName);
     }
-    byte[] binary = IoUtil.read(is);
 
     return expandConf(new String(binary, "UTF-8"));
   }
 
-  private String getBase64Binary(FileOrBinaryType fileOrBinary, ZipFile zipFile)
+  private String getBase64Binary(FileOrBinaryType fileOrBinary, Map<String, byte[]> zipEntries)
       throws IOException {
-    byte[] binary = getBinary(fileOrBinary, zipFile);
+    byte[] binary = getBinary(fileOrBinary, zipEntries);
     return (binary == null) ? null : Base64.encodeToString(binary);
   }
 
-  private byte[] getBinary(FileOrBinaryType fileOrBinary, ZipFile zipFile) throws IOException {
+  private byte[] getBinary(FileOrBinaryType fileOrBinary, Map<String, byte[]> zipEntries)
+      throws IOException {
     if (fileOrBinary == null) {
       return null;
     }
@@ -609,19 +539,13 @@ public class CaConf {
       return fileOrBinary.getBinary();
     }
 
-    String fileName = expandConf(fileOrBinary.getFile());
-
-    InputStream is;
-    if (zipFile != null) {
-      is = zipFile.getInputStream(new ZipEntry(fileName));
-      if (is == null) {
-        throw new IOException("could not find ZIP entry " + fileName);
-      }
-    } else {
-      is = Files.newInputStream(Paths.get(resolveFilePath(fileName)));
+    String fileName = fileOrBinary.getFile();
+    byte[] binary = zipEntries.get(fileName);
+    if (binary == null) {
+      throw new IOException("could not find ZIP entry " + fileName);
     }
 
-    return IoUtil.read(is);
+    return binary;
   }
 
   private List<String> getUris(UrisType jaxb) {
@@ -649,11 +573,6 @@ public class CaConf {
     }
 
     return confStr;
-  }
-
-  private String resolveFilePath(String filePath) {
-    File file = new File(filePath);
-    return file.isAbsolute() ? filePath : new File(baseDir, filePath).getPath();
   }
 
   private static int getIntPermission(PermissionsType type) throws InvalidConfException {

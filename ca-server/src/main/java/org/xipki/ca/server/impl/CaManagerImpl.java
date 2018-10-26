@@ -17,11 +17,12 @@
 
 package org.xipki.ca.server.impl;
 
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.nio.file.Files;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,6 +118,7 @@ import org.xipki.ca.server.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.server.mgmt.api.SignerEntry;
 import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.conf.CaConf;
+import org.xipki.ca.server.mgmt.api.conf.CaConfs;
 import org.xipki.ca.server.mgmt.api.conf.GenSelfIssued;
 import org.xipki.ca.server.mgmt.api.conf.SingleCaConf;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.AliasesType;
@@ -159,8 +162,6 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.PemEncoder;
-import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.StringUtil;
 import org.xml.sax.SAXException;
 
@@ -282,7 +283,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
   private boolean masterMode;
 
-  private Map<String, DataSourceWrapper> datasources;
+  private Map<String, String> datasourceNameConfFileMap;
 
   private final Map<String, CaInfo> caInfos = new ConcurrentHashMap<>();
 
@@ -469,38 +470,25 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       throw new CaMgmtException("ca.shardId is not in [0, 127]");
     }
 
-    if (this.datasources == null) {
-      this.datasources = new ConcurrentHashMap<>();
+    if (this.datasourceNameConfFileMap == null) {
+      this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
       for (Object objKey : caConfProperties.keySet()) {
         String key = (String) objKey;
         if (!StringUtil.startsWithIgnoreCase(key, "datasource.")) {
           continue;
         }
 
+        String datasourceName = key.substring("datasource.".length());
         String datasourceFile = caConfProperties.getProperty(key);
-        try {
-          String datasourceName = key.substring("datasource.".length());
-          DataSourceWrapper datasource = datasourceFactory.createDataSourceForFile(
-              datasourceName, datasourceFile, securityFactory.getPasswordResolver());
-
-          // test the datasource
-          Connection conn = datasource.getConnection();
-          datasource.returnConnection(conn);
-
-          LOG.info("datasource.{}: {}", datasourceName, datasourceFile);
-          this.datasources.put(datasourceName, datasource);
-        } catch (DataAccessException | PasswordResolverException | IOException
-            | RuntimeException ex) {
-          throw new CaMgmtException(concat(ex.getClass().getName(),
-            " while parsing datasource ", datasourceFile, ": ", ex.getMessage()), ex);
-        }
+        this.datasourceNameConfFileMap.put(datasourceName, datasourceFile);
       }
 
-      this.datasource = this.datasources.get("ca");
-    }
+      String caDatasourceFile = datasourceNameConfFileMap.remove("ca");
+      if (caDatasourceFile == null) {
+        throw new CaMgmtException("no datasource named 'ca' configured");
+      }
 
-    if (this.datasource == null) {
-      throw new CaMgmtException("no datasource named 'ca' configured");
+      this.datasource = loadDatasource("ca", caDatasourceFile);
     }
 
     this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
@@ -528,6 +516,25 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     initSigners();
     initCas();
   } // method init
+
+  private DataSourceWrapper loadDatasource(String datasourceName, String datasourceFile)
+      throws CaMgmtException {
+    try {
+      DataSourceWrapper datasource = datasourceFactory.createDataSourceForFile(
+          datasourceName, datasourceFile, securityFactory.getPasswordResolver());
+
+      // test the datasource
+      Connection conn = datasource.getConnection();
+      datasource.returnConnection(conn);
+
+      LOG.info("datasource.{}: {}", datasourceName, datasourceFile);
+      return datasource;
+    } catch (DataAccessException | PasswordResolverException | IOException
+        | RuntimeException ex) {
+      throw new CaMgmtException(concat(ex.getClass().getName(),
+        " while parsing datasource ", datasourceFile, ": ", ex.getMessage()), ex);
+    }
+  }
 
   @Override
   public CaSystemStatus getCaSystemStatus() {
@@ -837,18 +844,31 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       }
     }
 
+    if (datasource != null) {
+      try {
+        datasource.close();
+      } catch (Exception ex) {
+        LogUtil.warn(LOG, ex, concat("could not close datasource ca"));
+      }
+    }
+
+    if (publishers != null) {
+      for (String name : publishers.keySet()) {
+        IdentifiedCertPublisher publisher = publishers.get(name);
+        shutdownPublisher(publisher);
+      }
+    }
+
+    if (certprofiles != null) {
+      for (String name : certprofiles.keySet()) {
+        IdentifiedCertprofile certprofile = certprofiles.get(name);
+        shutdownCertprofile(certprofile);
+      }
+    }
+
     File caLockFile = new File("calock");
     if (caLockFile.exists()) {
       caLockFile.delete();
-    }
-
-    for (String dsName :datasources.keySet()) {
-      DataSourceWrapper ds = datasources.get(dsName);
-      try {
-        ds.close();
-      } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, concat("could not close datasource ", dsName));
-      }
     }
 
     auditLogPciEvent(true, "SHUTDOWN");
@@ -970,18 +990,18 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
     List<String> names = queryExecutor.namesFromTable("SIGNER");
     for (String name : names) {
-      SignerEntry dbEntry = queryExecutor.createSigner(name);
-      if (dbEntry == null) {
+      SignerEntry entry = queryExecutor.createSigner(name);
+      if (entry == null) {
         LOG.error("could not initialize signer '{}'", name);
         continue;
       }
 
-      dbEntry.setConfFaulty(true);
-      signerDbEntries.put(name, dbEntry);
+      entry.setConfFaulty(true);
+      signerDbEntries.put(name, entry);
 
-      SignerEntryWrapper signer = createSigner(dbEntry);
+      SignerEntryWrapper signer = createSigner(entry);
       if (signer != null) {
-        dbEntry.setConfFaulty(false);
+        entry.setConfFaulty(false);
         signers.put(name, signer);
         LOG.info("loaded signer {}", name);
       } else {
@@ -1371,18 +1391,18 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
   }
 
   @Override
-  public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  public void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException {
+    ParamUtil.requireNonNull("requestorEntry", requestorEntry);
     asssertMasterMode();
-    String name = dbEntry.getIdent().getName();
+    String name = requestorEntry.getIdent().getName();
     if (requestorDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
     }
 
     // encrypt the password
     PasswordResolver pwdResolver = securityFactory.getPasswordResolver();
-    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(dbEntry.getType())) {
-      String conf = dbEntry.getConf();
+    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(requestorEntry.getType())) {
+      String conf = requestorEntry.getConf();
       if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
         String encryptedPassword;
         try {
@@ -1390,16 +1410,17 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
         } catch (PasswordResolverException ex) {
           throw new CaMgmtException("could not encrypt requestor " + name, ex);
         }
-        dbEntry = new RequestorEntry(dbEntry.getIdent(), dbEntry.getType(), encryptedPassword);
+        requestorEntry = new RequestorEntry(requestorEntry.getIdent(), requestorEntry.getType(),
+            encryptedPassword);
       }
     }
 
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-    requestor.setDbEntry(dbEntry, pwdResolver);
+    requestor.setDbEntry(requestorEntry, pwdResolver);
 
-    queryExecutor.addRequestor(dbEntry);
-    idNameMap.addRequestor(dbEntry.getIdent());
-    requestorDbEntries.put(name, dbEntry);
+    queryExecutor.addRequestor(requestorEntry);
+    idNameMap.addRequestor(requestorEntry.getIdent());
+    requestorDbEntries.put(name, requestorEntry);
     requestors.put(name, requestor);
   } // method addRequestor
 
@@ -1607,48 +1628,48 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
   } // method changeCertprofile
 
   @Override
-  public void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  public void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
+    ParamUtil.requireNonNull("certprofileEntry", certprofileEntry);
     asssertMasterMode();
-    String name = dbEntry.getIdent().getName();
+    String name = certprofileEntry.getIdent().getName();
     if (certprofileDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Certprofile named ", name, " exists"));
     }
 
-    dbEntry.setFaulty(true);
-    IdentifiedCertprofile profile = createCertprofile(dbEntry);
+    certprofileEntry.setFaulty(true);
+    IdentifiedCertprofile profile = createCertprofile(certprofileEntry);
     if (profile == null) {
       throw new CaMgmtException("could not create Certprofile object");
     }
 
-    dbEntry.setFaulty(false);
+    certprofileEntry.setFaulty(false);
     certprofiles.put(name, profile);
-    queryExecutor.addCertprofile(dbEntry);
-    idNameMap.addCertprofile(dbEntry.getIdent());
-    certprofileDbEntries.put(name, dbEntry);
+    queryExecutor.addCertprofile(certprofileEntry);
+    idNameMap.addCertprofile(certprofileEntry.getIdent());
+    certprofileDbEntries.put(name, certprofileEntry);
   } // method addCertprofile
 
   @Override
-  public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  public void addSigner(SignerEntry signerEntry) throws CaMgmtException {
+    ParamUtil.requireNonNull("signerEntry", signerEntry);
     asssertMasterMode();
-    String name = dbEntry.getName();
+    String name = signerEntry.getName();
     if (signerDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Signer named ", name, " exists"));
     }
 
-    String conf = dbEntry.getConf();
+    String conf = signerEntry.getConf();
     if (conf != null) {
-      String newConf = canonicalizeSignerConf(dbEntry.getType(), conf, null, securityFactory);
+      String newConf = canonicalizeSignerConf(signerEntry.getType(), conf, null, securityFactory);
       if (!conf.equals(newConf)) {
-        dbEntry.setConf(newConf);
+        signerEntry.setConf(newConf);
       }
     }
 
-    SignerEntryWrapper signer = createSigner(dbEntry);
-    queryExecutor.addSigner(dbEntry);
+    SignerEntryWrapper signer = createSigner(signerEntry);
+    queryExecutor.addSigner(signerEntry);
     signers.put(name, signer);
-    signerDbEntries.put(name, dbEntry);
+    signerDbEntries.put(name, signerEntry);
   } // method addResponder
 
   @Override
@@ -1720,23 +1741,23 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
   }
 
   @Override
-  public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  public void addPublisher(PublisherEntry entry) throws CaMgmtException {
+    ParamUtil.requireNonNull("entry", entry);
     asssertMasterMode();
-    String name = dbEntry.getIdent().getName();
+    String name = entry.getIdent().getName();
     if (publisherDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Publisher named ", name, " exists"));
     }
 
-    dbEntry.setFaulty(true);
-    IdentifiedCertPublisher publisher = createPublisher(dbEntry);
-    dbEntry.setFaulty(false);
+    entry.setFaulty(true);
+    IdentifiedCertPublisher publisher = createPublisher(entry);
+    entry.setFaulty(false);
 
-    queryExecutor.addPublisher(dbEntry);
+    queryExecutor.addPublisher(entry);
 
     publishers.put(name, publisher);
-    idNameMap.addPublisher(dbEntry.getIdent());
-    publisherDbEntries.put(name, dbEntry);
+    idNameMap.addPublisher(entry.getIdent());
+    publisherDbEntries.put(name, entry);
   } // method addPublisher
 
   @Override
@@ -2339,10 +2360,10 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     }
   } // method shutdownPublisher
 
-  SignerEntryWrapper createSigner(SignerEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  SignerEntryWrapper createSigner(SignerEntry entry) throws CaMgmtException {
+    ParamUtil.requireNonNull("entry", entry);
     SignerEntryWrapper ret = new SignerEntryWrapper();
-    ret.setDbEntry(dbEntry);
+    ret.setDbEntry(entry);
     try {
       ret.initSigner(securityFactory);
     } catch (ObjectCreationException ex) {
@@ -2353,29 +2374,29 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return ret;
   } // method createSigner
 
-  IdentifiedCertprofile createCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
+  IdentifiedCertprofile createCertprofile(CertprofileEntry entry) throws CaMgmtException {
+    ParamUtil.requireNonNull("entry", entry);
 
-    String type = dbEntry.getType();
+    String type = entry.getType();
     if (!certprofileFactoryRegister.canCreateProfile(type)) {
       throw new CaMgmtException("unsupported cert profile type " + type);
     }
 
     try {
       Certprofile profile = certprofileFactoryRegister.newCertprofile(type);
-      IdentifiedCertprofile ret = new IdentifiedCertprofile(dbEntry, profile);
+      IdentifiedCertprofile ret = new IdentifiedCertprofile(entry, profile);
       ret.validate();
       return ret;
     } catch (ObjectCreationException | CertprofileException ex) {
-      String msg = "could not initialize Certprofile " + dbEntry.getIdent();
+      String msg = "could not initialize Certprofile " + entry.getIdent();
       LogUtil.error(LOG, ex, msg);
       throw new CaMgmtException(msg, ex);
     }
   } // method createCertprofile
 
-  IdentifiedCertPublisher createPublisher(PublisherEntry dbEntry) throws CaMgmtException {
-    ParamUtil.requireNonNull("dbEntry", dbEntry);
-    String type = dbEntry.getType();
+  IdentifiedCertPublisher createPublisher(PublisherEntry entry) throws CaMgmtException {
+    ParamUtil.requireNonNull("entry", entry);
+    String type = entry.getType();
 
     CertPublisher publisher;
     IdentifiedCertPublisher ret;
@@ -2386,26 +2407,27 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
         throw new CaMgmtException("unsupported publisher type " + type);
       }
 
-      ret = new IdentifiedCertPublisher(dbEntry, publisher);
-      ret.initialize(securityFactory.getPasswordResolver(), datasources);
+      ret = new IdentifiedCertPublisher(entry, publisher);
+      ret.initialize(securityFactory.getPasswordResolver(), datasourceNameConfFileMap);
+      ret.setAuditServiceRegister(auditServiceRegister);
       return ret;
     } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
-      String msg = "invalid configuration for the publisher " + dbEntry.getIdent();
+      String msg = "invalid configuration for the publisher " + entry.getIdent();
       LogUtil.error(LOG, ex, msg);
       throw new CaMgmtException(msg, ex);
     }
   } // method createPublisher
 
   @Override
-  public void addUser(AddUserEntry userEntry) throws CaMgmtException {
+  public void addUser(AddUserEntry addUserEntry) throws CaMgmtException {
     asssertMasterMode();
-    queryExecutor.addUser(userEntry);
+    queryExecutor.addUser(addUserEntry);
   }
 
   @Override
-  public void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
+  public void changeUser(ChangeUserEntry changeUserEntry) throws CaMgmtException {
     asssertMasterMode();
-    queryExecutor.changeUser(userEntry);
+    queryExecutor.changeUser(changeUserEntry);
   }
 
   @Override
@@ -2589,12 +2611,24 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
   }
 
   @Override
-  public void loadConf(CaConf conf) throws CaMgmtException {
-    ParamUtil.requireNonNull("conf", conf);
+  public Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
+      throws CaMgmtException {
+    ParamUtil.requireNonNull("zippedConfStream", zippedConfStream);
 
     if (!caSystemSetuped) {
       throw new CaMgmtException("CA system is not initialized yet.");
     }
+
+    CaConf conf;
+    try {
+      conf = new CaConf(zippedConfStream, securityFactory);
+    } catch (IOException | InvalidConfException | JAXBException | SAXException ex) {
+      throw new CaMgmtException("could not parse the CA configuration", ex);
+    } catch (RuntimeException ex) {
+      throw new CaMgmtException("caught RuntimeException while parsing the CA configuration", ex);
+    }
+
+    Map<String, X509Certificate> generatedRootCerts = new HashMap<>(2);
 
     // Responder
     for (String name : conf.getSignerNames()) {
@@ -2760,23 +2794,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
             X509Certificate cert = generateRootCa(caEntry, genSelfIssued.getProfile(),
                 genSelfIssued.getCsr(), genSelfIssued.getSerialNumber());
             LOG.info("generated root CA {}", caName);
-            String fn = genSelfIssued.getCertFilename();
-            if (fn != null) {
-              try {
-                byte[] encodedCert = cert.getEncoded();
-                if ("pem".equalsIgnoreCase(genSelfIssued.getCertOutputFormat())) {
-                  encodedCert = PemEncoder.encode(encodedCert, PemLabel.CERTIFICATE);
-                }
-                IoUtil.save(fn, encodedCert);
-                LOG.info("saved generated certificate of root CA {} to {}",
-                    caName, fn);
-              } catch (CertificateEncodingException ex) {
-                LogUtil.error(LOG, ex, concat("could not encode certificate of CA ", caName));
-              } catch (IOException ex) {
-                LogUtil.error(LOG, ex,
-                    concat("error while saving certificate of root CA ", caName, " to ", fn));
-              }
-            }
+            generatedRootCerts.put(caName, cert);
           } else {
             try {
               addCa(caEntry);
@@ -2914,17 +2932,17 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
         }
       } // scc.getUsers()
     } // cas
+
+    return generatedRootCerts.isEmpty() ? null : generatedRootCerts;
   }
 
   @Override
-  public void exportConf(String zipFilename, List<String> caNames)
+  public InputStream exportConf(List<String> caNames)
       throws CaMgmtException, IOException {
-    ParamUtil.requireNonBlank("zipFilename", zipFilename);
     if (!caSystemSetuped) {
       throw new CaMgmtException("CA system is not initialized yet.");
     }
 
-    zipFilename = IoUtil.expandFilepath(zipFilename);
     if (caNames != null) {
       List<String> tmpCaNames = new ArrayList<>(caNames.size());
       for (String name : caNames) {
@@ -2942,16 +2960,12 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       caNames = tmpCaNames;
     }
 
-    File zipFile = new File(zipFilename);
-    if (zipFile.exists()) {
-      throw new IOException(concat("File ", zipFilename, " exists."));
-    }
-
-    IoUtil.mkdirsParent(zipFile.toPath());
+    ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576); // initial 1M
+    ZipOutputStream zipStream = new ZipOutputStream(bytesStream);
+    zipStream.setLevel(Deflater.BEST_SPEED);
 
     CaconfType root = new CaconfType();
 
-    ZipOutputStream zipStream = getZipOutputStream(zipFile);
     try {
       Set<String> includeSignerNames = new HashSet<>();
       Set<String> includeRequestorNames = new HashSet<>();
@@ -3227,9 +3241,9 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
           jaxb.setName(name);
           jaxb.setType(entry.getType());
           jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/responder-", name, ".conf")));
+              concat("files/signer-", name, ".conf")));
           jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
-              concat("files/responder-", name, ".der")));
+              concat("files/signer-", name, ".der")));
 
           list.add(jaxb);
         }
@@ -3243,7 +3257,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       // add the CAConf XML file
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       try {
-        CaConf.marshal(root, bout);
+        CaConfs.marshal(root, bout);
       } catch (JAXBException | SAXException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
         throw new CaMgmtException(concat("could not marshal CAConf: ", ex.getMessage()), ex);
@@ -3258,8 +3272,10 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
         zipStream.closeEntry();
       }
     } finally {
-      zipStream.close();
+      zipStream.flush();
     }
+
+    return new ByteArrayInputStream(bytesStream.toByteArray());
   }
 
   private static FileOrValueType createFileOrValue(ZipOutputStream zipStream,
@@ -3313,16 +3329,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       }
     }
     return ret;
-  }
-
-  private static ZipOutputStream getZipOutputStream(File zipFile) throws IOException {
-    ParamUtil.requireNonNull("zipFile", zipFile);
-
-    BufferedOutputStream out = new BufferedOutputStream(
-        Files.newOutputStream(zipFile.toPath()), 1048576); // 1M
-    ZipOutputStream zipOutStream = new ZipOutputStream(out);
-    zipOutStream.setLevel(Deflater.BEST_SPEED);
-    return zipOutStream;
   }
 
   private static UrisType createUris(Collection<String> uris) {

@@ -24,7 +24,6 @@ import java.util.Map;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
@@ -47,13 +46,13 @@ public abstract class CertPublisher implements Closeable {
    *          Configuration. Could be {@code null}.
    * @param passwordResolver
    *          Password resolver. Could be {@code null}.
-   * @param datasources
-   *          Datasources. Must not be {@code null}.
+   * @param datasourceConfFiles
+   *          Datasource name to configuration file map. Must not be {@code null}.
    * @throws CertPublisherException
    *         If error during the initialization occurs.
    */
   public abstract void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
+      Map<String, String> datasourceConfFiles) throws CertPublisherException;
 
   @Deprecated
   public void shutdown() {

@@ -17,19 +17,14 @@
 
 package org.xipki.ca.server.mgmt.api;
 
-import java.sql.SQLException;
-
-import org.xipki.datasource.DataSourceWrapper;
-
 /**
  * TODO.
  * @author Lijun Liao
  * @since 2.0.0
  */
 
+@SuppressWarnings("serial")
 public class CaMgmtException extends Exception {
-
-  private static final long serialVersionUID = 1L;
 
   public CaMgmtException() {
   }
@@ -40,10 +35,6 @@ public class CaMgmtException extends Exception {
 
   public CaMgmtException(String message) {
     super(message);
-  }
-
-  public CaMgmtException(DataSourceWrapper datasource, String sql, SQLException sqlEx) {
-    this(datasource.translate(sql, sqlEx));
   }
 
   public CaMgmtException(Throwable cause) {

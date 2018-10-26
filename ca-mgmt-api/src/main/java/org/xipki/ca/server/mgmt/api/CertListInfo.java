@@ -29,13 +29,18 @@ import org.xipki.util.ParamUtil;
  */
 
 public class CertListInfo {
-  private final BigInteger serialNumber;
+  private BigInteger serialNumber;
 
-  private final Date notBefore;
+  private Date notBefore;
 
-  private final Date notAfter;
+  private Date notAfter;
 
-  private final String subject;
+  private String subject;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CertListInfo() {
+  }
 
   public CertListInfo(BigInteger serialNumber, String subject, Date notBefore, Date notAfter) {
     this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
@@ -44,16 +49,32 @@ public class CertListInfo {
     this.subject = ParamUtil.requireNonNull("subject", subject);
   }
 
+  public void setSerialNumber(BigInteger serialNumber) {
+    this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+  }
+
   public BigInteger getSerialNumber() {
     return serialNumber;
+  }
+
+  public void setNotBefore(Date notBefore) {
+    this.notBefore = ParamUtil.requireNonNull("notBefore", notBefore);
   }
 
   public Date getNotBefore() {
     return notBefore;
   }
 
+  public void setNotAfter(Date notAfter) {
+    this.notAfter = ParamUtil.requireNonNull("notAfter", notAfter);
+  }
+
   public Date getNotAfter() {
     return notAfter;
+  }
+
+  public void setSubject(String subject) {
+    this.subject = ParamUtil.requireNonNull("subject", subject);
   }
 
   public String getSubject() {

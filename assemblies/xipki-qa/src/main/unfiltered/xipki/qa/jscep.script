@@ -114,7 +114,6 @@ xi:update-cert-p12 \
   --password 1234 \
   --cert output/jscep-ocsp1-2.crt \
   --ca-cert output/subcawithcrl1.crt \
-  --outform $OUTFORM \
   --ca-cert output/rootca1.crt
 
 ## Renewal with different CommonName

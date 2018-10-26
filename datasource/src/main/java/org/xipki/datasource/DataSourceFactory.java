@@ -104,6 +104,26 @@ public class DataSourceFactory {
       conf.setProperty("dataSource.password", password);
     }
 
+    /*
+     * Expand the file path like
+     *   dataSource.url = jdbc:h2:~/xipki/db/h2/ocspcrl
+     *   dataSource.url = jdbc:hsqldb:file:~/xipki/db/hsqldb/ocspcache;sql.syntax_pgs=true
+     */
+    String dataSourceUrl = conf.getProperty("dataSource.url");
+    if (dataSourceUrl != null) {
+      String newUrl = null;
+      if (dataSourceUrl.startsWith("jdbc:h2:~")) {
+        newUrl = "jdbc:h2:" + IoUtil.expandFilepath(
+                    dataSourceUrl.substring("jdbc:h2:".length()));
+      } else if (dataSourceUrl.startsWith("jdbc:hsqldb:file:~")) {
+        newUrl = "jdbc:h2:" + IoUtil.expandFilepath(
+                    dataSourceUrl.substring("jdbc:hsqldb:file:".length()));
+      }
+      if (newUrl != null) {
+        conf.setProperty("dataSource.url", newUrl);
+      }
+    }
+
     Set<Object> keySet = new HashSet<>(conf.keySet());
     for (Object key : keySet) {
       if (((String) key).startsWith("liquibase")) {

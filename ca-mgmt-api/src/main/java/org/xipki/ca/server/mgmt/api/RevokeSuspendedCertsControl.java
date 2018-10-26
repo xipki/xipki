@@ -43,9 +43,14 @@ public class RevokeSuspendedCertsControl {
 
   public static final String KEY_UNCHANGED_SINCE = "revokeSuspendedCerts.unchangedSince";
 
-  private final CrlReason targetReason;
+  private CrlReason targetReason;
 
-  private final CertValidity unchangedSince;
+  private CertValidity unchangedSince;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private RevokeSuspendedCertsControl() {
+  }
 
   public RevokeSuspendedCertsControl(CrlReason targetReason, CertValidity unchangedSince) {
     this.targetReason = ParamUtil.requireNonNull("targetReason", targetReason);
@@ -63,6 +68,14 @@ public class RevokeSuspendedCertsControl {
         throw new IllegalArgumentException("invalid targetReason " + targetReason);
     }
   } // constructor
+
+  public void setUnchangedSince(CertValidity unchangedSince) {
+    this.unchangedSince = unchangedSince;
+  }
+
+  public void setTargetReason(CrlReason targetReason) {
+    this.targetReason = targetReason;
+  }
 
   public CrlReason getTargetReason() {
     return targetReason;

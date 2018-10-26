@@ -218,9 +218,7 @@ class CaCertstoreDbExporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     } finally {
-      if (entriesFileOs != null) {
-        IoUtil.closeStream(entriesFileOs);
-      }
+      IoUtil.closeQuietly(entriesFileOs);
     }
   }
 

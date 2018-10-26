@@ -31,7 +31,12 @@ public class NameId {
 
   private Integer id;
 
-  private final String name;
+  private String name;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private NameId() {
+  }
 
   public NameId(Integer id, String name) {
     this.id = id;
@@ -44,6 +49,10 @@ public class NameId {
 
   public Integer getId() {
     return id;
+  }
+
+  public void setName(String name) {
+    this.name = ParamUtil.requireNonBlankLower("name", name);
   }
 
   public String getName() {

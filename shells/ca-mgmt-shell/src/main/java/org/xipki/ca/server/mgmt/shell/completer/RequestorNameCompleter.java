@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -35,7 +36,11 @@ public class RequestorNameCompleter extends MgmtNameCompleter {
   @Override
   protected Set<String> getEnums() {
     Set<String> names = new HashSet<>();
-    names.addAll(caManager.getRequestorNames());
+    try {
+      names.addAll(caManager.getRequestorNames());
+    } catch (CaMgmtException ex) {
+      // CHECKSTYLE:SKIP
+    }
     names.remove(RequestorInfo.NAME_BY_CA);
     names.remove(RequestorInfo.NAME_BY_USER);
     return names;

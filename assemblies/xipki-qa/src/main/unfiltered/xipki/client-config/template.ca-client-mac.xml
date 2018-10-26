@@ -34,7 +34,7 @@
     <responder>
       <name>responder1</name>
       <cert>
-        <file>xipki/security/tlskeys/tls-server.der</file>
+        <file>xipki/keycerts/tlskeys/tls-server.der</file>
       </cert>
       <pbmMac>
         <owfAlgos>
