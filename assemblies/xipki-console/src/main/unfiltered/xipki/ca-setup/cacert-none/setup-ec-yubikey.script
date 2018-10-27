@@ -74,7 +74,12 @@ xi:replace --old "REPLACEME_CA_SIGNERCONF" \
   --new "algo=${HASH}withECDSA,slot=0,key-id=${P11_ID}" \
   xipki/ca-setup/cacert-none/ca-conf.xml
 
-ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.xml
+ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.xml \
+  --out-dir ${KEYCERTS_DIR}
+
+xi:copy-file ${KEYCERTS_DIR}/ca-myca1.der ${KEYCERTS_DIR}/myca1.der
+
+xi:rm --force ${KEYCERTS_DIR}/ca-myca1.der
 
 # Need to review the update-cert-p11 for yubikey
 # echo "# Update the certificate in the device"
@@ -84,9 +89,3 @@ source xipki/ca-setup/cacert-none/configure-ca.script
 
 echo "create initial CRL"
 ca:gencrl --ca myca1
-
-echo "# Restart OCSP server"
-
-feature:uninstall xipki-ocspserver
-
-feature:install xipki-ocspserver

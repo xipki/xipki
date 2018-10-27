@@ -30,7 +30,7 @@ public class AddSignerRequest extends CommRequest {
     return signerEntry;
   }
 
-  public void setEntry(SignerEntryWrapper signerEntry) {
+  public void setSignerEntry(SignerEntryWrapper signerEntry) {
     this.signerEntry = signerEntry;
   }
 

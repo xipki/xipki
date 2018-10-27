@@ -18,6 +18,7 @@
 package org.xipki.ca.server.mgmt.api.conf;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -145,7 +146,7 @@ public class CaConf {
 
       ZipEntry zipEntry;
       while ((zipEntry = zipStream.getNextEntry()) != null) {
-        byte[] zipEntryBytes = IoUtil.read(zipStream);
+        byte[] zipEntryBytes = read(zipStream);
         zipEntries.put(zipEntry.getName(), zipEntryBytes);
       }
 
@@ -527,6 +528,17 @@ public class CaConf {
       throws IOException {
     byte[] binary = getBinary(fileOrBinary, zipEntries);
     return (binary == null) ? null : Base64.encodeToString(binary);
+  }
+
+  private static byte[] read(InputStream in) throws IOException {
+    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+    int readed = 0;
+    byte[] buffer = new byte[2048];
+    while ((readed = in.read(buffer)) != -1) {
+      bout.write(buffer, 0, readed);
+    }
+
+    return bout.toByteArray();
   }
 
   private byte[] getBinary(FileOrBinaryType fileOrBinary, Map<String, byte[]> zipEntries)

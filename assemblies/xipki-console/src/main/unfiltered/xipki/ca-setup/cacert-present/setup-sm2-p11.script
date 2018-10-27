@@ -56,8 +56,3 @@ ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.xml
 
 echo "create initial CRL"
 ca:gencrl --ca myca1
-
-echo "# Restart OCSP server"
-feature:uninstall xipki-ocspserver
-
-feature:install xipki-ocspserver

@@ -73,7 +73,6 @@ import org.xipki.ca.server.mgmt.msg.ClearPublishQueueRequest;
 import org.xipki.ca.server.mgmt.msg.CommAction;
 import org.xipki.ca.server.mgmt.msg.CommRequest;
 import org.xipki.ca.server.mgmt.msg.CommResponse;
-import org.xipki.ca.server.mgmt.msg.ErrorResponse;
 import org.xipki.ca.server.mgmt.msg.ExportConfRequest;
 import org.xipki.ca.server.mgmt.msg.GenerateCertificateRequest;
 import org.xipki.ca.server.mgmt.msg.GenerateRootCaRequest;
@@ -118,7 +117,7 @@ import com.alibaba.fastjson.JSON;
  */
 
 @SuppressWarnings("serial")
-public class HttpCaMgmtServlet extends HttpServlet {
+public class HttpMgmtServlet extends HttpServlet {
 
   private static final class MyException extends Exception {
 
@@ -135,7 +134,7 @@ public class HttpCaMgmtServlet extends HttpServlet {
 
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpCaMgmtServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpMgmtServlet.class);
 
   private static final String CT_RESPONSE = "application/json";
 
@@ -484,7 +483,7 @@ public class HttpCaMgmtServlet extends HttpServlet {
             resp = new LoadConfResponse(null);
           } else {
             Map<String, byte[]> result = new HashMap<>(rootcaNameCertMap.size());
-            for (String name : result.keySet()) {
+            for (String name : rootcaNameCertMap.keySet()) {
               byte[] encodedCert;
               try {
                 encodedCert = rootcaNameCertMap.get(name).getEncoded();
@@ -607,6 +606,7 @@ public class HttpCaMgmtServlet extends HttpServlet {
       }
 
       response.setContentType(CT_RESPONSE);
+      response.setStatus(HttpServletResponse.SC_OK);
       if (resp == null) {
         response.setContentLength(0);
       } else {
@@ -615,29 +615,19 @@ public class HttpCaMgmtServlet extends HttpServlet {
         response.getOutputStream().write(respBytes);
       }
     } catch (MyException ex) {
-      writeErrorMessage(response, ex.getMessage());
-      response.setStatus(ex.getStatus());
+      response.setHeader(CommResponse.HEADER_XIPKI_ERROR, ex.getMessage());
+      response.sendError(ex.getStatus());
     } catch (CaMgmtException ex) {
       LOG.error("CaMgmtException", ex);
-      writeErrorMessage(response, ex.getMessage());
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      response.setHeader(CommResponse.HEADER_XIPKI_ERROR, ex.getMessage());
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } finally {
       response.flushBuffer();
     }
   } // method service
-
-  private static void writeErrorMessage(HttpServletResponse resp, String message)
-      throws IOException {
-    ErrorResponse errResp = new ErrorResponse(message);
-    byte[] errRespBytes = JSON.toJSONBytes(errResp);
-
-    resp.setContentType(CT_RESPONSE);
-    resp.setContentLength(errRespBytes.length);
-    resp.getOutputStream().write(errRespBytes);
-  }
 
   private static ByteArrayResponse toByteArrayResponse(CommAction action, X509Certificate cert)
       throws MyException {

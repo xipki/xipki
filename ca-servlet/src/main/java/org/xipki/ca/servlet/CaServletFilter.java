@@ -73,7 +73,7 @@ public class CaServletFilter implements Filter {
 
   private boolean remoteMgmtEnabled;
 
-  private HttpCaMgmtServlet mgmgServlet;
+  private HttpMgmtServlet mgmgServlet;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -145,7 +145,7 @@ public class CaServletFilter implements Filter {
     LOG.info("remote managemen is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {
-      this.mgmgServlet = new HttpCaMgmtServlet();
+      this.mgmgServlet = new HttpMgmtServlet();
       this.mgmgServlet.setCaManager(caManager);
     }
   }

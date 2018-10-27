@@ -74,7 +74,6 @@ import org.xipki.ca.server.mgmt.msg.ClearPublishQueueRequest;
 import org.xipki.ca.server.mgmt.msg.CommAction;
 import org.xipki.ca.server.mgmt.msg.CommRequest;
 import org.xipki.ca.server.mgmt.msg.CommResponse;
-import org.xipki.ca.server.mgmt.msg.ErrorResponse;
 import org.xipki.ca.server.mgmt.msg.ExportConfRequest;
 import org.xipki.ca.server.mgmt.msg.GenerateCertificateRequest;
 import org.xipki.ca.server.mgmt.msg.GenerateRootCaRequest;
@@ -439,7 +438,7 @@ public class CaMgmtClient implements CaManager {
   @Override
   public void addSigner(SignerEntry signerEntry) throws CaMgmtException {
     AddSignerRequest req = new AddSignerRequest();
-    req.setEntry(new SignerEntryWrapper(signerEntry));
+    req.setSignerEntry(new SignerEntryWrapper(signerEntry));
     voidTransmit(CommAction.addSigner, req);
   }
 
@@ -553,7 +552,8 @@ public class CaMgmtClient implements CaManager {
     req.setNotAfter(notAfter);
 
     byte[] respBytes = transmit(CommAction.generateCertificate, req);
-    return parseCert(respBytes);
+    ByteArrayResponse resp = parse(respBytes, ByteArrayResponse.class);
+    return parseCert(resp.getResult());
   }
 
   @Override
@@ -566,7 +566,8 @@ public class CaMgmtClient implements CaManager {
     req.setSerialNumber(serialNumber);
 
     byte[] respBytes = transmit(CommAction.generateRootCa, req);
-    return parseCert(respBytes);
+    ByteArrayResponse resp = parse(respBytes, ByteArrayResponse.class);
+    return parseCert(resp.getResult());
   }
 
   @Override
@@ -745,9 +746,11 @@ public class CaMgmtClient implements CaManager {
     }
   }
 
-  private X509CRL parseCrl(byte[] crlBytes) throws CaMgmtException {
+  private X509CRL parseCrl(byte[] respBytes) throws CaMgmtException {
+    ByteArrayResponse resp = parse(respBytes, ByteArrayResponse.class);
+
     try {
-      return X509Util.parseCrl(crlBytes);
+      return X509Util.parseCrl(resp.getResult());
     } catch (CertificateException | CRLException ex) {
       throw new CaMgmtException("could not parse X.509 CRL", ex);
     }
@@ -787,8 +790,6 @@ public class CaMgmtClient implements CaManager {
       }
       outputstream.flush();
 
-      String responseCt = httpUrlConnection.getHeaderField("Content-Type");
-
       if (httpUrlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
         InputStream in = httpUrlConnection.getInputStream();
 
@@ -812,27 +813,19 @@ public class CaMgmtClient implements CaManager {
           }
         }
       } else {
-        InputStream inputStream = httpUrlConnection.getErrorStream();
-        try {
-          if (RESPONSE_CT.equals(responseCt)) {
-            ErrorResponse resp = parse(inputStream, ErrorResponse.class);
-            throw new CaMgmtException(resp.getMessage());
-          } else {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("server returns ").append(httpUrlConnection.getResponseCode());
-            String respMsg = httpUrlConnection.getResponseMessage();
-            if (StringUtil.isNotBlank(respMsg)) {
-              sb.append(" ").append(respMsg);
-            }
-            throw new CaMgmtException(sb.toString());
+        String errorMessage = httpUrlConnection.getHeaderField(CommResponse.HEADER_XIPKI_ERROR);
+        if (errorMessage == null) {
+          StringBuilder sb = new StringBuilder(100);
+          sb.append("server returns ").append(httpUrlConnection.getResponseCode());
+          String respMsg = httpUrlConnection.getResponseMessage();
+          if (StringUtil.isNotBlank(respMsg)) {
+            sb.append(" ").append(respMsg);
           }
-        } finally {
-          if (inputStream != null) {
-            inputStream.close();
-          }
+          throw new CaMgmtException(sb.toString());
+        } else {
+          throw new CaMgmtException(errorMessage);
         }
       }
-
     } catch (IOException ex) {
       throw new CaMgmtException(
           "IOException while sending message to the server: " + ex.getMessage(), ex);
@@ -845,15 +838,6 @@ public class CaMgmtClient implements CaManager {
       return JSON.parseObject(bytes, clazz);
     } catch (RuntimeException ex) {
       throw new CaMgmtException("cannot parse request " + clazz + " from byte[]");
-    }
-  }
-
-  private static <T extends CommResponse> T parse(InputStream in, Class<?> clazz)
-      throws CaMgmtException {
-    try {
-      return JSON.parseObject(in, clazz);
-    } catch (RuntimeException | IOException ex) {
-      throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }
   }
 

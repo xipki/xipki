@@ -30,7 +30,6 @@ public class ErrorResponse extends CommResponse {
   }
 
   public ErrorResponse(String message) {
-    super();
     this.message = message;
   }
 

@@ -73,9 +73,10 @@ public class LoadConfAction extends CaAction {
       if (CollectionUtil.isEmpty(rootCerts)) {
         println("loaded " + msg);
       } else {
+        println("loaded " + msg);
         for (String caname : rootCerts.keySet()) {
           String filename = "ca-" + caname + "." + outform.toLowerCase();
-          saveVerbose("save certificate of root CA " + caname,
+          saveVerbose("saved certificate of root CA " + caname + " to",
               new File(outDir, filename),
               encodeCrl(rootCerts.get(caname).getEncoded(), outform));
         }

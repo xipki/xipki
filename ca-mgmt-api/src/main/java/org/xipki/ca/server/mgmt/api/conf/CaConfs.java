@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.Deflater;
@@ -53,6 +52,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
+import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
@@ -158,7 +158,9 @@ public class CaConfs {
               String zipEntryName = "files/signer-" + name + ".conf";
               createFileOrValue(zipStream, conf, zipEntryName);
               m.getConf().setFile(zipEntryName);
+              m.getConf().setValue(null);
             } else {
+              m.getConf().setFile(null);
               m.getConf().setValue(conf);
             }
           }
@@ -235,7 +237,9 @@ public class CaConfs {
                 String zipEntryName = "files/ca-" + name + "-signer.conf";
                 createFileOrValue(zipStream, conf, zipEntryName);
                 ci.getSignerConf().setFile(zipEntryName);
+                ci.getSignerConf().setValue(null);
               } else {
+                ci.getSignerConf().setFile(null);
                 ci.getSignerConf().setValue(conf);
               }
             }
@@ -396,8 +400,13 @@ public class CaConfs {
 
   public static void main(String[] args) {
     try {
-      InputStream is = convertFileConfToZip("xipki/setup/cacert-none/template.ca-conf.xml");
+      /*InputStream is = convertFileConfToZip(
+          "/home/lliao/source/xipki/assemblies/xipki-console/target/xipki-console-4.0.1-SNAPSHOT/"
+          + "xipki/ca-setup/cacert-none/ca-conf.xml");
       Files.copy(is, Paths.get("dummy.zip"), StandardCopyOption.REPLACE_EXISTING);
+      */
+      InputStream is2 = Files.newInputStream(Paths.get("dummy.zip"));
+      new CaConf(is2, new SecurityFactoryImpl());
     } catch (Exception ex) {
       ex.printStackTrace();
     }
