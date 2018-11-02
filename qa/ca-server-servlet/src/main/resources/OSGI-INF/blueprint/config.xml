@@ -31,7 +31,7 @@
   <bean id="cmpServlet" class="org.xipki.ca.server.servlet.HttpCmpServlet"/>
   <service ref="cmpServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/cmp/*"/>
+      <entry key="urlPatterns" value="/ca/cmp/*"/>
     </service-properties>
   </service>
 
@@ -39,7 +39,7 @@
   <bean id="restServlet" class="org.xipki.ca.server.servlet.HttpRestServlet"/>
   <service ref="restServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/rest/*"/>
+      <entry key="urlPatterns" value="/ca/rest/*"/>
     </service-properties>
   </service>
 
@@ -47,7 +47,7 @@
   <bean id="scepServlet" class="org.xipki.ca.server.servlet.HttpScepServlet"/>
   <service ref="scepServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/scep/*"/>
+      <entry key="urlPatterns" value="/ca/scep/*"/>
     </service-properties>
   </service>
 
@@ -55,7 +55,7 @@
   <bean id="healthServlet" class="org.xipki.ca.server.servlet.HealthCheckServlet"/>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/health/*"/>
+      <entry key="urlPatterns" value="/ca/health/*"/>
     </service-properties>
   </service>
 
@@ -63,7 +63,7 @@
   <bean id="caCertServlet" class="org.xipki.ca.server.servlet.HttpCaCertServlet"/>
   <service ref="caCertServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/cacert/*"/>
+      <entry key="urlPatterns" value="/ca/cacert/*"/>
     </service-properties>
   </service>
 

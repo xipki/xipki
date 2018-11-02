@@ -329,7 +329,7 @@ public class CaMgmtClient implements CaManager {
   @Override
   public Set<String> getCertprofilesForCa(String caName) throws CaMgmtException {
     NameRequest req = new NameRequest(caName);
-    byte[] respBytes = transmit(CommAction.getCa, req);
+    byte[] respBytes = transmit(CommAction.getCertprofilesForCa, req);
     StringSetResponse resp = parse(respBytes, StringSetResponse.class);
     return resp.getResult();
   }
@@ -837,7 +837,7 @@ public class CaMgmtClient implements CaManager {
     try {
       return JSON.parseObject(bytes, clazz);
     } catch (RuntimeException ex) {
-      throw new CaMgmtException("cannot parse request " + clazz + " from byte[]");
+      throw new CaMgmtException("cannot parse response " + clazz + " from byte[]", ex);
     }
   }
 

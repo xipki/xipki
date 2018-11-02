@@ -20,6 +20,10 @@ xi:rm -r -f output
 
 xi:mkdir output
 
+xi:rm -r -f error-output
+
+xi:mkdir error-output
+
 echo "========================================================"
 echo "HASH:       $HASH"
 echo "STDHASH:    $STDHASH"

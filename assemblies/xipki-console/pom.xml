@@ -349,7 +349,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>unix-bin</id>
+            <id>main</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>

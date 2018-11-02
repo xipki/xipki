@@ -16,7 +16,7 @@
 #
 ################################################################################
 
-JSCEP_URL = http://localhost:8080/scep/subcawithcrl/ocsp/pkiclient.exe
+JSCEP_URL = http://localhost:8080/ca/scep/subcawithcrl/ocsp/pkiclient.exe
 
 echo "#################################################################"
 echo "#              Enroll certificate with JSCEP                    #"

@@ -33,7 +33,7 @@
         </permissions>
         <maxValidity>8000y</maxValidity>
         <cmpResponderName>responder1</cmpResponderName>
-        <protocolSupport>cmp,rest</protocolSupport>
+        <protocolSupport>cmp,rest,scep</protocolSupport>
         <saveReq>false</saveReq>
         <signerType>${token.type}</signerType>
         <signerConf>

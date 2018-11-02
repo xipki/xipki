@@ -50,7 +50,7 @@
     <cainfoUpdateInterval>10</cainfoUpdateInterval>
     <ca>
       <name>rootca1</name>
-      <url>https://localhost:8443/cmp/rootca</url>
+      <url>https://localhost:8443/ca/cmp/rootca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>
@@ -65,7 +65,7 @@
     </ca>
     <ca>
       <name>subca1</name>
-      <url>https://localhost:8443/cmp/subca</url>
+      <url>https://localhost:8443/ca/cmp/subca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>
@@ -80,7 +80,7 @@
     </ca>
     <ca>
       <name>subcawithcrl1</name>
-      <url>https://localhost:8443/cmp/subcawithcrl</url>
+      <url>https://localhost:8443/ca/cmp/subcawithcrl</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>

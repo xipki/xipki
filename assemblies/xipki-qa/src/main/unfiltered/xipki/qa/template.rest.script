@@ -16,7 +16,7 @@
 #
 ################################################################################
 
-BASE_URL = https://localhost:8443/rest/subcawithcrl
+BASE_URL = https://localhost:8443/ca/rest/subcawithcrl
 
 echo "#################################################################"
 echo "#             Manage certificate via REST interface             #"

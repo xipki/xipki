@@ -69,7 +69,7 @@ public class CaEntryWrapper {
 
   private boolean duplicateSubjectPermitted;
 
-  private String protocolSupport;
+  private ProtocolSupport protocolSupport;
 
   private boolean saveRequest;
 
@@ -122,8 +122,7 @@ public class CaEntryWrapper {
     scepResponderName = caEntry.getScepResponderName();
     duplicateKeyPermitted = caEntry.isDuplicateKeyPermitted();
     duplicateSubjectPermitted = caEntry.isDuplicateSubjectPermitted();
-    protocolSupport = caEntry.getProtocoSupport() == null
-                        ? null : caEntry.getProtocoSupport().getEncoded();
+    protocolSupport = caEntry.getProtocoSupport();
     saveRequest = caEntry.isSaveRequest();
     validityMode = caEntry.getValidityMode();
     permission = caEntry.getPermission();
@@ -258,11 +257,11 @@ public class CaEntryWrapper {
     this.duplicateSubjectPermitted = duplicateSubjectPermitted;
   }
 
-  public String getProtocolSupport() {
+  public ProtocolSupport getProtocolSupport() {
     return protocolSupport;
   }
 
-  public void setProtocolSupport(String protocolSupport) {
+  public void setProtocolSupport(ProtocolSupport protocolSupport) {
     this.protocolSupport = protocolSupport;
   }
 
@@ -394,9 +393,7 @@ public class CaEntryWrapper {
 
     rv.setNextCrlNumber(nextCrlNumber);
     rv.setPermission(permission);
-    if (protocolSupport != null) {
-      rv.setProtocolSupport(new ProtocolSupport(protocolSupport));
-    }
+    rv.setProtocolSupport(protocolSupport);
     rv.setRevocationInfo(revocationInfo);
     rv.setSaveRequest(saveRequest);
     if (scepControl != null) {

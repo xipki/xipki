@@ -21,7 +21,7 @@
   <!--responseCache>
     <datasource name="datasource-cache">
       <conf>
-        <file>xipki/etc/ocsp/example/h2.ocsp-cache-db.properties</file>
+        <file>xipki/etc/ocsp/ocsp-cache-db.properties</file>
       </conf>
     </datasource>
     <validity>86400</validity>
@@ -69,12 +69,12 @@
   <datasources>
     <datasource name="datasource1">
       <conf>
-        <file>xipki/etc/ocsp/example/h2.ocsp-db.properties</file>
+        <file>xipki/etc/ocsp/ocsp-db.properties</file>
       </conf>
     </datasource>
     <datasource name="datasource-crl">
       <conf>
-        <file>xipki/etc/ocsp/example/h2.ocsp-crl-db.properties</file>
+        <file>xipki/etc/ocsp/ocsp-crl-db.properties</file>
       </conf>
     </datasource>
   </datasources>

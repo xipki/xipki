@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.internal.AuditServiceRegisterImpl;
 import org.xipki.audit.syslog.SyslogAuditService;
@@ -52,11 +53,11 @@ public class Audits implements Closeable {
     return auditServiceRegister;
   }
 
-  public void init() throws IOException {
+  public void init() throws IOException  {
     auditServiceRegister = new AuditServiceRegisterImpl();
 
     Properties auditProps = loadProperties(auditCfg, DFLT_AUDIT_CFG);
-    String auditType = getString(auditProps, "audit.type", "embed");
+    String auditType = getString(auditProps, "Audit.Type", "embed");
     if ("embed".equalsIgnoreCase(auditType)) {
       // do nothing
     } else if ("syslog".equalsIgnoreCase(auditType)) {
@@ -97,8 +98,21 @@ public class Audits implements Closeable {
           getString(props, "messageFormat", "rfc_5424"));
 
       auditServiceRegister.registService(service);
+    } else  if (auditType.startsWith("java:")) {
+      String className = auditType.substring("java:".length());
+      try {
+        Class<?> clazz = Class.forName(className);
+        AuditService service = (AuditService) clazz.newInstance();
+        auditServiceRegister.registService(service);
+      } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
+          | InstantiationException ex) {
+        throw new IOException("error caught while initializing AuditService " + auditType
+            + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+      }
     } else {
-      throw new IOException("invalid audit type '" + auditType + "'");
+      throw new IOException("invalid Audit.Type '" + auditType
+          + "'. Valid values are 'embed', 'syslog' or java:<name of class that implements "
+          + AuditService.class.getName() + ">");
     }
   }
 

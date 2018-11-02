@@ -128,6 +128,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
+import org.xipki.ca.server.impl.CaInfo;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
 import org.xipki.ca.server.impl.X509Ca;
@@ -302,11 +303,10 @@ public class CmpResponderImpl extends BaseCmpResponder {
       return false;
     }
 
-    if (CaStatus.ACTIVE != getCa().getCaInfo().getStatus()) {
-      return false;
-    }
+    CaInfo caInfo = getCa().getCaInfo();
 
-    return true;
+    return caInfo.getStatus() == CaStatus.ACTIVE
+        && caInfo.supportsCmp();
   }
 
   public HealthCheckResult healthCheck() {

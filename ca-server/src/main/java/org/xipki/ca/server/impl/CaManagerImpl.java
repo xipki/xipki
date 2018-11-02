@@ -794,7 +794,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
     cmpResponders.put(caName, caResponder);
 
-    if (caEntry.supportsScep() && caEntry.getScepResponderName() != null) {
+    if (caEntry.getScepResponderName() != null) {
       try {
         scepResponders.put(caName, new ScepResponderImpl(this, caEntry.getCaEntry()));
       } catch (CaMgmtException ex) {

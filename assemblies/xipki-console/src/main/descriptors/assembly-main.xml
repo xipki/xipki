@@ -78,6 +78,7 @@
       <excludes>
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
+        <exclude>xipki/qa/**</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>

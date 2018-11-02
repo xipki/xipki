@@ -53,7 +53,7 @@
     <cainfoUpdateInterval>10</cainfoUpdateInterval>
     <ca>
       <name>MYCA</name>
-      <url>https://localhost:8443/cmp/myca</url>
+      <url>https://localhost:8443/ca/cmp/myca</url>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>

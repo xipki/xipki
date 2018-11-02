@@ -52,7 +52,6 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.SignerType;
-import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
@@ -396,20 +395,6 @@ public class CaConfs {
     }
 
     return changed ? confPairs.getEncoded() : conf;
-  }
-
-  public static void main(String[] args) {
-    try {
-      /*InputStream is = convertFileConfToZip(
-          "/home/lliao/source/xipki/assemblies/xipki-console/target/xipki-console-4.0.1-SNAPSHOT/"
-          + "xipki/ca-setup/cacert-none/ca-conf.xml");
-      Files.copy(is, Paths.get("dummy.zip"), StandardCopyOption.REPLACE_EXISTING);
-      */
-      InputStream is2 = Files.newInputStream(Paths.get("dummy.zip"));
-      new CaConf(is2, new SecurityFactoryImpl());
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
   }
 
 }

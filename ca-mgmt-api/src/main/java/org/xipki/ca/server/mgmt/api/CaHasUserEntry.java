@@ -33,11 +33,16 @@ import org.xipki.util.StringUtil;
 
 public class CaHasUserEntry {
 
-  private final NameId userIdent;
+  private NameId userIdent;
 
   private int permission;
 
   private Set<String> profiles;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CaHasUserEntry() {
+  }
 
   public CaHasUserEntry(NameId userIdent) {
     this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
@@ -49,6 +54,10 @@ public class CaHasUserEntry {
 
   public void setPermission(int permission) {
     this.permission = permission;
+  }
+
+  public void setUserIdent(NameId userIdent) {
+    this.userIdent = userIdent;
   }
 
   public NameId getUserIdent() {

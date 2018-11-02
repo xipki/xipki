@@ -30,8 +30,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverImpl;
+import org.xipki.password.SinglePasswordResolver;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SecurityFactoryImpl;
+import org.xipki.security.SignerFactory;
 import org.xipki.security.SignerFactoryRegisterImpl;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
@@ -116,24 +118,41 @@ public class Securities implements Closeable {
     }
   }
 
-  private void initPassword() throws IOException {
+  private void initPassword() throws IOException, InvalidConfException {
     passwordResolver = new PasswordResolverImpl();
     Properties props = loadProperties(passwordCfg, DFLT_PASSWORD_CFG);
     String masterPasswordCallback = getString(props, "masterPassword.callback",
                         "FILE file=xipki/security/masterpassword.secret");
     passwordResolver.setMasterPasswordCallback(masterPasswordCallback);
     passwordResolver.init();
+
+    // register additional SinglePasswordResolvers
+    String list = getString(props, "Additional.SinglePasswordResolvers", null);
+    String[] classNames = list == null ? null : list.split(", ");
+    if (classNames != null) {
+      for (String className : classNames) {
+        try {
+          Class<?> clazz = Class.forName(className);
+          SinglePasswordResolver resolver = (SinglePasswordResolver) clazz.newInstance();
+          passwordResolver.registResolver(resolver);
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
+            | InstantiationException ex) {
+          throw new InvalidConfException("error caught while initializing SinglePasswordResolver "
+              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+      }
+    }
   }
 
   private void initSecurityFactory() throws IOException, InvalidConfException {
     securityFactory = new SecurityFactoryImpl();
-    Properties securityProps = loadProperties(securityCfg, DFLT_SECURITY_CFG);
+    Properties props = loadProperties(securityCfg, DFLT_SECURITY_CFG);
     securityFactory.setStrongRandom4SignEnabled(
-        getBoolean(securityProps, "sign.strongrandom.enabled", false));
+        getBoolean(props, "sign.strongrandom.enabled", false));
     securityFactory.setStrongRandom4KeyEnabled(
-        getBoolean(securityProps, "key.strongrandom.enabled", false));
+        getBoolean(props, "key.strongrandom.enabled", false));
     securityFactory.setDefaultSignerParallelism(
-        getInt(securityProps, "defaultSignerParallelism", 32));
+        getInt(props, "defaultSignerParallelism", 32));
 
     SignerFactoryRegisterImpl signerFactoryRegister = new SignerFactoryRegisterImpl();
     securityFactory.setSignerFactoryRegister(signerFactoryRegister);
@@ -144,6 +163,24 @@ public class Securities implements Closeable {
 
     // PKCS#11
     initSecurityPkcs11(signerFactoryRegister);
+
+    // register additional SignerFactories
+    String list = getString(props, "Additional.SignerFactories", null);
+    String[] classNames = list == null ? null : list.split(", ");
+    if (classNames != null) {
+      for (String className : classNames) {
+        try {
+          Class<?> clazz = Class.forName(className);
+          SignerFactory factory = (SignerFactory) clazz.newInstance();
+          signerFactoryRegister.registFactory(factory);
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
+            | InstantiationException ex) {
+          throw new InvalidConfException("error caught while initializing SignerFactory "
+              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+      }
+    }
+
   }
 
   private void initSecurityPkcs12(SignerFactoryRegisterImpl signerFactoryRegister)

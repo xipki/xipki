@@ -16,29 +16,7 @@
 #
 ################################################################################
 
-echo "#################################################################"
-echo "#                      Initialize the database                  #"
-echo "#################################################################"
-
-xi:initdb \
-  --force \
-  --db-conf xipki/etc/ca/example/h2.ca-db.properties \
-  --db-schema xipki/sql/ca-init.xml
-
-xi:initdb \
-  --force \
-  --db-conf xipki/etc/ocsp/example/h2.ocsp-db.properties \
-  --db-schema xipki/sql/ocsp-init.xml
-
-xi:initdb --force \
-  --db-conf  xipki/etc/ocsp/example/h2.ocsp-cache-db.properties \
-  --db-schema xipki/sql/ocsp-cache-init.xml
-
-xi:initdb --force \
-  --db-conf  xipki/etc/ocsp/example/h2.ocsp-crl-db.properties \
-  --db-schema xipki/sql/ocsp-init.xml
-
-feature:install xipki-custom-certprofiles
+source file:./xipki/qa/qa.d/initdb.script
 
 feature:install xipki-caserver
 
@@ -94,7 +72,12 @@ xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
 xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
   xipki/qa/qa.d/rootca.xml
 
-ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml
+ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml \
+  --out-dir output
+
+xi:copy-file output/ca-rootca1.der output/rootca1.crt
+
+xi:rm --force output/ca-rootca1.der
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs11" } then {

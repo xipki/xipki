@@ -231,8 +231,8 @@ class IdentifiedCertprofile implements Closeable {
     Map<ASN1ObjectIdentifier, ExtensionControl> controls
         = new HashMap<>(certprofile.getExtensionControls());
 
-    Set<ASN1ObjectIdentifier> neededExtTypes = new HashSet<>();
-    Set<ASN1ObjectIdentifier> wantedExtTypes = new HashSet<>();
+    Set<ASN1ObjectIdentifier> neededExtTypes = new HashSet<>(2);
+    Set<ASN1ObjectIdentifier> wantedExtTypes = new HashSet<>(2);
     if (requestedExtensions != null) {
       Extension reqExtension = requestedExtensions.getExtension(
           ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
@@ -309,11 +309,12 @@ class IdentifiedCertprofile implements Closeable {
         ocspUris = caUris.getOcspUris();
       }
 
+      AuthorityInformationAccess value = null;
       if (CollectionUtil.isNonEmpty(caIssuers) || CollectionUtil.isNonEmpty(ocspUris)) {
-        AuthorityInformationAccess value = CaUtil.createAuthorityInformationAccess(
+        value = CaUtil.createAuthorityInformationAccess(
             caIssuers, ocspUris);
-        addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
       }
+      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
 
     if (controls.containsKey(Extension.cRLDistributionPoints)
@@ -326,22 +327,24 @@ class IdentifiedCertprofile implements Closeable {
       extType = Extension.cRLDistributionPoints;
       extControl = controls.remove(extType);
       if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+        CRLDistPoint value = null;
         if (CollectionUtil.isNonEmpty(caUris.getCrlUris())) {
-          CRLDistPoint value = CaUtil.createCrlDistributionPoints(caUris.getCrlUris(),
+          value = CaUtil.createCrlDistributionPoints(caUris.getCrlUris(),
               x500CaPrincipal, crlSignerSubject);
-          addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
+        addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
       }
 
       // FreshestCRL
       extType = Extension.freshestCRL;
       extControl = controls.remove(extType);
       if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+        CRLDistPoint value = null;
         if (CollectionUtil.isNonEmpty(caUris.getDeltaCrlUris())) {
-          CRLDistPoint value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
+          value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
               x500CaPrincipal, crlSignerSubject);
-          addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
+        addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
       }
     }
 
@@ -422,7 +425,7 @@ class IdentifiedCertprofile implements Closeable {
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
 
-    // remove extensions that are not required frrom the list
+    // remove extensions that are not required from the list
     List<ASN1ObjectIdentifier> listToRm = null;
     for (ASN1ObjectIdentifier extnType : controls.keySet()) {
       ExtensionControl ctrl = controls.get(extnType);
@@ -816,18 +819,13 @@ class IdentifiedCertprofile implements Closeable {
       values.addExtension(extType, extValue);
       neededExtensionTypes.remove(extType);
       wantedExtensionTypes.remove(extType);
-      return;
+    } else if (extControl.isRequired()) {
+      String description = ObjectIdentifiers.getName(extType);
+      if (description == null) {
+        description = extType.getId();
+      }
+      throw new CertprofileException("could not add required extension " + description);
     }
-
-    if (!extControl.isRequired()) {
-      return;
-    }
-
-    String description = ObjectIdentifiers.getName(extType);
-    if (description == null) {
-      description = extType.getId();
-    }
-    throw new CertprofileException("could not add required extension " + description);
   } // method addExtension
 
   private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
@@ -838,18 +836,13 @@ class IdentifiedCertprofile implements Closeable {
       values.addExtension(extType, extControl.isCritical(), extValue);
       neededExtensionTypes.remove(extType);
       wantedExtensionTypes.remove(extType);
-      return;
+    } else if (extControl.isRequired()) {
+      String description = ObjectIdentifiers.getName(extType);
+      if (description == null) {
+        description = extType.getId();
+      }
+      throw new CertprofileException("could not add required extension " + description);
     }
-
-    if (!extControl.isRequired()) {
-      return;
-    }
-
-    String description = ObjectIdentifiers.getName(extType);
-    if (description == null) {
-      description = extType.getId();
-    }
-    throw new CertprofileException("could not add required extension " + description);
   } // method addExtension
 
 }

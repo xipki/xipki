@@ -270,16 +270,16 @@ public class CaInfo {
     caEntry.setDuplicateSubjectPermitted(permitted);
   }
 
-  public boolean supportCmp() {
-    return caEntry.getProtocoSupport().supportsCmp();
+  public boolean supportsCmp() {
+    return caEntry.getProtocoSupport().isCmp();
   }
 
   public boolean supportsRest() {
-    return caEntry.getProtocoSupport().supportsRest();
+    return caEntry.getProtocoSupport().isRest();
   }
 
   public boolean supportsScep() {
-    return caEntry.getProtocoSupport().supportsScep();
+    return caEntry.getProtocoSupport().isScep();
   }
 
   public void setProtocolSupport(ProtocolSupport protocolSupport) {

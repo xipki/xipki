@@ -104,6 +104,11 @@ public class CaEntry {
 
   private String hexSha1OfCert;
 
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private CaEntry() {
+  }
+
   public CaEntry(NameId ident, int serialNoBitLen, long nextCrlNumber, String signerType,
       String signerConf, CaUris caUris, int numCrls, int expirationPeriod) {
     this.ident = ParamUtil.requireNonNull("ident", ident);

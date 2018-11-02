@@ -167,9 +167,6 @@
           <certOutform>REPLACEME-OUTFORM</certOutform>
         </genSelfIssued>
         <cmpControl>send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2</cmpControl>
-        <cert>
-          <file>${output.dir}/rootca1.crt</file>
-        </cert>
         <duplicateKey>true</duplicateKey>
         <duplicateSubject>true</duplicateSubject>
         <expirationPeriod>365</expirationPeriod>

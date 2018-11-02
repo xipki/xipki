@@ -17,11 +17,13 @@
 
 package org.xipki.ca.client.shell;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CaClient;
+import org.xipki.ca.client.api.CaClientException;
 import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
@@ -38,7 +40,11 @@ public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
   @Override
   protected Set<String> getEnums() {
-    return caClient.getCaNames();
+    try {
+      return caClient.getCaNames();
+    } catch (CaClientException ex) {
+      return Collections.emptySet();
+    }
   }
 
 }

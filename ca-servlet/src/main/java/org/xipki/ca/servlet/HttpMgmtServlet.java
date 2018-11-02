@@ -162,7 +162,7 @@ public class HttpMgmtServlet extends HttpServlet {
       }
 
       InputStream in = request.getInputStream();
-      CommResponse resp = null;
+      final CommResponse resp;
 
       switch (action) {
         case addCa: {
@@ -176,91 +176,109 @@ public class HttpMgmtServlet extends HttpServlet {
                   "could not build the CaEntry: " + ex.getMessage());
             }
             caManager.addCa(caEntry);
+            resp = null;
             break;
         }
         case addCaAlias: {
           AddCaAliasRequest req = parse(in, AddCaAliasRequest.class);
           caManager.addCaAlias(req.getAliasName(), req.getCaName());
+          resp = null;
           break;
         }
         case addCertprofile: {
           AddCertprofileRequest req = parse(in, AddCertprofileRequest.class);
           caManager.addCertprofile(req.getCertprofileEntry());
+          resp = null;
           break;
         }
         case addCertprofileToCa: {
           AddCertprofileToCaRequest req = parse(in, AddCertprofileToCaRequest.class);
           caManager.addCertprofileToCa(req.getProfileName(), req.getCaName());
+          resp = null;
           break;
         }
         case addPublisher: {
           AddPublisherRequest req = parse(in, AddPublisherRequest.class);
           caManager.addPublisher(req.getPublisherEntry());
+          resp = null;
           break;
         }
         case addPublisherToCa: {
-          AddPublisherToCaRequest req = parse(in, AddPublisherRequest.class);
+          AddPublisherToCaRequest req = parse(in, AddPublisherToCaRequest.class);
           caManager.addPublisherToCa(req.getPublisherName(), req.getCaName());
+          resp = null;
           break;
         }
         case addRequestor: {
           AddRequestorRequest req = parse(in, AddRequestorRequest.class);
           caManager.addRequestor(req.getRequestorEntry());
+          resp = null;
           break;
         }
         case addRequestorToCa: {
           AddRequestorToCaRequest req = parse(in, AddRequestorToCaRequest.class);
           caManager.addRequestorToCa(req.getRequestor(), req.getCaName());
+          resp = null;
           break;
         }
         case addSigner: {
           AddSignerRequest req = parse(in, AddSignerRequest.class);
           caManager.addSigner(req.getSignerEntry().toSignerEntry());
+          resp = null;
           break;
         }
         case addUser: {
           AddUserRequest req = parse(in, AddUserRequest.class);
           caManager.addUser(req.getAddUserEntry());
+          resp = null;
           break;
         }
         case addUserToCa: {
           AddUserToCaRequest req = parse(in, AddUserToCaRequest.class);
           caManager.addUserToCa(req.getUser(), req.getCaName());
+          resp = null;
           break;
         }
         case changeCa: {
           ChangeCaRequest req = parse(in, ChangeCaRequest.class);
           caManager.changeCa(req.getChangeCaEntry());
+          resp = null;
           break;
         }
         case changeCertprofile: {
           ChangeTypeConfEntityRequest req = parse(in, ChangeTypeConfEntityRequest.class);
           caManager.changeCertprofile(req.getName(), req.getType(), req.getConf());
+          resp = null;
           break;
         }
         case changePublisher: {
           ChangeTypeConfEntityRequest req = parse(in, ChangeTypeConfEntityRequest.class);
           caManager.changePublisher(req.getName(), req.getType(), req.getConf());
+          resp = null;
           break;
         }
         case changeRequestor: {
           ChangeTypeConfEntityRequest req = parse(in, ChangeTypeConfEntityRequest.class);
           caManager.changeRequestor(req.getName(), req.getType(), req.getConf());
+          resp = null;
           break;
         }
         case changeSigner: {
           ChangeSignerRequest req = parse(in, ChangeSignerRequest.class);
           caManager.changeSigner(req.getName(), req.getType(), req.getConf(), req.getBase64Cert());
+          resp = null;
           break;
         }
         case changeUser: {
           ChangeUserRequest req = parse(in, ChangeUserRequest.class);
           caManager.changeUser(req.getChangeUserEntry());
+          resp = null;
           break;
         }
         case clearPublishQueue: {
           ClearPublishQueueRequest req = new ClearPublishQueueRequest();
           caManager.clearPublishQueue(req.getCaName(), req.getPublisherNames());
+          resp = null;
           break;
         }
         case exportConf: {
@@ -364,7 +382,8 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getCertprofilesForCa: {
           String caName = getNameFromRequest(in);
-          caManager.getCertprofilesForCa(caName);
+          Set<String> result = caManager.getCertprofilesForCa(caName);
+          resp = new StringSetResponse(result);
           break;
         }
         case getCertRequest: {
@@ -502,101 +521,121 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case notifyCaChange: {
           caManager.notifyCaChange();
+          resp = null;
           break;
         }
         case removeCa: {
           String name = getNameFromRequest(in);
           caManager.removeCa(name);
+          resp = null;
           break;
         }
         case removeCaAlias: {
           String name = getNameFromRequest(in);
           caManager.removeCaAlias(name);
+          resp = null;
           break;
         }
         case removeCertificate: {
           RemoveCertificateRequest req = parse(in, RemoveCertificateRequest.class);
           caManager.removeCertificate(req.getCaName(), req.getSerialNumber());
+          resp = null;
           break;
         }
         case removeCertprofile: {
           String name = getNameFromRequest(in);
           caManager.removeCertprofile(name);
+          resp = null;
           break;
         }
         case removeCertprofileFromCa: {
           RemoveEntityFromCaRequest req = parse(in, RemoveEntityFromCaRequest.class);
           caManager.removeCertprofileFromCa(req.getEntityName(), req.getCaName());
+          resp = null;
           break;
         }
         case removePublisher: {
           String name = getNameFromRequest(in);
           caManager.removePublisher(name);
+          resp = null;
           break;
         }
         case removePublisherFromCa: {
           RemoveEntityFromCaRequest req = parse(in, RemoveEntityFromCaRequest.class);
           caManager.removePublisherFromCa(req.getEntityName(), req.getCaName());
+          resp = null;
           break;
         }
         case removeRequestor: {
           String name = getNameFromRequest(in);
           caManager.removeRequestor(name);
+          resp = null;
           break;
         }
         case removeRequestorFromCa: {
           RemoveEntityFromCaRequest req = parse(in, RemoveEntityFromCaRequest.class);
           caManager.removeRequestorFromCa(req.getEntityName(), req.getCaName());
+          resp = null;
           break;
         }
         case removeSigner: {
           String name = getNameFromRequest(in);
           caManager.removeSigner(name);
+          resp = null;
           break;
         }
         case removeUser: {
           String name = getNameFromRequest(in);
           caManager.removeUser(name);
+          resp = null;
           break;
         }
         case removeUserFromCa: {
           RemoveEntityFromCaRequest req = parse(in, RemoveEntityFromCaRequest.class);
           caManager.removeUserFromCa(req.getEntityName(), req.getCaName());
+          resp = null;
           break;
         }
         case republishCertificates: {
           RepublishCertificatesRequest req = parse(in, RepublishCertificatesRequest.class);
           caManager.republishCertificates(req.getCaName(), req.getPublisherNames(),
               req.getNumThreads());
+          resp = null;
           break;
         }
         case restartCaSystem: {
           caManager.restartCaSystem();
+          resp = null;
           break;
         }
         case revokeCa: {
           RevokeCaRequest req = parse(in, RevokeCaRequest.class);
           caManager.revokeCa(req.getCaName(), req.getRevocationInfo());
+          resp = null;
           break;
         }
         case revokeCertficate: {
           RevokeCertificateRequest req = parse(in, RevokeCertificateRequest.class);
           caManager.revokeCertificate(req.getCaName(),req.getSerialNumber(),
               req.getReason(), req.getInvalidityTime());
+          resp = null;
           break;
         }
         case unlockCa: {
           caManager.unlockCa();
+          resp = null;
           break;
         }
         case unrevokeCa: {
           String name = getNameFromRequest(in);
           caManager.unrevokeCa(name);
+          resp = null;
           break;
         }
         case unrevokeCertificate: {
           UnrevokeCertificateRequest req = parse(in, UnrevokeCertificateRequest.class);
           caManager.unrevokeCertificate(req.getCaName(), req.getSerialNumber());
+          resp = null;
           break;
         }
         default: {
@@ -673,11 +712,9 @@ public class HttpMgmtServlet extends HttpServlet {
   private static <T extends CommRequest> T parse(InputStream in, Class<?> clazz)
       throws CaMgmtException {
     try {
-      byte[] inBytes = IoUtil.read(in);
-      System.out.write(inBytes);
-      return JSON.parseObject(inBytes, clazz);
+      return JSON.parseObject(in, clazz);
     } catch (RuntimeException | IOException ex) {
-      throw new CaMgmtException("cannot parse response " + clazz + " from InputStream");
+      throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }
   }
 

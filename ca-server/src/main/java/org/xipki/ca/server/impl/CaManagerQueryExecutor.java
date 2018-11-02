@@ -1028,8 +1028,8 @@ class CaManagerQueryExecutor {
     Boolean supportScep = changeCaEntry.getSupportScep();
     if (supportCmp != null || supportRest != null || supportScep != null) {
       ProtocolSupport oldSupport = currentCaEntry.getProtocoSupport();
-      ProtocolSupport support = new ProtocolSupport(oldSupport.supportsCmp(),
-          oldSupport.supportsRest(), oldSupport.supportsScep());
+      ProtocolSupport support = new ProtocolSupport(oldSupport.isCmp(),
+          oldSupport.isRest(), oldSupport.isScep());
 
       if (supportCmp != null) {
         support.setCmp(supportCmp);

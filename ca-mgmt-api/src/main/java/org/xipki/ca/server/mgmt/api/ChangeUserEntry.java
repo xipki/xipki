@@ -34,6 +34,11 @@ public class ChangeUserEntry {
 
   private String password;
 
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private ChangeUserEntry() {
+  }
+
   public ChangeUserEntry(NameId ident) throws CaMgmtException {
     this.ident = ParamUtil.requireNonNull("ident", ident);
   }

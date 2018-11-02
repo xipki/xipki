@@ -19,6 +19,7 @@ package org.xipki.ca.server.servlet;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -96,8 +97,11 @@ public class HttpRestServlet extends HttpServlet {
         resp.setContentType(resp.getContentType());
       }
 
-      for (String headerName : response.getHeaders().keySet()) {
-        resp.setHeader(headerName, response.getHeaders().get(headerName));
+      Map<String, String> headers = response.getHeaders();
+      if (headers != null) {
+        for (String headerName : response.getHeaders().keySet()) {
+          resp.setHeader(headerName, response.getHeaders().get(headerName));
+        }
       }
 
       byte[] respBody = response.getBody();

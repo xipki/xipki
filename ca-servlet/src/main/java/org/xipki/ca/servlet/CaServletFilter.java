@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audits.Audits;
 import org.xipki.ca.api.internal.CertPublisherFactoryRegisterImpl;
 import org.xipki.ca.api.internal.CertprofileFactoryRegisterImpl;
+import org.xipki.ca.api.profile.CertprofileFactory;
+import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.certprofile.xml.internal.CertprofileFactoryImpl;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.publisher.ocsp.OcspCertPublisherFactory;
@@ -95,11 +97,20 @@ public class CaServletFilter implements Filter {
     caManager.setAuditServiceRegister(audits.getAuditServiceRegister());
     caManager.setSecurityFactory(securities.getSecurityFactory());
 
+    Properties props = new Properties();
+    InputStream is = null;
+    try {
+      is = Files.newInputStream(Paths.get(DFLT_CA_SERVER_CFG));
+      props.load(is);
+    } catch (IOException ex) {
+      throw new ServletException("could not load properties from file " + DFLT_CA_SERVER_CFG);
+    } finally {
+      IoUtil.closeQuietly(is);
+    }
+
     // Certprofiles
-    CertprofileFactoryRegisterImpl certprofileFactoryRegister =
-        new CertprofileFactoryRegisterImpl();
-    certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
-    caManager.setCertprofileFactoryRegister(certprofileFactoryRegister);
+    caManager.setCertprofileFactoryRegister(
+        initCertprofileFactoryRegister(props));
 
     // Publisher
     CertPublisherFactoryRegisterImpl publiserFactoryRegister =
@@ -128,17 +139,6 @@ public class CaServletFilter implements Filter {
     this.scepServlet = new HttpScepServlet();
     this.scepServlet.setAuditServiceRegister(audits.getAuditServiceRegister());
     this.scepServlet.setResponderManager(caManager);
-
-    Properties props = new Properties();
-    InputStream is = null;
-    try {
-      is = Files.newInputStream(Paths.get(DFLT_CA_SERVER_CFG));
-      props.load(is);
-    } catch (IOException ex) {
-      throw new ServletException("could not load properties from file " + DFLT_CA_SERVER_CFG);
-    } finally {
-      IoUtil.closeQuietly(is);
-    }
 
     remoteMgmtEnabled =
         Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "true"));
@@ -207,6 +207,32 @@ public class CaServletFilter implements Filter {
   private static void sendError(HttpServletResponse res, int status) {
     res.setStatus(status);
     res.setContentLength(0);
+  }
+
+  private CertprofileFactoryRegister initCertprofileFactoryRegister(Properties props)
+      throws ServletException {
+    CertprofileFactoryRegisterImpl certprofileFactoryRegister =
+        new CertprofileFactoryRegisterImpl();
+    certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
+
+    // register additional SignerFactories
+    String list = props.getProperty("Additional.CertprofileFactories");
+    String[] classNames = list == null ? null : list.split(", ");
+    if (classNames != null) {
+      for (String className : classNames) {
+        try {
+          Class<?> clazz = Class.forName(className);
+          CertprofileFactory factory = (CertprofileFactory) clazz.newInstance();
+          certprofileFactoryRegister.registFactory(factory);
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
+            | InstantiationException ex) {
+          LOG.error("error caught while initializing CertprofileFactory "
+              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+      }
+    }
+
+    return certprofileFactoryRegister;
   }
 
 }

@@ -32,6 +32,6 @@ xi:update-cert-p12 --p12 output/scep1.p12 --password 1234 \
 ca:signer-add --name scep-responder1 --type pkcs12 \
   --conf password=1234,keystore=file:output/scep1.p12,algo=SHA256withRSA
 
-ca:ca-up --name subcawithcrl1 --scep-responder scep-responder1 --support-scep yes \
+ca:ca-up --name subcawithcrl1 --scep-responder scep-responder1 \
   --scep-control cacert.included=false,signercert.included=true,support.getcrl=true
 

@@ -41,6 +41,11 @@ public class ProtocolSupport {
 
   private boolean scep;
 
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private ProtocolSupport() {
+  }
+
   public ProtocolSupport(String encoded) {
     if (StringUtil.isBlank(encoded)) {
       return;
@@ -65,7 +70,7 @@ public class ProtocolSupport {
     this.scep = scep;
   }
 
-  public boolean supportsCmp() {
+  public boolean isCmp() {
     return cmp;
   }
 
@@ -73,7 +78,7 @@ public class ProtocolSupport {
     this.cmp = cmp;
   }
 
-  public boolean supportsRest() {
+  public boolean isRest() {
     return rest;
   }
 
@@ -81,7 +86,7 @@ public class ProtocolSupport {
     this.rest = rest;
   }
 
-  public boolean supportsScep() {
+  public boolean isScep() {
     return scep;
   }
 

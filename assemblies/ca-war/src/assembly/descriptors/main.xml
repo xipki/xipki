@@ -43,5 +43,17 @@
       <destName>ca.war</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>../shared/conf/xipki/etc/ca/example/h2.ca-db.properties</source>
+      <outputDirectory>xipki/etc/ca</outputDirectory>
+      <destName>ca-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>../shared/conf/xipki/etc/ca/example/h2.ocsp-db.properties</source>
+      <outputDirectory>xipki/etc/ca</outputDirectory>
+      <destName>ocsp-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 </assembly>

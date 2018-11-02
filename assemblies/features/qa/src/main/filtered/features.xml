@@ -116,7 +116,6 @@
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}" description="CA client shell">
     <feature>xipki-caclient</feature>
-    <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
