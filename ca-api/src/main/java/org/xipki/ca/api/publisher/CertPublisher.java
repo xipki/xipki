@@ -54,11 +54,6 @@ public abstract class CertPublisher implements Closeable {
   public abstract void initialize(String conf, PasswordResolver passwordResolver,
       Map<String, String> datasourceConfFiles) throws CertPublisherException;
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
   }

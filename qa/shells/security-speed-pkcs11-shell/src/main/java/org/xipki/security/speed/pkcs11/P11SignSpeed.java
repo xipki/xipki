@@ -110,11 +110,6 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     }
   }
 
-  @Deprecated
-  protected final void shutdown() {
-    close();
-  }
-
   @Override
   public final void close() {
     if (deleteKeyAfterTest) {

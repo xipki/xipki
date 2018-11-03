@@ -75,11 +75,6 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
         "could not find factory to create Certprofile of type '" + type + "'");
   }
 
-  @Deprecated
-  public void bindService(CertprofileFactory service) {
-    registFactory(service);
-  }
-
   public void registFactory(CertprofileFactory factory) {
     //might be null if dependency is optional
     if (factory == null) {
@@ -92,11 +87,6 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
 
     String action = replaced ? "replaced" : "added";
     LOG.info("{} CertprofileFactory binding for {}", action, factory);
-  }
-
-  @Deprecated
-  public void unbindService(CertprofileFactory service) {
-    unregistFactory(service);
   }
 
   public void unregistFactory(CertprofileFactory factory) {

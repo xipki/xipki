@@ -516,11 +516,6 @@ class IdentifiedCertprofile implements Closeable {
     return certprofile.incSerialNumberIfSubjectExists();
   }
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
     if (certprofile != null) {

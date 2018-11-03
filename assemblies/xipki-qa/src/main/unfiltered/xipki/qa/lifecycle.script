@@ -258,7 +258,7 @@ if { $printUsage equals "true" } then {
     xi:copy-file -f output/ocsp99.p12 \
       ${XIPKI_DIR}/keycerts/ocsp99.p12
   }
-    
+
   xi:copy-file -f output/subcawithcrl1.crl \
     ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl
 

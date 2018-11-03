@@ -140,11 +140,6 @@ class OcspBenchRequestor implements Closeable {
     this.httpClient.start();
   }
 
-  @Deprecated
-  public void shutdown() throws Exception {
-    close();
-  }
-
   @Override
   public void close() {
     httpClient.close();

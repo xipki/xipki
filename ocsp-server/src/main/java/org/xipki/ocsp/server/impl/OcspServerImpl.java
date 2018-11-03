@@ -324,7 +324,7 @@ public class OcspServerImpl implements OcspServer {
 
     servletPaths.clear();
     path2responderMap.clear();
-    
+
     Ocspserver conf = parseConf(confFile);
 
     //-- check the duplication names
@@ -558,11 +558,6 @@ public class OcspServerImpl implements OcspServer {
     }
     this.servletPaths = list2;
   } // method init0
-
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
 
   @Override
   public void close() {

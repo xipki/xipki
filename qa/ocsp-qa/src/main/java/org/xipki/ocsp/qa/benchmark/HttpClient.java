@@ -258,11 +258,6 @@ final class HttpClient implements Closeable {
     future.awaitUninterruptibly();
   }
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
     if (channel != null) {

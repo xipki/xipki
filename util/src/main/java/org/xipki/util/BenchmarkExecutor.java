@@ -61,11 +61,6 @@ public abstract class BenchmarkExecutor {
 
   protected abstract Runnable getTestor() throws Exception;
 
-  @Deprecated
-  protected void shutdown() {
-    close();
-  }
-
   public void close() {
   }
 

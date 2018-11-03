@@ -56,11 +56,6 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
         "could not find factory to create OcspStore of type '" + type + "'");
   }
 
-  @Deprecated
-  public void bindService(OcspStoreFactory service) {
-    registFactory(service);
-  }
-
   public void registFactory(OcspStoreFactory factory) {
     //might be null if dependency is optional
     if (factory == null) {
@@ -73,11 +68,6 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
 
     String action = replaced ? "replaced" : "added";
     LOG.info("{} CertStatusStoreFactory binding for {}", action, factory);
-  }
-
-  @Deprecated
-  public void unbindService(OcspStoreFactory service) {
-    unregistFactory(service);
   }
 
   public void unregistFactory(OcspStoreFactory factory) {

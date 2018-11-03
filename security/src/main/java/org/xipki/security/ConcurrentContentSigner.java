@@ -136,6 +136,4 @@ public interface ConcurrentContentSigner extends Closeable {
 
   boolean isHealthy();
 
-  @Deprecated
-  void shutdown();
 }

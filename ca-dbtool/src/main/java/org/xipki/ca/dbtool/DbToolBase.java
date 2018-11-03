@@ -121,11 +121,6 @@ public class DbToolBase implements Closeable {
     return true;
   } // method deleteFromTableWithLargerId
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
     datasource.returnConnection(connection);

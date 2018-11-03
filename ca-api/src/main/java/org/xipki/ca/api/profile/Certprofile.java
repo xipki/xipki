@@ -46,11 +46,6 @@ public abstract class Certprofile implements Closeable {
   protected Certprofile() {
   }
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
   }

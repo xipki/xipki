@@ -38,11 +38,6 @@ public class Providers implements Closeable {
     addBcProvider();
   }
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
   }

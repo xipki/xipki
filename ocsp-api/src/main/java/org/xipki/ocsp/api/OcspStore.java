@@ -98,9 +98,6 @@ public abstract class OcspStore implements Closeable {
   public abstract void init(String conf, DataSourceWrapper datasource)
       throws OcspStoreException;
 
-  @Deprecated
-  public abstract void shutdown() throws OcspStoreException;
-
   public abstract boolean isHealthy();
 
   public void setName(String name) {

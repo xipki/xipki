@@ -50,11 +50,6 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
     return services.isEmpty() ? dfltAuditService : services.getLast();
   }
 
-  @Deprecated
-  public void bindService(final AuditService service) {
-    registService(service);
-  }
-
   public void registService(final AuditService service) {
     //might be null if dependency is optional
     if (service == null) {
@@ -67,11 +62,6 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
     final String action = replaced ? "replaced" : "added";
     LOG.info("{} AuditService binding for {}", action, service);
-  }
-
-  @Deprecated
-  public void unbindService(final AuditService service) {
-    unregistService(service);
   }
 
   public void unregistService(final AuditService service) {

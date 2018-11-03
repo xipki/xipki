@@ -264,12 +264,6 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
-  @Override
   public void close() {
   }
 

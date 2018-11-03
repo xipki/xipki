@@ -57,11 +57,6 @@ public class PasswordResolverImpl implements PasswordResolver {
     initialized = true;
   }
 
-  @Deprecated
-  public void bindService(SinglePasswordResolver service) {
-    registResolver(service);
-  }
-
   public void registResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
     if (resolver == null) {
@@ -73,11 +68,6 @@ public class PasswordResolverImpl implements PasswordResolver {
     resolvers.add(resolver);
     String txt = replaced ? "replaced" : "added";
     LOG.debug("{} SinglePasswordResolver binding for {}", txt, resolver);
-  }
-
-  @Deprecated
-  public void unbindService(SinglePasswordResolver service) {
-    unregistResolver(service);
   }
 
   public void unregistResolver(SinglePasswordResolver resolver) {

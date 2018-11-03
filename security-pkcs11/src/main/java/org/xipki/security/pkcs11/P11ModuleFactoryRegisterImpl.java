@@ -41,11 +41,6 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
   private ConcurrentLinkedDeque<P11ModuleFactory> factories =
       new ConcurrentLinkedDeque<P11ModuleFactory>();
 
-  @Deprecated
-  public void bindService(P11ModuleFactory service) {
-    registFactory(service);
-  }
-
   public void registFactory(P11ModuleFactory factory) {
     //might be null if dependency is optional
     if (factory == null) {
@@ -58,11 +53,6 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
 
     String action = replaced ? "replaced" : "added";
     LOG.info("{} P11ModuleFactory binding for {}", action, factory);
-  }
-
-  @Deprecated
-  public void unbindService(P11ModuleFactory service) {
-    unregistFactory(service);
   }
 
   public void unregistFactory(P11ModuleFactory factory) {
@@ -104,11 +94,6 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
     }
 
     return p11Module;
-  }
-
-  @Deprecated
-  public void shutdown() {
-    close();
   }
 
   @Override

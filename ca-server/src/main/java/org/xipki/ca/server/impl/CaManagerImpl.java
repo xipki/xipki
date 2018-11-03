@@ -805,11 +805,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return true;
   } // method startCa
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
     LOG.info("stopping CA system");

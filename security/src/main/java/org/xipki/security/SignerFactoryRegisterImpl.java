@@ -49,11 +49,6 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     return Collections.unmodifiableSet(types);
   }
 
-  @Deprecated
-  public void bindService(SignerFactory service) {
-    registFactory(service);
-  }
-
   public void registFactory(SignerFactory factory) {
     //might be null if dependency is optional
     if (factory == null) {
@@ -66,11 +61,6 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
     String action = replaced ? "replaced" : "added";
     LOG.info("{} SignerFactory binding for {}", action, factory);
-  }
-
-  @Deprecated
-  public void unbindService(SignerFactory service) {
-    unbindService(service);
   }
 
   public void unregistFactory(SignerFactory factory) {

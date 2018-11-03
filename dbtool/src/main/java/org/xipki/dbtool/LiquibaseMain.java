@@ -149,11 +149,6 @@ public class LiquibaseMain implements Closeable {
     System.out.println("successfully  updated the database");
   }
 
-  @Deprecated
-  public void shutdown() {
-    close();
-  }
-
   @Override
   public void close() {
     try {

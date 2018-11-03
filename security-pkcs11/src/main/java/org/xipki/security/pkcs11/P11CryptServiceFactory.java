@@ -48,7 +48,4 @@ public interface P11CryptServiceFactory extends Closeable {
 
   Set<String> getModuleNames();
 
-  @Deprecated
-  void shutdown();
-
 }
