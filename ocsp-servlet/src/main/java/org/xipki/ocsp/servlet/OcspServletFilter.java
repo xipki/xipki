@@ -18,6 +18,10 @@
 package org.xipki.ocsp.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,13 +32,17 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.ocsp.api.internal.OcspStoreFactoryRegisterImpl;
 import org.xipki.ocsp.server.impl.OcspServerImpl;
 import org.xipki.ocsp.store.OcspStoreFactoryImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.securities.Securities;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -43,9 +51,11 @@ import org.xipki.util.InvalidConfException;
 
 public class OcspServletFilter implements Filter {
 
-  static final String ATTR_XIPKI_PATH = "xipki_path";
+  private static final Logger LOG = LoggerFactory.getLogger(OcspServletFilter.class);
 
-  private static final String DFLT_OCSP_SERVER_CFG = "xipki/etc/ocsp/ocsp-responderxml";
+  private static final String DFLT_OCSP_SERVER_CFG = "xipki/etc/org.xipki.ocsp.server.cfg";
+
+  private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp-responder.xml";
 
   private Securities securities;
 
@@ -54,6 +64,10 @@ public class OcspServletFilter implements Filter {
   private HealthCheckServlet healthServlet;
 
   private OcspServlet ocspServlet;
+
+  private boolean remoteMgmtEnabled;
+
+  private HttpMgmtServlet mgmgServlet;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -64,6 +78,17 @@ public class OcspServletFilter implements Filter {
       throw new ServletException("Exception while initializing Securites", ex);
     }
 
+    Properties props = new Properties();
+    InputStream is = null;
+    try {
+      is = Files.newInputStream(Paths.get(DFLT_OCSP_SERVER_CFG));
+      props.load(is);
+    } catch (IOException ex) {
+      throw new ServletException("could not load properties from file " + DFLT_OCSP_SERVER_CFG);
+    } finally {
+      IoUtil.closeQuietly(is);
+    }
+
     OcspServerImpl ocspServer = new OcspServerImpl();
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
 
@@ -72,7 +97,8 @@ public class OcspServletFilter implements Filter {
 
     ocspServer.setOcspStoreFactoryRegister(ocspStoreFactoryRegister);
 
-    ocspServer.setConfFile(DFLT_OCSP_SERVER_CFG);
+    String confFile = props.getProperty("confFile", DFLT_CONF_FILE);
+    ocspServer.setConfFile(confFile);
 
     try {
       ocspServer.init();
@@ -86,6 +112,15 @@ public class OcspServletFilter implements Filter {
 
     this.ocspServlet = new OcspServlet();
     this.ocspServlet.setServer(this.server);
+
+    this.remoteMgmtEnabled =
+        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "true"));
+    LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
+
+    if (remoteMgmtEnabled) {
+      this.mgmgServlet = new HttpMgmtServlet();
+      this.mgmgServlet.setOcspServer(this.server);
+    }
   }
 
   @Override
@@ -112,10 +147,17 @@ public class OcspServletFilter implements Filter {
 
     if (path.startsWith("/health/")) {
       String servletPath = path.substring(7); // 7 = "/health".length()
-      req.setAttribute(ATTR_XIPKI_PATH, servletPath);
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, servletPath);
       healthServlet.service(req, resp);
+    } else if (path.startsWith("/mgmt/")) {
+      if (remoteMgmtEnabled) {
+        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
+        mgmgServlet.service(req, resp);
+      } else {
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      }
     } else {
-      req.setAttribute(ATTR_XIPKI_PATH, path);
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path);
       ocspServlet.service(req, resp);
     }
   }

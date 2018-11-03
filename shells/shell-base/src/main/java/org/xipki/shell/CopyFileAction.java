@@ -41,8 +41,7 @@ public class CopyFileAction extends XiAction {
   @Completion(FileCompleter.class)
   private String source;
 
-  @Argument(index = 1, name = "destination", required = true,
-      description = "destination directory or file")
+  @Argument(index = 1, name = "destination", required = true, description = "destination file")
   @Completion(FileCompleter.class)
   private String dest;
 
@@ -51,7 +50,10 @@ public class CopyFileAction extends XiAction {
 
   @Override
   protected Object execute0() throws Exception {
-    File sourceFile = new File(expandFilepath(source));
+    source = expandFilepath(source);
+    dest = expandFilepath(dest);
+
+    File sourceFile = new File(source);
     if (!sourceFile.exists()) {
       throw new IllegalCmdParamException(source + " does not exist");
     }

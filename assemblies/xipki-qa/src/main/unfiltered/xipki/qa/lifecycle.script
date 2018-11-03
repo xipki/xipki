@@ -249,14 +249,31 @@ if { $printUsage equals "true" } then {
 
   source file:./xipki/qa/rest.script
 
-  # Force the OCSP responder to import the CRL to database
-  xi:copy-file -f xipki/etc/ocsp/foo.crl.UPDATEME \
-    output/subcawithcrl1.crl.UPDATEME
+  # Copy the configuration of OCSP responder
+  xi:copy-file -f \
+    xipki/etc/ocsp/ocsp-responder.xml \
+    ${XIPKI_DIR}/etc/ocsp/ocsp-responder.xml
 
-  feature:install xipki-ocspserver
+  if { "$TOKEN_TYPE" equals "pkcs12" } then {
+    xi:copy-file -f output/ocsp99.p12 \
+      ${XIPKI_DIR}/keycerts/ocsp99.p12
+  }
+    
+  xi:copy-file -f output/subcawithcrl1.crl \
+    ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl
+
+  xi:copy-file -f output/subcawithcrl1.crt \
+    ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/ca.crt
+
+  # Force the OCSP responder to import the CRL to database
+  xi:copy-file -f ${XIPKI_DIR}/etc/ocsp/foo.crl.UPDATEME \
+    ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl.UPDATEME
+
+  feature:install xipki-ocspmgmt-shell
+
+  # Restart OCSP server
+  ocsp:restart-server
 
   source file:./xipki/qa/ocsp.script
-
-  feature:uninstall xipki-ocspserver
 
 }

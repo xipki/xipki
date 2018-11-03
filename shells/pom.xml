@@ -36,6 +36,7 @@
     <module>ocsp-client-shell</module>
     <module>scep-client-shell</module>
     <module>ca-mgmt-shell</module>
+    <module>ocsp-mgmt-shell</module>
     <module>dbtool-shell</module>
     <module>ca-dbtool-shell</module>
   </modules>

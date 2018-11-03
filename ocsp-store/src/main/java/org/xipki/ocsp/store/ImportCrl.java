@@ -198,11 +198,11 @@ public class ImportCrl {
     octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
     this.isDeltaCrl = (octetString != null);
     if (this.isDeltaCrl) {
-      LOG.info("The CRL a DeltaCRL");
+      LOG.info("The CRL is a DeltaCRL");
       byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
       this.baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
     } else {
-      LOG.info("The CRL a full CRL");
+      LOG.info("The CRL is a full CRL");
       this.baseCrlNumber = null;
     }
 

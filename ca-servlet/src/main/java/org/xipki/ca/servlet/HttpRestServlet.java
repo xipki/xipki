@@ -37,6 +37,7 @@ import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.RestResponse;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
 
@@ -84,7 +85,7 @@ public class HttpRestServlet extends HttpServlet {
     try {
       RestResponder rest = responderManager.getRestResponder();
 
-      String path = (String) req.getAttribute(CaServletFilter.ATTR_XIPKI_PATH);
+      String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
       byte[] requestBytes = IoUtil.read(req.getInputStream());
       RestResponse response = rest.service(path, event, requestBytes, httpRetriever);

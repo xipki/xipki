@@ -260,17 +260,24 @@ public class OcspServerImpl implements OcspServer {
   }
 
   public void init() throws InvalidConfException, DataAccessException, PasswordResolverException {
+    init(true);
+  }
+
+  public void init(boolean force)
+      throws InvalidConfException, DataAccessException, PasswordResolverException {
     LOG.info("starting OCSPResponder server ...");
     if (initialized.get()) {
-      LOG.info("already started, skipping ...");
-      return;
+      if (!force) {
+        LOG.info("already started, skipping ...");
+        return;
+      }
     }
 
     try {
       init0();
       initialized.set(true);
       LOG.info("started OCSPResponder server");
-    } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
+    } catch (InvalidConfException | PasswordResolverException ex) {
       LOG.error("could not start OCSP responder", ex);
       throw ex;
     } catch (Error ex) {
@@ -285,7 +292,7 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private void init0() throws InvalidConfException, DataAccessException, PasswordResolverException {
+  private void init0() throws OcspStoreException, InvalidConfException, PasswordResolverException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
     }
@@ -296,6 +303,28 @@ public class OcspServerImpl implements OcspServer {
       throw new IllegalStateException("securityFactory is not set");
     }
 
+    initialized.set(false);
+
+    // reset
+    responseCacher = null;
+    responders.clear();
+    signers.clear();
+
+    requestOptions.clear();
+    responseOptions.clear();
+    for (String name : stores.keySet()) {
+      OcspStore store = stores.get(name);
+      try {
+        store.close();
+      } catch (IOException ex) {
+        throw new OcspStoreException("could not close OCSP store " + name, ex);
+      }
+    }
+    stores.clear();
+
+    servletPaths.clear();
+    path2responderMap.clear();
+    
     Ocspserver conf = parseConf(confFile);
 
     //-- check the duplication names
@@ -305,8 +334,8 @@ public class OcspServerImpl implements OcspServer {
     for (ResponderType m : conf.getResponders().getResponder()) {
       String name = m.getName();
 
-      if ("health".equals(name)) {
-        throw new InvalidConfException("responder name 'health' is not permitted");
+      if ("health".equalsIgnoreCase(name) || "mgmt".equalsIgnoreCase(name)) {
+        throw new InvalidConfException("responder name '" + name + "' is not permitted");
       }
 
       if (set.contains(name)) {

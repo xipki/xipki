@@ -48,6 +48,7 @@ import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.util.Base64;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
@@ -99,7 +100,7 @@ public class HttpScepServlet extends HttpServlet {
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws ServletException, IOException {
-    String path = (String) req.getAttribute(CaServletFilter.ATTR_XIPKI_PATH);
+    String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
     String caAlias = null;
     String certprofileName = null;
     if (path.length() > 1) {

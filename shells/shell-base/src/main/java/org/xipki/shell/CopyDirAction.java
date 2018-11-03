@@ -48,7 +48,10 @@ public class CopyDirAction extends XiAction {
 
   @Override
   protected Object execute0() throws Exception {
-    File sourceDir = new File(expandFilepath(source));
+    source = expandFilepath(source);
+    dest = expandFilepath(dest);
+
+    File sourceDir = new File(source);
     if (!sourceDir.exists()) {
       throw new IllegalCmdParamException(source + " does not exist");
     }

@@ -104,6 +104,7 @@ import org.xipki.ca.server.mgmt.msg.SignerEntryWrapper;
 import org.xipki.ca.server.mgmt.msg.StringResponse;
 import org.xipki.ca.server.mgmt.msg.StringSetResponse;
 import org.xipki.ca.server.mgmt.msg.UnrevokeCertificateRequest;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
@@ -148,7 +149,7 @@ public class HttpMgmtServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
-      String path = (String) request.getAttribute(CaServletFilter.ATTR_XIPKI_PATH);
+      String path = (String) request.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
 
       if (path == null || path.length() < 2) {
         throw new MyException(HttpServletResponse.SC_NOT_FOUND, "no action is specified");
@@ -654,11 +655,11 @@ public class HttpMgmtServlet extends HttpServlet {
         response.getOutputStream().write(respBytes);
       }
     } catch (MyException ex) {
-      response.setHeader(CommResponse.HEADER_XIPKI_ERROR, ex.getMessage());
+      response.setHeader(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
       response.sendError(ex.getStatus());
     } catch (CaMgmtException ex) {
       LOG.error("CaMgmtException", ex);
-      response.setHeader(CommResponse.HEADER_XIPKI_ERROR, ex.getMessage());
+      response.setHeader(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);

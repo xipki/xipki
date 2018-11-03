@@ -275,19 +275,16 @@
                 <feature>wrap</feature>
                 <feature>http-whiteboard</feature>
                 <!-- project-core features -->
-                <feature>xipki-caserver</feature>
                 <feature>xipki-camgmt-shell</feature>
+                <feature>xipki-ocspmgmt-shell</feature>
                 <feature>xipki-caclient-shell</feature>
                 <feature>xipki-security-shell</feature>
-                <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>
                 <feature>xipki-dbtool</feature>
-                <feature>xipki-audit-syslog</feature>
                 <feature>xipki-scepclient-shell</feature>
                 <feature>xipki-jscepclient-shell</feature>
                 <feature>xipki-caqa-shell</feature>
                 <feature>xipki-ocspqa-shell</feature>
-                <feature>xipki-custom-certprofiles</feature>
               </features>
             </configuration>
           </execution>

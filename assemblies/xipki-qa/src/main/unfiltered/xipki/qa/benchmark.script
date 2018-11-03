@@ -104,6 +104,6 @@ if { $printUsage equals "true" } then {
       --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL \
       --queue-size $OCSP_QUEUE_SIZE
 
-    feature:install xipki-ocspqa-shell
+    feature:uninstall xipki-ocspqa-shell
   }
 }

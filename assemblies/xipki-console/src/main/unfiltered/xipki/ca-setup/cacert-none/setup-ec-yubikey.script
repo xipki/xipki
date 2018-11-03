@@ -77,9 +77,7 @@ xi:replace --old "REPLACEME_CA_SIGNERCONF" \
 ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.xml \
   --out-dir ${KEYCERTS_DIR}
 
-xi:copy-file ${KEYCERTS_DIR}/ca-myca1.der ${KEYCERTS_DIR}/myca1.der
-
-xi:rm --force ${KEYCERTS_DIR}/ca-myca1.der
+xi:move-file ${KEYCERTS_DIR}/ca-myca1.der ${KEYCERTS_DIR}/myca1.der
 
 # Need to review the update-cert-p11 for yubikey
 # echo "# Update the certificate in the device"

@@ -105,6 +105,8 @@
     <module>ocsp-server</module>
     <module>ocsp-store</module>
     <module>ocsp-servlet</module>
+    <module>ocsp-mgmt-api</module>
+    <module>ocsp-mgmt-client</module>
     <module>shells</module>
     <module>examples</module>
     <module>qa</module>

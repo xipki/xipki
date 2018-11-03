@@ -18,8 +18,6 @@
 
 source file:./xipki/qa/qa.d/initdb.script
 
-feature:install xipki-caserver
-
 feature:install xipki-camgmt-shell
 
 echo "Sleeping 1 second"

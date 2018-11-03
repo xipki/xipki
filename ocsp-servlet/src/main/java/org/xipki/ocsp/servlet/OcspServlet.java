@@ -33,6 +33,7 @@ import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Base64;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
@@ -65,9 +66,8 @@ public class OcspServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-
     try {
-      String path = (String) req.getAttribute(OcspServletFilter.ATTR_XIPKI_PATH);
+      String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
       if (responderAndPath == null) {
         sendError(resp, HttpServletResponse.SC_NOT_FOUND);
@@ -117,7 +117,7 @@ public class OcspServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    String path = StringUtil.getRelativeRequestUri(req.getServletPath(), req.getRequestURI());
+    String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
     ResponderAndPath responderAndPath = server.getResponderForPath(path);
     if (responderAndPath == null) {
       sendError(resp, HttpServletResponse.SC_NOT_FOUND);

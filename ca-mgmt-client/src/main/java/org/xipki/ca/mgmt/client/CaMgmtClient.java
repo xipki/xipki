@@ -108,6 +108,7 @@ import org.xipki.ca.server.mgmt.msg.UnrevokeCertificateRequest;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
@@ -813,7 +814,7 @@ public class CaMgmtClient implements CaManager {
           }
         }
       } else {
-        String errorMessage = httpUrlConnection.getHeaderField(CommResponse.HEADER_XIPKI_ERROR);
+        String errorMessage = httpUrlConnection.getHeaderField(HttpConstants.HEADER_XIPKI_ERROR);
         if (errorMessage == null) {
           StringBuilder sb = new StringBuilder(100);
           sb.append("server returns ").append(httpUrlConnection.getResponseCode());

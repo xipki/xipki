@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.util.HealthCheckResult;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ParamUtil;
 
@@ -59,7 +60,7 @@ public class HealthCheckServlet extends HttpServlet {
     resp.setHeader("Access-Control-Allow-Origin", "*");
 
     try {
-      String path = (String) req.getAttribute(OcspServletFilter.ATTR_XIPKI_PATH);
+      String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
 
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
       if (responderAndPath == null) {

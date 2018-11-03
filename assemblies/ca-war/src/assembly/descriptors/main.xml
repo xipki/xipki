@@ -17,7 +17,7 @@
         <include>etc/ca/**</include>
         <include>etc/org.xipki.audit.cfg</include>
         <include>etc/org.xipki.audit.syslog.cfg</include>
-        <include>etc/ca.properties</include>
+        <include>etc/org.xipki.ca.server.cfg</include>
         <include>etc/org.xipki.password.cfg</include>
         <include>etc/org.xipki.security.cfg</include>
         <include>etc/org.xipki.security.pkcs11.cfg</include>

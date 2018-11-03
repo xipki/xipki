@@ -43,6 +43,7 @@ import org.xipki.ca.certprofile.xml.internal.CertprofileFactoryImpl;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.publisher.ocsp.OcspCertPublisherFactory;
 import org.xipki.securities.Securities;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 
@@ -51,11 +52,12 @@ import org.xipki.util.IoUtil;
  * @author Lijun Liao
  */
 public class CaServletFilter implements Filter {
-  static final String ATTR_XIPKI_PATH = "xipki_path";
 
   private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter.class);
 
-  private static final String DFLT_CA_SERVER_CFG = "xipki/etc/ca/ca.properties";
+  private static final String DFLT_CA_SERVER_CFG = "xipki/etc/org.xipki.ca.server.cfg";
+
+  private static final String DFLT_CONF_FILE = "xipki/etc/ca/ca.properties";
 
   private Audits audits;
 
@@ -118,7 +120,8 @@ public class CaServletFilter implements Filter {
     publiserFactoryRegister.registFactory(new OcspCertPublisherFactory());
     caManager.setCertPublisherFactoryRegister(publiserFactoryRegister);
 
-    caManager.setCaConfFile(DFLT_CA_SERVER_CFG);
+    String confFile = props.getProperty("confFile", DFLT_CONF_FILE);
+    caManager.setConfFile(confFile);
 
     caManager.startCaSystem();
 
@@ -140,11 +143,11 @@ public class CaServletFilter implements Filter {
     this.scepServlet.setAuditServiceRegister(audits.getAuditServiceRegister());
     this.scepServlet.setResponderManager(caManager);
 
-    remoteMgmtEnabled =
+    this.remoteMgmtEnabled =
         Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "true"));
-    LOG.info("remote managemen is {}", remoteMgmtEnabled ? "enabled" : "disabled");
+    LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
-    if (remoteMgmtEnabled) {
+    if (this.remoteMgmtEnabled) {
       this.mgmgServlet = new HttpMgmtServlet();
       this.mgmgServlet.setCaManager(caManager);
     }
@@ -178,23 +181,23 @@ public class CaServletFilter implements Filter {
 
     String path = req.getServletPath();
     if (path.startsWith("/cmp/")) {
-      req.setAttribute(ATTR_XIPKI_PATH, path.substring(4)); // 4 = "/cmp".length()
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(4)); // 4 = "/cmp".length()
       cmpServlet.service(req, res);
     } else if (path.startsWith("/rest/")) {
-      req.setAttribute(ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/rest".length()
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/rest".length()
       restServlet.service(req, res);
     } else if (path.startsWith("/scep/")) {
-      req.setAttribute(ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/scep".length()
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/scep".length()
       scepServlet.service(req, res);
     } else if (path.startsWith("/health/")) {
-      req.setAttribute(ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/health".length()
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/health".length()
       healthServlet.service(req, res);
     } else if (path.startsWith("/cacert/")) {
-      req.setAttribute(ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/cacert".length()
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/cacert".length()
       caCertServlet.service(req, res);
     } else if (path.startsWith("/mgmt/")) {
       if (remoteMgmtEnabled) {
-        req.setAttribute(ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
+        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
         mgmgServlet.service(req, res);
       } else {
         sendError(res, HttpServletResponse.SC_FORBIDDEN);

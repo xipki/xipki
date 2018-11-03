@@ -24,6 +24,4 @@ package org.xipki.ca.server.mgmt.msg;
 
 public abstract class CommResponse extends CommMessage {
 
-  public static final String HEADER_XIPKI_ERROR = "x-xipki-error";
-
 }

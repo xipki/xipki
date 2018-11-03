@@ -325,7 +325,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
   private final RestResponderImpl restResponder;
 
-  private Properties caConfProperties;
+  private Properties confProperties;
 
   private boolean caSystemSetuped;
 
@@ -435,11 +435,11 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     if (certPublisherFactoryRegister == null) {
       throw new IllegalStateException("certPublisherFactoryRegister is not set");
     }
-    if (caConfProperties == null) {
-      throw new IllegalStateException("caConfProperties is not set");
+    if (confProperties == null) {
+      throw new IllegalStateException("confProperties is not set");
     }
 
-    String caModeStr = caConfProperties.getProperty("ca.mode");
+    String caModeStr = confProperties.getProperty("ca.mode");
     if (caModeStr != null) {
       if ("slave".equalsIgnoreCase(caModeStr)) {
         masterMode = false;
@@ -454,7 +454,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     LOG.info("ca.mode: {}", caModeStr);
 
     int shardId;
-    String shardIdStr = caConfProperties.getProperty("ca.shardId");
+    String shardIdStr = confProperties.getProperty("ca.shardId");
     if (StringUtil.isBlank(shardIdStr)) {
       throw new CaMgmtException("ca.shardId is not set");
     }
@@ -472,14 +472,14 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
     if (this.datasourceNameConfFileMap == null) {
       this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
-      for (Object objKey : caConfProperties.keySet()) {
+      for (Object objKey : confProperties.keySet()) {
         String key = (String) objKey;
         if (!StringUtil.startsWithIgnoreCase(key, "datasource.")) {
           continue;
         }
 
         String datasourceName = key.substring("datasource.".length());
-        String datasourceFile = caConfProperties.getProperty(key);
+        String datasourceFile = confProperties.getProperty(key);
         this.datasourceNameConfFileMap.put(datasourceName, datasourceFile);
       }
 
@@ -1823,24 +1823,24 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     publishers.put(name, publisher);
   } // method changePublisher
 
-  public Properties getCaConfProperties() {
-    return caConfProperties;
+  public Properties getConfProperties() {
+    return confProperties;
   }
 
-  public void setCaConfProperties(Properties caConfProperties) {
-    this.caConfProperties = ParamUtil.requireNonNull("caConfProperties", caConfProperties);
+  public void setConfProperties(Properties confProperties) {
+    this.confProperties = ParamUtil.requireNonNull("confProperties", confProperties);
   }
 
-  public void setCaConfFile(String caConfFile) {
-    ParamUtil.requireNonBlank("caConfFile", caConfFile);
+  public void setConfFile(String confFile) {
+    ParamUtil.requireNonBlank("confFile", confFile);
 
-    Properties caConfProps = new Properties();
+    Properties confProps = new Properties();
     try {
-      caConfProps.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(caConfFile))));
+      confProps.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile))));
     } catch (IOException ex) {
-      throw new IllegalArgumentException("could not parse CA configuration file " + caConfFile, ex);
+      throw new IllegalArgumentException("could not parse CA configuration file " + confFile, ex);
     }
-    this.caConfProperties = caConfProps;
+    this.confProperties = confProps;
   }
 
   @Override

@@ -113,7 +113,7 @@
 # Just create the file ${crl.file}.UPDATEME to tell responder to update the CRL.
 #
 # required
-crl.file = output/subcawithcrl1.crl
+crl.file = xipki/etc/ocsp/crls/subcawithcrl1/crl.crl
 
 # CRL url
 # optional, default is none
@@ -125,7 +125,7 @@ crl.url = http://example.org/crl
 useUpdateDatesFromCrl = false
 
 # CA cert file
-caCert.file = output/subcawithcrl1.crt
+caCert.file = xipki/etc/ocsp/crls/subcawithcrl1/ca.crt
 
 # certificate used to verify the CRL signature.
 # Required for indirect CRL, otherwise optional
@@ -133,7 +133,7 @@ caCert.file = output/subcawithcrl1.crt
 
 # Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
 # optional.
-certs.dir = output
+certs.dir = xipki/etc/ocsp/crls/subcawithcrl1/certs/
         </conf>
       </source>
       <ignoreExpiredCert>true</ignoreExpiredCert>

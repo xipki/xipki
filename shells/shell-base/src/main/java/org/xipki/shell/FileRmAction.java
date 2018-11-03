@@ -50,7 +50,9 @@ public class FileRmAction extends XiAction {
 
   @Override
   protected Object execute0() throws Exception {
-    File target = new File(expandFilepath(targetPath));
+    targetPath = expandFilepath(targetPath);
+
+    File target = new File(targetPath);
     if (!target.exists()) {
       return null;
     }

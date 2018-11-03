@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.security.X509Cert;
+import org.xipki.util.HttpConstants;
 import org.xipki.util.ParamUtil;
 
 /**
@@ -66,7 +67,7 @@ public class HttpCaCertServlet extends HttpServlet {
       throws ServletException, IOException {
     try {
       String caName = null;
-      String path = (String) req.getAttribute(CaServletFilter.ATTR_XIPKI_PATH);
+      String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       if (path.length() > 1) {
         // skip the first char which is always '/'
         String caAlias = path.substring(1);
