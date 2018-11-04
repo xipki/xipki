@@ -29,9 +29,8 @@
   <properties>
     <app.name>PKI QA</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
-    <jdbc.mysql.version>5.1.46</jdbc.mysql.version>
     <patchkaraf.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
-    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap,http-whiteboard),xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-jdbc,xipki-audit,xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -96,12 +95,6 @@
                   <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>mysql</groupId>
-                  <artifactId>mysql-connector-java</artifactId>
-                  <version>${jdbc.mysql.version}</version>
-                  <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
-                </artifactItem>
-                <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
                   <version>${jdbc.mariadb.version}</version>
@@ -136,40 +129,6 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Extract the SQL scripts -->
-            <id>unpack-sql</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${output.directory}/xipki</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>publisher-ocsp</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <!-- Extract the XSD schemas -->
             <id>unpack-xsd</id>
             <phase>generate-resources</phase>
@@ -196,13 +155,6 @@
                 <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>ca-client-impl</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.shells</groupId>
-                  <artifactId>ca-client-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -273,7 +225,6 @@
               <features>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
-                <feature>http-whiteboard</feature>
                 <!-- project-core features -->
                 <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-ocspmgmt-shell</feature>

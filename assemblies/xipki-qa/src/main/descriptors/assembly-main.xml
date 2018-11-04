@@ -24,12 +24,6 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>../shared/license</directory>
-      <outputDirectory>license</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
       <directory>../shared/conf/xipki/etc</directory>
       <outputDirectory>etc</outputDirectory>
       <includes>

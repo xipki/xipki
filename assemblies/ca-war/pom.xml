@@ -65,6 +65,67 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Extract the SQL scripts -->
+            <id>unpack-sql</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/xipki</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>sql/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>publisher-ocsp</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>sql/**</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Extract the XSD schemas -->
+            <id>unpack-xsd</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${projectb.build.directory}/xipki</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>security-pkcs11</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>certprofile-xml</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-mgmt-api</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <id>unpack-tlskeys</id>
             <phase>generate-resources</phase>
             <goals>
