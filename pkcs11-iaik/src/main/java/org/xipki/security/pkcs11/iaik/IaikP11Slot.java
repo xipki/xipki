@@ -1320,7 +1320,7 @@ class IaikP11Slot extends P11Slot {
           throw new P11TokenException("could not read the generated private key");
         }
 
-        // certificate: some vendors like yubico generates also certificate
+        // certificate: some vendors like yubico generate also certificate
         X509PublicKeyCertificate cert2 = getCertificateObject(session, id, null);
         String certLabel = null;
         X509Certificate[] certs = null;
