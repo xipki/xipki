@@ -1,4 +1,3 @@
-
 ##### BEGIN XiPKI #####
 
 log4j2.logger.xipki.name = org.xipki
