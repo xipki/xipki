@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -34,6 +36,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -44,6 +47,8 @@ import org.xipki.util.ObjectCreationException;
 
 // CHECKSTYLE:SKIP
 public class PKCS11SignerFactory implements SignerFactory {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PKCS11SignerFactory.class);
 
   private static final String TYPE = "pkcs11";
 
@@ -179,6 +184,28 @@ public class PKCS11SignerFactory implements SignerFactory {
       }
     } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
+  public void refreshToken(String type) throws XiSecurityException {
+    if (!TYPE.equalsIgnoreCase(type)) {
+      // Nothing to do
+      return;
+    }
+
+    Set<String> errorModules = new HashSet<>(2);
+    for (String name : p11CryptServiceFactory.getModuleNames()) {
+      try {
+        p11CryptServiceFactory.getP11CryptService(name).refresh();
+      } catch (P11TokenException ex) {
+        LogUtil.error(LOG, ex, "could not refresh PKCS#11 module " + name);
+        errorModules.add(name);
+      }
+    }
+
+    if (!errorModules.isEmpty()) {
+      throw new XiSecurityException("could not refreshed modules " + errorModules);
     }
   }
 

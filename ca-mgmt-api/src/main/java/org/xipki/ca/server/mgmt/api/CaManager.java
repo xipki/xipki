@@ -75,6 +75,8 @@ public interface CaManager {
    */
   void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException;
 
+  void refreshTokenForSignerType(String signerType) throws CaMgmtException;
+
   /**
    * Removes the CA {@code caName} from the system.
    *

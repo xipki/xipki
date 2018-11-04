@@ -66,6 +66,8 @@
   <feature name="xipki-ocspmgmt-shell" version="${project.version}" description="OCSP management shell">
     <bundle start-level="80">mvn:org.xipki/util/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/ocsp-mgmt-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/ocsp-mgmt-msg/${project.version}</bundle>
+    <bundle start-level="80"><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle start-level="80">mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>

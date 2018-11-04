@@ -2606,6 +2606,16 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
   }
 
   @Override
+  public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
+    try {
+      securityFactory.refreshTokenForSignerType(signerType);
+    } catch (XiSecurityException ex) {
+      throw new CaMgmtException("could not refresh token for signer type " + signerType
+          + ": " + ex.getMessage(), ex);
+    }
+  }
+
+  @Override
   public Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
       throws CaMgmtException {
     ParamUtil.requireNonNull("zippedConfStream", zippedConfStream);

@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.mgmt.api;
+package org.xipki.ocsp.server.mgmt.shell;
+
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.ocsp.server.mgmt.api.OcspManager;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public interface OcspManager {
+public abstract class OcspAction extends XiAction {
 
-  void restartOcspServer() throws OcspMgmtException;
+  @Reference
+  protected OcspManager ocspManager;
 
-  void refreshTokenForSignerType(String signerType) throws OcspMgmtException;
 }

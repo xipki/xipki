@@ -104,6 +104,8 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ## Generate selfsigned rootca
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
   CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=1234"
@@ -317,6 +319,10 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ca:caprofile-rm -f \
   --ca rootca1 \
   --profile ocsp
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+}
 
 echo "#################################################################"
 echo "#                        Add subca with ocsp                    #"

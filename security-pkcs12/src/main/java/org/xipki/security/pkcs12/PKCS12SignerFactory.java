@@ -171,4 +171,9 @@ public class PKCS12SignerFactory implements SignerFactory {
           ex.getMessage()));
     }
   }
+
+  @Override
+  public void refreshToken(String type) throws XiSecurityException {
+    // Nothing to do.
+  }
 }

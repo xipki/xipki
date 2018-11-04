@@ -78,6 +78,7 @@ public enum CommAction {
   listCertificates,
   loadConf,
   notifyCaChange,
+  refreshTokenForSignerType,
   removeCa,
   removeCaAlias,
   removeCertificate,

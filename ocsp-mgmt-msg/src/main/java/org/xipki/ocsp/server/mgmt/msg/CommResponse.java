@@ -15,17 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.mgmt.api;
+package org.xipki.ocsp.server.mgmt.msg;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public interface OcspManager {
+public abstract class CommResponse extends CommMessage {
 
-  void restartOcspServer() throws OcspMgmtException;
-
-  void refreshTokenForSignerType(String signerType) throws OcspMgmtException;
 }

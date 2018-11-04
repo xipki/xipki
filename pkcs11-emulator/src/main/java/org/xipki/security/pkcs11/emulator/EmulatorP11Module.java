@@ -93,21 +93,21 @@ public class EmulatorP11Module extends AbstractP11Module {
 
     if (modulePath.isEmpty()) {
       baseDir = new File(DFLT_BASEDIR);
-      if (!baseDir.exists()) {
-        try {
-          createExampleRepository(DFLT_BASEDIR, 2);
-        } catch (IOException ex) {
-          throw new P11TokenException(
-              "could not initialize the base direcotry: " + DFLT_BASEDIR, ex);
-        }
-
-        LOG.info("Create and use the default base directory: " + DFLT_BASEDIR);
-      } else {
-        LOG.info("Use existing default base directory: " + DFLT_BASEDIR);
-      }
+      LOG.info("Use existing default base directory: " + DFLT_BASEDIR);
     } else {
       baseDir = new File(IoUtil.expandFilepath(modulePath));
       LOG.info("Use explicit base directory: " + baseDir.getPath());
+    }
+
+    if (!baseDir.exists()) {
+      try {
+        createExampleRepository(baseDir, 2);
+      } catch (IOException ex) {
+        throw new P11TokenException(
+            "could not initialize the base direcotry: " + baseDir.getPath(), ex);
+      }
+
+      LOG.info("create and initialize the base directory: " + baseDir.getPath());
     }
 
     this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ",
@@ -219,7 +219,7 @@ public class EmulatorP11Module extends AbstractP11Module {
     LOG.info("close", "close pkcs11 module: {}", getName());
   }
 
-  private void createExampleRepository(String dir, int numSlots) throws IOException {
+  private void createExampleRepository(File dir, int numSlots) throws IOException {
     for (int i = 0; i < numSlots; i++) {
       File slotDir = new File(dir, i + "-" + (800000 + i));
       slotDir.mkdirs();

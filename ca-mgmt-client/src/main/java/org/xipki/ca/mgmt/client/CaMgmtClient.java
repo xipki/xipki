@@ -739,6 +739,12 @@ public class CaMgmtClient implements CaManager {
     return resp.getResult();
   }
 
+  @Override
+  public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
+    NameRequest req = new NameRequest(signerType);
+    voidTransmit(CommAction.refreshTokenForSignerType, req);
+  }
+
   private X509Certificate parseCert(byte[] certBytes) throws CaMgmtException {
     try {
       return X509Util.parseCert(certBytes);

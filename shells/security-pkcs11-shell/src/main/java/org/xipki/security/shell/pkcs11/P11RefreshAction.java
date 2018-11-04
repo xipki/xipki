@@ -36,7 +36,7 @@ import org.xipki.shell.IllegalCmdParamException;
 
 @Command(scope = "xi", name = "refresh-p11", description = "refresh PKCS#11 module")
 @Service
-public class P11RefreshSlotAction extends SecurityAction {
+public class P11RefreshAction extends SecurityAction {
 
   @Option(name = "--module",  description = "name of the PKCS#11 module.")
   @Completion(P11ModuleNameCompleter.class)

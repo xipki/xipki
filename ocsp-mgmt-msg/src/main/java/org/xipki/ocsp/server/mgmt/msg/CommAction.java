@@ -15,17 +15,26 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.mgmt.api;
+package org.xipki.ocsp.server.mgmt.msg;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public interface OcspManager {
+public enum CommAction {
 
-  void restartOcspServer() throws OcspMgmtException;
+  refreshTokenForSignerType,
+  restartServer;
 
-  void refreshTokenForSignerType(String signerType) throws OcspMgmtException;
+  public static final CommAction ofName(String str) {
+    for (CommAction action : CommAction.values()) {
+      if (action.name().equalsIgnoreCase(str)) {
+        return action;
+      }
+    }
+
+    return null;
+  }
+
 }

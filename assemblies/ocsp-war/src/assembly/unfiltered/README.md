@@ -24,7 +24,7 @@ Deployment in Tomcat
         </SSLHostConfig>
     </Connector>
 ```
-  
+
      - Use APR connector (fast)
 
 ```sh

@@ -18,6 +18,7 @@
 package org.xipki.ocsp.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,10 +29,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.ocsp.server.impl.OcspServerImpl;
+import org.xipki.ocsp.server.mgmt.api.OcspMgmtException;
+import org.xipki.ocsp.server.mgmt.msg.CommAction;
+import org.xipki.ocsp.server.mgmt.msg.CommRequest;
+import org.xipki.ocsp.server.mgmt.msg.NameRequest;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ParamUtil;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -77,14 +85,17 @@ public class HttpMgmtServlet extends HttpServlet {
         throw new MyException(HttpServletResponse.SC_NOT_FOUND, "no action is specified");
       }
 
-      String action = path.substring(1);
+      String actionStr = path.substring(1);
+      CommAction action = CommAction.ofName(actionStr);
       if (action == null) {
         throw new MyException(HttpServletResponse.SC_NOT_FOUND,
-            "unknown action '" + action + "'");
+            "unknown action '" + actionStr + "'");
       }
 
+      InputStream in = request.getInputStream();
+
       switch (action) {
-        case "restart": {
+        case restartServer: {
             try {
               ocspServer.init(true);
             } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
@@ -93,6 +104,16 @@ public class HttpMgmtServlet extends HttpServlet {
                   "could not build the CaEntry: " + ex.getMessage());
             }
             break;
+        }
+        case refreshTokenForSignerType: {
+          String type = getNameFromRequest(in);
+          try {
+            ocspServer.refreshTokenForSignerType(type);
+          } catch (XiSecurityException ex) {
+            throw new OcspMgmtException("could not refresh token for signer type " + type
+                + ": " + ex.getMessage(), ex);
+          }
+          break;
         }
         default: {
           throw new MyException(HttpServletResponse.SC_NOT_FOUND,
@@ -113,5 +134,19 @@ public class HttpMgmtServlet extends HttpServlet {
       response.flushBuffer();
     }
   } // method service
+
+  private static String getNameFromRequest(InputStream in) throws OcspMgmtException {
+    NameRequest req = parse(in, NameRequest.class);
+    return req.getName();
+  }
+
+  private static <T extends CommRequest> T parse(InputStream in, Class<?> clazz)
+      throws OcspMgmtException {
+    try {
+      return JSON.parseObject(in, clazz);
+    } catch (RuntimeException | IOException ex) {
+      throw new OcspMgmtException("cannot parse request " + clazz + " from InputStream");
+    }
+  }
 
 }

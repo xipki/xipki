@@ -81,12 +81,12 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       throw new XiSecurityException("PKCS#11 module " + name + " is not defined");
     }
 
-    P11CryptService instance = services.get(moduleName);
+    P11CryptService instance = services.get(name);
     if (instance == null) {
       P11Module p11Module = p11ModuleFactoryRegister.getP11Module(conf);
       instance = new P11CryptService(p11Module);
-      LOG.info("added PKCS#11 module {}\n{}", moduleName, instance.getModule().getDescription());
-      services.put(moduleName, instance);
+      LOG.info("added PKCS#11 module {}\n{}", name, instance.getModule().getDescription());
+      services.put(name, instance);
     }
 
     return instance;

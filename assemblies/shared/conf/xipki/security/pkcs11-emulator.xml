@@ -21,7 +21,7 @@
       <type>emulator</type>
       <nativeLibraries>
         <nativeLibrary>
-          <path></path>
+          <path>~/.xipki/pkcs11-emulator</path>
           <!--path>?vendor=yubikey</path-->
         </nativeLibrary>
       </nativeLibraries>

@@ -20,6 +20,7 @@ package org.xipki.security;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -60,5 +61,7 @@ public interface SignerFactory {
    */
   ConcurrentContentSigner newSigner(String type, SignerConf conf,
       X509Certificate[] certificateChain) throws ObjectCreationException;
+
+  void refreshToken(String type) throws XiSecurityException;
 
 }

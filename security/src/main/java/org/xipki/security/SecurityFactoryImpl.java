@@ -56,6 +56,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -368,5 +369,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method validateSigner
+
+  @Override
+  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
+    signerFactoryRegister.refreshTokenForSignerType(signerType);
+  }
 
 }

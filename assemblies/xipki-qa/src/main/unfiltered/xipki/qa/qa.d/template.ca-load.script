@@ -70,6 +70,10 @@ xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
 xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
   xipki/qa/qa.d/rootca.xml
 
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+}
+
 ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml \
   --out-dir output
 
@@ -185,6 +189,10 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 }
 
 ca:caprofile-rm -f --ca rootca1 --profile ocsp
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+}
 
 echo "#################################################################"
 echo "#                        Add subca with OCSP                    #"

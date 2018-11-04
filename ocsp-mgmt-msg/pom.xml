@@ -23,29 +23,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>4.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>ocsp-mgmt-client</artifactId>
+  <artifactId>ocsp-mgmt-msg</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-mgmt-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-mgmt-msg</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>util</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>fastjson</artifactId>
-      <version>${fastjson.version}</version>
-    </dependency>
-  </dependencies>
 </project>

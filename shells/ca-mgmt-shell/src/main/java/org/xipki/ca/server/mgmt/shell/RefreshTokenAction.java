@@ -15,32 +15,31 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ocsp.server.mgmt.api.OcspMgmtException;
-import org.xipki.shell.CmdFailure;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 
 /**
  * TODO.
  * @author Lijun Liao
  */
 
-@Command(scope = "ocsp", name = "restart-server", description = "restart OCSP server")
+@Command(scope = "ca", name = "refresh-token", description = "refresh token for signers")
 @Service
-public class OcspSystemRestartAction extends OcspAction {
+public class RefreshTokenAction extends CaAction {
+
+  @Option(name = "--type", required = true, description = "type of the signer")
+  @Completion(SignerTypeCompleter.class)
+  protected String type;
 
   @Override
   protected Object execute0() throws Exception {
-    try {
-      ocspManager.restartOcspServer();
-    } catch (OcspMgmtException ex) {
-      throw new CmdFailure("could not restart OCSP server, error: " + ex.getMessage(), ex);
-    }
-
-    StringBuilder sb = new StringBuilder("restarted OCSP server\n");
-    print(sb.toString());
+    caManager.refreshTokenForSignerType(type);
+    print("refreshed token for signer type " + type);
     return null;
   } // method execute0
 

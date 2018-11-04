@@ -172,7 +172,7 @@ public class HttpMgmtServlet extends HttpServlet {
             try {
               caEntry = req.getCaEntry().toCaEntry();
             } catch (CertificateException | InvalidConfException ex) {
-              LOG.warn(action + ": could not build the CaEntry", ex);
+              LOG.error(action + ": could not build the CaEntry", ex);
               throw new MyException(HttpServletResponse.SC_BAD_REQUEST,
                   "could not build the CaEntry: " + ex.getMessage());
             }
@@ -308,7 +308,7 @@ public class HttpMgmtServlet extends HttpServlet {
           try {
             caEntry = req.getCaEntry().toCaEntry();
           } catch (CertificateException | InvalidConfException ex) {
-            LOG.warn(action + ": could not build the CaEntry", ex);
+            LOG.error(action + ": could not build the CaEntry", ex);
             throw new MyException(HttpServletResponse.SC_BAD_REQUEST,
                 "could not build the CaEntry: " + ex.getMessage());
           }
@@ -510,7 +510,7 @@ public class HttpMgmtServlet extends HttpServlet {
               } catch (CertificateEncodingException ex) {
                 final String errMsg =
                     "could not encode newly generated certificate of root CA " + name;
-                LOG.warn(errMsg);
+                LOG.error(action + ": " + errMsg, ex);
                 throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errMsg);
               }
               result.put(name, encodedCert);
@@ -522,6 +522,12 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case notifyCaChange: {
           caManager.notifyCaChange();
+          resp = null;
+          break;
+        }
+        case refreshTokenForSignerType: {
+          String type = getNameFromRequest(in);
+          caManager.refreshTokenForSignerType(type);
           resp = null;
           break;
         }
@@ -679,7 +685,7 @@ public class HttpMgmtServlet extends HttpServlet {
     try {
       encoded = cert.getEncoded();
     } catch (CertificateEncodingException ex) {
-      LOG.warn(action + ": could not encode the generated certificate", ex);
+      LOG.error(action + ": could not encode the generated certificate", ex);
       throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "could not encode the generated certificate");
     }
@@ -697,7 +703,7 @@ public class HttpMgmtServlet extends HttpServlet {
     try {
       encoded = crl.getEncoded();
     } catch (CRLException ex) {
-      LOG.warn(action + ": could not encode the generated CRL", ex);
+      LOG.error(action + ": could not encode the generated CRL", ex);
       throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "could not encode the generated CRL");
     }

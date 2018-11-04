@@ -104,6 +104,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.HealthCheckResult;
@@ -969,6 +970,10 @@ public class OcspServerImpl implements OcspServer {
 
   public void setOcspStoreFactoryRegister(OcspStoreFactoryRegister ocspStoreFactoryRegister) {
     this.ocspStoreFactoryRegister = ocspStoreFactoryRegister;
+  }
+
+  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
+    securityFactory.refreshTokenForSignerType(signerType);
   }
 
   private ResponderSigner initSigner(SignerType signerType) throws InvalidConfException {
