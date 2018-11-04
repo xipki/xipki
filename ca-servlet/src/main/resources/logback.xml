@@ -18,30 +18,43 @@
       </timeBasedFileNamingAndTriggeringPolicy>
     </rollingPolicy>
 
-    <!-- Safely log to the same file from multiple JVMs. Degrades performance! -->
-    <prudent>true</prudent>
+    <!-- If set to true: safely log to the same file from multiple JVMs. Degrades performance! -->
+    <prudent>false</prudent>
   </appender>
 
-
-  <!-- Console output -->
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <!-- Simple file output for audit -->
+  <appender name="AUDIT-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <!-- encoder defaults to ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
     <encoder>
-      <pattern>%-5level %logger{36} - %msg%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
-    <!-- Only log level INFO and above -->
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
-    </filter>
-  </appender>
 
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- rollover daily -->
+      <fileNamePattern>logs/ca-audit-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+          class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches 64 MB -->
+        <maxFileSize>64 MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+
+    <!-- If set to true: safely log to the same file from multiple JVMs. Degrades performance! -->
+    <prudent>false</prudent>
+  </appender>
 
   <!-- Enable FILE and STDOUT appenders for all log messages.
        By default, only log at level INFO and above. -->
   <root level="INFO">
     <appender-ref ref="FILE" />
-    <appender-ref ref="STDOUT" />
   </root>
+
+  <logger name="org.xipki" level="INFO">
+  </logger>
+
+  <logger name="xipki.audit.slf4j" level="INFO" additivity="false">
+    <appender-ref ref="AUDIT-FILE" />
+  </logger>
 
   <!-- For loggers in the these namespaces, log at all levels. -->
   <logger name="user" level="ALL" />

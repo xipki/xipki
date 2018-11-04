@@ -32,7 +32,7 @@
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.features/console/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
     <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-dbtool</patchkaraf.features>
-    
+
   </properties>
   <dependencies>
     <dependency>
