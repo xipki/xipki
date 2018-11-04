@@ -32,7 +32,7 @@ import org.xipki.litecaclient.RestCaClient;
 
 public class RestCaClientExample extends CaClientExample {
 
-  private static final String CA_URL = "https://localhost:8443/rest/myca";
+  private static final String CA_URL = "https://localhost:8443/ca/rest/myca";
 
   private static final String USER = "user1";
 

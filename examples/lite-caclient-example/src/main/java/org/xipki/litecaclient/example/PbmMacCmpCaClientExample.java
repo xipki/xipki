@@ -49,9 +49,9 @@ import org.xipki.litecaclient.TlsInit;
 
 public class PbmMacCmpCaClientExample extends CaClientExample {
 
-  //private static final String URL_PREFIX = "http://localhost:8080";
+  //private static final String URL_PREFIX = "http://localhost:8080/ca";
 
-  private static final String URL_PREFIX = "https://localhost:8443";
+  private static final String URL_PREFIX = "https://localhost:8443/ca";
 
   private static final String CMP_URL = URL_PREFIX + "/cmp/myca";
 
@@ -59,7 +59,7 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
 
   private static final String KEYCERT_DIR =  "target/tlskeys";
 
-  private static final String RESPONDER_CERT_FILE = KEYCERT_DIR + "/tls-server.der";
+  private static final String RESPONDER_CERT_FILE = KEYCERT_DIR + "/server/tls-server-cert.der";
 
   private static final String HASH_ALGO = "SHA256";
 

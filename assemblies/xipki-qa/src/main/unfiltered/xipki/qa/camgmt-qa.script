@@ -195,27 +195,27 @@ if { $printUsage equals "true" } then {
   echo "#                           Requestor                           #"
   echo "#################################################################"
   caqa:requestor-check --name requestor1 \
-    --cert xipki/keycerts/tlskeys/tls-client.der
+    --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
 
   ca:requestor-add --name qa-requestor1 \
-    --cert xipki/keycerts/tlskeys/tls-server.der
+    --cert xipki/keycerts/tlskeys/server/tls-server-cert.der
 
   # name already exists
   caqa:neg-requestor-add --name qa-requestor1 \
-    --cert xipki/keycerts/tlskeys/tls-server.der
+    --cert xipki/keycerts/tlskeys/server/tls-server-cert.der
 
   # invalid certificate
   caqa:neg-requestor-add --name qa-requestor1 \
     --cert xipki/qa/camgmt-qa.script
 
   caqa:requestor-check --name qa-requestor1 \
-    --cert xipki/keycerts/tlskeys/tls-server.der
+    --cert xipki/keycerts/tlskeys/server/tls-server-cert.der
 
   ca:requestor-up --name qa-requestor1 \
-    --cert xipki/keycerts/tlskeys/tls-client.der
+    --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
 
   caqa:requestor-check --name qa-requestor1 \
-    --cert xipki/keycerts/tlskeys/tls-client.der
+    --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
 
   ca:requestor-rm -f qa-requestor1
 
@@ -226,31 +226,31 @@ if { $printUsage equals "true" } then {
   echo "#                            Signer                             #"
   echo "#################################################################"
   caqa:signer-check --name responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA256WITHRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256WITHRSA
 
   ca:signer-add --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
 
   # name already exists
   caqa:neg-signer-add --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
 
   # password incorrect
   caqa:neg-signer-add --name qa-responder2 --type pkcs12 \
-    --conf password=123456,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA1withRSA
+    --conf password=123456,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
 
   # invalid algo
   caqa:neg-signer-add --name qa-responder2 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=INVALIDALGO
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=INVALIDALGO
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA1WITHRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1WITHRSA
 
   ca:signer-up --name qa-responder1 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA256withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA256WITHRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256WITHRSA
 
   ca:signer-rm -f qa-responder1
 
@@ -619,27 +619,27 @@ if { $printUsage equals "true" } then {
 
   ##### requestor #####
 
-  ca:requestor-add --name requestor2 --cert xipki/keycerts/tlskeys/tls-client.der
+  ca:requestor-add --name requestor2 --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
 
   ca:requestor-info
 
   ca:requestor-info requestor2
 
-  ca:requestor-up --name requestor2 --cert xipki/keycerts/tlskeys/tls-client.der
+  ca:requestor-up --name requestor2 --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
 
   ca:requestor-rm -f requestor2
 
   ##### signer #####
 
   ca:signer-add --name responder2 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA256withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA
 
   ca:signer-info
 
   ca:signer-info responder2
 
  ca:signer-up --name responder2 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
 
   ca:signer-rm -f responder2
 

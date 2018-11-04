@@ -48,7 +48,7 @@ import org.xipki.litecaclient.TlsInit;
 
 public class SignatureCmpCaClientExample extends CaClientExample {
 
-  //private static final String URL_PREFIX = "http://localhost:8080";
+  //private static final String URL_PREFIX = "http://localhost:8080/ca";
 
   private static final String URL_PREFIX = "https://localhost:8443/ca";
 
@@ -58,11 +58,11 @@ public class SignatureCmpCaClientExample extends CaClientExample {
 
   private static final String KEYCERT_DIR =  "target/tlskeys";
 
-  private static final String REQUESTOR_KEYSTORE_FILE = KEYCERT_DIR + "/tls-client.p12";
+  private static final String REQUESTOR_KEYSTORE_FILE = KEYCERT_DIR + "/client/tls-client.p12";
 
   private static final String REQUESTOR_KEYSTORE_PASSWORD = "1234";
 
-  private static final String RESPONDER_CERT_FILE = KEYCERT_DIR + "/tls-server.der";
+  private static final String RESPONDER_CERT_FILE = KEYCERT_DIR + "/server/tls-server-cert.der";
 
   private static final String HASH_ALGO = "SHA256";
 

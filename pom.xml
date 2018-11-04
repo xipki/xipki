@@ -45,7 +45,7 @@
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <xipki.tools.version>1.0.2</xipki.tools.version>
+    <xipki.tools.version>1.0.3-SNAPSHOT</xipki.tools.version>
     <xipki.scep.version>3.1.0</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.1</karaf.version>
@@ -113,6 +113,7 @@
     <module>qa</module>
     <module>audits</module>
     <module>securities</module>
+    <module>assemblies</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
@@ -430,15 +431,6 @@
     </dependencies>
   </dependencyManagement>
   <profiles>
-    <profile>
-      <id>assemblies</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>assemblies</module>
-      </modules>
-    </profile>
     <profile>
       <id>release</id>
       <activation>

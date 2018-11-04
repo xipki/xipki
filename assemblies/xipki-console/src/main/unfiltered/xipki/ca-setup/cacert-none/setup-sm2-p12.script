@@ -30,26 +30,6 @@ xi:sm2-p12 --password 1234 --out ${KEYCERTS_DIR}/myca1.p12
 xi:csr-p12 --hash SM3 --gm --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
   --out ${KEYCERTS_DIR}/myca1.csr --subject "${CA_SUBJECT}"
 
-#echo "#################################################################"
-#echo "#                      Initialize the database                  #"
-#echo "#################################################################"
-#
-#feature:install xipki-dbtool
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ca-db.properties \
-#  --db-schema xipki/sql/ca-init.xml
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ocsp-db.properties \
-#  --db-schema xipki/sql/ocsp-init.xml
-#
-#feature:uninstall xipki-dbtool
-#
-#ca:restart
-
 echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"
 echo "#################################################################"

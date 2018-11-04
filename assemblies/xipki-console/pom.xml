@@ -31,7 +31,8 @@
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.features/console/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
-    <patchkaraf.features>aries-blueprint/${karaf.version},wrap</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-dbtool</patchkaraf.features>
+    
   </properties>
   <dependencies>
     <dependency>
@@ -292,10 +293,9 @@
                 <feature>xipki-caclient</feature>
                 <feature>xipki-ocspclient</feature>
                 <feature>xipki-scepclient</feature>
-                <feature>xipki-caclient-benchmark</feature>
-                <feature>xipki-ocspqa</feature>
                 <feature>xipki-camgmt</feature>
                 <feature>xipki-dbtool</feature>
+                <feature>xipki-qa</feature>
               </features>
             </configuration>
           </execution>

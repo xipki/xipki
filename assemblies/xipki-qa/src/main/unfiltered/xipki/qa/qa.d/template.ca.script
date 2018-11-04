@@ -59,12 +59,12 @@ ca:publisher-add \
 ca:signer-add \
   --name responder1 \
   --type pkcs12 \
-  --conf password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
+  --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
 
 # CMP Requestors
 ca:requestor-add \
   --name requestor1 \
-  --cert xipki/keycerts/tlskeys/tls-client.der
+  --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
 
 ca:requestor-add \
   --name requestor-mac1 \

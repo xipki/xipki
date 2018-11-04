@@ -24,7 +24,7 @@
     <signer name="responder1">
       <type>pkcs12</type>
       <conf>
-        <value>password=1234,keystore=file:xipki/keycerts/tlskeys/tls-server.p12,algo=SHA256withRSA</value>
+        <value>password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA</value>
       </conf>
     </signer>
     <signer name="scep-responder1">
@@ -38,7 +38,7 @@
     <requestor name="requestor1">
       <type>cert</type>
       <binaryConf>
-        <file>xipki/keycerts/tlskeys/tls-client.der</file>
+        <file>xipki/keycerts/tlskeys/client/tls-client-cert.der</file>
       </binaryConf>
     </requestor>
     <requestor name="requestor-mac1">

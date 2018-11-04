@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Please adapt the URL
-BASE_URL="https://localhost:8443/rest/subcawithcrl"
+BASE_URL="https://localhost:8443/ca/rest/subcawithcrl"
 CACERT="output/subcawithcrl1.der"
 
 echo "base url: ${BASE_URL}"
@@ -16,7 +16,7 @@ CA_SHA1FP=`openssl sha1 ${DIR}/../../${CACERT} | cut -d '=' -f 2 | cut -d ' ' -f
 OPTS="--insecure --user user1:password1"
 
 # Use TLS client certificate to authorize
-#OPTS="--insecure --cert ${DIR}/../keycerts/tlskeys/tls-client.pem --key ${DIR}/../keycerts/tlskeys/tls-client-key.pem"
+#OPTS="--insecure --cert ${DIR}/../keycerts/tlskeys/client/tls-client-cert.pem --key ${DIR}/../keycerts/tlskeys/client/tls-client-key.pem"
 
 filename=tls-`date +%s` 
 

@@ -12,11 +12,11 @@ Deployment in Tomcat
                 certificateVerification="optional"
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                truststoreFile="xipki/keycerts/tlskeys/tls-ca-cert.p12"
+                truststoreFile="xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
                 truststorePassword="1234"
                 truststoreType="PKCS12">
             <Certificate type="RSA"
-                         certificateKeystoreFile="xipki/keycerts/tlskeys/tls-server.p12"
+                         certificateKeystoreFile="xipki/keycerts/tlskeys/server/tls-server.p12"
                          certificateKeystorePassword="1234"
                          certificateKeystoreType="PKCS12"/>
         </SSLHostConfig>
@@ -33,11 +33,10 @@ Deployment in Tomcat
                 certificateVerification="optional"
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                certificateRevocationListFile="xipki/keycerts/tlskeys/ca/tls-ca-crl.pem"
                 caCertificateFile="xipki/keycerts/tlskeys/ca/tls-ca-cert.pem">
             <Certificate type="RSA"
-                         certificateKeyFile="xipki/keycerts/tlskeys/tls-server-key.pem"
-                         certificateFile="xipki/keycerts/tlskeys/tls-server-cert.pem"/>
+                         certificateKeyFile="xipki/keycerts/tlskeys/server/tls-server-key.pem"
+                         certificateFile="xipki/keycerts/tlskeys/server/tls-server-cert.pem"/>
         </SSLHostConfig>
     </Connector>
 ```
@@ -49,11 +48,11 @@ Deployment in Jetty 9
 
 ```sh
 --module=https
-jetty.sslContext.keyStorePath=xipki/keycerts/tlskeys/tls-server.p12
+jetty.sslContext.keyStorePath=xipki/keycerts/tlskeys/server/tls-server.p12
 jetty.sslContext.keyStorePassword=1234
 jetty.sslContext.keyStoreType=PKCS12
 jetty.sslContext.keyManagerPassword=1234
-jetty.sslContext.trustStorePath=xipki/keycerts/tlskeys/tls-ca-cert.p12
+jetty.sslContext.trustStorePath=xipki/keycerts/tlskeys/ca/tls-ca-cert.p12
 jetty.sslContext.trustStorePassword=1234
 jetty.sslContext.trustStoreType=PKCS12
 jetty.sslContext.needClientAuth=false

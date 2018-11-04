@@ -1,12 +1,8 @@
 #!/bin/sh
 
 # Please adapt the URL
-CA_URL="https://localhost:8443/rest/myca"
+CA_URL="https://localhost:8443/ca/rest/myca"
 echo "CA URL: ${CA_URL}"
-
-OCSP_URL="http://localhost:8080/ocsp/responder1"
-
-echo "OCSP URL: ${OCSP_URL}"
 
 DIR=`dirname $0`
 
@@ -16,10 +12,10 @@ echo "working dir: ${DIR}"
 OPTS="--insecure --user user1:password1"
 
 # Use TLS client certificate to authorize in Linux
-#OPTS="--insecure --cert ${DIR}/../keycerts/tlskeys/tls-client.pem --key ${DIR}/../keycerts/tlskeys/tls-client-key.pem"
+#OPTS="--insecure --cert ${DIR}/../keycerts/tlskeys/client/tls-client-cert.pem --key ${DIR}/../keycerts/tlskeys/client/tls-client-key.pem"
 
 # Use TLS client certificate to authorize in Mac
-#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/tlskeys/tls-client.p12:1234"
+#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/tlskeys/client/tls-client.p12:1234"
 
 CUR_TIME=`date +%Y%m%d-%H%M%S`
 
@@ -63,43 +59,20 @@ curl ${OPTS} \
 # get the serial number
 SERIAL=0X`openssl x509 -inform der -serial -noout -in ${OUT_DIR}/${CN}.der | cut -d '=' -f 2`
 
-# The PEM file will be used by "openssl ocsp"
-openssl x509 -inform der -in ${OUT_DIR}/${CN}.der -out ${OUT_DIR}/${CN}.pem
-
-echo "Current OCSP status"
-
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
-
 echo "suspend certificate"
 
 curl ${OPTS} \
     "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
-
-echo "Current OCSP status"
-
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 
 echo "unsuspend certificate"
 
 curl ${OPTS} \
     "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
-echo "Current OCSP status"
-
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
-
 echo "revoke certificate"
 
 curl ${OPTS} \
     "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
-
-echo "Current OCSP status"
-
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 
 echo "generate new CRL"
 

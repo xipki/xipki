@@ -38,25 +38,7 @@ xi:rsa-p11 --slot 0 --label ${P11_LABEL} --key-size 2048
 xi:csr-p11 --hash ${HASH} --slot 0 --label ${P11_LABEL} \
   --out ${KEYCERTS_DIR}/myca1.csr --subject "${CA_SUBJECT}"
 
-#echo "#################################################################"
-#echo "#                      Initialize the database                  #"
-#echo "#################################################################"
-#
-#feature:install xipki-dbtool
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ca-db.properties \
-#  --db-schema xipki/sql/ca-init.xml
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ocsp-db.properties \
-#  --db-schema xipki/sql/ocsp-init.xml
-#
-#feature:uninstall xipki-dbtool
-#
-#ca:restart
+ca:refresh-token --type pkcs11
 
 echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"

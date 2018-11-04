@@ -126,7 +126,6 @@
                   <classifier>rsa</classifier>
                   <version>${xipki.tools.version}</version>
                   <type>zip</type>
-                  <includes>tls-ca-cert.p12</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>

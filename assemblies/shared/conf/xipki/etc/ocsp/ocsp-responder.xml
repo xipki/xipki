@@ -113,7 +113,7 @@
           <keystore>
             <type>pkcs12</type>
             <keystore>
-              <file>xipki/keycerts/tlskeys/tls-ca-cert.p12</file>
+              <file>xipki/keycerts/tlskeys/ca/tls-ca-cert.p12</file>
             </keystore>
             <password>1234</password>
           </keystore>

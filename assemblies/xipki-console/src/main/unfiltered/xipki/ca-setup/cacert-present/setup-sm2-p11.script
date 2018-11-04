@@ -18,26 +18,6 @@
 
 P11_LABEL = myca1-sm2
 
-#echo "#################################################################"
-#echo "#                      Initialize the database                  #"
-#echo "#################################################################"
-#
-#feature:install xipki-dbtool
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ca-db.properties \
-#  --db-schema xipki/sql/ca-init.xml
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ocsp-db.properties \
-#  --db-schema xipki/sql/ocsp-init.xml
-#
-#feature:uninstall xipki-dbtool
-#
-#ca:restart
-
 echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"
 echo "#################################################################"

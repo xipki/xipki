@@ -22,26 +22,6 @@ HASH = SHA256
 # Signature type: RSA or RSAandMGF1
 SIGTYPE=RSA
 
-#echo "#################################################################"
-#echo "#                      Initialize the database                  #"
-#echo "#################################################################"
-#
-#feature:install xipki-dbtool
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ca-db.properties \
-#  --db-schema xipki/sql/ca-init.xml
-#
-#xi:initdb \
-#  --force \
-#  --db-conf xipki/ca-config/ocsp-db.properties \
-#  --db-schema xipki/sql/ocsp-init.xml
-#
-#feature:uninstall xipki-dbtool
-#
-#ca:restart
-
 echo "#################################################################"
 echo "#                          Load ca-conf.xml                     #"
 echo "#################################################################"

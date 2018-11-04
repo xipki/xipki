@@ -140,8 +140,6 @@
                   <classifier>rsa</classifier>
                   <version>${xipki.tools.version}</version>
                   <type>zip</type>
-                  <includes>tls-ca*,tls-server*</includes>
-                  <excludes>tls-ca-key*,tls-ca.p12</excludes>
                 </artifactItem>
               </artifactItems>
             </configuration>

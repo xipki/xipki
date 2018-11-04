@@ -47,7 +47,7 @@ follows.
 
   In folder `xipki`
   ```sh
-  mvn clean install -Passemblies -DskipTests
+  mvn clean install -DskipTests
   ```
 
   Then you will find `xipki-pki-*.tar.gz` in the directory
