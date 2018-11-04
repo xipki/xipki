@@ -34,7 +34,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   private final P11ObjectIdentifier publicKeyId;
 
-  private final P11ObjectIdentifier certId;
+  private P11ObjectIdentifier certId;
 
   /**
    * TODO.
@@ -76,6 +76,15 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   public P11ObjectIdentifier getPublicKeyId() {
     return publicKeyId;
+  }
+
+  public void setCertLabel(String certLabel) {
+    if (certLabel != null) {
+      this.certId = certLabel.equals(keyId.getLabel())
+        ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
+    } else {
+      this.certId = null;
+    }
   }
 
   public P11ObjectIdentifier getCertId() {
