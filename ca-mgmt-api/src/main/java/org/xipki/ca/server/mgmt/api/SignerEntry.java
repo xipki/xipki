@@ -144,7 +144,7 @@ public class SignerEntry {
         }
       }
     } else {
-      sb.append("null");
+      sb.append("  null");
     }
     return sb.toString();
   } // method toString

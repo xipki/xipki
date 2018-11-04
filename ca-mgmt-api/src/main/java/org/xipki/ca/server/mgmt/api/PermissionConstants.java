@@ -58,7 +58,6 @@ public class PermissionConstants {
     codeTextMap.put(GET_CRL, "get_crl");
     codeTextMap.put(ENROLL_CROSS, "enroll_cross");
     codeTextMap.put(GEN_KEYPAIR, "gen_keypair");
-    codeTextMap.put(ALL, "all");
 
     for (Integer code : codeTextMap.keySet()) {
       textCodeMap.put(codeTextMap.get(code), code);
@@ -77,7 +76,13 @@ public class PermissionConstants {
   }
 
   public static Integer getPermissionForText(String text) {
-    return (text == null) ? null : textCodeMap.get(text.toLowerCase());
+    if (text == null) {
+      return null;
+    } else if ("all".equalsIgnoreCase(text)) {
+      return ALL;
+    } else {
+      return textCodeMap.get(text.toLowerCase());
+    }
   }
 
   public static String getTextForCode(int code) {
@@ -90,10 +95,6 @@ public class PermissionConstants {
   }
 
   public static String permissionToString(int permission) {
-    if (ALL == permission) {
-      return getTextForCode(permission);
-    }
-
     StringBuilder sb = new StringBuilder();
     for (Integer code : codeTextMap.keySet()) {
       if ((permission & code) != 0) {

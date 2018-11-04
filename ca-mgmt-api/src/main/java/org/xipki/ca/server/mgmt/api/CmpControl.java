@@ -411,7 +411,7 @@ public class CmpControl {
         "\n  send responder cert: ", sendResponderCert,
         "\n  message time bias: ", messageTimeBias,
         "\n  confirm waiting time: ", confirmWaitTime, "s",
-        "\n  hroup enroll: ", groupEnroll,
+        "\n  group enroll: ", groupEnroll,
         "\n  AKI in revocation request required: ", rrAkiRequired,
         "\n  signature algorithms: ", sigAlgoValidator.getAlgoNames(),
         "\n  POPO algorithms: ", popoAlgoValidator.getAlgoNames(),

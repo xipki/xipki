@@ -342,7 +342,7 @@ public class CaEntry {
         "\nduplicate subject: ", duplicateSubjectPermitted,
         "\n", protocolSupport,
         "\nsave request: ", saveRequest,
-        "\nvalidity mMode: ", validityMode,
+        "\nvalidity mode: ", validityMode,
         "\npermission: ", PermissionConstants.permissionToString(permission),
         "\nkeep expired certs: ",
             (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),

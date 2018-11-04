@@ -43,13 +43,13 @@ class InternUtil {
     }
 
     StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
-    sb.append("  issuer: ")
+    sb.append("  issuer:  ")
       .append(X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
     sb.append("  serialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
     sb.append("  subject: ")
       .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
     sb.append("  notBefore: ").append(cert.getNotBefore()).append("\n");
-    sb.append("  notAfter: ").append(cert.getNotAfter());
+    sb.append("  notAfter:  ").append(cert.getNotAfter());
 
     if (verbose) {
       sb.append("\n  encoded: ");
