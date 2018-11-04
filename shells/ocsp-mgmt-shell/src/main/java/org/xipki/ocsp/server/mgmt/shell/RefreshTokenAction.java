@@ -39,7 +39,7 @@ public class RefreshTokenAction extends OcspAction {
   @Override
   protected Object execute0() throws Exception {
     ocspManager.refreshTokenForSignerType(type);
-    print("refreshed token for signer type " + type);
+    println("refreshed token for signer type " + type);
     return null;
   } // method execute0
 

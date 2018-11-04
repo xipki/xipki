@@ -52,7 +52,7 @@ public class P11IdentityDeleteAction extends P11SecurityAction {
     P11Slot slot = getSlot();
     P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
     if (keyId == null) {
-      println(" unkown identity");
+      println("unkown identity");
       return null;
     }
 

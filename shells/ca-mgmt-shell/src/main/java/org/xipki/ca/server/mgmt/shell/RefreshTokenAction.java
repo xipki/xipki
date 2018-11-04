@@ -39,7 +39,7 @@ public class RefreshTokenAction extends CaAction {
   @Override
   protected Object execute0() throws Exception {
     caManager.refreshTokenForSignerType(type);
-    print("refreshed token for signer type " + type);
+    println("refreshed token for signer type " + type);
     return null;
   } // method execute0
 
