@@ -114,7 +114,7 @@ public class OcspServletFilter implements Filter {
     this.ocspServlet.setServer(this.server);
 
     this.remoteMgmtEnabled =
-        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "true"));
+        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "false"));
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {

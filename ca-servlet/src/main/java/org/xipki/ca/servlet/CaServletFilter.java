@@ -144,7 +144,7 @@ public class CaServletFilter implements Filter {
     this.scepServlet.setResponderManager(caManager);
 
     this.remoteMgmtEnabled =
-        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "true"));
+        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "false"));
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (this.remoteMgmtEnabled) {
