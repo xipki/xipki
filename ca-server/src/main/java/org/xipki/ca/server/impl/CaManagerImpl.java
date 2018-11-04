@@ -656,7 +656,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
         init();
       } catch (Exception ex) {
         LogUtil.error(LOG, ex);
-        return false;
       }
 
       this.lastStartTime = new Date();
