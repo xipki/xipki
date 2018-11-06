@@ -26,6 +26,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.xipki.ocsp.server.mgmt.api.OcspManager;
 import org.xipki.ocsp.server.mgmt.api.OcspMgmtException;
 import org.xipki.ocsp.server.mgmt.msg.CommAction;
@@ -34,8 +38,10 @@ import org.xipki.ocsp.server.mgmt.msg.CommResponse;
 import org.xipki.ocsp.server.mgmt.msg.NameRequest;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
+import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.http.ssl.SslContextConf;
 
 import com.alibaba.fastjson.JSON;
 
@@ -54,6 +60,16 @@ public class OcspMgmtClient implements OcspManager {
 
   private String serverUrl;
 
+  private SslContextConf sslContextConf;
+
+  private SSLSocketFactory sslSocketFactory;
+
+  private HostnameVerifier hostnameVerifier;
+
+  private boolean initialized;
+
+  private OcspMgmtException initException;
+
   public OcspMgmtClient() {
   }
 
@@ -64,6 +80,33 @@ public class OcspMgmtClient implements OcspManager {
     for (CommAction action : CommAction.values()) {
       actionUrlMap.put(action, new URL(this.serverUrl + action));
     }
+  }
+
+  public void setSslContextConf(SslContextConf sslContextConf) {
+    this.sslContextConf = sslContextConf;
+  }
+
+  public synchronized void initIfNotDone() throws OcspMgmtException {
+    if (initException != null) {
+      throw initException;
+    }
+
+    if (initialized) {
+      return;
+    }
+
+    if (sslContextConf != null && sslContextConf.isUseSslConf()) {
+      try {
+        sslSocketFactory = sslContextConf.buildSslContext().getSocketFactory();
+        hostnameVerifier = sslContextConf.buildHostnameVerifier();
+      } catch (ObjectCreationException ex) {
+        initException = new OcspMgmtException(
+            "could not initialize CaMgmtClient: " + ex.getMessage(), ex);
+        throw initException;
+      }
+    }
+
+    initialized = true;
   }
 
   @Override
@@ -88,6 +131,8 @@ public class OcspMgmtClient implements OcspManager {
 
   private byte[] transmit(CommAction action, CommRequest req, boolean voidReturn)
       throws OcspMgmtException {
+    initIfNotDone();
+
     byte[] reqBytes = req == null ? null : JSON.toJSONBytes(req);
     int size = reqBytes == null ? 0 : reqBytes.length;
 
@@ -95,6 +140,15 @@ public class OcspMgmtClient implements OcspManager {
 
     try {
       HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(url);
+      if (httpUrlConnection instanceof HttpsURLConnection) {
+        if (sslSocketFactory != null) {
+          ((HttpsURLConnection) httpUrlConnection).setSSLSocketFactory(sslSocketFactory);
+        }
+        if (hostnameVerifier != null) {
+          ((HttpsURLConnection) httpUrlConnection).setHostnameVerifier(hostnameVerifier);
+        }
+      }
+
       httpUrlConnection.setDoOutput(true);
       httpUrlConnection.setUseCaches(false);
 

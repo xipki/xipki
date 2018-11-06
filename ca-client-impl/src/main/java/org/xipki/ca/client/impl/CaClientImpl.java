@@ -26,10 +26,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
@@ -47,6 +50,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -93,6 +98,7 @@ import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.ca.client.impl.jaxb.RequestorType.PbmMac;
 import org.xipki.ca.client.impl.jaxb.RequestorType.Signature;
 import org.xipki.ca.client.impl.jaxb.ResponderType;
+import org.xipki.ca.client.impl.jaxb.SslType;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
@@ -110,6 +116,8 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.XmlUtil;
+import org.xipki.util.http.ssl.SSLContextBuilder;
+import org.xipki.util.http.ssl.SslUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -159,6 +167,27 @@ public final class CaClientImpl implements CaClient {
     }
 
   } // class ClientConfigUpdater
+
+  private class SslConf {
+
+    private final SSLSocketFactory sslSocketFactory;
+
+    private final HostnameVerifier hostnameVerifier;
+
+    SslConf(SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
+      this.sslSocketFactory = sslSocketFactory;
+      this.hostnameVerifier = hostnameVerifier;
+    }
+
+    public SSLSocketFactory getSslSocketFactory() {
+      return sslSocketFactory;
+    }
+
+    public HostnameVerifier getHostnameVerifier() {
+      return hostnameVerifier;
+    }
+
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(CaClientImpl.class);
 
@@ -261,6 +290,41 @@ public final class CaClientImpl implements CaClient {
       LOG.warn("no CA is configured");
     }
 
+    // ssl configurations
+    Map<String, SslConf> sslConfs = new HashMap<>();
+    if (config.getSsls() != null) {
+      for (SslType ssl : config.getSsls().getSsl()) {
+        SSLContextBuilder builder = new SSLContextBuilder();
+        if (ssl.getStoreType() != null) {
+          builder.setKeyStoreType(ssl.getStoreType());
+        }
+
+        try {
+          if (ssl.getKeystoreFile() != null) {
+            char[] pwd = ssl.getKeystorePassword() == null
+                ? null : ssl.getKeystorePassword().toCharArray();
+            builder.loadKeyMaterial(new File(ssl.getKeystoreFile()), pwd, pwd);
+          }
+
+          if (ssl.getTruststoreFile() != null) {
+            char[] pwd = ssl.getTruststorePassword() == null
+                ? null : ssl.getTruststorePassword().toCharArray();
+            builder.loadTrustMaterial(new File(ssl.getTruststoreFile()), pwd);
+          }
+
+          SSLSocketFactory socketFactory = builder.build().getSocketFactory();
+          HostnameVerifier hostnameVerifier =
+              SslUtil.createHostnameVerifier(ssl.getHostnameVerifier());
+          sslConfs.put(ssl.getName(), new SslConf(socketFactory, hostnameVerifier));
+        } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException
+            | KeyStoreException | CertificateException | KeyManagementException
+            | ObjectCreationException ex) {
+          throw new CaClientException("could not initialize SSL configuration " + ssl.getName()
+              + ": " + ex.getMessage(), ex);
+        }
+      }
+    }
+
     // responders
     Map<String, ClientCmpResponder> responders = new HashMap<>();
     for (ResponderType m : config.getResponders().getResponder()) {
@@ -296,7 +360,7 @@ public final class CaClientImpl implements CaClient {
       responders.put(m.getName(), responder);
     }
 
-    // CA
+    // CA;
     Set<ClientCaConf> cas = new HashSet<>();
     for (CaType caType : config.getCas().getCa()) {
       String caName = caType.getName();
@@ -307,8 +371,18 @@ public final class CaClientImpl implements CaClient {
           throw new CaClientException("no responder named " + caType.getResponder()
               + " is configured");
         }
+
+        SslConf sslConf = null;
+        if (caType.getSsl() != null) {
+          sslConf = sslConfs.get(caType.getSsl());
+          if (sslConf == null) {
+            throw new CaClientException("no ssl named " + caType.getSsl() + " is configured");
+          }
+        }
+
         ClientCaConf ca = new ClientCaConf(caName, caType.getUrl(), caType.getHealthUrl(),
-            caType.getRequestor(), responder);
+            caType.getRequestor(), responder,
+            sslConf.getSslSocketFactory(), sslConf.getHostnameVerifier());
 
         // CA cert
         if (caType.getCaCert().getAutoconf() != null) {
@@ -431,7 +505,8 @@ public final class CaClientImpl implements CaClient {
 
       if (requestors.containsKey(requestorName)) {
         ClientCmpAgent agent = new HttpClientCmpAgent(requestors.get(requestorName),
-            ca.getResponder(), ca.getUrl(), securityFactory);
+            ca.getResponder(), ca.getUrl(), securityFactory,
+            ca.getSslSocketFactory(), ca.getHostnameVerifier());
         ca.setAgent(agent);
       } else {
         throw new CaClientException("could not find requestor named " + requestorName

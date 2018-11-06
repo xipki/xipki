@@ -35,6 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CaEntry;
@@ -111,8 +115,10 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
+import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ParamUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.http.ssl.SslContextConf;
 
 import com.alibaba.fastjson.JSON;
 
@@ -131,7 +137,40 @@ public class CaMgmtClient implements CaManager {
 
   private String serverUrl;
 
+  private SSLSocketFactory sslSocketFactory;
+
+  private HostnameVerifier hostnameVerifier;
+
+  private SslContextConf sslContextConf;
+
+  private boolean initialized;
+
+  private CaMgmtException initException;
+
   public CaMgmtClient() {
+  }
+
+  public synchronized void initIfNotDone() throws CaMgmtException {
+    if (initException != null) {
+      throw initException;
+    }
+
+    if (initialized) {
+      return;
+    }
+
+    if (sslContextConf != null && sslContextConf.isUseSslConf()) {
+      try {
+        sslSocketFactory = sslContextConf.buildSslContext().getSocketFactory();
+        hostnameVerifier = sslContextConf.buildHostnameVerifier();
+      } catch (ObjectCreationException ex) {
+        initException = new CaMgmtException(
+            "could not initialize CaMgmtClient: " + ex.getMessage(), ex);
+        throw initException;
+      }
+    }
+
+    initialized = true;
   }
 
   public void setServerUrl(String serverUrl) throws MalformedURLException {
@@ -141,6 +180,10 @@ public class CaMgmtClient implements CaManager {
     for (CommAction action : CommAction.values()) {
       actionUrlMap.put(action, new URL(this.serverUrl + action));
     }
+  }
+
+  public void setSslContextConf(SslContextConf sslContextConf) {
+    this.sslContextConf = sslContextConf;
   }
 
   @Override
@@ -778,6 +821,8 @@ public class CaMgmtClient implements CaManager {
 
   private byte[] transmit(CommAction action, CommRequest req, boolean voidReturn)
       throws CaMgmtException {
+    initIfNotDone();
+
     byte[] reqBytes = req == null ? null : JSON.toJSONBytes(req);
     int size = reqBytes == null ? 0 : reqBytes.length;
 
@@ -785,6 +830,16 @@ public class CaMgmtClient implements CaManager {
 
     try {
       HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(url);
+
+      if (httpUrlConnection instanceof HttpsURLConnection) {
+        if (sslSocketFactory != null) {
+          ((HttpsURLConnection) httpUrlConnection).setSSLSocketFactory(sslSocketFactory);
+        }
+        if (hostnameVerifier != null) {
+          ((HttpsURLConnection) httpUrlConnection).setHostnameVerifier(hostnameVerifier);
+        }
+      }
+
       httpUrlConnection.setDoOutput(true);
       httpUrlConnection.setUseCaches(false);
 

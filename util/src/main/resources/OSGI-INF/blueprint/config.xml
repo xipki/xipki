@@ -16,9 +16,8 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
-  <cm:property-placeholder persistent-id="org.xipki.ca.mgmt.client">
+  <cm:property-placeholder persistent-id="org.xipki.util.curl">
     <cm:default-properties>
-      <cm:property name="serverUrl" value="https://localhost:8443/ca/mgmt"/>
       <cm:property name="useSslConf" value="false" />
       <cm:property name="sslStoreType" value="" />
       <cm:property name="sslKeystore" value="" />
@@ -39,10 +38,9 @@
     <property name="sslHostnameVerifier" value="${sslHostnameVerifier}"/>
   </bean>
 
-  <bean id="caManager" class="org.xipki.ca.mgmt.client.CaMgmtClient">
-    <property name="serverUrl" value="${serverUrl}"/>
+  <bean id="curl" class="org.xipki.util.http.curl.DefaultCurl">
     <property name="sslContextConf" ref="sslContextConf"/>
   </bean>
 
-  <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CaManager"/>
+  <service ref="curl" interface="org.xipki.util.http.curl.Curl"/>
 </blueprint>

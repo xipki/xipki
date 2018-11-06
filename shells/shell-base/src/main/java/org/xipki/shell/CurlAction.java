@@ -17,11 +17,7 @@
 
 package org.xipki.shell;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -30,11 +26,13 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.http.curl.Curl;
+import org.xipki.util.http.curl.CurlResult;
 
 /**
  * TODO.
@@ -76,139 +74,68 @@ public class CurlAction extends XiAction {
       description = "User and password of the form user:password")
   private String userPassword;
 
+  @Reference
+  private Curl curl;
+
   @Override
   protected Object execute0() throws Exception {
-
-    byte[] dataBytes = null;
+    byte[] content = null;
     if (postData != null) {
-      dataBytes = postData.getBytes(postDataCharSet);
+      content = postData.getBytes(postDataCharSet);
     } else if (postDataFile != null) {
-      dataBytes = IoUtil.read(postDataFile);
+      content = IoUtil.read(postDataFile);
     }
 
-    if (dataBytes != null) {
+    if (content != null) {
       usePost = Boolean.TRUE;
     }
 
-    URL newUrl = new URL(url);
-    HttpURLConnection httpConn = IoUtil.openHttpConn(newUrl);
-
-    try {
-      httpConn.setRequestMethod(usePost ? "POST" : "GET");
-      httpConn.setUseCaches(false);
-
-      if (headers != null) {
-        for (String header : headers) {
-          int idx = header.indexOf(':');
-          if (idx == -1 || idx == header.length() - 1) {
-            throw new IllegalCmdParamException("invalid HTTP header: '" + header + "'");
-          }
-
-          String key = header.substring(0, idx);
-          String value = header.substring(idx + 1).trim();
-
-          httpConn.setRequestProperty(key, value);
-        }
-      }
-
-      if (userPassword != null) {
-        int idx = userPassword.indexOf(':');
-        if (idx == -1 || idx == userPassword.length() - 1) {
-          throw new IllegalCmdParamException("invalid user");
+    Map<String, String> headerNameValues = null;
+    if (headers != null) {
+      headerNameValues = new HashMap<>();
+      for (String header : headers) {
+        int idx = header.indexOf(':');
+        if (idx == -1 || idx == header.length() - 1) {
+          throw new IllegalCmdParamException("invalid HTTP header: '" + header + "'");
         }
 
-        httpConn.setRequestProperty("Authorization",
-            "Basic " + Base64.encodeToString(userPassword.getBytes()));
+        String key = header.substring(0, idx);
+        String value = header.substring(idx + 1).trim();
+        headerNameValues.put(key, value);
       }
+    }
 
-      Map<String, List<String>> properties;
+    CurlResult result;
+    if (usePost) {
+      result = curl.curlPost(url, verbose, headerNameValues, userPassword, content);
+    } else {
+      result = curl.curlGet(url, verbose, headerNameValues, userPassword);
+    }
 
-      if (dataBytes == null) {
-        properties = httpConn.getRequestProperties();
+    if (result.getContent() == null && result.getErrorContent() == null) {
+      println("NO response content");
+      return null;
+    }
+
+    if (outFile != null) {
+      if (result.getContent() != null) {
+        saveVerbose("saved response to file", outFile, result.getContent());
       } else {
-        httpConn.setDoOutput(true);
-        httpConn.setRequestProperty("Content-Length", Integer.toString(dataBytes.length));
-        properties = httpConn.getRequestProperties();
-
-        OutputStream outputstream = httpConn.getOutputStream();
-        outputstream.write(dataBytes);
-        outputstream.flush();
+        saveVerbose("saved (error) response to file", "error-" + outFile, result.getErrorContent());
+      }
+    } else {
+      String ct = result.getContentType();
+      String charset = getCharset(ct);
+      if (charset == null) {
+        charset = "UTF-8";
       }
 
-      // show the request headers
-      if (verbose) {
-        println("=====request=====");
-        println("  HTTP method: " + httpConn.getRequestMethod());
-        for (String key : properties.keySet()) {
-          List<String> values = properties.get(key);
-          for (String value : values) {
-            println("  " + key + ": " + value);
-          }
-        }
-      }
-
-      // read the response
-      int respCode = httpConn.getResponseCode();
-      if (verbose) {
-        println("=====response=====");
-        println("  response code: " + respCode + " " + httpConn.getResponseMessage());
-        properties = httpConn.getHeaderFields();
-        for (String key : properties.keySet()) {
-          if (key == null) {
-            continue;
-          }
-          List<String> values = properties.get(key);
-          for (String value : values) {
-            println("  " + key + ": " + value);
-          }
-        }
-        println("=====response content=====");
+      if (result.getContent() != null) {
+        println(new String(result.getContent(), charset));
       } else {
-        if (respCode != HttpURLConnection.HTTP_OK) {
-          println("ERROR: bad response: " + httpConn.getResponseCode() + "    "
-              + httpConn.getResponseMessage());
-        }
+        println("ERROR: ");
+        println(new String(result.getContent(), charset));
       }
-
-      InputStream inputStream = null;
-      InputStream errorStream = null;
-
-      try {
-        inputStream = httpConn.getInputStream();
-      } catch (IOException ex) {
-        errorStream = httpConn.getErrorStream();
-      }
-
-      byte[] respContentBytes;
-      if (inputStream != null) {
-        respContentBytes = IoUtil.read(inputStream);
-      } else if (errorStream != null) {
-        respContentBytes = IoUtil.read(errorStream);
-      } else {
-        respContentBytes = null;
-      }
-
-      if (respContentBytes == null || respContentBytes.length == 0) {
-        println("NO response content");
-        return null;
-      }
-
-      if (outFile != null) {
-        String fn = (errorStream != null) ? "error-" + outFile : outFile;
-        saveVerbose("saved response to file", fn, respContentBytes);
-      } else {
-        String ct = httpConn.getHeaderField("Content-Type");
-        String charset = getCharset(ct);
-        if (charset == null) {
-          charset = "UTF-8";
-        }
-        if (errorStream != null) {
-          println("ERROR: ");
-        }
-        println(new String(respContentBytes, charset));
-      }
-    } finally {
-      httpConn.disconnect();
     }
 
     return null;

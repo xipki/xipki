@@ -21,6 +21,13 @@
   <xs:element name="caclient" type="caclientType"/>
   <xs:complexType name="caclientType">
     <xs:all>
+      <xs:element name="ssls" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ssl" type="sslType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="requestors">
         <xs:complexType>
           <xs:sequence>
@@ -52,6 +59,23 @@
             <xs:element name="ca" type="caType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="sslType">
+    <xs:all>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="storeType" type="xs:string" minOccurs="0"/>
+      <xs:element name="keystoreFile" type="xs:string" minOccurs="0"/>
+      <xs:element name="keystorePassword" type="xs:string" minOccurs="0"/>
+      <xs:element name="truststoreFile" type="xs:string" minOccurs="0"/>
+      <xs:element name="truststorePassword" type="xs:string" minOccurs="0"/>
+      <xs:element name="hostnameVerifier" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Valid values are no_op, default, or java:{qualified class name} (without the brackets)
+          </xs:documentation>
+        </xs:annotation>
       </xs:element>
     </xs:all>
   </xs:complexType>
@@ -128,6 +152,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="url" type="xs:anyURI"/>
       <xs:element name="healthUrl" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="ssl" type="xs:string" minOccurs="0"/>
       <xs:element name="requestor" type="xs:string"/>
       <xs:element name="responder" type="xs:string"/>
       <xs:element name="cmpcontrol" type="cmpcontrolType"/>

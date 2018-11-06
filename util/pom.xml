@@ -46,4 +46,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <properties>
+    <DynamicImport-Package>*</DynamicImport-Package>
+  </properties>
 </project>

@@ -34,13 +34,13 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ca/example/h2.ca-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ca/example/mariadb.ca-db.properties</source>
       <outputDirectory>xipki/etc/ca</outputDirectory>
       <destName>ca-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ca/example/h2.ocsp-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ca/example/mariadb.ocsp-db.properties</source>
       <outputDirectory>xipki/etc/ca</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>

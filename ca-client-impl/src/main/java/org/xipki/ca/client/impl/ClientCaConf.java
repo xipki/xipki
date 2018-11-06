@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.security.util.X509Util;
@@ -65,15 +68,22 @@ class ClientCaConf {
 
   private ClientCmpControl cmpControl;
 
+  private SSLSocketFactory sslSocketFactory;
+
+  private HostnameVerifier hostnameVerifier;
+
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
   ClientCaConf(String name, String url, String healthUrl, String requestorName,
-      ClientCmpResponder responder) {
+      ClientCmpResponder responder,
+      SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     this.name = ParamUtil.requireNonBlankLower("name", name);
     this.url = ParamUtil.requireNonBlank("url", url);
     this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
     this.responder = ParamUtil.requireNonNull("responder", responder);
     this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
+    this.sslSocketFactory = sslSocketFactory;
+    this.hostnameVerifier = hostnameVerifier;
   }
 
   public String getName() {
@@ -181,6 +191,22 @@ class ClientCaConf {
   public byte[] getSubjectKeyIdentifier() {
     return (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+  }
+
+  public SSLSocketFactory getSslSocketFactory() {
+    return sslSocketFactory;
+  }
+
+  public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+    this.sslSocketFactory = sslSocketFactory;
+  }
+
+  public HostnameVerifier getHostnameVerifier() {
+    return hostnameVerifier;
+  }
+
+  public void setHostnameVerifier(HostnameVerifier hostnameVerifier) {
+    this.hostnameVerifier = hostnameVerifier;
   }
 
 }

@@ -19,11 +19,29 @@
   <cm:property-placeholder persistent-id="org.xipki.ocsp.mgmt.client">
     <cm:default-properties>
       <cm:property name="serverUrl" value="https://localhost:8443/ocsp/mgmt"/>
+      <cm:property name="useSslConf" value="false" />
+      <cm:property name="sslStoreType" value="" />
+      <cm:property name="sslKeystore" value="" />
+      <cm:property name="sslKeystorePassword" value="" />
+      <cm:property name="sslTruststore" value="" />
+      <cm:property name="sslKeystorePassword" value="" />
+      <cm:property name="sslHostnameVerifier" value="default" />
     </cm:default-properties>
   </cm:property-placeholder>
 
+  <bean id="sslContextConf" class="org.xipki.util.http.ssl.SslContextConf">
+    <property name="useSslConf" value="${useSslConf}"/>
+    <property name="sslStoreType" value="${sslStoreType}"/>
+    <property name="sslKeystore" value="${sslKeystore}"/>
+    <property name="sslKeystorePassword" value="${sslKeystorePassword}"/>
+    <property name="sslTruststore" value="${sslTruststore}"/>
+    <property name="sslTruststorePassword" value="${sslTruststorePassword}"/>
+    <property name="sslHostnameVerifier" value="${sslHostnameVerifier}"/>
+  </bean>
+
   <bean id="ocspManager" class="org.xipki.ocsp.mgmt.client.OcspMgmtClient">
     <property name="serverUrl" value="${serverUrl}"/>
+    <property name="sslContextConf" ref="sslContextConf"/>
   </bean>
 
   <service ref="ocspManager" interface="org.xipki.ocsp.server.mgmt.api.OcspManager"/>

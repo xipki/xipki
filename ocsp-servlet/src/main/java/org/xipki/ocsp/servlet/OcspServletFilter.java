@@ -43,6 +43,7 @@ import org.xipki.securities.Securities;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 
 /**
  * TODO.
@@ -75,7 +76,8 @@ public class OcspServletFilter implements Filter {
     try {
       securities.init();
     } catch (IOException | InvalidConfException ex) {
-      throw new ServletException("Exception while initializing Securites", ex);
+      LogUtil.error(LOG, ex, "could not initializing Securities");
+      return;
     }
 
     Properties props = new Properties();
@@ -84,7 +86,8 @@ public class OcspServletFilter implements Filter {
       is = Files.newInputStream(Paths.get(DFLT_OCSP_SERVER_CFG));
       props.load(is);
     } catch (IOException ex) {
-      throw new ServletException("could not load properties from file " + DFLT_OCSP_SERVER_CFG);
+      LogUtil.error(LOG, ex, "could not load properties from file " + DFLT_OCSP_SERVER_CFG);
+      return;
     } finally {
       IoUtil.closeQuietly(is);
     }
@@ -103,7 +106,7 @@ public class OcspServletFilter implements Filter {
     try {
       ocspServer.init();
     } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
-      throw new ServletException("Exception while initializing OCSP server", ex);
+      LogUtil.error(LOG, ex, "could not start OCSP server");
     }
 
     this.server = ocspServer;

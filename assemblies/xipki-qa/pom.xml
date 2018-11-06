@@ -58,6 +58,13 @@
           <include>**/*</include>
         </includes>
       </resource>
+      <resource>
+        <directory>../xipki-console/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>etc/**</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>

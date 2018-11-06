@@ -15,6 +15,17 @@
   limitations under the License.
 -->
 <caclient xmlns="http://xipki.org/ca/client/conf/v2">
+  <ssls>
+    <ssl>
+      <name>ssl1</name>
+      <storeType>PKCS12</storeType>
+      <keystoreFile>xipki/keycerts/tlskeys/client/tls-client.p12</keystoreFile>
+      <keystorePassword>1234</keystorePassword>
+      <truststoreFile>xipki/keycerts/tlskeys/ca/tls-ca-cert.p12</truststoreFile>
+      <truststorePassword>1234</truststorePassword>
+      <hostnameVerifier>default</hostnameVerifier>
+    </ssl>
+  </ssls>
   <requestors>
     <requestor>
       <name>requestor1</name>
@@ -54,6 +65,7 @@
     <ca>
       <name>MYCA</name>
       <url>https://localhost:8443/ca/cmp/myca</url>
+      <ssl>ssl1</ssl>
       <requestor>requestor1</requestor>
       <responder>responder1</responder>
       <cmpcontrol>

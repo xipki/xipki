@@ -24,6 +24,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
@@ -42,11 +46,18 @@ class HttpClientCmpAgent extends ClientCmpAgent {
 
   private final URL serverUrl;
 
+  private final SSLSocketFactory sslSocketFactory;
+
+  private final HostnameVerifier hostnameVerifier;
+
   HttpClientCmpAgent(ClientCmpRequestor requestor, ClientCmpResponder responder,
-      String serverUrl, SecurityFactory securityFactory) {
+      String serverUrl, SecurityFactory securityFactory,
+      SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     super(requestor, responder, securityFactory);
     ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
+    this.sslSocketFactory = sslSocketFactory;
+    this.hostnameVerifier = hostnameVerifier;
     try {
       this.serverUrl = new URL(serverUrl);
     } catch (MalformedURLException ex) {
@@ -58,6 +69,16 @@ class HttpClientCmpAgent extends ClientCmpAgent {
   public byte[] send(byte[] request) throws IOException {
     ParamUtil.requireNonNull("request", request);
     HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
+    if (httpUrlConnection instanceof HttpsURLConnection) {
+      if (sslSocketFactory != null) {
+        ((HttpsURLConnection) httpUrlConnection).setSSLSocketFactory(sslSocketFactory);
+      }
+
+      if (hostnameVerifier != null) {
+        ((HttpsURLConnection) httpUrlConnection).setHostnameVerifier(hostnameVerifier);
+      }
+    }
+
     httpUrlConnection.setDoOutput(true);
     httpUrlConnection.setUseCaches(false);
 
