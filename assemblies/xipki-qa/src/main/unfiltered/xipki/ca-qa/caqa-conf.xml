@@ -83,8 +83,5 @@
     <certprofile name="max-time">
       <file>xipki/qa/certprofile/certprofile-max-time.xml</file>
     </certprofile>
-    <certprofile name="extended">
-      <file>xipki/ca-qa/certprofile/certprofile-extended-qa.xml</file>
-    </certprofile>
   </certprofiles>
 </qaconf>

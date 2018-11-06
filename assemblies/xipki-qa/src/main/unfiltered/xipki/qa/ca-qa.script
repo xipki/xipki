@@ -94,8 +94,5 @@ caqa:check-cert --issuer subca --profile ee-complex \
 caqa:check-cert --issuer subca --profile ee-complex \
   --csr output/ee-complex2.csr --cert output/ee-complex2.crt
 
-caqa:check-cert --issuer subca --profile extended \
-  --csr output/extended1.csr --cert output/extended1.crt
-
 feature:uninstall xipki-caqa-shell
 

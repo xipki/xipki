@@ -148,12 +148,6 @@
         <file>${profiles.dir}/certprofile-max-time.xml</file>
       </conf>
     </profile>
-    <profile name="extended">
-      <type>DemoXML</type>
-      <conf>
-        <file>${profiles.dir}/certprofile-extended.xml</file>
-      </conf>
-    </profile>
   </profiles>
   <cas>
     <ca name="rootca1">
