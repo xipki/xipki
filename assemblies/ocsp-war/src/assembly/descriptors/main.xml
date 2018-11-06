@@ -12,14 +12,6 @@
       <outputDirectory>xipki</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
-      <includes>
-        <include>security/**</include>
-        <include>etc/ocsp/**</include>
-        <include>etc/org.xipki.ocsp.server.cfg</include>
-        <include>etc/org.xipki.password.cfg</include>
-        <include>etc/org.xipki.security.cfg</include>
-        <include>etc/org.xipki.security.pkcs11.cfg</include>
-      </includes>
     </fileSet>
     <fileSet>
       <directory>src/assembly/unfiltered</directory>
@@ -42,19 +34,19 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/etc/ocsp/example/h2.ocsp-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ocsp/example/h2.ocsp-db.properties</source>
       <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/etc/ocsp/example/h2.ocsp-cache-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ocsp/example/h2.ocsp-cache-db.properties</source>
       <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <destName>ocsp-cache-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/etc/ocsp/example/h2.ocsp-crl-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ocsp/example/h2.ocsp-crl-db.properties</source>
       <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <destName>ocsp-crl-db.properties</destName>
       <fileMode>0644</fileMode>

@@ -12,16 +12,6 @@
       <outputDirectory>xipki</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
-      <includes>
-        <include>security/**</include>
-        <include>etc/ca/**</include>
-        <include>etc/org.xipki.audit.cfg</include>
-        <include>etc/org.xipki.audit.syslog.cfg</include>
-        <include>etc/org.xipki.ca.server.cfg</include>
-        <include>etc/org.xipki.password.cfg</include>
-        <include>etc/org.xipki.security.cfg</include>
-        <include>etc/org.xipki.security.pkcs11.cfg</include>
-      </includes>
     </fileSet>
     <fileSet>
       <directory>src/assembly/unfiltered</directory>
@@ -44,13 +34,13 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/etc/ca/example/h2.ca-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ca/example/h2.ca-db.properties</source>
       <outputDirectory>xipki/etc/ca</outputDirectory>
       <destName>ca-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/etc/ca/example/h2.ocsp-db.properties</source>
+      <source>src/assembly/unfiltered/xipki/etc/ca/example/h2.ocsp-db.properties</source>
       <outputDirectory>xipki/etc/ca</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
