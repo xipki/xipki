@@ -175,7 +175,21 @@ public class OcspServletFilter implements Filter {
 
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse resp = (HttpServletResponse) response;
-    String path = req.getServletPath();
+
+    // In Tomcat, req.getServletPath() will delete one %2F (/) if the URI contains
+    // %2F%F (aka // after decoding). This may happen if the OCSP request is sent via GET.
+    // String path = req.getServletPath();
+
+    // So we use the following method to retrieve the servletPath.
+    String requestUri = req.getRequestURI();
+    String contextPath = req.getContextPath();
+
+    String path;
+    if (requestUri.length() == contextPath.length()) {
+      path = "/";
+    } else {
+      path = requestUri.substring(contextPath.length());
+    }
 
     if (path.startsWith("/health/")) {
       String servletPath = path.substring(7); // 7 = "/health".length()

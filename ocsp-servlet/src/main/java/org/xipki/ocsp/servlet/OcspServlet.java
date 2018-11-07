@@ -19,6 +19,7 @@ package org.xipki.ocsp.servlet;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -154,8 +155,15 @@ public class OcspServlet extends HttpServlet {
         return;
       }
 
-      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder,
-          Base64.decode(b64OcspReq), true);
+      // URL decode
+      b64OcspReq = URLDecoder.decode(b64OcspReq, "US-ASCII");
+      byte[] ocspReq = Base64.decode(b64OcspReq);
+      if (ocspReq == null) {
+        sendError(resp, HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+
+      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocspReq, true);
       if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return;
