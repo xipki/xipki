@@ -17,11 +17,16 @@
 
 package org.xipki.ca.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -43,9 +48,11 @@ import org.xipki.ca.certprofile.xml.internal.CertprofileFactoryImpl;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.publisher.ocsp.OcspCertPublisherFactory;
 import org.xipki.securities.Securities;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 
 /**
  * TODO.
@@ -77,7 +84,7 @@ public class CaServletFilter implements Filter {
 
   private boolean remoteMgmtEnabled;
 
-  private HttpMgmtServlet mgmgServlet;
+  private HttpMgmtServlet mgmtServlet;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -148,8 +155,31 @@ public class CaServletFilter implements Filter {
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (this.remoteMgmtEnabled) {
-      this.mgmgServlet = new HttpMgmtServlet();
-      this.mgmgServlet.setCaManager(caManager);
+      String certFiles = props.getProperty("remote.mgmt.certs");
+      if (certFiles == null) {
+        LOG.error("no client certificate is configured, disable the remote managent");
+      } else {
+        Set<X509Certificate> certs = new HashSet<>();
+
+        String[] fileNames = certFiles.split(":; ");
+        for (String fileName : fileNames) {
+          try {
+            X509Certificate cert = X509Util.parseCert(new File(fileName));
+            certs.add(cert);
+          } catch (CertificateException | IOException ex) {
+            LogUtil.error(LOG, ex, "could not parse the client certificate " + fileName);
+          }
+
+        }
+
+        if (certs.isEmpty()) {
+          LOG.error("could not find any valid client certificates, disable the remote management");
+        } else {
+          mgmtServlet = new HttpMgmtServlet();
+          mgmtServlet.setCaManager(caManager);
+          mgmtServlet.setMgmtCerts(certs);
+        }
+      }
     }
   }
 
@@ -198,7 +228,7 @@ public class CaServletFilter implements Filter {
     } else if (path.startsWith("/mgmt/")) {
       if (remoteMgmtEnabled) {
         req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
-        mgmgServlet.service(req, res);
+        mgmtServlet.service(req, res);
       } else {
         sendError(res, HttpServletResponse.SC_FORBIDDEN);
       }

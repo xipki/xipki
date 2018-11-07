@@ -19,6 +19,9 @@ package org.xipki.ocsp.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -69,7 +72,13 @@ public class HttpMgmtServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/json";
 
+  private Set<X509Certificate> mgmtCerts;
+
   private OcspServerImpl ocspServer;
+
+  public void setMgmtCerts(Set<X509Certificate> mgmtCerts) {
+    this.mgmtCerts = new HashSet<>(ParamUtil.requireNonEmpty("mgmtCerts", mgmtCerts));
+  }
 
   public void setOcspServer(OcspServerImpl ocspServer) {
     this.ocspServer = ParamUtil.requireNonNull("ocspServer", ocspServer);;
@@ -79,6 +88,17 @@ public class HttpMgmtServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
+      X509Certificate clientCert = TlsHelper.getTlsClientCert(request);
+      if (clientCert == null) {
+        throw new MyException(HttpServletResponse.SC_UNAUTHORIZED,
+            "remote management is not permitted if TLS client certificate is not present");
+      }
+
+      if (!mgmtCerts.contains(clientCert)) {
+        throw new MyException(HttpServletResponse.SC_UNAUTHORIZED,
+            "remote management is not permitted to the client without valid certificate");
+      }
+
       String path = (String) request.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
 
       if (path == null || path.length() < 2) {
