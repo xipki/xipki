@@ -117,16 +117,13 @@ follows.
 
 5. Add JDBC drivers (optional)
 
-  This step is only required if you want to use database other than H2.
+  This step is only required if you want to use database other than PostGres, MariaDB (MySQL database can also be accessed via the MariaDB JDBC driver).
 
 Database Software | Driver | Download URL
 ------------------|--------|-------------
 Oracle | ojdbc7.jar | http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
 DB2 | db2jcc4.jar |
 MySQL | mysql-connector-java.jar | https://dev.mysql.com/downloads/connector/j, In debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar)
-MariaDB | mariadb-java-client-`<version>`.jar | https://downloads.mariadb.org/connector-java/
-PostgreSQL | postgresql-`<version>`.jar | https://jdbc.postgresql.org/download.html
-HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 
   * Copy the jar file to the folder `lib/jdbc`.
 
@@ -276,7 +273,7 @@ Components
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
-  - Supported databases: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle
+  - Supported databases: DB2, MariaDB, MySQL, Oracle
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
   - Customized extension to embed certificates in CRL
@@ -346,7 +343,7 @@ Components
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP
     signer and certificate status sources.
-  - Supported databases: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle
+  - Supported databases: DB2, MariaDB, MySQL, Oracle
   - Database tool (export and import OCSP database) simplifies the switch of
     databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
   - Client to send OCSP request

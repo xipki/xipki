@@ -19,8 +19,6 @@
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="intern-xipki-jdbc" version="${project.version}" description="JDBC drivers">
     <!-- add JDBC bundles here -->
-    <bundle start-level="75">file:lib/jdbc/h2-${jdbc.h2.version}.jar</bundle>
-    <bundle start-level="75">file:lib/jdbc/hsqldb-${jdbc.hsqldb.version}.jar</bundle>
     <bundle start-level="75">file:lib/jdbc/postgresql-${jdbc.postgresql.version}.jar</bundle>
     <bundle start-level="75">file:lib/jdbc/mariadb-java-client-${jdbc.mariadb.version}.jar</bundle>
   </feature>
