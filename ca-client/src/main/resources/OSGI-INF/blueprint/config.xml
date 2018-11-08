@@ -22,7 +22,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
-  <bean id="caClient" class="org.xipki.ca.client.impl.CaClientImpl"
+  <bean id="caClient" class="org.xipki.ca.client.CaClientImpl"
       destroy-method="close">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="confFile" value="${clientConfFile}"/>

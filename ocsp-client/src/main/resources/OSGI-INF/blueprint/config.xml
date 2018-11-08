@@ -24,7 +24,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
-  <bean id="ocspRequestor" class="org.xipki.ocsp.client.impl.DfltHttpOcspRequestor">
+  <bean id="ocspRequestor" class="org.xipki.ocsp.client.DfltHttpOcspRequestor">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="signerType" value="${signer.type}"/>
     <property name="signerConf" value="${signer.conf}"/>

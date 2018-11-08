@@ -38,7 +38,7 @@
 
     <jxb:bindings schemaLocation="../resources/xsd/ocsp-conf.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.xipki.ocsp.server.impl.jaxb"/>
+            <jxb:package name="org.xipki.ocsp.server.jaxb"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 

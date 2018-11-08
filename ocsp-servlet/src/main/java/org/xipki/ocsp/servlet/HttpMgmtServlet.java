@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
-import org.xipki.ocsp.server.impl.OcspServerImpl;
+import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.ocsp.server.mgmt.api.OcspMgmtException;
 import org.xipki.ocsp.server.mgmt.msg.CommAction;
 import org.xipki.ocsp.server.mgmt.msg.CommRequest;
