@@ -48,7 +48,7 @@ public interface CertprofileFactoryRegister {
    * @param type
    *          Type of the certificate. Must not be {@code null}.
    * @return new certificate profile.
-   * @throws ObjectCreationException
+   * @throws AuditServiceRuntimeException
    *           If certificate profile could not be created.
    */
   Certprofile newCertprofile(String type) throws ObjectCreationException;

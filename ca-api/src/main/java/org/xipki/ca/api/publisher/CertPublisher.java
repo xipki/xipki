@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.password.PasswordResolver;
@@ -149,13 +148,5 @@ public abstract class CertPublisher implements Closeable {
   public abstract boolean caUnrevoked(X509Cert caCert);
 
   public abstract boolean isHealthy();
-
-  /**
-   * Sets the AuditServiceRegister.
-   *
-   * @param auditServiceRegister
-   *          AuditServiceRegister to be set. Must not be {@code null}.
-   */
-  public abstract void setAuditServiceRegister(AuditServiceRegister auditServiceRegister);
 
 }

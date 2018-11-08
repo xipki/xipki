@@ -32,7 +32,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>ocsp-client-api</artifactId>
+      <artifactId>ocsp-client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

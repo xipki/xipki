@@ -16,8 +16,4 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="factory" class="org.xipki.ocsp.store.OcspStoreFactoryImpl"/>
-
-  <service ref="factory" interface="org.xipki.ocsp.api.OcspStoreFactory"/>
-
 </blueprint>

@@ -18,7 +18,7 @@
 
 source file:./xipki/qa/qa.d/initdb.script
 
-feature:install xipki-camgmt-shell
+feature:install xipki-camgmt
 
 echo "Sleeping 1 second"
 sleep 1

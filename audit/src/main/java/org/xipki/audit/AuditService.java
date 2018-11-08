@@ -25,6 +25,8 @@ package org.xipki.audit;
 
 public interface AuditService {
 
+  void init(String conf);
+
   /**
    * TODO.
    * @param event

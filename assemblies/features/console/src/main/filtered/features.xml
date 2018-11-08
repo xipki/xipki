@@ -25,14 +25,8 @@
     <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs11/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs12/${project.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/security-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
@@ -42,13 +36,8 @@
     <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs11/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs12/${project.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
     <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-client-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
   </feature>
@@ -59,7 +48,6 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs12/${project.version}</bundle>
     <bundle>mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
     <bundle>mvn:org.xipki.scep/scep-client/${xipki.scep.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
@@ -73,12 +61,7 @@
     <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs11/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-pkcs12/${project.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-client-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ocsp-client-shell/${project.version}</bundle>
   </feature>
@@ -88,11 +71,9 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-mgmt-msg/${project.version}</bundle>
     <bundle start-level="80"><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
@@ -119,12 +100,7 @@
     <feature>xipki-security</feature>
     <feature>xipki-caclient</feature>
     <feature>xipki-ocspclient</feature>
-    <bundle>mvn:org.xipki.qa/qa-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.qa.shells/security-speed-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.qa.shells/security-speed-pkcs11-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.qa.shells/security-speed-pkcs12-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.qa.shells/ca-client-benchmark-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.qa/ocsp-qa/${project.version}</bundle>
-    <bundle>mvn:org.xipki.qa.shells/ocsp-qa-shell/${project.version}</bundle>
+    <feature>xipki-camgmt</feature>
+    <bundle>mvn:org.xipki.shells/qa-shell/${project.version}</bundle>
   </feature>
 </features>

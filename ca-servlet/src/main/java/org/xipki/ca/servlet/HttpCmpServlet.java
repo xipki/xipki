@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.CmpResponder;
@@ -61,14 +61,7 @@ public class HttpCmpServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/pkixcmp";
 
-  private AuditServiceRegister auditServiceRegister;
-
   private ResponderManager responderManager;
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister =
-        ParamUtil.requireNonNull("auditServiceRegister", auditServiceRegister);
-  }
 
   public void setResponderManager(ResponderManager responderManager) {
     this.responderManager =
@@ -79,7 +72,7 @@ public class HttpCmpServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     X509Certificate clientCert = TlsHelper.getTlsClientCert(req);
-    AuditService auditService = auditServiceRegister.getAuditService();
+    AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setName(CaAuditConstants.NAME_perf);

@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.RestResponder;
@@ -52,14 +52,7 @@ public class HttpRestServlet extends HttpServlet {
 
   private static Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
-  private AuditServiceRegister auditServiceRegister;
-
   private ResponderManager responderManager;
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister =
-        ParamUtil.requireNonNull("auditServiceRegister", auditServiceRegister);
-  }
 
   public void setResponderManager(ResponderManager responderManager) {
     this.responderManager =
@@ -80,7 +73,7 @@ public class HttpRestServlet extends HttpServlet {
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws IOException {
-    AuditService auditService = auditServiceRegister.getAuditService();
+    AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     try {
       RestResponder rest = responderManager.getRestResponder();

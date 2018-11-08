@@ -22,6 +22,7 @@
       <cm:property name="key.strongrandom.enabled" value="false"/>
       <cm:property name="sign.strongrandom.enabled" value="false"/>
       <cm:property name="defaultSignerParallelism" value="32"/>
+      <cm:property name="pkcs11.confFile" value="xipki/security/pkcs11-hsm.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -30,15 +31,12 @@
   <bean id="providers" class="org.xipki.security.Providers"
       init-method="init" destroy-method="close"/>
 
-
   <bean id="signerFactoryRegister"
        class="org.xipki.security.SignerFactoryRegisterImpl">
   </bean>
 
-  <service ref="signerFactoryRegister"
-       interface="org.xipki.security.SignerFactoryRegister"/>
-  <reference-list id="signerFactories"
-       interface="org.xipki.security.SignerFactory"
+  <service ref="signerFactoryRegister" interface="org.xipki.security.SignerFactoryRegister"/>
+  <reference-list id="signerFactories" interface="org.xipki.security.SignerFactory"
        availability="optional">
     <reference-listener ref="signerFactoryRegister" bind-method="registFactory"
          unbind-method="unregistFactory"/>
@@ -52,5 +50,71 @@
     <property name="signerFactoryRegister" ref="signerFactoryRegister"/>
   </bean>
   <service ref="securityFactory" interface="org.xipki.security.SecurityFactory"/>
+
+  <bean id="pkcs12SignerFactory"
+      class="org.xipki.security.pkcs12.PKCS12SignerFactory">
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+
+  <!-- PKCS#12 -->
+  <service ref="pkcs12SignerFactory"
+      interface="org.xipki.security.SignerFactory"/>
+
+  <bean id="p11ModuleFactoryRegister"
+       class="org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl"
+       destroy-method="close">
+  </bean>
+
+  <!-- PKCS#11 -->
+  <service ref="p11ModuleFactoryRegister"
+       interface="org.xipki.security.pkcs11.P11ModuleFactoryRegister"/>
+  <reference-list id="p11ModuleFactories"
+       interface="org.xipki.security.pkcs11.P11ModuleFactory"
+       availability="optional">
+    <reference-listener ref="p11ModuleFactoryRegister" bind-method="registFactory"
+         unbind-method="unregistFactory"/>
+  </reference-list>
+
+  <bean id="p11CryptServiceFactory"
+      class="org.xipki.security.pkcs11.P11CryptServiceFactoryImpl"
+      init-method="init" destroy-method="close">
+    <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
+    <property name="passwordResolver" ref="passwordResolver"/>
+    <property name="p11ModuleFactoryRegister" ref="p11ModuleFactoryRegister"/>
+  </bean>
+
+  <service ref="p11CryptServiceFactory"
+      interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
+
+  <bean id="pkcs11SignerFactory"
+      class="org.xipki.security.pkcs11.PKCS11SignerFactory">
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
+  </bean>
+
+  <service ref="pkcs11SignerFactory"
+      interface="org.xipki.security.SignerFactory"/>
+
+  <bean id="XiProviderRegister"
+      class="org.xipki.security.pkcs11.provider.XiProviderRegister"
+      init-method="regist">
+    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
+  </bean>
+
+  <!-- PKCS#11 Emulator -->
+    <bean id="emulatorP11ModuleFactory"
+      class="org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory">
+  </bean>
+
+  <service ref="emulatorP11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
+  <!-- PKCS#11 Iaik -->
+  <bean id="iaikP11ModuleFactory"
+      class="org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory">
+  </bean>
+
+  <service ref="iaikP11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
 
 </blueprint>

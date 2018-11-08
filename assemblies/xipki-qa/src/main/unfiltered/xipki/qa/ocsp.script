@@ -22,7 +22,7 @@ echo "#################################################################"
 URL = http://localhost:8080/ocsp/responder1
 URL_CRL = http://localhost:8080/ocsp/responder2
 
-feature:install xipki-ocspqa-shell
+feature:install xipki-qa
 
 echo "Sleeping 1 second"
 sleep 1
@@ -319,4 +319,4 @@ xiqa:qa-ocsp-status $VERBOSE \
   --nonce \
   --resp-issuer output/rootca1.crt
 
-feature:uninstall xipki-ocspqa-shell
+feature:uninstall xipki-qa

@@ -157,13 +157,6 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>publisher-ocsp</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
                   <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -184,7 +177,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>security-pkcs11</artifactId>
+                  <artifactId>security</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -198,14 +191,14 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>ca-client-impl</artifactId>
+                  <artifactId>ca-client</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.shells</groupId>
-                  <artifactId>ca-client-shell</artifactId>
+                  <artifactId>qa-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -224,13 +217,6 @@
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
-                <!--artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem-->
               </artifactItems>
             </configuration>
           </execution>

@@ -30,7 +30,7 @@
     <app.name>PKI QA</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
     <patchkaraf.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
-    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-dbtool,xipki-security-shell</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-dbtool</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -148,7 +148,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>security-pkcs11</artifactId>
+                  <artifactId>security</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -162,7 +162,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>ca-client-impl</artifactId>
+                  <artifactId>ca-client</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -234,16 +234,14 @@
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
-                <feature>xipki-camgmt-shell</feature>
-                <feature>xipki-ocspmgmt-shell</feature>
-                <feature>xipki-caclient-shell</feature>
-                <feature>xipki-security-shell</feature>
-                <feature>xipki-ocspclient-shell</feature>
+                <feature>xipki-camgmt</feature>
+                <feature>xipki-ocspmgmt</feature>
+                <feature>xipki-caclient</feature>
+                <feature>xipki-security</feature>
+                <feature>xipki-ocspclient</feature>
                 <feature>xipki-dbtool</feature>
-                <feature>xipki-scepclient-shell</feature>
-                <feature>xipki-jscepclient-shell</feature>
-                <feature>xipki-caqa-shell</feature>
-                <feature>xipki-ocspqa-shell</feature>
+                <feature>xipki-scepclient</feature>
+                <feature>xipki-qa</feature>
               </features>
             </configuration>
           </execution>

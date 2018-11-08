@@ -23,14 +23,37 @@
     <artifactId>xipki-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.qa</groupId>
   <artifactId>qa</artifactId>
-  <name>XiPKI :: QA</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>qa-common</module>
-    <module>ocsp-qa</module>
-    <module>ca-qa</module>
-    <module>shells</module>
-  </modules>
+  <packaging>bundle</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>certprofile-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ocsp-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

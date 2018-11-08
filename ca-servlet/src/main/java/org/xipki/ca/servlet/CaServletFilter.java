@@ -39,15 +39,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audits.Audits;
+import org.xipki.audit.Audits;
 import org.xipki.ca.api.internal.CertPublisherFactoryRegisterImpl;
 import org.xipki.ca.api.internal.CertprofileFactoryRegisterImpl;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.certprofile.xml.internal.CertprofileFactoryImpl;
 import org.xipki.ca.server.impl.CaManagerImpl;
-import org.xipki.publisher.ocsp.OcspCertPublisherFactory;
-import org.xipki.securities.Securities;
+import org.xipki.ca.server.impl.publisher.ocsp.OcspCertPublisherFactory;
+import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
@@ -65,8 +65,6 @@ public class CaServletFilter implements Filter {
   private static final String DFLT_CA_SERVER_CFG = "xipki/etc/org.xipki.ca.server.cfg";
 
   private static final String DFLT_CONF_FILE = "xipki/etc/ca/ca.properties";
-
-  private Audits audits;
 
   private Securities securities;
 
@@ -88,12 +86,7 @@ public class CaServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
-    audits = new Audits();
-    try {
-      audits.init();
-    } catch (IOException ex) {
-      throw new ServletException("Exception while initializing Audits", ex);
-    }
+    Audits.init(null);
 
     securities = new Securities();
     try {
@@ -103,7 +96,6 @@ public class CaServletFilter implements Filter {
     }
 
     caManager = new CaManagerImpl();
-    caManager.setAuditServiceRegister(audits.getAuditServiceRegister());
     caManager.setSecurityFactory(securities.getSecurityFactory());
 
     Properties props = new Properties();
@@ -136,18 +128,15 @@ public class CaServletFilter implements Filter {
     this.caCertServlet.setResponderManager(caManager);
 
     this.cmpServlet = new HttpCmpServlet();
-    this.cmpServlet.setAuditServiceRegister(audits.getAuditServiceRegister());
     this.cmpServlet.setResponderManager(caManager);
 
     this.healthServlet = new HealthCheckServlet();
     this.healthServlet.setResponderManager(caManager);
 
     this.restServlet = new HttpRestServlet();
-    this.restServlet.setAuditServiceRegister(audits.getAuditServiceRegister());
     this.restServlet.setResponderManager(caManager);
 
     this.scepServlet = new HttpScepServlet();
-    this.scepServlet.setAuditServiceRegister(audits.getAuditServiceRegister());
     this.scepServlet.setResponderManager(caManager);
 
     this.remoteMgmtEnabled =
@@ -191,11 +180,6 @@ public class CaServletFilter implements Filter {
 
     if (caManager != null) {
       caManager.close();
-    }
-
-    // audits as last
-    if (audits != null) {
-      audits.close();
     }
   }
 

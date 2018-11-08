@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -82,10 +81,6 @@ class IdentifiedCertPublisher implements Closeable {
 
   public boolean isHealthy() {
     return certPublisher.isHealthy();
-  }
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    certPublisher.setAuditServiceRegister(auditServiceRegister);
   }
 
   public boolean caRevoked(X509Cert caCert, CertRevocationInfo revocationInfo) {

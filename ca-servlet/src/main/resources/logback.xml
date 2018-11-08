@@ -8,14 +8,13 @@
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
 
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
       <!-- rollover daily -->
       <fileNamePattern>logs/ca-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-      <timeBasedFileNamingAndTriggeringPolicy
-          class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <!-- or whenever the file size reaches 64 MB -->
-        <maxFileSize>64 MB</maxFileSize>
-      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- each file should be at most 64 MB, keep 60 days worth of history, but at most 20 GB -->
+      <maxFileSize>64 MB</maxFileSize>
+      <maxHistory>60</maxHistory>
+      <totalSizeCap>20GB</totalSizeCap>
     </rollingPolicy>
 
     <!-- If set to true: safely log to the same file from multiple JVMs. Degrades performance! -->
@@ -29,14 +28,13 @@
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
 
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
       <!-- rollover daily -->
       <fileNamePattern>logs/ca-audit-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-      <timeBasedFileNamingAndTriggeringPolicy
-          class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <!-- or whenever the file size reaches 64 MB -->
-        <maxFileSize>64 MB</maxFileSize>
-      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- each file should be at most 64 MB, keep 60 days worth of history, but at most 20 GB -->
+      <maxFileSize>64 MB</maxFileSize>
+      <maxHistory>60</maxHistory>
+      <totalSizeCap>20GB</totalSizeCap>
     </rollingPolicy>
 
     <!-- If set to true: safely log to the same file from multiple JVMs. Degrades performance! -->

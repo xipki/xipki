@@ -48,7 +48,7 @@ public interface CertPublisherFactory {
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return the new created publisher
-   * @throws ObjectCreationException
+   * @throws AuditServiceRuntimeException
    *           if publisher could not be created.
    */
   CertPublisher newPublisher(String type) throws ObjectCreationException;

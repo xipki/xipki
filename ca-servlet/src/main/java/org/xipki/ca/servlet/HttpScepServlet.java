@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
@@ -72,14 +72,7 @@ public class HttpScepServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
-  private AuditServiceRegister auditServiceRegister;
-
   private ResponderManager responderManager;
-
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister =
-        ParamUtil.requireNonNull("auditServiceRegister", auditServiceRegister);
-  }
 
   public void setResponderManager(ResponderManager responderManager) {
     this.responderManager =
@@ -121,7 +114,7 @@ public class HttpScepServlet extends HttpServlet {
       return;
     }
 
-    AuditService auditService = auditServiceRegister.getAuditService();
+    AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("SCEP");
     event.setName(CaAuditConstants.NAME_perf);

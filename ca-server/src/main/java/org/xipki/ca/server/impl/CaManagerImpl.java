@@ -67,8 +67,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.CertificateInfo;
@@ -342,8 +342,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
   private boolean casInitialized;
 
   private Date lastStartTime;
-
-  private AuditServiceRegister auditServiceRegister;
 
   private CertprofileFactoryRegister certprofileFactoryRegister;
 
@@ -776,7 +774,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     X509Ca ca;
     try {
       ca = new X509Ca(this, caEntry, certstore);
-      ca.setAuditServiceRegister(auditServiceRegister);
     } catch (OperationException ex) {
       LogUtil.error(LOG, ex, concat("X509CA.<init> (ca=", caName, ")"));
       return false;
@@ -2015,20 +2012,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     this.certPublisherFactoryRegister = register;
   }
 
-  public void setAuditServiceRegister(AuditServiceRegister register) {
-    this.auditServiceRegister = ParamUtil.requireNonNull("serviceRegister", register);
-
-    for (String name : publishers.keySet()) {
-      IdentifiedCertPublisher publisherEntry = publishers.get(name);
-      publisherEntry.setAuditServiceRegister(register);
-    }
-
-    for (String name : x509cas.keySet()) {
-      X509Ca ca = x509cas.get(name);
-      ca.setAuditServiceRegister(register);
-    }
-  }
-
   private void auditLogPciEvent(boolean successful, String eventType) {
     PciAuditEvent event = new PciAuditEvent(new Date());
     event.setUserId("CA-SYSTEM");
@@ -2041,7 +2024,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       event.setStatus(AuditStatus.FAILED.name());
       event.setLevel(AuditLevel.ERROR);
     }
-    auditServiceRegister.getAuditService().logEvent(event);
+    Audits.getAuditService().logEvent(event);
   } // method auditLogPciEvent
 
   @Override
@@ -2403,7 +2386,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
       ret = new IdentifiedCertPublisher(entry, publisher);
       ret.initialize(securityFactory.getPasswordResolver(), datasourceNameConfFileMap);
-      ret.setAuditServiceRegister(auditServiceRegister);
       return ret;
     } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
       String msg = "invalid configuration for the publisher " + entry.getIdent();

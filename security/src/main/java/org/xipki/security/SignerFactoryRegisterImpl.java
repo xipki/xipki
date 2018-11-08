@@ -41,6 +41,9 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private ConcurrentLinkedDeque<SignerFactory> factories = new ConcurrentLinkedDeque<>();
 
+  public SignerFactoryRegisterImpl() {
+  }
+
   @Override
   public Set<String> getSupportedSignerTypes() {
     Set<String> types = new HashSet<>();

@@ -19,7 +19,7 @@
 echo "#################################################################"
 echo "#                              QA                               #"
 echo "#################################################################"
-feature:install xipki-caqa-shell
+feature:install xipki-qa
 
 echo "Sleeping 1 second"
 sleep 1
@@ -94,5 +94,5 @@ caqa:check-cert --issuer subca --profile ee-complex \
 caqa:check-cert --issuer subca --profile ee-complex \
   --csr output/ee-complex2.csr --cert output/ee-complex2.crt
 
-feature:uninstall xipki-caqa-shell
+feature:uninstall xipki-qa
 

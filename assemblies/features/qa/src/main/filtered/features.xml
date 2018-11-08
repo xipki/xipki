@@ -18,124 +18,77 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-security" version="${project.version}" description="security">
-    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/security/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/security-pkcs11/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/security-pkcs12/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/pkcs11-emulator/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/pkcs11-iaik/${project.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/security-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-shell-base" version="${project.version}" description="shall base">
-    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-datasource" version="${project.version}" description="datasource">
-    <bundle start-level="70">mvn:org.xipki/util/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
-    <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/datasource/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-camgmt-shell" version="${project.version}" description="CA management shell">
+  <feature name="xipki-camgmt" version="${project.version}" description="CA management shell">
     <feature>xipki-security</feature>
-    <bundle start-level="70">mvn:org.xipki/cmp/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/ca-api/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle start-level="80"><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
-    <bundle>mvn:org.xipki/ca-mgmt-msg/${project.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
-    <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-security-shell" version="${project.version}" description="CA security shell">
-    <feature>xipki-shell-base</feature>
-    <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.shells/security-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/security-pkcs11-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/security-pkcs12-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-pkcs11-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/security-speed-pkcs12-shell/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-ocspmgmt-shell" version="${project.version}" description="OCSP management shell">
-    <bundle start-level="80">mvn:org.xipki/util/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ocsp-mgmt-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ocsp-mgmt-msg/${project.version}</bundle>
-    <bundle start-level="80"><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
-    <bundle start-level="80">mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
-    <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>
+  <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management shell">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-mgmt-api/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
     <!--feature>intern-xipki-jdbc</feature-->
-    <feature>xipki-datasource</feature>
-    <feature>xipki-shell-base</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
-    <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/dbtool/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ca-dbtool/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-dbtool-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
+    <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
+    <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
+    <bundle>mvn:org.xipki/dbtool/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-dbtool/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki/cmp/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ca-client-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ca-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caclient-shell" version="${project.version}" description="CA client shell">
-    <feature>xipki-caclient</feature>
-    <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/ca-client-benchmark-shell/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-scepclient-shell" version="${project.version}"
+  <feature name="xipki-scepclient" version="${project.version}"
       description="SCEP client shell">
-    <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.scep/scep-client/${xipki.scep.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/scep-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
+    <bundle>mvn:org.xipki.scep/scep-client/${xipki.scep.version}</bundle>
+    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client">
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki/ocsp-client-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ocsp-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ocsp-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient-shell" version="${project.version}"
-      description="OCSP client shell">
+  <feature name="xipki-qa" version="${project.version}" description="CA QA shell">
+    <feature>xipki-camgmt</feature>
     <feature>xipki-ocspclient</feature>
-    <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.shells/ocsp-client-shell/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
-    <feature prerequisite="true">xipki-camgmt-shell</feature>
-    <bundle start-level="70">mvn:org.xipki/certprofile-xml/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa/ca-qa/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/ca-qa-shell/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-jscepclient-shell" version="${project.version}"
-      description="SCEP client shell using JSCEP">
-    <feature prerequisite="true">xipki-shell-base</feature>
-    <bundle start-level="80"><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
-    <bundle start-level="80"><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
-    <bundle start-level="80">mvn:commons-codec/commons-codec/1.7</bundle>
-    <bundle start-level="80">mvn:commons-io/commons-io/2.4</bundle>
-    <bundle start-level="80">mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/jscep-client-shell/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-ocspqa-shell" version="${project.version}" description="OCSP QA shell">
-    <feature prerequisite="true">xipki-ocspclient-shell</feature>
-    <bundle start-level="80">mvn:org.xipki.qa/qa-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa/ocsp-qa/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.qa.shells/ocsp-qa-shell/${project.version}</bundle>
+    <feature>xipki-caclient</feature>
+    <bundle>mvn:org.xipki/certprofile-xml/${project.version}</bundle>
+    <bundle>mvn:org.xipki/qa/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/qa-shell/${project.version}</bundle>
   </feature>
 </features>

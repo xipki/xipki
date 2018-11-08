@@ -109,8 +109,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertWithDbId;
@@ -462,8 +462,6 @@ public class X509Ca implements Closeable {
   private ScheduledFuture<?> expiredCertsRemover;
 
   private ScheduledFuture<?> suspendedCertsRevoker;
-
-  private AuditServiceRegister auditServiceRegister;
 
   private final ConcurrentSkipListSet<Long> publicKeyCertsInProcess = new ConcurrentSkipListSet<>();
 
@@ -2583,13 +2581,8 @@ public class X509Ca implements Closeable {
     return result;
   } // method healthCheck
 
-  public void setAuditServiceRegister(AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",
-        auditServiceRegister);
-  }
-
   private AuditService auditService() {
-    return auditServiceRegister.getAuditService();
+    return Audits.getAuditService();
   }
 
   private AuditEvent newPerfAuditEvent(String eventType, String msgId) {

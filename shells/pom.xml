@@ -30,8 +30,6 @@
   <modules>
     <module>shell-base</module>
     <module>security-shell</module>
-    <module>security-pkcs11-shell</module>
-    <module>security-pkcs12-shell</module>
     <module>ca-client-shell</module>
     <module>ocsp-client-shell</module>
     <module>scep-client-shell</module>
@@ -39,5 +37,6 @@
     <module>ocsp-mgmt-shell</module>
     <module>dbtool-shell</module>
     <module>ca-dbtool-shell</module>
+    <module>qa-shell</module>
   </modules>
 </project>
