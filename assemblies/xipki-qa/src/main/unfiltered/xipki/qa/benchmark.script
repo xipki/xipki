@@ -16,8 +16,6 @@
 #
 ################################################################################
 
-OCSP_QUEUE_SIZE = 100
-
 printUsage = "false"
 
 argsValid = "false"
@@ -96,13 +94,11 @@ if { $printUsage equals "true" } then {
     sleep 1
     echo "OCSP status benchmark"
     xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
-      --issuer output/subca1.crt --cert output/tls-c2.crt --url $URL \
-      --queue-size $OCSP_QUEUE_SIZE
+      --issuer output/subca1.crt --cert output/tls-c2.crt --url $URL
 
     echo "Loadtest OCSP status"
     xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
-      --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL \
-      --queue-size $OCSP_QUEUE_SIZE
+      --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL
 
     feature:uninstall xipki-ocspqa-shell
   }

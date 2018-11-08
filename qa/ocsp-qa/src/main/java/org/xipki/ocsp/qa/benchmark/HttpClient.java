@@ -17,285 +17,131 @@
 
 package org.xipki.ocsp.qa.benchmark;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.ocsp.client.api.OcspRequestorException;
-import org.xipki.util.LogUtil;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.concurrent.CountLatch;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.2.0
+ * @since 2.0.0
  */
 
-final class HttpClient implements Closeable {
+public class HttpClient {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
+  // result in maximal 254 Base-64 encoded octets
+  private static final int MAX_LEN_GET = 190;
 
-  private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
+  private static final String CT_REQUEST = "application/ocsp-request";
 
-    public HttpClientInitializer() {
-    }
+  private static final String CT_RESPONSE = "application/ocsp-response";
 
-    @Override
-    public void initChannel(SocketChannel ch) {
-      ch.pipeline()
-        .addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
-        .addLast(new WriteTimeoutHandler(60, TimeUnit.SECONDS))
-        .addLast(new HttpClientCodec())
-        .addLast(new HttpObjectAggregator(4096))
-        .addLast(new HttpClientHandler());
-    }
+  private URL responderUrl;
+
+  private boolean viaHttpGetIfPossible;
+
+  private boolean parseResponse;
+
+  public HttpClient(URL responderUrl, boolean viaHttpGetIfPossible, boolean parseResponse) {
+    this.responderUrl = responderUrl;
+    this.viaHttpGetIfPossible = viaHttpGetIfPossible;
+    this.parseResponse = parseResponse;
   }
 
-  private class HttpClientHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
+  public void send(byte[] request) throws IOException, OcspRequestorException {
+    ParamUtil.requireNonNull("request", request);
+    ParamUtil.requireNonNull("responderUrl", responderUrl);
 
-    @Override
-    public void channelRead0(ChannelHandlerContext ctx, FullHttpResponse resp) {
-      try {
-        decrementPendingRequests();
-        responseHandler.onComplete(resp);
-      } catch (RuntimeException ex) {
-        LOG.error("unexpected error", ex);
+    int size = request.length;
+    HttpURLConnection httpUrlConnection;
+    if (viaHttpGetIfPossible && size <= MAX_LEN_GET) {
+      String b64Request = Base64.encodeToString(request);
+      String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
+      String baseUrl = responderUrl.toString();
+      String url = StringUtil.concat(baseUrl, (baseUrl.endsWith("/") ? "" : "/"), urlEncodedReq);
+
+      URL newUrl = new URL(url);
+      httpUrlConnection = IoUtil.openHttpConn(newUrl);
+      httpUrlConnection.setRequestMethod("GET");
+    } else {
+      httpUrlConnection = IoUtil.openHttpConn(responderUrl);
+      httpUrlConnection.setDoOutput(true);
+      httpUrlConnection.setUseCaches(false);
+
+      httpUrlConnection.setRequestMethod("POST");
+      httpUrlConnection.setRequestProperty("Content-Type", CT_REQUEST);
+      httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(size));
+      OutputStream outputstream = httpUrlConnection.getOutputStream();
+      outputstream.write(request);
+      outputstream.flush();
+    }
+
+    InputStream inputstream = httpUrlConnection.getInputStream();
+    if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+      inputstream.close();
+      throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
+          + httpUrlConnection.getResponseMessage());
+    }
+
+    String responseContentType = httpUrlConnection.getContentType();
+    boolean isValidContentType = false;
+    if (responseContentType != null) {
+      if (responseContentType.equalsIgnoreCase(CT_RESPONSE)) {
+        isValidContentType = true;
       }
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-      decrementPendingRequests();
-      ctx.close();
-      LOG.warn("error", cause);
-      responseHandler.onError();
+    if (!isValidContentType) {
+      inputstream.close();
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
-  }
 
-  private static Boolean epollAvailable;
+    byte[] respBytes = IoUtil.read(inputstream);
+    if (respBytes == null || respBytes.length == 0) {
+      throw new IOException("no body in response");
+    }
 
-  private static Boolean kqueueAvailable;
-
-  private final CountLatch latch = new CountLatch(0, 0);
-
-  private int queueSize = 1000;
-
-  private URI uri;
-
-  private String host;
-
-  private OcspBenchmark responseHandler;
-
-  private EventLoopGroup workerGroup;
-
-  private Channel channel;
-
-  private int pendingRequests = 0;
-
-  static {
-    String os = System.getProperty("os.name").toLowerCase();
-    ClassLoader loader = HttpClient.class.getClassLoader();
-    if (os.contains("linux")) {
-      try {
-        Class<?> checkClazz = clazz("io.netty.channel.epoll.Epoll", false, loader);
-        Method mt = checkClazz.getMethod("isAvailable");
-        Object obj = mt.invoke(null);
-
-        if (obj instanceof Boolean) {
-          epollAvailable = (Boolean) obj;
-        }
-      } catch (Throwable th) {
-        if (th instanceof ClassNotFoundException) {
-          LOG.info("epoll linux is not in classpath");
-        } else {
-          LogUtil.warn(LOG, th, "could not use Epoll transport");
-        }
+    if (!parseResponse) {
+      // a valid response should at least of size 10.
+      if (respBytes.length < 10) {
+        throw new OcspRequestorException("bad response: response too short");
       }
-    } else if (os.contains("mac os") || os.contains("os x")) {
-      try {
-        Class<?> checkClazz = clazz("io.netty.channel.epoll.kqueue.KQueue", false, loader);
-        Method mt = checkClazz.getMethod("isAvailable");
-        Object obj = mt.invoke(null);
-        if (obj instanceof Boolean) {
-          kqueueAvailable = (Boolean) obj;
-        }
-      } catch (Throwable th) {
-        LogUtil.warn(LOG, th, "could not use KQueue transport");
-      }
-    }
-  }
-
-  public HttpClient(URI uri, OcspBenchmark responseHandler, int queueSize) {
-    this.uri = ParamUtil.requireNonNull("uri", uri);
-    this.host = uri.getHost() + ":" + uri.getPort();
-    if (queueSize > 0) {
-      this.queueSize = queueSize;
-    }
-    this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
-    this.workerGroup = new NioEventLoopGroup(1);
-  }
-
-  @SuppressWarnings("unchecked")
-  public void start() throws Exception {
-    String scheme = (uri.getScheme() == null) ? "http" : uri.getScheme();
-
-    if (!"http".equalsIgnoreCase(scheme)) {
-      System.err.println("Only HTTP is supported.");
       return;
     }
 
-    int port = uri.getPort();
-    if (port == -1) {
-      port = 80;
-    }
-
-    Class<? extends SocketChannel> channelClass = NioSocketChannel.class;
-
-    final int numThreads = 1;
-
-    ClassLoader loader = getClass().getClassLoader();
-    if (epollAvailable != null && epollAvailable.booleanValue()) {
-      try {
-        channelClass = (Class<? extends SocketChannel>)
-            clazz("io.netty.channel.epoll.EpollSocketChannel", false, loader);
-
-        Class<?> clazz = clazz("io.netty.channel.epoll.EpollEventLoopGroup", true, loader);
-        Constructor<?> constructor = clazz.getConstructor(int.class);
-        this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
-        LOG.info("use Epoll Transport");
-      } catch (Throwable th) {
-        if (th instanceof ClassNotFoundException) {
-          LOG.info("epoll linux is not in classpath");
-        } else {
-          LogUtil.warn(LOG, th, "could not use Epoll transport");
-        }
-        channelClass = null;
-        this.workerGroup = null;
-      }
-    } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
-      try {
-        channelClass = (Class<? extends SocketChannel>)
-                clazz("io.netty.channel.kqueue.KQueueSocketChannel", false, loader);
-
-        Class<?> clazz = clazz("io.netty.channel.kqueue.KQueueEventLoopGroup", true, loader);
-        Constructor<?> constructor = clazz.getConstructor(int.class);
-        this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
-        LOG.info("Use KQueue Transport");
-      } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, "could not use KQueue transport");
-        channelClass = null;
-        this.workerGroup = null;
-      }
-    }
-
-    if (this.workerGroup == null) {
-      channelClass = NioSocketChannel.class;
-      this.workerGroup = new NioEventLoopGroup(numThreads);
-    }
-
-    Bootstrap bootstrap = new Bootstrap();
-    bootstrap.group(workerGroup)
-      .option(ChannelOption.SO_KEEPALIVE, true)
-      .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
-      .channel(channelClass)
-      .handler(new HttpClientInitializer());
-
-    String host = (uri.getHost() == null) ? "127.0.0.1" : uri.getHost();
-
-    // Make the connection attempt.
-    this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
-
-    long start = System.currentTimeMillis();
-    while (!this.channel.isActive() && System.currentTimeMillis() - start < 1000) {
-      LOG.info("channel is not active, waiting for 100 ms");
-      Thread.sleep(100);
-    }
-
-    if (!this.channel.isActive()) {
-      throw new IOException("coult not open and activate channel");
-    }
-  }
-
-  public void send(FullHttpRequest request) throws OcspRequestorException {
-    if (!channel.isActive()) {
-      throw new OcspRequestorException("channel is not active");
-    }
-
-    request.headers().add(HttpHeaderNames.HOST, host);
-
+    OCSPResp ocspResp;
     try {
-      latch.await(5, TimeUnit.SECONDS);
-    } catch (InterruptedException ex) {
-      throw new OcspRequestorException("sending poll is full");
+      ocspResp = new OCSPResp(respBytes);
+    } catch (IOException ex) {
+      throw new OcspRequestorException("could not parse OCSP response", ex);
     }
-    incrementPendingRequests();
-    ChannelFuture future = this.channel.writeAndFlush(request);
-    future.awaitUninterruptibly();
-  }
 
-  @Override
-  public void close() {
-    if (channel != null) {
-      channel = null;
+    Object respObject;
+    try {
+      respObject = ocspResp.getResponseObject();
+    } catch (OCSPException ex) {
+      throw new OcspRequestorException("responseObject is invalid", ex);
     }
-    this.workerGroup.shutdownGracefully();
-  }
 
-  private void incrementPendingRequests() {
-    synchronized (latch) {
-      if (++pendingRequests >= queueSize) {
-        if (latch.getCount() == 0) {
-          latch.countUp();
-        }
-      }
+    if (ocspResp.getStatus() != 0) {
+      throw new OcspRequestorException("bad response: response status is other than OK");
     }
-  }
 
-  private void decrementPendingRequests() {
-    synchronized (latch) {
-      if (--pendingRequests < queueSize) {
-        final int count = (int) latch.getCount();
-        if (count > 0) {
-          while (latch.getCount() != 0) {
-            latch.countDown();
-          }
-        } else if (count < 0) {
-          while (latch.getCount() != 0) {
-            latch.countUp();
-          }
-        }
-      }
+    if (!(respObject instanceof BasicOCSPResp)) {
+      throw new OcspRequestorException("bad response: response is not BasiOCSPResp");
     }
-  }
-
-  private static Class<?> clazz(String clazzName, boolean initialize, ClassLoader clazzLoader)
-      throws ClassNotFoundException {
-    return Class.forName(clazzName, initialize, clazzLoader);
-  }
+  } // method send
 
 }

@@ -124,13 +124,6 @@
     <bundle>mvn:org.xipki.qa.shells/security-speed-pkcs11-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.qa.shells/security-speed-pkcs12-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.qa.shells/ca-client-benchmark-shell/${project.version}</bundle>
-    <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-resolver/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
     <bundle>mvn:org.xipki.qa/ocsp-qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.qa.shells/ocsp-qa-shell/${project.version}</bundle>
   </feature>

@@ -19,10 +19,8 @@ package org.xipki.ocsp.qa.benchmark;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URLEncoder;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,16 +45,7 @@ import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.util.Base64;
 import org.xipki.util.ParamUtil;
-import org.xipki.util.StringUtil;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * TODO.
@@ -84,16 +73,11 @@ class OcspBenchRequestor implements Closeable {
 
   private RequestOptions requestOptions;
 
-  private String responderRawPathPost;
-
-  private String responderRawPathGet;
-
   private HttpClient httpClient;
 
-  public void init(OcspBenchmark responseHandler, String responderUrl, Certificate issuerCert,
-      RequestOptions requestOptions, int queueSize) throws Exception {
+  public void init(String responderUrl, Certificate issuerCert, RequestOptions requestOptions,
+      boolean parseResponse) throws Exception {
     ParamUtil.requireNonNull("issuerCert", issuerCert);
-    ParamUtil.requireNonNull("responseHandler", responseHandler);
     this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
 
     HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
@@ -129,48 +113,17 @@ class OcspBenchRequestor implements Closeable {
       this.extensions = new Extension[]{extn};
     }
 
-    URI uri = new URI(responderUrl);
-    this.responderRawPathPost = uri.getRawPath();
-    if (this.responderRawPathPost.endsWith("/")) {
-      this.responderRawPathGet = this.responderRawPathPost;
-    } else {
-      this.responderRawPathGet = this.responderRawPathPost + "/";
-    }
-    this.httpClient = new HttpClient(uri, responseHandler, queueSize);
-    this.httpClient.start();
+    this.httpClient = new HttpClient(new URL(responderUrl),
+                          requestOptions.isUseHttpGetForRequest(), parseResponse);
   }
 
   @Override
   public void close() {
-    httpClient.close();
   }
 
-  public void ask(BigInteger[] serialNumbers) throws OcspRequestorException {
+  public void ask(BigInteger[] serialNumbers) throws OcspRequestorException, IOException {
     byte[] ocspReq = buildRequest(serialNumbers);
-    int size = ocspReq.length;
-
-    FullHttpRequest request;
-
-    if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
-      String b64Request = Base64.encodeToString(ocspReq);
-      String urlEncodedReq;
-      try {
-        urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
-      } catch (UnsupportedEncodingException ex) {
-        throw new OcspRequestorException(ex.getMessage());
-      }
-      String newRawpath = StringUtil.concat(responderRawPathGet, urlEncodedReq);
-      request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-          HttpMethod.GET, newRawpath);
-    } else {
-      ByteBuf content = Unpooled.wrappedBuffer(ocspReq);
-      request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-          HttpMethod.POST, responderRawPathPost, content);
-      request.headers().addInt("Content-Length", content.readableBytes());
-    }
-    request.headers().add("Content-Type", "application/ocsp-request");
-
-    httpClient.send(request);
+    httpClient.send(ocspReq);
   } // method ask
 
   private byte[] buildRequest(BigInteger[] serialNumbers) throws OcspRequestorException {
