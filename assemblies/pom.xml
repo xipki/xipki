@@ -28,7 +28,7 @@
   <name>XiPKI :: Assemblies</name>
   <packaging>pom</packaging>
   <modules>
-    <module>feature-console</module>
+    <module>features</module>
     <module>xipki-console</module>
     <module>ocsp-war</module>
     <module>ca-war</module>
