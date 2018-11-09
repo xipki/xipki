@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.naming.spi.ObjectFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -246,12 +245,14 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
     synchronized (jaxbUnmarshallerLock) {
       try {
         if (jaxbUnmarshaller == null) {
-          JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+          JAXBContext context = JAXBContext.newInstance(
+              org.xipki.ca.client.benchmark.shell.jaxb.ObjectFactory.class);
           jaxbUnmarshaller = context.createUnmarshaller();
 
           final SchemaFactory schemaFact = SchemaFactory.newInstance(
               javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-          URL url = ObjectFactory.class.getResource("/xsd/benchmark.xsd");
+          URL url = org.xipki.ca.client.benchmark.shell.jaxb.ObjectFactory.class
+                      .getResource("/xsd/benchmark.xsd");
           jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
         }
 
